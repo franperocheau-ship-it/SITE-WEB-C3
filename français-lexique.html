@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lexique — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+
+    /* ── Page shell (mirrors français.html) ──────────────────────────────────── */
+    .page-wrap {
+      background: var(--bg);
+      min-height: calc(100vh - 88px);
+      padding-bottom: 64px;
+    }
+
+    .page-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 64px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 20px 0 0;
+      opacity: 0.75;
+      transition: opacity 180ms;
+    }
+    .back-link:hover { opacity: 1; }
+
+    .page-header {
+      text-align: center;
+      padding: 28px 0 40px;
+    }
+
+    .page-header-icon {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .page-title {
+      font-weight: 900;
+      font-size: 32px;
+      color: var(--blue);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .page-title-rule {
+      width: 44px;
+      height: 3px;
+      background: var(--red);
+      border-radius: 2px;
+      margin: 0 auto 16px;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    /* ── Controls (search + filters) — mirrors Grammaire ────────────────────── */
+    .skill-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      flex: 1;
+      min-width: 220px;
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--muted);
+    }
+
+    .search-input {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 10px 16px 10px 42px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+    .search-input::placeholder { color: var(--muted); }
+    .search-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(16,43,106,0.08);
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .filter-btn {
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 9px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      color: var(--muted);
+      background: var(--card-bg);
+      cursor: pointer;
+      transition: border-color 200ms, color 200ms, background 200ms;
+    }
+    .filter-btn:hover { border-color: var(--blue); color: var(--blue); }
+    .filter-btn.active[data-level="all"] { background: var(--blue);         border-color: var(--blue);         color: #fff; }
+    .filter-btn.active[data-level="CM1"] { background: rgba(16,43,106,0.1); border-color: rgba(16,43,106,0.3); color: var(--blue); }
+    .filter-btn.active[data-level="CM2"] { background: var(--blue);         border-color: var(--blue);         color: #fff; }
+    .filter-btn.active[data-level="6e"]  { background: var(--red);          border-color: var(--red);          color: #fff; }
+
+    /* ── Badge component (identical to Grammaire) ───────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .badge-cm1 { background: rgba(16,43,106,0.09); color: var(--blue); border: 1px solid rgba(16,43,106,0.18); }
+    .badge-cm2 { background: var(--blue);           color: #ffffff; }
+    .badge-6e  { background: var(--red);            color: #ffffff; }
+
+    /* ── Category section ────────────────────────────────────────────────────── */
+    .category-section {
+      margin-bottom: 44px;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .category-emoji {
+      font-size: 22px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .category-title {
+      font-weight: 800;
+      font-size: 17px;
+      color: var(--blue);
+      flex: 1;
+    }
+
+    .category-count {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--blue);
+      background: rgba(16,43,106,0.07);
+      border-radius: 100px;
+      padding: 3px 12px;
+      letter-spacing: 0.02em;
+      flex-shrink: 0;
+    }
+
+    .category-toggle {
+      color: var(--muted);
+      font-size: 13px;
+      transition: transform 250ms ease;
+      flex-shrink: 0;
+    }
+    .category-section.collapsed .category-toggle {
+      transform: rotate(-90deg);
+    }
+
+    .category-divider {
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 20px;
+    }
+
+    .skill-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .category-section.collapsed .skill-grid,
+    .category-section.collapsed .category-divider {
+      display: none;
+    }
+
+    /* ── Skill card ──────────────────────────────────────────────────────────── */
+    .skill-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 18px 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      overflow: hidden;
+      transition: transform 250ms ease, box-shadow 250ms ease;
+      border: 1.5px solid transparent;
+    }
+    .skill-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--border);
+    }
+
+    .skill-card-badges {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .skill-card-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.45;
+      flex: 1;
+    }
+
+    .skill-card-accent {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+    }
+
+    /* ── Empty state ─────────────────────────────────────────────────────────── */
+    .no-results {
+      text-align: center;
+      padding: 56px 0;
+      color: var(--muted);
+      font-size: 15px;
+      display: none;
+    }
+    .no-results.visible { display: block; }
+
+    /* ── Responsive ──────────────────────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .page-content { padding: 0 40px; }
+      .skill-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .page-content { padding: 0 24px; }
+      .skill-controls { flex-direction: column; align-items: stretch; }
+      .filter-row { justify-content: center; }
+      .skill-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    }
+
+    @media (max-width: 480px) {
+      .skill-grid { grid-template-columns: 1fr; }
+      .filter-row { flex-wrap: wrap; justify-content: center; }
+    }
+
+    /* ── Exercise overlay ────────────────────────────────────────────────────── */
+    .ex-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(10, 20, 50, 0.50);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 280ms ease;
+    }
+    .ex-overlay.is-open { opacity: 1; pointer-events: all; }
+
+    .ex-panel {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-img);
+      width: 100%;
+      max-width: 740px;
+      max-height: 88vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(20px);
+      transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .ex-overlay.is-open .ex-panel { transform: translateY(0); }
+
+    /* ── Panel header ─────────────────────────────────────────────────────── */
+    .ex-panel-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 22px 24px 18px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--card-bg);
+      z-index: 1;
+      border-radius: var(--radius-card) var(--radius-card) 0 0;
+    }
+
+    .ex-close-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: border-color 180ms, color 180ms, background 180ms;
+    }
+    .ex-close-btn:hover { border-color: var(--blue); color: var(--blue); background: rgba(16,43,106,0.04); }
+
+    .ex-skill-info { flex: 1; }
+
+    .ex-skill-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 6px; }
+
+    .ex-skill-title {
+      font-weight: 800;
+      font-size: 17px;
+      color: var(--blue);
+      line-height: 1.3;
+    }
+
+    /* ── Segmented toggle ─────────────────────────────────────────────────── */
+    .ex-type-toggle-wrap { padding: 18px 24px 2px; }
+
+    .ex-type-toggle {
+      display: inline-flex;
+      background: rgba(16,43,106,0.06);
+      border-radius: 100px;
+      padding: 3px;
+    }
+
+    .ex-type-btn {
+      border: none;
+      background: transparent;
+      border-radius: 100px;
+      padding: 8px 22px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 220ms ease, color 220ms ease, box-shadow 220ms ease;
+    }
+    .ex-type-btn.active {
+      background: var(--card-bg);
+      color: var(--blue);
+      box-shadow: 0 2px 8px rgba(16,43,106,0.12);
+    }
+
+    /* ── Exercise list ────────────────────────────────────────────────────── */
+    .ex-list {
+      padding: 16px 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .ex-item {
+      background: var(--bg);
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+
+    .ex-item-num {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    /* Fill-blank */
+    .ex-sentence { font-size: 15px; line-height: 1.75; color: var(--text); }
+
+    .ex-blank {
+      display: inline-block;
+      min-width: 90px;
+      border: none;
+      border-bottom: 2px solid var(--blue);
+      padding: 0 4px 1px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--blue);
+      background: transparent;
+      outline: none;
+      vertical-align: baseline;
+      transition: border-color 180ms;
+    }
+    .ex-blank:focus { border-color: var(--red); }
+
+    .ex-hint { margin-top: 10px; font-size: 12px; color: var(--muted); font-style: italic; }
+
+    /* MCQ */
+    .ex-question { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 14px; line-height: 1.5; }
+
+    .ex-choices { display: flex; flex-direction: column; gap: 8px; }
+
+    .ex-choice {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      text-align: left;
+      transition: border-color 180ms, background 180ms;
+    }
+    .ex-choice:hover:not(.correct):not(.incorrect) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.03);
+    }
+
+    .ex-choice-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      transition: border-color 180ms, background 180ms;
+    }
+    .ex-choice:hover:not(.correct):not(.incorrect) .ex-choice-dot { border-color: var(--blue); }
+
+    .ex-choice.correct  { border-color: #16a34a; background: rgba(22,163,74,0.07);  cursor: default; }
+    .ex-choice.incorrect{ border-color: var(--red); background: rgba(214,40,57,0.07); cursor: default; }
+    .ex-choice.correct  .ex-choice-dot { background: #16a34a; border-color: #16a34a; }
+    .ex-choice.incorrect .ex-choice-dot { background: var(--red); border-color: var(--red); }
+
+    /* ── Responsive: panel ────────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .ex-overlay { padding: 0; align-items: flex-end; }
+      .ex-panel {
+        max-width: 100%;
+        max-height: 92vh;
+        border-radius: var(--radius-card) var(--radius-card) 0 0;
+        transform: translateY(100%);
+      }
+      .ex-overlay.is-open .ex-panel { transform: translateY(0); }
+      .ex-type-btn { padding: 8px 14px; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════ -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <img src="assets/lfm-logo.svg" alt="Lycée Français de Madrid" class="header-logo">
+        <div class="header-text">
+          <span class="header-name">LYCÉE FRANÇAIS DE MADRID</span>
+          <span class="header-sub">Ressources numériques pour le cycle 3</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="lang-badge">FR</span>
+        <button class="menu-btn" aria-label="Ouvrir le menu">
+          <span class="mbar mbar-top"></span>
+          <span class="mbar mbar-mid"></span>
+          <span class="mbar mbar-bot"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════
+       MAIN
+  ═══════════════════════════════════════════ -->
+  <div class="page-wrap">
+    <div class="page-content">
+
+      <a href="français.html" class="back-link">← Français</a>
+
+      <div class="page-header">
+        <div class="page-header-icon">
+          <svg width="56" height="56" viewBox="0 0 64 64" fill="none">
+            <rect x="15" y="10" width="34" height="44" rx="4" stroke="#102B6A" stroke-width="2.5"/>
+            <rect x="15" y="10" width="7" height="44" rx="3" fill="#D62839" opacity="0.85"/>
+            <line x1="27" y1="23" x2="43" y2="23" stroke="#102B6A" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="27" y1="31" x2="43" y2="31" stroke="#102B6A" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="27" y1="39" x2="37" y2="39" stroke="#102B6A" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h1 class="page-title">Lexique</h1>
+        <div class="page-title-rule"></div>
+        <p class="page-subtitle">Choisis une notion à travailler.</p>
+      </div>
+
+      <!-- Controls -->
+      <div class="skill-controls">
+        <div class="search-wrap">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 20 20" fill="none">
+            <circle cx="9" cy="9" r="6" stroke="#5F6368" stroke-width="1.8"/>
+            <path d="M13.5 13.5L17 17" stroke="#5F6368" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <input
+            type="search"
+            id="searchInput"
+            class="search-input"
+            placeholder="Rechercher une notion..."
+            autocomplete="off"
+            spellcheck="false"
+          >
+        </div>
+        <div class="filter-row" role="group" aria-label="Filtrer par niveau">
+          <button class="filter-btn active" data-level="all">Tous</button>
+          <button class="filter-btn" data-level="CM1">CM1</button>
+          <button class="filter-btn" data-level="CM2">CM2</button>
+          <button class="filter-btn" data-level="6e">6e</button>
+        </div>
+      </div>
+
+      <div class="no-results" id="noResults">Aucune notion ne correspond à votre recherche.</div>
+
+      <!-- ═══════════════════════════════════════
+           SECTION 1 — Comprendre les mots
+      ═══════════════════════════════════════ -->
+      <section class="category-section" data-category="comprendre-mots">
+        <div class="category-header" role="button" tabindex="0" aria-expanded="true">
+          <span class="category-emoji">📚</span>
+          <h2 class="category-title">Comprendre les mots</h2>
+          <span class="category-count" id="count-comprendre-mots">7 notions</span>
+          <span class="category-toggle">▾</span>
+        </div>
+        <div class="category-divider"></div>
+        <div class="skill-grid">
+
+          <a class="skill-card" href="#ordre-alphabetique" data-levels="CM1,CM2,6e" data-slug="ordre-alphabetique">
+            <div class="skill-card-badges">
+              <span class="badge badge-cm1">CM1</span>
+              <span class="badge badge-cm2">CM2</span>
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Utiliser l'ordre alphabétique</div>
+            <div class="skill-card-accent" style="background:var(--blue)"></div>
+          </a>
+
+          <a class="skill-card" href="#utiliser-dictionnaire" data-levels="CM1,CM2,6e" data-slug="utiliser-dictionnaire">
+            <div class="skill-card-badges">
+              <span class="badge badge-cm1">CM1</span>
+              <span class="badge badge-cm2">CM2</span>
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Utiliser le dictionnaire</div>
+            <div class="skill-card-accent" style="background:var(--blue)"></div>
+          </a>
+
+          <a class="skill-card" href="#trouver-synonyme" data-levels="CM1,CM2,6e" data-slug="trouver-synonyme">
+            <div class="skill-card-badges">
+              <span class="badge badge-cm1">CM1</span>
+              <span class="badge badge-cm2">CM2</span>
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Trouver un synonyme</div>
+            <div class="skill-card-accent" style="background:var(--blue)"></div>
+          </a>
+
+          <a class="skill-card" href="#trouver-antonyme" data-levels="CM1,CM2,6e" data-slug="trouver-antonyme">
+            <div class="skill-card-badges">
+              <span class="badge badge-cm1">CM1</span>
+              <span class="badge badge-cm2">CM2</span>
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Trouver un antonyme</div>
+            <div class="skill-card-accent" style="background:var(--blue)"></div>
+          </a>
+
+          <a class="skill-card" href="#identifier-homonyme" data-levels="CM2,6e" data-slug="identifier-homonyme">
+            <div class="skill-card-badges">
+              <span class="badge badge-cm2">CM2</span>
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Identifier un homonyme</div>
+            <div class="skill-card-accent" style="background:var(--blue)"></div>
+          </a>
+
+          <a class="skill-card" href="#polysemie" data-levels="CM2,6e" data-slug="polysemie">
+            <div class="skill-card-badges">
+              <span class="badge badge-cm2">CM2</span>
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Comprendre la polysémie d'un mot</div>
+            <div class="skill-card-accent" style="background:var(--blue)"></div>
+          </a>
+
+          <a class="skill-card" href="#sens-propre-figure" data-levels="CM2,6e" data-slug="sens-propre-figure">
+            <div class="skill-card-badges">
+              <span class="badge badge-cm2">CM2</span>
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Identifier le sens propre et le sens figuré</div>
+            <div class="skill-card-accent" style="background:var(--blue)"></div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════
+           SECTION 2 — Construire les mots
+      ═══════════════════════════════════════ -->
+      <section class="category-section" data-category="construire-mots">
+        <div class="category-header" role="button" tabindex="0" aria-expanded="true">
+          <span class="category-emoji">🏗️</span>
+          <h2 class="category-title">Construire les mots</h2>
+          <span class="category-count" id="count-construire-mots">6 notions</span>
+          <span class="category-toggle">▾</span>
+        </div>
+        <div class="category-divider"></div>
+        <div class="skill-grid">
+
+          <a class="skill-card" href="#famille-de-mots" data-levels="CM1,CM2,6e" data-slug="famille-de-mots">
+            <div class="skill-card-badges">
+              <span class="badge badge-cm1">CM1</span>
+              <span class="badge badge-cm2">CM2</span>
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Identifier une famille de mots</div>
+            <div class="skill-card-accent" style="background:var(--blue)"></div>
+          </a>
+
+          <a class="skill-card" href="#identifier-radical" data-levels="CM2,6e" data-slug="identifier-radical">
+            <div class="skill-card-badges">
+              <span class="badge badge-cm2">CM2</span>
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Identifier le radical d'un mot</div>
+            <div class="skill-card-accent" style="background:var(--blue)"></div>
+          </a>
+
+          <a class="skill-card" href="#identifier-prefixe" data-levels="CM2,6e" data-slug="identifier-prefixe">
+            <div class="skill-card-badges">
+              <span class="badge badge-cm2">CM2</span>
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Identifier un préfixe</div>
+            <div class="skill-card-accent" style="background:var(--blue)"></div>
+          </a>
+
+          <a class="skill-card" href="#identifier-suffixe" data-levels="CM2,6e" data-slug="identifier-suffixe">
+            <div class="skill-card-badges">
+              <span class="badge badge-cm2">CM2</span>
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Identifier un suffixe</div>
+            <div class="skill-card-accent" style="background:var(--blue)"></div>
+          </a>
+
+          <a class="skill-card" href="#mot-derive" data-levels="CM2,6e" data-slug="mot-derive">
+            <div class="skill-card-badges">
+              <span class="badge badge-cm2">CM2</span>
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Former un mot dérivé</div>
+            <div class="skill-card-accent" style="background:var(--blue)"></div>
+          </a>
+
+          <a class="skill-card" href="#origine-mots" data-levels="6e" data-slug="origine-mots">
+            <div class="skill-card-badges">
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Comprendre l'origine de certains mots (latin, grec)</div>
+            <div class="skill-card-accent" style="background:var(--red)"></div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════
+           SECTION 3 — Relations entre les mots
+      ═══════════════════════════════════════ -->
+      <section class="category-section" data-category="relations-mots">
+        <div class="category-header" role="button" tabindex="0" aria-expanded="true">
+          <span class="category-emoji">🔗</span>
+          <h2 class="category-title">Relations entre les mots</h2>
+          <span class="category-count" id="count-relations-mots">4 notions</span>
+          <span class="category-toggle">▾</span>
+        </div>
+        <div class="category-divider"></div>
+        <div class="skill-grid">
+
+          <a class="skill-card" href="#regrouper-par-theme" data-levels="CM1,CM2,6e" data-slug="regrouper-par-theme">
+            <div class="skill-card-badges">
+              <span class="badge badge-cm1">CM1</span>
+              <span class="badge badge-cm2">CM2</span>
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Regrouper des mots par thème</div>
+            <div class="skill-card-accent" style="background:var(--blue)"></div>
+          </a>
+
+          <a class="skill-card" href="#champ-lexical" data-levels="CM2,6e" data-slug="champ-lexical">
+            <div class="skill-card-badges">
+              <span class="badge badge-cm2">CM2</span>
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Identifier un champ lexical</div>
+            <div class="skill-card-accent" style="background:var(--blue)"></div>
+          </a>
+
+          <a class="skill-card" href="#mot-adapte-contexte" data-levels="CM2,6e" data-slug="mot-adapte-contexte">
+            <div class="skill-card-badges">
+              <span class="badge badge-cm2">CM2</span>
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Choisir le mot adapté au contexte</div>
+            <div class="skill-card-accent" style="background:var(--blue)"></div>
+          </a>
+
+          <a class="skill-card" href="#niveaux-de-langue" data-levels="6e" data-slug="niveaux-de-langue">
+            <div class="skill-card-badges">
+              <span class="badge badge-6e">6e</span>
+            </div>
+            <div class="skill-card-title">Distinguer les niveaux de langue</div>
+            <div class="skill-card-accent" style="background:var(--red)"></div>
+          </a>
+
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-rule"></div>
+        <div class="footer-body">
+          <p class="footer-text">
+            Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,<br>
+            dans le respect d'un <strong class="footer-em">usage mesuré</strong> des écrans.
+          </p>
+        </div>
+        <p class="footer-credit">© François PEROCHEAU — LFM 2026</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════
+       EXERCISE PANEL OVERLAY
+  ═══════════════════════════════════════════ -->
+  <div id="exerciseOverlay" class="ex-overlay" aria-hidden="true">
+    <div id="exercisePanel" class="ex-panel" role="dialog" aria-modal="true" aria-label="Exercices">
+
+      <div class="ex-panel-header">
+        <button class="ex-close-btn" id="exerciseCloseBtn" aria-label="Fermer">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div class="ex-skill-info">
+          <div class="ex-skill-badges" id="exerciseSkillBadges"></div>
+          <div class="ex-skill-title" id="exerciseSkillTitle"></div>
+        </div>
+      </div>
+
+      <div class="ex-type-toggle-wrap">
+        <div class="ex-type-toggle" role="group" aria-label="Type d'exercice">
+          <button class="ex-type-btn active" data-type="fillBlank">Texte à trous</button>
+          <button class="ex-type-btn" data-type="mcq">QCM</button>
+        </div>
+      </div>
+
+      <div class="ex-list" id="exerciseList"></div>
+
+    </div>
+  </div>
+
+  <script>
+    /* ════════════════════════════════════════════════════════════════════════
+       SKILL DATA  —  single source of truth
+       Each skill contains title, slug, levels, category, and exercises.
+       The exercises object is consumed by ExercisePanel and is fully reusable
+       across Grammaire, Orthographe, Conjugaison, Mathématiques.
+    ════════════════════════════════════════════════════════════════════════ */
+    const SKILLS = [
+
+      /* ── Comprendre les mots ─────────────────────────────────────────────── */
+      {
+        title: "Utiliser l'ordre alphabétique", slug: "ordre-alphabetique",
+        levels: ["CM1","CM2","6e"], category: "comprendre-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "Dans un dictionnaire, les mots sont rangés dans l'ordre ____.", answer: "alphabétique", hint: "Indice : de A à Z" },
+            { sentence: "La lettre B vient ____ la lettre D dans l'alphabet.", answer: "avant", hint: "Indice : B est en 2e position, D en 4e" },
+            { sentence: "Pour trouver 'zèbre', on se rend vers la ____ du dictionnaire.", answer: "fin", hint: "Indice : Z est la dernière lettre de l'alphabet" }
+          ],
+          mcq: [
+            { question: "Quel groupe de mots est classé dans l'ordre alphabétique ?", choices: ["lune, arbre, mer, vent", "arbre, lune, mer, vent", "mer, arbre, vent, lune", "vent, lune, arbre, mer"], answer: "arbre, lune, mer, vent" },
+            { question: "Quel mot vient en premier dans le dictionnaire ?", choices: ["tigre", "renard", "aigle", "zèbre"], answer: "aigle" },
+            { question: "Pour classer 'chat' et 'chien', quelle lettre compare-t-on en premier ?", choices: ["la 1re lettre", "la 2e lettre", "la 3e lettre", "la 4e lettre"], answer: "la 3e lettre" }
+          ]
+        }
+      },
+
+      {
+        title: "Utiliser le dictionnaire", slug: "utiliser-dictionnaire",
+        levels: ["CM1","CM2","6e"], category: "comprendre-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "Le dictionnaire donne la ____ des mots.", answer: "définition", hint: "Indice : ce que le mot signifie" },
+            { sentence: "On cherche un verbe dans le dictionnaire à son ____.", answer: "infinitif", hint: "Indice : la forme de base du verbe" },
+            { sentence: "Les mots repères en haut des pages permettent de se ____ dans le dictionnaire.", answer: "repérer", hint: "Indice : savoir où on en est" }
+          ],
+          mcq: [
+            { question: "À quoi sert un dictionnaire ?", choices: ["Faire des calculs", "Connaître la définition d'un mot", "Apprendre l'histoire", "Conjuguer uniquement"], answer: "Connaître la définition d'un mot" },
+            { question: "Sous quelle forme cherche-t-on un verbe dans le dictionnaire ?", choices: ["Au présent", "Au passé composé", "À l'infinitif", "Au futur"], answer: "À l'infinitif" },
+            { question: "Que trouve-t-on souvent après la définition dans le dictionnaire ?", choices: ["Un dessin obligatoire", "Tous les synonymes possibles", "Un exemple d'utilisation", "La traduction en anglais"], answer: "Un exemple d'utilisation" }
+          ]
+        }
+      },
+
+      {
+        title: "Trouver un synonyme", slug: "trouver-synonyme",
+        levels: ["CM1","CM2","6e"], category: "comprendre-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "Le chevalier est très ____.", answer: "courageux", hint: "Indice : synonyme de 'brave'" },
+            { sentence: "Cette histoire est vraiment ____.", answer: "amusante", hint: "Indice : synonyme de 'drôle'" },
+            { sentence: "Le désert est une région très ____.", answer: "aride", hint: "Indice : synonyme de 'sec'" }
+          ],
+          mcq: [
+            { question: "Quel est le synonyme de 'rapide' ?", choices: ["lent", "vif", "calme", "faible"], answer: "vif" },
+            { question: "Quel est le synonyme de 'content' ?", choices: ["triste", "heureux", "fâché", "inquiet"], answer: "heureux" },
+            { question: "Quel est le synonyme de 'débuter' ?", choices: ["terminer", "arrêter", "commencer", "casser"], answer: "commencer" }
+          ]
+        }
+      },
+
+      {
+        title: "Trouver un antonyme", slug: "trouver-antonyme",
+        levels: ["CM1","CM2","6e"], category: "comprendre-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "L'antonyme de 'jour' est ____.", answer: "nuit", hint: "Indice : le contraire de jour" },
+            { sentence: "L'antonyme de 'chaud' est ____.", answer: "froid", hint: "Indice : ce qu'on ressent en hiver" },
+            { sentence: "L'antonyme de 'monter' est ____.", answer: "descendre", hint: "Indice : aller vers le bas" }
+          ],
+          mcq: [
+            { question: "Quel est l'antonyme de 'grand' ?", choices: ["gros", "fort", "petit", "haut"], answer: "petit" },
+            { question: "Quel est l'antonyme de 'gentil' ?", choices: ["sage", "méchant", "poli", "calme"], answer: "méchant" },
+            { question: "Quel est l'antonyme de 'commencer' ?", choices: ["débuter", "continuer", "terminer", "avancer"], answer: "terminer" }
+          ]
+        }
+      },
+
+      {
+        title: "Identifier un homonyme", slug: "identifier-homonyme",
+        levels: ["CM2","6e"], category: "comprendre-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "'Vert' (couleur) et 'verre' (pour boire) sont des ____.", answer: "homonymes", hint: "Indice : ils se prononcent de la même façon" },
+            { sentence: "Les homonymes se prononcent de façon ____ mais ont des sens différents.", answer: "identique", hint: "Indice : pareil, semblable" },
+            { sentence: "Le mot '____ ' peut désigner un métal précieux ou marquer une opposition.", answer: "or", hint: "Indice : métal jaune précieux, et aussi un mot de liaison" }
+          ],
+          mcq: [
+            { question: "Lesquels sont des homonymes ?", choices: ["soleil / lune", "mère / mer", "maison / jardin", "chat / chien"], answer: "mère / mer" },
+            { question: "Que partagent deux homonymes ?", choices: ["La même écriture", "La même prononciation", "Le même sens", "La même longueur"], answer: "La même prononciation" },
+            { question: "Quel mot est un homonyme de 'sot' (stupide) ?", choices: ["sort", "seau", "sol", "sous"], answer: "seau" }
+          ]
+        }
+      },
+
+      {
+        title: "Comprendre la polysémie d'un mot", slug: "polysemie",
+        levels: ["CM2","6e"], category: "comprendre-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "Un mot qui a plusieurs sens différents est un mot ____.", answer: "polysémique", hint: "Indice : du grec 'poly' (plusieurs) et 'sema' (signe)" },
+            { sentence: "Le mot 'voler' peut signifier se déplacer dans les airs ou ____ un objet.", answer: "dérober", hint: "Indice : prendre ce qui ne nous appartient pas" },
+            { sentence: "Pour trouver le bon sens d'un mot polysémique, on s'aide du ____.", answer: "contexte", hint: "Indice : les mots qui entourent le mot" }
+          ],
+          mcq: [
+            { question: "Quel est un exemple de mot polysémique ?", choices: ["stylo (un seul sens)", "voler (se déplacer ou dérober)", "rouge (une couleur)", "arbre (un seul sens)"], answer: "voler (se déplacer ou dérober)" },
+            { question: "Que signifie 'polysémique' ?", choices: ["Qui a un seul sens", "Qui a plusieurs sens", "Qui vient du grec", "Qui est rare"], answer: "Qui a plusieurs sens" },
+            { question: "Dans 'Le feu est rouge', que signifie 'feu' ?", choices: ["Un incendie", "Un signal de circulation", "De la chaleur", "Une bougie"], answer: "Un signal de circulation" }
+          ]
+        }
+      },
+
+      {
+        title: "Identifier le sens propre et le sens figuré", slug: "sens-propre-figure",
+        levels: ["CM2","6e"], category: "comprendre-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "Quand on dit 'Le chat monte dans l'arbre', 'monter' est au sens ____.", answer: "propre", hint: "Indice : le sens concret et littéral" },
+            { sentence: "'Avoir le cafard' signifie être triste : c'est le sens ____.", answer: "figuré", hint: "Indice : le sens imagé, non littéral" },
+            { sentence: "Le sens ____ d'un mot est son sens courant et le plus concret.", answer: "propre", hint: "Indice : direct, non imagé" }
+          ],
+          mcq: [
+            { question: "Dans 'Il a un coeur de pierre', le mot 'pierre' est au :", choices: ["sens propre", "sens figuré", "sens alphabétique", "sens contraire"], answer: "sens figuré" },
+            { question: "Dans 'La rivière coule vite', 'couler' est au :", choices: ["sens figuré", "sens contraire", "sens propre", "sens polysémique"], answer: "sens propre" },
+            { question: "Quelle phrase utilise 'lourd' au sens figuré ?", choices: ["Ce sac est très lourd.", "La pierre est lourde.", "Cette nouvelle est lourde à porter.", "Le cartable est lourd."], answer: "Cette nouvelle est lourde à porter." }
+          ]
+        }
+      },
+
+      /* ── Construire les mots ──────────────────────────────────────────────── */
+      {
+        title: "Identifier une famille de mots", slug: "famille-de-mots",
+        levels: ["CM1","CM2","6e"], category: "construire-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "'Jardiner', 'jardinier' et 'jardinage' forment une ____ de mots.", answer: "famille", hint: "Indice : ils partagent la même racine" },
+            { sentence: "Les mots d'une même famille ont tous le même ____.", answer: "radical", hint: "Indice : la partie commune à tous ces mots" },
+            { sentence: "'Chanter', 'chanteur' et 'chanson' forment une ____ de mots.", answer: "famille", hint: "Indice : ils partagent le radical 'chant'" }
+          ],
+          mcq: [
+            { question: "Quel mot n'appartient pas à la famille de 'fleur' ?", choices: ["fleurir", "fleuriste", "fleuve", "floraison"], answer: "fleuve" },
+            { question: "Quel groupe forme une famille de mots ?", choices: ["maison / mais / mason", "pêche / pêcheur / pêcher", "livre / libre / livrer", "terre / terreur / tierce"], answer: "pêche / pêcheur / pêcher" },
+            { question: "Quel est le radical commun à 'porter', 'porteur' et 'portable' ?", choices: ["port", "por", "portabl", "porte"], answer: "port" }
+          ]
+        }
+      },
+
+      {
+        title: "Identifier le radical d'un mot", slug: "identifier-radical",
+        levels: ["CM2","6e"], category: "construire-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "Dans le mot 'chanteur', le radical est ____.", answer: "chant", hint: "Indice : la partie qui porte le sens principal" },
+            { sentence: "Le radical du mot 'jardinage' est ____.", answer: "jardin", hint: "Indice : sans le suffixe -age" },
+            { sentence: "Dans 'pêcheur' et 'pêche', le radical commun est ____.", answer: "pêch", hint: "Indice : la partie partagée par les deux mots" }
+          ],
+          mcq: [
+            { question: "Quel est le radical du mot 'chanteur' ?", choices: ["chant", "-eur", "chan", "chante"], answer: "chant" },
+            { question: "Quel est le radical commun à 'marcher', 'marcheur' et 'marche' ?", choices: ["march", "marche", "mar", "marcher"], answer: "march" },
+            { question: "Quel est le radical du mot 'danseur' ?", choices: ["dans", "-eur", "danse", "danser"], answer: "dans" }
+          ]
+        }
+      },
+
+      {
+        title: "Identifier un préfixe", slug: "identifier-prefixe",
+        levels: ["CM2","6e"], category: "construire-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "Dans le mot 'déplacer', 'dé-' est un ____.", answer: "préfixe", hint: "Indice : il se place avant le radical" },
+            { sentence: "Le préfixe 'im-' dans 'impossible' signifie ____.", answer: "non", hint: "Indice : il exprime le contraire" },
+            { sentence: "Dans 'revenir', le préfixe 're-' indique qu'on fait l'action ____.", answer: "à nouveau", hint: "Indice : une deuxième fois" }
+          ],
+          mcq: [
+            { question: "Quel est le préfixe dans 'antiviolence' ?", choices: ["anti-", "viol", "violence", "-ence"], answer: "anti-" },
+            { question: "Que signifie le préfixe 'pré-' dans 'prévoir' ?", choices: ["après", "avant", "contre", "sans"], answer: "avant" },
+            { question: "Quel mot contient un préfixe ?", choices: ["maison", "soleil", "désordre", "jardin"], answer: "désordre" }
+          ]
+        }
+      },
+
+      {
+        title: "Identifier un suffixe", slug: "identifier-suffixe",
+        levels: ["CM2","6e"], category: "construire-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "Dans le mot 'chanteur', '-eur' est le ____.", answer: "suffixe", hint: "Indice : il se place après le radical" },
+            { sentence: "Le suffixe '-ette' dans 'maisonnette' indique que la maison est ____.", answer: "petite", hint: "Indice : -ette marque la petite taille" },
+            { sentence: "Dans 'rapidement', le suffixe '-ment' transforme l'adjectif en ____.", answer: "adverbe", hint: "Indice : il précise comment se déroule l'action" }
+          ],
+          mcq: [
+            { question: "Quel est le suffixe dans 'jardinage' ?", choices: ["jardin-", "-age", "-inage", "jar-"], answer: "-age" },
+            { question: "Que signifie le suffixe '-eur' dans 'plongeur' ?", choices: ["Celui qui fait l'action", "Avant", "Encore", "Sans"], answer: "Celui qui fait l'action" },
+            { question: "Quel mot contient un suffixe signifiant 'petite taille' ?", choices: ["maison", "jardin", "maisonnette", "soleil"], answer: "maisonnette" }
+          ]
+        }
+      },
+
+      {
+        title: "Former un mot dérivé", slug: "mot-derive",
+        levels: ["CM2","6e"], category: "construire-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "En ajoutant le suffixe '-eur' à 'chanter', on forme le mot ____.", answer: "chanteur", hint: "Indice : celui qui chante" },
+            { sentence: "Le mot 'impoli' est formé en ajoutant le préfixe 'im-' au mot ____.", answer: "poli", hint: "Indice : le mot de base, sans le préfixe" },
+            { sentence: "Un mot formé à partir d'un radical auquel on ajoute des affixes est un mot ____.", answer: "dérivé", hint: "Indice : il dérive du mot d'origine" }
+          ],
+          mcq: [
+            { question: "Quel mot est dérivé de 'fleur' ?", choices: ["fleuve", "flûte", "fleurir", "flour"], answer: "fleurir" },
+            { question: "Comment est formé le mot 'malheureux' ?", choices: ["préfixe mal- + heureux", "heureux + suffixe -mal", "radical mal + eux", "sans dérivation"], answer: "préfixe mal- + heureux" },
+            { question: "Quel mot est dérivé de 'pêche' avec un suffixe ?", choices: ["repêcher", "dépêcher", "empêcher", "pêcheur"], answer: "pêcheur" }
+          ]
+        }
+      },
+
+      {
+        title: "Comprendre l'origine de certains mots (latin, grec)", slug: "origine-mots",
+        levels: ["6e"], category: "construire-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "Le mot 'aquarium' vient du latin '____ ' qui signifie 'eau'.", answer: "aqua", hint: "Indice : on retrouve cette racine dans 'aquatique'" },
+            { sentence: "La racine grecque 'tele-' signifie 'loin' et se retrouve dans le mot ____.", answer: "téléphone", hint: "Indice : appareil pour communiquer à distance" },
+            { sentence: "Le mot 'bibliothèque' vient du grec '____ ' (livre) et 'theke' (rangement).", answer: "biblio", hint: "Indice : on la retrouve dans 'bibliographie'" }
+          ],
+          mcq: [
+            { question: "Que signifie la racine latine 'terra' ?", choices: ["eau", "feu", "terre", "air"], answer: "terre" },
+            { question: "Quelle racine grecque signifie 'vie' ?", choices: ["geo", "bio", "photo", "logo"], answer: "bio" },
+            { question: "Le mot 'philosophie' vient du grec 'philos' (ami) et 'sophia' qui signifie :", choices: ["vie", "sagesse", "lumière", "nature"], answer: "sagesse" }
+          ]
+        }
+      },
+
+      /* ── Relations entre les mots ─────────────────────────────────────────── */
+      {
+        title: "Regrouper des mots par thème", slug: "regrouper-par-theme",
+        levels: ["CM1","CM2","6e"], category: "relations-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "Les mots 'chien', 'chat', 'lapin' appartiennent au thème des animaux de ____.", answer: "compagnie", hint: "Indice : on les garde chez soi" },
+            { sentence: "Pour regrouper des mots par thème, on cherche ce qu'ils ont en ____.", answer: "commun", hint: "Indice : ce qui les réunit tous" },
+            { sentence: "Les mots 'couteau', 'fourchette' et 'cuillère' appartiennent au thème des ____.", answer: "couverts", hint: "Indice : on les utilise pour manger" }
+          ],
+          mcq: [
+            { question: "Quel mot n'appartient pas au thème de la nature ?", choices: ["forêt", "rivière", "calculatrice", "montagne"], answer: "calculatrice" },
+            { question: "Quel groupe appartient au thème des sports ?", choices: ["marteau, scie, clou", "natation, tennis, football", "cahier, stylo, règle", "four, casserole, assiette"], answer: "natation, tennis, football" },
+            { question: "Quel thème réunit 'robe', 'pantalon', 'manteau' et 'chapeau' ?", choices: ["La maison", "Les vêtements", "Les aliments", "Les couleurs"], answer: "Les vêtements" }
+          ]
+        }
+      },
+
+      {
+        title: "Identifier un champ lexical", slug: "champ-lexical",
+        levels: ["CM2","6e"], category: "relations-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "L'ensemble des mots liés à un même thème forme un ____ lexical.", answer: "champ", hint: "Indice : on parle du champ lexical de la mer, de la peur…" },
+            { sentence: "'Houle', 'vague', 'marée' et 'écume' appartiennent au champ lexical de la ____.", answer: "mer", hint: "Indice : grande étendue d'eau salée" },
+            { sentence: "Le champ lexical de la peur comprend des mots comme 'effroi', 'terreur' et ____.", answer: "angoisse", hint: "Indice : un autre mot pour désigner la peur intense" }
+          ],
+          mcq: [
+            { question: "Quel mot appartient au champ lexical de la guerre ?", choices: ["fleur", "bataille", "cuisine", "musique"], answer: "bataille" },
+            { question: "Quel groupe forme un champ lexical de l'école ?", choices: ["stylo, cahier, tableau, maître", "four, casserole, couteau, plat", "ballon, piscine, stade, arbitre", "montagne, forêt, rivière, prairie"], answer: "stylo, cahier, tableau, maître" },
+            { question: "À quel champ lexical appartient le mot 'diagnostic' ?", choices: ["L'architecture", "La médecine", "L'agriculture", "La musique"], answer: "La médecine" }
+          ]
+        }
+      },
+
+      {
+        title: "Choisir le mot adapté au contexte", slug: "mot-adapte-contexte",
+        levels: ["CM2","6e"], category: "relations-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "Choisir le bon mot selon la situation, c'est choisir le mot ____ au contexte.", answer: "adapté", hint: "Indice : le mot qui convient le mieux" },
+            { sentence: "Dans un texte scientifique, on préférera le mot 'substance' plutôt que le mot ____.", answer: "truc", hint: "Indice : un mot familier et imprécis" },
+            { sentence: "Pour bien choisir un mot, on tient compte du ____ de la phrase.", answer: "contexte", hint: "Indice : les mots et phrases qui entourent" }
+          ],
+          mcq: [
+            { question: "Quelle phrase utilise le mot le plus adapté pour parler d'un bébé ?", choices: ["Le bébé brailla toute la nuit.", "Le bébé vociféra toute la nuit.", "Le bébé pleura toute la nuit.", "Le bébé tempêta toute la nuit."], answer: "Le bébé pleura toute la nuit." },
+            { question: "Quel mot est le plus adapté pour décrire la démarche d'un éléphant ?", choices: ["sautiller", "danser", "voltiger", "avancer lourdement"], answer: "avancer lourdement" },
+            { question: "Dans un texte scientifique, quel mot choisiriez-vous ?", choices: ["truc", "machin", "substance", "bidule"], answer: "substance" }
+          ]
+        }
+      },
+
+      {
+        title: "Distinguer les niveaux de langue", slug: "niveaux-de-langue",
+        levels: ["6e"], category: "relations-mots",
+        exercises: {
+          fillBlank: [
+            { sentence: "Il existe trois niveaux de langue : soutenu, courant et ____.", answer: "familier", hint: "Indice : le niveau utilisé avec ses amis proches" },
+            { sentence: "Dire 'Je n'ai pas vu ce film' correspond au niveau de langue ____.", answer: "courant", hint: "Indice : le niveau standard de la vie quotidienne" },
+            { sentence: "Dans une lettre officielle, on utilise le niveau de langue ____.", answer: "soutenu", hint: "Indice : le niveau le plus formel" }
+          ],
+          mcq: [
+            { question: "Quelle phrase est au niveau de langue soutenu ?", choices: ["J'ai pas faim.", "Je n'ai pas faim.", "Je ne suis point affamé.", "J'ai zéro faim."], answer: "Je ne suis point affamé." },
+            { question: "À quel niveau de langue appartient 'C'est un bouquin super' ?", choices: ["Soutenu", "Courant", "Familier", "Scientifique"], answer: "Familier" },
+            { question: "Avec quel niveau de langue parle-t-on à un directeur d'école ?", choices: ["Familier", "Courant ou soutenu", "Argotique", "Populaire"], answer: "Courant ou soutenu" }
+          ]
+        }
+      }
+
+    ]; // end SKILLS
+
+    /* ════════════════════════════════════════════════════════════════════════
+       UTILITIES
+    ════════════════════════════════════════════════════════════════════════ */
+
+    function shuffle(array) {
+      const a = [...array];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function htmlEsc(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function badgesHTML(levels) {
+      return levels.map(lvl => {
+        const cls = lvl === 'CM1' ? 'badge-cm1' : lvl === 'CM2' ? 'badge-cm2' : 'badge-6e';
+        return `<span class="badge ${cls}">${lvl}</span>`;
+      }).join('');
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       EXERCISE PANEL
+       Generic and reusable — only the SKILLS data changes per subject.
+    ════════════════════════════════════════════════════════════════════════ */
+    const ExercisePanel = {
+      overlay: null,
+      panel:   null,
+      currentSkill: null,
+      currentType:  'fillBlank',
+
+      init() {
+        this.overlay = document.getElementById('exerciseOverlay');
+        this.panel   = document.getElementById('exercisePanel');
+
+        document.getElementById('exerciseCloseBtn')
+          .addEventListener('click', () => this.close());
+
+        this.overlay.addEventListener('click', e => {
+          if (e.target === this.overlay) this.close();
+        });
+
+        document.addEventListener('keydown', e => {
+          if (e.key === 'Escape' && this.overlay.classList.contains('is-open')) this.close();
+        });
+
+        document.querySelectorAll('.ex-type-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.ex-type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            this.currentType = btn.dataset.type;
+            this.panel.scrollTop = 0;
+            this.renderExercises();
+          });
+        });
+
+        document.querySelectorAll('.skill-card').forEach(card => {
+          card.addEventListener('click', e => {
+            e.preventDefault();
+            this.open(card.dataset.slug);
+          });
+        });
+      },
+
+      open(slug) {
+        this.currentSkill = SKILLS.find(s => s.slug === slug);
+        if (!this.currentSkill || !this.currentSkill.exercises) return;
+
+        /* Reset to fill-blank */
+        this.currentType = 'fillBlank';
+        document.querySelectorAll('.ex-type-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('[data-type="fillBlank"]').classList.add('active');
+
+        document.getElementById('exerciseSkillBadges').innerHTML =
+          badgesHTML(this.currentSkill.levels);
+        document.getElementById('exerciseSkillTitle').textContent = this.currentSkill.title;
+
+        this.renderExercises();
+
+        document.body.style.overflow = 'hidden';
+        this.overlay.setAttribute('aria-hidden', 'false');
+        requestAnimationFrame(() => this.overlay.classList.add('is-open'));
+        document.getElementById('exerciseCloseBtn').focus();
+      },
+
+      close() {
+        this.overlay.classList.remove('is-open');
+        this.overlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        setTimeout(() => { this.panel.scrollTop = 0; }, 300);
+      },
+
+      renderExercises() {
+        const exList    = document.getElementById('exerciseList');
+        const exercises = this.currentSkill.exercises[this.currentType];
+
+        if (this.currentType === 'fillBlank') {
+          exList.innerHTML = exercises.map((ex, i) => this.fillBlankItem(ex, i)).join('');
+        } else {
+          exList.innerHTML = exercises.map((ex, i) => this.mcqItem(ex, i)).join('');
+          this.bindChoices();
+        }
+      },
+
+      fillBlankItem(ex, i) {
+        const parts = ex.sentence.split('____');
+        const input = `<input class="ex-blank" type="text" autocomplete="off" spellcheck="false"
+          aria-label="Votre réponse" data-answer="${htmlEsc(ex.answer)}" placeholder="…">`;
+        const sentence = htmlEsc(parts[0]) + input + (parts[1] ? htmlEsc(parts[1]) : '');
+        return `<div class="ex-item">
+          <div class="ex-item-num">Exercice ${i + 1}</div>
+          <div class="ex-sentence">${sentence}</div>
+          <div class="ex-hint">${htmlEsc(ex.hint)}</div>
+        </div>`;
+      },
+
+      mcqItem(ex, i) {
+        const shuffled = shuffle(ex.choices);
+        const choices  = shuffled.map(c => `
+          <button class="ex-choice" data-correct="${htmlEsc(ex.answer)}" data-value="${htmlEsc(c)}">
+            <span class="ex-choice-dot"></span>
+            <span>${htmlEsc(c)}</span>
+          </button>`).join('');
+        return `<div class="ex-item">
+          <div class="ex-item-num">Exercice ${i + 1}</div>
+          <div class="ex-question">${htmlEsc(ex.question)}</div>
+          <div class="ex-choices">${choices}</div>
+        </div>`;
+      },
+
+      bindChoices() {
+        document.querySelectorAll('.ex-choice').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const item = btn.closest('.ex-item');
+            if (item.querySelector('.correct, .incorrect')) return; /* already answered */
+
+            const correct = btn.dataset.value === btn.dataset.correct;
+            btn.classList.add(correct ? 'correct' : 'incorrect');
+
+            if (!correct) {
+              item.querySelectorAll('.ex-choice').forEach(c => {
+                if (c.dataset.value === c.dataset.correct) c.classList.add('correct');
+              });
+            }
+          });
+        });
+      }
+    };
+
+    /* ════════════════════════════════════════════════════════════════════════
+       FILTER / SEARCH / COLLAPSE  (unchanged from previous version)
+    ════════════════════════════════════════════════════════════════════════ */
+    const searchInput = document.getElementById('searchInput');
+    const filterBtns  = document.querySelectorAll('.filter-btn');
+    const allCards    = document.querySelectorAll('.skill-card');
+    const noResults   = document.getElementById('noResults');
+
+    let activeLevel = 'all';
+    let searchQuery = '';
+
+    function normalise(str) {
+      return str.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    }
+
+    function updateVisibility() {
+      const q = normalise(searchQuery.trim());
+      const catCounts = {};
+
+      document.querySelectorAll('.category-section').forEach(s => {
+        catCounts[s.dataset.category] = 0;
+      });
+
+      allCards.forEach(card => {
+        const levels   = card.dataset.levels.split(',');
+        const title    = normalise(card.querySelector('.skill-card-title').textContent);
+        const category = card.closest('.category-section').dataset.category;
+
+        const levelOk  = activeLevel === 'all' || levels.includes(activeLevel);
+        const searchOk = !q || title.includes(q);
+        const visible  = levelOk && searchOk;
+
+        card.style.display = visible ? '' : 'none';
+        if (visible) catCounts[category]++;
+      });
+
+      let totalVisible = 0;
+      document.querySelectorAll('.category-section').forEach(section => {
+        const cat   = section.dataset.category;
+        const count = catCounts[cat] || 0;
+        totalVisible += count;
+
+        const countEl = section.querySelector('.category-count');
+        if (countEl) countEl.textContent = count + (count === 1 ? ' notion' : ' notions');
+
+        section.style.display = count === 0 ? 'none' : '';
+      });
+
+      noResults.classList.toggle('visible', totalVisible === 0);
+    }
+
+    searchInput.addEventListener('input', e => {
+      searchQuery = e.target.value;
+      updateVisibility();
+    });
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeLevel = btn.dataset.level;
+        updateVisibility();
+      });
+    });
+
+    document.querySelectorAll('.category-header').forEach(header => {
+      const toggle = () => {
+        const section   = header.closest('.category-section');
+        const collapsed = section.classList.toggle('collapsed');
+        header.setAttribute('aria-expanded', String(!collapsed));
+      };
+      header.addEventListener('click', toggle);
+      header.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    });
+
+    /* ── Boot ─────────────────────────────────────────────────────────────── */
+    ExercisePanel.init();
+  </script>
+
+</body>
+</html>

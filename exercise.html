@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercice — Français — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="exercise-data.js"></script>
+  <style>
+    /* ── Page layout ────────────────────────────────────────── */
+    .page-wrap {
+      background: var(--bg);
+      min-height: calc(100vh - 88px);
+      padding-bottom: 64px;
+    }
+
+    .page-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 64px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 20px 0 0;
+      opacity: 0.75;
+      transition: opacity 180ms;
+    }
+    .back-link:hover { opacity: 1; }
+
+    /* ── Exercise container (narrows content to readable width) ── */
+    .ex-container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* ── Page header ────────────────────────────────────────── */
+    .ex-page-header {
+      text-align: center;
+      padding: 28px 0 36px;
+    }
+
+    .ex-page-badges {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .badge-cm1 {
+      background: rgba(16,43,106,0.09);
+      color: var(--blue);
+      border: 1px solid rgba(16,43,106,0.18);
+    }
+
+    .badge-cm2 {
+      background: var(--blue);
+      color: #ffffff;
+    }
+
+    .badge-6e {
+      background: var(--red);
+      color: #ffffff;
+    }
+
+    .badge-ce1 {
+      background: rgba(217,119,6,0.09);
+      color: #92400e;
+      border: 1px solid rgba(217,119,6,0.25);
+    }
+
+    .badge-ce2 {
+      background: rgba(22,163,74,0.09);
+      color: #15803d;
+      border: 1px solid rgba(22,163,74,0.25);
+    }
+
+    .ex-page-title {
+      font-weight: 800;
+      font-size: 21px;
+      color: var(--blue);
+      line-height: 1.35;
+      max-width: 560px;
+      margin: 0 auto 10px;
+    }
+
+    .ex-page-rule {
+      width: 44px;
+      height: 3px;
+      background: var(--red);
+      border-radius: 2px;
+      margin: 0 auto;
+    }
+
+    /* ── Progress ───────────────────────────────────────────── */
+    .ex-progress {
+      margin-bottom: 24px;
+    }
+
+    .ex-progress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .ex-progress-label {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--blue);
+      letter-spacing: 0.04em;
+    }
+
+    .ex-bar-bg {
+      height: 8px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .ex-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue) 0%, #1b4db0 100%);
+      border-radius: 100px;
+      transition: width 500ms cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── Question card ──────────────────────────────────────── */
+    .ex-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-md);
+      padding: 36px 40px;
+    }
+
+    /* ── Question label ─────────────────────────────────────── */
+    .ex-question-label {
+      font-weight: 800;
+      font-size: 12px;
+      color: var(--blue);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    /* ── Verb display ───────────────────────────────────────── */
+    .ex-verb-display {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 28px;
+      padding: 20px 24px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      text-align: center;
+    }
+
+    /* ── Sentence display (find-conjugated-verb) ───────────── */
+    .ex-sentence-display {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 28px;
+      padding: 22px 28px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      text-align: center;
+    }
+
+    /* ── Word tiles (find-error & word-order) ───────────────── */
+    .ex-sentence-words {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      padding: 20px 24px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .ex-word-btn {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 200ms, background 200ms, transform 200ms;
+    }
+
+    .ex-word-btn:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.04);
+      transform: translateY(-2px);
+    }
+
+    .ex-word-btn:disabled { cursor: default; }
+
+    .ex-word-btn.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.09);
+      color: #15803d;
+    }
+
+    .ex-word-btn.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+
+    .ex-word-btn.ex-word-used { opacity: 0.35; }
+
+    /* ── Word-order answer area ─────────────────────────────── */
+    .ex-word-order-answer {
+      min-height: 52px;
+      background: rgba(16,43,106,0.04);
+      border: 2px dashed rgba(16,43,106,0.20);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 20px;
+      margin-bottom: 16px;
+    }
+
+    .ex-word-order-placeholder {
+      color: var(--muted);
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    .ex-answer-word {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--blue);
+    }
+
+    /* ── Conjugation table ──────────────────────────────────── */
+    .ex-conj-table {
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .ex-conj-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ex-conj-row:last-child { border-bottom: none; }
+
+    .ex-conj-subject, .ex-conj-form {
+      padding: 11px 18px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .ex-conj-subject {
+      background: var(--bg);
+      color: var(--text);
+      border-right: 1px solid var(--border);
+    }
+
+    .ex-conj-form {
+      background: var(--card-bg);
+      color: var(--muted);
+    }
+
+    .ex-conj-row.is-active .ex-conj-subject {
+      background: rgba(16,43,106,0.07);
+      color: var(--blue);
+      font-weight: 700;
+    }
+
+    .ex-conj-row.is-active .ex-conj-form { color: var(--blue); font-weight: 700; }
+    .ex-conj-row.is-done  .ex-conj-form { color: #15803d; font-weight: 700; }
+    .ex-conj-row.is-error .ex-conj-form { color: var(--red); font-weight: 700; }
+
+    /* ── Choices ────────────────────────────────────────────── */
+    .ex-choices-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .ex-choice {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 200ms, background 200ms, transform 200ms;
+    }
+
+    .ex-choice:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.04);
+      transform: translateY(-2px);
+    }
+
+    .ex-choice:disabled { cursor: default; }
+
+    .ex-choice.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.09);
+      color: #15803d;
+    }
+
+    .ex-choice.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+
+    /* ── Feedback ───────────────────────────────────────────── */
+    .ex-feedback-area { margin-top: 4px; }
+
+    .ex-feedback-correct {
+      background: rgba(22,163,74,0.08);
+      border: 1.5px solid rgba(22,163,74,0.25);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #15803d;
+    }
+
+    .ex-feedback-wrong {
+      background: rgba(214,40,57,0.05);
+      border: 1.5px solid rgba(214,40,57,0.18);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    /* ── Step 2 ─────────────────────────────────────────────── */
+    .ex-step2-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 28px 0;
+    }
+
+    .ex-group-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .ex-group-btn {
+      flex: 1;
+      min-width: 120px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 13px 20px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 200ms, background 200ms, transform 200ms;
+    }
+
+    .ex-group-btn:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.04);
+      transform: translateY(-2px);
+    }
+
+    .ex-group-btn:disabled { cursor: default; }
+
+    .ex-group-btn.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.09);
+      color: #15803d;
+    }
+
+    .ex-group-btn.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+
+    /* Step 2 slide-in animation */
+    #step2:not(.ex-hidden) {
+      animation: exFadeIn 320ms ease forwards;
+    }
+
+    @keyframes exFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Next button ────────────────────────────────────────── */
+    .ex-next-btn {
+      display: block;
+      margin: 28px auto 0;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      padding: 13px 44px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 200ms, transform 200ms;
+    }
+
+    .ex-next-btn:hover {
+      background: #0d2255;
+      transform: translateY(-2px);
+    }
+
+    /* ── Results ────────────────────────────────────────────── */
+    .ex-results-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-md);
+      padding: 56px 48px;
+      text-align: center;
+    }
+
+    .ex-score-value {
+      font-size: 76px;
+      font-weight: 900;
+      color: var(--blue);
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .ex-score-pct {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--muted);
+      margin-top: 8px;
+      margin-bottom: 28px;
+    }
+
+    .ex-score-msg {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 40px;
+      line-height: 1.4;
+    }
+
+    .ex-results-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .ex-btn-primary {
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      padding: 13px 36px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      transition: background 200ms, transform 200ms;
+    }
+
+    .ex-btn-primary:hover {
+      background: #0d2255;
+      transform: translateY(-2px);
+    }
+
+    .ex-btn-secondary {
+      background: transparent;
+      color: var(--blue);
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 13px 36px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      transition: border-color 200ms, background 200ms, transform 200ms;
+    }
+
+    .ex-btn-secondary:hover {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.04);
+      transform: translateY(-2px);
+    }
+
+    /* ── Text input ─────────────────────────────────────────── */
+    .ex-input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      align-items: stretch;
+    }
+
+    .ex-text-input {
+      flex: 1;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-family: inherit;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+
+    .ex-text-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(16,43,106,0.10);
+    }
+
+    .ex-text-input.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.06);
+      color: #15803d;
+    }
+
+    .ex-text-input.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+
+    .ex-text-input:disabled { cursor: default; }
+
+    .ex-validate-btn {
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 24px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 200ms, transform 200ms;
+    }
+
+    .ex-validate-btn:hover:not(:disabled) {
+      background: #0d2255;
+      transform: translateY(-2px);
+    }
+
+    .ex-validate-btn:disabled { opacity: 0.5; cursor: default; }
+
+    /* ── Type selection screen ──────────────────────────────── */
+    .ex-type-back-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0 0 14px 0;
+      display: block;
+      transition: color 200ms;
+    }
+
+    .ex-type-back-btn:hover { color: var(--blue); }
+
+    /* ── Type selection screen ──────────────────────────────── */
+    .ex-type-select-label {
+      text-align: center;
+      font-size: 15px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+
+    .ex-type-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .ex-type-card {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      transition: border-color 200ms, box-shadow 200ms, transform 200ms;
+    }
+
+    .ex-type-card:hover {
+      border-color: var(--blue);
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-2px);
+    }
+
+    .ex-type-card.is-random {
+      background: var(--blue);
+      border-color: var(--blue);
+      margin-top: 8px;
+    }
+
+    .ex-type-card.is-random .ex-type-name,
+    .ex-type-card.is-random .ex-type-desc { color: #fff; }
+
+    .ex-type-icon {
+      font-size: 26px;
+      flex-shrink: 0;
+      width: 36px;
+      text-align: center;
+    }
+
+    .ex-type-name {
+      display: block;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .ex-type-desc {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ── Utility ────────────────────────────────────────────── */
+    .ex-hidden { display: none !important; }
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .page-content { padding: 0 40px; }
+    }
+
+    @media (max-width: 768px) {
+      .page-content { padding: 0 24px; }
+    }
+
+    @media (max-width: 600px) {
+      .ex-card { padding: 24px 20px; }
+      .ex-choices-grid { grid-template-columns: 1fr; }
+      .ex-verb-display     { font-size: 22px; padding: 16px 18px; }
+      .ex-sentence-display { font-size: 17px; padding: 16px 18px; }
+      .ex-word-btn { font-size: 16px; padding: 8px 14px; }
+      .ex-input-row { flex-direction: column; }
+      .ex-text-input { font-size: 18px; }
+      .ex-results-card { padding: 36px 20px; }
+      .ex-score-value { font-size: 60px; }
+      .ex-score-pct { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <img src="assets/lfm-logo.svg" alt="Lycée Français de Madrid" class="header-logo">
+        <div class="header-text">
+          <span class="header-name">LYCÉE FRANÇAIS DE MADRID</span>
+          <span class="header-sub">Ressources numériques pour le cycle 3</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="lang-badge">FR</span>
+        <button class="menu-btn" aria-label="Ouvrir le menu">
+          <span class="mbar mbar-top"></span>
+          <span class="mbar mbar-mid"></span>
+          <span class="mbar mbar-bot"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <div class="page-wrap">
+    <div class="page-content">
+
+      <a href="#" class="back-link" id="ex-back-link">← Retour</a>
+
+      <div class="ex-container">
+
+        <!-- Page header -->
+        <div class="ex-page-header">
+          <div class="ex-page-badges" id="ex-badges"></div>
+          <h1 class="ex-page-title" id="ex-page-title"></h1>
+          <div class="ex-page-rule"></div>
+        </div>
+
+        <!-- ── Type selection screen ── -->
+        <div id="type-select-screen" class="ex-hidden">
+          <p class="ex-type-select-label">Quel type d'exercice veux-tu faire ?</p>
+          <div class="ex-type-grid" id="ex-type-grid"></div>
+        </div>
+
+        <!-- ── Exercise screen ── -->
+        <div id="exercise-screen">
+
+          <button class="ex-type-back-btn ex-hidden" id="ex-type-back-btn"
+                  onclick="startSession()">← Choisir un autre exercice</button>
+
+          <!-- Progress -->
+          <div class="ex-progress">
+            <div class="ex-progress-top">
+              <span class="ex-progress-label">
+                Question <span id="q-num">1</span> sur <span id="q-total">10</span>
+              </span>
+            </div>
+            <div class="ex-bar-bg">
+              <div class="ex-bar-fill" id="ex-bar-fill" style="width:0%"></div>
+            </div>
+          </div>
+
+          <!-- Question card — content injected by JS based on exercise type -->
+          <div class="ex-card" id="ex-card"></div>
+        </div>
+
+        <!-- ── Results screen ── -->
+        <div id="results-screen" class="ex-hidden">
+          <div class="ex-results-card">
+            <div class="ex-score-value" id="score-value"></div>
+            <div class="ex-score-pct"   id="score-pct"></div>
+            <div class="ex-score-msg"   id="score-msg"></div>
+            <div class="ex-results-btns">
+              <button class="ex-btn-primary" id="restart-btn">Recommencer</button>
+              <a id="ex-back-btn" href="français-conjugaison.html" class="ex-btn-secondary">
+                Retour aux notions
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.ex-container -->
+    </div><!-- /.page-content -->
+  </div><!-- /.page-wrap -->
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-rule"></div>
+        <div class="footer-body">
+          <p class="footer-text">
+            Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,<br>
+            dans le respect d'un <strong class="footer-em">usage mesuré</strong> des écrans.
+          </p>
+        </div>
+        <p class="footer-credit">© François PEROCHEAU — LFM 2026</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ── Utilities ────────────────────────────────────────────────────────── */
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    /* ── State ────────────────────────────────────────────────────────────── */
+
+    let questions     = [];
+    let currentIndex  = 0;
+    let score         = 0;
+    let sessionData   = null;
+    let currentType   = null;   /* set once per session */
+    let wordOrderAnswer = [];   /* word-order type */
+    let conjTableRows   = [];   /* conjugation-table type */
+
+    const SUCCESS = ["✅ Bravo !", "✨ Très bien !", "🌟 Exact !"];
+
+    const TYPE_META = {
+      "fill-blank":        { icon: "✏️", name: "Complète la phrase",           desc: "Choisis la bonne forme du verbe" },
+      "multiple-choice":   { icon: "🎯", name: "Choix multiple",               desc: "Quelle forme correspond à ce sujet ?" },
+      "matching":          { icon: "🔗", name: "Associe sujet et forme",        desc: "Relie chaque sujet à sa conjugaison" },
+      "find-error":        { icon: "🔍", name: "Trouve l'erreur",               desc: "Repère le mot incorrect dans la phrase" },
+      "conjugation-table": { icon: "📋", name: "Tableau de conjugaison",        desc: "Complète les six formes au présent" },
+      "guess-subject":     { icon: "🤔", name: "Quel sujet convient ?",         desc: "Trouve le sujet qui correspond à la forme" },
+      "word-order":        { icon: "🔀", name: "Remets les mots dans l'ordre",  desc: "Reconstruit la phrase dans le bon ordre" }
+    };
+
+    /* ── Init ─────────────────────────────────────────────────────────────── */
+
+    function init() {
+      const params = new URLSearchParams(window.location.search);
+      const slug   = params.get("slug");
+
+      if (!slug || !EXERCISE_DATA[slug]) {
+        document.getElementById("exercise-screen").innerHTML =
+          "<p style='text-align:center;padding:64px 24px;color:var(--muted);font-size:15px'>" +
+          "Exercice introuvable.</p>";
+        return;
+      }
+
+      sessionData = EXERCISE_DATA[slug];
+
+      /* Page metadata */
+      document.title = sessionData.title + " — Conjugaison — LFM";
+      document.getElementById("ex-page-title").textContent = sessionData.title;
+
+      /* Back link */
+      const backEl = document.getElementById("ex-back-link");
+      backEl.href        = sessionData.backLink.href;
+      backEl.textContent = "← " + sessionData.backLink.label;
+
+      /* Badges */
+      document.getElementById("ex-badges").innerHTML = sessionData.levels
+        .map(l => {
+          const cls = l === "CE1" ? "badge-ce1"
+                    : l === "CE2" ? "badge-ce2"
+                    : l === "CM1" ? "badge-cm1"
+                    : l === "CM2" ? "badge-cm2"
+                    : l === "6e"  ? "badge-6e"
+                    : "badge-cm1";
+          return `<span class="badge ${cls}">${l}</span>`;
+        }).join("");
+
+      /* Results back button */
+      document.getElementById("ex-back-btn").href = sessionData.backLink.href;
+
+      /* Bind restart */
+      document.getElementById("restart-btn").addEventListener("click", startSession);
+
+      /* Total counter */
+      document.getElementById("q-total").textContent = sessionData.questionsPerSession;
+
+      startSession();
+    }
+
+    /* ── Session start ────────────────────────────────────────────────────── */
+
+    function startSession() {
+      /* Multiple types → show the choice screen; single type → start directly */
+      if (sessionData.exerciseTypes && sessionData.exerciseTypes.length > 1) {
+        showTypeSelect();
+      } else {
+        startSessionWithType(sessionData.type);
+      }
+    }
+
+    function showTypeSelect() {
+      document.getElementById("type-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const grid = document.getElementById("ex-type-grid");
+      grid.innerHTML = sessionData.exerciseTypes.map(t => {
+        const m = TYPE_META[t] || { icon: "📝", name: t, desc: "" };
+        return `
+          <button class="ex-type-card" data-type="${t}">
+            <span class="ex-type-icon">${m.icon}</span>
+            <div>
+              <span class="ex-type-name">${m.name}</span>
+              <span class="ex-type-desc">${m.desc}</span>
+            </div>
+          </button>`;
+      }).join('') + `
+        <button class="ex-type-card is-random" data-type="__random__">
+          <span class="ex-type-icon">🎲</span>
+          <div>
+            <span class="ex-type-name">Surprise !</span>
+            <span class="ex-type-desc">L'exercice est choisi au hasard</span>
+          </div>
+        </button>`;
+
+      grid.querySelectorAll(".ex-type-card").forEach(btn =>
+        btn.addEventListener("click", () => {
+          const t = btn.dataset.type;
+          document.getElementById("type-select-screen").classList.add("ex-hidden");
+          startSessionWithType(t === "__random__" ? rand(sessionData.exerciseTypes) : t);
+        })
+      );
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function startSessionWithType(type) {
+      currentType = type;
+
+      let bankSource;
+      let n = sessionData.questionsPerSession;
+
+      if ((currentType === "matching" || currentType === "conjugation-table") &&
+           sessionData.conjugationForms) {
+        bankSource = sessionData.conjugationForms;
+        n = bankSource.length;
+      } else if (currentType === "guess-subject" && sessionData.guessSubjectBank) {
+        bankSource = sessionData.guessSubjectBank;
+      } else if (currentType === "find-error" && sessionData.findErrorBank) {
+        bankSource = sessionData.findErrorBank;
+      } else if (currentType === "word-order" && sessionData.wordOrderBank) {
+        bankSource = sessionData.wordOrderBank;
+      } else {
+        bankSource = sessionData.bank;
+      }
+
+      questions = shuffle(bankSource).slice(0, n);
+      currentIndex = 0;
+      score        = 0;
+
+      document.getElementById("q-total").textContent = questions.length;
+
+      if (currentType === "conjugation-table") {
+        conjTableRows = questions.map(q => ({
+          subject:       q.subject,
+          correctAnswer: q.answer,
+          answered:      false,
+          correct:       null
+        }));
+      }
+
+      /* Show back-to-types button only when there are multiple types */
+      const backTypeBtn = document.getElementById("ex-type-back-btn");
+      if (sessionData.exerciseTypes && sessionData.exerciseTypes.length > 1) {
+        backTypeBtn.classList.remove("ex-hidden");
+      } else {
+        backTypeBtn.classList.add("ex-hidden");
+      }
+
+      document.getElementById("results-screen").classList.add("ex-hidden");
+      document.getElementById("exercise-screen").classList.remove("ex-hidden");
+
+      showQuestion(0);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* ── Show question — dispatches to the right renderer ───────────────── */
+
+    function showQuestion(idx) {
+      const q = questions[idx];
+      document.getElementById("q-num").textContent       = idx + 1;
+      document.getElementById("ex-bar-fill").style.width = (idx / questions.length * 100) + "%";
+
+      const card = document.getElementById("ex-card");
+      if (currentType === "infinitif-et-groupe") {
+        renderInfinitifEtGroupe(card, q);
+      } else if (currentType === "find-conjugated-verb") {
+        renderFindConjugatedVerb(card, q);
+      } else if (currentType === "fill-blank") {
+        renderFillBlank(card, q);
+      } else if (currentType === "multiple-choice") {
+        renderMultipleChoice(card, q);
+      } else if (currentType === "matching") {
+        renderMatching(card, q);
+      } else if (currentType === "find-error") {
+        renderFindError(card, q);
+      } else if (currentType === "conjugation-table") {
+        renderConjugationTable(card, q);
+      } else if (currentType === "guess-subject") {
+        renderGuessSubject(card, q);
+      } else if (currentType === "word-order") {
+        renderWordOrder(card, q);
+      } else if (currentType === "text-input") {
+        renderTextInput(card, q);
+      } else if (currentType === "auxiliaire-identifier") {
+        renderAuxiliaireIdentifier(card, q);
+      } else if (currentType === "infinitif-passe-compose") {
+        renderInfinitifPasseCompose(card, q);
+      } else if (currentType === "yes-no") {
+        renderYesNo(card, q);
+      }
+    }
+
+    /* ── Type: infinitif-et-groupe (2-step) ──────────────────────────────── */
+
+    function renderInfinitifEtGroupe(card, q) {
+      card.innerHTML = `
+        <div id="step1">
+          <p class="ex-question-label">Quel est l'infinitif de ce verbe ?</p>
+          <div class="ex-verb-display">${q.sentence}</div>
+          <div class="ex-choices-grid" id="ex-choices-grid"></div>
+          <div class="ex-feedback-area" id="feedback1"></div>
+        </div>
+        <div id="step2" class="ex-hidden">
+          <div class="ex-step2-divider"></div>
+          <p class="ex-question-label">À quel groupe appartient ce verbe ?</p>
+          <div class="ex-group-row">
+            <button class="ex-group-btn" data-group="1er groupe">1er groupe</button>
+            <button class="ex-group-btn" data-group="2e groupe">2e groupe</button>
+            <button class="ex-group-btn" data-group="3e groupe">3e groupe</button>
+          </div>
+          <div class="ex-feedback-area" id="feedback2"></div>
+        </div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const grid = document.getElementById("ex-choices-grid");
+      grid.innerHTML = shuffle(q.choices)
+        .map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`)
+        .join("");
+      grid.querySelectorAll(".ex-choice").forEach(btn =>
+        btn.addEventListener("click", () => handleStep1(btn, q))
+      );
+
+      document.querySelectorAll(".ex-group-btn").forEach(btn =>
+        btn.addEventListener("click", () => handleStep2(btn, q))
+      );
+    }
+
+    function handleStep1(btn, q) {
+      document.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
+
+      const isRight = btn.dataset.value === q.infinitive;
+
+      document.querySelectorAll(".ex-choice").forEach(b => {
+        if (b.dataset.value === q.infinitive) b.classList.add("is-correct");
+      });
+      if (!isRight) btn.classList.add("is-wrong");
+
+      if (isRight) {
+        setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+        setTimeout(() => {
+          document.getElementById("step2").classList.remove("ex-hidden");
+          document.getElementById("step2").scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }, 750);
+      } else {
+        setFeedback("feedback1", `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne réponse.<br>
+            L'infinitif de « <strong>${q.verb}</strong> » est <strong>${q.infinitive}</strong>.<br>
+            C'est un verbe du ${q.group}.
+          </div>
+        `);
+        showNextBtn();
+      }
+    }
+
+    function handleStep2(btn, q) {
+      document.querySelectorAll(".ex-group-btn").forEach(b => b.disabled = true);
+
+      const isRight = btn.dataset.group === q.group;
+
+      document.querySelectorAll(".ex-group-btn").forEach(b => {
+        if (b.dataset.group === q.group) b.classList.add("is-correct");
+      });
+      if (!isRight) btn.classList.add("is-wrong");
+
+      if (isRight) {
+        score++;
+        setFeedback("feedback2", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+      } else {
+        setFeedback("feedback2", `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas le bon groupe.<br>
+            <strong>${q.infinitive}</strong> est un verbe du <strong>${q.group}</strong>.
+          </div>
+        `);
+      }
+
+      showNextBtn();
+    }
+
+    /* ── Type: find-conjugated-verb (1-step, auto-advance) ───────────────── */
+
+    function renderFindConjugatedVerb(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">Quel est le verbe conjugué dans cette phrase ?</p>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-choices-grid" id="ex-choices-grid"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+      `;
+
+      const grid = document.getElementById("ex-choices-grid");
+      grid.innerHTML = shuffle(q.choices)
+        .map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`)
+        .join("");
+      grid.querySelectorAll(".ex-choice").forEach(btn =>
+        btn.addEventListener("click", () => handleFindConjugatedVerb(btn, q))
+      );
+    }
+
+    function handleFindConjugatedVerb(btn, q) {
+      document.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
+
+      const isRight = btn.dataset.value === q.answer;
+
+      document.querySelectorAll(".ex-choice").forEach(b => {
+        if (b.dataset.value === q.answer) b.classList.add("is-correct");
+      });
+      if (!isRight) btn.classList.add("is-wrong");
+
+      if (isRight) {
+        score++;
+        setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+      } else {
+        setFeedback("feedback1", `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne réponse.<br>
+            Le verbe conjugué est : <strong>« ${q.answer} »</strong>.
+          </div>
+        `);
+      }
+
+      /* Auto-advance: longer pause when wrong so the correction can be read */
+      setTimeout(nextQuestion, isRight ? 1200 : 2400);
+    }
+
+    /* ── Type: fill-blank ────────────────────────────────────────────────── */
+
+    function renderFillBlank(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">Complète avec la bonne forme du verbe <em>${sessionData.verb || 'être'}</em>.</p>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-choices-grid" id="ex-choices-grid"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      populateFormChoices(q);
+    }
+
+    /* ── Type: multiple-choice ───────────────────────────────────────────── */
+
+    function renderMultipleChoice(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">Quelle est la forme du verbe <em>${sessionData.verb || 'être'}</em> avec ce sujet ?</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="ex-choices-grid"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      populateFormChoices(q);
+    }
+
+    /* shared by fill-blank and multiple-choice */
+    function populateFormChoices(q) {
+      const grid = document.getElementById("ex-choices-grid");
+      grid.innerHTML = shuffle(q.choices)
+        .map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`)
+        .join("");
+      grid.querySelectorAll(".ex-choice").forEach(btn =>
+        btn.addEventListener("click", () => handleFormChoice(btn, q))
+      );
+    }
+
+    function handleFormChoice(btn, q) {
+      document.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
+
+      const isRight = btn.dataset.value === q.answer;
+
+      document.querySelectorAll(".ex-choice").forEach(b => {
+        if (b.dataset.value === q.answer) b.classList.add("is-correct");
+      });
+      if (!isRight) btn.classList.add("is-wrong");
+
+      if (isRight) {
+        score++;
+        setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+      } else {
+        setFeedback("feedback1", `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne réponse.<br>
+            Avec « <strong>${q.subject}</strong> », la forme correcte est : <strong>${q.answer}</strong>.
+          </div>
+        `);
+      }
+
+      showNextBtn();
+    }
+
+    /* ── Type: matching ──────────────────────────────────────────────────── */
+
+    function renderMatching(card, q) {
+      const allForms = (sessionData.conjugationForms || []).map(f => f.answer);
+      card.innerHTML = `
+        <p class="ex-question-label">Associe ce sujet à la bonne forme du verbe <em>${sessionData.verb || 'être'}</em>.</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="ex-choices-grid"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      const grid = document.getElementById("ex-choices-grid");
+      grid.innerHTML = shuffle(allForms)
+        .map(f => `<button class="ex-choice" data-value="${f}">${f}</button>`)
+        .join("");
+      grid.querySelectorAll(".ex-choice").forEach(btn =>
+        btn.addEventListener("click", () => handleMatching(btn, q))
+      );
+    }
+
+    function handleMatching(btn, q) {
+      document.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
+      const isRight = btn.dataset.value === q.answer;
+      document.querySelectorAll(".ex-choice").forEach(b => {
+        if (b.dataset.value === q.answer) b.classList.add("is-correct");
+      });
+      if (!isRight) btn.classList.add("is-wrong");
+      if (isRight) {
+        score++;
+        setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+      } else {
+        setFeedback("feedback1", `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne forme.<br>
+            Avec « <strong>${q.subject}</strong> » : <strong>${q.answer}</strong>.
+          </div>
+        `);
+      }
+      showNextBtn();
+    }
+
+    /* ── Type: find-error ────────────────────────────────────────────────── */
+
+    function renderFindError(card, q) {
+      const words = q.sentence.replace(/\.$/, '').split(' ');
+      card.innerHTML = `
+        <p class="ex-question-label">Clique sur le mot qui n'est pas correct.</p>
+        <div class="ex-sentence-words">
+          ${words.map(w => `<button class="ex-word-btn" data-word="${w}">${w}</button>`).join('')}
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      document.querySelectorAll(".ex-word-btn").forEach(btn =>
+        btn.addEventListener("click", () => handleFindError(btn, q))
+      );
+    }
+
+    function handleFindError(btn, q) {
+      document.querySelectorAll(".ex-word-btn").forEach(b => b.disabled = true);
+      const isRight = btn.dataset.word === q.errorWord;
+      document.querySelectorAll(".ex-word-btn").forEach(b => {
+        if (b.dataset.word === q.errorWord) b.classList.add("is-correct");
+      });
+      if (!isRight) btn.classList.add("is-wrong");
+      if (isRight) {
+        score++;
+        setFeedback("feedback1", `
+          <div class="ex-feedback-correct">
+            ${rand(SUCCESS)}<br>
+            La bonne phrase est : <em>« ${q.correction} »</em>
+          </div>
+        `);
+      } else {
+        setFeedback("feedback1", `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas le bon mot.<br>
+            L'erreur était : <strong>« ${q.errorWord} »</strong><br>
+            La bonne phrase : <em>« ${q.correction} »</em>
+          </div>
+        `);
+      }
+      showNextBtn();
+    }
+
+    /* ── Type: conjugation-table ─────────────────────────────────────────── */
+
+    function renderConjugationTable(card, q) {
+      const tableHTML = conjTableRows.map((row, i) => {
+        let display, cls;
+        if (i < currentIndex) {
+          display = row.correct ? row.correctAnswer : `✗ ${row.correctAnswer}`;
+          cls     = row.correct ? 'is-done' : 'is-error';
+        } else if (i === currentIndex) {
+          display = '___';
+          cls     = 'is-active';
+        } else {
+          display = '?';
+          cls     = '';
+        }
+        return `<div class="ex-conj-row ${cls}">
+          <div class="ex-conj-subject">${row.subject}</div>
+          <div class="ex-conj-form">${display}</div>
+        </div>`;
+      }).join('');
+
+      card.innerHTML = `
+        <p class="ex-question-label">Complète la conjugaison du verbe <em>${sessionData.verb || 'être'}</em> au présent.</p>
+        <div class="ex-conj-table">${tableHTML}</div>
+        <div class="ex-choices-grid" id="ex-choices-grid"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      const grid = document.getElementById("ex-choices-grid");
+      grid.innerHTML = shuffle(q.choices)
+        .map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`)
+        .join("");
+      grid.querySelectorAll(".ex-choice").forEach(btn =>
+        btn.addEventListener("click", () => handleConjTable(btn, q))
+      );
+    }
+
+    function handleConjTable(btn, q) {
+      document.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
+      const isRight = btn.dataset.value === q.answer;
+      conjTableRows[currentIndex].answered = true;
+      conjTableRows[currentIndex].correct  = isRight;
+      document.querySelectorAll(".ex-choice").forEach(b => {
+        if (b.dataset.value === q.answer) b.classList.add("is-correct");
+      });
+      if (!isRight) btn.classList.add("is-wrong");
+      if (isRight) {
+        score++;
+        setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+      } else {
+        setFeedback("feedback1", `
+          <div class="ex-feedback-wrong">
+            ❌ Avec « <strong>${q.subject}</strong> », la forme est : <strong>${q.answer}</strong>.
+          </div>
+        `);
+      }
+      showNextBtn();
+    }
+
+    /* ── Type: guess-subject ─────────────────────────────────────────────── */
+
+    function renderGuessSubject(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">Quel sujet convient ?</p>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-choices-grid" id="ex-choices-grid"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      const grid = document.getElementById("ex-choices-grid");
+      grid.innerHTML = shuffle(q.choices)
+        .map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`)
+        .join("");
+      grid.querySelectorAll(".ex-choice").forEach(btn =>
+        btn.addEventListener("click", () => handleGuessSubject(btn, q))
+      );
+    }
+
+    function handleGuessSubject(btn, q) {
+      document.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
+      const isRight = btn.dataset.value === q.answer;
+      document.querySelectorAll(".ex-choice").forEach(b => {
+        if (b.dataset.value === q.answer) b.classList.add("is-correct");
+      });
+      if (!isRight) btn.classList.add("is-wrong");
+      if (isRight) {
+        score++;
+        setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+      } else {
+        setFeedback("feedback1", `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne réponse.<br>
+            Le sujet correct est : <strong>« ${q.answer} »</strong>.
+          </div>
+        `);
+      }
+      showNextBtn();
+    }
+
+    /* ── Type: word-order ────────────────────────────────────────────────── */
+
+    function renderWordOrder(card, q) {
+      wordOrderAnswer = [];
+      card.innerHTML = `
+        <p class="ex-question-label">Remets les mots dans le bon ordre.</p>
+        <div class="ex-word-order-answer" id="word-order-answer">
+          <span class="ex-word-order-placeholder">Clique sur les mots dans l'ordre…</span>
+        </div>
+        <div class="ex-sentence-words" id="ex-word-pool">
+          ${shuffle(q.words).map((w, i) =>
+            `<button class="ex-word-btn" data-word="${w}" data-idx="${i}">${w}</button>`
+          ).join('')}
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      document.querySelectorAll(".ex-word-btn").forEach(btn =>
+        btn.addEventListener("click", () => handleWordClick(btn, q))
+      );
+    }
+
+    function handleWordClick(btn, q) {
+      if (btn.disabled) return;
+      btn.disabled = true;
+      btn.classList.add("ex-word-used");
+      wordOrderAnswer.push(btn.dataset.word);
+
+      const answerEl = document.getElementById("word-order-answer");
+      answerEl.innerHTML = wordOrderAnswer
+        .map(w => `<span class="ex-answer-word">${w}</span>`)
+        .join('<span style="color:var(--muted);margin:0 3px">·</span>');
+
+      const total  = document.querySelectorAll("#ex-word-pool .ex-word-btn").length;
+      const placed = document.querySelectorAll("#ex-word-pool .ex-word-btn:disabled").length;
+      if (placed === total) checkWordOrder(q);
+    }
+
+    function checkWordOrder(q) {
+      const playerStr  = wordOrderAnswer.join(' ').toLowerCase();
+      const correctStr = q.answer.replace(/\.$/, '').toLowerCase();
+      const isRight    = playerStr === correctStr;
+      if (isRight) {
+        score++;
+        setFeedback("feedback1", `
+          <div class="ex-feedback-correct">
+            ${rand(SUCCESS)}<br>
+            <em>« ${q.answer} »</em>
+          </div>
+        `);
+      } else {
+        setFeedback("feedback1", `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas le bon ordre.<br>
+            La bonne réponse : <strong>« ${q.answer} »</strong>
+          </div>
+        `);
+      }
+      showNextBtn();
+    }
+
+    /* ── Next question ────────────────────────────────────────────────────── */
+
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex >= questions.length) {
+        showResults();
+      } else {
+        /* Update progress bar before rendering new question */
+        document.getElementById("ex-bar-fill").style.width =
+          (currentIndex / questions.length * 100) + "%";
+        showQuestion(currentIndex);
+        document.getElementById("ex-card") &&
+          document.getElementById("ex-card").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    /* ── Results ──────────────────────────────────────────────────────────── */
+
+    function showResults() {
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.remove("ex-hidden");
+
+      const total = questions.length;
+      const pct   = Math.round(score / total * 100);
+
+      document.getElementById("score-value").textContent = score + " / " + total;
+      document.getElementById("score-pct").textContent   = pct + " %";
+
+      let msg;
+      if (pct === 100)      msg = "🏆 Incroyable ! Tu maîtrises cette compétence.";
+      else if (pct >= 80)   msg = "🌟 Très bien !";
+      else if (pct >= 60)   msg = "👍 Continue comme ça !";
+      else                  msg = "💪 Encore un petit effort !";
+
+      document.getElementById("score-msg").textContent = msg;
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* ── Helpers ──────────────────────────────────────────────────────────── */
+
+    /* ── Type: text-input ────────────────────────────────────────────────── */
+
+    function normalize(str) {
+      return str
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, ' ')
+        .replace(/[''`´‘’]/g, '');
+    }
+
+    function renderTextInput(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">Conjugue le verbe suivant dans la phrase.</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="ex-text-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="ex-validate-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      const input  = document.getElementById("ex-text-input");
+      const valBtn = document.getElementById("ex-validate-btn");
+      setTimeout(() => input.focus(), 50);
+      valBtn.addEventListener("click", () => handleTextInput(q));
+      input.addEventListener("keydown", e => { if (e.key === "Enter") handleTextInput(q); });
+    }
+
+    function handleTextInput(q) {
+      const input  = document.getElementById("ex-text-input");
+      const valBtn = document.getElementById("ex-validate-btn");
+      if (!input.value.trim()) return;
+
+      input.disabled  = true;
+      valBtn.disabled = true;
+
+      const isRight = normalize(input.value) === normalize(q.answer);
+      input.classList.add(isRight ? "is-correct" : "is-wrong");
+
+      if (isRight) {
+        score++;
+        setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+      } else {
+        setFeedback("feedback1", `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne réponse.<br>
+            La bonne réponse était : <strong>${q.answer}</strong>
+          </div>
+        `);
+      }
+      showNextBtn();
+    }
+
+    /* ── Type: infinitif-passe-compose (2-step) ─────────────────────────────
+       Step 1 — click the past participle in the sentence (word tiles)
+       Step 2 — type the infinitive
+    ────────────────────────────────────────────────────────────────────────── */
+
+    function renderInfinitifPasseCompose(card, q) {
+      let step1Correct = false;
+      const words = q.sentence.replace(/\.$/, '').split(' ');
+
+      card.innerHTML = `
+        <div id="step1">
+          <p class="ex-question-label">Clique sur le participe passé dans cette phrase.</p>
+          <div class="ex-sentence-words" id="ex-word-tiles">
+            ${words.map(w => `<button class="ex-word-btn" data-word="${w}">${w}</button>`).join('')}
+          </div>
+          <div class="ex-feedback-area" id="feedback1"></div>
+        </div>
+        <div id="step2" class="ex-hidden">
+          <div class="ex-step2-divider"></div>
+          <p class="ex-question-label">Quel est l'infinitif de ce verbe ?</p>
+          <div class="ex-verb-display" id="participle-display"></div>
+          <div class="ex-input-row">
+            <input type="text" class="ex-text-input" id="ex-inf-input"
+                   autocomplete="off" autocorrect="off" autocapitalize="off"
+                   spellcheck="false" placeholder="Écris l'infinitif…">
+            <button class="ex-validate-btn" id="ex-inf-validate">Valider</button>
+          </div>
+          <div class="ex-feedback-area" id="feedback2"></div>
+        </div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      document.querySelectorAll("#ex-word-tiles .ex-word-btn").forEach(btn =>
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#ex-word-tiles .ex-word-btn").forEach(b => b.disabled = true);
+          const isRight = btn.dataset.word === q.participle;
+          step1Correct = isRight;
+          document.querySelectorAll("#ex-word-tiles .ex-word-btn").forEach(b => {
+            if (b.dataset.word === q.participle) b.classList.add("is-correct");
+          });
+          if (!isRight) btn.classList.add("is-wrong");
+          if (isRight) {
+            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+          } else {
+            setFeedback("feedback1", `
+              <div class="ex-feedback-wrong">
+                ❌ Le participe passé est <strong>« ${q.participle} »</strong>.
+              </div>
+            `);
+          }
+          document.getElementById("participle-display").textContent = q.participle;
+          setTimeout(() => {
+            document.getElementById("step2").classList.remove("ex-hidden");
+            document.getElementById("step2").scrollIntoView({ behavior: "smooth", block: "nearest" });
+            setTimeout(() => {
+              const inp = document.getElementById("ex-inf-input");
+              if (inp) inp.focus();
+            }, 80);
+          }, 750);
+        })
+      );
+
+      function validateInfinitive() {
+        const input  = document.getElementById("ex-inf-input");
+        const valBtn = document.getElementById("ex-inf-validate");
+        if (!input || !input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+        const isRight = normalize(input.value) === normalize(q.infinitive);
+        input.classList.add(isRight ? "is-correct" : "is-wrong");
+        if (step1Correct && isRight) {
+          score++;
+          setFeedback("feedback2", `
+            <div class="ex-feedback-correct">
+              ${rand(SUCCESS)}<br>
+              <strong>${q.participle}</strong> → infinitif : <strong>${q.infinitive}</strong>
+            </div>
+          `);
+        } else if (isRight) {
+          setFeedback("feedback2", `
+            <div class="ex-feedback-correct">
+              ${rand(SUCCESS)}<br>
+              <strong>${q.participle}</strong> → infinitif : <strong>${q.infinitive}</strong>
+            </div>
+          `);
+        } else {
+          setFeedback("feedback2", `
+            <div class="ex-feedback-wrong">
+              ❌ L'infinitif de « <strong>${q.participle}</strong> » est <strong>${q.infinitive}</strong>.
+            </div>
+          `);
+        }
+        showNextBtn();
+      }
+
+      document.getElementById("ex-inf-validate").addEventListener("click", validateInfinitive);
+      document.getElementById("ex-inf-input").addEventListener("keydown", e => {
+        if (e.key === "Enter") validateInfinitive();
+      });
+    }
+
+    /* ── Type: auxiliaire-identifier (2-step) ───────────────────────────────
+       Step 1 — click être or avoir
+       Step 2 — type the correctly conjugated form
+    ────────────────────────────────────────────────────────────────────────── */
+
+    function renderAuxiliaireIdentifier(card, q) {
+      let step1Correct = false;
+
+      card.innerHTML = `
+        <div id="step1">
+          <p class="ex-question-label">Quel auxiliaire utilise-t-on pour former ce passé composé ?</p>
+          <div class="ex-sentence-display">${q.sentence}</div>
+          <div class="ex-group-row" id="aux-buttons">
+            <button class="ex-group-btn" data-aux="être">être</button>
+            <button class="ex-group-btn" data-aux="avoir">avoir</button>
+          </div>
+          <div class="ex-feedback-area" id="feedback1"></div>
+        </div>
+        <div id="step2" class="ex-hidden">
+          <div class="ex-step2-divider"></div>
+          <p class="ex-question-label">Maintenant, écris la bonne forme de l'auxiliaire.</p>
+          <div class="ex-sentence-display">${q.sentence}</div>
+          <div class="ex-input-row">
+            <input type="text" class="ex-text-input" id="ex-aux-input"
+                   autocomplete="off" autocorrect="off" autocapitalize="off"
+                   spellcheck="false" placeholder="Ta réponse…">
+            <button class="ex-validate-btn" id="ex-aux-validate">Valider</button>
+          </div>
+          <div class="ex-feedback-area" id="feedback2"></div>
+        </div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      document.querySelectorAll("#aux-buttons .ex-group-btn").forEach(btn =>
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#aux-buttons .ex-group-btn").forEach(b => b.disabled = true);
+          const isRight = btn.dataset.aux === q.auxiliary;
+          step1Correct = isRight;
+          document.querySelectorAll("#aux-buttons .ex-group-btn").forEach(b => {
+            if (b.dataset.aux === q.auxiliary) b.classList.add("is-correct");
+          });
+          if (!isRight) btn.classList.add("is-wrong");
+          if (isRight) {
+            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+          } else {
+            setFeedback("feedback1", `
+              <div class="ex-feedback-wrong">
+                ❌ Non, on utilise l'auxiliaire <strong>${q.auxiliary}</strong> avec ce verbe.
+              </div>
+            `);
+          }
+          setTimeout(() => {
+            document.getElementById("step2").classList.remove("ex-hidden");
+            document.getElementById("step2").scrollIntoView({ behavior: "smooth", block: "nearest" });
+            setTimeout(() => {
+              const inp = document.getElementById("ex-aux-input");
+              if (inp) inp.focus();
+            }, 80);
+          }, 750);
+        })
+      );
+
+      function validateAuxInput() {
+        const input  = document.getElementById("ex-aux-input");
+        const valBtn = document.getElementById("ex-aux-validate");
+        if (!input || !input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? "is-correct" : "is-wrong");
+        const correctSentence = q.sentence.replace("___", q.answer);
+        if (step1Correct && isRight) {
+          score++;
+          setFeedback("feedback2", `
+            <div class="ex-feedback-correct">
+              ${rand(SUCCESS)}<br>
+              <em>« ${correctSentence} »</em>
+            </div>
+          `);
+        } else if (isRight) {
+          setFeedback("feedback2", `
+            <div class="ex-feedback-correct">
+              ${rand(SUCCESS)}<br>
+              <em>« ${correctSentence} »</em>
+            </div>
+          `);
+        } else {
+          setFeedback("feedback2", `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne forme.<br>
+              La bonne réponse : <em>« ${correctSentence} »</em>
+            </div>
+          `);
+        }
+        showNextBtn();
+      }
+
+      document.getElementById("ex-aux-validate").addEventListener("click", validateAuxInput);
+      document.getElementById("ex-aux-input").addEventListener("keydown", e => {
+        if (e.key === "Enter") validateAuxInput();
+      });
+    }
+
+    /* ── Type: yes-no ────────────────────────────────────────────────────── */
+
+    function renderYesNo(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">Cette phrase est-elle déclarative ?</p>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-choices-grid" id="ex-choices-grid"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      const grid = document.getElementById("ex-choices-grid");
+      grid.innerHTML = `
+        <button class="ex-choice" data-value="oui">Oui</button>
+        <button class="ex-choice" data-value="non">Non</button>
+      `;
+      grid.querySelectorAll(".ex-choice").forEach(btn =>
+        btn.addEventListener("click", () => handleYesNo(btn, q))
+      );
+    }
+
+    function handleYesNo(btn, q) {
+      document.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
+      const answered = btn.dataset.value === "oui";
+      const isRight  = answered === q.isDeclarative;
+
+      const correctVal = q.isDeclarative ? "oui" : "non";
+      document.querySelectorAll(".ex-choice").forEach(b => {
+        if (b.dataset.value === correctVal) b.classList.add("is-correct");
+      });
+      if (!isRight) btn.classList.add("is-wrong");
+
+      if (isRight) {
+        score++;
+        setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+      } else if (q.isDeclarative) {
+        setFeedback("feedback1", `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne réponse.<br>
+            Cette phrase est déclarative.<br>
+            Elle donne une information.
+          </div>
+        `);
+      } else {
+        setFeedback("feedback1", `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne réponse.<br>
+            Cette phrase n'est pas déclarative.<br>
+            C'est une question ou un ordre.
+          </div>
+        `);
+      }
+      showNextBtn();
+    }
+
+    function setFeedback(id, html) {
+      document.getElementById(id).innerHTML = html;
+    }
+
+    function showNextBtn() {
+      const btn    = document.getElementById("next-btn");
+      const isLast = currentIndex === questions.length - 1;
+      btn.textContent = isLast ? "Voir mes résultats" : "Suivant →";
+      btn.classList.remove("ex-hidden");
+      btn.onclick = nextQuestion;
+    }
+
+    /* ── Start ────────────────────────────────────────────────────────────── */
+    init();
+  </script>
+
+</body>
+</html>
