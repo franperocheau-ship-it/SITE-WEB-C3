@@ -581,6 +581,47 @@ body.home-page .cards-grid {
 }
 
 @media (max-width: 768px) {
+
+  /* Annuler la surcharge 40 px desktop → 20 px sur mobile */
+  body.home-page .container,
+  body.home-page .header-inner {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  /* En-tête : hauteur flexible, texte professeur sur 2 lignes */
+  body.home-page .header {
+    height: auto;
+    min-height: 70px;
+    padding: 12px 0;
+  }
+  body.home-page .header-inner {
+    height: auto;
+  }
+  body.home-page .header-brand {
+    flex: 1;
+    min-width: 0;
+    gap: 12px;
+  }
+  body.home-page .header-logo {
+    height: 44px;
+  }
+  body.home-page .header-text {
+    min-width: 0;
+  }
+  body.home-page .header-sub {
+    white-space: normal;
+    word-break: break-word;
+    font-size: 10px;
+    line-height: 1.4;
+  }
+
+  /* Points décoratifs : masqués sur mobile */
+  body.home-page .dot-matrix {
+    display: none;
+  }
+
+  /* Hero layout */
   body.home-page .hero {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
@@ -590,12 +631,60 @@ body.home-page .cards-grid {
     padding: 48px 24px 40px 24px;
   }
 
+  /* Image hero : supprime le décalage desktop, recentre pour afficher les 3 élèves */
+  body.home-page .hero-img {
+    height: 100%;
+    margin-top: 0;
+    object-position: 50% 20%;
+  }
+
+  /* Cartes */
   body.home-page .cards-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Footer : empilement vertical, texte sans débordement */
+  body.home-page .footer-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  body.home-page .footer-rule {
+    flex: none;
+    width: 100%;
+  }
+  body.home-page .footer-body {
+    flex-shrink: 1;
+    width: 100%;
+  }
+  body.home-page .footer-text {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+  body.home-page .footer-credit {
+    flex: none;
+    text-align: center;
+    width: 100%;
   }
 }
 
 @media (max-width: 480px) {
+
+  /* Réduction des paddings sur très petits écrans */
+  body.home-page .container,
+  body.home-page .header-inner {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  /* Logo et texte légèrement réduits sur 320-480 px */
+  body.home-page .header-logo {
+    height: 40px;
+  }
+  body.home-page .header-sub {
+    font-size: 9.5px;
+  }
+
   body.home-page .cards-grid {
     grid-template-columns: 1fr;
   }
