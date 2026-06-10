@@ -1028,6 +1028,8 @@
         renderInfinitifPasseCompose(card, q);
       } else if (currentType === "yes-no") {
         renderYesNo(card, q);
+      } else if (currentType === "transform-interrogative") {
+        renderTransformInterrogative(card, q);
       }
     }
 
@@ -1776,8 +1778,9 @@
     /* ── Type: yes-no ────────────────────────────────────────────────────── */
 
     function renderYesNo(card, q) {
+      const label = sessionData.yesNoLabel || "Cette phrase est-elle déclarative ?";
       card.innerHTML = `
-        <p class="ex-question-label">Cette phrase est-elle déclarative ?</p>
+        <p class="ex-question-label">${label}</p>
         <div class="ex-sentence-display">${q.sentence}</div>
         <div class="ex-choices-grid" id="ex-choices-grid"></div>
         <div class="ex-feedback-area" id="feedback1"></div>
@@ -1795,36 +1798,191 @@
 
     function handleYesNo(btn, q) {
       document.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
-      const answered = btn.dataset.value === "oui";
-      const isRight  = answered === q.isDeclarative;
+      const answered     = btn.dataset.value === "oui";
+      const isTargetBool = (q.isTarget !== undefined) ? q.isTarget : q.isDeclarative;
+      const isRight      = answered === isTargetBool;
 
-      const correctVal = q.isDeclarative ? "oui" : "non";
+      const correctVal = isTargetBool ? "oui" : "non";
       document.querySelectorAll(".ex-choice").forEach(b => {
         if (b.dataset.value === correctVal) b.classList.add("is-correct");
       });
       if (!isRight) btn.classList.add("is-wrong");
 
+      const targetName = sessionData.targetTypeName || "déclarative";
+
       if (isRight) {
         score++;
         setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
-      } else if (q.isDeclarative) {
+      } else if (isTargetBool) {
         setFeedback("feedback1", `
           <div class="ex-feedback-wrong">
             ❌ Ce n'est pas la bonne réponse.<br>
-            Cette phrase est déclarative.<br>
-            Elle donne une information.
+            « ${q.sentence} » est une phrase ${targetName}.
           </div>
         `);
       } else {
+        const actualLabel = q.phraseType
+          ? `une phrase ${q.phraseType}`
+          : `une phrase d'un autre type`;
         setFeedback("feedback1", `
           <div class="ex-feedback-wrong">
             ❌ Ce n'est pas la bonne réponse.<br>
-            Cette phrase n'est pas déclarative.<br>
-            C'est une question ou un ordre.
+            « ${q.sentence} » est ${actualLabel}, pas une phrase ${targetName}.
           </div>
         `);
       }
       showNextBtn();
+    }
+
+    /* ── Type: transform-interrogative ──────────────────────────────────────── */
+
+    function normTI(str) {
+      return str
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, ' ')
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, '');
+    }
+
+    function validateTI(answer, q) {
+      const raw  = answer.trim();
+      const norm = normTI(raw);
+
+      /* Critère 1 — point d'interrogation */
+      if (!raw.endsWith('?')) {
+        return { valid: false, reason: 'no-question-mark' };
+      }
+
+      /* Critère 2 — mots-clés présents */
+      const wordStr = norm.replace(/[?.,!;:«»'"]/g, '');
+      const missing = q.keyWords.filter(w => !wordStr.includes(normTI(w)));
+      if (missing.length > 0) {
+        return { valid: false, reason: 'missing-words' };
+      }
+
+      /* Détection de la forme */
+      if (norm.includes('est-ce qu')) {
+        return { valid: true, form: 'est-ce-que' };
+      }
+      if (/[a-z]+(-t)?-(tu|il|elle|on|nous|vous|ils|elles)\b/.test(norm)) {
+        return { valid: true, form: 'inversion' };
+      }
+      return { valid: true, form: 'intonation' };
+    }
+
+    function renderTransformInterrogative(card, q) {
+      let remainingAttempts = 2;
+      let scored       = false;
+      let bonusTryMode = false;
+
+      card.innerHTML = `
+        <p class="ex-question-label">Transforme cette phrase déclarative en phrase interrogative.</p>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="ti-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Écris ta phrase interrogative…">
+          <button class="ex-validate-btn" id="ti-validate">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const inp = document.getElementById("ti-input");
+      const btn = document.getElementById("ti-validate");
+      setTimeout(() => inp.focus(), 50);
+      btn.addEventListener("click", submit);
+      inp.addEventListener("keydown", e => { if (e.key === "Enter") submit(); });
+
+      function enableRetry() {
+        inp.disabled = false;
+        inp.classList.remove("is-correct", "is-wrong");
+        inp.value    = "";
+        btn.disabled = false;
+        document.getElementById("feedback1").innerHTML = "";
+        inp.focus();
+      }
+
+      function submit() {
+        const answer = inp.value.trim();
+        if (!answer) return;
+
+        inp.disabled = true;
+        btn.disabled = true;
+
+        const result = validateTI(answer, q);
+
+        if (result.valid) {
+          if (!scored) { score++; scored = true; }
+          inp.classList.add("is-correct");
+
+          if (result.form === 'intonation' && !bonusTryMode) {
+            /* Forme c : correct mais encourager les formes canoniques */
+            const skipLabel = currentIndex === questions.length - 1
+              ? "Voir mes résultats" : "Phrase suivante";
+            setFeedback("feedback1", `
+              <div class="ex-feedback-correct" style="margin-bottom:12px">
+                ✅ C'est juste ! À l'oral, on pose souvent la question comme ça.<br>
+                Essaie maintenant de l'écrire avec « est-ce que » ou en inversant le sujet et le verbe :<br>
+                <em style="display:inline-block;margin-top:6px">« ${q.modelEcQ} »</em><br>
+                <em>« ${q.modelInv} »</em>
+              </div>
+              <div style="display:flex;gap:12px;flex-wrap:wrap">
+                <button class="ex-validate-btn" id="ti-retry-btn">Réessayer</button>
+                <button class="ex-next-btn" id="ti-skip-btn" style="margin:0">${skipLabel}</button>
+              </div>
+            `);
+            document.getElementById("ti-retry-btn").addEventListener("click", () => {
+              bonusTryMode = true;
+              enableRetry();
+            });
+            document.getElementById("ti-skip-btn").addEventListener("click", nextQuestion);
+
+          } else {
+            /* Forme a, b ou tentative bonus */
+            const formMsg = result.form === 'est-ce-que'
+              ? '✨ Bonne forme avec « est-ce que » !'
+              : result.form === 'inversion'
+              ? '🌟 Bonne forme avec l\'inversion sujet-verbe !'
+              : rand(SUCCESS);
+            setFeedback("feedback1", `<div class="ex-feedback-correct">${formMsg}</div>`);
+            showNextBtn();
+          }
+
+        } else {
+          /* Réponse invalide */
+          inp.classList.add("is-wrong");
+          remainingAttempts--;
+
+          const errMsg = result.reason === 'no-question-mark'
+            ? "Une phrase interrogative se termine par un point d'interrogation ( ? )."
+            : "Pense à conserver les mots importants de la phrase de départ.";
+
+          if (remainingAttempts <= 0) {
+            /* Plus d'essais : afficher les réponses modèles */
+            setFeedback("feedback1", `
+              <div class="ex-feedback-wrong">
+                ❌ ${errMsg}<br><br>
+                <strong>Réponses modèles :</strong><br>
+                <em>« ${q.modelEcQ} »</em><br>
+                <em>« ${q.modelInv} »</em>
+              </div>
+            `);
+            showNextBtn();
+          } else {
+            /* 1 essai restant */
+            setFeedback("feedback1", `
+              <div class="ex-feedback-wrong" style="margin-bottom:12px">
+                ❌ ${errMsg}<br>
+                <span style="font-size:12px;opacity:0.8">Il te reste 1 essai.</span>
+              </div>
+              <button class="ex-validate-btn" id="ti-retry-btn">Réessayer</button>
+            `);
+            document.getElementById("ti-retry-btn").addEventListener("click", enableRetry);
+          }
+        }
+      }
     }
 
     function setFeedback(id, html) {

@@ -1298,6 +1298,8 @@ const EXERCISE_DATA = {
     levels: ["CM1", "CM2", "6e"],
     type: "yes-no",
     questionsPerSession: 15,
+    yesNoLabel: "Cette phrase est-elle déclarative ?",
+    targetTypeName: "déclarative",
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
 
     bank: [
@@ -1321,22 +1323,213 @@ const EXERCISE_DATA = {
       { sentence: "Dans le jardin, les fleurs poussent rapidement au printemps.",              isDeclarative: true  },
       /* ── Phrases non déclaratives — début (courtes) ── */
       { sentence: "Où vas-tu ?",                                                               isDeclarative: false, phraseType: "interrogative" },
-      { sentence: "Ferme la fenêtre.",                                                         isDeclarative: false, phraseType: "imperative"    },
-      { sentence: "Range tes affaires.",                                                       isDeclarative: false, phraseType: "imperative"    },
+      { sentence: "Ferme la fenêtre.",                                                         isDeclarative: false, phraseType: "impérative"    },
+      { sentence: "Range tes affaires.",                                                       isDeclarative: false, phraseType: "impérative"    },
       /* ── Phrases non déclaratives — milieu ── */
       { sentence: "Comment t'appelles-tu ?",                                                   isDeclarative: false, phraseType: "interrogative" },
       { sentence: "As-tu fini ton exercice ?",                                                 isDeclarative: false, phraseType: "interrogative" },
-      { sentence: "Écoute attentivement.",                                                     isDeclarative: false, phraseType: "imperative"    },
+      { sentence: "Écoute attentivement.",                                                     isDeclarative: false, phraseType: "impérative"    },
       { sentence: "Pourquoi regardes-tu le ciel ?",                                            isDeclarative: false, phraseType: "interrogative" },
       { sentence: "Que fais-tu ce soir ?",                                                     isDeclarative: false, phraseType: "interrogative" },
-      { sentence: "Prenez vos cahiers.",                                                       isDeclarative: false, phraseType: "imperative"    },
-      { sentence: "Traverse la rue avec prudence.",                                            isDeclarative: false, phraseType: "imperative"    },
+      { sentence: "Prenez vos cahiers.",                                                       isDeclarative: false, phraseType: "impérative"    },
+      { sentence: "Traverse la rue avec prudence.",                                            isDeclarative: false, phraseType: "impérative"    },
       /* ── Phrases non déclaratives — fin (plus longues) ── */
-      { sentence: "Referme le livre.",                                                         isDeclarative: false, phraseType: "imperative"    },
+      { sentence: "Referme le livre.",                                                         isDeclarative: false, phraseType: "impérative"    },
       { sentence: "Quand partons-nous ?",                                                      isDeclarative: false, phraseType: "interrogative" },
       { sentence: "Peux-tu m'aider ?",                                                        isDeclarative: false, phraseType: "interrogative" },
       { sentence: "Veux-tu venir avec nous ?",                                                 isDeclarative: false, phraseType: "interrogative" },
       { sentence: "Peux-tu expliquer comment tu as trouvé cette réponse ?",                   isDeclarative: false, phraseType: "interrogative" }
+    ]
+  },
+
+  "transformer-declarative-interrogative": {
+    title: "Transformer une phrase déclarative en phrase interrogative",
+    levels: ["CM1", "CM2", "6e"],
+    type: "transform-interrogative",
+    questionsPerSession: 10,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+
+    bank: [
+      {
+        sentence:  "Tu ranges tes affaires.",
+        keyWords:  ["ranges", "affaires"],
+        modelEcQ:  "Est-ce que tu ranges tes affaires ?",
+        modelInv:  "Ranges-tu tes affaires ?"
+      },
+      {
+        sentence:  "Il mange une pomme.",
+        keyWords:  ["mange", "pomme"],
+        modelEcQ:  "Est-ce qu'il mange une pomme ?",
+        modelInv:  "Mange-t-il une pomme ?"
+      },
+      {
+        sentence:  "Les enfants jouent dans le jardin.",
+        keyWords:  ["enfants", "jouent", "jardin"],
+        modelEcQ:  "Est-ce que les enfants jouent dans le jardin ?",
+        modelInv:  "Les enfants jouent-ils dans le jardin ?"
+      },
+      {
+        sentence:  "Elle lit un livre.",
+        keyWords:  ["lit", "livre"],
+        modelEcQ:  "Est-ce qu'elle lit un livre ?",
+        modelInv:  "Lit-elle un livre ?"
+      },
+      {
+        sentence:  "Vous aimez la musique.",
+        keyWords:  ["aimez", "musique"],
+        modelEcQ:  "Est-ce que vous aimez la musique ?",
+        modelInv:  "Aimez-vous la musique ?"
+      },
+      {
+        sentence:  "Papa prépare le dîner.",
+        keyWords:  ["prépare", "dîner"],
+        modelEcQ:  "Est-ce que papa prépare le dîner ?",
+        modelInv:  "Papa prépare-t-il le dîner ?"
+      },
+      {
+        sentence:  "Nous partons en vacances demain.",
+        keyWords:  ["partons", "vacances", "demain"],
+        modelEcQ:  "Est-ce que nous partons en vacances demain ?",
+        modelInv:  "Partons-nous en vacances demain ?"
+      },
+      {
+        sentence:  "Le chat dort sur le canapé.",
+        keyWords:  ["chat", "dort", "canapé"],
+        modelEcQ:  "Est-ce que le chat dort sur le canapé ?",
+        modelInv:  "Le chat dort-il sur le canapé ?"
+      },
+      {
+        sentence:  "Les élèves écoutent la maîtresse.",
+        keyWords:  ["élèves", "écoutent", "maîtresse"],
+        modelEcQ:  "Est-ce que les élèves écoutent la maîtresse ?",
+        modelInv:  "Les élèves écoutent-ils la maîtresse ?"
+      },
+      {
+        sentence:  "Tu viens à la fête samedi.",
+        keyWords:  ["viens", "fête", "samedi"],
+        modelEcQ:  "Est-ce que tu viens à la fête samedi ?",
+        modelInv:  "Viens-tu à la fête samedi ?"
+      }
+    ]
+  },
+
+  "identifier-phrase-interrogative": {
+    title: "Identifier une phrase interrogative",
+    levels: ["CM1", "CM2", "6e"],
+    type: "yes-no",
+    questionsPerSession: 15,
+    yesNoLabel: "Cette phrase est-elle interrogative ?",
+    targetTypeName: "interrogative",
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+
+    bank: [
+      /* ── Phrases interrogatives (cibles) ── */
+      { sentence: "Où vas-tu ce matin ?",                    isTarget: true  },
+      { sentence: "As-tu fini tes devoirs ?",                isTarget: true  },
+      { sentence: "Qu'est-ce que tu aimes lire ?",           isTarget: true  },
+      { sentence: "Est-ce que tu viens à la fête ?",         isTarget: true  },
+      { sentence: "Comment s'appelle ton chat ?",            isTarget: true  },
+      { sentence: "Pourquoi es-tu en retard ?",              isTarget: true  },
+      { sentence: "Veux-tu jouer avec nous ?",               isTarget: true  },
+      /* ── Distracteurs ── */
+      { sentence: "Le soleil brille dans le ciel bleu.",     isTarget: false, phraseType: "déclarative"  },
+      { sentence: "Ma sœur aime beaucoup la lecture.",       isTarget: false, phraseType: "déclarative"  },
+      { sentence: "Nous partons en vacances demain.",        isTarget: false, phraseType: "déclarative"  },
+      { sentence: "Les fleurs poussent au printemps.",       isTarget: false, phraseType: "déclarative"  },
+      { sentence: "Pose ton cartable sur la chaise.",        isTarget: false, phraseType: "impérative"   },
+      { sentence: "Ouvrez vos cahiers à la page dix.",       isTarget: false, phraseType: "impérative"   },
+      { sentence: "Comme il fait beau aujourd'hui !",        isTarget: false, phraseType: "exclamative"  },
+      { sentence: "Quelle belle journée !",                  isTarget: false, phraseType: "exclamative"  }
+    ]
+  },
+
+  "identifier-phrase-imperative": {
+    title: "Identifier une phrase impérative",
+    levels: ["CM1", "CM2", "6e"],
+    type: "yes-no",
+    questionsPerSession: 15,
+    yesNoLabel: "Cette phrase est-elle impérative ?",
+    targetTypeName: "impérative",
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+
+    bank: [
+      /* ── Phrases impératives (cibles) ── */
+      { sentence: "Ferme la porte.",                         isTarget: true  },
+      { sentence: "Range tes affaires.",                     isTarget: true  },
+      { sentence: "Lis ce livre avec attention.",            isTarget: true  },
+      { sentence: "Venez écouter l'histoire.",               isTarget: true  },
+      { sentence: "N'oublie pas ton manteau.",               isTarget: true  },
+      { sentence: "Levez-vous tous ensemble.",               isTarget: true  },
+      { sentence: "Écris ton prénom en haut de la page.",    isTarget: true  },
+      /* ── Distracteurs ── */
+      { sentence: "La cloche sonne à midi.",                 isTarget: false, phraseType: "déclarative"   },
+      { sentence: "Les enfants jouent dans la cour.",        isTarget: false, phraseType: "déclarative"   },
+      { sentence: "Mon chien s'appelle Rex.",                isTarget: false, phraseType: "déclarative"   },
+      { sentence: "Est-ce que tu as chaud ?",                isTarget: false, phraseType: "interrogative" },
+      { sentence: "Où habitent tes grands-parents ?",        isTarget: false, phraseType: "interrogative" },
+      { sentence: "Peux-tu m'expliquer cela ?",              isTarget: false, phraseType: "interrogative" },
+      { sentence: "Comme tu es courageux !",                 isTarget: false, phraseType: "exclamative"   },
+      { sentence: "Quelle bonne idée !",                     isTarget: false, phraseType: "exclamative"   }
+    ]
+  },
+
+  "identifier-phrase-negative": {
+    title: "Identifier une phrase négative",
+    levels: ["CM1", "CM2", "6e"],
+    type: "yes-no",
+    questionsPerSession: 15,
+    yesNoLabel: "Cette phrase est-elle négative ?",
+    targetTypeName: "négative",
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+
+    bank: [
+      /* ── Phrases négatives (cibles) ── */
+      { sentence: "Je ne mange pas de viande.",              isTarget: true  },
+      { sentence: "Elle ne lit jamais le soir.",             isTarget: true  },
+      { sentence: "Nous n'allons plus à cette école.",       isTarget: true  },
+      { sentence: "Il n'a pas encore fini ses devoirs.",     isTarget: true  },
+      { sentence: "N'oublie pas tes affaires.",              isTarget: true  },
+      { sentence: "Ne crie pas dans les couloirs.",          isTarget: true  },
+      { sentence: "Il ne dit rien à personne.",              isTarget: true  },
+      /* ── Distracteurs (formes affirmatives) ── */
+      { sentence: "Le chat dort sur le canapé.",             isTarget: false, phraseType: "affirmative"   },
+      { sentence: "Mes amis jouent au foot.",                isTarget: false, phraseType: "affirmative"   },
+      { sentence: "Quelle belle histoire !",                 isTarget: false, phraseType: "affirmative"   },
+      { sentence: "Viens jouer avec moi.",                   isTarget: false, phraseType: "affirmative"   },
+      { sentence: "As-tu faim ?",                           isTarget: false, phraseType: "affirmative"   },
+      { sentence: "Prends ton manteau.",                     isTarget: false, phraseType: "affirmative"   },
+      { sentence: "La rivière coule doucement.",             isTarget: false, phraseType: "affirmative"   },
+      { sentence: "Où est mon stylo ?",                     isTarget: false, phraseType: "affirmative"   }
+    ]
+  },
+
+  "identifier-phrase-exclamative": {
+    title: "Identifier une phrase exclamative",
+    levels: ["CM1", "CM2", "6e"],
+    type: "yes-no",
+    questionsPerSession: 15,
+    yesNoLabel: "Cette phrase est-elle exclamative ?",
+    targetTypeName: "exclamative",
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+
+    bank: [
+      /* ── Phrases exclamatives (cibles) ── */
+      { sentence: "Quelle belle journée !",                  isTarget: true  },
+      { sentence: "Comme tu es grand !",                     isTarget: true  },
+      { sentence: "Quel dommage !",                          isTarget: true  },
+      { sentence: "Comme c'est magnifique !",                isTarget: true  },
+      { sentence: "Que tu es intelligent !",                 isTarget: true  },
+      { sentence: "Quel beau dessin tu as fait !",           isTarget: true  },
+      { sentence: "Comme il fait froid ce matin !",          isTarget: true  },
+      /* ── Distracteurs ── */
+      { sentence: "Mon chat s'appelle Mimi.",                isTarget: false, phraseType: "déclarative"   },
+      { sentence: "Le vent souffle fort.",                   isTarget: false, phraseType: "déclarative"   },
+      { sentence: "Les élèves écoutent attentivement.",      isTarget: false, phraseType: "déclarative"   },
+      { sentence: "Où est passé mon livre ?",               isTarget: false, phraseType: "interrogative" },
+      { sentence: "Est-ce que tu as bien dormi ?",           isTarget: false, phraseType: "interrogative" },
+      { sentence: "Qui a renversé le vase ?",                isTarget: false, phraseType: "interrogative" },
+      { sentence: "Posez vos crayons.",                      isTarget: false, phraseType: "impérative"    },
+      { sentence: "Mange ta soupe.",                         isTarget: false, phraseType: "impérative"    }
     ]
   },
 
