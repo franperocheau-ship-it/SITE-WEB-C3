@@ -557,8 +557,13 @@ body.home-page .container {
 /* Hero : proportions ajustées, hauteur légèrement augmentée pour une image
    plus grande, gap droite réduit pour mieux utiliser l'espace horizontal. */
 body.home-page .hero {
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 45% 55%;
   grid-template-rows: 540px;
+}
+
+/* Recadrage desktop : montre les 3 élèves, ancre en haut-centre */
+body.home-page .hero-img {
+  object-position: center top;
 }
 
 /* Alignement dynamique : le bord gauche du titre s'aligne avec le logo
