@@ -537,3 +537,66 @@ button { font-family: inherit; cursor: pointer; }
     text-align: center;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HOME PAGE — SURCHARGES SPÉCIFIQUES (préfixe body.home-page)
+   N'affecte que index.html — aucune autre page n'a class="home-page" sur body
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Alignement horizontal unifié : header, hero, cartes et footer
+   partagent le même point de départ gauche (40 px depuis le conteneur). */
+body.home-page .header-inner {
+  padding: 0 40px;
+}
+
+body.home-page .container {
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+/* Hero : proportions ajustées, hauteur légèrement augmentée pour une image
+   plus grande, gap droite réduit pour mieux utiliser l'espace horizontal. */
+body.home-page .hero {
+  grid-template-columns: 50% 50%;
+  grid-template-rows: 540px;
+}
+
+/* Alignement dynamique : le bord gauche du titre s'aligne avec le logo
+   et les cartes, quel que soit la largeur du viewport. */
+body.home-page .hero-content {
+  padding: 60px 24px 0 max(40px, calc((100vw - 1400px) / 2 + 40px));
+}
+
+/* Grille des cartes : occupe davantage la largeur disponible. */
+body.home-page .cards-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* — RESPONSIVE — */
+
+@media (max-width: 1024px) {
+  body.home-page .hero-content {
+    padding: 56px 24px 64px 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  body.home-page .hero {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  body.home-page .hero-content {
+    padding: 48px 24px 40px 24px;
+  }
+
+  body.home-page .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  body.home-page .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
