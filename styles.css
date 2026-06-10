@@ -585,107 +585,120 @@ body.home-page .cards-grid {
   /* Annuler la surcharge 40 px desktop → 20 px sur mobile */
   body.home-page .container,
   body.home-page .header-inner {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
   }
 
-  /* En-tête : hauteur flexible, texte professeur sur 2 lignes */
+  /* En-tête : hauteur flexible, texte professeur entièrement visible sur 2 lignes */
   body.home-page .header {
-    height: auto;
-    min-height: 70px;
-    padding: 12px 0;
+    height: auto !important;
+    min-height: 70px !important;
+    padding: 12px 0 !important;
   }
   body.home-page .header-inner {
-    height: auto;
+    height: auto !important;
   }
   body.home-page .header-brand {
-    flex: 1;
-    min-width: 0;
-    gap: 12px;
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow: visible !important;
+    gap: 12px !important;
   }
   body.home-page .header-logo {
-    height: 44px;
+    height: 44px !important;
   }
   body.home-page .header-text {
-    min-width: 0;
+    min-width: 0 !important;
+    overflow: visible !important;
   }
   body.home-page .header-sub {
-    white-space: normal;
-    word-break: break-word;
-    font-size: 10px;
-    line-height: 1.4;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    font-size: 11px !important;
+    line-height: 1.4 !important;
   }
 
   /* Points décoratifs : masqués sur mobile */
   body.home-page .dot-matrix {
-    display: none;
+    display: none !important;
   }
 
   /* Hero layout */
   body.home-page .hero {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto !important;
   }
 
   body.home-page .hero-content {
-    padding: 48px 24px 40px 24px;
+    padding: 48px 24px 40px 24px !important;
   }
 
   /* Image hero : supprime le décalage desktop, recentre pour afficher les 3 élèves */
   body.home-page .hero-img {
-    height: 100%;
-    margin-top: 0;
-    object-position: 50% 20%;
+    height: 100% !important;
+    margin-top: 0 !important;
+    object-position: 50% 20% !important;
   }
 
   /* Cartes */
   body.home-page .cards-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 
-  /* Footer : empilement vertical, texte sans débordement */
+  /* Footer : empilement vertical, tous les textes visibles sans coupure */
   body.home-page .footer-inner {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
   }
   body.home-page .footer-rule {
-    flex: none;
-    width: 100%;
+    flex: none !important;
+    width: 100% !important;
   }
   body.home-page .footer-body {
-    flex-shrink: 1;
-    width: 100%;
+    flex-shrink: 1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
   }
   body.home-page .footer-text {
-    word-break: break-word;
-    overflow-wrap: break-word;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    overflow: visible !important;
+    max-width: 100% !important;
+    text-align: center !important;
   }
   body.home-page .footer-credit {
-    flex: none;
-    text-align: center;
-    width: 100%;
+    flex: none !important;
+    text-align: center !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }
 
 @media (max-width: 480px) {
 
-  /* Réduction des paddings sur très petits écrans */
+  /* Paddings réduits sur 320-480 px */
   body.home-page .container,
   body.home-page .header-inner {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
   }
 
-  /* Logo et texte légèrement réduits sur 320-480 px */
+  /* Logo et texte légèrement réduits */
   body.home-page .header-logo {
-    height: 40px;
+    height: 40px !important;
   }
   body.home-page .header-sub {
-    font-size: 9.5px;
+    font-size: 10px !important;
   }
 
   body.home-page .cards-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 }
