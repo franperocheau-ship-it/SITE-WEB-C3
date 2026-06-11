@@ -709,6 +709,123 @@
       .ex-score-value { font-size: 60px; }
       .ex-score-pct { font-size: 22px; }
     }
+
+    /* ── Type : produire-3-formes ───────────────────────────────────────── */
+    .pfi-field { margin-bottom: 22px; }
+
+    .pfi-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pfi-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .pfi-bonus .pfi-tag {
+      background: rgba(16,43,106,0.14);
+      color: var(--blue);
+    }
+
+    .pfi-bonus-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 9px;
+      background: rgba(22,163,74,0.10);
+      color: #15803d;
+      border: 1px solid rgba(22,163,74,0.25);
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    .pfi-hint {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .pfi-input-row { margin-bottom: 6px; }
+    .pfi-input-row .ex-text-input { font-size: 17px; }
+
+    .pfi-field-feedback { min-height: 0; }
+
+    .pfi-validate-row {
+      text-align: center;
+      margin-top: 26px;
+    }
+
+    .pfi-summary {
+      margin-top: 28px;
+      border-top: 1.5px solid var(--border);
+      padding-top: 22px;
+      animation: exFadeIn 320ms ease forwards;
+    }
+
+    .pfi-summary-title {
+      font-weight: 800;
+      font-size: 11px;
+      color: var(--blue);
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .pfi-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .pfi-summary-item {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 15px;
+    }
+
+    .pfi-summary-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .pfi-summary-sentence {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .pfi-hl       { font-weight: 800; border-radius: 3px; padding: 0 2px; }
+    .pfi-hl-inton { color: var(--blue); background: rgba(16,43,106,0.09); }
+    .pfi-hl-ecq   { color: #15803d;     background: rgba(22,163,74,0.10); }
+    .pfi-hl-inv   { color: var(--red);  background: rgba(214,40,57,0.08); }
+
+    @media (max-width: 600px) {
+      .pfi-summary-grid { grid-template-columns: 1fr; }
+      .pfi-input-row .ex-text-input { font-size: 16px; }
+    }
   </style>
 </head>
 <body>
@@ -716,13 +833,13 @@
   <!-- NAVBAR -->
   <header class="header">
     <div class="header-inner">
-      <div class="header-brand">
+      <a href="index.html" class="header-brand">
         <img src="assets/lfm-logo.svg" alt="Lycée Français de Madrid" class="header-logo">
         <div class="header-text">
           <span class="header-name">LYCÉE FRANÇAIS DE MADRID</span>
           <span class="header-sub">François PEROCHEAU - Classe de CM2</span>
         </div>
-      </div>
+      </a>
       <div class="header-actions">
         <span class="lang-badge">FR</span>
         <button class="menu-btn" aria-label="Ouvrir le menu">
@@ -754,6 +871,12 @@
         <div id="type-select-screen" class="ex-hidden">
           <p class="ex-type-select-label">Quel type d'exercice veux-tu faire ?</p>
           <div class="ex-type-grid" id="ex-type-grid"></div>
+        </div>
+
+        <!-- ── Level selection screen (produire-3-formes) ── -->
+        <div id="level-select-screen" class="ex-hidden">
+          <p class="ex-type-select-label">Quel est ton niveau ?</p>
+          <div class="ex-type-grid" id="ex-level-grid"></div>
         </div>
 
         <!-- ── Exercise screen ── -->
@@ -834,8 +957,9 @@
     let score         = 0;
     let sessionData   = null;
     let currentType   = null;   /* set once per session */
-    let wordOrderAnswer = [];   /* word-order type */
-    let conjTableRows   = [];   /* conjugation-table type */
+    let wordOrderAnswer  = [];   /* word-order type */
+    let conjTableRows    = [];   /* conjugation-table type */
+    let pfiSelectedLevel = null; /* produire-3-formes : niveau sélectionné */
 
     const SUCCESS = ["✅ Bravo !", "✨ Très bien !", "🌟 Exact !"];
 
@@ -900,6 +1024,7 @@
     /* ── Session start ────────────────────────────────────────────────────── */
 
     function startSession() {
+      pfiSelectedLevel = null; /* reset level choice for each new session */
       /* Multiple types → show the choice screen; single type → start directly */
       if (sessionData.exerciseTypes && sessionData.exerciseTypes.length > 1) {
         showTypeSelect();
@@ -910,6 +1035,7 @@
 
     function showTypeSelect() {
       document.getElementById("type-select-screen").classList.remove("ex-hidden");
+      document.getElementById("level-select-screen").classList.add("ex-hidden");
       document.getElementById("exercise-screen").classList.add("ex-hidden");
       document.getElementById("results-screen").classList.add("ex-hidden");
 
@@ -938,6 +1064,45 @@
           const t = btn.dataset.type;
           document.getElementById("type-select-screen").classList.add("ex-hidden");
           startSessionWithType(t === "__random__" ? rand(sessionData.exerciseTypes) : t);
+        })
+      );
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showLevelSelect() {
+      document.getElementById("type-select-screen").classList.add("ex-hidden");
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels = sessionData.levels || ["CM1", "CM2", "6e"];
+      const descs  = {
+        "CM1": "2 formes : intonation + est-ce que (inversion en bonus)",
+        "CM2": "3 formes : intonation, est-ce que et inversion",
+        "6e":  "3 formes : intonation, est-ce que et inversion"
+      };
+      const badgeCls = { "CM1": "badge-cm1", "CM2": "badge-cm2", "6e": "badge-6e" };
+
+      const grid = document.getElementById("ex-level-grid");
+      grid.innerHTML = levels.map(l => `
+        <button class="ex-type-card" data-level="${l}">
+          <span class="ex-type-icon">
+            <span class="badge ${badgeCls[l] || 'badge-cm1'}" style="font-size:13px;padding:4px 12px">${l}</span>
+          </span>
+          <div>
+            <span class="ex-type-name">${l}</span>
+            <span class="ex-type-desc">${descs[l] || ''}</span>
+          </div>
+        </button>`).join('');
+
+      grid.querySelectorAll(".ex-type-card").forEach(btn =>
+        btn.addEventListener("click", () => {
+          pfiSelectedLevel = btn.dataset.level;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          window.scrollTo({ top: 0, behavior: "smooth" });
         })
       );
 
@@ -987,6 +1152,12 @@
         backTypeBtn.classList.add("ex-hidden");
       }
 
+      /* produire-3-formes : ask for level before starting */
+      if (currentType === "produire-3-formes" && !pfiSelectedLevel) {
+        showLevelSelect();
+        return;
+      }
+
       document.getElementById("results-screen").classList.add("ex-hidden");
       document.getElementById("exercise-screen").classList.remove("ex-hidden");
 
@@ -1030,6 +1201,10 @@
         renderYesNo(card, q);
       } else if (currentType === "transform-interrogative") {
         renderTransformInterrogative(card, q);
+      } else if (currentType === "transform-negative") {
+        renderTransformNegative(card, q);
+      } else if (currentType === "produire-3-formes") {
+        renderProduire3Formes(card, q);
       }
     }
 
@@ -1982,6 +2157,385 @@
             document.getElementById("ti-retry-btn").addEventListener("click", enableRetry);
           }
         }
+      }
+    }
+
+    /* ── Type: transform-negative ───────────────────────────────────────────── */
+
+    function normTN(str) {
+      return str
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, ' ')
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, '')
+        .replace(/[''`´''‛]/g, "'");
+    }
+
+    function validateTN(answer, q) {
+      const raw  = answer.trim();
+      const norm = normTN(raw);
+      const NEG_PATS = ['pas', 'plus', 'jamais', 'rien', 'personne'];
+      const hasNe      = norm.includes(' ne ') || norm.startsWith('ne ') || norm.includes("n'");
+      const hasNegWord = NEG_PATS.some(w => new RegExp('\\b' + w + '\\b').test(norm));
+
+      /* Négation orale (pas de «ne»  mais mot négatif présent) — non comptée */
+      if (!hasNe && hasNegWord) return { valid: false, reason: 'oral-negation' };
+
+      /* Point final */
+      if (!raw.endsWith('.')) return { valid: false, reason: 'no-period' };
+
+      /* «ne» sans deuxième partie */
+      if (hasNe && !hasNegWord) return { valid: false, reason: 'missing-neg-word' };
+
+      /* Aucune négation */
+      if (!hasNe) return { valid: false, reason: 'no-negation' };
+
+      /* Mots-clés conservés */
+      const wordStr = norm.replace(/[?.!;:«»'".,]/g, '');
+      const missing = q.keyWords.filter(w => !wordStr.includes(normTN(w)));
+      if (missing.length > 0) return { valid: false, reason: 'missing-words' };
+
+      return { valid: true };
+    }
+
+    function highlightNegation(answer) {
+      let result = answer.replace(/[''`´''‛]/g, "'");
+      result = result.replace(/\bne\b/gi, '<strong style="color:var(--red)">ne</strong>');
+      result = result.replace(/\bn'/gi, '<strong style="color:var(--red)">n\'</strong>');
+      const negWords = ['pas', 'plus', 'jamais', 'rien', 'personne'];
+      for (const w of negWords) {
+        const regex = new RegExp('\\b' + w + '\\b', 'gi');
+        const updated = result.replace(regex, '<strong style="color:var(--red)">' + w + '</strong>');
+        if (updated !== result) { result = updated; break; }
+      }
+      return result;
+    }
+
+    function renderTransformNegative(card, q) {
+      let remainingAttempts = 2;
+      let scored = false;
+
+      card.innerHTML = `
+        <p class="ex-question-label">Transforme cette phrase affirmative en phrase négative.</p>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="tn-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Écris ta phrase négative…">
+          <button class="ex-validate-btn" id="tn-validate">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const inp = document.getElementById("tn-input");
+      const btn = document.getElementById("tn-validate");
+      setTimeout(() => inp.focus(), 50);
+      btn.addEventListener("click", submit);
+      inp.addEventListener("keydown", e => { if (e.key === "Enter") submit(); });
+
+      function enableRetry(keepValue) {
+        inp.disabled = false;
+        inp.classList.remove("is-correct", "is-wrong");
+        if (!keepValue) inp.value = "";
+        btn.disabled = false;
+        document.getElementById("feedback1").innerHTML = "";
+        inp.focus();
+      }
+
+      function submit() {
+        const answer = inp.value.trim();
+        if (!answer) return;
+
+        const result = validateTN(answer, q);
+
+        /* Négation orale — non comptée comme essai, input reste intact */
+        if (!result.valid && result.reason === 'oral-negation') {
+          inp.classList.add("is-wrong");
+          setFeedback("feedback1", `
+            <div class="ex-feedback-wrong" style="margin-bottom:12px">
+              ⚠️ Presque ! À l'oral, on dit souvent ça. Mais à l'écrit, la négation s'écrit en deux parties : <strong>ne … pas</strong>.<br>
+              Essaie : <em>« ${q.modelNeg} »</em>
+            </div>
+            <button class="ex-validate-btn" id="tn-retry-btn">Réessayer</button>
+          `);
+          document.getElementById("tn-retry-btn").addEventListener("click", () => enableRetry(true));
+          return;
+        }
+
+        inp.disabled = true;
+        btn.disabled = true;
+
+        if (result.valid) {
+          if (!scored) { score++; scored = true; }
+          inp.classList.add("is-correct");
+          setFeedback("feedback1", `
+            <div class="ex-feedback-correct">
+              ${rand(SUCCESS)}<br>
+              ${highlightNegation(answer)}
+            </div>
+          `);
+          showNextBtn();
+
+        } else {
+          inp.classList.add("is-wrong");
+          remainingAttempts--;
+
+          const errMsg = result.reason === 'no-period'
+            ? "Une phrase se termine par un point ( . )."
+            : result.reason === 'missing-neg-word'
+            ? "Il manque la deuxième partie de la négation : ne … pas, ne … plus, ne … jamais."
+            : result.reason === 'no-negation'
+            ? "Pense à ajouter la négation : <strong>ne … pas</strong> autour du verbe."
+            : "Pense à conserver les mots importants de la phrase de départ.";
+
+          if (remainingAttempts <= 0) {
+            setFeedback("feedback1", `
+              <div class="ex-feedback-wrong">
+                ❌ ${errMsg}<br><br>
+                <strong>Réponse modèle :</strong><br>
+                <em>« ${q.modelNeg} »</em>
+              </div>
+            `);
+            showNextBtn();
+          } else {
+            setFeedback("feedback1", `
+              <div class="ex-feedback-wrong" style="margin-bottom:12px">
+                ❌ ${errMsg}<br>
+                <span style="font-size:12px;opacity:0.8">Il te reste 1 essai.</span>
+              </div>
+              <button class="ex-validate-btn" id="tn-retry-btn">Réessayer</button>
+            `);
+            document.getElementById("tn-retry-btn").addEventListener("click", () => enableRetry(false));
+          }
+        }
+      }
+    }
+
+    /* ── Type: produire-3-formes ────────────────────────────────────────────
+       6 phrases déclaratives → 3 champs (intonation / est-ce que / inversion)
+       CM1 : champ inversion = bonus (non obligatoire)
+       2 essais par champ, puis réponse modèle pour ce champ uniquement
+    ─────────────────────────────────────────────────────────────────────── */
+
+    function normPFI(str) {
+      return str
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, ' ')
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, '')
+        .replace(/œ/g, 'oe')
+        .replace(/æ/g, 'ae')
+        .replace(/[''`´'']/g, "'");
+    }
+
+    function pfiValidateField(idx, rawValue, q) {
+      const raw     = rawValue.trim();
+      const norm    = normPFI(raw);
+      const wordStr = norm.replace(/[?.,!;:«»'"]/g, ' ');
+
+      if (!raw.endsWith('?')) return { ok: false, reason: 'no-qmark' };
+
+      const missing = q.keyWords.filter(w => !wordStr.includes(normPFI(w)));
+      if (missing.length > 0) return { ok: false, reason: 'missing-words' };
+
+      const hasEcQ = /est-ce qu/.test(norm);
+      const hasInv = /[a-z]+(-t)?-(je|tu|il|elle|on|nous|vous|ils|elles)\b/.test(norm);
+
+      if (idx === 0) {
+        if (hasEcQ || hasInv) return { ok: false, reason: 'not-intonation' };
+        return { ok: true };
+      }
+      if (idx === 1) {
+        if (!hasEcQ) return { ok: false, reason: 'no-ecq' };
+        return { ok: true };
+      }
+      if (idx === 2) {
+        if (!hasInv) return { ok: false, reason: 'no-inv' };
+        return { ok: true };
+      }
+      return { ok: true };
+    }
+
+    function pfiErrMsg(reason) {
+      const msgs = {
+        'no-qmark':      "Une phrase interrogative se termine par un point d'interrogation ( ? ).",
+        'missing-words': "Pense à conserver les mots importants de la phrase de départ.",
+        'not-intonation':"Ici, on garde l'ordre de la phrase déclarative et on ajoute seulement le point d'interrogation.",
+        'no-ecq':        "Cette forme doit commencer par « Est-ce que ».",
+        'no-inv':        "Ici, le verbe passe devant le sujet, reliés par un tiret : « Ranges-tu… »."
+      };
+      return msgs[reason] || "Vérifie ta réponse.";
+    }
+
+    function pfiHighlight(text, form) {
+      const esc = text
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      if (form === 'intonation') {
+        return esc.replace(/\?$/, '<span class="pfi-hl pfi-hl-inton">?</span>');
+      }
+      if (form === 'ecq') {
+        return esc.replace(
+          /(est-ce que|est-ce qu['''])/gi,
+          '<span class="pfi-hl pfi-hl-ecq">$1</span>'
+        );
+      }
+      if (form === 'inv') {
+        return esc.replace(
+          /([A-Za-zÀ-ɏ]+(?:-t)?-(je|tu|il|elle|on|nous|vous|ils|elles))/gi,
+          '<span class="pfi-hl pfi-hl-inv">$1</span>'
+        );
+      }
+      return esc;
+    }
+
+    function renderProduire3Formes(card, q) {
+      const cm1 = pfiSelectedLevel === 'CM1';
+
+      /* per-field state */
+      const fs = [
+        { attempts: 0, done: false, scored: false, required: true    },
+        { attempts: 0, done: false, scored: false, required: true    },
+        { attempts: 0, done: false, scored: false, required: !cm1   }
+      ];
+
+      const fields = [
+        { tag:'1', label:"Avec l'intonation",          hint:'(même ordre des mots + ?)',  ph:"Ex. : Tu aides ta sœur ?"           },
+        { tag:'2', label:"Avec <em>est-ce que</em>",   hint:'',                            ph:"Ex. : Est-ce que tu aides ta sœur ?" },
+        { tag:'3', label:"Avec l'inversion du sujet",  hint:'',                            ph:"Ex. : Aides-tu ta sœur ?"            }
+      ];
+
+      card.innerHTML = `
+        <p class="ex-question-label">Écris la même question de trois façons différentes.</p>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        ${fields.map((f, i) => `
+          <div class="pfi-field${i === 2 && cm1 ? ' pfi-bonus' : ''}" id="pfi-field-${i}">
+            <div class="pfi-label">
+              <span class="pfi-tag">${f.tag}</span>
+              ${f.label}
+              ${f.hint ? `<span class="pfi-hint">${f.hint}</span>` : ''}
+              ${i === 2 && cm1 ? '<span class="pfi-bonus-tag">Bonus</span>' : ''}
+            </div>
+            <div class="pfi-input-row">
+              <input type="text" class="ex-text-input pfi-input" id="pfi-inp-${i}"
+                     autocomplete="off" autocorrect="off" autocapitalize="off"
+                     spellcheck="false" placeholder="${f.ph}">
+            </div>
+            <div class="pfi-field-feedback" id="pfi-fb-${i}"></div>
+          </div>`).join('')}
+        <div class="pfi-validate-row">
+          <button class="ex-validate-btn" id="pfi-validate">Valider les formes</button>
+        </div>
+        <div id="pfi-summary" class="pfi-summary ex-hidden"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      for (let i = 0; i < 3; i++) {
+        const inp = document.getElementById(`pfi-inp-${i}`);
+        inp.addEventListener('input',   () => inp.classList.remove('is-wrong'));
+        inp.addEventListener('keydown', e  => { if (e.key === 'Enter') runValidate(); });
+      }
+      setTimeout(() => document.getElementById('pfi-inp-0').focus(), 50);
+
+      let validating = false;
+      document.getElementById('pfi-validate').addEventListener('click', runValidate);
+
+      function runValidate() {
+        if (validating) return;
+        const btn = document.getElementById('pfi-validate');
+        if (btn.disabled) return;
+        validating = true;
+
+        const models = [q.modelIntonation, q.modelEcQ, q.modelInv];
+
+        for (let i = 0; i < 3; i++) {
+          if (fs[i].done) continue;
+
+          const inp = document.getElementById(`pfi-inp-${i}`);
+          const fb  = document.getElementById(`pfi-fb-${i}`);
+          const val = inp.value;
+
+          /* CM1 bonus field empty while required fields still open → skip */
+          if (!val.trim()) continue;
+
+          const res = pfiValidateField(i, val, q);
+
+          if (res.ok) {
+            fs[i].done = fs[i].scored = true;
+            inp.classList.remove('is-wrong');
+            inp.classList.add('is-correct');
+            inp.disabled = true;
+            const okMsgs = [
+              "✅ Bonne forme avec l'intonation !",
+              "✅ Bonne forme avec <em>est-ce que</em> !",
+              "✅ Bonne forme avec l'inversion du sujet !"
+            ];
+            fb.innerHTML = `<div class="ex-feedback-correct" style="font-size:13px;padding:10px 14px;margin-top:6px">${okMsgs[i]}</div>`;
+          } else {
+            fs[i].attempts++;
+            inp.classList.add('is-wrong');
+
+            if (fs[i].attempts >= 2) {
+              fs[i].done = true;
+              inp.disabled = true;
+              fb.innerHTML = `
+                <div class="ex-feedback-wrong" style="font-size:13px;padding:10px 14px;margin-top:6px">
+                  ❌ ${pfiErrMsg(res.reason)}<br>
+                  <strong>Réponse modèle :</strong> <em>« ${models[i]} »</em>
+                </div>`;
+            } else {
+              fb.innerHTML = `
+                <div class="ex-feedback-wrong" style="font-size:13px;padding:10px 14px;margin-top:6px">
+                  ❌ ${pfiErrMsg(res.reason)}
+                  <span style="display:block;font-size:11px;opacity:0.75;margin-top:3px">Il te reste 1 essai pour ce champ.</span>
+                </div>`;
+            }
+          }
+        }
+
+        /* CM1 : if required fields done and bonus field empty → close it */
+        if (cm1 && !fs[2].done && fs[0].done && fs[1].done) {
+          const inp3 = document.getElementById('pfi-inp-2');
+          if (!inp3.value.trim()) {
+            fs[2].done = true;
+            inp3.disabled = true;
+          }
+        }
+
+        const allDone = fs[0].done && fs[1].done && fs[2].done;
+
+        if (allDone) {
+          btn.disabled = true;
+          if (fs.every((f, i) => !f.required || f.scored)) score++;
+          showPFISummary(q);
+          showNextBtn();
+        } else if (cm1 && fs[0].done && fs[1].done) {
+          btn.textContent = 'Valider le bonus';
+        }
+
+        validating = false;
+      }
+
+      function showPFISummary(q) {
+        const el = document.getElementById('pfi-summary');
+        el.classList.remove('ex-hidden');
+        const items = [
+          { label: "Avec l'intonation", text: q.modelIntonation, form: 'intonation' },
+          { label: "Avec est-ce que",   text: q.modelEcQ,        form: 'ecq'        },
+          { label: "Avec l'inversion",  text: q.modelInv,        form: 'inv'        }
+        ];
+        el.innerHTML = `
+          <div class="pfi-summary-title">Récapitulatif — Les 3 formes interrogatives</div>
+          <div class="pfi-summary-grid">
+            ${items.map(it => `
+              <div class="pfi-summary-item">
+                <div class="pfi-summary-label">${it.label}</div>
+                <div class="pfi-summary-sentence">${pfiHighlight(it.text, it.form)}</div>
+              </div>`).join('')}
+          </div>`;
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }
 

@@ -1413,6 +1413,67 @@ const EXERCISE_DATA = {
     ]
   },
 
+  "transformer-affirmative-negative": {
+    title: "Transformer une phrase affirmative en phrase négative",
+    levels: ["CM1", "CM2", "6e"],
+    type: "transform-negative",
+    questionsPerSession: 10,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+
+    bank: [
+      {
+        sentence:  "Tu ranges tes affaires.",
+        keyWords:  ["ranges", "affaires"],
+        modelNeg:  "Tu ne ranges pas tes affaires."
+      },
+      {
+        sentence:  "Il mange des bonbons.",
+        keyWords:  ["mange", "bonbons"],
+        modelNeg:  "Il ne mange pas de bonbons."
+      },
+      {
+        sentence:  "Les enfants jouent dans le jardin.",
+        keyWords:  ["enfants", "jouent", "jardin"],
+        modelNeg:  "Les enfants ne jouent pas dans le jardin."
+      },
+      {
+        sentence:  "Elle lit tous les soirs.",
+        keyWords:  ["lit", "soirs"],
+        modelNeg:  "Elle ne lit pas tous les soirs."
+      },
+      {
+        sentence:  "Nous aimons la pizza.",
+        keyWords:  ["aimons", "pizza"],
+        modelNeg:  "Nous n'aimons pas la pizza."
+      },
+      {
+        sentence:  "Je comprends la leçon.",
+        keyWords:  ["comprends", "leçon"],
+        modelNeg:  "Je ne comprends pas la leçon."
+      },
+      {
+        sentence:  "Le chat dort sur le canapé.",
+        keyWords:  ["chat", "dort", "canapé"],
+        modelNeg:  "Le chat ne dort pas sur le canapé."
+      },
+      {
+        sentence:  "Vous regardez la télévision.",
+        keyWords:  ["regardez", "télévision"],
+        modelNeg:  "Vous ne regardez pas la télévision."
+      },
+      {
+        sentence:  "Papa prépare le dîner.",
+        keyWords:  ["prépare", "dîner"],
+        modelNeg:  "Papa ne prépare pas le dîner."
+      },
+      {
+        sentence:  "Les élèves écoutent la maîtresse.",
+        keyWords:  ["élèves", "écoutent", "maîtresse"],
+        modelNeg:  "Les élèves n'écoutent pas la maîtresse."
+      }
+    ]
+  },
+
   "identifier-phrase-interrogative": {
     title: "Identifier une phrase interrogative",
     levels: ["CM1", "CM2", "6e"],
@@ -1701,6 +1762,66 @@ const EXERCISE_DATA = {
         answer:     "résout",
         choices:    ["léa",       "résout",     "exercice",     "rapidement"],
         difficulty: 3
+      }
+    ]
+  },
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     Produire différentes formes de phrases interrogatives
+     Type custom : produire-3-formes
+     3 champs par phrase (intonation / est-ce que / inversion)
+     CM1 → 2 formes obligatoires (inversion = bonus)
+     CM2 / 6e → 3 formes obligatoires
+  ───────────────────────────────────────────────────────────────────────── */
+  "produire-formes-interrogatives": {
+    title: "Produire différentes formes de phrases interrogatives",
+    levels: ["CM1", "CM2", "6e"],
+    type: "produire-3-formes",
+    questionsPerSession: 6,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+
+    bank: [
+      {
+        sentence:        "Tu aides ta sœur.",
+        keyWords:        ["aides", "sœur"],
+        modelIntonation: "Tu aides ta sœur ?",
+        modelEcQ:        "Est-ce que tu aides ta sœur ?",
+        modelInv:        "Aides-tu ta sœur ?"
+      },
+      {
+        sentence:        "Elle dessine un château.",
+        keyWords:        ["dessine", "château"],
+        modelIntonation: "Elle dessine un château ?",
+        modelEcQ:        "Est-ce qu'elle dessine un château ?",
+        modelInv:        "Dessine-t-elle un château ?"
+      },
+      {
+        sentence:        "Vous lisez un livre.",
+        keyWords:        ["lisez", "livre"],
+        modelIntonation: "Vous lisez un livre ?",
+        modelEcQ:        "Est-ce que vous lisez un livre ?",
+        modelInv:        "Lisez-vous un livre ?"
+      },
+      {
+        sentence:        "Il fait beau aujourd'hui.",
+        keyWords:        ["fait", "beau"],
+        modelIntonation: "Il fait beau aujourd'hui ?",
+        modelEcQ:        "Est-ce qu'il fait beau aujourd'hui ?",
+        modelInv:        "Fait-il beau aujourd'hui ?"
+      },
+      {
+        sentence:        "Les élèves travaillent en classe.",
+        keyWords:        ["élèves", "travaillent", "classe"],
+        modelIntonation: "Les élèves travaillent en classe ?",
+        modelEcQ:        "Est-ce que les élèves travaillent en classe ?",
+        modelInv:        "Les élèves travaillent-ils en classe ?"
+      },
+      {
+        sentence:        "Nous allons à la piscine.",
+        keyWords:        ["allons", "piscine"],
+        modelIntonation: "Nous allons à la piscine ?",
+        modelEcQ:        "Est-ce que nous allons à la piscine ?",
+        modelInv:        "Allons-nous à la piscine ?"
       }
     ]
   }
