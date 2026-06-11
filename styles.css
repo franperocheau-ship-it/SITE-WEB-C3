@@ -410,6 +410,18 @@ button { font-family: inherit; cursor: pointer; }
   background: var(--red);
 }
 
+/* Stretched link : toute la carte est cliquable quand le bouton est un <a> */
+.card a.card-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.card:has(a.card-btn) {
+  cursor: pointer;
+}
+
 .card-accent {
   position: absolute;
   bottom: 0;
