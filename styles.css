@@ -93,6 +93,7 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--blue);
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  text-decoration: none;
 }
 
 .header-sub {
@@ -100,6 +101,7 @@ button { font-family: inherit; cursor: pointer; }
   font-weight: 400;
   color: var(--blue);
   letter-spacing: 0.02em;
+  text-decoration: none;
 }
 
 .header-actions {
