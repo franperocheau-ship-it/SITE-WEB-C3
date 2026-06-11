@@ -457,7 +457,6 @@
           {
             label: null,
             skills: [
-              { title: "Reconnaître une fraction",                                         slug: "reconnaitre-fraction",                  levels: ["CM1"] },
               { title: "Lire une fraction",                                                slug: "lire-fraction",                         levels: ["CM1"] },
               { title: "Représenter une fraction",                                         slug: "representer-fraction",                  levels: ["CM1"] },
               { title: "Placer une fraction sur une droite graduée",                       slug: "placer-fraction-droite-graduee",        levels: ["CM2"] },
@@ -486,17 +485,26 @@
       }).join("");
     }
 
+    /* Slugs qui ont une page d'exercice active */
+    const EXERCISE_SLUGS = new Set([
+      "lire-fraction",
+      "representer-fraction"
+    ]);
+
     /* ── Skill card rendering ──────────────────────────────────────────────── */
     function renderSkillCard(skill, sectionId) {
       const displayLevels = expandLevels(skill.levels);
+      const hasExercise   = EXERCISE_SLUGS.has(skill.slug);
+      const href          = hasExercise ? `exercise.html?slug=${skill.slug}` : "#";
+      const onclick       = hasExercise ? "" : `onclick="return false;"`;
       return `
         <a class="skill-card"
-           href="#"
+           href="${href}"
            data-slug="${skill.slug}"
            data-levels="${displayLevels.join(",")}"
            data-title="${skill.title.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}"
            data-section="${sectionId}"
-           onclick="return false;">
+           ${onclick}>
           <div class="skill-badges">${renderBadges(displayLevels)}</div>
           <div class="skill-title">${skill.title}</div>
         </a>

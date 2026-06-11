@@ -826,6 +826,274 @@
       .pfi-summary-grid { grid-template-columns: 1fr; }
       .pfi-input-row .ex-text-input { font-size: 16px; }
     }
+
+    /* ── Type : mots-cliquables ──────────────────────────────────────────── */
+    .ex-word-btn.is-selected {
+      background: rgba(16,43,106,0.12);
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+    .ex-word-btn.is-missed {
+      border: 2px dashed #16a34a;
+      color: #16a34a;
+      background: rgba(22,163,74,0.06);
+    }
+
+    /* ── Type : choix-etiquette ──────────────────────────────────────────── */
+    .ex-label-display {
+      font-size: 56px;
+      text-align: center;
+      margin: 16px 0 6px;
+      line-height: 1;
+    }
+    .ex-label-word {
+      font-size: 28px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 22px;
+      color: var(--blue);
+    }
+
+    /* ── Type : glisser-deposer ──────────────────────────────────────────── */
+    .ex-fill-sentence {
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 2.4;
+      margin: 16px 0;
+      padding: 16px 20px;
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+    }
+    .ex-blank {
+      display: inline-block;
+      min-width: 80px;
+      border-bottom: 3px solid var(--blue);
+      text-align: center;
+      padding: 0 10px 2px;
+      margin: 0 3px;
+      cursor: pointer;
+      font-style: italic;
+      color: rgba(16,43,106,0.4);
+      transition: background 140ms;
+      border-radius: 4px 4px 0 0;
+      vertical-align: text-bottom;
+    }
+    .ex-blank:empty::before { content: "___"; }
+    .ex-blank.is-filled  { font-style: normal; color: inherit; background: rgba(16,43,106,0.06); }
+    .ex-blank.is-target  { background: rgba(16,43,106,0.14); }
+    .ex-blank.is-correct { border-bottom-color: #16a34a; color: #15803d; background: rgba(22,163,74,0.08); }
+    .ex-blank.is-wrong   { border-bottom-color: var(--red); color: var(--red); background: rgba(214,40,57,0.08); }
+    .ex-blank:hover:not([data-locked]) { background: rgba(16,43,106,0.06); }
+    .ex-bank-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: rgba(16,43,106,0.45);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .ex-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 14px;
+      background: rgba(16,43,106,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin: 4px 0 14px;
+      min-height: 50px;
+    }
+
+    /* ── Type : classification-etapes ───────────────────────────────────── */
+    .ex-classify-step { margin-top: 18px; }
+    .ex-classify-step-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: rgba(16,43,106,0.45);
+      margin-bottom: 10px;
+    }
+
+    /* ── Type : lire-fraction ────────────────────────────────────────────── */
+    .frac-display-area {
+      text-align: center;
+      padding: 22px 16px;
+      margin-bottom: 28px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .frac-input-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 auto 8px;
+    }
+    .frac-input-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin: 4px 0;
+    }
+    .frac-field {
+      width: 100px;
+      text-align: center;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 6px;
+      font-family: inherit;
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+    .frac-field:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(16,43,106,0.10);
+    }
+    .frac-field.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.06);
+      color: #15803d;
+    }
+    .frac-field.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+    .frac-field:disabled { cursor: default; }
+    .frac-divider {
+      width: 100px;
+      border-top: 3px solid var(--blue);
+      margin: 6px 0;
+    }
+    .frac-validate-row { text-align: center; margin: 20px 0; }
+    @media (max-width: 600px) {
+      .frac-field { font-size: 24px; width: 80px; }
+      .frac-divider { width: 80px; }
+    }
+
+    /* ── Type : representer-fraction ─────────────────────────────────────── */
+    .rfrac-question-area {
+      text-align: center;
+      padding: 20px 16px 16px;
+      margin-bottom: 20px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+    }
+    .rfrac-display {
+      display: inline-grid;
+      justify-items: center;
+      font-weight: 900;
+      font-size: 44px;
+      color: var(--blue);
+      line-height: 1.15;
+    }
+    .rfrac-num { padding: 0 14px 4px; }
+    .rfrac-den { padding: 4px 14px 0; }
+    .rfrac-bar {
+      width: 100%;
+      height: 3px;
+      background: var(--blue);
+      margin: 2px 0;
+      border: none;
+    }
+    .rfrac-hint {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-top: 10px;
+      margin-bottom: 0;
+    }
+    .rfrac-strips-area {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .rfrac-unit { display: flex; flex-direction: column; gap: 4px; }
+    .rfrac-strip {
+      display: flex;
+      gap: 3px;
+      height: 54px;
+    }
+    .rfrac-unit-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .rfrac-part {
+      flex: 1;
+      min-width: 0;
+      border-radius: 5px;
+      border: 2px solid #93c5fd;
+      background: #eff6ff;
+      cursor: pointer;
+      transition: background 140ms, border-color 140ms;
+      padding: 0;
+    }
+    .rfrac-part:hover:not(:disabled) {
+      border-color: #3b82f6;
+      background: #bfdbfe;
+    }
+    .rfrac-part.is-colored {
+      background: #3b82f6;
+      border-color: #1d4ed8;
+    }
+    .rfrac-part.is-ok {
+      background: #16a34a;
+      border-color: #15803d;
+      cursor: default;
+    }
+    .rfrac-part:disabled { cursor: default; }
+    .rfrac-counter {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 16px;
+      min-height: 20px;
+    }
+    .rfrac-validate-row { text-align: center; margin-bottom: 4px; }
+    @media (max-width: 600px) {
+      .rfrac-strip { height: 42px; gap: 2px; }
+      .rfrac-display { font-size: 36px; }
+    }
+
+    /* ── Type : placer-fraction-droite ──────────────────────────────────── */
+    .nline-question-area {
+      text-align: center;
+      padding: 20px 16px 16px;
+      margin-bottom: 20px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+    }
+    .nline-scroll-wrap {
+      overflow-x: auto;
+      padding: 8px 4px 12px;
+      margin-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .nline-status {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--blue);
+      min-height: 20px;
+      margin-bottom: 16px;
+    }
   </style>
 </head>
 <body>
@@ -1024,7 +1292,10 @@
     /* ── Session start ────────────────────────────────────────────────────── */
 
     function startSession() {
-      pfiSelectedLevel = null; /* reset level choice for each new session */
+      pfiSelectedLevel = null;
+      fracLevel        = null;
+      rfLevel          = null;
+      nlLevel          = null;
       /* Multiple types → show the choice screen; single type → start directly */
       if (sessionData.exerciseTypes && sessionData.exerciseTypes.length > 1) {
         showTypeSelect();
@@ -1205,6 +1476,20 @@
         renderTransformNegative(card, q);
       } else if (currentType === "produire-3-formes") {
         renderProduire3Formes(card, q);
+      } else if (currentType === "mots-cliquables") {
+        renderMotsCliquables(card, q);
+      } else if (currentType === "choix-etiquette") {
+        renderChoixEtiquette(card, q);
+      } else if (currentType === "glisser-deposer") {
+        renderGlisserDeposer(card, q);
+      } else if (currentType === "classification-etapes") {
+        renderClassificationEtapes(card, q);
+      } else if (currentType === "lire-fraction") {
+        renderLireFraction(card, q);
+      } else if (currentType === "representer-fraction") {
+        renderRepresenterFraction(card, q);
+      } else if (currentType === "placer-fraction-droite") {
+        renderPlacerFractionDroite(card, q);
       }
     }
 
@@ -2537,6 +2822,681 @@
           </div>`;
         el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
+    }
+
+    /* ── Type : mots-cliquables ─────────────────────────────────────────── */
+
+    function renderMotsCliquables(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction}</p>
+        <div class="ex-sentence-words" id="mc-words"></div>
+        <div class="ex-feedback-area" id="mc-piege" style="min-height:24px"></div>
+        <button class="ex-choice" id="mc-validate" style="margin-top:10px;width:100%">Valider ma sélection</button>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      const container = document.getElementById("mc-words");
+      const selected  = new Set();
+      let answered    = false;
+
+      q.sentence.split(/\s+/).forEach(token => {
+        const clean = token.replace(/[.,!?;:«»"""'']/g, "");
+        if (!clean) return;
+        const btn = document.createElement("button");
+        btn.className    = "ex-word-btn";
+        btn.textContent  = token;
+        btn.dataset.clean = clean;
+
+        btn.addEventListener("click", () => {
+          if (answered) return;
+          if (selected.has(clean)) {
+            selected.delete(clean);
+            btn.classList.remove("is-selected");
+            document.getElementById("mc-piege").innerHTML = "";
+          } else {
+            selected.add(clean);
+            btn.classList.add("is-selected");
+            const piegeMsg = q.piege && (q.piege[clean] || q.piege[token]);
+            if (piegeMsg) {
+              document.getElementById("mc-piege").innerHTML =
+                `<div class="ex-feedback-wrong" style="font-size:13px;padding:8px 12px">⚠️ ${piegeMsg}</div>`;
+            }
+          }
+        });
+        container.appendChild(btn);
+      });
+
+      document.getElementById("mc-validate").addEventListener("click", () => {
+        if (answered) return;
+        answered = true;
+        let hasWrong = false, hasMissed = false;
+
+        container.querySelectorAll(".ex-word-btn").forEach(btn => {
+          const clean      = btn.dataset.clean;
+          const isTarget   = q.targets.includes(clean);
+          const wasSelected = selected.has(clean);
+          btn.disabled = true;
+          btn.classList.remove("is-selected");
+
+          if      (isTarget && wasSelected)  { btn.classList.add("is-correct"); }
+          else if (isTarget && !wasSelected) { btn.classList.add("is-missed"); hasMissed = true; }
+          else if (!isTarget && wasSelected) { btn.classList.add("is-wrong"); btn.classList.add("shake"); hasWrong = true; }
+        });
+
+        document.getElementById("mc-validate").disabled = true;
+        document.getElementById("mc-piege").innerHTML   = "";
+
+        if (!hasWrong && !hasMissed) {
+          score++;
+          setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+        } else {
+          setFeedback("feedback1", `
+            <div class="ex-feedback-wrong">
+              ❌ Pas tout à fait !
+              Les bonnes réponses sont en vert${hasMissed ? "; les mots manqués sont encadrés en pointillés" : ""}.
+            </div>`);
+        }
+        showNextBtn();
+      });
+    }
+
+    /* ── Type : choix-etiquette ──────────────────────────────────────────── */
+
+    function renderChoixEtiquette(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction || 'Quel déterminant va avec ce nom ?'}</p>
+        <div class="ex-label-display">${q.emoji || ''}</div>
+        <div class="ex-label-word">${q.word}</div>
+        <div class="ex-choices-grid" id="ex-choices-grid"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      const grid = document.getElementById("ex-choices-grid");
+      shuffle(q.choices).forEach(c => {
+        const btn = document.createElement("button");
+        btn.className  = "ex-choice";
+        btn.textContent = c;
+        btn.addEventListener("click", () => {
+          grid.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
+          const isRight = c === q.answer;
+          grid.querySelectorAll(".ex-choice").forEach(b => {
+            if (b.textContent === q.answer) b.classList.add("is-correct");
+          });
+          if (!isRight) btn.classList.add("is-wrong");
+          if (isRight) {
+            score++;
+            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+          } else {
+            setFeedback("feedback1", `
+              <div class="ex-feedback-wrong">
+                ❌ On dit : <strong>${q.answer} ${q.word}</strong>.
+              </div>`);
+          }
+          showNextBtn();
+        });
+        grid.appendChild(btn);
+      });
+    }
+
+    /* ── Type : glisser-deposer ──────────────────────────────────────────── */
+
+    function renderGlisserDeposer(card, q) {
+      let blankIdx = 0;
+      const templateHtml = q.template.replace(/___/g, () =>
+        `<span class="ex-blank" data-idx="${blankIdx++}" data-val=""></span>`
+      );
+
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction || 'Place les bons mots dans les cases.'}</p>
+        <div class="ex-fill-sentence" id="gd-sentence">${templateHtml}</div>
+        <div class="ex-bank-label">Mots disponibles :</div>
+        <div class="ex-bank" id="gd-bank"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-choice" id="gd-validate" style="margin-top:10px;width:100%">Valider</button>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const bankEl  = document.getElementById("gd-bank");
+      let selected  = null;
+      let answered  = false;
+
+      shuffle([...q.bank]).forEach(word => {
+        const btn = document.createElement("button");
+        btn.className    = "ex-word-btn";
+        btn.textContent  = word;
+        btn.dataset.word = word;
+        btn.addEventListener("click", () => {
+          if (answered) return;
+          if (selected && selected.bankBtn === btn) {
+            btn.classList.remove("is-selected");
+            selected = null;
+            return;
+          }
+          if (selected) selected.bankBtn.classList.remove("is-selected");
+          selected = { word, bankBtn: btn };
+          btn.classList.add("is-selected");
+        });
+        bankEl.appendChild(btn);
+      });
+
+      document.getElementById("gd-sentence").querySelectorAll(".ex-blank").forEach(blank => {
+        blank.addEventListener("click", () => {
+          if (answered) return;
+          const currentVal = blank.dataset.val;
+
+          if (selected) {
+            if (currentVal) {
+              const oldBtn = bankEl.querySelector(`[data-word="${currentVal}"]`);
+              if (oldBtn) { oldBtn.disabled = false; oldBtn.classList.remove("ex-word-used"); }
+            }
+            blank.dataset.val  = selected.word;
+            blank.textContent  = selected.word;
+            blank.classList.add("is-filled");
+            selected.bankBtn.disabled = true;
+            selected.bankBtn.classList.add("ex-word-used");
+            selected.bankBtn.classList.remove("is-selected");
+            selected = null;
+          } else if (currentVal) {
+            const oldBtn = bankEl.querySelector(`[data-word="${currentVal}"]`);
+            if (oldBtn) { oldBtn.disabled = false; oldBtn.classList.remove("ex-word-used"); }
+            blank.dataset.val = "";
+            blank.textContent = "";
+            blank.classList.remove("is-filled");
+          }
+        });
+      });
+
+      document.getElementById("gd-validate").addEventListener("click", () => {
+        if (answered) return;
+        answered = true;
+
+        const blanks = document.getElementById("gd-sentence").querySelectorAll(".ex-blank");
+        let correct  = 0;
+        blanks.forEach((blank, i) => {
+          const val    = blank.dataset.val;
+          const expect = q.blanks[i];
+          blank.dataset.locked = "1";
+          if (val === expect) {
+            blank.classList.add("is-correct");
+            correct++;
+          } else {
+            blank.classList.add("is-wrong");
+            if (!val) blank.textContent = `(${expect})`;
+          }
+        });
+
+        bankEl.querySelectorAll(".ex-word-btn").forEach(b => b.disabled = true);
+        document.getElementById("gd-validate").disabled = true;
+
+        if (correct === blanks.length) {
+          score++;
+          setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+        } else {
+          setFeedback("feedback1", `
+            <div class="ex-feedback-wrong">
+              ❌ ${correct}/${blanks.length} bonne${correct > 1 ? "s" : ""} réponse${correct > 1 ? "s" : ""}.
+              Les cases vertes sont correctes.
+            </div>`);
+        }
+        showNextBtn();
+      });
+    }
+
+    /* ── Type : classification-etapes ───────────────────────────────────── */
+
+    function renderClassificationEtapes(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction || 'Identifie, puis classe.'}</p>
+        <div class="ex-sentence-display">${q.sentence}</div>
+
+        <div id="ce-step1" class="ex-classify-step">
+          <div class="ex-classify-step-title">Étape 1 — ${q.step1Instruction}</div>
+          <div class="ex-sentence-words" id="ce-words"></div>
+          <div class="ex-feedback-area" id="ce-fb1"></div>
+          <button class="ex-choice" id="ce-val1" style="margin-top:10px;width:100%">Valider l'étape 1</button>
+        </div>
+
+        <div id="ce-step2" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title">Étape 2 — ${q.step2Instruction}</div>
+          <div class="ex-choices-grid" id="ce-choices2"></div>
+          <div class="ex-feedback-area" id="feedback1"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const selected1   = new Set();
+      let step1Correct  = false;
+
+      const wordsEl = document.getElementById("ce-words");
+      q.sentence.split(/\s+/).forEach(token => {
+        const clean = token.replace(/[.,!?;:«»"""'']/g, "");
+        if (!clean) return;
+        const btn = document.createElement("button");
+        btn.className    = "ex-word-btn";
+        btn.textContent  = token;
+        btn.dataset.clean = clean;
+
+        btn.addEventListener("click", () => {
+          if (btn.disabled) return;
+          if (selected1.has(clean)) {
+            selected1.delete(clean);
+            btn.classList.remove("is-selected");
+          } else {
+            selected1.add(clean);
+            btn.classList.add("is-selected");
+          }
+        });
+        wordsEl.appendChild(btn);
+      });
+
+      document.getElementById("ce-val1").addEventListener("click", () => {
+        const targets = new Set(q.step1Targets.map(t => t.replace(/[.,!?;:]/g, "")));
+        let correct   = true;
+
+        wordsEl.querySelectorAll(".ex-word-btn").forEach(btn => {
+          const clean      = btn.dataset.clean;
+          const isTarget   = targets.has(clean);
+          const wasSelected = selected1.has(clean);
+          btn.disabled = true;
+          btn.classList.remove("is-selected");
+
+          if      (isTarget && wasSelected)  { btn.classList.add("is-correct"); }
+          else if (isTarget && !wasSelected) { btn.classList.add("is-missed"); correct = false; }
+          else if (!isTarget && wasSelected) { btn.classList.add("is-wrong"); btn.classList.add("shake"); correct = false; }
+        });
+
+        document.getElementById("ce-val1").disabled = true;
+        step1Correct = correct;
+
+        document.getElementById("ce-fb1").innerHTML = correct
+          ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+          : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Les bonnes réponses sont en vert.</div>`;
+
+        setTimeout(() => {
+          const step2 = document.getElementById("ce-step2");
+          step2.classList.remove("ex-hidden");
+          step2.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }, 500);
+      });
+
+      const choices2El = document.getElementById("ce-choices2");
+      shuffle(q.classifyChoices).forEach(c => {
+        const btn = document.createElement("button");
+        btn.className   = "ex-choice";
+        btn.textContent = c;
+        btn.addEventListener("click", () => {
+          choices2El.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
+          const isRight = c === q.step2Answer;
+          choices2El.querySelectorAll(".ex-choice").forEach(b => {
+            if (b.textContent === q.step2Answer) b.classList.add("is-correct");
+          });
+          if (!isRight) btn.classList.add("is-wrong");
+
+          if (isRight && step1Correct) {
+            score++;
+            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+          } else if (isRight) {
+            setFeedback("feedback1",
+              `<div class="ex-feedback-correct" style="opacity:0.8">
+                ✓ Bonne réponse à l'étape 2 (mais l'étape 1 était incomplète).
+              </div>`);
+          } else {
+            setFeedback("feedback1", `
+              <div class="ex-feedback-wrong">
+                ❌ La bonne réponse est : <strong>${q.step2Answer}</strong>.
+              </div>`);
+          }
+          showNextBtn();
+        });
+        choices2El.appendChild(btn);
+      });
+    }
+
+    /* ── Type : lire-fraction ────────────────────────────────────────────
+       Affiche une figure (bande, disque ou grille rectangulaire) avec des
+       parts coloriées. L'élève écrit la fraction représentée.
+       parts   = dénominateur  |  colored = numérateur
+    ────────────────────────────────────────────────────────────────────── */
+
+    let fracLevel = null;
+
+    /* ── Générateurs SVG ─────────────────────────────────────────── */
+
+    function _fracStrip(parts, colored) {
+      const pw = Math.max(28, Math.floor(300 / parts));
+      const W  = pw * parts, H = 64;
+      let s = '';
+      for (let i = 0; i < parts; i++) {
+        s += `<rect x="${i * pw}" y="0" width="${pw}" height="${H}"
+               fill="${i < colored ? '#3b82f6' : '#e2e8f0'}" stroke="#fff" stroke-width="2"/>`;
+      }
+      s += `<rect x="1" y="1" width="${W - 2}" height="${H - 2}"
+             fill="none" stroke="#1e40af" stroke-width="2" rx="4"/>`;
+      return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"
+               style="max-width:100%;display:block;margin:0 auto">${s}</svg>`;
+    }
+
+    function _fracCircle(parts, colored) {
+      if (parts < 2) return '';
+      const cx = 80, cy = 80, r = 72, W = 160, H = 160;
+      const step = (2 * Math.PI) / parts;
+      let s = '';
+      for (let i = 0; i < parts; i++) {
+        const a1 = -Math.PI / 2 + step * i, a2 = a1 + step;
+        const x1 = (cx + r * Math.cos(a1)).toFixed(2), y1 = (cy + r * Math.sin(a1)).toFixed(2);
+        const x2 = (cx + r * Math.cos(a2)).toFixed(2), y2 = (cy + r * Math.sin(a2)).toFixed(2);
+        const lg = step > Math.PI ? 1 : 0;
+        s += `<path d="M${cx},${cy} L${x1},${y1} A${r},${r},0,${lg},1,${x2},${y2} Z"
+               fill="${i < colored ? '#3b82f6' : '#e2e8f0'}" stroke="#fff" stroke-width="2"/>`;
+      }
+      s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1e40af" stroke-width="2"/>`;
+      return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${s}</svg>`;
+    }
+
+    function _fracRect(parts, cols, colored) {
+      const rows = Math.ceil(parts / cols);
+      const cW   = Math.min(70, Math.floor(280 / cols)), cH = cW;
+      const W = cols * cW, H = rows * cH;
+      let s = '';
+      for (let i = 0; i < parts; i++) {
+        const col = i % cols, row = Math.floor(i / cols);
+        s += `<rect x="${col * cW}" y="${row * cH}" width="${cW}" height="${cH}"
+               fill="${i < colored ? '#3b82f6' : '#e2e8f0'}" stroke="#fff" stroke-width="2"/>`;
+      }
+      s += `<rect x="1" y="1" width="${W - 2}" height="${H - 2}"
+             fill="none" stroke="#1e40af" stroke-width="2" rx="4"/>`;
+      return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"
+               style="max-width:100%;display:block;margin:0 auto">${s}</svg>`;
+    }
+
+    function _unitSvg(q, c) {
+      if (q.shape === 'circle') return _fracCircle(q.parts, c);
+      if (q.shape === 'rect')   return _fracRect(q.parts, q.cols || 2, c);
+      return _fracStrip(q.parts, c);
+    }
+
+    function _buildFracVisual(q) {
+      if (q.colored <= q.parts) return _unitSvg(q, q.colored);
+
+      /* Fraction > 1 : plusieurs figures côte à côte */
+      const full = Math.floor(q.colored / q.parts);
+      const rem  = q.colored % q.parts;
+      const n    = full + (rem > 0 ? 1 : 0);
+      let items  = '';
+      for (let u = 0; u < n; u++) {
+        items += `<div style="display:flex;flex-direction:column;align-items:center">
+          ${_unitSvg(q, u < full ? q.parts : rem)}
+        </div>`;
+      }
+      return `<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;align-items:flex-end">
+                ${items}
+              </div>
+              <p style="font-size:11px;font-weight:600;color:var(--muted);text-align:center;margin:10px 0 0">
+                Chaque figure représente 1 entier.
+              </p>`;
+    }
+
+    /* ── Renderer principal ──────────────────────────────────────── */
+
+    function renderLireFraction(card, q) {
+      /* — Sélecteur de niveau au premier appel — */
+      if (fracLevel === null && currentIndex === 0) {
+        card.innerHTML = `
+          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
+            Quel niveau veux-tu pratiquer ?
+          </p>
+          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
+            <button class="ex-type-card" data-level="1">
+              <span class="ex-type-icon">⭐</span>
+              <div>
+                <span class="ex-type-name">Niveau 1</span>
+                <span class="ex-type-desc">Fractions simples avec petits nombres</span>
+              </div>
+            </button>
+            <button class="ex-type-card" data-level="2">
+              <span class="ex-type-icon">⭐⭐</span>
+              <div>
+                <span class="ex-type-name">Niveau 2</span>
+                <span class="ex-type-desc">Fractions variées, y compris supérieures à 1</span>
+              </div>
+            </button>
+          </div>
+        `;
+        document.getElementById('ex-bar-fill').style.width = '0%';
+        card.querySelectorAll('.ex-type-card').forEach(btn =>
+          btn.addEventListener('click', () => {
+            fracLevel = parseInt(btn.dataset.level, 10);
+            questions = shuffle(sessionData.bank.filter(it => it.difficulty === fracLevel))
+                          .slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            currentIndex = 0;
+            score = 0;
+            showQuestion(0);
+          })
+        );
+        return;
+      }
+
+      /* — Rendu de la question — */
+      card.innerHTML = `
+        <p class="ex-question-label">Quelle fraction de la figure est coloriée ?</p>
+        <div class="frac-display-area">${_buildFracVisual(q)}</div>
+        <div class="frac-input-area">
+          <span class="frac-input-label">Numérateur</span>
+          <input type="text" inputmode="numeric" class="frac-field" id="frac-inp-n"
+                 autocomplete="off" autocorrect="off" spellcheck="false"
+                 placeholder="?" maxlength="3" aria-label="numérateur">
+          <div class="frac-divider"></div>
+          <input type="text" inputmode="numeric" class="frac-field" id="frac-inp-d"
+                 autocomplete="off" autocorrect="off" spellcheck="false"
+                 placeholder="?" maxlength="3" aria-label="dénominateur">
+          <span class="frac-input-label">Dénominateur</span>
+        </div>
+        <div class="frac-validate-row">
+          <button class="ex-validate-btn" id="frac-validate">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const nInp = document.getElementById('frac-inp-n');
+      const dInp = document.getElementById('frac-inp-d');
+      const vBtn = document.getElementById('frac-validate');
+
+      setTimeout(() => nInp.focus(), 50);
+      nInp.addEventListener('keydown', e => { if (e.key === 'Enter') dInp.focus(); });
+      dInp.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
+      vBtn.addEventListener('click', doValidate);
+
+      function doValidate() {
+        if (!nInp.value.trim() || !dInp.value.trim()) return;
+        nInp.disabled = dInp.disabled = vBtn.disabled = true;
+
+        const n = parseInt(nInp.value.trim(), 10);
+        const d = parseInt(dInp.value.trim(), 10);
+
+        /* Fraction équivalente : produit en croix n/d == colored/parts */
+        const isRight = Number.isInteger(n) && Number.isInteger(d) &&
+                        n > 0 && d > 0 &&
+                        n * q.parts === d * q.colored;
+
+        nInp.classList.add(isRight ? 'is-correct' : 'is-wrong');
+        dInp.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          score++;
+          setFeedback('feedback1', `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+        } else {
+          setFeedback('feedback1', `
+            <div class="ex-feedback-wrong">
+              ❌ Pas tout à fait. La fraction représentée est
+              <strong>${q.colored}/${q.parts}</strong>
+              (une fraction équivalente était aussi acceptée).
+            </div>`);
+        }
+        showNextBtn();
+      }
+    }
+
+    /* ── Type : representer-fraction ────────────────────────────────────────
+       L'élève voit une fraction et colorie les parts correspondantes
+       sur une ou plusieurs bandes rectangulaires cliquables.
+       level 1 : bande partagée en denominator parts (≤ 1 et > 1)
+       level 2 : bande partagée en partitions parts (multiple de denominator)
+    ────────────────────────────────────────────────────────────────────────── */
+
+    let rfLevel = null;
+
+    function _rfracHtml(num, den) {
+      return `<span class="rfrac-display">
+        <span class="rfrac-num">${num}</span>
+        <span class="rfrac-bar"></span>
+        <span class="rfrac-den">${den}</span>
+      </span>`;
+    }
+
+    function renderRepresenterFraction(card, q) {
+      /* — Sélecteur de niveau au premier appel — */
+      if (rfLevel === null && currentIndex === 0) {
+        card.innerHTML = `
+          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
+            Quel niveau veux-tu pratiquer ?
+          </p>
+          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
+            <button class="ex-type-card" data-level="1">
+              <span class="ex-type-icon">⭐</span>
+              <div>
+                <span class="ex-type-name">Niveau 1</span>
+                <span class="ex-type-desc">Fraction simple — la bande est partagée selon le dénominateur</span>
+              </div>
+            </button>
+            <button class="ex-type-card" data-level="2">
+              <span class="ex-type-icon">⭐⭐</span>
+              <div>
+                <span class="ex-type-name">Niveau 2</span>
+                <span class="ex-type-desc">Partage différent — introduction aux fractions équivalentes</span>
+              </div>
+            </button>
+          </div>
+        `;
+        document.getElementById('ex-bar-fill').style.width = '0%';
+        card.querySelectorAll('.ex-type-card').forEach(btn =>
+          btn.addEventListener('click', () => {
+            rfLevel   = parseInt(btn.dataset.level, 10);
+            questions = shuffle(sessionData.bank.filter(it => it.level === rfLevel))
+                          .slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+          })
+        );
+        return;
+      }
+
+      const { numerator, denominator } = q;
+      const isLevel2      = q.level === 2;
+      const partsPerStrip = isLevel2 ? q.partitions : denominator;
+      const stripsCount   = isLevel2 ? 1 : Math.ceil(numerator / denominator);
+      const correctTotal  = isLevel2 ? (numerator * q.partitions / denominator) : numerator;
+
+      let colored = 0;
+      let scored  = false;
+
+      /* Texte d'aide contextuel */
+      let hintHtml = '';
+      if (isLevel2) {
+        hintHtml = `<p class="rfrac-hint">La bande est partagée en <strong>${q.partitions} parts</strong> égales.</p>`;
+      } else if (stripsCount > 1) {
+        hintHtml = `<p class="rfrac-hint">Chaque bande représente 1 entier.</p>`;
+      }
+
+      /* Construction des bandes */
+      let stripsHtml = '';
+      for (let s = 0; s < stripsCount; s++) {
+        let partsHtml = '';
+        for (let p = 0; p < partsPerStrip; p++) {
+          partsHtml += `<button class="rfrac-part" data-strip="${s}" data-part="${p}"></button>`;
+        }
+        if (stripsCount > 1) {
+          stripsHtml += `
+            <div class="rfrac-unit">
+              <div class="rfrac-strip">${partsHtml}</div>
+              <div class="rfrac-unit-label">entier ${s + 1}</div>
+            </div>`;
+        } else {
+          stripsHtml += `<div class="rfrac-strip">${partsHtml}</div>`;
+        }
+      }
+
+      const counterText = n =>
+        `${n} part${n !== 1 ? 's' : ''} coloriée${n !== 1 ? 's' : ''} — objectif : ${correctTotal}`;
+
+      card.innerHTML = `
+        <p class="ex-question-label">Colorie les parts pour représenter cette fraction.</p>
+        <div class="rfrac-question-area">
+          ${_rfracHtml(numerator, denominator)}
+          ${hintHtml}
+        </div>
+        <div class="rfrac-strips-area" id="rfrac-strips">${stripsHtml}</div>
+        <div class="rfrac-counter" id="rfrac-counter">${counterText(0)}</div>
+        <div class="rfrac-validate-row">
+          <button class="ex-validate-btn" id="rfrac-validate">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const counterEl   = card.querySelector('#rfrac-counter');
+      const validateBtn = card.querySelector('#rfrac-validate');
+
+      card.querySelectorAll('.rfrac-part').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          if (btn.classList.contains('is-colored')) {
+            btn.classList.remove('is-colored');
+            colored--;
+          } else {
+            btn.classList.add('is-colored');
+            colored++;
+          }
+          counterEl.textContent = counterText(colored);
+        });
+      });
+
+      function enableRetry() {
+        card.querySelectorAll('.rfrac-part').forEach(b => { b.disabled = false; });
+        validateBtn.disabled = false;
+        document.getElementById('feedback1').innerHTML = '';
+      }
+
+      validateBtn.addEventListener('click', () => {
+        const isRight = colored === correctTotal;
+        card.querySelectorAll('.rfrac-part').forEach(b => { b.disabled = true; });
+        validateBtn.disabled = true;
+
+        if (isRight) {
+          if (!scored) { score++; scored = true; }
+          card.querySelectorAll('.rfrac-part.is-colored').forEach(b => {
+            b.classList.remove('is-colored');
+            b.classList.add('is-ok');
+          });
+          setFeedback('feedback1', `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+          showNextBtn();
+        } else {
+          setFeedback('feedback1', `
+            <div class="ex-feedback-wrong" style="margin-bottom:12px">
+              ❌ Tu as colorié <strong>${colored} part${colored !== 1 ? 's' : ''}</strong>
+              au lieu de <strong>${correctTotal}</strong>.<br>
+              Pour représenter ${_rfracHtml(numerator, denominator)},
+              il faut exactement <strong>${correctTotal} part${correctTotal !== 1 ? 's' : ''}</strong>.
+            </div>
+            <button class="ex-validate-btn" id="rfrac-retry">Modifier ma réponse</button>
+          `);
+          card.querySelector('#rfrac-retry').addEventListener('click', enableRetry);
+        }
+      });
     }
 
     function setFeedback(id, html) {

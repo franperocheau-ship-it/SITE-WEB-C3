@@ -460,8 +460,18 @@
       "identifier-phrase-exclamative",
       "transformer-declarative-interrogative",
       "transformer-affirmative-negative",
-      "produire-formes-interrogatives"
+      "produire-formes-interrogatives",
+      "distinguer-phrase-simple-complexe",
+      "identifier-article-defini",
+      "identifier-article-indefini",
+      "identifier-determinant-possessif",
+      "identifier-determinant-demonstratif",
+      "identifier-nom-phrase",
+      "identifier-adjectif"
     ]);
+
+    /* ── Standalone exercise pages (not using the generic engine) ─────────── */
+    const CUSTOM_HREFS = {};
 
     /* ── Data ──────────────────────────────────────────────────────────────── */
     const SECTIONS = [
@@ -648,8 +658,8 @@
 
     /* ── Skill card rendering ──────────────────────────────────────────────── */
     function renderSkillCard(skill, sectionId) {
-      const hasExercise = EXERCISE_SLUGS.has(skill.slug);
-      const href        = hasExercise ? `exercise.html?slug=${skill.slug}` : "#";
+      const hasExercise = EXERCISE_SLUGS.has(skill.slug) || skill.slug in CUSTOM_HREFS;
+      const href        = CUSTOM_HREFS[skill.slug] || (EXERCISE_SLUGS.has(skill.slug) ? `exercise.html?slug=${skill.slug}` : "#");
       const onclick     = hasExercise ? "" : `onclick="return false;"`;
       return `
         <a class="skill-card"

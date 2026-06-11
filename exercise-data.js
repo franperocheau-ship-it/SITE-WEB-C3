@@ -1773,6 +1773,834 @@ const EXERCISE_DATA = {
      CM1 → 2 formes obligatoires (inversion = bonus)
      CM2 / 6e → 3 formes obligatoires
   ───────────────────────────────────────────────────────────────────────── */
+
+  /* ─── Grammaire : déterminants, noms, adjectifs, phrase complexe ──────── */
+
+  /* ────────────────────────────────────────────────────────────────────────
+     Identifier un article défini — le / la / les / l'
+     Étape 1 : mots-cliquables — détecter les articles dans des phrases
+     Étapes 2–3 : slugs « articles-definis-choix » et « articles-definis-completer »
+  ─────────────────────────────────────────────────────────────────────────── */
+  "identifier-article-defini": {
+    title: "Identifier les articles définis",
+    levels: ["CM1", "CM2", "6e"],
+    type: "mots-cliquables",
+    questionsPerSession: 6,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+    bank: [
+      {
+        instruction: "Clique sur tous les articles définis (le, la, les, l') dans la phrase.",
+        sentence: "Le chat dort sur le canapé .",
+        targets: ["Le", "le"],
+        piege: {}
+      },
+      {
+        instruction: "Clique sur tous les articles définis (le, la, les, l') dans la phrase.",
+        sentence: "La maîtresse range les livres de l' école .",
+        targets: ["La", "les", "l'"],
+        piege: {}
+      },
+      {
+        instruction: "Clique sur tous les articles définis (le, la, les, l') dans la phrase.",
+        sentence: "Je le vois tous les jours .",
+        targets: ["les"],
+        piege: { "le": "Ici, « le » remplace un nom. C'est un pronom personnel, pas un article !" }
+      },
+      {
+        instruction: "Clique sur tous les articles définis (le, la, les, l') dans la phrase.",
+        sentence: "L' oiseau chante dans l' arbre .",
+        targets: ["L'", "l'"],
+        piege: {}
+      },
+      {
+        instruction: "Clique sur tous les articles définis (le, la, les, l') dans la phrase.",
+        sentence: "Les enfants adorent la pizza .",
+        targets: ["Les", "la"],
+        piege: {}
+      },
+      {
+        instruction: "Clique sur tous les articles définis (le, la, les, l') dans la phrase. Attention, il y a peut-être un piège !",
+        sentence: "Il la regarde et les prend .",
+        targets: [],
+        piege: {
+          "la": "Ici, « la » et « les » remplacent des noms. Ce sont des pronoms personnels, pas des articles !",
+          "les": "Ici, « la » et « les » remplacent des noms. Ce sont des pronoms personnels, pas des articles !"
+        }
+      }
+    ]
+  },
+
+  "articles-definis-choix": {
+    title: "Choisir l'article défini — le / la / les / l'",
+    levels: ["CM1", "CM2", "6e"],
+    type: "choix-etiquette",
+    questionsPerSession: 8,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+    bank: [
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "🐱", word: "chat",   answer: "le",  choices: ["le", "la", "les", "l'"] },
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "🏫", word: "école",  answer: "l'",  choices: ["le", "la", "les", "l'"] },
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "🌳", word: "arbre",  answer: "l'",  choices: ["le", "la", "les", "l'"] },
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "🐶", word: "chiens", answer: "les", choices: ["le", "la", "les", "l'"] },
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "🌙", word: "lune",   answer: "la",  choices: ["le", "la", "les", "l'"] },
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "🤝", word: "ami",    answer: "l'",  choices: ["le", "la", "les", "l'"] },
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "🌸", word: "fleurs", answer: "les", choices: ["le", "la", "les", "l'"] },
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "☀️", word: "soleil", answer: "le",  choices: ["le", "la", "les", "l'"] }
+    ]
+  },
+
+  "articles-definis-completer": {
+    title: "Compléter avec l'article défini — Le printemps",
+    levels: ["CM1", "CM2", "6e"],
+    type: "glisser-deposer",
+    questionsPerSession: 1,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+    bank: [
+      {
+        instruction: "Place les bons articles définis dans les cases. Attention à l'intrus !",
+        template: "___ printemps est arrivé ! ___ hirondelles reviennent dans ___ ciel. ___ école organise une sortie dans la forêt.",
+        blanks: ["Le", "Les", "le", "L'"],
+        bank: ["Le", "Les", "le", "L'", "des"]
+      }
+    ]
+  },
+
+  /* ────────────────────────────────────────────────────────────────────────
+     Identifier un article indéfini — un / une / des
+     Étapes 1 + 3 : choix-etiquette (défini/indéfini + choisir un/une/des)
+     Étape 2 : slug « articles-indefinis-premiere-rencontre »
+  ─────────────────────────────────────────────────────────────────────────── */
+  "identifier-article-indefini": {
+    title: "Identifier les articles indéfinis",
+    levels: ["CM1", "CM2", "6e"],
+    type: "choix-etiquette",
+    questionsPerSession: 8,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+    bank: [
+      {
+        instruction: "L'article en gras est-il défini ou indéfini ?",
+        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Une</b> grenouille saute dans l'étang.</span>",
+        word: "une",
+        choices: ["défini", "indéfini"],
+        answer: "indéfini"
+      },
+      {
+        instruction: "L'article en gras est-il défini ou indéfini ?",
+        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Les</b> étoiles brillent dans le ciel noir.</span>",
+        word: "les",
+        choices: ["défini", "indéfini"],
+        answer: "défini"
+      },
+      {
+        instruction: "L'article en gras est-il défini ou indéfini ?",
+        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'>Je mange <b>un</b> gâteau au chocolat.</span>",
+        word: "un",
+        choices: ["défini", "indéfini"],
+        answer: "indéfini"
+      },
+      {
+        instruction: "L'article en gras est-il défini ou indéfini ?",
+        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>La</b> lune est pleine ce soir.</span>",
+        word: "la",
+        choices: ["défini", "indéfini"],
+        answer: "défini"
+      },
+      {
+        instruction: "L'article en gras est-il défini ou indéfini ?",
+        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Des</b> enfants jouent dans le parc.</span>",
+        word: "des",
+        choices: ["défini", "indéfini"],
+        answer: "indéfini"
+      },
+      {
+        instruction: "L'article en gras est-il défini ou indéfini ?",
+        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Le</b> directeur parle aux élèves.</span>",
+        word: "le",
+        choices: ["défini", "indéfini"],
+        answer: "défini"
+      },
+      {
+        instruction: "L'article en gras est-il défini ou indéfini ?",
+        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'>Il a trouvé <b>une</b> nouvelle cachette.</span>",
+        word: "une",
+        choices: ["défini", "indéfini"],
+        answer: "indéfini"
+      },
+      {
+        instruction: "L'article en gras est-il défini ou indéfini ?",
+        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>L'</b>hirondelle annonce le printemps.</span>",
+        word: "l'",
+        choices: ["défini", "indéfini"],
+        answer: "défini"
+      },
+      { instruction: "Quel article indéfini va avec ce nom ?", emoji: "🏠", word: "maison",     answer: "une", choices: ["un", "une", "des"] },
+      { instruction: "Quel article indéfini va avec ce nom ?", emoji: "👦", word: "garçons",    answer: "des", choices: ["un", "une", "des"] },
+      { instruction: "Quel article indéfini va avec ce nom ?", emoji: "🤖", word: "robot",      answer: "un",  choices: ["un", "une", "des"] },
+      { instruction: "Quel article indéfini va avec ce nom ?", emoji: "🌺", word: "fleur",      answer: "une", choices: ["un", "une", "des"] },
+      { instruction: "Quel article indéfini va avec ce nom ?", emoji: "🌳", word: "arbres",     answer: "des", choices: ["un", "une", "des"] },
+      { instruction: "Quel article indéfini va avec ce nom ?", emoji: "💻", word: "ordinateur", answer: "un",  choices: ["un", "une", "des"] }
+    ]
+  },
+
+  "articles-indefinis-premiere-rencontre": {
+    title: "Articles indéfinis — Première et deuxième mention",
+    levels: ["CM1", "CM2", "6e"],
+    type: "glisser-deposer",
+    questionsPerSession: 4,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+    bank: [
+      {
+        instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.",
+        template: "___ chat noir dort sur la fenêtre. ___ chat s'appelle Minuit.",
+        blanks: ["Un", "Le"],
+        bank: ["Un", "Le", "Une", "La"]
+      },
+      {
+        instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.",
+        template: "___ élève entre dans la salle. ___ élève s'appelle Emma.",
+        blanks: ["Une", "L'"],
+        bank: ["Une", "L'", "Un", "Le"]
+      },
+      {
+        instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.",
+        template: "___ chien aboie dans le jardin. ___ chien appartient à notre voisin.",
+        blanks: ["Un", "Le"],
+        bank: ["Un", "Le", "Une", "La"]
+      },
+      {
+        instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.",
+        template: "___ livre est posé sur la table. ___ livre parle des dinosaures.",
+        blanks: ["Un", "Le"],
+        bank: ["Un", "Le", "Une", "La"]
+      }
+    ]
+  },
+
+  /* ────────────────────────────────────────────────────────────────────────
+     Identifier un déterminant démonstratif — ce / cet / cette / ces
+     Toutes les étapes fusionnées en choix-etiquette
+  ─────────────────────────────────────────────────────────────────────────── */
+  "identifier-determinant-demonstratif": {
+    title: "Identifier les déterminants démonstratifs",
+    levels: ["CM1", "CM2", "6e"],
+    type: "choix-etiquette",
+    questionsPerSession: 10,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+    bank: [
+      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "⚽", word: "ballon",     answer: "ce",    choices: ["ce", "cet", "cette", "ces"] },
+      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "✈️", word: "avion",      answer: "cet",   choices: ["ce", "cet", "cette", "ces"] },
+      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "🏠", word: "maison",     answer: "cette", choices: ["ce", "cet", "cette", "ces"] },
+      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "🌸", word: "fleurs",     answer: "ces",   choices: ["ce", "cet", "cette", "ces"] },
+      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "🏨", word: "hôtel",      answer: "cet",   choices: ["ce", "cet", "cette", "ces"] },
+      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "👟", word: "chaussures", answer: "ces",   choices: ["ce", "cet", "cette", "ces"] },
+      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "🐦", word: "oiseau",     answer: "cet",   choices: ["ce", "cet", "cette", "ces"] },
+      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "📚", word: "livres",     answer: "ces",   choices: ["ce", "cet", "cette", "ces"] },
+      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "ce chien",      answer: "CE",    choices: ["CE", "CET", "CETTE", "CES"] },
+      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "cette pomme",   answer: "CETTE", choices: ["CE", "CET", "CETTE", "CES"] },
+      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "ces étoiles",   answer: "CES",   choices: ["CE", "CET", "CETTE", "CES"] },
+      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "cet ami",       answer: "CET",   choices: ["CE", "CET", "CETTE", "CES"] },
+      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "ce bureau",     answer: "CE",    choices: ["CE", "CET", "CETTE", "CES"] },
+      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "cette chanson", answer: "CETTE", choices: ["CE", "CET", "CETTE", "CES"] },
+      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "cet étudiant",  answer: "CET",   choices: ["CE", "CET", "CETTE", "CES"] },
+      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "ces outils",    answer: "CES",   choices: ["CE", "CET", "CETTE", "CES"] },
+      {
+        instruction: "Ce déterminant est-il démonstratif ou possessif ?",
+        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'>Je range <b>ces</b> affaires dans mon sac.</span>",
+        word: "ces",
+        choices: ["démonstratif", "possessif"],
+        answer: "démonstratif"
+      },
+      {
+        instruction: "Ce déterminant est-il démonstratif ou possessif ?",
+        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'>Je range <b>ses</b> affaires dans mon sac.</span>",
+        word: "ses",
+        choices: ["démonstratif", "possessif"],
+        answer: "possessif"
+      },
+      {
+        instruction: "Ce déterminant est-il démonstratif ou possessif ?",
+        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Ce</b> livre est vraiment passionnant !</span>",
+        word: "ce",
+        choices: ["démonstratif", "possessif"],
+        answer: "démonstratif"
+      },
+      {
+        instruction: "Ce déterminant est-il démonstratif ou possessif ?",
+        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Son</b> livre est vraiment passionnant !</span>",
+        word: "son",
+        choices: ["démonstratif", "possessif"],
+        answer: "possessif"
+      },
+      {
+        instruction: "Ce déterminant est-il démonstratif ou possessif ?",
+        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Ces</b> oiseaux chantent magnifiquement.</span>",
+        word: "ces",
+        choices: ["démonstratif", "possessif"],
+        answer: "démonstratif"
+      },
+      {
+        instruction: "Ce déterminant est-il démonstratif ou possessif ?",
+        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Ses</b> oiseaux chantent magnifiquement.</span>",
+        word: "ses",
+        choices: ["démonstratif", "possessif"],
+        answer: "possessif"
+      }
+    ]
+  },
+
+  /* ────────────────────────────────────────────────────────────────────────
+     Identifier un déterminant possessif
+     Étapes 1 + 3 : choix-etiquette
+     Étape 2 : slug « possessifs-dans-phrases »
+  ─────────────────────────────────────────────────────────────────────────── */
+  "identifier-determinant-possessif": {
+    title: "Identifier les déterminants possessifs",
+    levels: ["CM1", "CM2", "6e"],
+    type: "choix-etiquette",
+    questionsPerSession: 8,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+    bank: [
+      {
+        instruction: "<span style='font-style:italic;text-transform:none'>C'est le vélo de Paul.</span>",
+        emoji: "",
+        word: "C'est ___ vélo.",
+        choices: ["son", "sa", "ses", "leur"],
+        answer: "son"
+      },
+      {
+        instruction: "<span style='font-style:italic;text-transform:none'>C'est la chambre de Léa.</span>",
+        emoji: "",
+        word: "C'est ___ chambre.",
+        choices: ["son", "sa", "ses", "leur"],
+        answer: "sa"
+      },
+      {
+        instruction: "<span style='font-style:italic;text-transform:none'>Ce sont les affaires de Tom.</span>",
+        emoji: "",
+        word: "Ce sont ___ affaires.",
+        choices: ["son", "sa", "ses", "leur"],
+        answer: "ses"
+      },
+      {
+        instruction: "<span style='font-style:italic;text-transform:none'>C'est la voiture de Paul et Léa.</span>",
+        emoji: "",
+        word: "C'est ___ voiture.",
+        choices: ["son", "leur", "leurs", "sa"],
+        answer: "leur"
+      },
+      {
+        instruction: "<span style='font-style:italic;text-transform:none'>Ce sont les jouets de Paul et Léa.</span>",
+        emoji: "",
+        word: "Ce sont ___ jouets.",
+        choices: ["leur", "leurs", "ses", "des"],
+        answer: "leurs"
+      },
+      {
+        instruction: "<span style='font-style:italic;text-transform:none'>C'est le cahier de toi.</span>",
+        emoji: "",
+        word: "C'est ___ cahier.",
+        choices: ["ton", "ta", "tes", "votre"],
+        answer: "ton"
+      },
+      {
+        instruction: "<span style='font-style:italic;text-transform:none'>C'est la trousse de vous.</span>",
+        emoji: "",
+        word: "C'est ___ trousse.",
+        choices: ["votre", "vos", "notre", "ton"],
+        answer: "votre"
+      },
+      {
+        instruction: "<span style='font-style:italic;text-transform:none'>C'est l'amie de Tom.</span>",
+        emoji: "",
+        word: "C'est ___ amie.",
+        choices: ["son", "sa", "ses", "mon"],
+        answer: "son"
+      },
+      { instruction: "je range ___ affaires.",      emoji: "", word: "je",    choices: ["mes", "tes", "ses", "nos"],    answer: "mes"   },
+      { instruction: "tu ranges ___ affaires.",     emoji: "", word: "tu",    choices: ["mes", "tes", "ses", "nos"],    answer: "tes"   },
+      { instruction: "il range ___ affaires.",      emoji: "", word: "il",    choices: ["mes", "tes", "ses", "nos"],    answer: "ses"   },
+      { instruction: "nous rangeons ___ affaires.", emoji: "", word: "nous",  choices: ["mes", "tes", "ses", "nos"],    answer: "nos"   },
+      { instruction: "je lave ___ vélo.",           emoji: "", word: "je",    choices: ["mon", "ton", "son", "leur"],   answer: "mon"   },
+      { instruction: "tu laves ___ vélo.",          emoji: "", word: "tu",    choices: ["mon", "ton", "son", "leur"],   answer: "ton"   },
+      { instruction: "il lave ___ vélo.",           emoji: "", word: "il",    choices: ["mon", "ton", "son", "leur"],   answer: "son"   },
+      { instruction: "elles lavent ___ vélo.",      emoji: "", word: "elles", choices: ["mon", "ton", "son", "leur"],   answer: "leur"  },
+      { instruction: "je montre ___ photo.",        emoji: "", word: "je",    choices: ["ma", "ta", "sa", "votre"],     answer: "ma"    },
+      { instruction: "tu montres ___ photo.",       emoji: "", word: "tu",    choices: ["ma", "ta", "sa", "votre"],     answer: "ta"    },
+      { instruction: "elle montre ___ photo.",      emoji: "", word: "elle",  choices: ["ma", "ta", "sa", "votre"],     answer: "sa"    },
+      { instruction: "vous montrez ___ photo.",     emoji: "", word: "vous",  choices: ["ma", "ta", "sa", "votre"],     answer: "votre" },
+      { instruction: "je prends ___ livres.",       emoji: "", word: "je",    choices: ["mes", "ses", "nos", "leurs"],  answer: "mes"   },
+      { instruction: "il prend ___ livres.",        emoji: "", word: "il",    choices: ["mes", "ses", "nos", "leurs"],  answer: "ses"   },
+      { instruction: "nous prenons ___ livres.",    emoji: "", word: "nous",  choices: ["mes", "ses", "nos", "leurs"],  answer: "nos"   },
+      { instruction: "ils prennent ___ livres.",    emoji: "", word: "ils",   choices: ["mes", "ses", "nos", "leurs"],  answer: "leurs" }
+    ]
+  },
+
+  "possessifs-dans-phrases": {
+    title: "Repérer les déterminants possessifs dans une phrase",
+    levels: ["CM1", "CM2", "6e"],
+    type: "mots-cliquables",
+    questionsPerSession: 5,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+    bank: [
+      {
+        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
+        sentence: "Je range mes affaires dans mon sac .",
+        targets: ["mes", "mon"],
+        piege: {}
+      },
+      {
+        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
+        sentence: "Elle prête son crayon à sa camarade .",
+        targets: ["son", "sa"],
+        piege: {}
+      },
+      {
+        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
+        sentence: "Nous adorons notre école et nos professeurs .",
+        targets: ["notre", "nos"],
+        piege: {}
+      },
+      {
+        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
+        sentence: "Il promène son chien avec ses amis .",
+        targets: ["son", "ses"],
+        piege: {}
+      },
+      {
+        instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention au piège !",
+        sentence: "Leurs parents les attendent devant leur maison .",
+        targets: ["Leurs", "leur"],
+        piege: { "les": "« les » est un pronom personnel complément, pas un possessif !" }
+      }
+    ]
+  },
+
+  /* ────────────────────────────────────────────────────────────────────────
+     Identifier un adjectif
+     Toutes les étapes adaptées en mots-cliquables
+  ─────────────────────────────────────────────────────────────────────────── */
+  "identifier-adjectif": {
+    title: "Identifier les adjectifs",
+    levels: ["CM1", "CM2", "6e"],
+    type: "mots-cliquables",
+    questionsPerSession: 8,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+    bank: [
+      {
+        instruction: "Clique sur tous les adjectifs parmi ces mots. (Ils peuvent décrire : le chat.)",
+        sentence: "petit noir mange maison silencieusement rapide",
+        targets: ["petit", "noir", "rapide"],
+        piege: {
+          "mange": "« mange » est un verbe.",
+          "maison": "« maison » est un nom.",
+          "silencieusement": "« silencieusement » est un adverbe (finit souvent en -ment)."
+        }
+      },
+      {
+        instruction: "Clique sur tous les adjectifs parmi ces mots. (Ils peuvent décrire : la fille.)",
+        sentence: "jolie gentille chante école doucement bleue",
+        targets: ["jolie", "gentille", "bleue"],
+        piege: {
+          "chante": "« chante » est un verbe.",
+          "école": "« école » est un nom.",
+          "doucement": "« doucement » est un adverbe (finit en -ment)."
+        }
+      },
+      {
+        instruction: "Clique sur tous les adjectifs dans la phrase.",
+        sentence: "La petite chatte grise dort sur le canapé confortable .",
+        targets: ["petite", "grise", "confortable"],
+        piege: {}
+      },
+      {
+        instruction: "Clique sur tous les adjectifs dans la phrase.",
+        sentence: "Un élève curieux lit un livre passionnant .",
+        targets: ["curieux", "passionnant"],
+        piege: {}
+      },
+      {
+        instruction: "Clique sur tous les adjectifs dans la phrase.",
+        sentence: "Il marche lentement dans la rue bondée .",
+        targets: ["bondée"],
+        piege: { "lentement": "« lentement » est un adverbe (il décrit le verbe « marche »), pas un adjectif." }
+      },
+      {
+        instruction: "Clique sur tous les adjectifs dans la phrase.",
+        sentence: "La porte fermée cache un couloir sombre .",
+        targets: ["fermée", "sombre"],
+        piege: {}
+      },
+      {
+        instruction: "Clique sur tous les adjectifs dans la phrase.",
+        sentence: "Ces beaux oiseaux chantent des mélodies douces .",
+        targets: ["beaux", "douces"],
+        piege: {}
+      },
+      {
+        instruction: "Clique sur tous les adjectifs dans la phrase.",
+        sentence: "Mon grand-père prépare une soupe chaude .",
+        targets: ["chaude"],
+        piege: { "grand-père": "« grand-père » est un nom composé, pas un adjectif." }
+      },
+      {
+        instruction: "Clique sur le mot qui N'EST PAS un adjectif (l'intrus).",
+        sentence: "rouge grand table joyeux",
+        targets: ["table"],
+        piege: {
+          "rouge": "« rouge » est un adjectif de couleur — cherche l'intrus !",
+          "grand": "« grand » est un adjectif — cherche l'intrus !",
+          "joyeux": "« joyeux » est un adjectif — cherche l'intrus !"
+        }
+      },
+      {
+        instruction: "Clique sur le mot qui N'EST PAS un adjectif (l'intrus).",
+        sentence: "rapide courir fort doux",
+        targets: ["courir"],
+        piege: {
+          "rapide": "« rapide » est un adjectif — cherche l'intrus !",
+          "fort": "« fort » est un adjectif — cherche l'intrus !",
+          "doux": "« doux » est un adjectif — cherche l'intrus !"
+        }
+      },
+      {
+        instruction: "Clique sur le mot qui N'EST PAS un adjectif (l'intrus).",
+        sentence: "beau maison petit léger",
+        targets: ["maison"],
+        piege: {
+          "beau": "« beau » est un adjectif — cherche l'intrus !",
+          "petit": "« petit » est un adjectif — cherche l'intrus !",
+          "léger": "« léger » est un adjectif — cherche l'intrus !"
+        }
+      },
+      {
+        instruction: "Clique sur le mot qui N'EST PAS un adjectif (l'intrus).",
+        sentence: "chanter triste sage bleu",
+        targets: ["chanter"],
+        piege: {
+          "triste": "« triste » est un adjectif — cherche l'intrus !",
+          "sage": "« sage » est un adjectif — cherche l'intrus !",
+          "bleu": "« bleu » est un adjectif de couleur — cherche l'intrus !"
+        }
+      },
+      {
+        instruction: "Clique sur le mot qui N'EST PAS un adjectif (l'intrus).",
+        sentence: "lentement heureux vif froid",
+        targets: ["lentement"],
+        piege: {
+          "heureux": "« heureux » est un adjectif — cherche l'intrus !",
+          "vif": "« vif » est un adjectif — cherche l'intrus !",
+          "froid": "« froid » est un adjectif — cherche l'intrus !"
+        }
+      },
+      {
+        instruction: "Clique sur le mot qui N'EST PAS un adjectif (l'intrus).",
+        sentence: "verte lumière ancienne nouvelle",
+        targets: ["lumière"],
+        piege: {
+          "verte": "« verte » est un adjectif de couleur — cherche l'intrus !",
+          "ancienne": "« ancienne » est un adjectif — cherche l'intrus !",
+          "nouvelle": "« nouvelle » est un adjectif — cherche l'intrus !"
+        }
+      }
+    ]
+  },
+
+  /* ────────────────────────────────────────────────────────────────────────
+     Identifier un nom dans une phrase
+     Toutes les étapes adaptées en mots-cliquables
+  ─────────────────────────────────────────────────────────────────────────── */
+  "identifier-nom-phrase": {
+    title: "Identifier les noms dans une phrase",
+    levels: ["CM1", "CM2", "6e"],
+    type: "mots-cliquables",
+    questionsPerSession: 8,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+    bank: [
+      {
+        instruction: "Clique sur tous les noms dans la phrase.",
+        sentence: "Le chien mange sa nourriture dans le jardin .",
+        targets: ["chien", "nourriture", "jardin"],
+        piege: {}
+      },
+      {
+        instruction: "Clique sur tous les noms dans la phrase.",
+        sentence: "La porte de la salle claque .",
+        targets: ["porte", "salle"],
+        piege: { "claque": "« claque » est un verbe (la porte claque). Les noms s'accompagnent souvent d'un déterminant." }
+      },
+      {
+        instruction: "Clique sur tous les noms dans la phrase.",
+        sentence: "L' astronaute voyage vers la planète rouge .",
+        targets: ["astronaute", "planète"],
+        piege: { "rouge": "« rouge » est un adjectif, pas un nom. Les noms ont souvent un déterminant devant eux." }
+      },
+      {
+        instruction: "Clique sur tous les noms dans la phrase.",
+        sentence: "Le cuisinier prépare une délicieuse soupe .",
+        targets: ["cuisinier", "soupe"],
+        piege: { "délicieuse": "« délicieuse » est un adjectif (il décrit la soupe). Le nom, c'est « soupe »." }
+      },
+      {
+        instruction: "Clique sur tous les noms dans la phrase.",
+        sentence: "Les enfants lisent des histoires amusantes .",
+        targets: ["enfants", "histoires"],
+        piege: { "amusantes": "« amusantes » est un adjectif. Les noms ici sont « enfants » et « histoires »." }
+      },
+      {
+        instruction: "Clique sur tous les noms (communs ET propres) dans la phrase.",
+        sentence: "Emma joue au football avec ses amis .",
+        targets: ["Emma", "football", "amis"],
+        piege: {}
+      },
+      { instruction: "Classe ce nom : ville",       sentence: "commun   propre", targets: ["commun"], piege: { "propre":  "« ville » est un nom commun : il désigne n'importe quelle ville, sans majuscule." } },
+      { instruction: "Classe ce nom : fleuve",      sentence: "commun   propre", targets: ["commun"], piege: { "propre":  "« fleuve » est un nom commun : il désigne n'importe quel fleuve." } },
+      { instruction: "Classe ce nom : chien",       sentence: "commun   propre", targets: ["commun"], piege: { "propre":  "« chien » est un nom commun : il désigne n'importe quel chien." } },
+      { instruction: "Classe ce nom : professeur",  sentence: "commun   propre", targets: ["commun"], piege: { "propre":  "« professeur » est un nom commun : il désigne n'importe quel professeur." } },
+      { instruction: "Classe ce nom : livre",       sentence: "commun   propre", targets: ["commun"], piege: { "propre":  "« livre » est un nom commun." } },
+      { instruction: "Classe ce nom : Madrid",      sentence: "commun   propre", targets: ["propre"],  piege: { "commun": "« Madrid » est un nom propre : il désigne une ville particulière et prend une majuscule." } },
+      { instruction: "Classe ce nom : Emma",        sentence: "commun   propre", targets: ["propre"],  piege: { "commun": "« Emma » est un nom propre : c'est un prénom, il prend une majuscule." } },
+      { instruction: "Classe ce nom : la Seine",    sentence: "commun   propre", targets: ["propre"],  piege: { "commun": "« la Seine » est un nom propre : c'est le nom d'un fleuve particulier." } },
+      { instruction: "Classe ce nom : Léa",         sentence: "commun   propre", targets: ["propre"],  piege: { "commun": "« Léa » est un nom propre : c'est un prénom." } },
+      { instruction: "Classe ce nom : LFM",         sentence: "commun   propre", targets: ["propre"],  piege: { "commun": "« LFM » est un nom propre : c'est le sigle d'une école particulière." } },
+      {
+        instruction: "Quel nom répond à cette devinette ? On y range les livres de la classe.",
+        sentence: "bibliothèque ranger grand table",
+        targets: ["bibliothèque"],
+        piege: {
+          "ranger": "« ranger » est un verbe à l'infinitif, pas un nom.",
+          "grand": "« grand » est un adjectif, pas un nom.",
+          "table": "« table » est un nom, mais on ne range pas des livres sur une table... réfléchis !"
+        }
+      },
+      {
+        instruction: "Quel nom répond à cette devinette ? Il apporte la lumière pendant la journée.",
+        sentence: "soleil briller chaud nuit",
+        targets: ["soleil"],
+        piege: {
+          "briller": "« briller » est un verbe.",
+          "chaud": "« chaud » est un adjectif.",
+          "nuit": "« nuit » est aussi un nom, mais elle n'apporte pas la lumière !"
+        }
+      },
+      {
+        instruction: "Quel nom répond à cette devinette ? On y joue avec ses camarades à la récréation.",
+        sentence: "terrain jouer amusant ballon",
+        targets: ["terrain"],
+        piege: {
+          "jouer": "« jouer » est un verbe.",
+          "amusant": "« amusant » est un adjectif.",
+          "ballon": "« ballon » est un nom, mais on joue AVEC un ballon, pas SUR un ballon !"
+        }
+      },
+      {
+        instruction: "Quel nom répond à cette devinette ? Elle coule de la montagne vers la mer.",
+        sentence: "rivière couler froide cascade",
+        targets: ["rivière"],
+        piege: {
+          "couler": "« couler » est un verbe.",
+          "froide": "« froide » est un adjectif.",
+          "cascade": "« cascade » coule aussi, mais c'est une chute d'eau verticale, pas une rivière !"
+        }
+      }
+    ]
+  },
+
+  /* ────────────────────────────────────────────────────────────────────────
+     Distinguer phrase simple et phrase complexe
+     Étapes 1 + 2 : classification-etapes (verbes conjugués → simple/complexe)
+     Étape 3 : slug « phrases-connecteurs »
+  ─────────────────────────────────────────────────────────────────────────── */
+  "distinguer-phrase-simple-complexe": {
+    title: "Distinguer phrase simple et phrase complexe",
+    levels: ["CM2", "6e"],
+    type: "classification-etapes",
+    questionsPerSession: 8,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+    bank: [
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
+        sentence: "Le chat dort sur le canapé.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
+        step1Targets: ["dort"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "simple"
+      },
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
+        sentence: "Les enfants rient et courent dans la cour.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
+        step1Targets: ["rient", "courent"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "complexe"
+      },
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (aller = infinitif !)",
+        sentence: "La petite fille veut aller à la piscine.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s). Attention à l'infinitif !",
+        step1Targets: ["veut"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "simple"
+      },
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
+        sentence: "Mon chien aboie quand le voisin arrive.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
+        step1Targets: ["aboie", "arrive"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "complexe"
+      },
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
+        sentence: "Le footballeur tire le ballon et marque un but.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
+        step1Targets: ["tire", "marque"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "complexe"
+      },
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (travailler = infinitif !)",
+        sentence: "La maîtresse demande aux élèves de travailler en silence.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s). Attention à l'infinitif !",
+        step1Targets: ["demande"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "simple"
+      },
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
+        sentence: "Le soleil brille dans le ciel bleu.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
+        step1Targets: ["brille"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "simple"
+      },
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
+        sentence: "Je mange une pomme parce que j'ai faim.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
+        step1Targets: ["mange", "j'ai"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "complexe"
+      },
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (Même si la phrase est longue !)",
+        sentence: "Le vieux monsieur avec le long manteau rouge marche lentement dans le parc.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
+        step1Targets: ["marche"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "simple"
+      },
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
+        sentence: "Les oiseaux chantent et les fleurs poussent au printemps.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
+        step1Targets: ["chantent", "poussent"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "complexe"
+      },
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (jouer = infinitif !)",
+        sentence: "Mon chat adore jouer avec la pelote de laine.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s). Attention à l'infinitif !",
+        step1Targets: ["adore"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "simple"
+      },
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
+        sentence: "Il pleut depuis ce matin.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
+        step1Targets: ["pleut"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "simple"
+      },
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
+        sentence: "Les élèves écoutent quand le professeur parle.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
+        step1Targets: ["écoutent", "parle"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "complexe"
+      },
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (décoller = infinitif !)",
+        sentence: "La fusée va décoller dans dix secondes.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s). Attention à l'infinitif !",
+        step1Targets: ["va"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "simple"
+      },
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
+        sentence: "Le lapin saute mais le renard l'attrape.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
+        step1Targets: ["saute", "l'attrape"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "complexe"
+      },
+      {
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
+        sentence: "Zoé ferme les yeux parce qu'elle tremble.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
+        step1Targets: ["ferme", "tremble"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "complexe"
+      }
+    ]
+  },
+
+  "phrases-connecteurs": {
+    title: "Relier deux phrases avec la bonne conjonction",
+    levels: ["CM2", "6e"],
+    type: "choix-etiquette",
+    questionsPerSession: 4,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+    bank: [
+      {
+        instruction: "Quelle conjonction relie le mieux ces deux phrases ?",
+        emoji: "<span style='font-size:15px;line-height:1.6;display:block;font-style:italic'>Léa est triste. / Elle a perdu son jouet.</span>",
+        word: "Léa est triste ___ elle a perdu son jouet.",
+        choices: ["mais", "parce que", "quand"],
+        answer: "parce que"
+      },
+      {
+        instruction: "Quelle conjonction relie le mieux ces deux phrases ?",
+        emoji: "<span style='font-size:15px;line-height:1.6;display:block;font-style:italic'>Les enfants rentrent en classe. / La cloche sonne.</span>",
+        word: "Les enfants rentrent ___ la cloche sonne.",
+        choices: ["et", "mais", "quand"],
+        answer: "quand"
+      },
+      {
+        instruction: "Quelle conjonction relie le mieux ces deux phrases ?",
+        emoji: "<span style='font-size:15px;line-height:1.6;display:block;font-style:italic'>Tom aime le chocolat. / Sa sœur préfère les fraises.</span>",
+        word: "Tom aime le chocolat ___ sa sœur préfère les fraises.",
+        choices: ["parce que", "mais", "quand"],
+        answer: "mais"
+      },
+      {
+        instruction: "Quelle conjonction relie le mieux ces deux phrases ?",
+        emoji: "<span style='font-size:15px;line-height:1.6;display:block;font-style:italic'>Le chien aboie. / Le facteur passe dans la rue.</span>",
+        word: "Le chien aboie ___ le facteur passe dans la rue.",
+        choices: ["qui", "parce que", "quand"],
+        answer: "quand"
+      }
+    ]
+  },
+
   "produire-formes-interrogatives": {
     title: "Produire différentes formes de phrases interrogatives",
     levels: ["CM1", "CM2", "6e"],
@@ -1823,6 +2651,96 @@ const EXERCISE_DATA = {
         modelEcQ:        "Est-ce que nous allons à la piscine ?",
         modelInv:        "Allons-nous à la piscine ?"
       }
+    ]
+  },
+
+  /* ══════════════════════════════════════════════════════════════════════
+     MATHÉMATIQUES — FRACTIONS
+  ══════════════════════════════════════════════════════════════════════ */
+
+  "representer-fraction": {
+    title: "Représenter une fraction",
+    type: "representer-fraction",
+    levels: ["CM1"],
+    questionsPerSession: 10,
+    backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
+
+    /* ── Banque de questions ─────────────────────────────────────────────
+       level 1 : fraction simple — la bande est partagée en `denominator`
+                 parts. Fractions ≤ 1 ET > 1 (plusieurs bandes).
+       level 2 : partage différent — la bande est partagée en `partitions`
+                 parts (multiple de `denominator`). Introduction fractions éq.
+    ────────────────────────────────────────────────────────────────────── */
+    bank: [
+
+      /* Niveau 1 — fractions ≤ 1 */
+      { level: 1, numerator: 1, denominator: 2 },
+      { level: 1, numerator: 3, denominator: 4 },
+      { level: 1, numerator: 2, denominator: 5 },
+      { level: 1, numerator: 5, denominator: 6 },
+      { level: 1, numerator: 7, denominator: 8 },
+
+      /* Niveau 1 — fractions > 1 (plusieurs bandes automatiques) */
+      { level: 1, numerator: 5,  denominator: 4 },
+      { level: 1, numerator: 7,  denominator: 5 },
+      { level: 1, numerator: 3,  denominator: 2 },
+      { level: 1, numerator: 11, denominator: 6 },
+      { level: 1, numerator: 9,  denominator: 4 },
+
+      /* Niveau 2 — partage différent du dénominateur */
+      { level: 2, numerator: 1, denominator: 2, partitions: 4  },
+      { level: 2, numerator: 1, denominator: 2, partitions: 6  },
+      { level: 2, numerator: 1, denominator: 3, partitions: 6  },
+      { level: 2, numerator: 2, denominator: 3, partitions: 6  },
+      { level: 2, numerator: 1, denominator: 4, partitions: 8  },
+      { level: 2, numerator: 3, denominator: 4, partitions: 8  },
+      { level: 2, numerator: 2, denominator: 5, partitions: 10 },
+      { level: 2, numerator: 4, denominator: 5, partitions: 10 },
+      { level: 2, numerator: 3, denominator: 6, partitions: 12 },
+      { level: 2, numerator: 5, denominator: 6, partitions: 12 },
+
+    ]
+  },
+
+  "lire-fraction": {
+    title: "Lire une fraction",
+    type: "lire-fraction",
+    levels: ["CM1"],
+    questionsPerSession: 10,
+    backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
+
+    /* ── Banque de questions ─────────────────────────────────────────────
+       parts    : nombre total de parts égales (= dénominateur)
+       colored  : nombre de parts coloriées    (= numérateur)
+       shape    : "strip" | "circle" | "rect"
+       cols     : colonnes (shape "rect" uniquement)
+       difficulty 1 : fractions ≤ 1, petits dénominateurs
+       difficulty 2 : fractions variées, y compris supérieures à 1
+    ────────────────────────────────────────────────────────────────────── */
+    bank: [
+      /* Niveau 1 — bandes et disques, fractions ≤ 1 */
+      { parts: 2, colored: 1, shape: "strip",              difficulty: 1 },
+      { parts: 4, colored: 1, shape: "strip",              difficulty: 1 },
+      { parts: 4, colored: 3, shape: "strip",              difficulty: 1 },
+      { parts: 3, colored: 1, shape: "circle",             difficulty: 1 },
+      { parts: 3, colored: 2, shape: "circle",             difficulty: 1 },
+      { parts: 5, colored: 2, shape: "strip",              difficulty: 1 },
+      { parts: 5, colored: 3, shape: "strip",              difficulty: 1 },
+      { parts: 6, colored: 5, shape: "circle",             difficulty: 1 },
+      { parts: 4, colored: 2, shape: "rect",  cols: 2,     difficulty: 1 },
+      { parts: 6, colored: 4, shape: "rect",  cols: 3,     difficulty: 1 },
+
+      /* Niveau 2 — figures variées, dont fractions > 1 */
+      { parts: 4, colored: 5, shape: "strip",              difficulty: 2 },
+      { parts: 4, colored: 7, shape: "strip",              difficulty: 2 },
+      { parts: 3, colored: 4, shape: "circle",             difficulty: 2 },
+      { parts: 5, colored: 6, shape: "strip",              difficulty: 2 },
+      { parts: 3, colored: 5, shape: "circle",             difficulty: 2 },
+      { parts: 4, colored: 9, shape: "strip",              difficulty: 2 },
+      { parts: 8, colored: 5, shape: "rect",  cols: 4,     difficulty: 2 },
+      { parts: 10, colored: 7, shape: "rect", cols: 5,     difficulty: 2 },
+      { parts: 6, colored: 4, shape: "circle",             difficulty: 2 },
+      { parts: 9, colored: 6, shape: "rect",  cols: 3,     difficulty: 2 }
     ]
   }
 
