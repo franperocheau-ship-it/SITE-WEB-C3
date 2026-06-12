@@ -470,7 +470,7 @@
       const session = await lfmAuth.getSession();
       if (!session) return;
       const profile = await lfmAuth.getProfile();
-      if (profile) lfmAuth.redirectToDashboard(profile.role);
+      if (profile && profile.role === role) lfmAuth.redirectToDashboard(profile.role);
     })();
 
     /* ── Utilitaires ─────────────────────────────────────────────────────── */
