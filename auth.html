@@ -180,6 +180,29 @@
     }
     .auth-back:hover { color: var(--blue); }
 
+    /* Toggle afficher/masquer mot de passe */
+    .pwd-wrap { position: relative; display: flex; align-items: center; }
+    .pwd-wrap .auth-input { padding-right: 46px; }
+    .pwd-toggle {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      padding: 4px;
+      cursor: pointer;
+      color: var(--muted);
+      line-height: 0;
+      transition: color 180ms;
+      flex-shrink: 0;
+    }
+    .pwd-toggle:hover { color: var(--blue); }
+
+    /* Indicateur correspondance mot de passe */
+    .pwd-label-row { display: flex; align-items: center; gap: 6px; }
+    .pwd-match { font-size: 15px; font-weight: 700; line-height: 1; }
+    .pwd-match.ok  { color: #16a34a; }
+    .pwd-match.err { color: var(--red); }
+
     @media (max-width: 480px) {
       .auth-box { padding: 28px 20px; }
     }
@@ -239,8 +262,11 @@
         </div>
         <div class="auth-field">
           <label class="auth-label" for="login-pwd">Mot de passe</label>
-          <input class="auth-input" id="login-pwd" type="password"
-                 required autocomplete="current-password" placeholder="••••••••">
+          <div class="pwd-wrap">
+            <input class="auth-input" id="login-pwd" type="password"
+                   required autocomplete="current-password" placeholder="••••••••">
+            <button type="button" class="pwd-toggle" aria-label="Afficher le mot de passe" onclick="togglePwd('login-pwd',this)"></button>
+          </div>
         </div>
         <button class="auth-submit" type="submit" id="login-btn">Se connecter</button>
         <button type="button" id="forgot-link" style="display:none;background:none;border:none;color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer;margin-top:4px;text-align:center;width:100%;transition:color 180ms"
@@ -271,13 +297,22 @@
       <form class="auth-form" id="reset-form" style="display:none" novalidate>
         <div class="auth-field">
           <label class="auth-label" for="reset-pwd">Nouveau mot de passe</label>
-          <input class="auth-input" id="reset-pwd" type="password"
-                 required autocomplete="new-password" placeholder="8 caractères minimum">
+          <div class="pwd-wrap">
+            <input class="auth-input" id="reset-pwd" type="password"
+                   required autocomplete="new-password" placeholder="8 caractères minimum">
+            <button type="button" class="pwd-toggle" aria-label="Afficher le mot de passe" onclick="togglePwd('reset-pwd',this)"></button>
+          </div>
         </div>
         <div class="auth-field">
-          <label class="auth-label" for="reset-pwd2">Confirmer le mot de passe</label>
-          <input class="auth-input" id="reset-pwd2" type="password"
-                 required autocomplete="new-password" placeholder="••••••••">
+          <div class="pwd-label-row">
+            <label class="auth-label" for="reset-pwd2">Confirmer le mot de passe</label>
+            <span class="pwd-match" id="reset-pwd2-match"></span>
+          </div>
+          <div class="pwd-wrap">
+            <input class="auth-input" id="reset-pwd2" type="password"
+                   required autocomplete="new-password" placeholder="••••••••">
+            <button type="button" class="pwd-toggle" aria-label="Afficher le mot de passe" onclick="togglePwd('reset-pwd2',this)"></button>
+          </div>
         </div>
         <button class="auth-submit" type="submit" id="reset-btn">Enregistrer le nouveau mot de passe</button>
       </form>
@@ -296,13 +331,22 @@
         </div>
         <div class="auth-field">
           <label class="auth-label" for="reg-pwd">Mot de passe</label>
-          <input class="auth-input" id="reg-pwd" type="password"
-                 required autocomplete="new-password" placeholder="8 caractères minimum">
+          <div class="pwd-wrap">
+            <input class="auth-input" id="reg-pwd" type="password"
+                   required autocomplete="new-password" placeholder="8 caractères minimum">
+            <button type="button" class="pwd-toggle" aria-label="Afficher le mot de passe" onclick="togglePwd('reg-pwd',this)"></button>
+          </div>
         </div>
         <div class="auth-field">
-          <label class="auth-label" for="reg-pwd2">Confirmer le mot de passe</label>
-          <input class="auth-input" id="reg-pwd2" type="password"
-                 required autocomplete="new-password" placeholder="••••••••">
+          <div class="pwd-label-row">
+            <label class="auth-label" for="reg-pwd2">Confirmer le mot de passe</label>
+            <span class="pwd-match" id="reg-pwd2-match"></span>
+          </div>
+          <div class="pwd-wrap">
+            <input class="auth-input" id="reg-pwd2" type="password"
+                   required autocomplete="new-password" placeholder="••••••••">
+            <button type="button" class="pwd-toggle" aria-label="Afficher le mot de passe" onclick="togglePwd('reg-pwd2',this)"></button>
+          </div>
         </div>
         <button class="auth-submit" type="submit" id="reg-btn">Créer mon compte</button>
       </form>
@@ -616,6 +660,8 @@
           'success'
         );
         document.getElementById('reg-form').reset();
+        const m = document.getElementById('reg-pwd2-match');
+        m.textContent = ''; m.className = 'pwd-match';
       } catch (err) {
         console.error('[LFM] Erreur inscription Supabase:', err);
         let msg;
@@ -639,6 +685,40 @@
         setLoading(btn, false);
       }
     });
+    /* ── Toggle afficher/masquer le mot de passe ────────────────────────────── */
+    const EYE_OPEN = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    const EYE_OFF  = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+
+    document.querySelectorAll('.pwd-toggle').forEach(btn => btn.innerHTML = EYE_OPEN);
+
+    function togglePwd(inputId, btn) {
+      const input  = document.getElementById(inputId);
+      const hidden = input.type === 'password';
+      input.type    = hidden ? 'text' : 'password';
+      btn.innerHTML = hidden ? EYE_OFF : EYE_OPEN;
+      btn.setAttribute('aria-label', hidden ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
+    }
+
+    /* ── Indicateur de correspondance en temps réel ─────────────────────────── */
+    function checkPwdMatch(pwd1Id, pwd2Id, matchId) {
+      const v1 = document.getElementById(pwd1Id).value;
+      const v2 = document.getElementById(pwd2Id).value;
+      const el = document.getElementById(matchId);
+      if (!v2) { el.className = 'pwd-match'; el.textContent = ''; return; }
+      el.className  = 'pwd-match ' + (v1 === v2 ? 'ok' : 'err');
+      el.textContent = v1 === v2 ? '✓' : '✗';
+    }
+
+    ['reg-pwd', 'reg-pwd2'].forEach(id =>
+      document.getElementById(id).addEventListener('input', () =>
+        checkPwdMatch('reg-pwd', 'reg-pwd2', 'reg-pwd2-match')
+      )
+    );
+    ['reset-pwd', 'reset-pwd2'].forEach(id =>
+      document.getElementById(id).addEventListener('input', () =>
+        checkPwdMatch('reset-pwd', 'reset-pwd2', 'reset-pwd2-match')
+      )
+    );
   </script>
 </body>
 </html>
