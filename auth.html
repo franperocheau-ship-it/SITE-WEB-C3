@@ -299,6 +299,11 @@
           <input class="auth-input" id="reg-pwd" type="password"
                  required autocomplete="new-password" placeholder="8 caractères minimum">
         </div>
+        <div class="auth-field">
+          <label class="auth-label" for="reg-pwd2">Confirmer le mot de passe</label>
+          <input class="auth-input" id="reg-pwd2" type="password"
+                 required autocomplete="new-password" placeholder="••••••••">
+        </div>
         <button class="auth-submit" type="submit" id="reg-btn">Créer mon compte</button>
       </form>
 
@@ -494,12 +499,20 @@
         }
         lfmAuth.redirectToDashboard(profile.role);
       } catch (err) {
+        console.error('[LFM] Erreur connexion:', err);
         const isEleve = cfg.useUsername;
-        const msg = /invalid login|invalid.*credentials/i.test(err.message)
-          ? isEleve
+        let msg;
+        if (/invalid login|invalid.*credentials/i.test(err.message)) {
+          msg = isEleve
             ? 'Identifiant ou mot de passe incorrect. Vérifie avec ton enseignant·e.'
-            : 'Identifiants incorrects. Vérifiez votre e-mail et votre mot de passe.'
-          : 'Connexion impossible. Réessayez dans quelques instants.';
+            : 'Identifiants incorrects. Vérifiez votre e-mail et votre mot de passe.';
+        } else if (/email.*not.*confirmed|confirm.*email/i.test(err.message)) {
+          msg = 'Adresse e-mail non confirmée. Vérifiez votre boîte mail.';
+        } else if (/rate limit|too many/i.test(err.message)) {
+          msg = 'Trop de tentatives. Veuillez patienter quelques minutes.';
+        } else {
+          msg = 'Connexion impossible : ' + err.message;
+        }
         showMsg(msg, 'error');
         setLoading(btn, false);
       }
@@ -526,8 +539,8 @@
       const email = document.getElementById('forgot-email').value.trim();
       setLoading(btn, true);
       try {
-       const redirectTo =
-  'https://franperocheau-ship-it.github.io/SITE-WEB-C3/auth.html?role=enseignant';
+        const redirectTo =
+          'https://franperocheau-ship-it.github.io/SITE-WEB-C3/auth.html?role=enseignant';
         await lfmAuth.resetPassword(email, redirectTo);
         showMsg(
           'Un lien de réinitialisation vous a été envoyé. Vérifiez votre boîte e-mail (et vos spams).',
@@ -535,7 +548,8 @@
         );
         document.getElementById('forgot-form').reset();
       } catch (err) {
-        showMsg('Impossible d\'envoyer le lien. Vérifiez l\'adresse e-mail saisie.', 'error');
+        console.error('[LFM] Erreur reset mot de passe:', err);
+        showMsg('Impossible d\'envoyer le lien : ' + err.message, 'error');
       } finally {
         setLoading(btn, false);
       }
@@ -578,24 +592,48 @@
       const name  = document.getElementById('reg-name').value.trim();
       const email = document.getElementById('reg-email').value.trim();
       const pwd   = document.getElementById('reg-pwd').value;
+      const pwd2  = document.getElementById('reg-pwd2').value;
 
       if (pwd.length < 8) {
         showMsg('Le mot de passe doit contenir au moins 8 caractères.', 'error');
         return;
       }
+      if (pwd !== pwd2) {
+        showMsg('Les deux mots de passe ne correspondent pas.', 'error');
+        return;
+      }
 
       setLoading(btn, true);
       try {
-        await lfmAuth.signUp(email, pwd, name, 'enseignant');
+        const result = await lfmAuth.signUp(email, pwd, name, 'enseignant');
+        /* Supabase renvoie identities=[] quand l'email existe déjà (sans confirmation) */
+        if (result.user && result.user.identities && result.user.identities.length === 0) {
+          showMsg('Cette adresse e-mail est déjà utilisée. Essayez de vous connecter.', 'error');
+          return;
+        }
         showMsg(
           'Demande envoyée ! Votre compte est en attente de validation par l\'administrateur. Vous pourrez vous connecter dès qu\'il aura approuvé votre accès.',
           'success'
         );
         document.getElementById('reg-form').reset();
       } catch (err) {
-        const msg = /already registered|user already/i.test(err.message)
-          ? 'Cette adresse e-mail est déjà utilisée.'
-          : 'Inscription impossible. Réessayez dans quelques instants.';
+        console.error('[LFM] Erreur inscription Supabase:', err);
+        let msg;
+        if (/already registered|user already|email.*exist/i.test(err.message)) {
+          msg = 'Cette adresse e-mail est déjà utilisée. Essayez de vous connecter.';
+        } else if (/database error saving/i.test(err.message)) {
+          msg = 'Erreur lors de la création du profil (trigger SQL). Contactez l\'administrateur. Détail : ' + err.message;
+        } else if (/email.*invalid|invalid.*email|unable to validate/i.test(err.message)) {
+          msg = 'Adresse e-mail invalide.';
+        } else if (/password.*weak|password.*short|at least 6|at least 8/i.test(err.message)) {
+          msg = 'Mot de passe trop faible. Utilisez au moins 8 caractères.';
+        } else if (/signup.*disabled|new user.*not allowed|signups not allowed/i.test(err.message)) {
+          msg = 'Les inscriptions sont temporairement désactivées. Contactez l\'administrateur.';
+        } else if (/rate limit|too many/i.test(err.message)) {
+          msg = 'Trop de tentatives. Veuillez patienter quelques minutes avant de réessayer.';
+        } else {
+          msg = 'Inscription impossible : ' + err.message;
+        }
         showMsg(msg, 'error');
       } finally {
         setLoading(btn, false);

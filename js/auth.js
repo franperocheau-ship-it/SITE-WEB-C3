@@ -10,7 +10,10 @@ const lfmAuth = (() => {
   /* Connexion ──────────────────────────────────────────────────────────────── */
   async function signIn(email, password) {
     const { data, error } = await db.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    if (error) {
+      console.error('[lfmAuth.signIn] Supabase error:', error.status, error.code, error.message);
+      throw error;
+    }
     return data;
   }
 
@@ -23,7 +26,11 @@ const lfmAuth = (() => {
         data: { display_name: displayName, role }
       }
     });
-    if (error) throw error;
+    if (error) {
+      console.error('[lfmAuth.signUp] Supabase error:', error.status, error.code, error.message, error);
+      throw error;
+    }
+    console.log('[lfmAuth.signUp] Success — user:', data?.user?.id, '— identities:', data?.user?.identities?.length);
     return data;
   }
 
