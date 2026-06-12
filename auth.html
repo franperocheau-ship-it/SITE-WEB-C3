@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css?v=5">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <style>
+
+    .auth-wrap {
+      min-height: calc(100vh - 88px - 74px);
+      background: var(--bg);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 48px 24px 64px;
+    }
+
+    .auth-box {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-md);
+      width: 100%;
+      max-width: 440px;
+      padding: 40px;
+    }
+
+    .auth-icon { font-size: 40px; text-align: center; margin-bottom: 12px; }
+
+    .auth-title {
+      font-weight: 900;
+      font-size: 22px;
+      color: var(--blue);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .auth-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .auth-rule {
+      width: 40px;
+      height: 3px;
+      background: var(--red);
+      border-radius: 2px;
+      margin: 0 auto 28px;
+    }
+
+    /* Onglets connexion / inscription */
+    .auth-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg);
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 24px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      background: none;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 180ms, color 180ms;
+    }
+
+    .auth-tab.is-active {
+      background: var(--card-bg);
+      color: var(--blue);
+      box-shadow: 0 2px 8px rgba(16,43,106,0.08);
+    }
+
+    /* Champs */
+    .auth-form { display: flex; flex-direction: column; gap: 16px; }
+
+    .auth-field { display: flex; flex-direction: column; gap: 6px; }
+
+    .auth-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .auth-input {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 180ms, box-shadow 180ms;
+    }
+
+    .auth-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(16,43,106,0.09);
+    }
+
+    .auth-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--blue);
+      color: #ffffff;
+      border: none;
+      border-radius: 100px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: background 180ms, transform 140ms;
+      letter-spacing: 0.01em;
+    }
+
+    .auth-submit:hover:not(:disabled) { background: #0d2255; transform: translateY(-1px); }
+    .auth-submit:disabled { opacity: 0.6; cursor: default; transform: none; }
+
+    /* Messages */
+    .auth-msg {
+      display: none;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .auth-msg.is-error {
+      display: block;
+      background: rgba(214,40,57,0.07);
+      border: 1px solid rgba(214,40,57,0.22);
+      color: var(--red);
+    }
+
+    .auth-msg.is-success {
+      display: block;
+      background: rgba(22,163,74,0.07);
+      border: 1px solid rgba(22,163,74,0.22);
+      color: #15803d;
+    }
+
+    /* Message d'information (élève, admin) */
+    .auth-info {
+      background: rgba(16,43,106,0.05);
+      border: 1px solid rgba(16,43,106,0.12);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .auth-back {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 180ms;
+    }
+    .auth-back:hover { color: var(--blue); }
+
+    @media (max-width: 480px) {
+      .auth-box { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <img src="assets/lfm-logo.svg" alt="Lycée Français de Madrid" class="header-logo">
+        <div class="header-text">
+          <span class="header-name">LYCÉE FRANÇAIS DE MADRID</span>
+          <span class="header-sub">Ressources numériques pour le cycle 3</span>
+        </div>
+      </a>
+      <div class="header-actions">
+        <span class="lang-badge">FR</span>
+        <button class="menu-btn" aria-label="Ouvrir le menu">
+          <span class="mbar mbar-top"></span>
+          <span class="mbar mbar-mid"></span>
+          <span class="mbar mbar-mid2"></span>
+          <span class="mbar mbar-bot"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENU -->
+  <div class="auth-wrap">
+    <div class="auth-box">
+
+      <div class="auth-icon" id="auth-icon">📚</div>
+      <h1 class="auth-title" id="auth-title">Espace enseignant</h1>
+      <p class="auth-subtitle" id="auth-subtitle">Connectez-vous à votre espace</p>
+      <div class="auth-rule"></div>
+
+      <!-- Onglets connexion / inscription (enseignant uniquement) -->
+      <div class="auth-tabs" id="auth-tabs" style="display:none">
+        <button class="auth-tab is-active" data-tab="login">Se connecter</button>
+        <button class="auth-tab" data-tab="register">Créer un compte</button>
+      </div>
+
+      <!-- Info contextuelle (élève, admin) -->
+      <div class="auth-info" id="auth-info" style="display:none"></div>
+
+      <!-- Feedback -->
+      <div class="auth-msg" id="auth-msg"></div>
+
+      <!-- Formulaire de connexion -->
+      <form class="auth-form" id="login-form" novalidate>
+        <div class="auth-field">
+          <label class="auth-label" for="login-email">Adresse e-mail</label>
+          <input class="auth-input" id="login-email" type="email"
+                 required autocomplete="email" placeholder="prenom.nom@lfmadrid.org">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="login-pwd">Mot de passe</label>
+          <input class="auth-input" id="login-pwd" type="password"
+                 required autocomplete="current-password" placeholder="••••••••">
+        </div>
+        <button class="auth-submit" type="submit" id="login-btn">Se connecter</button>
+      </form>
+
+      <!-- Formulaire d'inscription (enseignant uniquement) -->
+      <form class="auth-form" id="reg-form" style="display:none" novalidate>
+        <div class="auth-field">
+          <label class="auth-label" for="reg-name">Prénom et nom</label>
+          <input class="auth-input" id="reg-name" type="text"
+                 required autocomplete="name" placeholder="Marie Dupont">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="reg-email">Adresse e-mail</label>
+          <input class="auth-input" id="reg-email" type="email"
+                 required autocomplete="email" placeholder="prenom.nom@lfmadrid.org">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="reg-pwd">Mot de passe</label>
+          <input class="auth-input" id="reg-pwd" type="password"
+                 required autocomplete="new-password" placeholder="8 caractères minimum">
+        </div>
+        <button class="auth-submit" type="submit" id="reg-btn">Créer mon compte</button>
+      </form>
+
+      <a href="index.html" class="auth-back">← Retour à l'accueil</a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-rule"></div>
+        <div class="footer-body">
+          <p class="footer-text">
+            Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,<br>
+            dans le respect d'un <strong class="footer-em">usage mesuré</strong> des écrans.
+          </p>
+        </div>
+        <p class="footer-credit">© François PEROCHEAU — LFM 2026</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/menu.js"></script>
+  <script>
+    /* ── Configuration par rôle ───────────────────────────────────────────── */
+    const ROLES = {
+      enseignant: {
+        icon:        '📚',
+        title:       'Espace enseignant',
+        sub:         'Gérez vos classes et suivez vos élèves',
+        canRegister: true
+      },
+      eleve: {
+        icon:        '🎒',
+        title:       'Espace élève',
+        sub:         'Connectez-vous à votre espace personnel',
+        canRegister: false,
+        useUsername: true,
+        info:        'Ton identifiant et ton mot de passe t\'ont été remis par ton enseignant·e.'
+      },
+      admin: {
+        icon:        '⚙️',
+        title:       'Espace administrateur',
+        sub:         'Accès réservé aux administrateurs',
+        canRegister: false,
+        info:        'Cet espace est réservé aux administrateurs. Les comptes sont créés manuellement dans le tableau de bord Supabase.'
+      }
+    };
+
+    /* ── Lecture des paramètres ?role= et ?status= ──────────────────────── */
+    const params = new URLSearchParams(window.location.search);
+    const role   = params.get('role')   || 'enseignant';
+    const status = params.get('status') || null;
+    const cfg    = ROLES[role] || ROLES.enseignant;
+
+    /* ── Personnalisation de la page ─────────────────────────────────────── */
+    document.title = cfg.title + ' — LFM';
+    document.getElementById('auth-icon').textContent     = cfg.icon;
+    document.getElementById('auth-title').textContent    = cfg.title;
+    document.getElementById('auth-subtitle').textContent = cfg.sub;
+
+    if (cfg.canRegister) {
+      document.getElementById('auth-tabs').style.display = '';
+    }
+    if (cfg.info) {
+      const el = document.getElementById('auth-info');
+      el.textContent = cfg.info;
+      el.style.display = 'block';
+    }
+
+    /* Message de statut (pending / rejected) */
+    if (status === 'pending') {
+      showMsg(
+        'Votre demande de compte est en attente de validation par l\'administrateur. Vous recevrez accès dès qu\'elle sera approuvée.',
+        'success'
+      );
+    } else if (status === 'rejected') {
+      showMsg(
+        'Votre demande d\'accès a été refusée. Contactez l\'administrateur pour plus d\'informations.',
+        'error'
+      );
+    }
+
+    /* Mode identifiant pour les élèves (username → email synthétique) */
+    if (cfg.useUsername) {
+      const emailLabel = document.querySelector('label[for="login-email"]');
+      const emailInput = document.getElementById('login-email');
+      if (emailLabel) emailLabel.textContent = 'Identifiant';
+      if (emailInput) {
+        emailInput.type        = 'text';
+        emailInput.placeholder = 'ex : jean.dupont';
+        emailInput.autocomplete = 'username';
+      }
+    }
+
+    /* ── Redirection si déjà connecté ────────────────────────────────────── */
+    (async () => {
+      const session = await lfmAuth.getSession();
+      if (!session) return;
+      const profile = await lfmAuth.getProfile();
+      if (profile) lfmAuth.redirectToDashboard(profile.role);
+    })();
+
+    /* ── Utilitaires ─────────────────────────────────────────────────────── */
+    function showMsg(text, type) {
+      const el = document.getElementById('auth-msg');
+      el.textContent = text;
+      el.className = 'auth-msg is-' + type;
+    }
+    function clearMsg() {
+      const el = document.getElementById('auth-msg');
+      el.textContent = '';
+      el.className = 'auth-msg';
+    }
+    function setLoading(btn, on) {
+      btn.disabled    = on;
+      btn.textContent = on ? 'Chargement…' : btn.dataset.label;
+    }
+
+    /* Mémorise le label initial de chaque bouton */
+    ['login-btn', 'reg-btn'].forEach(id => {
+      const el = document.getElementById(id);
+      el.dataset.label = el.textContent;
+    });
+
+    /* ── Onglets ─────────────────────────────────────────────────────────── */
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.tab;
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('is-active'));
+        tab.classList.add('is-active');
+        document.getElementById('login-form').style.display = target === 'login'    ? '' : 'none';
+        document.getElementById('reg-form').style.display   = target === 'register' ? '' : 'none';
+        clearMsg();
+      });
+    });
+
+    /* ── Formulaire de connexion ─────────────────────────────────────────── */
+    document.getElementById('login-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      clearMsg();
+      const btn = document.getElementById('login-btn');
+      setLoading(btn, true);
+
+      let emailRaw = document.getElementById('login-email').value.trim();
+      const pwd    = document.getElementById('login-pwd').value;
+
+      /* Pour les élèves, transformer l'identifiant en email synthétique */
+      const email = cfg.useUsername ? emailRaw + '@eleves.lfmadrid.org' : emailRaw;
+
+      try {
+        await lfmAuth.signIn(email, pwd);
+        const profile = await lfmAuth.getProfile();
+        if (!profile) {
+          showMsg('Profil introuvable. Contactez l\'administrateur.', 'error');
+          setLoading(btn, false);
+          return;
+        }
+        /* Bloquer les enseignants en attente ou refusés */
+        if (profile.role === 'enseignant' && profile.status === 'pending') {
+          await lfmAuth.signOut();
+          showMsg('Votre compte est en attente de validation par l\'administrateur.', 'success');
+          setLoading(btn, false);
+          return;
+        }
+        if (profile.role === 'enseignant' && profile.status === 'rejected') {
+          await lfmAuth.signOut();
+          showMsg('Votre demande d\'accès a été refusée. Contactez l\'administrateur.', 'error');
+          setLoading(btn, false);
+          return;
+        }
+        lfmAuth.redirectToDashboard(profile.role);
+      } catch (err) {
+        const isEleve = cfg.useUsername;
+        const msg = /invalid login|invalid.*credentials/i.test(err.message)
+          ? isEleve
+            ? 'Identifiant ou mot de passe incorrect. Vérifie avec ton enseignant·e.'
+            : 'Identifiants incorrects. Vérifiez votre e-mail et votre mot de passe.'
+          : 'Connexion impossible. Réessayez dans quelques instants.';
+        showMsg(msg, 'error');
+        setLoading(btn, false);
+      }
+    });
+
+    /* ── Formulaire d'inscription (enseignants) ──────────────────────────── */
+    document.getElementById('reg-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      clearMsg();
+      const btn = document.getElementById('reg-btn');
+
+      const name  = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const pwd   = document.getElementById('reg-pwd').value;
+
+      if (pwd.length < 8) {
+        showMsg('Le mot de passe doit contenir au moins 8 caractères.', 'error');
+        return;
+      }
+
+      setLoading(btn, true);
+      try {
+        await lfmAuth.signUp(email, pwd, name, 'enseignant');
+        showMsg(
+          'Demande envoyée ! Votre compte est en attente de validation par l\'administrateur. Vous pourrez vous connecter dès qu\'il aura approuvé votre accès.',
+          'success'
+        );
+        document.getElementById('reg-form').reset();
+      } catch (err) {
+        const msg = /already registered|user already/i.test(err.message)
+          ? 'Cette adresse e-mail est déjà utilisée.'
+          : 'Inscription impossible. Réessayez dans quelques instants.';
+        showMsg(msg, 'error');
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+  </script>
+</body>
+</html>

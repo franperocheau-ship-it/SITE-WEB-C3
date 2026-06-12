@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Résultats — Espace enseignant — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=5">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/teacher.js"></script>
+  <style>
+    /* ── Layout ──────────────────────────────────────────────────────────────── */
+    .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
+    .dash-content { max-width: 960px; margin: 0 auto; }
+
+    /* ── Breadcrumb ──────────────────────────────────────────────────────────── */
+    .breadcrumb {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 24px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
+    }
+    .breadcrumb a, .bc-btn {
+      color: var(--blue); text-decoration: none; font-weight: 600;
+      cursor: pointer; background: none; border: none;
+      font-family: inherit; font-size: 13px; padding: 0;
+    }
+    .breadcrumb a:hover, .bc-btn:hover { text-decoration: underline; }
+    .bc-sep { color: var(--border); user-select: none; }
+    .bc-current { font-weight: 600; color: var(--text); }
+
+    /* ── Section header ──────────────────────────────────────────────────────── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; gap: 12px; flex-wrap: wrap;
+    }
+    .section-title { font-weight: 800; font-size: 20px; color: var(--blue); }
+
+    /* ── Buttons ─────────────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 20px; border-radius: 100px;
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none;
+      transition: background 180ms, transform 120ms;
+      text-decoration: none;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-1px); }
+    .btn-outline {
+      background: var(--card-bg); color: var(--blue);
+      border: 1.5px solid rgba(16,43,106,0.2);
+    }
+    .btn-outline:hover { border-color: var(--blue); }
+    .btn-ghost {
+      background: var(--card-bg); color: var(--muted);
+      border: 1.5px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--red); color: var(--red); }
+    .btn-sm { padding: 7px 14px; font-size: 12px; }
+
+    /* ── Level badges ────────────────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; border-radius: 100px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+    }
+    .badge-cm1 { background: rgba(16,43,106,0.09); color: var(--blue); border: 1px solid rgba(16,43,106,0.15); }
+    .badge-cm2 { background: var(--blue); color: #fff; }
+    .badge-6e  { background: var(--red);  color: #fff; }
+
+    /* ── Class cards (Vue A) ─────────────────────────────────────────────────── */
+    .classes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .class-card {
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm); padding: 24px;
+      cursor: pointer; border: 2px solid transparent;
+      transition: border-color 200ms, box-shadow 200ms, transform 130ms;
+      display: flex; flex-direction: column; gap: 12px;
+      position: relative; overflow: hidden;
+    }
+    .class-card:hover {
+      border-color: rgba(16,43,106,0.2); box-shadow: var(--shadow-md);
+      transform: translateY(-3px);
+    }
+    .class-card-top { display: flex; align-items: flex-start; justify-content: space-between; }
+    .class-card-name { font-weight: 800; font-size: 18px; color: var(--blue); margin-top: 6px; }
+    .class-card-year { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .class-card-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; color: var(--muted); margin-top: auto;
+    }
+    .class-card-arrow { color: var(--blue); font-size: 18px; }
+    .class-card-accent {
+      position: absolute; bottom: 0; left: 0;
+      width: 100%; height: 3px; background: var(--blue); opacity: 0.25;
+    }
+
+    /* ── Students table (Vue B) ──────────────────────────────────────────────── */
+    .class-info-bar {
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm); padding: 20px 24px;
+      margin-bottom: 20px; border-left: 4px solid var(--blue);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap;
+    }
+    .class-info-name { font-weight: 800; font-size: 18px; color: var(--blue); }
+    .class-info-meta { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    .table-wrap {
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm); overflow: hidden;
+    }
+    .result-table { width: 100%; border-collapse: collapse; }
+    .result-table th {
+      font-size: 10px; font-weight: 700; color: var(--muted);
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 14px 20px; text-align: left;
+      border-bottom: 1px solid var(--border); background: var(--bg);
+    }
+    .result-table td {
+      padding: 14px 20px; font-size: 14px; color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+    .result-table tr:last-child td { border-bottom: none; }
+    .result-table tr:hover td { background: rgba(16,43,106,0.02); }
+    .student-name-cell {
+      font-weight: 600; color: var(--blue); cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .student-name-cell:hover { text-decoration: underline; }
+    .student-avatar-sm {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(16,43,106,0.1); color: var(--blue);
+      font-size: 13px; font-weight: 800;
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Score pill */
+    .score-pill {
+      display: inline-flex; align-items: center;
+      padding: 4px 10px; border-radius: 100px;
+      font-size: 12px; font-weight: 700;
+    }
+    .score-high   { background: rgba(22,163,74,0.1);   color: #15803d; }
+    .score-mid    { background: rgba(234,179,8,0.1);   color: #a16207; }
+    .score-low    { background: rgba(214,40,57,0.1);   color: var(--red); }
+    .score-none   { background: var(--bg); color: var(--muted); }
+
+    /* ── Student detail (Vue C) ──────────────────────────────────────────────── */
+    .student-header {
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm); padding: 24px 28px;
+      margin-bottom: 20px; border-left: 4px solid var(--red);
+      display: flex; align-items: center; gap: 20px;
+    }
+    .student-avatar-lg {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--red); color: #fff;
+      font-weight: 800; font-size: 22px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .student-header-info { flex: 1; }
+    .student-header-name { font-weight: 800; font-size: 22px; color: var(--blue); }
+    .student-header-meta { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    /* Stats row */
+    .stats-row-3 {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 12px; margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm); padding: 20px 24px;
+    }
+    .stat-label {
+      font-size: 10px; font-weight: 700; color: var(--muted);
+      letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px;
+    }
+    .stat-value {
+      font-size: 32px; font-weight: 900; color: var(--blue); line-height: 1;
+    }
+    .stat-unit { font-size: 14px; font-weight: 600; color: var(--muted); margin-left: 4px; }
+
+    /* Charts */
+    .charts-row {
+      display: grid; grid-template-columns: 2fr 1fr;
+      gap: 16px; margin-bottom: 20px;
+    }
+    .chart-card {
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm); padding: 22px 24px;
+    }
+    .chart-card-title {
+      font-size: 12px; font-weight: 700; color: var(--blue);
+      letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 16px;
+    }
+    .chart-wrap { position: relative; }
+
+    /* History table */
+    .history-card {
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm); overflow: hidden;
+    }
+    .history-card-title {
+      font-size: 12px; font-weight: 700; color: var(--blue);
+      letter-spacing: 0.07em; text-transform: uppercase;
+      padding: 18px 24px 14px; border-bottom: 1px solid var(--border);
+    }
+
+    /* Subject badge */
+    .subj-fr   { background: rgba(16,43,106,0.08); color: var(--blue);
+                 padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+    .subj-math { background: rgba(214,40,57,0.08); color: var(--red);
+                 padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 56px 24px; color: var(--muted); }
+    .empty-icon  { font-size: 40px; margin-bottom: 12px; }
+    .empty-text  { font-size: 15px; }
+
+    /* Loading */
+    .view-loading { text-align: center; padding: 64px 24px; color: var(--muted); font-size: 15px; }
+
+    /* Nav footer */
+    .nav-footer {
+      display: flex; align-items: center; gap: 16px;
+      margin-top: 24px; flex-wrap: wrap; justify-content: flex-start;
+    }
+
+    @media (max-width: 600px) {
+      .stats-row-3    { grid-template-columns: 1fr 1fr; }
+      .charts-row     { grid-template-columns: 1fr; }
+      .result-table td, .result-table th { padding: 10px 12px; }
+    }
+    @media (max-width: 400px) {
+      .stats-row-3    { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <img src="assets/lfm-logo.svg" alt="Lycée Français de Madrid" class="header-logo">
+        <div class="header-text">
+          <span class="header-name">LYCÉE FRANÇAIS DE MADRID</span>
+          <span class="header-sub">François PEROCHEAU - Classe de CM2</span>
+        </div>
+      </a>
+      <div class="header-actions">
+        <span class="lang-badge">FR</span>
+        <button class="menu-btn" aria-label="Ouvrir le menu">
+          <span class="mbar mbar-top"></span>
+          <span class="mbar mbar-mid"></span>
+          <span class="mbar mbar-mid2"></span>
+          <span class="mbar mbar-bot"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENU -->
+  <div class="dash-wrap">
+    <div class="dash-content">
+
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb" id="breadcrumb" aria-label="Fil d'Ariane">
+        <a href="dashboard-enseignant.html">Espace enseignant</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-current" id="bc-page">Résultats</span>
+      </nav>
+
+      <!-- Chargement -->
+      <div id="view-loading" class="view-loading">Chargement…</div>
+
+      <!-- ── Vue A : Classes ───────────────────────────────────────────────── -->
+      <div id="view-classes" style="display:none">
+        <div class="section-header">
+          <h1 class="section-title">Résultats par classe</h1>
+        </div>
+        <div class="classes-grid" id="classes-grid"></div>
+      </div>
+
+      <!-- ── Vue B : Élèves d'une classe ───────────────────────────────────── -->
+      <div id="view-students" style="display:none">
+        <div class="class-info-bar">
+          <div>
+            <div class="class-info-name" id="class-info-name">—</div>
+            <div class="class-info-meta" id="class-info-meta">—</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" id="export-class-btn">⬇ Export CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="result-table">
+            <thead>
+              <tr>
+                <th>Élève</th>
+                <th>Exercices</th>
+                <th>Moyenne</th>
+                <th>Dernière activité</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="students-tbody"></tbody>
+          </table>
+        </div>
+        <div class="nav-footer">
+          <button class="btn btn-ghost btn-sm" onclick="navigate({view:'classes'})">← Retour aux classes</button>
+        </div>
+      </div>
+
+      <!-- ── Vue C : Fiche élève ────────────────────────────────────────────── -->
+      <div id="view-student" style="display:none">
+        <div class="student-header">
+          <div class="student-avatar-lg" id="student-avatar">?</div>
+          <div class="student-header-info">
+            <div class="student-header-name" id="student-header-name">—</div>
+            <div class="student-header-meta" id="student-header-meta">—</div>
+          </div>
+        </div>
+
+        <div class="stats-row-3" id="student-stats-row"></div>
+
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-card-title">Évolution des scores</div>
+            <div class="chart-wrap" style="height:200px"><canvas id="chart-line"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-title">Par matière</div>
+            <div class="chart-wrap" style="height:200px"><canvas id="chart-donut"></canvas></div>
+          </div>
+        </div>
+
+        <div class="history-card">
+          <div class="history-card-title">20 derniers exercices</div>
+          <table class="result-table">
+            <thead>
+              <tr>
+                <th>Exercice</th>
+                <th>Matière</th>
+                <th>Score</th>
+                <th>Résultat</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="history-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="nav-footer" id="student-nav-footer"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-rule"></div>
+        <div class="footer-body">
+          <p class="footer-text">
+            Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,<br>
+            dans le respect d'un <strong class="footer-em">usage mesuré</strong> des écrans.
+          </p>
+        </div>
+        <p class="footer-credit">© François PEROCHEAU — LFM 2026</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/menu.js"></script>
+  <script>
+  /* ═══════════════════════════════════════════════════════════════════════════
+     STATE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  let _classes       = [];
+  let _currentClass  = null;   // { id, name, level, school_year, student_count }
+  let _currentStudent = null;  // { auth_user_id, display_name, class_name }
+  let _charts        = {};
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════════════════════════════════════ */
+  (async () => {
+    const profile = await lfmAuth.requireRole('enseignant');
+    if (!profile) return;
+    document.title = 'Résultats — ' + profile.display_name + ' — LFM';
+
+    try {
+      _classes = await lfmTeacher.getClasses();
+    } catch (e) {
+      _classes = [];
+    }
+    applyView();
+  })();
+
+  window.addEventListener('popstate', applyView);
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     NAVIGATION
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function navigate(params) {
+    const url = new URL(window.location.href);
+    ['view','class','student','sname','cname','clevel','cyear'].forEach(k => url.searchParams.delete(k));
+    Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+    history.pushState(null, '', url);
+    applyView();
+  }
+
+  async function applyView() {
+    const p    = new URLSearchParams(window.location.search);
+    const view = p.get('view') || 'classes';
+
+    ['view-loading','view-classes','view-students','view-student'].forEach(id => {
+      document.getElementById(id).style.display = 'none';
+    });
+    document.getElementById('view-loading').style.display = '';
+
+    if (view === 'classes') {
+      updateBreadcrumb([]);
+      renderClasses();
+    } else if (view === 'eleves') {
+      const classId = p.get('class');
+      _currentClass = _classes.find(c => c.id === classId) || null;
+      updateBreadcrumb([
+        { label: 'Résultats', params: { view: 'classes' } }
+      ], _currentClass?.name || 'Classe');
+      await renderStudents(classId);
+    } else if (view === 'eleve') {
+      _currentStudent = {
+        auth_user_id: p.get('student'),
+        display_name: decodeURIComponent(p.get('sname') || 'Élève'),
+        class_name:   decodeURIComponent(p.get('cname') || ''),
+        class_level:  p.get('clevel') || ''
+      };
+      const classId = p.get('class');
+      updateBreadcrumb([
+        { label: 'Résultats', params: { view: 'classes' } },
+        { label: _currentClass?.name || decodeURIComponent(p.get('cname') || 'Classe'),
+          params: { view: 'eleves', class: classId,
+                    cname: p.get('cname'), clevel: p.get('clevel'), cyear: p.get('cyear') } }
+      ], _currentStudent.display_name);
+      await renderStudentDetail();
+    }
+
+    document.getElementById('view-loading').style.display = 'none';
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     BREADCRUMB
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function updateBreadcrumb(ancestors, current) {
+    const bc  = document.getElementById('breadcrumb');
+    const sep = '<span class="bc-sep">›</span>';
+
+    let html = '<a href="dashboard-enseignant.html">Espace enseignant</a>' + sep;
+    if (ancestors.length === 0) {
+      html += '<span class="bc-current">Résultats</span>';
+    } else {
+      html += ancestors.map(a => {
+        const qs = new URLSearchParams(a.params).toString();
+        return `<button class="bc-btn" onclick="navigate(${JSON.stringify(a.params)})">${escHtml(a.label)}</button>`;
+      }).join(sep);
+      html += sep + '<span class="bc-current">' + escHtml(current || '') + '</span>';
+    }
+    bc.innerHTML = html;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     VUE A — CLASSES
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function renderClasses() {
+    const grid = document.getElementById('classes-grid');
+
+    if (_classes.length === 0) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-icon">🏫</div>
+        <div class="empty-text">Aucune classe créée.<br>
+          <a href="classes-enseignant.html" style="color:var(--blue);font-weight:600">Créer une classe →</a>
+        </div>
+      </div>`;
+    } else {
+      grid.innerHTML = _classes.map(cls => `
+        <div class="class-card" onclick="navigate({view:'eleves',class:'${cls.id}',
+          cname:encodeURIComponent('${escJs(cls.name)}'),
+          clevel:'${escJs(cls.level)}',cyear:encodeURIComponent('${escJs(cls.school_year)}')})">
+          <div class="class-card-top">
+            <span class="badge badge-${cls.level.toLowerCase().replace('è','e')}">${cls.level}</span>
+          </div>
+          <div class="class-card-name">${escHtml(cls.name)}</div>
+          <div class="class-card-year">${escHtml(cls.school_year)}</div>
+          <div class="class-card-foot">
+            <span>${cls.student_count} élève${cls.student_count !== 1 ? 's' : ''}</span>
+            <span class="class-card-arrow">→</span>
+          </div>
+          <div class="class-card-accent"></div>
+        </div>`).join('');
+    }
+    document.getElementById('view-classes').style.display = '';
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     VUE B — ÉLÈVES D'UNE CLASSE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function renderStudents(classId) {
+    const p = new URLSearchParams(window.location.search);
+    const cname  = decodeURIComponent(p.get('cname') || '');
+    const clevel = p.get('clevel') || '';
+    const cyear  = decodeURIComponent(p.get('cyear') || '');
+
+    document.getElementById('class-info-name').textContent =
+      cname || (_currentClass?.name || 'Classe');
+    document.getElementById('class-info-meta').textContent =
+      [clevel || _currentClass?.level, cyear || _currentClass?.school_year].filter(Boolean).join(' · ');
+
+    let students = [];
+    try {
+      students = await lfmTeacher.getClassResults(classId);
+    } catch (e) {
+      console.warn('[LFM] getClassResults :', e.message);
+    }
+
+    /* Export CSV */
+    document.getElementById('export-class-btn').onclick = async () => {
+      const raw = await lfmTeacher.getStudents(classId);
+      lfmTeacher.exportCSV(raw, cname || 'classe');
+    };
+
+    const tbody = document.getElementById('students-tbody');
+    if (students.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted)">
+        Aucun élève dans cette classe.</td></tr>`;
+    } else {
+      tbody.innerHTML = students.map(s => {
+        const avgPct = s.avg_pct;
+        const pillCls = avgPct === null ? 'score-none'
+                      : avgPct >= 70  ? 'score-high'
+                      : avgPct >= 50  ? 'score-mid'
+                      : 'score-low';
+        const pillTxt = avgPct === null ? '—' : avgPct + '%';
+        const lastAct = s.last_activity
+          ? new Date(s.last_activity).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' })
+          : '—';
+        const initial = (s.display_name || '?')[0].toUpperCase();
+
+        const canView = !!s.auth_user_id;
+        const viewBtn = canView
+          ? `<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();navigate({
+               view:'eleve', student:'${s.auth_user_id}',
+               sname:encodeURIComponent('${escJs(s.display_name)}'),
+               cname:encodeURIComponent('${escJs(cname || '')}'),
+               clevel:'${escJs(clevel || '')}',
+               class:'${classId}'
+             })">Voir la fiche →</button>`
+          : `<span style="font-size:11px;color:var(--muted)">Pas de compte</span>`;
+
+        return `<tr>
+          <td>
+            <div class="student-name-cell" ${canView ? `onclick="navigate({
+               view:'eleve', student:'${s.auth_user_id}',
+               sname:encodeURIComponent('${escJs(s.display_name)}'),
+               cname:encodeURIComponent('${escJs(cname || '')}'),
+               clevel:'${escJs(clevel || '')}',
+               class:'${classId}'
+             })"` : ''}>
+              <div class="student-avatar-sm">${initial}</div>
+              ${escHtml(s.display_name)}
+            </div>
+          </td>
+          <td>${s.exercise_count}</td>
+          <td><span class="score-pill ${pillCls}">${pillTxt}</span></td>
+          <td style="color:var(--muted);font-size:13px">${lastAct}</td>
+          <td>${viewBtn}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    document.getElementById('view-students').style.display = '';
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     VUE C — FICHE ÉLÈVE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function renderStudentDetail() {
+    const s = _currentStudent;
+    if (!s?.auth_user_id) {
+      document.getElementById('view-student').style.display = '';
+      document.getElementById('student-stats-row').innerHTML =
+        '<div class="empty-state" style="grid-column:1/-1">Cet élève n\'a pas encore de compte connecté.</div>';
+      return;
+    }
+
+    const initial = (s.display_name || '?')[0].toUpperCase();
+    document.getElementById('student-avatar').textContent     = initial;
+    document.getElementById('student-header-name').textContent = s.display_name;
+    document.getElementById('student-header-meta').textContent =
+      [s.class_name, s.class_level].filter(Boolean).join(' · ');
+
+    let stats = null;
+    try {
+      stats = await lfmTeacher.getStudentStats(s.auth_user_id);
+    } catch (e) {
+      console.warn('[LFM] getStudentStats :', e.message);
+    }
+
+    renderStudentStats(stats);
+    renderLineChart(stats?.chartData || []);
+    renderDoughnutChart(stats?.subjects || []);
+    renderHistory(stats?.recent || []);
+
+    const p = new URLSearchParams(window.location.search);
+    document.getElementById('student-nav-footer').innerHTML = `
+      <button class="btn btn-ghost btn-sm" onclick="navigate({
+        view:'eleves', class:'${p.get('class') || ''}',
+        cname:encodeURIComponent('${escJs(s.class_name || '')}'),
+        clevel:'${escJs(s.class_level || '')}'
+      })">← Retour à la classe</button>`;
+
+    document.getElementById('view-student').style.display = '';
+  }
+
+  function renderStudentStats(stats) {
+    const row = document.getElementById('student-stats-row');
+    if (!stats || stats.total === 0) {
+      row.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-icon">📭</div>
+        <div class="empty-text">Cet élève n'a pas encore réalisé d'exercice.</div>
+      </div>`;
+      return;
+    }
+    const bestLabel = stats.bestSubject === 'français'     ? 'Français'
+                    : stats.bestSubject === 'mathématiques' ? 'Maths'
+                    : stats.bestSubject || '—';
+    row.innerHTML = `
+      <div class="stat-card">
+        <div class="stat-label">Exercices réalisés</div>
+        <div class="stat-value">${stats.total}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Moyenne générale</div>
+        <div class="stat-value">${stats.avgPct !== null ? stats.avgPct : '—'}<span class="stat-unit">${stats.avgPct !== null ? '%' : ''}</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Meilleure matière</div>
+        <div class="stat-value" style="font-size:20px;margin-top:4px">${escHtml(bestLabel)}</div>
+      </div>`;
+  }
+
+  function renderLineChart(chartData) {
+    destroyChart('line');
+    const canvas = document.getElementById('chart-line');
+    if (chartData.length === 0) {
+      canvas.parentElement.innerHTML = '<div class="empty-state" style="padding:32px 0">Pas encore de données.</div>';
+      return;
+    }
+    _charts.line = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels: chartData.map(d => d.label),
+        datasets: [{
+          data: chartData.map(d => d.pct),
+          borderColor: '#102B6A',
+          backgroundColor: 'rgba(16,43,106,0.07)',
+          tension: 0.35,
+          fill: true,
+          pointBackgroundColor: '#102B6A',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          pointHoverRadius: 7
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: {
+          y: { min: 0, max: 100,
+               ticks: { callback: v => v + '%', font: { size: 11 }, maxTicksLimit: 6 },
+               grid: { color: 'rgba(0,0,0,0.05)' } },
+          x: { ticks: { font: { size: 11 } }, grid: { display: false } }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ' ' + ctx.raw + '%' } }
+        }
+      }
+    });
+  }
+
+  function renderDoughnutChart(subjects) {
+    destroyChart('donut');
+    const canvas = document.getElementById('chart-donut');
+    if (subjects.length === 0) {
+      canvas.parentElement.innerHTML = '<div class="empty-state" style="padding:32px 0">Pas encore de données.</div>';
+      return;
+    }
+    const COLORS = { 'français': '#102B6A', 'mathématiques': '#D62839' };
+    _charts.donut = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: subjects.map(s => s.subject === 'français' ? 'Français' : 'Maths'),
+        datasets: [{
+          data: subjects.map(s => s.count),
+          backgroundColor: subjects.map(s => COLORS[s.subject] || '#888'),
+          borderWidth: 3, borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, cutout: '58%',
+        plugins: {
+          legend: { position: 'bottom', labels: { padding: 14, font: { size: 12 } } },
+          tooltip: { callbacks: {
+            label: ctx => {
+              const s = subjects[ctx.dataIndex];
+              return ' ' + ctx.raw + ' ex. — moy. ' + s.avg + '%';
+            }
+          }}
+        }
+      }
+    });
+  }
+
+  function renderHistory(recent) {
+    const tbody = document.getElementById('history-tbody');
+    if (recent.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted)">
+        Aucun exercice enregistré.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = recent.map(r => {
+      const pct     = parseFloat(r.pct);
+      const pillCls = pct >= 70 ? 'score-high' : pct >= 50 ? 'score-mid' : 'score-low';
+      const slug    = (r.exercise_slug || '').replace(/-/g, ' ');
+      const title   = slug.charAt(0).toUpperCase() + slug.slice(1);
+      const subjCls = r.subject === 'français' ? 'subj-fr' : 'subj-math';
+      const subjLbl = r.subject === 'français' ? 'Français' : 'Maths';
+      const date    = new Date(r.completed_at).toLocaleDateString('fr-FR',
+        { day: '2-digit', month: '2-digit', year: '2-digit' });
+      return `<tr>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+            title="${escHtml(title)}">${escHtml(title)}</td>
+        <td><span class="${subjCls}">${subjLbl}</span></td>
+        <td style="font-size:13px">${r.score}/${r.total}</td>
+        <td><span class="score-pill ${pillCls}">${Math.round(pct)}%</span></td>
+        <td style="color:var(--muted);font-size:13px">${date}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     UTILITAIRES
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function destroyChart(key) {
+    if (_charts[key]) { _charts[key].destroy(); delete _charts[key]; }
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function escJs(str) {
+    return String(str).replace(/'/g, "\\'").replace(/\\/g, '\\\\');
+  }
+  </script>
+</body>
+</html>

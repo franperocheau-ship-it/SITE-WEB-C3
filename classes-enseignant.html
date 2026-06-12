@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes classes — Espace enseignant — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=5">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/teacher.js"></script>
+  <style>
+    /* ── Layout ──────────────────────────────────────────────────────────────── */
+    .dash-wrap {
+      min-height: calc(100vh - 88px - 74px);
+      background: var(--bg);
+      padding: 32px 24px 64px;
+    }
+    .dash-content { max-width: 960px; margin: 0 auto; }
+
+    /* ── Breadcrumb ──────────────────────────────────────────────────────────── */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+    .breadcrumb a, .breadcrumb .bc-link {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 0;
+    }
+    .breadcrumb a:hover, .breadcrumb .bc-link:hover { text-decoration: underline; }
+    .bc-sep { color: var(--border); user-select: none; }
+
+    /* ── Tabs ────────────────────────────────────────────────────────────────── */
+    .page-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--card-bg);
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
+      padding: 5px;
+      margin-bottom: 24px;
+      width: fit-content;
+    }
+    .page-tab {
+      padding: 9px 20px;
+      background: none;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 180ms, color 180ms;
+    }
+    .page-tab.is-active { background: var(--blue); color: #fff; }
+
+    /* ── Section header ──────────────────────────────────────────────────────── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .section-title {
+      font-weight: 800;
+      font-size: 20px;
+      color: var(--blue);
+    }
+    .section-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    /* ── Buttons ─────────────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background 180ms, transform 120ms, opacity 180ms;
+      text-decoration: none;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.45; cursor: default; transform: none !important; }
+    .btn-primary { background: var(--blue); color: #fff; box-shadow: 0 2px 8px rgba(16,43,106,0.2); }
+    .btn-primary:hover:not(:disabled) { background: #0d2255; }
+    .btn-outline { background: var(--card-bg); color: var(--blue); border: 1.5px solid rgba(16,43,106,0.2); }
+    .btn-outline:hover:not(:disabled) { border-color: var(--blue); }
+    .btn-ghost { background: var(--card-bg); color: var(--muted); border: 1.5px solid var(--border); }
+    .btn-ghost:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
+    .btn-danger { background: rgba(214,40,57,0.07); color: var(--red); border: 1.5px solid rgba(214,40,57,0.2); }
+    .btn-danger:hover:not(:disabled) { background: rgba(214,40,57,0.14); }
+    .btn-sm { padding: 7px 14px; font-size: 12px; }
+    .btn-icon { padding: 7px 10px; border-radius: 8px; }
+
+    /* ── Class cards ─────────────────────────────────────────────────────────── */
+    .classes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 16px;
+    }
+    .class-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 22px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 180ms, box-shadow 180ms, transform 120ms;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .class-card:hover {
+      border-color: rgba(16,43,106,0.15);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .class-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .class-card-name { font-weight: 800; font-size: 18px; color: var(--blue); margin-top: 8px; }
+    .class-card-year { font-size: 12px; color: var(--muted); }
+    .class-card-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+    .class-card-count { font-size: 13px; color: var(--muted); }
+    .class-card-del {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 15px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      line-height: 1;
+      transition: background 180ms, color 180ms;
+    }
+    .class-card-del:hover { background: rgba(214,40,57,0.08); color: var(--red); }
+
+    /* ── Level badges ────────────────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .badge-cm1 { background: rgba(16,43,106,0.09); color: var(--blue); border: 1px solid rgba(16,43,106,0.15); }
+    .badge-cm2 { background: var(--blue); color: #fff; }
+    .badge-6e  { background: var(--red);  color: #fff; }
+
+    /* ── Empty state ─────────────────────────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 56px 24px;
+      color: var(--muted);
+    }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-text { font-size: 15px; margin-bottom: 20px; }
+
+    /* ── Detail header ───────────────────────────────────────────────────────── */
+    .detail-class-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--blue);
+      flex-wrap: wrap;
+    }
+    .detail-class-name { font-weight: 800; font-size: 22px; color: var(--blue); margin: 6px 0 4px; }
+    .detail-class-meta { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+
+    /* ── Students table ──────────────────────────────────────────────────────── */
+    .table-wrap {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      overflow-x: auto;
+    }
+    .students-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      min-width: 520px;
+    }
+    .students-table th {
+      background: rgba(16,43,106,0.04);
+      padding: 13px 16px;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+    .students-table td {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: middle;
+    }
+    .students-table tr:last-child td { border-bottom: none; }
+    .students-table tbody tr:hover td { background: rgba(16,43,106,0.015); }
+    .td-name { font-weight: 600; }
+    .td-cred {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      background: var(--bg);
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+    .td-actions { display: flex; gap: 6px; justify-content: flex-end; }
+    .th-actions { text-align: right !important; }
+
+    /* ── Modal ───────────────────────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,25,60,0.45);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 24px;
+    }
+    .modal {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: 0 24px 64px rgba(16,43,106,0.22);
+      width: 100%;
+      max-width: 440px;
+      animation: modal-in 180ms ease;
+    }
+    @keyframes modal-in {
+      from { transform: translateY(12px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px 0;
+    }
+    .modal-title { font-weight: 800; font-size: 17px; color: var(--blue); }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: var(--muted);
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 6px;
+      transition: color 180ms, background 180ms;
+    }
+    .modal-close:hover { color: var(--red); background: rgba(214,40,57,0.07); }
+    .modal-body { padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 16px; }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; padding-top: 4px; }
+
+    /* ── Form fields ─────────────────────────────────────────────────────────── */
+    .form-field { display: flex; flex-direction: column; gap: 6px; }
+    .form-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .form-input, .form-select {
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 180ms, box-shadow 180ms;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .form-input:focus, .form-select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(16,43,106,0.09);
+    }
+
+    /* ── Credentials display ─────────────────────────────────────────────────── */
+    .cred-box {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .cred-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .cred-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .cred-value { font-family: 'Courier New', monospace; font-size: 15px; font-weight: 700; color: var(--blue); }
+    .cred-name-value { font-size: 15px; font-weight: 700; color: var(--blue); font-family: inherit; }
+
+    /* ── Confirm dialog ──────────────────────────────────────────────────────── */
+    .confirm-text { font-size: 14px; color: var(--text); line-height: 1.6; }
+    .confirm-warning { font-size: 12px; color: var(--red); margin-top: 6px; }
+
+    /* ── Toast ───────────────────────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(0);
+      background: #1a3a7a;
+      color: #fff;
+      padding: 11px 22px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 2000;
+      box-shadow: 0 4px 20px rgba(16,43,106,0.3);
+      white-space: nowrap;
+      animation: toast-in 200ms ease;
+    }
+    .toast.is-error { background: var(--red); }
+    @keyframes toast-in {
+      from { transform: translateX(-50%) translateY(16px); opacity: 0; }
+      to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
+    }
+
+    /* ── Print zone ──────────────────────────────────────────────────────────── */
+    #print-zone { display: none; }
+
+    @media print {
+      body > *:not(#print-zone) { display: none !important; }
+      #print-zone {
+        display: block;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+      .print-title  { font-size: 16px; font-weight: bold; margin-bottom: 4px; }
+      .print-sub    { font-size: 12px; color: #666; margin-bottom: 16px; }
+      .print-table  { width: 100%; border-collapse: collapse; font-size: 13px; }
+      .print-table th, .print-table td {
+        border: 1px solid #ccc;
+        padding: 7px 10px;
+        text-align: left;
+      }
+      .print-table th { background: #f0f4ff; font-weight: bold; }
+      .print-table tr:nth-child(even) td { background: #fafafa; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <img src="assets/lfm-logo.svg" alt="Lycée Français de Madrid" class="header-logo">
+        <div class="header-text">
+          <span class="header-name">LYCÉE FRANÇAIS DE MADRID</span>
+          <span class="header-sub">Ressources numériques pour le cycle 3</span>
+        </div>
+      </a>
+      <div class="header-actions">
+        <span class="lang-badge">FR</span>
+        <button class="menu-btn" aria-label="Ouvrir le menu">
+          <span class="mbar mbar-top"></span>
+          <span class="mbar mbar-mid"></span>
+          <span class="mbar mbar-mid2"></span>
+          <span class="mbar mbar-bot"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENU -->
+  <div class="dash-wrap">
+    <div class="dash-content">
+
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb" id="breadcrumb" aria-label="Navigation">
+        <a href="dashboard-enseignant.html">Tableau de bord</a>
+        <span class="bc-sep">/</span>
+        <button class="bc-link" id="bc-section">Mes classes</button>
+        <span class="bc-sep" id="bc-sep2" style="display:none">/</span>
+        <span id="bc-class" style="display:none"></span>
+      </nav>
+
+      <!-- Tabs (cachés en vue détail) -->
+      <div class="page-tabs" id="page-tabs">
+        <button class="page-tab" id="tab-classes" onclick="navigate({})">🏫 Mes classes</button>
+        <button class="page-tab" id="tab-eleves"  onclick="navigate({view:'eleves'})">👤 Mes élèves</button>
+      </div>
+
+      <!-- ────────────────────────────────────────────────────────────────────
+           VUE : LISTE DES CLASSES
+      ──────────────────────────────────────────────────────────────────────── -->
+      <div id="view-classes" style="display:none">
+        <div class="section-header">
+          <span class="section-title">Mes classes</span>
+          <button class="btn btn-primary" onclick="openModalClass()">+ Nouvelle classe</button>
+        </div>
+        <div class="classes-grid" id="classes-grid"></div>
+        <div id="empty-classes" class="empty-state" style="display:none">
+          <div class="empty-icon">🏫</div>
+          <div class="empty-text">Aucune classe pour l'instant.</div>
+          <button class="btn btn-primary" onclick="openModalClass()">Créer ma première classe</button>
+        </div>
+      </div>
+
+      <!-- ────────────────────────────────────────────────────────────────────
+           VUE : TOUS LES ÉLÈVES
+      ──────────────────────────────────────────────────────────────────────── -->
+      <div id="view-eleves" style="display:none">
+        <div class="section-header">
+          <span class="section-title">Tous mes élèves</span>
+        </div>
+        <div class="table-wrap" id="all-students-wrap" style="display:none">
+          <table class="students-table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Identifiant</th>
+                <th>Mot de passe</th>
+                <th>Classe</th>
+              </tr>
+            </thead>
+            <tbody id="all-students-tbody"></tbody>
+          </table>
+        </div>
+        <div id="empty-eleves" class="empty-state" style="display:none">
+          <div class="empty-icon">👤</div>
+          <div class="empty-text">Aucun élève pour l'instant.</div>
+          <p style="font-size:13px;color:var(--muted)">Créez d'abord une classe, puis ajoutez vos élèves.</p>
+        </div>
+      </div>
+
+      <!-- ────────────────────────────────────────────────────────────────────
+           VUE : DÉTAIL D'UNE CLASSE
+      ──────────────────────────────────────────────────────────────────────── -->
+      <div id="view-detail" style="display:none">
+
+        <!-- Carte classe -->
+        <div class="detail-class-card">
+          <div>
+            <div id="detail-badge"></div>
+            <div class="detail-class-name" id="detail-class-name"></div>
+            <div class="detail-class-meta">
+              <span id="detail-year"></span>
+              <span>·</span>
+              <span id="detail-count"></span>
+            </div>
+          </div>
+          <div class="section-actions">
+            <button class="btn btn-outline btn-sm" onclick="openModalEditClass()">Modifier</button>
+            <button class="btn btn-danger btn-sm" onclick="confirmDeleteClass()">Supprimer la classe</button>
+          </div>
+        </div>
+
+        <!-- En-tête élèves -->
+        <div class="section-header">
+          <span class="section-title">Élèves</span>
+          <div class="section-actions">
+            <button class="btn btn-ghost btn-sm" id="btn-print" onclick="printCredentials()">🖨 Imprimer</button>
+            <button class="btn btn-ghost btn-sm" id="btn-pdf"   onclick="downloadPDF()">📄 PDF</button>
+            <button class="btn btn-ghost btn-sm" id="btn-csv"   onclick="doExportCSV()">⬇ CSV</button>
+            <button class="btn btn-outline btn-sm" onclick="openModalBulk()">+ Ajout en masse</button>
+            <button class="btn btn-primary btn-sm" onclick="openModalAddStudent()">+ Ajouter un élève</button>
+          </div>
+        </div>
+
+        <!-- Tableau élèves -->
+        <div class="table-wrap" id="detail-table-wrap" style="display:none">
+          <table class="students-table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Identifiant</th>
+                <th>Mot de passe</th>
+                <th class="th-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="detail-tbody"></tbody>
+          </table>
+        </div>
+        <div id="empty-detail" class="empty-state" style="display:none">
+          <div class="empty-icon">👤</div>
+          <div class="empty-text">Aucun élève dans cette classe.</div>
+          <button class="btn btn-primary" onclick="openModalAddStudent()">Ajouter le premier élève</button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-rule"></div>
+        <div class="footer-body">
+          <p class="footer-text">
+            Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,<br>
+            dans le respect d'un <strong class="footer-em">usage mesuré</strong> des écrans.
+          </p>
+        </div>
+        <p class="footer-credit">© François PEROCHEAU — LFM 2026</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       MODALS
+  ═══════════════════════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-overlay" style="display:none">
+
+    <!-- ── Créer / modifier une classe ──────────────────────────────────────── -->
+    <div class="modal" id="modal-class" style="display:none">
+      <div class="modal-header">
+        <h2 class="modal-title" id="mc-title">Nouvelle classe</h2>
+        <button class="modal-close" onclick="closeModal()" aria-label="Fermer">×</button>
+      </div>
+      <form class="modal-body" id="form-class" onsubmit="submitClass(event)" novalidate>
+        <div class="form-field">
+          <label class="form-label" for="fc-name">Nom de la classe</label>
+          <input class="form-input" id="fc-name" type="text" required placeholder="CM2 A" maxlength="60">
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="fc-level">Niveau</label>
+          <select class="form-select" id="fc-level" required>
+            <option value="">— Choisir —</option>
+            <option value="CM1">CM1</option>
+            <option value="CM2">CM2</option>
+            <option value="6e">6e</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="fc-year">Année scolaire</label>
+          <input class="form-input" id="fc-year" type="text" required placeholder="2025-2026" maxlength="9">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+          <button type="submit"  class="btn btn-primary" id="mc-submit">Créer</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ── Ajouter / modifier un élève ──────────────────────────────────────── -->
+    <div class="modal" id="modal-student" style="display:none">
+      <div class="modal-header">
+        <h2 class="modal-title" id="ms-title">Ajouter un élève</h2>
+        <button class="modal-close" onclick="closeModal()" aria-label="Fermer">×</button>
+      </div>
+      <form class="modal-body" id="form-student" onsubmit="submitStudent(event)" novalidate>
+        <div class="form-field">
+          <label class="form-label" for="fs-name">Prénom et nom</label>
+          <input class="form-input" id="fs-name" type="text" required placeholder="Marie Dupont" maxlength="80">
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin:0">
+          L'identifiant et le mot de passe seront générés automatiquement.
+        </p>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+          <button type="submit"  class="btn btn-primary" id="ms-submit">Ajouter</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ── Identifiants créés ────────────────────────────────────────────────── -->
+    <div class="modal" id="modal-cred" style="display:none">
+      <div class="modal-header">
+        <h2 class="modal-title">Identifiants créés ✓</h2>
+        <button class="modal-close" onclick="closeModal()" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13px;color:var(--muted);margin:0">
+          Notez ou imprimez ces identifiants. Le mot de passe ne sera plus visible ensuite.
+        </p>
+        <div class="cred-box">
+          <div class="cred-row">
+            <span class="cred-label">Élève</span>
+            <span class="cred-name-value" id="cred-name"></span>
+          </div>
+          <div class="cred-row">
+            <span class="cred-label">Identifiant</span>
+            <span class="cred-value" id="cred-user"></span>
+          </div>
+          <div class="cred-row">
+            <span class="cred-label">Mot de passe</span>
+            <span class="cred-value" id="cred-pass"></span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost"   onclick="closeModal()">Fermer</button>
+          <button class="btn btn-outline" onclick="printOneCred()">🖨 Imprimer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Déplacer un élève ─────────────────────────────────────────────────── -->
+    <div class="modal" id="modal-move" style="display:none">
+      <div class="modal-header">
+        <h2 class="modal-title">Déplacer l'élève</h2>
+        <button class="modal-close" onclick="closeModal()" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:14px;color:var(--text);margin:0">
+          Nouvelle classe pour <strong id="move-name"></strong> :
+        </p>
+        <div class="form-field">
+          <label class="form-label" for="move-select">Classe de destination</label>
+          <select class="form-select" id="move-select">
+            <option value="">— Sans classe —</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost"   onclick="closeModal()">Annuler</button>
+          <button class="btn btn-primary" onclick="submitMove()">Déplacer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Ajout en masse ──────────────────────────────────────────────────── -->
+    <div class="modal" id="modal-bulk" style="display:none">
+      <div class="modal-header">
+        <h2 class="modal-title">Ajout en masse</h2>
+        <button class="modal-close" onclick="closeModal()" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13px;color:var(--muted);margin:0;line-height:1.6">
+          Un élève par ligne — prénom seul ou prénom + nom :<br>
+          <em>Emma, Lucas Martin, Sarah…</em>
+        </p>
+        <div class="form-field">
+          <label class="form-label" for="bulk-names">Liste des élèves</label>
+          <textarea class="form-input" id="bulk-names" rows="8"
+            placeholder="Emma&#10;Lucas Martin&#10;Sarah&#10;Noah&#10;Léa"
+            style="resize:vertical;line-height:1.6;font-size:14px"></textarea>
+        </div>
+        <div id="bulk-progress" style="display:none">
+          <div style="font-size:13px;color:var(--muted);margin-bottom:6px" id="bulk-progress-label">Création en cours…</div>
+          <div style="background:var(--border);border-radius:100px;height:6px;overflow:hidden">
+            <div id="bulk-progress-bar" style="height:100%;background:var(--blue);border-radius:100px;width:0%;transition:width 200ms"></div>
+          </div>
+        </div>
+        <div id="bulk-results" style="display:none;max-height:180px;overflow-y:auto;background:var(--bg);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.8"></div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost"   id="bulk-cancel" onclick="closeModal()">Annuler</button>
+          <button class="btn btn-primary" id="bulk-submit" onclick="submitBulk()">Générer les comptes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Réinitialisation mot de passe ───────────────────────────────────── -->
+    <div class="modal" id="modal-reset" style="display:none">
+      <div class="modal-header">
+        <h2 class="modal-title">Réinitialiser le mot de passe</h2>
+        <button class="modal-close" onclick="closeModal()" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="confirm-text" id="reset-text"></p>
+        <div class="cred-box" id="reset-cred-box" style="display:none">
+          <div class="cred-row">
+            <span class="cred-label">Nouveau mot de passe</span>
+            <span class="cred-value" id="reset-new-pwd"></span>
+          </div>
+        </div>
+        <div class="modal-footer" id="reset-footer">
+          <button class="btn btn-ghost"  onclick="closeModal()">Annuler</button>
+          <button class="btn btn-primary" id="reset-confirm-btn">Réinitialiser</button>
+        </div>
+        <div class="modal-footer" id="reset-done-footer" style="display:none">
+          <button class="btn btn-ghost"   onclick="closeModal()">Fermer</button>
+          <button class="btn btn-outline" onclick="printResetCred()">🖨 Imprimer la fiche</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Confirmation suppression ─────────────────────────────────────────── -->
+    <div class="modal" id="modal-confirm" style="display:none">
+      <div class="modal-header">
+        <h2 class="modal-title" id="conf-title">Confirmer la suppression</h2>
+        <button class="modal-close" onclick="closeModal()" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="confirm-text" id="conf-text"></p>
+        <div class="modal-footer">
+          <button class="btn btn-ghost"  onclick="closeModal()">Annuler</button>
+          <button class="btn btn-danger" id="conf-btn" onclick="executeDelete()">Supprimer</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Zone d'impression (visible uniquement @media print) -->
+  <div id="print-zone"></div>
+
+  <script src="js/menu.js"></script>
+  <script>
+  /* ═══════════════════════════════════════════════════════════════════════════
+     STATE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  let _classes          = [];
+  let _currentClass     = null;
+  let _students         = [];
+  let _allStudents      = [];
+  let _editingClassId   = null;
+  let _editingStudentId = null;
+  let _movingStudentId  = null;
+  let _pendingDelete    = null;
+
+  function normalize(str) {
+    return str.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, '-');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════════════════════════════════════ */
+  (async () => {
+    const profile = await lfmAuth.requireRole('enseignant');
+    if (!profile) return;
+    document.title = 'Mes classes — ' + profile.display_name + ' — LFM';
+    applyView();
+  })();
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     NAVIGATION
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function navigate(params) {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('view');
+    url.searchParams.delete('class');
+    Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+    history.pushState(null, '', url);
+    applyView();
+  }
+
+  window.addEventListener('popstate', applyView);
+
+  async function applyView() {
+    const p       = new URLSearchParams(window.location.search);
+    const classId = p.get('class');
+    const view    = p.get('view');
+
+    hideAll();
+
+    if (classId) {
+      await showDetail(classId);
+    } else if (view === 'eleves') {
+      setTab('eleves');
+      updateBreadcrumb('eleves');
+      await showEleves();
+    } else {
+      setTab('classes');
+      updateBreadcrumb('classes');
+      await showClasses();
+    }
+  }
+
+  function hideAll() {
+    ['view-classes', 'view-eleves', 'view-detail'].forEach(id => {
+      document.getElementById(id).style.display = 'none';
+    });
+  }
+
+  function setTab(which) {
+    document.getElementById('page-tabs').style.display = 'flex';
+    document.getElementById('tab-classes').classList.toggle('is-active', which === 'classes');
+    document.getElementById('tab-eleves').classList.toggle('is-active', which === 'eleves');
+  }
+
+  function updateBreadcrumb(which) {
+    const sec  = document.getElementById('bc-section');
+    const sep2 = document.getElementById('bc-sep2');
+    const cls  = document.getElementById('bc-class');
+
+    if (which === 'detail' && _currentClass) {
+      sec.textContent  = 'Mes classes';
+      sec.onclick      = () => navigate({});
+      sep2.style.display = 'inline';
+      cls.style.display  = 'inline';
+      cls.textContent    = _currentClass.name;
+    } else {
+      sec.textContent    = which === 'eleves' ? 'Mes élèves' : 'Mes classes';
+      sec.onclick        = null;
+      sep2.style.display = 'none';
+      cls.style.display  = 'none';
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     VUE : CLASSES
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function showClasses() {
+    try {
+      _classes = await lfmTeacher.getClasses();
+    } catch (e) {
+      showToast('Erreur lors du chargement des classes', 'error');
+    }
+    renderClasses();
+    document.getElementById('view-classes').style.display = 'block';
+  }
+
+  function renderClasses() {
+    const grid  = document.getElementById('classes-grid');
+    const empty = document.getElementById('empty-classes');
+    if (_classes.length === 0) {
+      grid.innerHTML      = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    grid.innerHTML = _classes.map(c => `
+      <div class="class-card" data-id="${c.id}">
+        <div class="class-card-top">
+          <span class="badge badge-${badgeClass(c.level)}">${esc(c.level)}</span>
+        </div>
+        <div class="class-card-name">${esc(c.name)}</div>
+        <div class="class-card-year">${esc(c.school_year)}</div>
+        <div class="class-card-foot">
+          <span class="class-card-count">${c.student_count} élève${c.student_count !== 1 ? 's' : ''}</span>
+          <button class="class-card-del" data-del="${c.id}" title="Supprimer">🗑</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('classes-grid').addEventListener('click', e => {
+    const delBtn = e.target.closest('[data-del]');
+    const card   = e.target.closest('.class-card');
+    if (delBtn) {
+      e.stopPropagation();
+      const id  = delBtn.dataset.del;
+      const cls = _classes.find(c => c.id === id);
+      confirmDeleteById('class', id, cls ? cls.name : '');
+      return;
+    }
+    if (card) navigate({ class: card.dataset.id });
+  });
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     VUE : TOUS LES ÉLÈVES
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function showEleves() {
+    try {
+      _allStudents = await lfmTeacher.getAllStudents();
+    } catch (e) {
+      showToast('Erreur lors du chargement des élèves', 'error');
+    }
+    renderAllStudents();
+    document.getElementById('view-eleves').style.display = 'block';
+  }
+
+  function renderAllStudents() {
+    const wrap  = document.getElementById('all-students-wrap');
+    const empty = document.getElementById('empty-eleves');
+    const tbody = document.getElementById('all-students-tbody');
+    if (_allStudents.length === 0) {
+      wrap.style.display  = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    wrap.style.display  = 'block';
+    tbody.innerHTML = _allStudents.map(s => {
+      const clsCell = s.classes
+        ? `<span class="badge badge-${badgeClass(s.classes.level)}">${esc(s.classes.level)}</span> ${esc(s.classes.name)}`
+        : '<em style="color:var(--muted)">Sans classe</em>';
+      return `
+        <tr>
+          <td class="td-name">${esc(s.display_name)}</td>
+          <td><span class="td-cred">${esc(s.username)}</span></td>
+          <td><span class="td-cred">${esc(s.password)}</span></td>
+          <td>${clsCell}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     VUE : DÉTAIL CLASSE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function showDetail(classId) {
+    try {
+      if (!_classes.length) _classes = await lfmTeacher.getClasses();
+      _currentClass = _classes.find(c => c.id === classId);
+      if (!_currentClass) { navigate({}); return; }
+      _students = await lfmTeacher.getStudents(classId);
+    } catch (e) {
+      showToast('Erreur lors du chargement', 'error');
+      navigate({});
+      return;
+    }
+
+    document.getElementById('page-tabs').style.display = 'none';
+    updateBreadcrumb('detail');
+    renderDetail();
+    document.getElementById('view-detail').style.display = 'block';
+  }
+
+  function renderDetail() {
+    const c = _currentClass;
+    document.getElementById('detail-badge').innerHTML     = `<span class="badge badge-${badgeClass(c.level)}">${esc(c.level)}</span>`;
+    document.getElementById('detail-class-name').textContent = c.name;
+    document.getElementById('detail-year').textContent    = c.school_year;
+    renderDetailStudents();
+  }
+
+  function renderDetailStudents() {
+    const wrap  = document.getElementById('detail-table-wrap');
+    const empty = document.getElementById('empty-detail');
+    const tbody = document.getElementById('detail-tbody');
+
+    document.getElementById('detail-count').textContent =
+      `${_students.length} élève${_students.length !== 1 ? 's' : ''}`;
+
+    const hasStudents = _students.length > 0;
+    document.getElementById('btn-print').disabled = !hasStudents;
+    document.getElementById('btn-pdf').disabled   = !hasStudents;
+    document.getElementById('btn-csv').disabled   = !hasStudents;
+
+    if (!hasStudents) {
+      wrap.style.display  = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    wrap.style.display  = 'block';
+
+    tbody.innerHTML = _students.map(s => `
+      <tr>
+        <td class="td-name">${esc(s.display_name)}</td>
+        <td><span class="td-cred">${esc(s.username)}</span></td>
+        <td><span class="td-cred" id="pwd-${s.id}">${esc(s.password)}</span></td>
+        <td>
+          <div class="td-actions">
+            <button class="btn btn-outline btn-sm btn-icon" data-action="edit"   data-sid="${s.id}" title="Modifier le nom">✏️</button>
+            <button class="btn btn-ghost  btn-sm btn-icon" data-action="reset"  data-sid="${s.id}" title="Réinitialiser le mot de passe">🔄</button>
+            <button class="btn btn-ghost  btn-sm btn-icon" data-action="move"   data-sid="${s.id}" title="Déplacer vers une autre classe">↗️</button>
+            <button class="btn btn-danger btn-sm btn-icon" data-action="delete" data-sid="${s.id}" title="Supprimer l'élève">🗑</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  document.getElementById('detail-tbody').addEventListener('click', e => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const id      = btn.dataset.sid;
+    const action  = btn.dataset.action;
+    const student = _students.find(s => s.id === id);
+    if (!student) return;
+    if (action === 'edit')   openModalEditStudent(student);
+    if (action === 'reset')  confirmResetPassword(student);
+    if (action === 'move')   openModalMove(student);
+    if (action === 'delete') confirmDeleteById('student', id, student.display_name);
+  });
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     MODAL HELPERS
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function openModal(which) {
+    document.getElementById('modal-overlay').style.display = 'flex';
+    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    document.getElementById('modal-' + which).style.display = 'block';
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').style.display = 'none';
+    _editingClassId   = null;
+    _editingStudentId = null;
+    _movingStudentId  = null;
+  }
+
+  document.getElementById('modal-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal-overlay')) closeModal();
+  });
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     MODAL : CLASSE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function openModalClass() {
+    _editingClassId = null;
+    document.getElementById('mc-title').textContent  = 'Nouvelle classe';
+    document.getElementById('mc-submit').textContent = 'Créer';
+    document.getElementById('form-class').reset();
+    const yr = new Date().getMonth() >= 7
+      ? `${new Date().getFullYear()}-${new Date().getFullYear()+1}`
+      : `${new Date().getFullYear()-1}-${new Date().getFullYear()}`;
+    document.getElementById('fc-year').value = yr;
+    openModal('class');
+    setTimeout(() => document.getElementById('fc-name').focus(), 80);
+  }
+
+  function openModalEditClass() {
+    const c = _currentClass;
+    _editingClassId = c.id;
+    document.getElementById('mc-title').textContent  = 'Modifier la classe';
+    document.getElementById('mc-submit').textContent = 'Enregistrer';
+    document.getElementById('fc-name').value  = c.name;
+    document.getElementById('fc-level').value = c.level;
+    document.getElementById('fc-year').value  = c.school_year;
+    openModal('class');
+  }
+
+  async function submitClass(e) {
+    e.preventDefault();
+    const btn  = document.getElementById('mc-submit');
+    const name = document.getElementById('fc-name').value.trim();
+    const lvl  = document.getElementById('fc-level').value;
+    const yr   = document.getElementById('fc-year').value.trim();
+    if (!name || !lvl || !yr) return;
+
+    btn.disabled = true;
+    btn.textContent = 'En cours…';
+    try {
+      if (_editingClassId) {
+        const updated = await lfmTeacher.updateClass(_editingClassId, { name, level: lvl, school_year: yr });
+        Object.assign(_currentClass, updated);
+        const idx = _classes.findIndex(c => c.id === _editingClassId);
+        if (idx !== -1) Object.assign(_classes[idx], { name, level: lvl, school_year: yr });
+        renderDetail();
+        showToast('Classe modifiée');
+      } else {
+        const created = await lfmTeacher.createClass(name, lvl, yr);
+        _classes.push({ ...created, student_count: 0 });
+        renderClasses();
+        showToast('Classe créée');
+      }
+      closeModal();
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = _editingClassId ? 'Enregistrer' : 'Créer';
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     MODAL : ÉLÈVE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function openModalAddStudent() {
+    _editingStudentId = null;
+    document.getElementById('ms-title').textContent  = 'Ajouter un élève';
+    document.getElementById('ms-submit').textContent = 'Ajouter';
+    document.getElementById('form-student').reset();
+    openModal('student');
+    setTimeout(() => document.getElementById('fs-name').focus(), 80);
+  }
+
+  function openModalEditStudent(student) {
+    _editingStudentId = student.id;
+    document.getElementById('ms-title').textContent  = 'Modifier l\'élève';
+    document.getElementById('ms-submit').textContent = 'Enregistrer';
+    document.getElementById('fs-name').value = student.display_name;
+    openModal('student');
+    setTimeout(() => document.getElementById('fs-name').focus(), 80);
+  }
+
+  async function submitStudent(e) {
+    e.preventDefault();
+    const btn  = document.getElementById('ms-submit');
+    const name = document.getElementById('fs-name').value.trim();
+    if (!name) return;
+
+    btn.disabled = true;
+    btn.textContent = 'En cours…';
+    try {
+      if (_editingStudentId) {
+        await lfmTeacher.updateStudent(_editingStudentId, { display_name: name });
+        const s = _students.find(s => s.id === _editingStudentId);
+        if (s) s.display_name = name;
+        renderDetailStudents();
+        closeModal();
+        showToast('Élève modifié');
+      } else {
+        const created = await lfmTeacher.createStudent(name, _currentClass.id);
+        _students.push(created);
+        const idx = _classes.findIndex(c => c.id === _currentClass.id);
+        if (idx !== -1) _classes[idx].student_count++;
+        renderDetailStudents();
+        closeModal();
+        /* Afficher les identifiants */
+        document.getElementById('cred-name').textContent = created.display_name;
+        document.getElementById('cred-user').textContent = created.username;
+        document.getElementById('cred-pass').textContent = created.password;
+        openModal('cred');
+      }
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = _editingStudentId ? 'Enregistrer' : 'Ajouter';
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     MODAL : DÉPLACER
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function openModalMove(student) {
+    _movingStudentId = student.id;
+    document.getElementById('move-name').textContent = student.display_name;
+    const sel = document.getElementById('move-select');
+    sel.innerHTML = '<option value="">— Sans classe —</option>';
+    _classes
+      .filter(c => c.id !== (_currentClass && _currentClass.id))
+      .forEach(c => {
+        const o = document.createElement('option');
+        o.value       = c.id;
+        o.textContent = `${c.level} — ${c.name} (${c.school_year})`;
+        sel.appendChild(o);
+      });
+    openModal('move');
+  }
+
+  async function submitMove() {
+    const newClassId = document.getElementById('move-select').value || null;
+    try {
+      await lfmTeacher.moveStudent(_movingStudentId, newClassId);
+      _students = _students.filter(s => s.id !== _movingStudentId);
+      const idx = _classes.findIndex(c => c.id === _currentClass.id);
+      if (idx !== -1 && _classes[idx].student_count > 0) _classes[idx].student_count--;
+      renderDetailStudents();
+      closeModal();
+      showToast('Élève déplacé');
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     MODAL : CONFIRMATION SUPPRESSION
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function confirmDeleteClass() {
+    confirmDeleteById('class', _currentClass.id, _currentClass.name);
+  }
+
+  function confirmDeleteById(type, id, name) {
+    _pendingDelete = { type, id };
+    if (type === 'class') {
+      document.getElementById('conf-title').textContent = 'Supprimer la classe';
+      document.getElementById('conf-text').innerHTML   =
+        `Voulez-vous vraiment supprimer la classe <strong>${esc(name)}</strong> ?<br>
+         <span class="confirm-warning">Tous les élèves de cette classe seront également supprimés.</span>`;
+    } else {
+      document.getElementById('conf-title').textContent = 'Supprimer l\'élève';
+      document.getElementById('conf-text').innerHTML   =
+        `Voulez-vous vraiment supprimer <strong>${esc(name)}</strong> ?`;
+    }
+    openModal('confirm');
+  }
+
+  async function executeDelete() {
+    if (!_pendingDelete) return;
+    const { type, id } = _pendingDelete;
+    const btn = document.getElementById('conf-btn');
+    btn.disabled = true;
+    try {
+      if (type === 'class') {
+        await lfmTeacher.deleteClass(id);
+        _classes = _classes.filter(c => c.id !== id);
+        closeModal();
+        navigate({});
+        showToast('Classe supprimée');
+      } else {
+        await lfmTeacher.deleteStudent(id);
+        _students = _students.filter(s => s.id !== id);
+        const idx = _classes.findIndex(c => c.id === _currentClass.id);
+        if (idx !== -1 && _classes[idx].student_count > 0) _classes[idx].student_count--;
+        renderDetailStudents();
+        closeModal();
+        showToast('Élève supprimé');
+      }
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    } finally {
+      btn.disabled   = false;
+      _pendingDelete = null;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     MODAL : AJOUT EN MASSE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function openModalBulk() {
+    document.getElementById('bulk-names').value      = '';
+    document.getElementById('bulk-progress').style.display = 'none';
+    document.getElementById('bulk-results').style.display  = 'none';
+    document.getElementById('bulk-submit').disabled  = false;
+    document.getElementById('bulk-submit').textContent = 'Générer les comptes';
+    document.getElementById('bulk-cancel').textContent = 'Annuler';
+    openModal('bulk');
+    setTimeout(() => document.getElementById('bulk-names').focus(), 80);
+  }
+
+  async function submitBulk() {
+    const raw = document.getElementById('bulk-names').value;
+    const names = raw.split('\n').map(n => n.trim()).filter(n => n.length > 0);
+    if (names.length === 0) return;
+
+    const submitBtn = document.getElementById('bulk-submit');
+    const cancelBtn = document.getElementById('bulk-cancel');
+    const progWrap  = document.getElementById('bulk-progress');
+    const progBar   = document.getElementById('bulk-progress-bar');
+    const progLabel = document.getElementById('bulk-progress-label');
+    const resultsEl = document.getElementById('bulk-results');
+
+    submitBtn.disabled = true;
+    progWrap.style.display  = 'block';
+    resultsEl.style.display = 'none';
+
+    const results = await lfmTeacher.createStudentsBulk(names, _currentClass.id, (done, total) => {
+      const pct = Math.round((done / total) * 100);
+      progBar.style.width = pct + '%';
+      progLabel.textContent = `Création en cours… ${done}/${total}`;
+    });
+
+    const ok      = results.filter(r => r.ok);
+    const failed  = results.filter(r => !r.ok);
+
+    ok.forEach(r => _students.push(r.student));
+    const idx = _classes.findIndex(c => c.id === _currentClass.id);
+    if (idx !== -1) _classes[idx].student_count += ok.length;
+    renderDetailStudents();
+
+    let html = '';
+    ok.forEach(r => {
+      html += `<div style="color:#15803d">✓ <strong>${esc(r.student.display_name)}</strong> — <code>${esc(r.student.username)}</code> / <code>${esc(r.student.password)}</code></div>`;
+    });
+    failed.forEach(r => {
+      html += `<div style="color:var(--red)">✗ ${esc(r.name)} — ${esc(r.error)}</div>`;
+    });
+    resultsEl.innerHTML  = html;
+    resultsEl.style.display = 'block';
+    progLabel.textContent   = `${ok.length} compte${ok.length !== 1 ? 's' : ''} créé${ok.length !== 1 ? 's' : ''}${failed.length > 0 ? `, ${failed.length} erreur${failed.length !== 1 ? 's' : ''}` : ''}`;
+
+    submitBtn.disabled     = false;
+    submitBtn.textContent  = 'Fermer';
+    submitBtn.onclick      = closeModal;
+    cancelBtn.style.display = 'none';
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     MODAL : RÉINITIALISATION MOT DE PASSE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  let _resetStudentId = null;
+  let _resetStudentName = null;
+
+  function confirmResetPassword(student) {
+    _resetStudentId   = student.id;
+    _resetStudentName = student.display_name;
+    document.getElementById('reset-text').innerHTML =
+      `Voulez-vous générer un nouveau mot de passe pour <strong>${esc(student.display_name)}</strong> ?`;
+    document.getElementById('reset-cred-box').style.display    = 'none';
+    document.getElementById('reset-footer').style.display      = 'flex';
+    document.getElementById('reset-done-footer').style.display = 'none';
+
+    const btn = document.getElementById('reset-confirm-btn');
+    btn.disabled    = false;
+    btn.textContent = 'Réinitialiser';
+    btn.onclick     = executeReset;
+    openModal('reset');
+  }
+
+  async function executeReset() {
+    const btn = document.getElementById('reset-confirm-btn');
+    btn.disabled    = true;
+    btn.textContent = 'En cours…';
+    try {
+      const newPwd = await lfmTeacher.resetStudentPassword(_resetStudentId);
+
+      // Mettre à jour l'état local et l'affichage en tableau
+      const s = _students.find(s => s.id === _resetStudentId);
+      if (s) {
+        s.password = newPwd;
+        const cell = document.getElementById('pwd-' + _resetStudentId);
+        if (cell) cell.textContent = newPwd;
+      }
+
+      document.getElementById('reset-new-pwd').textContent      = newPwd;
+      document.getElementById('reset-cred-box').style.display   = 'block';
+      document.getElementById('reset-footer').style.display     = 'none';
+      document.getElementById('reset-done-footer').style.display = 'flex';
+      document.getElementById('reset-text').innerHTML =
+        `Nouveau mot de passe de <strong>${esc(_resetStudentName)}</strong> :`;
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+      btn.disabled    = false;
+      btn.textContent = 'Réinitialiser';
+    }
+  }
+
+  function printResetCred() {
+    const pwd = document.getElementById('reset-new-pwd').textContent;
+    const username = _students.find(s => s.id === _resetStudentId)?.username || '—';
+    buildPrintZone([{ display_name: _resetStudentName, username, password: pwd }],
+      `Identifiant — ${_resetStudentName}`);
+    window.print();
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     IMPRESSION & EXPORT
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function downloadPDF() {
+    if (!_students.length || !window.jspdf) return;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+
+    const SCHOOL    = 'Lycée Français de Madrid';
+    const className = _currentClass.name + ' — ' + _currentClass.school_year;
+    const today     = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+    const SITE_URL  = window.location.origin + '/index.html';
+
+    const PAGE_W = 210, MARGIN = 16;
+    let y = 18;
+
+    // ── En-tête ──
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(15);
+    doc.setTextColor(16, 43, 106);
+    doc.text(SCHOOL, PAGE_W / 2, y, { align: 'center' }); y += 7;
+
+    doc.setFontSize(12);
+    doc.text(className, PAGE_W / 2, y, { align: 'center' }); y += 6;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(100, 116, 139);
+    doc.text('Généré le ' + today, PAGE_W / 2, y, { align: 'center' }); y += 8;
+
+    // Filet rouge
+    doc.setDrawColor(214, 40, 57);
+    doc.setLineWidth(0.7);
+    doc.line(MARGIN, y, PAGE_W - MARGIN, y); y += 7;
+
+    // ── En-tête tableau ──
+    const COL = { num: MARGIN, name: MARGIN + 10, user: MARGIN + 68, pwd: MARGIN + 120 };
+    const ROW_H = 8;
+
+    doc.setFillColor(240, 245, 255);
+    doc.rect(MARGIN, y - 5, PAGE_W - 2 * MARGIN, ROW_H, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(16, 43, 106);
+    doc.text('#',            COL.num,  y);
+    doc.text('Élève',        COL.name, y);
+    doc.text('Pseudo',       COL.user, y);
+    doc.text('Mot de passe', COL.pwd,  y);
+    y += ROW_H;
+
+    // ── Lignes élèves ──
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    _students.forEach((s, i) => {
+      if (y > 260) {
+        doc.addPage();
+        y = 20;
+      }
+      const bg = i % 2 === 0 ? [255, 255, 255] : [248, 250, 252];
+      doc.setFillColor(...bg);
+      doc.rect(MARGIN, y - 5.5, PAGE_W - 2 * MARGIN, ROW_H, 'F');
+
+      doc.setTextColor(80, 95, 120);
+      doc.text(String(i + 1), COL.num, y);
+
+      doc.setTextColor(30, 41, 59);
+      doc.setFont('helvetica', 'bold');
+      doc.text(s.display_name, COL.name, y, { maxWidth: 52 });
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(16, 43, 106);
+      doc.text(s.username, COL.user, y);
+
+      doc.setFont('courier', 'bold');
+      doc.setTextColor(214, 40, 57);
+      doc.text(s.password, COL.pwd, y);
+
+      doc.setFont('helvetica', 'normal');
+      y += ROW_H;
+    });
+
+    // Filet bas tableau
+    y += 2;
+    doc.setDrawColor(200, 210, 230);
+    doc.setLineWidth(0.3);
+    doc.line(MARGIN, y, PAGE_W - MARGIN, y); y += 8;
+
+    // ── Encadré instructions ──
+    const BOX_X = MARGIN, BOX_W = PAGE_W - 2 * MARGIN;
+    doc.setDrawColor(16, 43, 106);
+    doc.setLineWidth(0.4);
+    doc.setFillColor(245, 248, 255);
+    const instructLines = [
+      'Pour se connecter :',
+      '1. Ouvrir le site : ' + SITE_URL,
+      '2. Cliquer sur le menu hamburger en haut à droite.',
+      '3. Choisir « Espace élève ».',
+      '4. Saisir le pseudo et le mot de passe.'
+    ];
+    const BOX_H = 6 + instructLines.length * 5.5 + 4;
+    if (y + BOX_H > 280) { doc.addPage(); y = 20; }
+    doc.roundedRect(BOX_X, y, BOX_W, BOX_H, 2, 2, 'FD');
+    y += 6;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(16, 43, 106);
+    doc.text(instructLines[0], BOX_X + 5, y); y += 5.5;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(50, 65, 90);
+    instructLines.slice(1).forEach(line => { doc.text(line, BOX_X + 5, y); y += 5.5; });
+
+    // ── Numéros de page ──
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let p = 1; p <= pageCount; p++) {
+      doc.setPage(p);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(160, 170, 190);
+      doc.text(`${SCHOOL} — ${p}/${pageCount}`, PAGE_W / 2, 292, { align: 'center' });
+    }
+
+    const filename = `identifiants-${normalize(_currentClass.name)}-${_currentClass.school_year}.pdf`;
+    doc.save(filename);
+  }
+
+  function printCredentials() {
+    if (!_students.length) return;
+    buildPrintZone(_students, `Identifiants — ${_currentClass.name} (${_currentClass.school_year})`);
+    window.print();
+  }
+
+  function printOneCred() {
+    const student = {
+      display_name: document.getElementById('cred-name').textContent,
+      username:     document.getElementById('cred-user').textContent,
+      password:     document.getElementById('cred-pass').textContent
+    };
+    buildPrintZone([student], 'Identifiant élève — LFM');
+    window.print();
+  }
+
+  function doExportCSV() {
+    if (!_students.length) return;
+    lfmTeacher.exportCSV(_students, _currentClass.name);
+  }
+
+  function buildPrintZone(students, title) {
+    document.getElementById('print-zone').innerHTML = `
+      <div class="print-title">${esc(title)}</div>
+      <div class="print-sub">Lycée Français de Madrid — ${new Date().toLocaleDateString('fr-FR')}</div>
+      <table class="print-table">
+        <thead><tr><th>#</th><th>Nom</th><th>Identifiant</th><th>Mot de passe</th></tr></thead>
+        <tbody>
+          ${students.map((s, i) => `
+            <tr>
+              <td>${i + 1}</td>
+              <td>${esc(s.display_name)}</td>
+              <td>${esc(s.username)}</td>
+              <td>${esc(s.password)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     UTILITAIRES
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function badgeClass(level) {
+    if (level === '6e') return '6e';
+    return level.toLowerCase(); // cm1 ou cm2
+  }
+
+  function esc(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  let _toastTimer;
+  function showToast(msg, type) {
+    clearTimeout(_toastTimer);
+    document.querySelector('.toast')?.remove();
+    const t       = document.createElement('div');
+    t.className   = 'toast' + (type === 'error' ? ' is-error' : '');
+    t.textContent = msg;
+    document.body.appendChild(t);
+    _toastTimer = setTimeout(() => t.remove(), 3000);
+  }
+  </script>
+</body>
+</html>

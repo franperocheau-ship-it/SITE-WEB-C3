@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Espace élève — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css?v=5">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <style>
+    .dash-wrap {
+      min-height: calc(100vh - 88px - 74px);
+      background: var(--bg);
+      padding: 40px 24px 64px;
+    }
+
+    .dash-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    .dash-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      border-left: 4px solid var(--red);
+    }
+
+    .dash-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--red);
+      color: #fff;
+      font-weight: 800;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dash-welcome { flex: 1; }
+
+    .dash-role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(214,40,57,0.08);
+      color: var(--red);
+      border: 1px solid rgba(214,40,57,0.18);
+      border-radius: 100px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .dash-name {
+      font-weight: 800;
+      font-size: 22px;
+      color: var(--blue);
+      margin-bottom: 4px;
+    }
+
+    .dash-sub {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ── Stat cards ── */
+    .dash-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .dash-stat {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 22px 24px;
+    }
+
+    .dash-stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .dash-stat-value {
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--blue);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .dash-stat-unit {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+
+    /* ── Section card ── */
+    .dash-section {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 26px 28px;
+      margin-bottom: 20px;
+    }
+
+    .dash-section-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--blue);
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    /* ── Subject bars ── */
+    .subject-row {
+      margin-bottom: 16px;
+    }
+
+    .subject-row:last-child { margin-bottom: 0; }
+
+    .subject-row-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 7px;
+    }
+
+    .subject-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .subject-meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .subject-bar-bg {
+      height: 10px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .subject-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      transition: width 600ms cubic-bezier(.4,0,.2,1);
+    }
+
+    .bar-francais      { background: linear-gradient(90deg, var(--blue) 0%, #1b4db0 100%); }
+    .bar-mathematiques { background: linear-gradient(90deg, var(--red) 0%, #c0162a 100%); }
+
+    /* ── Recent exercises ── */
+    .recent-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .recent-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 16px;
+      background: var(--bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .recent-score-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .badge-good  { background: rgba(22,163,74,0.12);  color: #15803d; }
+    .badge-ok    { background: rgba(234,179,8,0.12);  color: #92400e; }
+    .badge-low   { background: rgba(214,40,57,0.10);  color: var(--red); }
+
+    .recent-info { flex: 1; min-width: 0; }
+
+    .recent-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .recent-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .recent-subject-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot-francais      { background: var(--blue); }
+    .dot-mathematiques { background: var(--red); }
+
+    /* ── Mini chart (évolution) ── */
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 64px;
+      padding-bottom: 4px;
+    }
+
+    .chart-bar-wrap {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chart-bar {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      min-height: 3px;
+      transition: height 600ms ease;
+    }
+
+    .chart-bar-val {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    /* ── Empty state ── */
+    .dash-empty {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .dash-empty-icon { font-size: 40px; margin-bottom: 10px; }
+
+    /* ── CTA button ── */
+    .dash-cta-wrap { text-align: center; margin-top: 8px; }
+
+    .dash-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      padding: 13px 32px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 180ms, transform 140ms;
+      letter-spacing: 0.01em;
+    }
+
+    .dash-cta:hover { background: #0d2255; transform: translateY(-2px); }
+
+    /* ── Actions bar ── */
+    .dash-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .dash-logout {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 10px 28px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 180ms, color 180ms;
+    }
+
+    .dash-logout:hover { border-color: var(--red); color: var(--red); }
+
+    .dash-back-link {
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    @media (max-width: 600px) {
+      .dash-header  { padding: 20px; }
+      .dash-section { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <img src="assets/lfm-logo.svg" alt="Lycée Français de Madrid" class="header-logo">
+        <div class="header-text">
+          <span class="header-name">LYCÉE FRANÇAIS DE MADRID</span>
+          <span class="header-sub">Ressources numériques pour le cycle 3</span>
+        </div>
+      </a>
+      <div class="header-actions">
+        <span class="lang-badge">FR</span>
+        <button class="menu-btn" aria-label="Ouvrir le menu">
+          <span class="mbar mbar-top"></span>
+          <span class="mbar mbar-mid"></span>
+          <span class="mbar mbar-mid2"></span>
+          <span class="mbar mbar-bot"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENU -->
+  <div class="dash-wrap">
+    <div class="dash-content">
+
+      <!-- En-tête élève -->
+      <div class="dash-header">
+        <div class="dash-avatar" id="dash-avatar">?</div>
+        <div class="dash-welcome">
+          <div class="dash-role-badge">🎒 Espace élève</div>
+          <div class="dash-name" id="dash-name">Chargement…</div>
+          <div class="dash-sub" id="dash-sub">Bienvenue sur ton espace personnel</div>
+        </div>
+      </div>
+
+      <!-- Statistiques globales -->
+      <div class="dash-stats" id="dash-stats" style="display:none">
+        <div class="dash-stat">
+          <div class="dash-stat-label">Exercices réalisés</div>
+          <div class="dash-stat-value" id="stat-total">0</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-label">Taux de réussite moyen</div>
+          <div class="dash-stat-value" id="stat-avg">—<span class="dash-stat-unit"></span></div>
+        </div>
+      </div>
+
+      <!-- Progression par matière -->
+      <div class="dash-section" id="section-subjects" style="display:none">
+        <div class="dash-section-title">Progression par matière</div>
+        <div id="subjects-content"></div>
+      </div>
+
+      <!-- Évolution récente -->
+      <div class="dash-section" id="section-chart" style="display:none">
+        <div class="dash-section-title">Évolution récente</div>
+        <div class="chart-bars" id="chart-bars"></div>
+      </div>
+
+      <!-- Derniers exercices -->
+      <div class="dash-section" id="section-recent" style="display:none">
+        <div class="dash-section-title">Derniers exercices</div>
+        <div class="recent-list" id="recent-list"></div>
+      </div>
+
+      <!-- État vide (premier usage) -->
+      <div class="dash-section" id="section-empty" style="display:none">
+        <div class="dash-empty">
+          <div class="dash-empty-icon">🚀</div>
+          <strong>C'est parti !</strong><br>
+          Tu n'as pas encore réalisé d'exercice.<br>
+          Lance-toi pour voir ta progression ici.
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="dash-cta-wrap">
+        <a href="index.html" class="dash-cta">Continuer à m'entraîner →</a>
+      </div>
+
+      <!-- Actions -->
+      <div class="dash-actions">
+        <a href="index.html" class="dash-back-link">← Retour aux exercices</a>
+        <button class="dash-logout" id="dash-logout-btn">Se déconnecter</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-rule"></div>
+        <div class="footer-body">
+          <p class="footer-text">
+            Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,<br>
+            dans le respect d'un <strong class="footer-em">usage mesuré</strong> des écrans.
+          </p>
+        </div>
+        <p class="footer-credit">© François PEROCHEAU — LFM 2026</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/menu.js"></script>
+  <script>
+    /* ── Formatage de date ─────────────────────────────────────────────────── */
+    function formatDate(iso) {
+      const d = new Date(iso);
+      const now = new Date();
+      const diff = Math.floor((now - d) / 86400000);
+      if (diff === 0) return "Aujourd'hui";
+      if (diff === 1) return "Hier";
+      if (diff < 7)  return "Il y a " + diff + " jours";
+      return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+    }
+
+    /* ── Couleur de barre selon le score ───────────────────────────────────── */
+    function scoreBadgeClass(pct) {
+      if (pct >= 80) return 'badge-good';
+      if (pct >= 50) return 'badge-ok';
+      return 'badge-low';
+    }
+
+    function barColor(pct) {
+      if (pct >= 80) return '#16a34a';
+      if (pct >= 50) return '#d97706';
+      return '#d62839';
+    }
+
+    /* ── Label lisible pour un exercice_slug ───────────────────────────────── */
+    function slugLabel(slug) {
+      return (slug || '—')
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, c => c.toUpperCase())
+        .slice(0, 48);
+    }
+
+    /* ── Rendu du dashboard ────────────────────────────────────────────────── */
+    function renderDashboard(profile, results, classMeta) {
+      /* En-tête */
+      const initial = (profile.display_name || '?')[0].toUpperCase();
+      document.getElementById('dash-avatar').textContent = initial;
+      document.getElementById('dash-name').textContent   = profile.display_name;
+
+      let subText = 'Bienvenue sur ton espace personnel';
+      if (classMeta) {
+        subText = classMeta.level + ' · ' + classMeta.className;
+        if (classMeta.teacherName) subText += ' · ' + classMeta.teacherName;
+      }
+      document.getElementById('dash-sub').textContent = subText;
+
+      document.title = 'Espace élève — ' + profile.display_name + ' — LFM';
+
+      /* Pas de résultats */
+      if (!results || results.length === 0) {
+        document.getElementById('section-empty').style.display = '';
+        return;
+      }
+
+      /* ── Stats globales ── */
+      const total  = results.length;
+      const avgPct = Math.round(results.reduce((s, r) => s + parseFloat(r.pct), 0) / total);
+
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-avg').innerHTML =
+        avgPct + '<span class="dash-stat-unit">%</span>';
+      document.getElementById('dash-stats').style.display = '';
+
+      /* ── Progression par matière ── */
+      const bySubject = {};
+      for (const r of results) {
+        const k = r.subject;
+        if (!bySubject[k]) bySubject[k] = { count: 0, sumPct: 0 };
+        bySubject[k].count++;
+        bySubject[k].sumPct += parseFloat(r.pct);
+      }
+
+      const SUBJECT_LABELS = {
+        'français':       { label: 'Français',       cls: 'bar-francais' },
+        'mathématiques':  { label: 'Mathématiques',  cls: 'bar-mathematiques' }
+      };
+
+      const subjectHtml = Object.entries(bySubject).map(([key, data]) => {
+        const avg  = Math.round(data.sumPct / data.count);
+        const meta = SUBJECT_LABELS[key] || { label: key, cls: 'bar-francais' };
+        return `
+          <div class="subject-row">
+            <div class="subject-row-top">
+              <span class="subject-name">${meta.label}</span>
+              <span class="subject-meta">${data.count} exercice${data.count > 1 ? 's' : ''} · ${avg} %</span>
+            </div>
+            <div class="subject-bar-bg">
+              <div class="subject-bar-fill ${meta.cls}" style="width:${avg}%"></div>
+            </div>
+          </div>`;
+      }).join('');
+
+      document.getElementById('subjects-content').innerHTML = subjectHtml;
+      document.getElementById('section-subjects').style.display = '';
+
+      /* ── Graphique d'évolution (10 derniers) ── */
+      const chartData = results.slice(0, 10).reverse();
+      if (chartData.length >= 2) {
+        const barsHtml = chartData.map(r => {
+          const pct = parseFloat(r.pct);
+          const h   = Math.max(8, Math.round(pct * 0.6)); /* max ~60px pour 100% */
+          return `
+            <div class="chart-bar-wrap">
+              <span class="chart-bar-val">${Math.round(pct)}</span>
+              <div class="chart-bar" style="height:${h}px;background:${barColor(pct)}"></div>
+            </div>`;
+        }).join('');
+        document.getElementById('chart-bars').innerHTML = barsHtml;
+        document.getElementById('section-chart').style.display = '';
+      }
+
+      /* ── Derniers exercices ── */
+      const recent = results.slice(0, 5);
+      const recentHtml = recent.map(r => {
+        const pct      = parseFloat(r.pct);
+        const badgeCls = scoreBadgeClass(pct);
+        const dotCls   = r.subject === 'mathématiques' ? 'dot-mathematiques' : 'dot-francais';
+        const catLabel = r.category
+          ? r.category.replace(/-/g, ' ')
+            .replace(/\b\w/g, c => c.toUpperCase())
+          : '';
+        return `
+          <div class="recent-item">
+            <div class="recent-score-badge ${badgeCls}">${Math.round(pct)} %</div>
+            <div class="recent-info">
+              <div class="recent-title">${slugLabel(r.exercise_slug)}</div>
+              <div class="recent-meta">${catLabel ? catLabel + ' · ' : ''}${formatDate(r.completed_at)}</div>
+            </div>
+            <div class="recent-subject-dot ${dotCls}"></div>
+          </div>`;
+      }).join('');
+
+      document.getElementById('recent-list').innerHTML = recentHtml;
+      document.getElementById('section-recent').style.display = '';
+    }
+
+    /* ── Initialisation ────────────────────────────────────────────────────── */
+    (async () => {
+      const profile = await lfmAuth.requireRole('eleve');
+      if (!profile) return;
+
+      /* Déconnexion */
+      document.getElementById('dash-logout-btn').addEventListener('click', () => lfmAuth.signOut());
+
+      /* Info de classe (optionnel, peut être absent) */
+      let classMeta = null;
+      try {
+        const { data } = await window.lfmDb
+          .from('class_memberships')
+          .select('classes(name, level, teacher:profiles!classes_teacher_id_fkey(display_name))')
+          .limit(1)
+          .maybeSingle();
+        if (data?.classes) {
+          classMeta = {
+            className:   data.classes.name,
+            level:       data.classes.level,
+            teacherName: data.classes.teacher?.display_name || null
+          };
+        }
+      } catch (_) { /* pas encore inscrit dans une classe */ }
+
+      /* Résultats de l'élève (tri du plus récent au plus ancien) */
+      const { data: results } = await window.lfmDb
+        .from('exercise_results')
+        .select('*')
+        .order('completed_at', { ascending: false });
+
+      renderDashboard(profile, results || [], classMeta);
+    })();
+  </script>
+</body>
+</html>

@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Exercice — Français — Lycée Français de Madrid</title>
   <link rel="stylesheet" href="styles.css?v=5">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/results.js"></script>
   <script src="exercise-data.js?v=3"></script>
   <style>
     /* ── Page layout ────────────────────────────────────────── */
@@ -1457,7 +1461,7 @@
         <img src="assets/lfm-logo.svg" alt="Lycée Français de Madrid" class="header-logo">
         <div class="header-text">
           <span class="header-name">LYCÉE FRANÇAIS DE MADRID</span>
-          <span class="header-sub">François PEROCHEAU - Classe de CM2</span>
+          <span class="header-sub">Ressources numériques pour le cycle 3</span>
         </div>
       </a>
       <div class="header-actions">
@@ -1577,6 +1581,7 @@
     let score         = 0;
     let sessionData   = null;
     let currentType   = null;   /* set once per session */
+    let sessionStartTime = null;
     let wordOrderAnswer  = [];   /* word-order type */
     let conjTableRows    = [];   /* conjugation-table type */
     let pfiSelectedLevel = null; /* produire-3-formes : niveau sélectionné */
@@ -1737,6 +1742,7 @@
 
     function startSessionWithType(type) {
       currentType = type;
+      sessionStartTime = Date.now();
 
       let bankSource;
       let n = sessionData.questionsPerSession;
@@ -2314,6 +2320,16 @@
 
     /* ── Results ──────────────────────────────────────────────────────────── */
 
+    /* Dérive subject/category depuis le href du backLink.
+       Ex. "français-conjugaison.html" → { subject:"français", category:"conjugaison" }
+           "mathématiques-nombres-entiers.html" → { subject:"mathématiques", category:"nombres-entiers" } */
+    function deriveSubjectCategory(href) {
+      const base = (href || '').replace('.html', '');
+      const idx  = base.indexOf('-');
+      if (idx === -1) return { subject: base || null, category: null };
+      return { subject: base.slice(0, idx), category: base.slice(idx + 1) };
+    }
+
     function showResults() {
       document.getElementById("exercise-screen").classList.add("ex-hidden");
       document.getElementById("results-screen").classList.remove("ex-hidden");
@@ -2331,8 +2347,22 @@
       else                  msg = "💪 Encore un petit effort !";
 
       document.getElementById("score-msg").textContent = msg;
-
       window.scrollTo({ top: 0, behavior: "smooth" });
+
+      /* Enregistrement du résultat pour les élèves connectés */
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      const activeLevel = pfiSelectedLevel || fracLevel || rfLevel || nlLevel || nbEntierLevel || null;
+      saveExerciseResult({
+        exerciseSlug: slug,
+        subject,
+        category,
+        exerciseType: currentType,
+        level:        activeLevel,
+        score,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
     }
 
     /* ── Helpers ──────────────────────────────────────────────────────────── */
@@ -4290,9 +4320,10 @@
        ════════════════════════════════════════════════════════════════════════ */
 
     function vpInitSession() {
-      questions    = Array(13).fill(null);
-      currentIndex = 0;
-      score        = 0;
+      questions        = Array(13).fill(null);
+      currentIndex     = 0;
+      score            = 0;
+      sessionStartTime = Date.now();
 
       vpState = {
         steps: [
@@ -4399,6 +4430,20 @@
       else                msg = '💪 Encore un petit effort !';
       document.getElementById('score-msg').textContent = msg;
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      /* Enregistrement du résultat pour les élèves connectés */
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug,
+        subject,
+        category,
+        exerciseType: 'valeur-position',
+        level:        null,
+        score,
+        total:        13,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
     }
 
     /* ════════════════════════════════════════════════════════════════════════
@@ -4847,5 +4892,8 @@
     init();
   </script>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/menu.js"></script>
 </body>
 </html>

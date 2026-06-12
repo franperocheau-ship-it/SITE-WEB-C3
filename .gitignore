@@ -1,0 +1,19 @@
+# Système
+.DS_Store
+Thumbs.db
+
+# Éditeurs
+.vscode/
+*.swp
+*.swo
+
+# Si un jour on ajoute un outil de build
+node_modules/
+dist/
+.env
+.env.local
+.env*.local
+
+# Clés et secrets (ne jamais commiter)
+*service_role*
+*secret*

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Espace enseignant — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css?v=5">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/teacher.js"></script>
+  <style>
+    .dash-wrap {
+      min-height: calc(100vh - 88px - 74px);
+      background: var(--bg);
+      padding: 40px 24px 64px;
+    }
+
+    .dash-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* ── En-tête enseignant ──────────────────────────────────────────────────── */
+    .dash-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 28px 32px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--blue);
+    }
+
+    .dash-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 800;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dash-welcome { flex: 1; }
+
+    .dash-role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16,43,106,0.08);
+      color: var(--blue);
+      border: 1px solid rgba(16,43,106,0.16);
+      border-radius: 100px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .dash-name {
+      font-weight: 800;
+      font-size: 22px;
+      color: var(--blue);
+      margin-bottom: 4px;
+    }
+
+    .dash-sub {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ── Stats ───────────────────────────────────────────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--blue);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Cards navigation ────────────────────────────────────────────────────── */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .dash-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-decoration: none;
+      border: 2px solid transparent;
+      transition: border-color 200ms, box-shadow 200ms, transform 140ms;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dash-card--active:hover {
+      border-color: rgba(16,43,106,0.2);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .dash-card--soon {
+      opacity: 0.55;
+      cursor: default;
+    }
+
+    .dash-card-icon { font-size: 28px; }
+
+    .dash-card-title {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--blue);
+    }
+
+    .dash-card-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .dash-card-action {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: 0.03em;
+    }
+
+    .dash-card-soon {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(16,43,106,0.06);
+      color: var(--blue);
+      border-radius: 100px;
+      padding: 3px 10px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+
+    .dash-card-accent {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 3px;
+      background: var(--blue);
+    }
+
+    .dash-card--soon .dash-card-accent { opacity: 0.15; }
+    .dash-card--active .dash-card-accent { opacity: 0.35; }
+
+    /* ── Bouton déconnexion ──────────────────────────────────────────────────── */
+    .dash-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .dash-logout {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 10px 28px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 180ms, color 180ms;
+    }
+    .dash-logout:hover { border-color: var(--red); color: var(--red); }
+
+    @media (max-width: 480px) {
+      .dash-header { padding: 20px; }
+      .stats-row   { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <img src="assets/lfm-logo.svg" alt="Lycée Français de Madrid" class="header-logo">
+        <div class="header-text">
+          <span class="header-name">LYCÉE FRANÇAIS DE MADRID</span>
+          <span class="header-sub">Ressources numériques pour le cycle 3</span>
+        </div>
+      </a>
+      <div class="header-actions">
+        <span class="lang-badge">FR</span>
+        <button class="menu-btn" aria-label="Ouvrir le menu">
+          <span class="mbar mbar-top"></span>
+          <span class="mbar mbar-mid"></span>
+          <span class="mbar mbar-mid2"></span>
+          <span class="mbar mbar-bot"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENU -->
+  <div class="dash-wrap">
+    <div class="dash-content">
+
+      <!-- En-tête utilisateur -->
+      <div class="dash-header">
+        <div class="dash-avatar" id="dash-avatar">?</div>
+        <div class="dash-welcome">
+          <div class="dash-role-badge">📚 Espace enseignant</div>
+          <div class="dash-name" id="dash-name">Chargement…</div>
+          <div class="dash-sub">Bienvenue sur votre espace pédagogique</div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-value" id="stat-classes">—</span>
+          <span class="stat-label">Classe(s)</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="stat-eleves">—</span>
+          <span class="stat-label">Élève(s)</span>
+        </div>
+      </div>
+
+      <!-- Cards de navigation -->
+      <div class="dash-grid">
+        <a href="classes-enseignant.html" class="dash-card dash-card--active">
+          <div class="dash-card-icon">🏫</div>
+          <div class="dash-card-title">Mes classes</div>
+          <div class="dash-card-desc">Créez et gérez vos groupes d'élèves par niveau et par année scolaire.</div>
+          <div class="dash-card-action">Gérer →</div>
+          <div class="dash-card-accent"></div>
+        </a>
+        <a href="classes-enseignant.html?view=eleves" class="dash-card dash-card--active">
+          <div class="dash-card-icon">👤</div>
+          <div class="dash-card-title">Mes élèves</div>
+          <div class="dash-card-desc">Créez les identifiants de vos élèves et associez-les à votre classe.</div>
+          <div class="dash-card-action">Gérer →</div>
+          <div class="dash-card-accent"></div>
+        </a>
+        <a href="resultats-enseignant.html" class="dash-card dash-card--active">
+          <div class="dash-card-icon">📊</div>
+          <div class="dash-card-title">Résultats</div>
+          <div class="dash-card-desc">Consultez les scores et la progression de chaque élève par exercice.</div>
+          <div class="dash-card-action">Voir les résultats →</div>
+          <div class="dash-card-accent"></div>
+        </a>
+        <button class="dash-card dash-card--active" id="export-all-btn" style="text-align:left">
+          <div class="dash-card-icon">📥</div>
+          <div class="dash-card-title">Export CSV</div>
+          <div class="dash-card-desc">Téléchargez les identifiants de tous vos élèves au format CSV.</div>
+          <div class="dash-card-action" id="export-action-label">Télécharger →</div>
+          <div class="dash-card-accent"></div>
+        </button>
+      </div>
+
+      <!-- Pied de page -->
+      <div class="dash-footer">
+        <a href="index.html" style="color:var(--blue);font-size:13px;font-weight:600;text-decoration:none">
+          ← Retour aux exercices
+        </a>
+        <button class="dash-logout" id="dash-logout-btn">Se déconnecter</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-rule"></div>
+        <div class="footer-body">
+          <p class="footer-text">
+            Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,<br>
+            dans le respect d'un <strong class="footer-em">usage mesuré</strong> des écrans.
+          </p>
+        </div>
+        <p class="footer-credit">© François PEROCHEAU — LFM 2026</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/menu.js"></script>
+  <script>
+    (async () => {
+      const profile = await lfmAuth.requireRole('enseignant');
+      if (!profile) return;
+
+      const initial = (profile.display_name || '?')[0].toUpperCase();
+      document.getElementById('dash-avatar').textContent = initial;
+      document.getElementById('dash-name').textContent   = profile.display_name;
+      document.title = 'Espace enseignant — ' + profile.display_name + ' — LFM';
+
+      document.getElementById('dash-logout-btn').addEventListener('click', () => lfmAuth.signOut());
+
+      /* Chargement des stats */
+      try {
+        const stats = await lfmTeacher.getStats();
+        document.getElementById('stat-classes').textContent = stats.classes;
+        document.getElementById('stat-eleves').textContent  = stats.students;
+      } catch (_) {
+        document.getElementById('stat-classes').textContent = '—';
+        document.getElementById('stat-eleves').textContent  = '—';
+      }
+
+      /* Export CSV de tous les élèves */
+      document.getElementById('export-all-btn').addEventListener('click', async () => {
+        const btn   = document.getElementById('export-all-btn');
+        const label = document.getElementById('export-action-label');
+        btn.disabled  = true;
+        label.textContent = 'Export…';
+        try {
+          await lfmTeacher.exportAllStudentsCSV();
+        } catch (e) {
+          alert('Erreur lors de l\'export : ' + e.message);
+        } finally {
+          btn.disabled  = false;
+          label.textContent = 'Télécharger →';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

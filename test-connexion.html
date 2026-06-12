@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test connexion Supabase — LFM</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 48px auto; padding: 0 24px; background: #f8fafc; color: #1e293b; }
+    h1   { font-size: 20px; margin-bottom: 24px; color: #102b6a; }
+    .card { background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,.08); padding: 24px; margin-bottom: 16px; }
+    .card h2  { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #64748b; margin: 0 0 12px; }
+    .result   { font-size: 14px; line-height: 1.7; }
+    .ok   { color: #15803d; font-weight: 600; }
+    .err  { color: #d62839; font-weight: 600; }
+    .info { color: #475569; }
+    code  { background: #f1f5f9; border-radius: 4px; padding: 1px 6px; font-size: 13px; }
+    button {
+      margin-top: 8px;
+      padding: 10px 22px;
+      background: #102b6a;
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { background: #0d2255; }
+  </style>
+</head>
+<body>
+
+<h1>🔌 Test de connexion Supabase</h1>
+
+<!-- Test 1 : initialisation du client -->
+<div class="card">
+  <h2>1 — Client Supabase</h2>
+  <div class="result" id="r1">En attente…</div>
+</div>
+
+<!-- Test 2 : session courante -->
+<div class="card">
+  <h2>2 — Session Auth</h2>
+  <div class="result" id="r2">En attente…</div>
+</div>
+
+<!-- Test 3 : lecture base de données -->
+<div class="card">
+  <h2>3 — Lecture base de données (table <code>profiles</code>)</h2>
+  <div class="result" id="r3">En attente…</div>
+</div>
+
+<!-- Bouton relancer -->
+<button onclick="runTests()">↺ Relancer les tests</button>
+
+<script>
+  async function runTests() {
+    document.getElementById('r1').innerHTML = 'En cours…';
+    document.getElementById('r2').innerHTML = 'En cours…';
+    document.getElementById('r3').innerHTML = 'En cours…';
+
+    /* ── Test 1 : client initialisé ── */
+    try {
+      if (!window.lfmDb || typeof window.lfmDb.auth === 'undefined') throw new Error('window.lfmDb est indéfini');
+      document.getElementById('r1').innerHTML =
+        `<span class="ok">✓ Client initialisé</span><br>
+         <span class="info">URL : <code>${SUPABASE_URL}</code></span>`;
+    } catch (e) {
+      document.getElementById('r1').innerHTML = `<span class="err">✗ ${e.message}</span>`;
+      return;
+    }
+
+    /* ── Test 2 : session Auth ── */
+    try {
+      const { data: { session }, error } = await window.lfmDb.auth.getSession();
+      if (error) throw error;
+      document.getElementById('r2').innerHTML = session
+        ? `<span class="ok">✓ Connecté</span> — <code>${session.user.email}</code>`
+        : `<span class="ok">✓ API Auth joignable</span><br><span class="info">Aucune session active (normal si non connecté)</span>`;
+    } catch (e) {
+      document.getElementById('r2').innerHTML = `<span class="err">✗ ${e.message}</span>`;
+    }
+
+    /* ── Test 3 : lecture BDD ── */
+    try {
+      const { data, error, status } = await window.lfmDb.from('profiles').select('id').limit(1);
+      if (error) {
+        // 401/403 = RLS bloque → la connexion BDD fonctionne quand même
+        if (status === 401 || status === 403) {
+          document.getElementById('r3').innerHTML =
+            `<span class="ok">✓ Base de données joignable</span><br>
+             <span class="info">RLS actif — accès refusé sans session (comportement correct)</span>`;
+        } else {
+          throw error;
+        }
+      } else {
+        document.getElementById('r3').innerHTML =
+          `<span class="ok">✓ Requête réussie</span><br>
+           <span class="info">${data.length} ligne(s) retournée(s) depuis <code>profiles</code></span>`;
+      }
+    } catch (e) {
+      document.getElementById('r3').innerHTML =
+        `<span class="err">✗ ${e.message}</span><br>
+         <span class="info">Vérifiez que la table <code>profiles</code> existe dans Supabase (SQL Editor → schéma)</span>`;
+    }
+  }
+
+  runTests();
+</script>
+</body>
+</html>
