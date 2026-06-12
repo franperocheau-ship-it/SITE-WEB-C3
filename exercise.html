@@ -685,6 +685,358 @@
       margin-top: 2px;
     }
 
+    /* ══════════════════════════════════════════════════════════
+       TYPE : valeur-position
+       ══════════════════════════════════════════════════════════ */
+
+    /* ── Barre d'étapes ──────────────────────────────────────── */
+    .vp-steps-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .vp-step-dot {
+      flex: 1;
+      height: 5px;
+      border-radius: 100px;
+      background: var(--border);
+      transition: background 400ms;
+    }
+    .vp-step-dot.is-done   { background: #16a34a; }
+    .vp-step-dot.is-active { background: var(--blue); }
+
+    .vp-step-badge {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(16,43,106,0.06);
+      color: var(--blue);
+      border: 1px solid rgba(16,43,106,0.15);
+      border-radius: 100px;
+      padding: 4px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 18px;
+    }
+
+    /* ── Grand affichage de nombre ───────────────────────────── */
+    .vp-number-display {
+      font-size: 50px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-align: center;
+      padding: 24px 20px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 24px;
+      line-height: 1;
+    }
+    .vp-digit-plain { color: var(--text); }
+    .vp-digit-lit   {
+      color: var(--red);
+      background: rgba(214,40,57,0.10);
+      border-radius: 6px;
+      padding: 2px 4px;
+    }
+    .vp-digit-sep { color: var(--muted); opacity: .35; }
+
+    /* ── Bouton audio (étape 2) ─────────────────────────────── */
+    .vp-audio-btn {
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      padding: 13px 32px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      transition: background 200ms, transform 200ms, opacity 200ms;
+      letter-spacing: 0.01em;
+    }
+    .vp-audio-btn:hover:not(:disabled) { background: #0d2255; transform: translateY(-2px); }
+    .vp-audio-btn:disabled { opacity: .6; cursor: default; transform: none; }
+    .vp-audio-btn.is-playing { background: #0e7490; }
+
+    .vp-audio-hint {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    /* ── Tableau de numération (étape 2) ─────────────────────── */
+    .vp-table-wrap { overflow-x: auto; margin-bottom: 14px; }
+    .vp-num-table {
+      border-collapse: collapse;
+      margin: 0 auto;
+    }
+    .vp-table-class-header {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+      padding: 7px 10px;
+    }
+    .vp-class-millions { background: #4f46e5; }
+    .vp-class-milliers { background: var(--blue); }
+    .vp-class-unites   { background: #0e7490; }
+    .vp-col-header {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 5px 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      min-width: 52px;
+    }
+    .vp-drop-cell {
+      width: 52px;
+      height: 52px;
+      border: 2px dashed rgba(16,43,106,0.22);
+      border-radius: 8px;
+      text-align: center;
+      vertical-align: middle;
+      padding: 0;
+      transition: border-color 150ms, background 150ms;
+    }
+    .vp-input-cell {
+      width: 100%;
+      height: 48px;
+      border: none;
+      background: transparent;
+      text-align: center;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      outline: none;
+      padding: 0;
+      cursor: text;
+      display: block;
+      border-radius: 6px;
+    }
+    .vp-input-cell:focus {
+      background: rgba(16,43,106,0.06);
+    }
+    .vp-drop-cell.vp-cell-inactive {
+      background: rgba(16,43,106,0.02);
+      border-color: rgba(16,43,106,0.08);
+      cursor: default;
+      color: rgba(16,43,106,0.18);
+    }
+    .vp-drop-cell.is-correct {
+      border-style: solid;
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.09);
+      color: #15803d;
+    }
+    .vp-drop-cell.is-wrong {
+      border-style: solid;
+      border-color: var(--red);
+      background: rgba(214,40,57,0.07);
+      color: var(--red);
+    }
+
+    /* ── Chiffres cliquables (étape 3) ───────────────────────── */
+    .vp-number-clickable {
+      display: flex;
+      gap: 2px;
+      justify-content: center;
+      align-items: center;
+      padding: 22px 16px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .vp-digit-btn {
+      font-size: 46px;
+      font-weight: 900;
+      color: var(--text);
+      background: none;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      padding: 0 6px;
+      cursor: pointer;
+      transition: border-color 150ms, background 150ms, color 150ms, transform 150ms;
+      line-height: 1.2;
+      font-family: inherit;
+    }
+    .vp-digit-btn:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.07);
+      transform: scale(1.08);
+    }
+    .vp-digit-btn:disabled { cursor: default; }
+    .vp-digit-btn.is-correct {
+      border-color: #16a34a;
+      color: #15803d;
+      background: rgba(22,163,74,0.10);
+    }
+    .vp-digit-btn.is-wrong {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(214,40,57,0.08);
+    }
+    .vp-digit-sep-lg {
+      font-size: 46px;
+      font-weight: 900;
+      color: var(--muted);
+      opacity: .28;
+      padding: 0 2px;
+      user-select: none;
+    }
+
+    /* ── Intro étape 4 ───────────────────────────────────────── */
+    .vp-intro-card {
+      background: rgba(16,43,106,0.04);
+      border: 1.5px solid rgba(16,43,106,0.14);
+      border-radius: 14px;
+      padding: 22px 26px;
+      margin-bottom: 20px;
+    }
+    .vp-intro-title {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 16px;
+    }
+    .vp-intro-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+    }
+    .vp-intro-row2 { border-color: rgba(22,163,74,0.35); }
+    .vp-intro-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .vp-intro-numrow {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+    .vp-intro-value {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--blue);
+      flex-shrink: 0;
+    }
+    .vp-intro-value-green { color: #15803d; }
+    .vp-hl-digit-anim {
+      color: var(--blue);
+      background: rgba(16,43,106,0.11);
+      border-radius: 4px;
+      padding: 1px 3px;
+    }
+    .vp-hl-block {
+      color: #15803d;
+      background: rgba(22,163,74,0.12);
+      border-radius: 4px;
+      padding: 1px 3px;
+    }
+
+    /* ── Décomposition (étape 5) ─────────────────────────────── */
+    .vp-decomp-number {
+      font-size: 28px;
+      font-weight: 900;
+      text-align: center;
+      color: var(--blue);
+      margin-bottom: 12px;
+      letter-spacing: 0.03em;
+    }
+    .vp-decomp-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 18px 16px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 18px;
+    }
+    .vp-decomp-term {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .vp-decomp-input {
+      width: 46px;
+      text-align: center;
+      border: 2px solid var(--blue);
+      border-radius: 8px;
+      padding: 6px 2px;
+      font-family: inherit;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      transition: border-color 150ms, box-shadow 150ms;
+      /* hide spinner */
+      -moz-appearance: textfield;
+    }
+    .vp-decomp-input::-webkit-outer-spin-button,
+    .vp-decomp-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .vp-decomp-input:focus {
+      box-shadow: 0 0 0 3px rgba(16,43,106,0.12);
+    }
+    .vp-decomp-input.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.07);
+      color: #15803d;
+    }
+    .vp-decomp-input.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+    .vp-decomp-input:disabled { cursor: default; }
+    .vp-decomp-mult {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .vp-decomp-op {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--muted);
+      margin: 0 2px;
+    }
+
+    @media (max-width: 600px) {
+      .vp-number-display  { font-size: 36px; padding: 18px 12px; }
+      .vp-digit-btn       { font-size: 34px; }
+      .vp-digit-sep-lg    { font-size: 34px; }
+      .vp-intro-numrow    { font-size: 22px; }
+      .vp-intro-value     { font-size: 22px; }
+      .vp-decomp-number   { font-size: 22px; }
+      .vp-decomp-input    { width: 38px; font-size: 18px; }
+    }
+
     /* ── Utility ────────────────────────────────────────────── */
     .ex-hidden { display: none !important; }
 
@@ -1228,6 +1580,8 @@
     let wordOrderAnswer  = [];   /* word-order type */
     let conjTableRows    = [];   /* conjugation-table type */
     let pfiSelectedLevel = null; /* produire-3-formes : niveau sélectionné */
+    let vpState      = null;     /* valeur-position  : état de session     */
+    let vpTableSt    = null;     /* valeur-position  : état tableau étape 2 */
 
     const SUCCESS = ["✅ Bravo !", "✨ Très bien !", "🌟 Exact !"];
 
@@ -1296,6 +1650,7 @@
       fracLevel        = null;
       rfLevel          = null;
       nlLevel          = null;
+      nbEntierLevel    = null;
       /* Multiple types → show the choice screen; single type → start directly */
       if (sessionData.exerciseTypes && sessionData.exerciseTypes.length > 1) {
         showTypeSelect();
@@ -1396,6 +1751,9 @@
         bankSource = sessionData.findErrorBank;
       } else if (currentType === "word-order" && sessionData.wordOrderBank) {
         bankSource = sessionData.wordOrderBank;
+      } else if (currentType === "valeur-position") {
+        vpInitSession();
+        return;
       } else {
         bankSource = sessionData.bank;
       }
@@ -1490,6 +1848,10 @@
         renderRepresenterFraction(card, q);
       } else if (currentType === "placer-fraction-droite") {
         renderPlacerFractionDroite(card, q);
+      } else if (currentType === "nombre-entier") {
+        renderNombreEntier(card, q);
+      } else if (currentType === "valeur-position") {
+        renderValeurPosition(card);
       }
     }
 
@@ -3499,6 +3861,183 @@
       });
     }
 
+    /* ── Type : placer-fraction-droite ──────────────────────────────────────
+       Affiche une fraction en écriture classique. L'élève clique sur la
+       graduation correspondante d'une droite numérique graduée.
+       level 1 : fraction < 1, droite de 0 à 1
+       level 2 : fraction > 1, droite de 0 à ceil(num/denom)
+    ────────────────────────────────────────────────────────────────────────── */
+
+    let nlLevel = null;
+
+    function renderPlacerFractionDroite(card, q) {
+      /* — Sélecteur de niveau au premier appel — */
+      if (nlLevel === null && currentIndex === 0) {
+        card.innerHTML = `
+          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
+            Quel niveau veux-tu pratiquer ?
+          </p>
+          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
+            <button class="ex-type-card" data-level="1">
+              <span class="ex-type-icon">⭐</span>
+              <div>
+                <span class="ex-type-name">Niveau 1</span>
+                <span class="ex-type-desc">Fractions inférieures à 1</span>
+              </div>
+            </button>
+            <button class="ex-type-card" data-level="2">
+              <span class="ex-type-icon">⭐⭐</span>
+              <div>
+                <span class="ex-type-name">Niveau 2</span>
+                <span class="ex-type-desc">Fractions supérieures à 1</span>
+              </div>
+            </button>
+          </div>
+        `;
+        document.getElementById('ex-bar-fill').style.width = '0%';
+        card.querySelectorAll('.ex-type-card').forEach(btn =>
+          btn.addEventListener('click', () => {
+            nlLevel = parseInt(btn.dataset.level, 10);
+            questions = shuffle(sessionData.bank.filter(it => it.level === nlLevel))
+                          .slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            currentIndex = 0;
+            score = 0;
+            showQuestion(0);
+          })
+        );
+        return;
+      }
+
+      const { numerator, denominator } = q;
+      const maxUnits       = nlLevel === 1 ? 1 : Math.ceil(numerator / denominator);
+      const totalIntervals = maxUnits * denominator;
+      const correctTickIdx = numerator; /* tick i représente i/denominator */
+
+      /* Espacement adaptatif : graduations suffisamment larges pour le tactile */
+      const tickSpacing = Math.max(36, Math.min(72, Math.floor(560 / totalIntervals)));
+      const padL = 28, padR = 44;
+      const lineWidth = totalIntervals * tickSpacing;
+      const W = lineWidth + padL + padR;
+      const H = 90;
+      const lineY = 42;
+      const totalTicks = totalIntervals + 1;
+
+      let selectedIdx = null;
+      let answered    = false;
+      let scored      = false;
+
+      function buildSvg() {
+        let s = '';
+        /* Ligne */
+        s += `<line x1="${padL}" y1="${lineY}" x2="${padL + lineWidth + 8}" y2="${lineY}"
+               stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>`;
+        /* Flèche */
+        s += `<polygon points="${padL + lineWidth + 16},${lineY} ${padL + lineWidth + 6},${lineY - 5} ${padL + lineWidth + 6},${lineY + 5}" fill="#94a3b8"/>`;
+
+        for (let i = 0; i < totalTicks; i++) {
+          const x       = padL + i * tickSpacing;
+          const isMajor = i % denominator === 0;
+          const tH      = isMajor ? 22 : 12;
+
+          /* Graduation */
+          s += `<line x1="${x}" y1="${lineY - tH / 2}" x2="${x}" y2="${lineY + tH / 2}"
+                 stroke="${isMajor ? '#102b6a' : '#64748b'}"
+                 stroke-width="${isMajor ? 2 : 1.5}"/>`;
+
+          /* Étiquette entière */
+          if (isMajor) {
+            s += `<text x="${x}" y="${lineY + 13 + 16}"
+                   text-anchor="middle" font-family="sans-serif"
+                   font-size="13" font-weight="700" fill="#102b6a">${i / denominator}</text>`;
+          }
+
+          /* Zone cliquable transparente (large pour le tactile) */
+          s += `<rect x="${x - 18}" y="2" width="36" height="${H - 4}"
+                 fill="transparent" class="nline-hit" data-idx="${i}"
+                 style="cursor:pointer"/>`;
+        }
+
+        /* Marqueur de la sélection actuelle */
+        if (selectedIdx !== null) {
+          const dx = padL + selectedIdx * tickSpacing;
+          s += `<circle cx="${dx}" cy="${lineY}" r="9"
+                 fill="#3b82f6" stroke="#1d4ed8" stroke-width="2.5"
+                 pointer-events="none"/>`;
+        }
+
+        return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"
+                 style="display:block;max-width:100%;overflow:visible">${s}</svg>`;
+      }
+
+      card.innerHTML = `
+        <p class="ex-question-label">Place cette fraction sur la droite graduée.</p>
+        <div class="nline-question-area">${_rfracHtml(numerator, denominator)}</div>
+        <div class="nline-scroll-wrap" id="nline-svg-wrap">${buildSvg()}</div>
+        <p class="nline-status" id="nline-status">Clique sur une graduation pour la sélectionner.</p>
+        <div class="rfrac-validate-row">
+          <button class="ex-validate-btn" id="nline-validate" disabled>Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const svgWrap  = card.querySelector('#nline-svg-wrap');
+      const statusEl = card.querySelector('#nline-status');
+      const vBtn     = card.querySelector('#nline-validate');
+
+      function bindTickClicks() {
+        svgWrap.querySelectorAll('.nline-hit').forEach(rect => {
+          rect.addEventListener('click', () => {
+            if (answered) return;
+            selectedIdx = parseInt(rect.dataset.idx, 10);
+            svgWrap.innerHTML = buildSvg();
+            bindTickClicks();
+            statusEl.textContent = `Graduation sélectionnée : ${selectedIdx}/${denominator}`;
+            vBtn.disabled = false;
+          });
+        });
+      }
+
+      bindTickClicks();
+
+      vBtn.addEventListener('click', () => {
+        if (selectedIdx === null || answered) return;
+        answered = true;
+        vBtn.disabled = true;
+        svgWrap.querySelectorAll('.nline-hit').forEach(r => { r.style.pointerEvents = 'none'; });
+
+        const isRight = selectedIdx === correctTickIdx;
+
+        if (isRight) {
+          if (!scored) { score++; scored = true; }
+          setFeedback('feedback1',
+            `<div class="ex-feedback-correct">✅ Bravo ! Tu as placé correctement la fraction sur la droite graduée.</div>`);
+          showNextBtn();
+        } else {
+          const ord = numerator === 1 ? '1re' : `${numerator}e`;
+          setFeedback('feedback1', `
+            <div class="ex-feedback-wrong" style="margin-bottom:12px">
+              ❌ Pas tout à fait. La fraction ${_rfracHtml(numerator, denominator)}
+              correspond à la ${ord} graduation depuis 0
+              (l'unité est partagée en <strong>${denominator} parts</strong> égales).
+            </div>
+            <button class="ex-validate-btn" id="nline-retry">Modifier ma réponse</button>
+          `);
+          card.querySelector('#nline-retry').addEventListener('click', () => {
+            answered    = false;
+            selectedIdx = null;
+            svgWrap.innerHTML = buildSvg();
+            bindTickClicks();
+            svgWrap.querySelectorAll('.nline-hit').forEach(r => { r.style.pointerEvents = ''; });
+            statusEl.textContent = 'Clique sur une graduation pour la sélectionner.';
+            vBtn.disabled = true;
+            document.getElementById('feedback1').innerHTML = '';
+          });
+        }
+      });
+    }
+
     function setFeedback(id, html) {
       document.getElementById(id).innerHTML = html;
     }
@@ -3509,6 +4048,799 @@
       btn.textContent = isLast ? "Voir mes résultats" : "Suivant →";
       btn.classList.remove("ex-hidden");
       btn.onclick = nextQuestion;
+    }
+
+    /* ── Type : nombre-entier ────────────────────────────────────────────── */
+
+    let nbEntierLevel = null;
+
+    function normalizeNombreInput(str) {
+      return str
+        .toLowerCase()
+        .trim()
+        .replace(/[-\s]+/g, '')
+        .replace(/[''`´'']/g, '');
+    }
+
+    function renderNombreEntier(card, q) {
+      if (nbEntierLevel === null && currentIndex === 0) {
+        card.innerHTML = `
+          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
+            Quel niveau veux-tu pratiquer ?
+          </p>
+          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
+            <button class="ex-type-card" data-level="CM1">
+              <span class="ex-type-icon">⭐</span>
+              <div>
+                <span class="ex-type-name">CM1</span>
+                <span class="ex-type-desc">Nombres jusqu'à 999 999</span>
+              </div>
+            </button>
+            <button class="ex-type-card" data-level="CM2">
+              <span class="ex-type-icon">⭐⭐</span>
+              <div>
+                <span class="ex-type-name">CM2</span>
+                <span class="ex-type-desc">Nombres jusqu'à 999 999 999</span>
+              </div>
+            </button>
+          </div>
+        `;
+        document.getElementById('ex-bar-fill').style.width = '0%';
+        card.querySelectorAll('.ex-type-card').forEach(btn =>
+          btn.addEventListener('click', () => {
+            nbEntierLevel = btn.dataset.level;
+            questions = shuffle(sessionData.bank.filter(it => it.level === nbEntierLevel))
+                          .slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            currentIndex = 0;
+            score = 0;
+            showQuestion(0);
+          })
+        );
+        return;
+      }
+
+      if (q.inputMode === 'qcm') {
+        renderNombreEntierQCM(card, q);
+      } else {
+        renderNombreEntierSaisie(card, q);
+      }
+    }
+
+    function renderNombreEntierQCM(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction}</p>
+        <div class="ex-label-word">${q.word}</div>
+        <div class="ex-choices-grid" id="ex-choices-grid"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      const grid = document.getElementById('ex-choices-grid');
+      shuffle([...q.choices]).forEach(c => {
+        const btn = document.createElement('button');
+        btn.className  = 'ex-choice';
+        btn.textContent = c;
+        btn.addEventListener('click', () => {
+          grid.querySelectorAll('.ex-choice').forEach(b => b.disabled = true);
+          const isRight = normalizeNombreInput(c) === normalizeNombreInput(q.answer);
+          grid.querySelectorAll('.ex-choice').forEach(b => {
+            if (normalizeNombreInput(b.textContent) === normalizeNombreInput(q.answer)) {
+              b.classList.add('is-correct');
+            }
+          });
+          if (!isRight) btn.classList.add('is-wrong');
+          if (isRight) {
+            score++;
+            setFeedback('feedback1', `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+          } else {
+            setFeedback('feedback1', `
+              <div class="ex-feedback-wrong">
+                ❌ Ce n'est pas la bonne réponse.<br>
+                La bonne réponse était : <strong>${q.answer}</strong>
+              </div>`);
+          }
+          showNextBtn();
+        });
+        grid.appendChild(btn);
+      });
+    }
+
+    function renderNombreEntierSaisie(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction}</p>
+        <div class="ex-label-word">${q.word}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="ex-nombre-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="ex-nombre-valide-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      const input  = document.getElementById('ex-nombre-input');
+      const valBtn = document.getElementById('ex-nombre-valide-btn');
+      setTimeout(() => input.focus(), 50);
+
+      function validate() {
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+        const accepted = q.acceptedAnswers ? [q.answer, ...q.acceptedAnswers] : [q.answer];
+        const isRight  = accepted.some(a => normalizeNombreInput(a) === normalizeNombreInput(input.value));
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+        if (isRight) {
+          score++;
+          setFeedback('feedback1', `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+        } else {
+          setFeedback('feedback1', `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.answer}</strong>
+            </div>`);
+        }
+        showNextBtn();
+      }
+
+      valBtn.addEventListener('click', validate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') validate(); });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       TYPE : valeur-position — Identifier la valeur d'un chiffre selon sa position
+       5 étapes, 13 questions canoniques, mécanisme retry sur erreur.
+       ═══════════════════════════════════════════════════════════════════════ */
+
+    /* Table des positions : index 0=unités … 8=centaines de millions */
+    const VP_POS = [
+      { name: "unités",                short: "u", val: 1          },
+      { name: "dizaines",              short: "d", val: 10         },
+      { name: "centaines",             short: "c", val: 100        },
+      { name: "milliers",              short: "u", val: 1000       },
+      { name: "dizaines de milliers",  short: "d", val: 10000      },
+      { name: "centaines de milliers", short: "c", val: 100000     },
+      { name: "millions",              short: "u", val: 1000000    },
+      { name: "dizaines de millions",  short: "d", val: 10000000   },
+      { name: "centaines de millions", short: "c", val: 100000000  },
+    ];
+
+    function vpDigitAt(n, pos) {
+      return Math.floor(n / VP_POS[pos].val) % 10;
+    }
+
+    function vpFmt(n) {
+      return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+
+    function vpItemKey(item) {
+      return typeof item === 'number' ? item : item.n;
+    }
+
+    /* ── localStorage ────────────────────────────────────────────────────── */
+    function vpLoadUsed(key) {
+      try {
+        const s = localStorage.getItem('vp_used_' + key);
+        return s ? new Set(JSON.parse(s)) : new Set();
+      } catch(e) { return new Set(); }
+    }
+
+    function vpSaveUsed(key, set) {
+      try { localStorage.setItem('vp_used_' + key, JSON.stringify([...set])); }
+      catch(e) {}
+    }
+
+    /* ── Pioche aléatoire sans répétition ────────────────────────────────── */
+    function vpPickFrom(pool, usedSet, excludeKey) {
+      let avail = pool.filter(item => {
+        const k = vpItemKey(item);
+        return !usedSet.has(k) && k !== excludeKey;
+      });
+      if (avail.length === 0) {
+        usedSet.clear();
+        avail = pool.filter(item => vpItemKey(item) !== excludeKey);
+        if (avail.length === 0) avail = [...pool];
+      }
+      return avail[Math.floor(Math.random() * avail.length)];
+    }
+
+    /* ── En-tête d'étape ─────────────────────────────────────────────────── */
+    function vpStepHeader(stepNum, stepName) {
+      const labels = [1,2,3,4,5];
+      const dots = labels.map(i => {
+        const cls = i < stepNum ? 'is-done' : i === stepNum ? 'is-active' : '';
+        return `<div class="vp-step-dot ${cls}"></div>`;
+      }).join('');
+      return `
+        <div class="vp-steps-bar">${dots}</div>
+        <div class="vp-step-badge">Étape ${stepNum}/5 — ${stepName}</div>
+      `;
+    }
+
+    /* ── Nombre en HTML avec position surlignée ─────────────────────────── */
+    function vpNumberHtml(n, highlightPos, hlCls) {
+      const str = n.toString(), len = str.length;
+      let html = '';
+      for (let i = 0; i < len; i++) {
+        if (i > 0 && (len - i) % 3 === 0) html += `<span class="vp-digit-sep"> </span>`;
+        const posR = len - 1 - i;
+        if (highlightPos !== undefined && posR === highlightPos)
+          html += `<span class="${hlCls || 'vp-digit-lit'}">${str[i]}</span>`;
+        else
+          html += `<span class="vp-digit-plain">${str[i]}</span>`;
+      }
+      return html;
+    }
+
+    /* Surligne tout le bloc gauche >= pos (pour "nombre de") */
+    function vpNumberHtmlBlock(n, pos) {
+      const str = n.toString(), len = str.length;
+      let html = '';
+      for (let i = 0; i < len; i++) {
+        if (i > 0 && (len - i) % 3 === 0) html += `<span class="vp-digit-sep"> </span>`;
+        const posR = len - 1 - i;
+        html += posR >= pos
+          ? `<span class="vp-hl-block">${str[i]}</span>`
+          : `<span class="vp-digit-plain">${str[i]}</span>`;
+      }
+      return html;
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       INIT SESSION
+       ════════════════════════════════════════════════════════════════════════ */
+
+    function vpInitSession() {
+      questions    = Array(13).fill(null);
+      currentIndex = 0;
+      score        = 0;
+
+      vpState = {
+        steps: [
+          { type: 1, label: 'Le chiffre allumé',    total: 3, key: 'step1', pool: sessionData.step1Pool },
+          { type: 2, label: 'Tableau de numération',total: 2, key: 'step2', pool: sessionData.step2Pool },
+          { type: 3, label: 'Chiffre des…',    total: 3, key: 'step3', pool: sessionData.step3Pool },
+          { type: 4, label: 'Nombre de…',      total: 3, key: 'step4', pool: sessionData.step4Pool },
+          { type: 5, label: 'La décomposition',total: 2, key: 'step5', pool: sessionData.step5Pool },
+        ],
+        stepIdx:        0,
+        slotIdx:        0,
+        isFirstTry:     true,
+        step4IntroSeen: false,
+        currentItem:    null,
+        used: {
+          step1: vpLoadUsed('step1'),
+          step2: vpLoadUsed('step2'),
+          step3: vpLoadUsed('step3'),
+          step4: vpLoadUsed('step4'),
+          step5: vpLoadUsed('step5'),
+        }
+      };
+
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      document.getElementById('q-total').textContent = '13';
+
+      showQuestion(0);
+    }
+
+    /* ── Dispatcher (appelé par showQuestion) ────────────────────────────── */
+    function renderValeurPosition(card) {
+      if (!vpState) return;
+      const step    = vpState.steps[vpState.stepIdx];
+      const curKey  = vpState.currentItem ? vpItemKey(vpState.currentItem) : null;
+      const item    = vpPickFrom(step.pool, vpState.used[step.key], curKey);
+      vpState.currentItem = item;
+
+      if      (step.type === 1) vpStep1(card, item);
+      else if (step.type === 2) vpStep2(card, item);
+      else if (step.type === 3) vpStep3(card, item);
+      else if (step.type === 4) {
+        if (!vpState.step4IntroSeen && vpState.slotIdx === 0 && vpState.isFirstTry)
+          vpStep4Intro(card, item);
+        else
+          vpStep4(card, item);
+      }
+      else if (step.type === 5) vpStep5(card, item);
+    }
+
+    /* ── Bonne réponse ───────────────────────────────────────────────────── */
+    function vpOnCorrect() {
+      if (vpState.isFirstTry) score++;
+      const step = vpState.steps[vpState.stepIdx];
+      vpState.used[step.key].add(vpItemKey(vpState.currentItem));
+      vpSaveUsed(step.key, vpState.used[step.key]);
+      currentIndex++;
+      vpState.slotIdx++;
+      if (vpState.slotIdx >= step.total) { vpState.stepIdx++; vpState.slotIdx = 0; }
+      vpState.isFirstTry  = true;
+      vpState.currentItem = null;
+    }
+
+    /* ── Boutons après réponse ───────────────────────────────────────────── */
+    function vpAddNextBtn(card, isRetry) {
+      const btn = document.createElement('button');
+      btn.className   = 'ex-next-btn';
+      btn.style.marginTop = '20px';
+      btn.textContent = isRetry
+        ? 'Réessayer avec un autre nombre →'
+        : currentIndex >= 13 ? 'Voir mes résultats' : 'Suivant →';
+      btn.onclick = isRetry ? vpDoRetry : vpDoNext;
+      card.appendChild(btn);
+    }
+
+    function vpDoNext() {
+      if (currentIndex >= 13) { vpShowResults(); return; }
+      document.getElementById('ex-bar-fill').style.width = (currentIndex / 13 * 100) + '%';
+      document.getElementById('q-num').textContent = currentIndex + 1;
+      const card = document.getElementById('ex-card');
+      renderValeurPosition(card);
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function vpDoRetry() {
+      const card = document.getElementById('ex-card');
+      renderValeurPosition(card);
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function vpShowResults() {
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      const s20 = Math.round(score / 13 * 20);
+      const pct = Math.round(score / 13 * 100);
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   =
+        score + ' bonne' + (score > 1 ? 's' : '') + ' réponse' + (score > 1 ? 's' : '') + ' sur 13';
+      let msg;
+      if (pct === 100)    msg = '🏆 Incroyable ! Tu maîtrise cette compétence.';
+      else if (pct >= 80) msg = '🌟 Très bien !';
+      else if (pct >= 60) msg = '👍 Continue comme ça !';
+      else                msg = '💪 Encore un petit effort !';
+      document.getElementById('score-msg').textContent = msg;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       ÉTAPE 1 — Le chiffre allumé (QCM)
+       ════════════════════════════════════════════════════════════════════════ */
+
+    function vpStep1(card, item) {
+      const { n, pos } = item;
+      const d          = vpDigitAt(n, pos);
+      const correctVal = d * VP_POS[pos].val;
+
+      /* Distracteurs : le même chiffre à d'autres positions */
+      const distractors = [];
+      for (let p = 0; p < 9 && distractors.length < 3; p++) {
+        if (p === pos) continue;
+        const v = d * VP_POS[p].val;
+        if (!distractors.includes(v) && v !== correctVal) distractors.push(v);
+      }
+      /* Cas spécial zéro */
+      const choices = d === 0
+        ? shuffle([0, VP_POS[pos].val, VP_POS[pos].val * 3, VP_POS[pos].val * 7])
+        : shuffle([correctVal, ...distractors.slice(0, 3)]);
+
+      card.innerHTML = `
+        ${vpStepHeader(1, 'Le chiffre allumé')}
+        <p class="ex-question-label">Quelle est la <strong>valeur</strong> du chiffre mis en évidence ?</p>
+        <div class="vp-number-display">${vpNumberHtml(n, pos)}</div>
+        <div class="ex-choices-grid">
+          ${choices.map(c =>
+            `<button class="ex-choice" data-val="${c}">${vpFmt(c)}</button>`
+          ).join('')}
+        </div>
+        <div class="ex-feedback-area" id="vp-fb"></div>
+      `;
+
+      card.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => {
+          const chosen = parseInt(btn.dataset.val);
+          card.querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (parseInt(b.dataset.val) === correctVal) b.classList.add('is-correct');
+          });
+
+          if (chosen === correctVal) {
+            btn.classList.add('is-correct');
+            const expl = d === 0
+              ? `Le chiffre allumé est <strong>0</strong> : sa valeur est toujours <strong>0</strong>.`
+              : `Le chiffre <strong>${d}</strong> est aux <strong>${VP_POS[pos].name}</strong>, donc sa valeur est <strong>${vpFmt(correctVal)}</strong>.`;
+            setFeedback('vp-fb', `<div class="ex-feedback-correct">${rand(SUCCESS)}<br>${expl}</div>`);
+            vpOnCorrect();
+            vpAddNextBtn(card, false);
+          } else {
+            btn.classList.add('is-wrong');
+            const msg = d === 0
+              ? `❌ Le chiffre allumé est <strong>0</strong> — sa valeur est toujours <strong>0</strong>.`
+              : `❌ Le chiffre mis en évidence est <strong>${d}</strong>, il est aux <strong>${VP_POS[pos].name}</strong>, donc sa valeur est <strong>${vpFmt(correctVal)}</strong>.`;
+            setFeedback('vp-fb', `<div class="ex-feedback-wrong">${msg}</div>`);
+            vpState.isFirstTry = false;
+            vpAddNextBtn(card, true);
+          }
+        })
+      );
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       ÉTAPE 2 — Tableau de numération (écoute + clic-pour-placer)
+       Le nombre écrit est masqué : l'élève doit l'entendre pour raisonner.
+       ════════════════════════════════════════════════════════════════════════ */
+
+    /* ── Lecture vocale via Web Speech API ────────────────────────────────── */
+    function vpSpeak(text, btnId) {
+      if (!window.speechSynthesis) return;
+      const btn = btnId ? document.getElementById(btnId) : null;
+      if (btn) { btn.disabled = true; btn.classList.add('is-playing'); btn.textContent = '🔊 …'; }
+      speechSynthesis.cancel();
+      const utter  = new SpeechSynthesisUtterance(text);
+      utter.lang   = 'fr-FR';
+      utter.rate   = 0.82;
+      utter.pitch  = 1;
+      utter.onend  = () => {
+        const b = btnId ? document.getElementById(btnId) : null;
+        if (b) { b.textContent = '🔊 Ré-écouter'; b.disabled = false; b.classList.remove('is-playing'); }
+      };
+      speechSynthesis.speak(utter);
+    }
+
+    function vpStep2(card, item) {
+      const n  = typeof item === 'number' ? item : item.n;
+      const fr = (typeof item === 'object' && item.fr) ? item.fr : n.toString();
+
+      const str = n.toString(), len = str.length;
+      const activePosSet = new Set(str.split('').map((_, i) => len - 1 - i));
+
+      const classGroups = [];
+      if (len >= 7) classGroups.push({ label: 'Classe des millions',  pos: [8,7,6] });
+      if (len >= 4) classGroups.push({ label: 'Classe des milliers',  pos: [5,4,3] });
+      classGroups.push(              { label: 'Classe des unités',    pos: [2,1,0] });
+
+      let tHtml = `<div class="vp-table-wrap"><table class="vp-num-table"><tr>`;
+      classGroups.forEach(g => {
+        const bc = g.label.includes('millions') ? 'vp-class-millions'
+                 : g.label.includes('milliers') ? 'vp-class-milliers'
+                 : 'vp-class-unites';
+        tHtml += `<th colspan="3" class="vp-table-class-header ${bc}">${g.label}</th>`;
+      });
+      tHtml += `</tr><tr>`;
+      classGroups.forEach(g => g.pos.forEach(p => {
+        tHtml += `<th class="vp-col-header">${VP_POS[p].short}</th>`;
+      }));
+      tHtml += `</tr><tr>`;
+      classGroups.forEach(g => g.pos.forEach(p => {
+        if (activePosSet.has(p)) {
+          tHtml += `<td class="vp-drop-cell"><input type="text" inputmode="numeric" maxlength="1" class="vp-input-cell" data-cell="${p}"></td>`;
+        } else {
+          tHtml += `<td class="vp-drop-cell vp-cell-inactive"></td>`;
+        }
+      }));
+      tHtml += `</tr></table></div>`;
+
+      card.innerHTML = `
+        ${vpStepHeader(2, 'Tableau de numération')}
+        <p class="ex-question-label">
+          Écoute le nombre, puis écris chaque chiffre dans la bonne colonne.
+        </p>
+        <div style="text-align:center;margin:8px 0 18px">
+          <button class="vp-audio-btn" id="vp-listen-btn">🔊 Écouter</button>
+          <p class="vp-audio-hint">Clique pour entendre le nombre — ne le cherche pas à l'écran !</p>
+        </div>
+        ${tHtml}
+        <div class="ex-feedback-area" id="vp-fb"></div>
+        <div style="text-align:center;margin-top:10px">
+          <button class="ex-validate-btn" id="vp-val-btn">Valider</button>
+        </div>
+      `;
+
+      /* Audio */
+      document.getElementById('vp-listen-btn')
+        .addEventListener('click', () => vpSpeak(fr, 'vp-listen-btn'));
+
+      /* Navigation au clavier : avance/recule entre les cellules */
+      const inputs = Array.from(card.querySelectorAll('.vp-input-cell'));
+      inputs.forEach((inp, idx) => {
+        inp.addEventListener('input', () => {
+          inp.value = inp.value.replace(/[^0-9]/g, '').slice(-1);
+          if (inp.value && idx + 1 < inputs.length) inputs[idx + 1].focus();
+        });
+        inp.addEventListener('keydown', e => {
+          if (e.key === 'Backspace' && !inp.value && idx > 0) inputs[idx - 1].focus();
+        });
+      });
+
+      /* Validation */
+      document.getElementById('vp-val-btn').addEventListener('click', () => {
+        let wrong = [];
+        inputs.forEach(inp => {
+          const p        = parseInt(inp.dataset.cell);
+          const expected = vpDigitAt(n, p);
+          const actual   = inp.value === '' ? null : parseInt(inp.value);
+          const cell     = inp.closest('td');
+          if (actual === expected) {
+            cell.classList.add('is-correct');
+          } else {
+            cell.classList.add('is-wrong');
+            wrong.push(p);
+          }
+          inp.disabled = true;
+        });
+        document.getElementById('vp-val-btn').disabled = true;
+
+        if (wrong.length === 0) {
+          setFeedback('vp-fb', `<div class="ex-feedback-correct">${rand(SUCCESS)} Tous les chiffres sont bien placés !</div>`);
+          vpOnCorrect();
+          vpAddNextBtn(card, false);
+        } else {
+          const corr = wrong.map(p =>
+            `<strong>${vpDigitAt(n, p)}</strong> aux ${VP_POS[p].name}`
+          ).join(', ');
+          setFeedback('vp-fb', `<div class="ex-feedback-wrong">❌ Quelques erreurs.<br>${vpFmt(n)} = ${corr}.</div>`);
+          vpState.isFirstTry = false;
+          vpAddNextBtn(card, true);
+        }
+      });
+
+      setTimeout(() => vpSpeak(fr, 'vp-listen-btn'), 450);
+    }
+
+
+    /* ════════════════════════════════════════════════════════════════════════
+       ÉTAPE 3 — Chiffre des… (clic sur le bon chiffre)
+       ════════════════════════════════════════════════════════════════════════ */
+
+    function vpStep3(card, item) {
+      const { n, posName, pos } = item;
+      const str = n.toString(), len = str.length;
+
+      let btnsHtml = '';
+      for (let i = 0; i < len; i++) {
+        if (i > 0 && (len - i) % 3 === 0)
+          btnsHtml += `<span class="vp-digit-sep-lg"> </span>`;
+        btnsHtml += `<button class="vp-digit-btn" data-pos="${len - 1 - i}">${str[i]}</button>`;
+      }
+
+      card.innerHTML = `
+        ${vpStepHeader(3, 'Chiffre des…')}
+        <p class="ex-question-label">Clique sur le chiffre des <strong>${posName}</strong>.</p>
+        <div class="vp-number-clickable">${btnsHtml}</div>
+        <div class="ex-feedback-area" id="vp-fb"></div>
+      `;
+
+      const correctDigit = vpDigitAt(n, pos);
+
+      card.querySelectorAll('.vp-digit-btn').forEach(btn =>
+        btn.addEventListener('click', () => {
+          const clickedPos = parseInt(btn.dataset.pos);
+          card.querySelectorAll('.vp-digit-btn').forEach(b => b.disabled = true);
+
+          if (clickedPos === pos) {
+            btn.classList.add('is-correct');
+            setFeedback('vp-fb', `<div class="ex-feedback-correct">${rand(SUCCESS)}<br>
+              Oui ! Le chiffre des <strong>${posName}</strong> de ${vpFmt(n)} est bien <strong>${correctDigit}</strong>.</div>`);
+            vpOnCorrect();
+            vpAddNextBtn(card, false);
+          } else {
+            btn.classList.add('is-wrong');
+            card.querySelectorAll('.vp-digit-btn').forEach(b => {
+              if (parseInt(b.dataset.pos) === pos) b.classList.add('is-correct');
+            });
+            const clickedDigit = vpDigitAt(n, clickedPos);
+            const fb = clickedDigit === correctDigit
+              ? `❌ Attention ! Il y a plusieurs <strong>${clickedDigit}</strong> dans ce nombre. On demandait celui des <strong>${posName}</strong> — pas des ${VP_POS[clickedPos].name}.`
+              : `❌ Tu as cliqué sur le chiffre des <strong>${VP_POS[clickedPos].name}</strong>. Celui des <strong>${posName}</strong> est <strong>${correctDigit}</strong>.`;
+            setFeedback('vp-fb', `<div class="ex-feedback-wrong">${fb}</div>`);
+            vpState.isFirstTry = false;
+            vpAddNextBtn(card, true);
+          }
+        })
+      );
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       ÉTAPE 4 — Nombre de… (animation intro + saisie)
+       ════════════════════════════════════════════════════════════════════════ */
+
+    function vpStep4Intro(card, item) {
+      /* Démonstration avec 45 782 / centaines */
+      const demoN   = 45782, demoPos = 2;
+      const digitH  = vpNumberHtml(demoN, demoPos, 'vp-hl-digit-anim');
+      const blockH  = vpNumberHtmlBlock(demoN, demoPos);
+      const dDigit  = vpDigitAt(demoN, demoPos);
+      const dNombre = Math.floor(demoN / VP_POS[demoPos].val);
+
+      card.innerHTML = `
+        ${vpStepHeader(4, 'Nombre de…')}
+        <div class="vp-intro-card">
+          <div class="vp-intro-title">💡 Rappel — chiffre vs nombre</div>
+          <div class="vp-intro-row">
+            <div>
+              <div class="vp-intro-label">Le <em>chiffre</em> des centaines de ${vpFmt(demoN)} :</div>
+              <div class="vp-intro-numrow">${digitH}</div>
+            </div>
+            <div class="vp-intro-value">${dDigit}</div>
+          </div>
+          <div class="vp-intro-row vp-intro-row2" id="vp-intro-r2" style="opacity:0;transition:opacity 500ms">
+            <div>
+              <div class="vp-intro-label">Le <em>nombre</em> de centaines de ${vpFmt(demoN)} :</div>
+              <div class="vp-intro-numrow">${blockH}</div>
+            </div>
+            <div class="vp-intro-value vp-intro-value-green">${dNombre}</div>
+          </div>
+        </div>
+        <div style="text-align:center">
+          <button class="ex-next-btn" id="vp-intro-ok" style="display:inline-block;margin:0 auto">
+            C’est parti !
+          </button>
+        </div>
+        <div class="ex-feedback-area" id="vp-fb"></div>
+      `;
+
+      setTimeout(() => {
+        const r2 = document.getElementById('vp-intro-r2');
+        if (r2) r2.style.opacity = '1';
+      }, 1400);
+
+      document.getElementById('vp-intro-ok').addEventListener('click', () => {
+        vpState.step4IntroSeen = true;
+        vpStep4(document.getElementById('ex-card'), item);
+      });
+    }
+
+    function vpStep4(card, item) {
+      const { n, posName, placeValue } = item;
+      const pos           = VP_POS.findIndex(p => p.val === placeValue);
+      const correctAnswer = Math.floor(n / placeValue);
+      const digitAnswer   = vpDigitAt(n, pos);
+
+      card.innerHTML = `
+        ${vpStepHeader(4, 'Nombre de…')}
+        <p class="ex-question-label">
+          Quel est le <strong>NOMBRE</strong> de <strong>${posName}</strong> de :
+        </p>
+        <div class="vp-number-display" style="font-size:44px">${vpFmt(n)}</div>
+        <div class="ex-input-row">
+          <input type="number" inputmode="numeric" class="ex-text-input" id="vp-input"
+                 min="0" autocomplete="off" spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="vp-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="vp-fb"></div>
+      `;
+
+      const input  = document.getElementById('vp-input');
+      const valBtn = document.getElementById('vp-val-btn');
+      setTimeout(() => input.focus(), 80);
+
+      function doValidate() {
+        const entered = parseInt(input.value);
+        if (isNaN(entered) || input.value.trim() === '') return;
+        input.disabled = valBtn.disabled = true;
+
+        if (entered === correctAnswer) {
+          input.classList.add('is-correct');
+          setFeedback('vp-fb', `<div class="ex-feedback-correct">${rand(SUCCESS)}<br>
+            Il y a bien <strong>${correctAnswer}</strong> ${posName} dans ${vpFmt(n)}.</div>`);
+          vpOnCorrect();
+          vpAddNextBtn(card, false);
+        } else {
+          input.classList.add('is-wrong');
+          const digitHtml = vpNumberHtml(n, pos, 'vp-hl-digit-anim');
+          const blockHtml = vpNumberHtmlBlock(n, pos);
+          const confFb = entered === digitAnswer
+            ? `<br>⚠️ <strong>${entered}</strong> est le <em>chiffre</em> des ${posName}, pas le <em>nombre</em>.`
+            : '';
+          setFeedback('vp-fb', `
+            <div class="ex-feedback-wrong">❌ Pas tout à fait.${confFb}
+              <table style="margin-top:10px;font-size:13px;border-collapse:collapse;width:100%">
+                <tr>
+                  <td style="padding:6px 8px;color:var(--muted)">Chiffre des ${posName} :</td>
+                  <td style="padding:6px 8px">
+                    <span class="vp-intro-numrow" style="font-size:20px">${digitHtml}</span>
+                    &nbsp;→&nbsp;<strong>${digitAnswer}</strong>
+                  </td>
+                </tr>
+                <tr style="background:rgba(22,163,74,0.05)">
+                  <td style="padding:6px 8px;color:var(--muted)">Nombre de ${posName} :</td>
+                  <td style="padding:6px 8px">
+                    <span class="vp-intro-numrow" style="font-size:20px">${blockHtml}</span>
+                    &nbsp;→&nbsp;<strong>${correctAnswer}</strong>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          `);
+          vpState.isFirstTry = false;
+          vpAddNextBtn(card, true);
+        }
+      }
+
+      valBtn.addEventListener('click', doValidate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       ÉTAPE 5 — La décomposition
+       ════════════════════════════════════════════════════════════════════════ */
+
+    function vpStep5(card, n) {
+      const str = n.toString(), len = str.length;
+      const parts = Array.from(str, (d, i) => ({
+        pos: len - 1 - i,
+        digit: parseInt(d),
+        placeVal: VP_POS[len - 1 - i].val
+      }));
+
+      let decompHtml = '';
+      parts.forEach((p, i) => {
+        if (i > 0) decompHtml += `<span class="vp-decomp-op">+</span>`;
+        decompHtml += `<span class="vp-decomp-term">
+          <input type="number" inputmode="numeric" min="0" max="9"
+                 class="vp-decomp-input" data-pos="${p.pos}" autocomplete="off">
+          ${p.placeVal > 1 ? `<span class="vp-decomp-mult">× ${vpFmt(p.placeVal)}</span>` : ''}
+        </span>`;
+      });
+
+      card.innerHTML = `
+        ${vpStepHeader(5, 'La décomposition')}
+        <p class="ex-question-label">Complète la décomposition :</p>
+        <div class="vp-decomp-number">${vpFmt(n)} =</div>
+        <div class="vp-decomp-row">${decompHtml}</div>
+        <div style="text-align:center;margin-bottom:16px">
+          <button class="ex-validate-btn" id="vp-dec-val">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="vp-fb"></div>
+      `;
+
+      const inputs = card.querySelectorAll('.vp-decomp-input');
+      if (inputs.length) setTimeout(() => inputs[0].focus(), 80);
+
+      inputs.forEach((inp, idx) =>
+        inp.addEventListener('keydown', e => {
+          if (e.key === 'Enter')
+            (idx < inputs.length - 1 ? inputs[idx + 1] : document.getElementById('vp-dec-val')).focus();
+        })
+      );
+
+      document.getElementById('vp-dec-val').addEventListener('click', () => {
+        let allOk = true, hasEmpty = false;
+        inputs.forEach(inp => {
+          if (inp.value.trim() === '') { hasEmpty = true; return; }
+          const pos      = parseInt(inp.dataset.pos);
+          const expected = vpDigitAt(n, pos);
+          const entered  = parseInt(inp.value);
+          inp.disabled   = true;
+          inp.classList.add(entered === expected ? 'is-correct' : 'is-wrong');
+          if (entered !== expected) allOk = false;
+        });
+
+        if (hasEmpty) {
+          setFeedback('vp-fb', `<div class="ex-feedback-wrong">⚠️ Remplis toutes les cases avant de valider.</div>`);
+          inputs.forEach(inp => { inp.disabled = false; inp.classList.remove('is-correct','is-wrong'); });
+          return;
+        }
+        document.getElementById('vp-dec-val').disabled = true;
+
+        if (allOk) {
+          const decomp = parts.map(p =>
+            p.placeVal > 1
+              ? `${p.digit} × ${vpFmt(p.placeVal)}`
+              : `${p.digit}`
+          ).join(' + ');
+          setFeedback('vp-fb', `<div class="ex-feedback-correct">${rand(SUCCESS)}<br>${vpFmt(n)} = ${decomp}</div>`);
+          vpOnCorrect();
+          vpAddNextBtn(card, false);
+        } else {
+          const sol = parts.map(p =>
+            p.placeVal > 1
+              ? `<strong>${p.digit}</strong> × ${vpFmt(p.placeVal)}`
+              : `<strong>${p.digit}</strong>`
+          ).join(' + ');
+          setFeedback('vp-fb', `<div class="ex-feedback-wrong">❌ Quelques erreurs.<br>${vpFmt(n)} = ${sol}</div>`);
+          vpState.isFirstTry = false;
+          vpAddNextBtn(card, true);
+        }
+      });
     }
 
     /* ── Start ────────────────────────────────────────────────────────────── */

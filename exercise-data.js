@@ -2742,6 +2742,357 @@ const EXERCISE_DATA = {
       { parts: 6, colored: 4, shape: "circle",             difficulty: 2 },
       { parts: 9, colored: 6, shape: "rect",  cols: 3,     difficulty: 2 }
     ]
+  },
+
+  "placer-fraction-droite-graduee": {
+    title: "Placer une fraction sur une droite graduée",
+    type: "placer-fraction-droite",
+    levels: ["CM2"],
+    questionsPerSession: 10,
+    backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
+
+    /* ── Banque de questions ─────────────────────────────────────────────
+       level 1 : fraction < 1 — droite de 0 à 1, partagée en denominator parts
+       level 2 : fraction > 1 — droite de 0 à ceil(num/denom), même découpage
+       Tick i représente la valeur i/denominator.
+       La bonne réponse est toujours le tick d'index numerator.
+    ────────────────────────────────────────────────────────────────────── */
+    bank: [
+
+      /* Niveau 1 — fractions inférieures à 1 */
+      { level: 1, numerator: 1, denominator: 2 },
+      { level: 1, numerator: 1, denominator: 3 },
+      { level: 1, numerator: 2, denominator: 3 },
+      { level: 1, numerator: 1, denominator: 4 },
+      { level: 1, numerator: 3, denominator: 4 },
+      { level: 1, numerator: 1, denominator: 5 },
+      { level: 1, numerator: 2, denominator: 5 },
+      { level: 1, numerator: 3, denominator: 5 },
+      { level: 1, numerator: 4, denominator: 5 },
+      { level: 1, numerator: 5, denominator: 6 },
+
+      /* Niveau 2 — fractions supérieures à 1 */
+      { level: 2, numerator: 5,  denominator: 4 },
+      { level: 2, numerator: 3,  denominator: 2 },
+      { level: 2, numerator: 7,  denominator: 4 },
+      { level: 2, numerator: 7,  denominator: 5 },
+      { level: 2, numerator: 9,  denominator: 4 },
+      { level: 2, numerator: 11, denominator: 6 },
+      { level: 2, numerator: 8,  denominator: 3 },
+      { level: 2, numerator: 10, denominator: 4 },
+      { level: 2, numerator: 13, denominator: 8 },
+      { level: 2, numerator: 15, denominator: 6 }
+
+    ]
+  },
+
+  /* ══════════════════════════════════════════════════════════════════════
+     MATHÉMATIQUES — NOMBRES ENTIERS
+  ══════════════════════════════════════════════════════════════════════ */
+
+  "ecrire-nombre-entier-chiffres": {
+    title: "Écrire un nombre en chiffres",
+    type: "nombre-entier",
+    levels: ["CM1", "CM2"],
+    questionsPerSession: 12,
+    backLink: { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
+
+    bank: [
+
+      /* ── CM1 — 15 questions, jusqu'à 999 999 ──────────────────────────── */
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "soixante-cinq",
+        answer: "65", choices: ["65", "56", "605", "650"] },
+      { level: "CM1", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "soixante-treize",
+        answer: "73" },
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "deux-cent-douze",
+        answer: "212", choices: ["212", "221", "2 012", "2 120"] },
+      { level: "CM1", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "quatre-cent-soixante",
+        answer: "460" },
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "mille-deux-cent-huit",
+        answer: "1 208", choices: ["1 208", "1 280", "12 008", "1 028"] },
+      { level: "CM1", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "trois-mille-quatre-vingts",
+        answer: "3 080" },
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "cinq-mille-soixante",
+        answer: "5 060", choices: ["5 060", "5 600", "5 006", "560"] },
+      { level: "CM1", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "douze-mille-cinq",
+        answer: "12 005" },
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "quarante-cinq-mille-trois-cents",
+        answer: "45 300", choices: ["45 300", "45 030", "45 003", "43 500"] },
+      { level: "CM1", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "quatre-vingt-sept-mille-six-cent-trente-neuf",
+        answer: "87 639" },
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "cent-mille-huit",
+        answer: "100 008", choices: ["100 008", "100 080", "10 008", "100 800"] },
+      { level: "CM1", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "deux-cent-mille-cent",
+        answer: "200 100" },
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "cinq-cent-mille-deux-cent-soixante",
+        answer: "500 260", choices: ["500 260", "500 026", "500 206", "502 060"] },
+      { level: "CM1", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "six-cent-quarante-deux-mille-treize",
+        answer: "642 013" },
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "neuf-cent-mille-neuf-cent-un",
+        answer: "900 901", choices: ["900 901", "990 901", "900 191", "900 910"] },
+
+      /* ── CM2 — 15 questions, jusqu'à 999 999 999 ──────────────────────── */
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "un-million",
+        answer: "1 000 000", choices: ["1 000 000", "100 000", "1 000", "10 000 000"] },
+      { level: "CM2", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "deux-millions-trois-cent-mille",
+        answer: "2 300 000" },
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "cinq-millions-cinquante",
+        answer: "5 000 050", choices: ["5 000 050", "5 000 500", "5 050 000", "5 005 000"] },
+      { level: "CM2", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "dix-millions-quatre-cent-vingt-mille",
+        answer: "10 420 000" },
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "vingt-cinq-millions",
+        answer: "25 000 000", choices: ["25 000 000", "2 500 000", "250 000 000", "25 000"] },
+      { level: "CM2", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "cinquante-millions-six-mille",
+        answer: "50 006 000" },
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "un-million-deux-cent-mille",
+        answer: "1 200 000", choices: ["1 200 000", "1 020 000", "1 002 000", "12 000 000"] },
+      { level: "CM2", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "soixante-quinze-millions-trois-cent-mille-quarante-deux",
+        answer: "75 300 042" },
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "cent-millions",
+        answer: "100 000 000", choices: ["100 000 000", "10 000 000", "1 000 000 000", "100 000"] },
+      { level: "CM2", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "deux-cent-millions",
+        answer: "200 000 000" },
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "trois-cent-quarante-cinq-millions-six-cent-soixante-dix-huit-mille-neuf-cent-douze",
+        answer: "345 678 912", choices: ["345 678 912", "345 768 912", "354 678 912", "345 678 921"] },
+      { level: "CM2", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "huit-cent-millions-huit-cents",
+        answer: "800 000 800" },
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "deux-cent-cinquante-quatre-millions-sept-cent-trente-deux-mille-cent-neuf",
+        answer: "254 732 109", choices: ["254 732 109", "254 732 190", "254 732 019", "254 730 109"] },
+      { level: "CM2", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "neuf-millions-neuf-cent-mille-neuf-cents",
+        answer: "9 900 900" },
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "quatre-cent-millions-dix-mille-soixante",
+        answer: "400 010 060", choices: ["400 010 060", "400 100 060", "400 010 600", "400 001 060"] }
+    ]
+  },
+
+  "ecrire-nombre-entier-lettres": {
+    title: "Écrire un nombre en lettres",
+    type: "nombre-entier",
+    levels: ["CM1", "CM2"],
+    questionsPerSession: 12,
+    backLink: { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
+    bank: [
+
+      /* ── CM1 — 15 questions, jusqu'à 999 999 ──────────────────────────── */
+      /* Pièges : accord de -vingts/-cent/-cents, invariabilité de mille     */
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "80",
+        answer: "quatre-vingts",
+        choices: ["quatre-vingts", "quatre-vingt", "huitante", "quatre-vingt-zéro"] },
+      { level: "CM1", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "21",
+        answer: "vingt-et-un" },
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "200",
+        answer: "deux-cents",
+        choices: ["deux-cents", "deux-cent", "deux-centièmes", "vingt-zéros"] },
+      { level: "CM1", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "203",
+        answer: "deux-cent-trois" },
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "81",
+        answer: "quatre-vingt-un",
+        choices: ["quatre-vingt-un", "quatre-vingts-un", "quatre-vingt-et-un", "huitante-un"] },
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "71",
+        answer: "soixante-et-onze",
+        choices: ["soixante-et-onze", "soixante-onze", "soixante-et-un", "septante-et-un"] },
+      { level: "CM1", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "300",
+        answer: "trois-cents" },
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "2 000",
+        answer: "deux-mille",
+        choices: ["deux-mille", "deux-milles", "deux-milliers", "vingt-cents"] },
+      { level: "CM1", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "1 200",
+        answer: "mille-deux-cents" },
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "1 201",
+        answer: "mille-deux-cent-un",
+        choices: ["mille-deux-cent-un", "mille-deux-cents-un", "mille-deux-cent-et-un", "mille-deux-cents-et-un"] },
+      { level: "CM1", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "3 500",
+        answer: "trois-mille-cinq-cents" },
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "80 000",
+        answer: "quatre-vingt-mille",
+        choices: ["quatre-vingt-mille", "quatre-vingts-mille", "quatre-vingt-milles", "quatre-vingts-milles"] },
+      { level: "CM1", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "100 000",
+        answer: "cent-mille" },
+      { level: "CM1", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "45 300",
+        answer: "quarante-cinq-mille-trois-cents",
+        choices: ["quarante-cinq-mille-trois-cents", "quarante-cinq-mille-trois-cent", "quarante-cinq-milles-trois-cents", "quarante-cinq-mille-trois-centaines"] },
+      { level: "CM1", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "200 400",
+        answer: "deux-cent-mille-quatre-cents" },
+
+      /* ── CM2 — 15 questions, millions et milliards ─────────────────────── */
+      /* Pièges : million/millions, cent devant million, milliard             */
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "1 000 000",
+        answer: "un-million",
+        choices: ["un-million", "un-mille-mille", "mille-mille", "un-milliard"] },
+      { level: "CM2", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "2 000 000",
+        answer: "deux-millions" },
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "100 000 000",
+        answer: "cent-millions",
+        choices: ["cent-millions", "cents-millions", "cent-million", "cent-mille-mille"] },
+      { level: "CM2", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "3 000 000",
+        answer: "trois-millions" },
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "200 000 000",
+        answer: "deux-cent-millions",
+        choices: ["deux-cent-millions", "deux-cents-millions", "deux-cent-million", "vingt-millions"] },
+      { level: "CM2", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "5 000 200",
+        answer: "cinq-millions-deux-cents" },
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "1 000 000 000",
+        answer: "un-milliard",
+        choices: ["un-milliard", "un-billion", "mille-millions", "un-mille-millions"] },
+      { level: "CM2", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "12 000 000",
+        answer: "douze-millions" },
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "1 200 000",
+        answer: "un-million-deux-cent-mille",
+        choices: ["un-million-deux-cent-mille", "un-million-deux-cents-mille", "un-million-deux-cent-milles", "douze-cent-mille"] },
+      { level: "CM2", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "750 000 000",
+        answer: "sept-cent-cinquante-millions" },
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "500 000 000",
+        answer: "cinq-cent-millions",
+        choices: ["cinq-cent-millions", "cinq-cents-millions", "cinq-cent-million", "cinq-mille-cent-mille"] },
+      { level: "CM2", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "2 500 000",
+        answer: "deux-millions-cinq-cent-mille" },
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "25 000 000",
+        answer: "vingt-cinq-millions",
+        choices: ["vingt-cinq-millions", "vingt-cinq-million", "vingt-cinq-milles-mille", "vingt-et-cinq-millions"] },
+      { level: "CM2", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "300 045 000",
+        answer: "trois-cent-millions-quarante-cinq-mille" },
+      { level: "CM2", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "99 099 099",
+        answer: "quatre-vingt-dix-neuf-millions-quatre-vingt-dix-neuf-mille-quatre-vingt-dix-neuf",
+        choices: [
+          "quatre-vingt-dix-neuf-millions-quatre-vingt-dix-neuf-mille-quatre-vingt-dix-neuf",
+          "quatre-vingts-dix-neuf-millions-quatre-vingt-dix-neuf-mille-quatre-vingt-dix-neuf",
+          "quatre-vingt-dix-neuf-millions-quatre-vingt-dix-neuf-mille-quatre-vingt-neuf",
+          "quatre-vingt-dix-neuf-millions-quatre-vingt-dix-mille-quatre-vingt-dix-neuf"
+        ] }
+    ]
+  }
+
+,
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     Identifier la valeur d'un chiffre selon sa position — 5 étapes
+     ═══════════════════════════════════════════════════════════════════════ */
+  "identifier-valeur-chiffre-position": {
+    title: "Identifier la valeur d'un chiffre selon sa position",
+    type:  "valeur-position",
+    levels: ["CM1", "CM2", "6e"],
+    questionsPerSession: 13,
+    backLink: { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
+
+    /* Étape 1 — "Le chiffre allumé" : { n, pos } — pos = rang depuis la droite (0=unités) */
+    step1Pool: [
+      { n: 4582,   pos: 2 },   /* 5 → 500                                               */
+      { n: 7346,   pos: 3 },   /* 7 → 7 000                                             */
+      { n: 93508,  pos: 2 },   /* 5 → 500   (zéro adjacent)                             */
+      { n: 4484,   pos: 2 },   /* 4 → 400   (piège : chiffre 4 répété trois fois)       */
+      { n: 71204,  pos: 1 },   /* 0 → 0     (piège : le chiffre allumé est un zéro)     */
+      { n: 358209, pos: 5 },   /* 3 → 300 000                                           */
+      { n: 62850,  pos: 4 },   /* 6 → 60 000                                            */
+      { n: 834567, pos: 3 },   /* 4 → 4 000                                             */
+      { n: 209300, pos: 4 },   /* 0 → 0     (piège : zéro à position haute)             */
+      { n: 540821, pos: 5 },   /* 5 → 500 000                                           */
+    ],
+
+    /* Étape 2 — Tableau de numération : { n, fr } — fr = texte lu à voix haute */
+    step2Pool: [
+      { n: 6254,   fr: "six mille deux cent cinquante-quatre" },
+      { n: 30508,  fr: "trente mille cinq cent huit" },           /* zéro intercalé */
+      { n: 72061,  fr: "soixante-douze mille soixante et un" },
+      { n: 103475, fr: "cent trois mille quatre cent soixante-quinze" },
+      { n: 4009,   fr: "quatre mille neuf" },                     /* deux zéros     */
+      { n: 81300,  fr: "quatre-vingt-un mille trois cents" },
+    ],
+
+    /* Étape 3 — "Clique sur le chiffre des…" : { n, posName, pos } */
+    step3Pool: [
+      { n: 23508,   posName: "milliers",              pos: 3 },  /* 3 (zéro adjacent)        */
+      { n: 4484,    posName: "centaines",              pos: 2 },  /* 4 (piège : trois fois 4) */
+      { n: 53042800, posName: "dizaines de millions",  pos: 7 },  /* 5 (8 chiffres)           */
+      { n: 69482,   posName: "dizaines",               pos: 1 },  /* 8                        */
+      { n: 105070,  posName: "centaines de milliers",  pos: 5 },  /* 1                        */
+      { n: 833912,  posName: "dizaines de milliers",   pos: 4 },  /* 3 (piège : deux fois 3)  */
+      { n: 40300,   posName: "centaines",              pos: 2 },  /* 3                        */
+      { n: 2050900, posName: "millions",               pos: 6 },  /* 2                        */
+    ],
+
+    /* Étape 4 — "Nombre de…" : { n, posName, placeValue }
+       Réponse = Math.floor(n / placeValue)
+       Piège classique : élève répond chiffre=7 au lieu de nombre=457 */
+    step4Pool: [
+      { n: 45782,   posName: "centaines",             placeValue: 100    },  /* 457 (chiffre=7) */
+      { n: 30508,   posName: "milliers",              placeValue: 1000   },  /* 30  (zéro)      */
+      { n: 2345678, posName: "dizaines de milliers",  placeValue: 10000  },  /* 234             */
+      { n: 96300,   posName: "centaines",             placeValue: 100    },  /* 963             */
+      { n: 1050000, posName: "dizaines de milliers",  placeValue: 10000  },  /* 105             */
+      { n: 74839,   posName: "milliers",              placeValue: 1000   },  /* 74              */
+      { n: 830247,  posName: "centaines de milliers", placeValue: 100000 },  /* 8               */
+      { n: 5070,    posName: "milliers",              placeValue: 1000   },  /* 5               */
+    ],
+
+    /* Étape 5 — Décomposition : nombres dont zéros intercalés en piège final */
+    step5Pool: [
+      4582,    /* 4×1 000 + 5×100 + 8×10 + 2                                   */
+      30508,   /* 3×10 000 + 0×1 000 + 5×100 + 0×10 + 8  (piège requis)       */
+      716043,  /* 6 chiffres avec zéro                                          */
+      8200,    /* 4 chiffres, zéros finaux                                       */
+      90305,   /* 5 chiffres, deux zéros                                        */
+      403026,  /* 6 chiffres, deux zéros                                        */
+    ]
   }
 
 };
