@@ -243,6 +243,43 @@
                  required autocomplete="current-password" placeholder="••••••••">
         </div>
         <button class="auth-submit" type="submit" id="login-btn">Se connecter</button>
+        <button type="button" id="forgot-link" style="display:none;background:none;border:none;color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer;margin-top:4px;text-align:center;width:100%;transition:color 180ms"
+                onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--muted)'">
+          Mot de passe oublié ?
+        </button>
+      </form>
+
+      <!-- Formulaire "Mot de passe oublié" -->
+      <form class="auth-form" id="forgot-form" style="display:none" novalidate>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:4px">
+          Saisissez votre adresse e-mail. Vous recevrez un lien pour choisir un nouveau mot de passe.
+        </p>
+        <div class="auth-field">
+          <label class="auth-label" for="forgot-email">Adresse e-mail</label>
+          <input class="auth-input" id="forgot-email" type="email"
+                 required autocomplete="email" placeholder="prenom.nom@lfmadrid.org">
+        </div>
+        <button class="auth-submit" type="submit" id="forgot-btn">Envoyer le lien</button>
+        <button type="button" id="forgot-back"
+                style="background:none;border:none;color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer;margin-top:4px;text-align:center;width:100%;transition:color 180ms"
+                onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--muted)'">
+          ← Retour à la connexion
+        </button>
+      </form>
+
+      <!-- Formulaire de réinitialisation de mot de passe (lien reçu par e-mail) -->
+      <form class="auth-form" id="reset-form" style="display:none" novalidate>
+        <div class="auth-field">
+          <label class="auth-label" for="reset-pwd">Nouveau mot de passe</label>
+          <input class="auth-input" id="reset-pwd" type="password"
+                 required autocomplete="new-password" placeholder="8 caractères minimum">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="reset-pwd2">Confirmer le mot de passe</label>
+          <input class="auth-input" id="reset-pwd2" type="password"
+                 required autocomplete="new-password" placeholder="••••••••">
+        </div>
+        <button class="auth-submit" type="submit" id="reset-btn">Enregistrer le nouveau mot de passe</button>
       </form>
 
       <!-- Formulaire d'inscription (enseignant uniquement) -->
@@ -358,6 +395,27 @@
       }
     }
 
+    /* ── "Mot de passe oublié" : visible uniquement pour les enseignants ───── */
+    if (role === 'enseignant') {
+      document.getElementById('forgot-link').style.display = '';
+    }
+
+    /* ── Détection du mode récupération de mot de passe ─────────────────── */
+    lfmDb.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        document.getElementById('auth-icon').textContent     = '🔑';
+        document.getElementById('auth-title').textContent    = 'Nouveau mot de passe';
+        document.getElementById('auth-subtitle').textContent = 'Choisissez un mot de passe sécurisé';
+        document.getElementById('auth-tabs').style.display   = 'none';
+        document.getElementById('auth-info').style.display   = 'none';
+        document.getElementById('login-form').style.display  = 'none';
+        document.getElementById('forgot-form').style.display = 'none';
+        document.getElementById('reg-form').style.display    = 'none';
+        document.getElementById('reset-form').style.display  = '';
+        clearMsg();
+      }
+    });
+
     /* ── Redirection si déjà connecté ────────────────────────────────────── */
     (async () => {
       const session = await lfmAuth.getSession();
@@ -383,9 +441,9 @@
     }
 
     /* Mémorise le label initial de chaque bouton */
-    ['login-btn', 'reg-btn'].forEach(id => {
+    ['login-btn', 'reg-btn', 'forgot-btn', 'reset-btn'].forEach(id => {
       const el = document.getElementById(id);
-      el.dataset.label = el.textContent;
+      if (el) el.dataset.label = el.textContent;
     });
 
     /* ── Onglets ─────────────────────────────────────────────────────────── */
@@ -443,6 +501,69 @@
             : 'Identifiants incorrects. Vérifiez votre e-mail et votre mot de passe.'
           : 'Connexion impossible. Réessayez dans quelques instants.';
         showMsg(msg, 'error');
+        setLoading(btn, false);
+      }
+    });
+
+    /* ── Lien "Mot de passe oublié" ─────────────────────────────────────── */
+    document.getElementById('forgot-link').addEventListener('click', () => {
+      document.getElementById('login-form').style.display  = 'none';
+      document.getElementById('forgot-form').style.display = '';
+      clearMsg();
+    });
+
+    document.getElementById('forgot-back').addEventListener('click', () => {
+      document.getElementById('forgot-form').style.display = 'none';
+      document.getElementById('login-form').style.display  = '';
+      clearMsg();
+    });
+
+    /* ── Formulaire "Mot de passe oublié" ────────────────────────────────── */
+    document.getElementById('forgot-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      clearMsg();
+      const btn   = document.getElementById('forgot-btn');
+      const email = document.getElementById('forgot-email').value.trim();
+      setLoading(btn, true);
+      try {
+        const redirectTo = window.location.origin + window.location.pathname;
+        await lfmAuth.resetPassword(email, redirectTo);
+        showMsg(
+          'Un lien de réinitialisation vous a été envoyé. Vérifiez votre boîte e-mail (et vos spams).',
+          'success'
+        );
+        document.getElementById('forgot-form').reset();
+      } catch (err) {
+        showMsg('Impossible d\'envoyer le lien. Vérifiez l\'adresse e-mail saisie.', 'error');
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+
+    /* ── Formulaire de réinitialisation de mot de passe ─────────────────── */
+    document.getElementById('reset-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      clearMsg();
+      const btn  = document.getElementById('reset-btn');
+      const pwd  = document.getElementById('reset-pwd').value;
+      const pwd2 = document.getElementById('reset-pwd2').value;
+
+      if (pwd.length < 8) {
+        showMsg('Le mot de passe doit contenir au moins 8 caractères.', 'error');
+        return;
+      }
+      if (pwd !== pwd2) {
+        showMsg('Les deux mots de passe ne correspondent pas.', 'error');
+        return;
+      }
+
+      setLoading(btn, true);
+      try {
+        await lfmAuth.updatePassword(pwd);
+        showMsg('Mot de passe modifié avec succès ! Redirection vers votre espace…', 'success');
+        setTimeout(() => lfmAuth.redirectToDashboard('enseignant'), 2200);
+      } catch (err) {
+        showMsg('Erreur : ' + err.message, 'error');
         setLoading(btn, false);
       }
     });

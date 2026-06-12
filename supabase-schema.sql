@@ -318,3 +318,50 @@ AS $$
       AND teacher_id   = auth.uid()
   );
 $$;
+
+
+-- ═══════════════════════════════════════════════════════════════════════════
+--  MISE À JOUR V5 — EMAIL ENSEIGNANTS + SUPPRESSION ENSEIGNANT
+--  À exécuter dans Supabase Dashboard → SQL Editor.
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- Fonction sécurisée : retourne les enseignants actifs avec leur email (auth.users)
+-- Accessible uniquement aux admins via RPC.
+CREATE OR REPLACE FUNCTION public.get_teachers_with_email()
+RETURNS TABLE(
+  id            UUID,
+  display_name  TEXT,
+  email         TEXT,
+  status        TEXT,
+  created_at    TIMESTAMPTZ,
+  class_count   BIGINT,
+  student_count BIGINT
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF public.my_role() != 'admin' THEN
+    RAISE EXCEPTION 'Accès refusé';
+  END IF;
+
+  RETURN QUERY
+  SELECT
+    p.id,
+    p.display_name,
+    u.email::TEXT,
+    p.status,
+    p.created_at,
+    COUNT(DISTINCT c.id)::BIGINT  AS class_count,
+    COUNT(DISTINCT s.id)::BIGINT  AS student_count
+  FROM public.profiles p
+  JOIN auth.users u ON u.id = p.id
+  LEFT JOIN public.classes  c ON c.teacher_id = p.id
+  LEFT JOIN public.students s ON s.teacher_id = p.id
+  WHERE p.role   = 'enseignant'
+    AND p.status = 'active'
+  GROUP BY p.id, p.display_name, u.email, p.status, p.created_at
+  ORDER BY p.display_name;
+END;
+$$;

@@ -52,35 +52,22 @@ const lfmAdmin = (() => {
     if (error) throw error;
   }
 
-  /* ── Liste des enseignants actifs avec leurs stats ───────────────────────── */
+  /* ── Liste des enseignants actifs avec email et stats ────────────────────── */
+  /* Utilise la fonction SQL get_teachers_with_email() (voir migration V5 du schéma) */
   async function getTeachers() {
-    const { data, error } = await db
-      .from('profiles')
-      .select('id, display_name, created_at')
-      .eq('role', 'enseignant')
-      .eq('status', 'active')
-      .order('display_name');
+    const { data, error } = await db.rpc('get_teachers_with_email');
     if (error) throw error;
+    return data || [];
+  }
 
-    const teachers = data || [];
-    if (teachers.length === 0) return [];
-
-    const ids = teachers.map(t => t.id);
-    const [classesRes, studentsRes] = await Promise.all([
-      db.from('classes').select('teacher_id').in('teacher_id', ids),
-      db.from('students').select('teacher_id').in('teacher_id', ids)
-    ]);
-
-    const classCount   = {};
-    const studentCount = {};
-    (classesRes.data  || []).forEach(c => { classCount[c.teacher_id]   = (classCount[c.teacher_id]   || 0) + 1; });
-    (studentsRes.data || []).forEach(s => { studentCount[s.teacher_id] = (studentCount[s.teacher_id] || 0) + 1; });
-
-    return teachers.map(t => ({
-      ...t,
-      class_count:   classCount[t.id]   || 0,
-      student_count: studentCount[t.id] || 0
-    }));
+  /* ── Supprimer un enseignant ──────────────────────────────────────────────── */
+  async function deleteTeacher(id) {
+    const { data, error } = await db.functions.invoke('delete-teacher', {
+      body: { teacher_id: id }
+    });
+    if (error) throw new Error(error.message || 'Erreur lors de la suppression');
+    if (data && data.error) throw new Error(data.error);
+    return data;
   }
 
   /* ── Toutes les classes avec enseignant et nb élèves ─────────────────────── */
@@ -144,6 +131,6 @@ const lfmAdmin = (() => {
   return {
     getGlobalStats,
     getPendingTeachers, approveTeacher, rejectTeacher,
-    getTeachers, getAllClasses, exportAllStudents
+    getTeachers, getAllClasses, exportAllStudents, deleteTeacher
   };
 })();

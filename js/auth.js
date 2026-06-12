@@ -87,5 +87,17 @@ const lfmAuth = (() => {
     return profile;
   }
 
-  return { signIn, signUp, signOut, getSession, getProfile, redirectToDashboard, requireRole };
+  /* Envoie un e-mail de réinitialisation de mot de passe ──────────────────── */
+  async function resetPassword(email, redirectTo) {
+    const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo });
+    if (error) throw error;
+  }
+
+  /* Définit un nouveau mot de passe (après clic sur le lien de reset) ─────── */
+  async function updatePassword(newPassword) {
+    const { error } = await db.auth.updateUser({ password: newPassword });
+    if (error) throw error;
+  }
+
+  return { signIn, signUp, signOut, getSession, getProfile, redirectToDashboard, requireRole, resetPassword, updatePassword };
 })();
