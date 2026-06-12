@@ -11,4 +11,14 @@
 const SUPABASE_URL  = 'https://wugqxkiljayqqnzdctuf.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_EuUKNCFYOehAe16-udO1Jg_r0RL7OFy';
 
-window.lfmDb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+window.lfmDb = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  }
+);
