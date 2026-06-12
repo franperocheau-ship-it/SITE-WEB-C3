@@ -526,7 +526,8 @@
       const email = document.getElementById('forgot-email').value.trim();
       setLoading(btn, true);
       try {
-        const redirectTo = window.location.origin + window.location.pathname;
+       const redirectTo =
+  'https://franperocheau-ship-it.github.io/SITE-WEB-C3/auth.html?role=enseignant';
         await lfmAuth.resetPassword(email, redirectTo);
         showMsg(
           'Un lien de réinitialisation vous a été envoyé. Vérifiez votre boîte e-mail (et vos spams).',
