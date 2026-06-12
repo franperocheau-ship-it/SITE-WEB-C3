@@ -136,6 +136,8 @@ const lfmTeacher = (() => {
         results.push({ ok: false, name, error: err.message });
       }
       if (onProgress) onProgress(i + 1, names.length);
+      // Pause entre chaque signUp pour rester sous le rate limit Supabase (auth IP)
+      if (i < names.length - 1) await new Promise(r => setTimeout(r, 450));
     }
     return results;
   }

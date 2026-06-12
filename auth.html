@@ -591,10 +591,21 @@
           'success'
         );
         document.getElementById('forgot-form').reset();
+        /* Cooldown 60 s : évite de saturer le quota Supabase (2-3 resets/h par e-mail) */
+        let remaining = 60;
+        btn.dataset.label = 'Renvoyer le lien';
+        btn.textContent = `Patienter ${remaining} s…`;
+        const tick = setInterval(() => {
+          remaining--;
+          btn.textContent = `Patienter ${remaining} s…`;
+          if (remaining <= 0) {
+            clearInterval(tick);
+            setLoading(btn, false);
+          }
+        }, 1000);
       } catch (err) {
         console.error('[LFM] Erreur reset mot de passe:', err);
         showMsg('Impossible d\'envoyer le lien : ' + err.message, 'error');
-      } finally {
         setLoading(btn, false);
       }
     });
@@ -662,6 +673,8 @@
         document.getElementById('reg-form').reset();
         const m = document.getElementById('reg-pwd2-match');
         m.textContent = ''; m.className = 'pwd-match';
+        /* Ne pas ré-activer le bouton : la demande est envoyée, soumettre à nouveau n'a pas de sens */
+        return;
       } catch (err) {
         console.error('[LFM] Erreur inscription Supabase:', err);
         let msg;
