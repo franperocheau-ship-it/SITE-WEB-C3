@@ -606,7 +606,7 @@
     document.getElementById('student-avatar').textContent     = initial;
     document.getElementById('student-header-name').textContent = s.display_name;
     document.getElementById('student-header-meta').textContent =
-      [s.class_name, s.class_level].filter(Boolean).join(' · ');
+      [s.class_level, s.class_name].filter(Boolean).join(' · ') || 'Ressources numériques pour le cycle 3';
 
     let stats = null;
     try {
