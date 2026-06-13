@@ -1585,12 +1585,14 @@
     let wordOrderAnswer  = [];   /* word-order type */
     let conjTableRows    = [];   /* conjugation-table type */
     let pfiSelectedLevel = null; /* produire-3-formes : niveau sélectionné */
+    let accordLevel      = null; /* accord-ecrit      : niveau sélectionné */
     let vpState      = null;     /* valeur-position  : état de session     */
     let vpTableSt    = null;     /* valeur-position  : état tableau étape 2 */
 
     const SUCCESS = ["✅ Bravo !", "✨ Très bien !", "🌟 Exact !"];
 
     const TYPE_META = {
+      "accord-ecrit":      { icon: "✍️", name: "Écris la bonne forme",          desc: "Transforme le groupe nominal en écrivant ta réponse" },
       "fill-blank":        { icon: "✏️", name: "Complète la phrase",           desc: "Choisis la bonne forme du verbe" },
       "multiple-choice":   { icon: "🎯", name: "Choix multiple",               desc: "Quelle forme correspond à ce sujet ?" },
       "matching":          { icon: "🔗", name: "Associe sujet et forme",        desc: "Relie chaque sujet à sa conjugaison" },
@@ -1652,6 +1654,7 @@
 
     function startSession() {
       pfiSelectedLevel = null;
+      accordLevel      = null;
       fracLevel        = null;
       rfLevel          = null;
       nlLevel          = null;
@@ -1740,6 +1743,53 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
+    function showAccordLevelSelect() {
+      document.getElementById("type-select-screen").classList.add("ex-hidden");
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels   = sessionData.levels || ["CM1", "CM2", "6e"];
+      const descs    = sessionData.levelDescs || {
+        "CM1": "Notions de base",
+        "CM2": "Notions intermédiaires",
+        "6e":  "Notions avancées"
+      };
+      const badgeCls = { "CM1": "badge-cm1", "CM2": "badge-cm2", "6e": "badge-6e" };
+      const diffMap  = { "CM1": 1, "CM2": 2, "6e": 3 };
+
+      const grid = document.getElementById("ex-level-grid");
+      grid.innerHTML = levels.map(l => `
+        <button class="ex-type-card" data-level="${l}">
+          <span class="ex-type-icon">
+            <span class="badge ${badgeCls[l] || 'badge-cm1'}" style="font-size:13px;padding:4px 12px">${l}</span>
+          </span>
+          <div>
+            <span class="ex-type-name">${l}</span>
+            <span class="ex-type-desc">${descs[l] || ''}</span>
+          </div>
+        </button>`).join('');
+
+      grid.querySelectorAll(".ex-type-card").forEach(btn =>
+        btn.addEventListener("click", () => {
+          accordLevel = btn.dataset.level;
+          const diff  = diffMap[accordLevel];
+          const filtered = (sessionData.bank || []).filter(q => q.difficulty === diff);
+          const n = sessionData.questionsPerSession || 15;
+          questions = shuffle(filtered).slice(0, n);
+          currentIndex = 0;
+          score        = 0;
+          document.getElementById("q-total").textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        })
+      );
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
     function startSessionWithType(type) {
       currentType = type;
       sessionStartTime = Date.now();
@@ -1793,6 +1843,12 @@
         return;
       }
 
+      /* accord-ecrit : ask for level, then filter bank by difficulty */
+      if (currentType === "accord-ecrit" && !accordLevel) {
+        showAccordLevelSelect();
+        return;
+      }
+
       document.getElementById("results-screen").classList.add("ex-hidden");
       document.getElementById("exercise-screen").classList.remove("ex-hidden");
 
@@ -1826,6 +1882,8 @@
         renderGuessSubject(card, q);
       } else if (currentType === "word-order") {
         renderWordOrder(card, q);
+      } else if (currentType === "accord-ecrit") {
+        renderAccordEcrit(card, q);
       } else if (currentType === "text-input") {
         renderTextInput(card, q);
       } else if (currentType === "auxiliaire-identifier") {
@@ -2352,7 +2410,7 @@
       /* Enregistrement du résultat pour les élèves connectés */
       const slug = new URLSearchParams(window.location.search).get('slug');
       const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
-      const activeLevel = pfiSelectedLevel || fracLevel || rfLevel || nlLevel || nbEntierLevel || null;
+      const activeLevel = pfiSelectedLevel || accordLevel || fracLevel || rfLevel || nlLevel || nbEntierLevel || null;
       saveExerciseResult({
         exerciseSlug: slug,
         subject,
@@ -2417,6 +2475,61 @@
           <div class="ex-feedback-wrong">
             ❌ Ce n'est pas la bonne réponse.<br>
             La bonne réponse était : <strong>${q.answer}</strong>
+          </div>
+        `);
+      }
+      showNextBtn();
+    }
+
+    /* ── Type: accord-ecrit ──────────────────────────────────────────────────
+       Student reads an instruction, sees a GN to transform, and types the
+       correct form. Supports q.answer (string) or q.answers (array).
+       Questions are pre-filtered by difficulty level before session starts.
+    ────────────────────────────────────────────────────────────────────────── */
+
+    function renderAccordEcrit(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction}</p>
+        <div class="ex-verb-display">${q.prompt}</div>
+        ${q.sentence ? `<div class="ex-sentence-display" style="margin-top:10px">${q.sentence}</div>` : ''}
+        <div class="ex-input-row" style="margin-top:18px">
+          <input type="text" class="ex-text-input" id="ex-accord-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="ex-accord-validate">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      const input  = document.getElementById("ex-accord-input");
+      const valBtn = document.getElementById("ex-accord-validate");
+      setTimeout(() => input.focus(), 50);
+      valBtn.addEventListener("click",  () => handleAccordEcrit(q));
+      input.addEventListener("keydown", e => { if (e.key === "Enter") handleAccordEcrit(q); });
+    }
+
+    function handleAccordEcrit(q) {
+      const input  = document.getElementById("ex-accord-input");
+      const valBtn = document.getElementById("ex-accord-validate");
+      if (!input.value.trim()) return;
+
+      input.disabled  = true;
+      valBtn.disabled = true;
+
+      const accepted = Array.isArray(q.answers) ? q.answers : [q.answer];
+      const isRight  = accepted.some(a => normalize(input.value) === normalize(a));
+      input.classList.add(isRight ? "is-correct" : "is-wrong");
+
+      if (isRight) {
+        score++;
+        setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+      } else {
+        const correct = accepted[0];
+        const others  = accepted.slice(1).map(a => `<strong>${a}</strong>`).join(', ');
+        setFeedback("feedback1", `
+          <div class="ex-feedback-wrong">
+            ❌ Pas tout à fait !<br>
+            La bonne réponse : <strong>${correct}</strong>${others ? ` (ou ${others})` : ''}
           </div>
         `);
       }

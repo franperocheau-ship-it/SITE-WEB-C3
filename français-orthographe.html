@@ -544,6 +544,14 @@
       }
     ];
 
+    /* ── Exercices disponibles ─────────────────────────────────────────────── */
+    const EXERCISE_SLUGS = new Set([
+      "ortho-accorder-determinant-nom",
+      "ortho-accorder-adjectif-nom"
+    ]);
+
+    const CUSTOM_HREFS = {};
+
     /* ── Badge rendering ───────────────────────────────────────────────────── */
     function renderBadges(levels) {
       return levels.map(level => {
@@ -554,14 +562,17 @@
 
     /* ── Skill card rendering ──────────────────────────────────────────────── */
     function renderSkillCard(skill, sectionId) {
+      const hasExercise = EXERCISE_SLUGS.has(skill.slug) || skill.slug in CUSTOM_HREFS;
+      const href        = CUSTOM_HREFS[skill.slug] || (EXERCISE_SLUGS.has(skill.slug) ? `exercise.html?slug=${skill.slug}` : "#");
+      const onclick     = hasExercise ? "" : `onclick="return false;"`;
       return `
         <a class="skill-card"
-           href="#"
+           href="${href}"
            data-slug="${skill.slug}"
            data-levels="${skill.levels.join(",")}"
            data-title="${skill.title.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}"
            data-section="${sectionId}"
-           onclick="return false;">
+           ${onclick}>
           <div class="skill-badges">${renderBadges(skill.levels)}</div>
           <div class="skill-title">${skill.title}</div>
         </a>
