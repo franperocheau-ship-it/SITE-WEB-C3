@@ -488,12 +488,7 @@
       document.getElementById('dash-avatar').textContent = initial;
       document.getElementById('dash-name').textContent   = profile.display_name;
 
-      let subText = 'Bienvenue sur ton espace personnel';
-      if (classMeta) {
-        subText = classMeta.level + ' · ' + classMeta.className;
-        if (classMeta.teacherName) subText += ' · ' + classMeta.teacherName;
-      }
-      document.getElementById('dash-sub').textContent = subText;
+      document.getElementById('dash-sub').textContent = 'Ressources numériques pour le cycle 3';
 
       document.title = 'Espace élève — ' + profile.display_name + ' — LFM';
 
