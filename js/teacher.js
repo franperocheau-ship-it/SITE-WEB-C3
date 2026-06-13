@@ -101,6 +101,8 @@ const lfmTeacher = (() => {
   }
 
   async function deleteClass(id) {
+    const { error: studErr } = await db.from('students').delete().eq('class_id', id);
+    if (studErr) throw studErr;
     const { error } = await db.from('classes').delete().eq('id', id);
     if (error) throw error;
   }

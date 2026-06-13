@@ -15,7 +15,7 @@ async function saveExerciseResult({
   durationSecs = null
 }) {
   /* Silencieux si Supabase non configuré ou si l'utilisateur est anonyme */
-  if (!window.lfmDb || !window.lfmAuth) return;
+  if (!window.lfmDb || typeof lfmAuth === 'undefined') return;
 
   try {
     const session = await lfmAuth.getSession();
