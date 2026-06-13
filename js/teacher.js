@@ -101,8 +101,18 @@ const lfmTeacher = (() => {
   }
 
   async function deleteClass(id) {
-    const { error: studErr } = await db.from('students').delete().eq('class_id', id);
-    if (studErr) throw studErr;
+    // Récupérer les IDs des élèves avant la suppression
+    const { data: students, error: fetchErr } = await db
+      .from('students').select('id').eq('class_id', id);
+    if (fetchErr) throw fetchErr;
+
+    // Supprimer les élèves par leur propre ID (contourne les éventuels problèmes RLS/FK)
+    if (students && students.length > 0) {
+      const ids = students.map(s => s.id);
+      const { error: studErr } = await db.from('students').delete().in('id', ids);
+      if (studErr) throw studErr;
+    }
+
     const { error } = await db.from('classes').delete().eq('id', id);
     if (error) throw error;
   }
