@@ -1041,6 +1041,79 @@
       .vp-decomp-input    { width: 38px; font-size: 18px; }
     }
 
+    /* ── Type : encadrer-fraction ────────────────────────────────────────── */
+    .encadr-frame-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 24px 16px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .encadr-input {
+      width: 64px;
+      height: 64px;
+      border: 3px solid var(--border);
+      border-radius: 12px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 800;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      -moz-appearance: textfield;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+    .encadr-input::-webkit-outer-spin-button,
+    .encadr-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .encadr-input:focus:not(:disabled) {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(16,43,106,0.10);
+    }
+    .encadr-input.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.08);
+      color: #15803d;
+    }
+    .encadr-input.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+    .encadr-input:disabled { cursor: default; }
+    .encadr-sign {
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--muted);
+      user-select: none;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .encadr-nline-wrap {
+      overflow-x: auto;
+      padding: 8px 4px 12px;
+      margin-bottom: 8px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .encadr-nline-status {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--blue);
+      min-height: 20px;
+      margin-bottom: 14px;
+    }
+    .encadr-validate-row { text-align: center; margin-bottom: 14px; }
+    @media (max-width: 600px) {
+      .encadr-input { width: 50px; height: 50px; font-size: 22px; }
+      .encadr-sign  { font-size: 24px; }
+    }
+
     /* ── Utility ────────────────────────────────────────────── */
     .ex-hidden { display: none !important; }
 
@@ -1781,6 +1854,7 @@
       nlLevel          = null;
       nbEntierLevel    = null;
       cmpLevel         = null;
+      encadrLevel      = null;
       /* Multiple types → show the choice screen; single type → start directly */
       if (sessionData.exerciseTypes && sessionData.exerciseTypes.length > 1) {
         showTypeSelect();
@@ -2036,6 +2110,8 @@
         renderPlacerFractionDroite(card, q);
       } else if (currentType === "comparer-fractions") {
         renderComparerFractions(card, q);
+      } else if (currentType === "encadrer-fraction") {
+        renderEncadrerFraction(card, q);
       } else if (currentType === "nombre-entier") {
         renderNombreEntier(card, q);
       } else if (currentType === "valeur-position") {
@@ -2489,7 +2565,11 @@
     function nextQuestion() {
       currentIndex++;
       if (currentIndex >= questions.length) {
-        showResults();
+        if (currentType === 'encadrer-fraction') {
+          encadrShowResults();
+        } else {
+          showResults();
+        }
       } else {
         /* Update progress bar before rendering new question */
         document.getElementById("ex-bar-fill").style.width =
@@ -2534,7 +2614,7 @@
       /* Enregistrement du résultat pour les élèves connectés */
       const slug = new URLSearchParams(window.location.search).get('slug');
       const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
-      const activeLevel = pfiSelectedLevel || accordLevel || fracLevel || rfLevel || nlLevel || nbEntierLevel || cmpLevel || null;
+      const activeLevel = pfiSelectedLevel || accordLevel || fracLevel || rfLevel || nlLevel || nbEntierLevel || cmpLevel || encadrLevel || null;
       saveExerciseResult({
         exerciseSlug: slug,
         subject,
@@ -4798,6 +4878,326 @@
 
       signInp.addEventListener('keydown', e => { if (e.key === 'Enter' && !signInp.disabled) doSign(); });
       signBtn.addEventListener('click', doSign);
+    }
+
+    /* ── Type : encadrer-fraction ────────────────────────────────────────────
+       Niveau 1 (difficulty 1) — avec droite graduée
+         Étape 1 : l'élève place la fraction sur la droite (clic sur graduation)
+         Étape 2 : l'élève complète ▢ < fraction < ▢
+         Feedback erreur : droite redessinée avec lo/hi surlignés en rouge
+       Niveau 2 (difficulty 2) — sans droite graduée
+         L'élève complète directement ▢ < fraction < ▢ par le calcul
+         Feedback erreur : calcul détaillé (lo×den / den = lo, etc.)
+    ────────────────────────────────────────────────────────────────────────── */
+
+    let encadrLevel = null;
+
+    /* ── Level selector + router ─────────────────────────────────────── */
+    function renderEncadrerFraction(card, q) {
+      if (encadrLevel === null && currentIndex === 0) {
+        card.innerHTML = `
+          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
+            Quel niveau veux-tu pratiquer ?
+          </p>
+          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
+            <button class="ex-type-card" data-level="1">
+              <span class="ex-type-icon">⭐</span>
+              <div>
+                <span class="ex-type-name">Niveau 1 — CM1 / CM2</span>
+                <span class="ex-type-desc">Avec droite graduée pour t'aider</span>
+              </div>
+            </button>
+            <button class="ex-type-card" data-level="2">
+              <span class="ex-type-icon">⭐⭐</span>
+              <div>
+                <span class="ex-type-name">Niveau 2 — CM2 / 6e</span>
+                <span class="ex-type-desc">Par le calcul, sans droite graduée</span>
+              </div>
+            </button>
+          </div>
+        `;
+        document.getElementById('ex-bar-fill').style.width = '0%';
+        card.querySelectorAll('.ex-type-card').forEach(btn =>
+          btn.addEventListener('click', () => {
+            encadrLevel = parseInt(btn.dataset.level, 10);
+            questions   = shuffle(sessionData.bank.filter(it => it.difficulty === encadrLevel))
+                            .slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+          })
+        );
+        return;
+      }
+      if (encadrLevel === 1) {
+        _renderEncadrAvecDroite(card, q);
+      } else {
+        _renderEncadrSansDroite(card, q);
+      }
+    }
+
+    /* ── Fraction display (reuses rfrac-display CSS) ─────────────────── */
+    function _encadrFracHtml(num, den) {
+      return `<span class="rfrac-display">
+        <span class="rfrac-num">${num}</span>
+        <span class="rfrac-bar"></span>
+        <span class="rfrac-den">${den}</span>
+      </span>`;
+    }
+
+    /* ── Number line SVG ─────────────────────────────────────────────── */
+    function _encadrNlineSvg(num, den, maxUnits, dotIdx, dotGreen, clickable, hlLo, hlHi) {
+      const totalIntervals = maxUnits * den;
+      const tickSpacing    = Math.max(36, Math.min(72, Math.floor(520 / totalIntervals)));
+      const padL = 28, padR = 48;
+      const lineW = totalIntervals * tickSpacing;
+      const W = lineW + padL + padR;
+      const H = 92, lineY = 44;
+
+      let s = '';
+      s += `<line x1="${padL}" y1="${lineY}" x2="${padL + lineW + 8}" y2="${lineY}"
+             stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>`;
+      s += `<polygon points="${padL + lineW + 16},${lineY} ${padL + lineW + 6},${lineY - 5} ${padL + lineW + 6},${lineY + 5}" fill="#94a3b8"/>`;
+
+      for (let i = 0; i <= totalIntervals; i++) {
+        const x       = padL + i * tickSpacing;
+        const isMajor = (i % den === 0);
+        const tH      = isMajor ? 22 : 12;
+        const intVal  = i / den;
+
+        let tickFill = isMajor ? '#102b6a' : '#94a3b8';
+        let tickW    = isMajor ? 2 : 1.5;
+        if (hlLo !== null && isMajor && intVal === hlLo) { tickFill = '#d62839'; tickW = 3; }
+        if (hlHi !== null && isMajor && intVal === hlHi) { tickFill = '#d62839'; tickW = 3; }
+
+        s += `<line x1="${x}" y1="${lineY - tH / 2}" x2="${x}" y2="${lineY + tH / 2}"
+               stroke="${tickFill}" stroke-width="${tickW}"/>`;
+
+        if (isMajor) {
+          let lblFill = '#102b6a';
+          if (hlLo !== null && intVal === hlLo) lblFill = '#d62839';
+          if (hlHi !== null && intVal === hlHi) lblFill = '#d62839';
+          s += `<text x="${x}" y="${lineY + 30}" text-anchor="middle"
+                 font-family="sans-serif" font-size="13" font-weight="700"
+                 fill="${lblFill}">${intVal}</text>`;
+        }
+
+        if (clickable) {
+          s += `<rect x="${x - 20}" y="0" width="40" height="${H}"
+                 fill="transparent" class="encadr-hit" data-idx="${i}"
+                 style="cursor:pointer"/>`;
+        }
+      }
+
+      if (dotIdx !== null) {
+        const dx   = padL + dotIdx * tickSpacing;
+        const fill = dotGreen ? '#16a34a' : '#3b82f6';
+        const strk = dotGreen ? '#15803d' : '#1d4ed8';
+        s += `<circle cx="${dx}" cy="${lineY}" r="9"
+               fill="${fill}" stroke="${strk}" stroke-width="2.5" pointer-events="none"/>`;
+      }
+
+      return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"
+               style="display:block;max-width:100%;overflow:visible">${s}</svg>`;
+    }
+
+    /* ── Niveau 1 renderer ───────────────────────────────────────────── */
+    function _renderEncadrAvecDroite(card, q) {
+      const { numerator: num, denominator: den, lo, hi, isInteger } = q;
+      const maxUnits = Math.floor(num / den) + 1;
+      const sign     = isInteger ? '≤' : '<';
+
+      let selectedIdx   = null;
+      let placementDone = false;
+
+      function svgWrap()  { return card.querySelector('#encadr-svg-wrap');  }
+      function statusEl() { return card.querySelector('#encadr-status'); }
+
+      function rebuildSvg(hlLo, hlHi) {
+        const dotIdx   = placementDone ? num : selectedIdx;
+        const dotGreen = placementDone;
+        svgWrap().innerHTML = _encadrNlineSvg(num, den, maxUnits, dotIdx, dotGreen, !placementDone, hlLo, hlHi);
+        if (!placementDone) bindHits();
+      }
+
+      function bindHits() {
+        svgWrap().querySelectorAll('.encadr-hit').forEach(r => {
+          r.addEventListener('click', () => {
+            if (placementDone) return;
+            selectedIdx = parseInt(r.dataset.idx, 10);
+            svgWrap().innerHTML = _encadrNlineSvg(num, den, maxUnits, selectedIdx, false, true, null, null);
+            bindHits();
+            statusEl().textContent = `Graduation sélectionnée : ${selectedIdx}/${den}`;
+            card.querySelector('#encadr-place-btn').disabled = false;
+          });
+        });
+      }
+
+      card.innerHTML = `
+        <p class="ex-question-label">Encadre cette fraction entre deux entiers consécutifs.</p>
+        <div class="encadr-frame-row">
+          <input type="number" class="encadr-input" id="encadr-lo" placeholder="?" disabled>
+          <span class="encadr-sign">${sign}</span>
+          ${_encadrFracHtml(num, den)}
+          <span class="encadr-sign">${sign}</span>
+          <input type="number" class="encadr-input" id="encadr-hi" placeholder="?" disabled>
+        </div>
+        <p style="font-size:12px;font-weight:600;color:var(--muted);text-align:center;margin-bottom:8px">
+          ➊ Place la fraction sur la droite — ➋ complète l'encadrement
+        </p>
+        <div class="encadr-nline-wrap" id="encadr-svg-wrap">
+          ${_encadrNlineSvg(num, den, maxUnits, null, false, true, null, null)}
+        </div>
+        <p class="encadr-nline-status" id="encadr-status">Clique sur une graduation pour placer la fraction.</p>
+        <div class="encadr-validate-row">
+          <button class="ex-validate-btn" id="encadr-place-btn" disabled>Valider le placement</button>
+        </div>
+        <div class="encadr-validate-row" id="encadr-encadr-row" style="display:none">
+          <button class="ex-validate-btn" id="encadr-validate-btn">Valider l'encadrement</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      bindHits();
+
+      card.querySelector('#encadr-place-btn').addEventListener('click', () => {
+        if (selectedIdx === null) return;
+        placementDone = true;
+        card.querySelector('#encadr-place-btn').disabled = true;
+        rebuildSvg(null, null);
+        const isExact = (selectedIdx === num);
+        statusEl().textContent = isExact
+          ? `✓ Bravo, la fraction ${num}/${den} est bien à cette position !`
+          : `La position correcte de ${num}/${den} est marquée en vert.`;
+        card.querySelector('#encadr-lo').disabled = false;
+        card.querySelector('#encadr-hi').disabled = false;
+        card.querySelector('#encadr-encadr-row').style.display = '';
+        setTimeout(() => card.querySelector('#encadr-lo').focus(), 50);
+      });
+
+      function doValidate() { _validateEncadr(card, q, maxUnits); }
+      card.querySelector('#encadr-validate-btn').addEventListener('click', doValidate);
+      ['encadr-lo', 'encadr-hi'].forEach(id =>
+        card.querySelector('#' + id).addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); })
+      );
+    }
+
+    /* ── Niveau 2 renderer ───────────────────────────────────────────── */
+    function _renderEncadrSansDroite(card, q) {
+      const { numerator: num, denominator: den, isInteger } = q;
+      const sign = isInteger ? '≤' : '<';
+
+      card.innerHTML = `
+        <p class="ex-question-label">Encadre cette fraction entre deux entiers consécutifs.</p>
+        <div class="encadr-frame-row">
+          <input type="number" class="encadr-input" id="encadr-lo" placeholder="?" autocomplete="off">
+          <span class="encadr-sign">${sign}</span>
+          ${_encadrFracHtml(num, den)}
+          <span class="encadr-sign">${sign}</span>
+          <input type="number" class="encadr-input" id="encadr-hi" placeholder="?" autocomplete="off">
+        </div>
+        <p style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:14px;font-weight:500">
+          Combien de fois le dénominateur entre-t-il dans le numérateur ?
+        </p>
+        <div class="encadr-validate-row">
+          <button class="ex-validate-btn" id="encadr-validate-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      setTimeout(() => card.querySelector('#encadr-lo').focus(), 50);
+      function doValidate() { _validateEncadr(card, q, null); }
+      card.querySelector('#encadr-validate-btn').addEventListener('click', doValidate);
+      ['encadr-lo', 'encadr-hi'].forEach(id =>
+        card.querySelector('#' + id).addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); })
+      );
+    }
+
+    /* ── Shared validation ───────────────────────────────────────────── */
+    function _validateEncadr(card, q, maxUnits) {
+      const { numerator: num, denominator: den, lo, hi, isInteger } = q;
+      const loInput = card.querySelector('#encadr-lo');
+      const hiInput = card.querySelector('#encadr-hi');
+      const vBtn    = card.querySelector('#encadr-validate-btn');
+
+      const loVal = parseInt(loInput.value, 10);
+      const hiVal = parseInt(hiInput.value, 10);
+      if (isNaN(loVal) || isNaN(hiVal)) return;
+
+      loInput.disabled = true;
+      hiInput.disabled = true;
+      if (vBtn) vBtn.disabled = true;
+
+      const loOk    = (loVal === lo);
+      const hiOk    = (hiVal === hi);
+      const isRight = loOk && hiOk;
+      const sign    = isInteger ? '≤' : '<';
+
+      loInput.classList.add(loOk ? 'is-correct' : 'is-wrong');
+      hiInput.classList.add(hiOk ? 'is-correct' : 'is-wrong');
+
+      if (isRight) {
+        score++;
+        setFeedback('feedback1',
+          `<div class="ex-feedback-correct">✅ Bravo ! ${lo} ${sign} ${num}/${den} ${sign} ${hi}</div>`);
+      } else {
+        if (encadrLevel === 1 && maxUnits !== null) {
+          const svgWrap = card.querySelector('#encadr-svg-wrap');
+          if (svgWrap) {
+            svgWrap.innerHTML = _encadrNlineSvg(num, den, maxUnits, num, true, false, lo, hi);
+          }
+        }
+        let explanation;
+        if (isInteger) {
+          explanation = `${num}/${den} est égal à l'entier ${lo}. On écrit donc ${lo} ${sign} ${num}/${den} ${sign} ${lo}.`;
+        } else {
+          explanation = `${lo * den}/${den} = ${lo} et ${hi * den}/${den} = ${hi}, donc ${lo} ${sign} ${num}/${den} ${sign} ${hi}.`;
+        }
+        setFeedback('feedback1', `
+          <div class="ex-feedback-wrong">
+            ❌ Pas tout à fait.<br>${explanation}
+          </div>
+        `);
+      }
+      showNextBtn();
+    }
+
+    /* ── Custom results screen (/20) ─────────────────────────────────── */
+    function encadrShowResults() {
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+
+      const total = questions.length;
+      const s20   = Math.round(score / total * 20);
+      const pct   = Math.round(score / total * 100);
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   =
+        score + ' bonne' + (score > 1 ? 's' : '') + ' réponse' + (score > 1 ? 's' : '') + ' sur ' + total;
+
+      let msg;
+      if (pct === 100)    msg = '🏆 Incroyable ! Tu maîtrises cette compétence.';
+      else if (pct >= 80) msg = '🌟 Très bien !';
+      else if (pct >= 60) msg = '👍 Continue comme ça !';
+      else                msg = '💪 Encore un petit effort !';
+      document.getElementById('score-msg').textContent = msg;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug,
+        subject,
+        category,
+        exerciseType: 'encadrer-fraction',
+        level:        encadrLevel,
+        score,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
     }
 
     function setFeedback(id, html) {
