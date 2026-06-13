@@ -3400,6 +3400,57 @@ const EXERCISE_DATA = {
       { instruction: "Mets ce groupe nominal au féminin. (-et → -ette)",
         prompt: "un voisin muet", answer: "une voisine muette", difficulty: 3 }
     ]
+  },
+
+  /* ══════════════════════════════════════════════════════════════════════
+     MATHÉMATIQUES — FRACTIONS — COMPARER DEUX FRACTIONS
+  ══════════════════════════════════════════════════════════════════════ */
+
+  "comparer-fractions": {
+    title: "Comparer deux fractions",
+    levels: ["CM1", "CM2", "6e"],
+    type: "comparer-fractions",
+    questionsPerSession: 6,
+    backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
+
+    /* ── Banque de questions ──────────────────────────────────────────────
+       level 1 — même dénominateur (CM1)
+         → comparer revient à comparer les numérateurs
+         → inclut au moins un cas d'égalité
+       level 2 — dénominateurs différents (CM2 / 6e)
+         → approche visuelle : même taille de disque, partages différents
+         → inclut : fractions équivalentes, pièges (1/2 > 1/3),
+                    cas où grand dénominateur ≠ grande fraction
+    ────────────────────────────────────────────────────────────────────── */
+    bank: [
+
+      /* Niveau 1 — même dénominateur */
+      { level: 1, left: { num: 3, den: 4 }, right: { num: 1, den: 4 }, answer: ">" },
+      { level: 1, left: { num: 2, den: 5 }, right: { num: 4, den: 5 }, answer: "<" },
+      { level: 1, left: { num: 3, den: 6 }, right: { num: 3, den: 6 }, answer: "=" },
+      { level: 1, left: { num: 5, den: 8 }, right: { num: 3, den: 8 }, answer: ">" },
+      { level: 1, left: { num: 1, den: 3 }, right: { num: 2, den: 3 }, answer: "<" },
+      { level: 1, left: { num: 4, den: 7 }, right: { num: 6, den: 7 }, answer: "<" },
+
+      /* Niveau 3 — droite graduée partagée, fractions < 1 et > 1, dénominateurs différents */
+      { level: 3, left: { num: 1, den: 2 }, right: { num: 2, den: 3 }, answer: "<" },   // LCM=6
+      { level: 3, left: { num: 3, den: 4 }, right: { num: 1, den: 2 }, answer: ">" },   // LCM=4
+      { level: 3, left: { num: 1, den: 3 }, right: { num: 1, den: 2 }, answer: "<" },   // LCM=6
+      { level: 3, left: { num: 2, den: 3 }, right: { num: 1, den: 2 }, answer: ">" },   // LCM=6
+      { level: 3, left: { num: 5, den: 3 }, right: { num: 3, den: 2 }, answer: ">" },   // LCM=6, >1
+      { level: 3, left: { num: 4, den: 3 }, right: { num: 3, den: 2 }, answer: "<" },   // LCM=6, >1
+      { level: 3, left: { num: 5, den: 4 }, right: { num: 3, den: 2 }, answer: "<" },   // LCM=4, >1
+      { level: 3, left: { num: 3, den: 2 }, right: { num: 4, den: 3 }, answer: ">" },   // LCM=6, >1
+
+      /* Niveau 2 — dénominateurs différents */
+      { level: 2, left: { num: 1, den: 2 }, right: { num: 2, den: 4 }, answer: "=" },
+      { level: 2, left: { num: 1, den: 2 }, right: { num: 1, den: 3 }, answer: ">" },
+      { level: 2, left: { num: 3, den: 4 }, right: { num: 2, den: 3 }, answer: ">" },
+      { level: 2, left: { num: 1, den: 3 }, right: { num: 2, den: 5 }, answer: "<" },
+      { level: 2, left: { num: 2, den: 3 }, right: { num: 3, den: 4 }, answer: "<" },
+      { level: 2, left: { num: 1, den: 4 }, right: { num: 2, den: 3 }, answer: "<" }
+
+    ]
   }
 
 };

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Histoire EMILE — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css?v=5">
+  <style>
+    /* ── TOKENS HISTOIRE ─────────────────────────────────────────────────── */
+    :root {
+      --hist-6e:  #7C3AED;
+      --hist-cm1: #2563EB;
+      --hist-cm2: #16A34A;
+      --tw: 182px;
+      --tg: 14px;
+    }
+
+    /* ── PAGE SHELL ──────────────────────────────────────────────────────── */
+    .page-wrap {
+      background: var(--bg);
+      min-height: calc(100vh - 88px);
+      padding-bottom: 72px;
+    }
+
+    .page-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 64px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 20px 0 0;
+      opacity: 0.75;
+      transition: opacity 180ms;
+    }
+    .back-link:hover { opacity: 1; }
+
+    /* ── PAGE HEADER ─────────────────────────────────────────────────────── */
+    .page-header {
+      text-align: center;
+      padding: 32px 0 36px;
+    }
+
+    .page-header-icon {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .page-title {
+      font-weight: 900;
+      font-size: 36px;
+      color: var(--blue);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .page-emile-line {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      margin-bottom: 14px;
+    }
+
+    .page-title-rule {
+      width: 44px;
+      height: 3px;
+      background: var(--red);
+      border-radius: 2px;
+      margin: 0 auto 14px;
+    }
+
+    .page-intro {
+      font-size: 15px;
+      color: var(--muted);
+      font-weight: 400;
+      font-style: italic;
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── FILTRES ─────────────────────────────────────────────────────────── */
+    .hist-filters {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+
+    .hist-btn {
+      border: 2px solid var(--border);
+      border-radius: 100px;
+      padding: 9px 24px;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      background: var(--card-bg);
+      color: var(--text);
+      transition: background 200ms, border-color 200ms, color 200ms;
+    }
+
+    .hist-btn[data-f="all"]:is(.active,:hover)  { background: var(--blue);      border-color: var(--blue);      color: #fff; }
+    .hist-btn[data-f="6e"]:is(.active,:hover)   { background: var(--hist-6e);   border-color: var(--hist-6e);   color: #fff; }
+    .hist-btn[data-f="cm1"]:is(.active,:hover)  { background: var(--hist-cm1);  border-color: var(--hist-cm1);  color: #fff; }
+    .hist-btn[data-f="cm2"]:is(.active,:hover)  { background: var(--hist-cm2);  border-color: var(--hist-cm2);  color: #fff; }
+
+    /* ── TIMELINE ─────────────────────────────────────────────────────────── */
+    .timeline-section { position: relative; }
+
+    /* Wrapper pour la flèche et l'effet de bord */
+    .timeline-scroll-wrapper {
+      position: relative;
+    }
+
+    .timeline-scroll {
+      overflow-x: auto;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+      padding-bottom: 12px;
+    }
+    .timeline-scroll::-webkit-scrollbar        { height: 5px; }
+    .timeline-scroll::-webkit-scrollbar-track  { background: transparent; }
+    .timeline-scroll::-webkit-scrollbar-thumb  { background: var(--border); border-radius: 3px; }
+
+    /* Dégradé de bord droit */
+    .timeline-scroll-wrapper::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 12px;
+      width: 100px;
+      background: linear-gradient(to right, transparent, #F8FAFC 80%);
+      pointer-events: none;
+      z-index: 9;
+      transition: opacity 300ms;
+    }
+    .timeline-scroll-wrapper.at-end::after,
+    .timeline-scroll-wrapper.is-grid::after { opacity: 0; }
+
+    /* Flèche de défilement */
+    .tl-arrow {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      margin-top: -20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      opacity: 1;
+      transition: opacity 300ms ease, box-shadow 200ms ease;
+      animation: nudge-right 2.2s ease-in-out infinite;
+    }
+    .tl-arrow:hover {
+      box-shadow: var(--shadow-img);
+      animation-play-state: paused;
+    }
+    .tl-arrow.hidden {
+      opacity: 0;
+      pointer-events: none;
+      animation: none;
+    }
+
+    @keyframes nudge-right {
+      0%, 100%  { transform: translateX(0);   }
+      35%       { transform: translateX(6px);  }
+      65%       { transform: translateX(0px);  }
+    }
+
+    .timeline-content {
+      min-width: max-content;
+      padding-bottom: 4px;
+    }
+
+    /* ── MODE GRILLE (quand un filtre est actif) ─────────────────────────── */
+    .timeline-content.is-grid {
+      min-width: auto;
+    }
+    .timeline-content.is-grid .era-row { display: none; }
+
+    .tl-row.is-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(182px, 1fr));
+      gap: 16px;
+    }
+    .tl-row.is-grid::before { display: none; }
+    .tl-row.is-grid .tl-dot { display: none; }
+
+    /* Items masqués par le filtre */
+    .tl-item.is-hidden { display: none; }
+
+    /* ── ERA LABELS ──────────────────────────────────────────────────────── */
+    .era-row {
+      display: flex;
+      gap: var(--tg);
+      margin-bottom: 8px;
+    }
+
+    .era-chip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 0;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 12px;
+      color: #fff;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+    }
+    .era-chip.e6   { width: calc(4 * var(--tw) + 3 * var(--tg)); background: var(--hist-6e);  }
+    .era-chip.ecm1 { width: calc(4 * var(--tw) + 3 * var(--tg)); background: var(--hist-cm1); }
+    .era-chip.ecm2 { width: calc(6 * var(--tw) + 5 * var(--tg)); background: var(--hist-cm2); }
+
+    /* ── RANGÉE TIMELINE ─────────────────────────────────────────────────── */
+    .tl-row {
+      display: flex;
+      gap: var(--tg);
+      position: relative;
+      align-items: stretch;   /* toutes les colonnes à la même hauteur */
+    }
+
+    /* Ligne gradient */
+    .tl-row::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left:  calc(var(--tw) / 2);
+      right: calc(var(--tw) / 2);
+      height: 3px;
+      border-radius: 2px;
+      background: linear-gradient(to right,
+        var(--hist-6e)  0%,   var(--hist-6e)  27%,
+        var(--hist-cm1) 27%,  var(--hist-cm1) 58%,
+        var(--hist-cm2) 58%,  var(--hist-cm2) 100%
+      );
+      pointer-events: none;
+    }
+
+    /* Item individuel */
+    .tl-item {
+      width: var(--tw);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Point sur la frise */
+    .tl-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 3px solid var(--bg);
+      margin-top: 12px;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+      transition: transform 220ms ease;
+    }
+    .tl-item:hover .tl-dot { transform: scale(1.4); }
+
+    .dot-6e  { background: var(--hist-6e);  box-shadow: 0 0 0 2px var(--hist-6e);  }
+    .dot-cm1 { background: var(--hist-cm1); box-shadow: 0 0 0 2px var(--hist-cm1); }
+    .dot-cm2 { background: var(--hist-cm2); box-shadow: 0 0 0 2px var(--hist-cm2); }
+
+    /* ── CARTE HISTOIRE ──────────────────────────────────────────────────── */
+    .hist-card {
+      flex: 1;                /* remplit toute la hauteur de tl-item → cartes égales */
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 18px 12px 14px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      overflow: hidden;
+      border-top: 3px solid transparent;
+      transition: transform 240ms ease, box-shadow 240ms ease;
+    }
+    .hist-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .hc-6e  { border-top-color: var(--hist-6e);  }
+    .hc-cm1 { border-top-color: var(--hist-cm1); }
+    .hc-cm2 { border-top-color: var(--hist-cm2); }
+
+    .hc-emoji {
+      font-size: 28px;
+      line-height: 1;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .hc-title {
+      font-weight: 800;
+      font-size: 9.5px;
+      color: var(--blue);
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+
+    .hc-desc {
+      font-size: 10.5px;
+      color: var(--muted);
+      font-weight: 400;
+      line-height: 1.4;
+      flex: 1;               /* pousse le badge vers le bas */
+    }
+
+    .hc-badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 100px;
+      padding: 3px 11px;
+      font-size: 9.5px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-top: 10px;
+    }
+    .hb-6e  { background: var(--hist-6e);  }
+    .hb-cm1 { background: var(--hist-cm1); }
+    .hb-cm2 { background: var(--hist-cm2); }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────────────────── */
+    @media (max-width: 1024px) { .page-content { padding: 0 40px; } }
+    @media (max-width: 768px)  { .page-content { padding: 0 24px; } }
+
+    @media (max-width: 640px) {
+      .timeline-content { min-width: auto; }
+      .era-row          { display: none; }
+      .tl-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      .tl-row::before { display: none; }
+      .tl-dot         { display: none; }
+      .tl-item        { width: 100%; }
+      .hist-card      { border-top-width: 4px; padding: 16px 12px 12px; }
+      .tl-arrow,
+      .timeline-scroll-wrapper::after { display: none; }
+    }
+
+    @media (max-width: 400px) {
+      .tl-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .hist-btn     { padding: 7px 16px; font-size: 12px; }
+      .page-content { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════ -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <img src="assets/lfm-logo.svg" alt="Lycée Français de Madrid" class="header-logo">
+        <div class="header-text">
+          <span class="header-name">LYCÉE FRANÇAIS DE MADRID</span>
+          <span class="header-sub">Ressources numériques pour le cycle 3</span>
+        </div>
+      </a>
+      <div class="header-actions">
+        <span class="lang-badge">FR</span>
+        <button class="menu-btn" aria-label="Ouvrir le menu">
+          <span class="mbar mbar-top"></span>
+          <span class="mbar mbar-mid"></span>
+          <span class="mbar mbar-mid2"></span>
+          <span class="mbar mbar-bot"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════
+       MAIN
+  ══════════════════════════════════════ -->
+  <div class="page-wrap">
+    <div class="page-content">
+
+      <a href="index.html" class="back-link">← Accueil</a>
+
+      <!-- EN-TÊTE DE PAGE -->
+      <div class="page-header">
+        <div class="page-header-icon">
+          <div style="position:relative;display:inline-block;line-height:0;">
+            <!-- Icône temple grec -->
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+              <polygon points="12,24 32,10 52,24" stroke="#102B6A" stroke-width="2.5" stroke-linejoin="round" fill="none"/>
+              <line x1="20" y1="24" x2="20" y2="48" stroke="#102B6A" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="32" y1="24" x2="32" y2="48" stroke="#102B6A" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="44" y1="24" x2="44" y2="48" stroke="#102B6A" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="10" y1="48" x2="54" y2="48" stroke="#102B6A" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="12" y1="52" x2="52" y2="52" stroke="#102B6A" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+            <!-- Bulle drapeau britannique -->
+            <svg style="position:absolute;top:-8px;right:-9px;pointer-events:none;" width="34" height="32" viewBox="0 0 26 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <clipPath id="hist-flag-clip">
+                  <rect x="2" y="2" width="22" height="12" rx="0.8"/>
+                </clipPath>
+              </defs>
+              <path d="M2.3,1.3 H24.3 Q25.8,1.3 25.8,2.8 V16.3 Q25.8,17.8 24.3,17.8 H15.3 L13.3,21.3 L11.3,17.8 H2.3 Q0.8,17.8 0.8,16.3 V2.8 Q0.8,1.3 2.3,1.3 Z" fill="rgba(16,43,106,0.13)"/>
+              <path d="M2,1 H24 Q25.5,1 25.5,2.5 V16 Q25.5,17.5 24,17.5 H15 L13,21 L11,17.5 H2 Q0.5,17.5 0.5,16 V2.5 Q0.5,1 2,1 Z" fill="white" stroke="#102B6A" stroke-width="1.3"/>
+              <rect x="2" y="2" width="22" height="12" rx="0.8" fill="#012169" clip-path="url(#hist-flag-clip)"/>
+              <line x1="2"  y1="2"  x2="24" y2="14" stroke="white"   stroke-width="3.5" clip-path="url(#hist-flag-clip)"/>
+              <line x1="24" y1="2"  x2="2"  y2="14" stroke="white"   stroke-width="3.5" clip-path="url(#hist-flag-clip)"/>
+              <line x1="2"  y1="2"  x2="24" y2="14" stroke="#CF091B" stroke-width="1.7" clip-path="url(#hist-flag-clip)"/>
+              <line x1="24" y1="2"  x2="2"  y2="14" stroke="#CF091B" stroke-width="1.7" clip-path="url(#hist-flag-clip)"/>
+              <rect x="2"     y="6.75" width="22"  height="2.5" fill="white"   clip-path="url(#hist-flag-clip)"/>
+              <rect x="11.75" y="2"    width="2.5"  height="12"  fill="white"   clip-path="url(#hist-flag-clip)"/>
+              <rect x="2"     y="7.25" width="22"  height="1.5" fill="#CF091B" clip-path="url(#hist-flag-clip)"/>
+              <rect x="12.25" y="2"    width="1.5"  height="12"  fill="#CF091B" clip-path="url(#hist-flag-clip)"/>
+              <circle cx="9"  cy="15.5" r="0.85" fill="#102B6A" opacity="0.7"/>
+              <circle cx="13" cy="15.5" r="0.85" fill="#D62839" opacity="0.75"/>
+              <circle cx="17" cy="15.5" r="0.85" fill="#102B6A" opacity="0.7"/>
+            </svg>
+          </div>
+        </div>
+        <h1 class="page-title">HISTOIRE</h1>
+        <p class="page-emile-line">
+          <span class="emile-label">EMILE</span>&nbsp;
+          <span class="emile-desc">History in English</span>
+        </p>
+        <div class="page-title-rule"></div>
+        <p class="page-intro">Explore the main topics of History through interactive lessons, exercises and videos.</p>
+      </div>
+
+      <!-- FILTRES -->
+      <div class="hist-filters">
+        <button class="hist-btn active" data-f="all">All</button>
+        <button class="hist-btn" data-f="6e">6ème</button>
+        <button class="hist-btn" data-f="cm1">CM1</button>
+        <button class="hist-btn" data-f="cm2">CM2</button>
+      </div>
+
+      <!-- FRISE CHRONOLOGIQUE -->
+      <div class="timeline-section">
+        <div class="timeline-scroll-wrapper" id="tl-wrapper">
+
+          <!-- Scroll container -->
+          <div class="timeline-scroll" id="tl-scroll">
+            <div class="timeline-content" id="tl-content">
+
+              <!-- Étiquettes de section -->
+              <div class="era-row">
+                <div class="era-chip e6">6ème</div>
+                <div class="era-chip ecm1">CM1</div>
+                <div class="era-chip ecm2">CM2</div>
+              </div>
+
+              <!-- Items : point + carte -->
+              <div class="tl-row" id="tl-row">
+
+                <!-- 1 ─ 6ème -->
+                <div class="tl-item" data-level="6e">
+                  <div class="tl-dot dot-6e"></div>
+                  <a class="hist-card hc-6e" href="#">
+                    <span class="hc-emoji">🏹</span>
+                    <div class="hc-title">From Hunter-Gatherers to Farmers</div>
+                    <div class="hc-desc">Paleolithic to Neolithic</div>
+                    <span class="hc-badge hb-6e">6ème</span>
+                  </a>
+                </div>
+
+                <!-- 2 ─ 6ème -->
+                <div class="tl-item" data-level="6e">
+                  <div class="tl-dot dot-6e"></div>
+                  <a class="hist-card hc-6e" href="#">
+                    <span class="hc-emoji">🏺</span>
+                    <div class="hc-title">Mesopotamia &amp; Ancient Egypt</div>
+                    <div class="hc-desc">First states and civilizations</div>
+                    <span class="hc-badge hb-6e">6ème</span>
+                  </a>
+                </div>
+
+                <!-- 3 ─ 6ème -->
+                <div class="tl-item" data-level="6e">
+                  <div class="tl-dot dot-6e"></div>
+                  <a class="hist-card hc-6e" href="#">
+                    <span class="hc-emoji">🏛️</span>
+                    <div class="hc-title">Ancient Greece</div>
+                    <div class="hc-desc">City-states and Alexander the Great</div>
+                    <span class="hc-badge hb-6e">6ème</span>
+                  </a>
+                </div>
+
+                <!-- 4 ─ 6ème -->
+                <div class="tl-item" data-level="6e">
+                  <div class="tl-dot dot-6e"></div>
+                  <a class="hist-card hc-6e" href="#">
+                    <span class="hc-emoji">🛡️</span>
+                    <div class="hc-title">The Celts and the Mediterranean World</div>
+                    <div class="hc-desc">Exchanges and societies</div>
+                    <span class="hc-badge hb-6e">6ème</span>
+                  </a>
+                </div>
+
+                <!-- 5 ─ CM1 -->
+                <div class="tl-item" data-level="cm1">
+                  <div class="tl-dot dot-cm1"></div>
+                  <a class="hist-card hc-cm1" href="#">
+                    <span class="hc-emoji">🏰</span>
+                    <div class="hc-title">Medieval Daily Life</div>
+                    <div class="hc-desc">XI<sup>th</sup>–XIII<sup>th</sup> centuries</div>
+                    <span class="hc-badge hb-cm1">CM1</span>
+                  </a>
+                </div>
+
+                <!-- 6 ─ CM1 -->
+                <div class="tl-item" data-level="cm1">
+                  <div class="tl-dot dot-cm1"></div>
+                  <a class="hist-card hc-cm1" href="#">
+                    <span class="hc-emoji">👑</span>
+                    <div class="hc-title">The French Monarchy</div>
+                    <div class="hc-desc">XVI<sup>th</sup>–XVII<sup>th</sup> centuries</div>
+                    <span class="hc-badge hb-cm1">CM1</span>
+                  </a>
+                </div>
+
+                <!-- 7 ─ CM1 -->
+                <div class="tl-item" data-level="cm1">
+                  <div class="tl-dot dot-cm1"></div>
+                  <a class="hist-card hc-cm1" href="#">
+                    <span class="hc-emoji">⛵</span>
+                    <div class="hc-title">Age of Exploration</div>
+                    <div class="hc-desc">European explorations and conquests</div>
+                    <span class="hc-badge hb-cm1">CM1</span>
+                  </a>
+                </div>
+
+                <!-- 8 ─ CM1 -->
+                <div class="tl-item" data-level="cm1">
+                  <div class="tl-dot dot-cm1"></div>
+                  <a class="hist-card hc-cm1" href="#">
+                    <span class="hc-emoji">📜</span>
+                    <div class="hc-title">The French Revolution</div>
+                    <div class="hc-desc">1789, a revolutionary year</div>
+                    <span class="hc-badge hb-cm1">CM1</span>
+                  </a>
+                </div>
+
+                <!-- 9 ─ CM2 -->
+                <div class="tl-item" data-level="cm2">
+                  <div class="tl-dot dot-cm2"></div>
+                  <a class="hist-card hc-cm2" href="#">
+                    <span class="hc-emoji">🦅</span>
+                    <div class="hc-title">From the Republic to the Empire</div>
+                    <div class="hc-desc">1792–1815</div>
+                    <span class="hc-badge hb-cm2">CM2</span>
+                  </a>
+                </div>
+
+                <!-- 10 ─ CM2 -->
+                <div class="tl-item" data-level="cm2">
+                  <div class="tl-dot dot-cm2"></div>
+                  <a class="hist-card hc-cm2" href="#">
+                    <span class="hc-emoji">⚖️</span>
+                    <div class="hc-title">Building the Republic</div>
+                    <div class="hc-desc">1848–1914</div>
+                    <span class="hc-badge hb-cm2">CM2</span>
+                  </a>
+                </div>
+
+                <!-- 11 ─ CM2 -->
+                <div class="tl-item" data-level="cm2">
+                  <div class="tl-dot dot-cm2"></div>
+                  <a class="hist-card hc-cm2" href="#">
+                    <span class="hc-emoji">🏭</span>
+                    <div class="hc-title">The Industrial Age</div>
+                    <div class="hc-desc">19th century France</div>
+                    <span class="hc-badge hb-cm2">CM2</span>
+                  </a>
+                </div>
+
+                <!-- 12 ─ CM2 -->
+                <div class="tl-item" data-level="cm2">
+                  <div class="tl-dot dot-cm2"></div>
+                  <a class="hist-card hc-cm2" href="#">
+                    <span class="hc-emoji">🎖️</span>
+                    <div class="hc-title">World War I</div>
+                    <div class="hc-desc">France and the Great War (1914–1918)</div>
+                    <span class="hc-badge hb-cm2">CM2</span>
+                  </a>
+                </div>
+
+                <!-- 13 ─ CM2 -->
+                <div class="tl-item" data-level="cm2">
+                  <div class="tl-dot dot-cm2"></div>
+                  <a class="hist-card hc-cm2" href="#">
+                    <span class="hc-emoji">✈️</span>
+                    <div class="hc-title">World War II</div>
+                    <div class="hc-desc">France and the Second World War (1939–1945)</div>
+                    <span class="hc-badge hb-cm2">CM2</span>
+                  </a>
+                </div>
+
+                <!-- 14 ─ CM2 -->
+                <div class="tl-item" data-level="cm2">
+                  <div class="tl-dot dot-cm2"></div>
+                  <a class="hist-card hc-cm2" href="#">
+                    <span class="hc-emoji">🕊️</span>
+                    <div class="hc-title">France Since 1945</div>
+                    <div class="hc-desc">80 years of transformation</div>
+                    <span class="hc-badge hb-cm2">CM2</span>
+                  </a>
+                </div>
+
+              </div><!-- /tl-row -->
+            </div><!-- /timeline-content -->
+          </div><!-- /timeline-scroll -->
+
+          <!-- Flèche de défilement -->
+          <button class="tl-arrow" id="tl-arrow" aria-label="Défiler vers la droite">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M9 6l6 6-6 6" stroke="#102B6A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+        </div><!-- /timeline-scroll-wrapper -->
+      </div><!-- /timeline-section -->
+
+    </div><!-- /page-content -->
+  </div><!-- /page-wrap -->
+
+  <!-- ══════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-rule"></div>
+        <div class="footer-body">
+          <p class="footer-text">
+            Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,<br>
+            dans le respect d'un <strong class="footer-em">usage mesuré</strong> des écrans.
+          </p>
+        </div>
+        <p class="footer-credit">© François PEROCHEAU — LFM 2026</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/menu.js"></script>
+  <script>
+    const filterBtns  = document.querySelectorAll('.hist-btn');
+    const tlItems     = document.querySelectorAll('.tl-item');
+    const tlRow       = document.getElementById('tl-row');
+    const tlContent   = document.getElementById('tl-content');
+    const tlScroll    = document.getElementById('tl-scroll');
+    const tlWrapper   = document.getElementById('tl-wrapper');
+    const tlArrow     = document.getElementById('tl-arrow');
+
+    /* ── Flèche de défilement ─────────────────────────────── */
+    function syncArrow() {
+      const atEnd = tlScroll.scrollLeft + tlScroll.clientWidth >= tlScroll.scrollWidth - 24;
+      tlArrow.classList.toggle('hidden', atEnd);
+      tlWrapper.classList.toggle('at-end', atEnd);
+    }
+
+    tlScroll.addEventListener('scroll', syncArrow, { passive: true });
+    syncArrow();
+
+    tlArrow.addEventListener('click', () => {
+      tlScroll.scrollBy({ left: 3 * (182 + 14), behavior: 'smooth' });
+    });
+
+    /* ── Filtres ──────────────────────────────────────────── */
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const f = btn.dataset.f;
+        const isAll = f === 'all';
+
+        /* Basculer entre frise horizontale et grille */
+        tlContent.classList.toggle('is-grid', !isAll);
+        tlRow.classList.toggle('is-grid', !isAll);
+        tlWrapper.classList.toggle('is-grid', !isAll);
+
+        /* Afficher / masquer les items */
+        tlItems.forEach(item => {
+          const match = isAll || item.dataset.level === f;
+          item.classList.toggle('is-hidden', !match);
+        });
+
+        /* Flèche : visible uniquement en mode frise */
+        if (isAll) {
+          tlScroll.scrollLeft = 0;
+          tlArrow.classList.remove('hidden');
+          syncArrow();
+        } else {
+          tlArrow.classList.add('hidden');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

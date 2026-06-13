@@ -1450,6 +1450,127 @@
       min-height: 20px;
       margin-bottom: 16px;
     }
+
+    /* ── Type : comparer-fractions ───────────────────────────────────────── */
+    .cmp-layout {
+      display: grid;
+      grid-template-columns: 1fr 60px 1fr;
+      align-items: start;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .cmp-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .cmp-side-locked {
+      opacity: 0.38;
+      pointer-events: none;
+    }
+    .cmp-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-top: 44px;
+      gap: 6px;
+    }
+    .cmp-sign-input {
+      width: 52px;
+      height: 52px;
+      border: 3px solid var(--border);
+      border-radius: 12px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: 800;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+    .cmp-sign-input:focus:not(:disabled) {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(16,43,106,0.10);
+    }
+    .cmp-sign-input:disabled { opacity: 0.32; cursor: default; }
+    .cmp-sign-input.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.08);
+      color: #15803d;
+    }
+    .cmp-sign-input.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+    .cmp-sign-hint {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-align: center;
+      opacity: 0.7;
+    }
+    .cmp-counter {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-align: center;
+      min-height: 14px;
+    }
+    .cmp-side-feedback {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--red);
+      min-height: 14px;
+      text-align: center;
+    }
+    .cmp-step-badge {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(16,43,106,0.06);
+      color: var(--blue);
+      border: 1px solid rgba(16,43,106,0.15);
+      border-radius: 100px;
+      padding: 4px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      margin-bottom: 14px;
+    }
+    @keyframes cmpBlink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.12; }
+    }
+    .cmp-blink { animation: cmpBlink 360ms ease-in-out 5; }
+    @media (max-width: 580px) {
+      .cmp-layout { grid-template-columns: 1fr 42px 1fr; gap: 8px; }
+      .cmp-sign-input { width: 38px; height: 38px; font-size: 18px; }
+    }
+    /* ── comparer-fractions niveau 3 (droites graduées) ──── */
+    .cmp-nl-row {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 16px 12px;
+      margin-bottom: 14px;
+    }
+    .cmp-nl-locked { opacity: 0.38; pointer-events: none; }
+    .cmp-nl-fraction-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+    .cmp-nl-status {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--blue);
+      flex: 1;
+    }
   </style>
 </head>
 <body>
@@ -1659,6 +1780,7 @@
       rfLevel          = null;
       nlLevel          = null;
       nbEntierLevel    = null;
+      cmpLevel         = null;
       /* Multiple types → show the choice screen; single type → start directly */
       if (sessionData.exerciseTypes && sessionData.exerciseTypes.length > 1) {
         showTypeSelect();
@@ -1912,6 +2034,8 @@
         renderRepresenterFraction(card, q);
       } else if (currentType === "placer-fraction-droite") {
         renderPlacerFractionDroite(card, q);
+      } else if (currentType === "comparer-fractions") {
+        renderComparerFractions(card, q);
       } else if (currentType === "nombre-entier") {
         renderNombreEntier(card, q);
       } else if (currentType === "valeur-position") {
@@ -2410,7 +2534,7 @@
       /* Enregistrement du résultat pour les élèves connectés */
       const slug = new URLSearchParams(window.location.search).get('slug');
       const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
-      const activeLevel = pfiSelectedLevel || accordLevel || fracLevel || rfLevel || nlLevel || nbEntierLevel || null;
+      const activeLevel = pfiSelectedLevel || accordLevel || fracLevel || rfLevel || nlLevel || nbEntierLevel || cmpLevel || null;
       saveExerciseResult({
         exerciseSlug: slug,
         subject,
@@ -4179,6 +4303,501 @@
           });
         }
       });
+    }
+
+    /* ── Type : comparer-fractions ────────────────────────────────────────────
+       3 étapes par question :
+       1. Coloriage du disque gauche  → validé en vert
+       2. Coloriage du disque droit   → validé en vert
+       3. Saisie du signe < > =       → feedback immédiat + explication si erreur
+       level 1 : même dénominateur (CM1)
+       level 2 : dénominateurs différents, approche visuelle des aires (CM2/6e)
+    ────────────────────────────────────────────────────────────────────────── */
+
+    let cmpLevel = null;
+
+    function _cmpPieSvg(den, states, interactive) {
+      const cx = 68, cy = 68, r = 60, W = 136, H = 136;
+      let s = '';
+      if (den === 1) {
+        const fill = states[0] ? '#3b82f6' : '#e2e8f0';
+        s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="#fff" stroke-width="2"
+               ${interactive ? 'data-idx="0" style="cursor:pointer"' : ''}/>`;
+      } else {
+        const step = (2 * Math.PI) / den;
+        for (let i = 0; i < den; i++) {
+          const a1 = -Math.PI / 2 + step * i;
+          const a2 = a1 + step;
+          const x1 = (cx + r * Math.cos(a1)).toFixed(2), y1 = (cy + r * Math.sin(a1)).toFixed(2);
+          const x2 = (cx + r * Math.cos(a2)).toFixed(2), y2 = (cy + r * Math.sin(a2)).toFixed(2);
+          const lg = step > Math.PI ? 1 : 0;
+          s += `<path d="M${cx},${cy} L${x1},${y1} A${r},${r},0,${lg},1,${x2},${y2} Z"
+                 fill="${states[i] ? '#3b82f6' : '#e2e8f0'}" stroke="#fff" stroke-width="2"
+                 ${interactive ? `data-idx="${i}" style="cursor:pointer"` : ''}/>`;
+        }
+      }
+      s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1e40af" stroke-width="2"/>`;
+      return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="max-width:100%;display:block">${s}</svg>`;
+    }
+
+    function _cmpPieSvgOk(den, num) {
+      const cx = 68, cy = 68, r = 60, W = 136, H = 136;
+      let s = '';
+      if (den === 1) {
+        s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#16a34a" stroke="#fff" stroke-width="2"/>`;
+      } else {
+        const step = (2 * Math.PI) / den;
+        for (let i = 0; i < den; i++) {
+          const a1 = -Math.PI / 2 + step * i;
+          const a2 = a1 + step;
+          const x1 = (cx + r * Math.cos(a1)).toFixed(2), y1 = (cy + r * Math.sin(a1)).toFixed(2);
+          const x2 = (cx + r * Math.cos(a2)).toFixed(2), y2 = (cy + r * Math.sin(a2)).toFixed(2);
+          const lg = step > Math.PI ? 1 : 0;
+          s += `<path d="M${cx},${cy} L${x1},${y1} A${r},${r},0,${lg},1,${x2},${y2} Z"
+                 fill="${i < num ? '#16a34a' : '#e2e8f0'}" stroke="#fff" stroke-width="2"/>`;
+        }
+      }
+      s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#15803d" stroke-width="2"/>`;
+      return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="max-width:100%;display:block">${s}</svg>`;
+    }
+
+    function _cmpExplanation(left, right, answer) {
+      const lh = _rfracHtml(left.num, left.den);
+      const rh = _rfracHtml(right.num, right.den);
+      if (answer === '=')
+        return `La bonne réponse est <strong>=</strong> : ${lh} et ${rh} représentent la même aire — elles sont égales.`;
+      if (answer === '>')
+        return `La bonne réponse est <strong>&gt;</strong> : ${lh} est plus grande que ${rh} — l'aire de gauche est plus grande.`;
+      return `La bonne réponse est <strong>&lt;</strong> : ${lh} est plus petite que ${rh} — l'aire de gauche est plus petite.`;
+    }
+
+    function renderComparerFractions(card, q) {
+
+      /* ─ Sélecteur de niveau ─ */
+      if (cmpLevel === null && currentIndex === 0) {
+        card.innerHTML = `
+          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
+            Quel niveau veux-tu pratiquer ?
+          </p>
+          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
+            <button class="ex-type-card" data-level="1">
+              <span class="ex-type-icon" style="height:36px;border-radius:50%;background:rgba(16,43,106,0.08);border:1.5px solid rgba(16,43,106,0.2);display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--blue)">1</span>
+              <div>
+                <span class="ex-type-name">Niveau 1</span>
+                <span class="ex-type-desc">Même dénominateur — compare les parts coloriées</span>
+              </div>
+            </button>
+            <button class="ex-type-card" data-level="2">
+              <span class="ex-type-icon" style="height:36px;border-radius:50%;background:rgba(16,43,106,0.08);border:1.5px solid rgba(16,43,106,0.2);display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--blue)">2</span>
+              <div>
+                <span class="ex-type-name">Niveau 2</span>
+                <span class="ex-type-desc">Dénominateurs différents — compare les aires visuellement</span>
+              </div>
+            </button>
+            <button class="ex-type-card" data-level="3">
+              <span class="ex-type-icon" style="height:36px;border-radius:50%;background:rgba(16,43,106,0.08);border:1.5px solid rgba(16,43,106,0.2);display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--blue)">3</span>
+              <div>
+                <span class="ex-type-name">Niveau 3</span>
+                <span class="ex-type-desc">Fractions &lt; 1 et &gt; 1 — place-les sur une droite graduée</span>
+              </div>
+            </button>
+          </div>
+        `;
+        document.getElementById('ex-bar-fill').style.width = '0%';
+        card.querySelectorAll('.ex-type-card').forEach(btn =>
+          btn.addEventListener('click', () => {
+            cmpLevel  = parseInt(btn.dataset.level, 10);
+            questions = shuffle(sessionData.bank.filter(it => it.level === cmpLevel))
+                          .slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+          })
+        );
+        return;
+      }
+
+      if (cmpLevel === 3) { renderComparerFractionsNL(card, q); return; }
+
+      const { left, right, answer } = q;
+      const leftStates  = Array(left.den).fill(false);
+      const rightStates = Array(right.den).fill(false);
+      let leftDone  = false;
+      let rightDone = false;
+      let scored    = false;
+
+      const leftCount  = () => leftStates.filter(Boolean).length;
+      const rightCount = () => rightStates.filter(Boolean).length;
+
+      card.innerHTML = `
+        <div style="text-align:center;margin-bottom:12px">
+          <span class="cmp-step-badge" id="cmp-step-badge">Étape 1 / 3 — Colorie la fraction de gauche</span>
+        </div>
+        <div class="cmp-layout">
+          <div class="cmp-side" id="cmp-left">
+            <div style="margin-bottom:2px">${_rfracHtml(left.num, left.den)}</div>
+            <div id="cmp-left-svg"></div>
+            <div class="cmp-counter" id="cmp-left-counter">0 / ${left.num} parts coloriées</div>
+            <div class="cmp-side-feedback" id="cmp-left-fb"></div>
+            <button class="ex-validate-btn" id="cmp-left-btn"
+                    style="padding:10px 18px;font-size:13px;margin-top:2px">Valider</button>
+          </div>
+
+          <div class="cmp-center">
+            <input type="text" class="cmp-sign-input" id="cmp-sign"
+                   maxlength="1" placeholder="?" disabled
+                   autocomplete="off" autocorrect="off" spellcheck="false"
+                   aria-label="signe de comparaison">
+            <div class="cmp-sign-hint">&lt;&nbsp;&nbsp;=&nbsp;&nbsp;&gt;</div>
+          </div>
+
+          <div class="cmp-side cmp-side-locked" id="cmp-right">
+            <div style="margin-bottom:2px">${_rfracHtml(right.num, right.den)}</div>
+            <div id="cmp-right-svg"></div>
+            <div class="cmp-counter" id="cmp-right-counter">0 / ${right.num} parts coloriées</div>
+            <div class="cmp-side-feedback" id="cmp-right-fb"></div>
+            <button class="ex-validate-btn" id="cmp-right-btn"
+                    style="padding:10px 18px;font-size:13px;margin-top:2px" disabled>Valider</button>
+          </div>
+        </div>
+
+        <div style="text-align:center;margin-bottom:12px">
+          <button class="ex-validate-btn" id="cmp-sign-btn" disabled>Valider le signe</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      /* ─ Rendu et interaction SVG ─ */
+      function renderLeftSvg() {
+        const wrap = card.querySelector('#cmp-left-svg');
+        wrap.innerHTML = _cmpPieSvg(left.den, leftStates, !leftDone);
+        if (!leftDone) {
+          wrap.querySelectorAll('[data-idx]').forEach(el =>
+            el.addEventListener('click', () => {
+              leftStates[parseInt(el.getAttribute('data-idx'), 10)] ^= true;
+              card.querySelector('#cmp-left-counter').textContent =
+                `${leftCount()} / ${left.num} parts coloriées`;
+              card.querySelector('#cmp-left-fb').textContent = '';
+              renderLeftSvg();
+            })
+          );
+        }
+      }
+
+      function renderRightSvg() {
+        const wrap = card.querySelector('#cmp-right-svg');
+        wrap.innerHTML = _cmpPieSvg(right.den, rightStates, !rightDone);
+        if (!rightDone) {
+          wrap.querySelectorAll('[data-idx]').forEach(el =>
+            el.addEventListener('click', () => {
+              rightStates[parseInt(el.getAttribute('data-idx'), 10)] ^= true;
+              card.querySelector('#cmp-right-counter').textContent =
+                `${rightCount()} / ${right.num} parts coloriées`;
+              card.querySelector('#cmp-right-fb').textContent = '';
+              renderRightSvg();
+            })
+          );
+        }
+      }
+
+      renderLeftSvg();
+      renderRightSvg();
+
+      /* ─ Validation gauche ─ */
+      card.querySelector('#cmp-left-btn').addEventListener('click', () => {
+        const n = leftCount();
+        if (n !== left.num) {
+          card.querySelector('#cmp-left-fb').textContent =
+            `Tu as colorié ${n} part${n !== 1 ? 's' : ''}, il en faut ${left.num}.`;
+          return;
+        }
+        leftDone = true;
+        card.querySelector('#cmp-left-fb').textContent = '';
+        card.querySelector('#cmp-left-btn').disabled = true;
+        card.querySelector('#cmp-left-svg').innerHTML = _cmpPieSvgOk(left.den, left.num);
+        card.querySelector('#cmp-left-counter').textContent = `✓ ${left.num} / ${left.num}`;
+        card.querySelector('#cmp-step-badge').textContent = 'Étape 2 / 3 — Colorie la fraction de droite';
+        card.querySelector('#cmp-right').classList.remove('cmp-side-locked');
+        card.querySelector('#cmp-right-btn').disabled = false;
+        renderRightSvg();
+      });
+
+      /* ─ Validation droite ─ */
+      card.querySelector('#cmp-right-btn').addEventListener('click', () => {
+        const n = rightCount();
+        if (n !== right.num) {
+          card.querySelector('#cmp-right-fb').textContent =
+            `Tu as colorié ${n} part${n !== 1 ? 's' : ''}, il en faut ${right.num}.`;
+          return;
+        }
+        rightDone = true;
+        card.querySelector('#cmp-right-fb').textContent = '';
+        card.querySelector('#cmp-right-btn').disabled = true;
+        card.querySelector('#cmp-right-svg').innerHTML = _cmpPieSvgOk(right.den, right.num);
+        card.querySelector('#cmp-right-counter').textContent = `✓ ${right.num} / ${right.num}`;
+        card.querySelector('#cmp-step-badge').textContent = 'Étape 3 / 3 — Quel est le bon signe ?';
+        const signInp = card.querySelector('#cmp-sign');
+        const signBtn = card.querySelector('#cmp-sign-btn');
+        signInp.disabled = false;
+        signBtn.disabled = false;
+        setTimeout(() => signInp.focus(), 50);
+      });
+
+      /* ─ Validation signe ─ */
+      const signInp = card.querySelector('#cmp-sign');
+      const signBtn = card.querySelector('#cmp-sign-btn');
+
+      function doSign() {
+        const val = signInp.value.trim();
+        if (!val) return;
+        signInp.disabled = true;
+        signBtn.disabled = true;
+
+        const isRight = val === answer;
+        signInp.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          if (!scored) { score++; scored = true; }
+          const displaySign = answer === '<' ? '&lt;' : answer === '>' ? '&gt;' : '=';
+          setFeedback('feedback1', `<div class="ex-feedback-correct">
+            ${rand(SUCCESS)}
+            <span style="font-size:13px;font-weight:600;display:block;margin-top:6px">
+              ${_rfracHtml(left.num, left.den)} ${displaySign} ${_rfracHtml(right.num, right.den)}
+            </span>
+          </div>`);
+          showNextBtn();
+        } else {
+          const lSvg = card.querySelector('#cmp-left-svg');
+          const rSvg = card.querySelector('#cmp-right-svg');
+          lSvg.classList.add('cmp-blink');
+          rSvg.classList.add('cmp-blink');
+          setTimeout(() => {
+            lSvg.classList.remove('cmp-blink');
+            rSvg.classList.remove('cmp-blink');
+            const displayVal = val === '<' ? '&lt;' : val;
+            setFeedback('feedback1', `<div class="ex-feedback-wrong">
+              ❌ Le signe « ${displayVal} » n'est pas correct.<br>
+              ${_cmpExplanation(left, right, answer)}
+            </div>`);
+            showNextBtn();
+          }, 360 * 5 + 200);
+        }
+      }
+
+      signInp.addEventListener('keydown', e => { if (e.key === 'Enter' && !signInp.disabled) doSign(); });
+      signBtn.addEventListener('click', doSign);
+    }
+
+    /* ── Niveau 3 : droite graduée unique partagée ──────────────────────── */
+
+    function _cmpSharedLineSvg(den, maxUnits, leftDot, rightDot, hitEnabled) {
+      const total = maxUnits * den;
+      const sp    = Math.max(36, Math.min(64, Math.floor(540 / total)));
+      const pL = 28, pR = 44, W = total * sp + pL + pR, H = 82, lY = 38;
+      let s = '';
+      s += `<line x1="${pL}" y1="${lY}" x2="${pL + total * sp + 8}" y2="${lY}"
+             stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>`;
+      s += `<polygon points="${pL + total * sp + 16},${lY} ${pL + total * sp + 6},${lY - 5} ${pL + total * sp + 6},${lY + 5}"
+             fill="#94a3b8"/>`;
+      for (let i = 0; i <= total; i++) {
+        const x = pL + i * sp, maj = i % den === 0, tH = maj ? 20 : 10;
+        s += `<line x1="${x}" y1="${lY - tH / 2}" x2="${x}" y2="${lY + tH / 2}"
+               stroke="${maj ? '#102b6a' : '#64748b'}" stroke-width="${maj ? 2 : 1.5}"/>`;
+        if (maj) s += `<text x="${x}" y="${lY + 24}" text-anchor="middle"
+               font-family="sans-serif" font-size="12" font-weight="700" fill="#102b6a">${i / den}</text>`;
+        if (hitEnabled) s += `<rect x="${x - 16}" y="2" width="32" height="${H - 4}"
+               fill="transparent" class="cmp-nline-hit" data-idx="${i}" style="cursor:pointer"/>`;
+      }
+      /* Markers — left first (drawn below right so right is on top when same tick) */
+      if (leftDot) {
+        const dx = pL + leftDot.idx * sp;
+        s += `<circle cx="${dx}" cy="${lY}" r="9" fill="${leftDot.fill}"
+               stroke="${leftDot.stroke}" stroke-width="2.5" pointer-events="none"/>`;
+        s += `<text x="${dx}" y="${lY - 13}" text-anchor="middle" font-family="sans-serif"
+               font-size="11" font-weight="700" fill="${leftDot.fill}" pointer-events="none"
+               >${leftDot.label}</text>`;
+      }
+      if (rightDot) {
+        const dx = pL + rightDot.idx * sp;
+        s += `<circle cx="${dx}" cy="${lY}" r="9" fill="${rightDot.fill}"
+               stroke="${rightDot.stroke}" stroke-width="2.5" pointer-events="none"/>`;
+        s += `<text x="${dx}" y="${lY + 40}" text-anchor="middle" font-family="sans-serif"
+               font-size="11" font-weight="700" fill="${rightDot.fill}" pointer-events="none"
+               >${rightDot.label}</text>`;
+      }
+      return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"
+               style="display:block;max-width:100%;overflow:visible">${s}</svg>`;
+    }
+
+    function renderComparerFractionsNL(card, q) {
+      const { left, right, answer } = q;
+      function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+      const lcm      = left.den * right.den / gcd(left.den, right.den);
+      const leftIdx  = left.num  * (lcm / left.den);
+      const rightIdx = right.num * (lcm / right.den);
+      function simplify(n, d) {
+        const g = gcd(n, d); return g === 1 ? `${n}/${d}` : `${n/g}/${d/g}`;
+      }
+      const maxUnits = Math.max(
+        Math.ceil(left.num / left.den),
+        Math.ceil(right.num / right.den)
+      );
+
+      let phase    = 1;   /* 1=place gauche  2=place droite  3=signe */
+      let leftSel  = null;
+      let rightSel = null;
+      let scored   = false;
+
+      card.innerHTML = `
+        <div style="text-align:center;margin-bottom:12px">
+          <span class="cmp-step-badge" id="cmp-step-badge">
+            Étape 1 / 3 — Place ${_rfracHtml(left.num, left.den)} sur la droite
+          </span>
+        </div>
+
+        <div id="cmp-legend" style="display:none;text-align:center;margin-bottom:10px;font-size:13px;font-weight:700">
+          <span style="color:#16a34a">●&nbsp;${_rfracHtml(left.num, left.den)}</span>
+          &nbsp;&nbsp;&nbsp;
+          <span style="color:#ea580c">●&nbsp;${_rfracHtml(right.num, right.den)}</span>
+        </div>
+
+        <div class="nline-scroll-wrap" id="cmp-svg-wrap"></div>
+        <p class="nline-status" id="cmp-status">Clique sur une graduation.</p>
+        <div class="cmp-side-feedback" id="cmp-fb"></div>
+        <div style="text-align:center;margin-bottom:20px">
+          <button class="ex-validate-btn" id="cmp-nl-btn" disabled>Valider</button>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:12px;flex-wrap:wrap">
+          <div>${_rfracHtml(left.num, left.den)}</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+            <input type="text" class="cmp-sign-input" id="cmp-sign"
+                   maxlength="1" placeholder="?" disabled
+                   autocomplete="off" autocorrect="off" spellcheck="false"
+                   aria-label="signe de comparaison">
+            <div class="cmp-sign-hint">&lt;&nbsp;&nbsp;=&nbsp;&nbsp;&gt;</div>
+          </div>
+          <div>${_rfracHtml(right.num, right.den)}</div>
+        </div>
+        <div style="text-align:center;margin-bottom:12px">
+          <button class="ex-validate-btn" id="cmp-sign-btn" disabled>Valider le signe</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const svgWrap  = card.querySelector('#cmp-svg-wrap');
+      const statusEl = card.querySelector('#cmp-status');
+      const fbEl     = card.querySelector('#cmp-fb');
+      const nlBtn    = card.querySelector('#cmp-nl-btn');
+
+      function redraw() {
+        const lDot = leftSel !== null ? {
+          idx: leftSel,
+          fill:   phase > 1 ? '#16a34a' : '#3b82f6',
+          stroke: phase > 1 ? '#15803d' : '#1d4ed8',
+          label: `${left.num}/${left.den}`
+        } : null;
+        const rDot = rightSel !== null ? {
+          idx: rightSel,
+          fill:   phase === 3 ? '#ea580c' : '#3b82f6',
+          stroke: phase === 3 ? '#c2410c' : '#1d4ed8',
+          label: `${right.num}/${right.den}`
+        } : null;
+        svgWrap.innerHTML = _cmpSharedLineSvg(lcm, maxUnits, lDot, rDot, phase < 3);
+        if (phase < 3) {
+          svgWrap.querySelectorAll('.cmp-nline-hit').forEach(r =>
+            r.addEventListener('click', () => {
+              const idx = parseInt(r.dataset.idx, 10);
+              if (phase === 1) { leftSel  = idx; }
+              else             { rightSel = idx; }
+              fbEl.textContent = '';
+              statusEl.textContent = `Graduation sélectionnée : ${simplify(idx, lcm)}`;
+              nlBtn.disabled = false;
+              redraw();
+            })
+          );
+        }
+      }
+
+      redraw();
+
+      nlBtn.addEventListener('click', () => {
+        if (phase === 1) {
+          if (leftSel !== leftIdx) {
+            fbEl.textContent = 'Ce n\'est pas la bonne graduation. Essaie encore !';
+            leftSel = null; nlBtn.disabled = true;
+            statusEl.textContent = 'Clique sur une graduation.';
+            redraw(); return;
+          }
+          phase = 2;
+          fbEl.textContent = '';
+          nlBtn.disabled = true;
+          card.querySelector('#cmp-step-badge').innerHTML =
+            `Étape 2 / 3 — Place maintenant ${_rfracHtml(right.num, right.den)} sur la droite`;
+          card.querySelector('#cmp-legend').style.display = 'block';
+          statusEl.textContent = 'Clique sur une graduation.';
+          redraw();
+
+        } else if (phase === 2) {
+          if (rightSel !== rightIdx) {
+            fbEl.textContent = 'Ce n\'est pas la bonne graduation. Essaie encore !';
+            rightSel = null; nlBtn.disabled = true;
+            statusEl.textContent = 'Clique sur une graduation.';
+            redraw(); return;
+          }
+          phase = 3;
+          fbEl.textContent = '';
+          nlBtn.disabled = true;
+          nlBtn.style.display = 'none';
+          statusEl.style.display = 'none';
+          card.querySelector('#cmp-step-badge').textContent = 'Étape 3 / 3 — Quel est le bon signe ?';
+          redraw();
+          const signInp = card.querySelector('#cmp-sign');
+          const signBtn = card.querySelector('#cmp-sign-btn');
+          signInp.disabled = false;
+          signBtn.disabled = false;
+          setTimeout(() => signInp.focus(), 50);
+        }
+      });
+
+      const signInp = card.querySelector('#cmp-sign');
+      const signBtn = card.querySelector('#cmp-sign-btn');
+
+      function doSign() {
+        const val = signInp.value.trim();
+        if (!val) return;
+        signInp.disabled = true;
+        signBtn.disabled = true;
+        const isRight = val === answer;
+        signInp.classList.add(isRight ? 'is-correct' : 'is-wrong');
+        if (isRight) {
+          if (!scored) { score++; scored = true; }
+          const ds = answer === '<' ? '&lt;' : answer === '>' ? '&gt;' : '=';
+          setFeedback('feedback1', `<div class="ex-feedback-correct">
+            ${rand(SUCCESS)}
+            <span style="font-size:13px;font-weight:600;display:block;margin-top:6px">
+              ${_rfracHtml(left.num, left.den)} ${ds} ${_rfracHtml(right.num, right.den)}
+            </span>
+          </div>`);
+          showNextBtn();
+        } else {
+          svgWrap.classList.add('cmp-blink');
+          setTimeout(() => {
+            svgWrap.classList.remove('cmp-blink');
+            setFeedback('feedback1', `<div class="ex-feedback-wrong">
+              ❌ Le signe « ${val === '<' ? '&lt;' : val} » n'est pas correct.<br>
+              ${_cmpExplanation(left, right, answer)}
+            </div>`);
+            showNextBtn();
+          }, 360 * 5 + 200);
+        }
+      }
+
+      signInp.addEventListener('keydown', e => { if (e.key === 'Enter' && !signInp.disabled) doSign(); });
+      signBtn.addEventListener('click', doSign);
     }
 
     function setFeedback(id, html) {

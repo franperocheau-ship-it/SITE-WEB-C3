@@ -431,6 +431,26 @@ button { font-family: inherit; cursor: pointer; }
   border-radius: 0 0 var(--radius-card) var(--radius-card);
 }
 
+.card-subtitle-emile {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  margin-top: 3px;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.emile-label {
+  color: var(--red);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.emile-desc {
+  color: var(--blue);
+  font-weight: 500;
+}
+
 /* ─── FOOTER ──────────────────────────────────────────────────────────────── */
 
 .footer {
