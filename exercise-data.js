@@ -3495,6 +3495,47 @@ const EXERCISE_DATA = {
       { level: 2, left: { num: 1, den: 4 }, right: { num: 2, den: 3 }, answer: "<" }
 
     ]
+  },
+
+  /* ── Vocabulaire bilingue : La Révolution française ─────────────────────── */
+  "vocabulaire-revolution-francaise": {
+    title: "Vocabulaire de la Révolution française",
+    levels: ["CM1"],
+    type: "vocabu-bilingue",
+    backLink: { href: "histoire.html", label: "Histoire EMILE" },
+
+    vocabulaire: [
+      { anglais: "French Revolution",                 francais: "Révolution française" },
+      { anglais: "King",                              francais: "Roi" },
+      { anglais: "Queen",                             francais: "Reine" },
+      { anglais: "People",                            francais: "Peuple" },
+      { anglais: "Citizens",                          francais: "Citoyens" },
+      { anglais: "Nobles",                            francais: "Nobles" },
+      { anglais: "Clergy",                            francais: "Clergé" },
+      { anglais: "Third Estate",                      francais: "Tiers État" },
+      { anglais: "Taxes",                             francais: "Impôts" },
+      { anglais: "Bread",                             francais: "Pain" },
+      { anglais: "Hunger",                            francais: "Faim" },
+      { anglais: "Poverty",                           francais: "Pauvreté" },
+      { anglais: "Liberty",                           francais: "Liberté" },
+      { anglais: "Equality",                          francais: "Égalité" },
+      { anglais: "Fraternity",                        francais: "Fraternité" },
+      { anglais: "Rights",                            francais: "Droits" },
+      { anglais: "Revolution",                        francais: "Révolution" },
+      { anglais: "Protest",                           francais: "Manifestation" },
+      { anglais: "Rebellion",                         francais: "Révolte" },
+      { anglais: "Army",                              francais: "Armée" },
+      { anglais: "Bastille",                          francais: "Bastille" },
+      { anglais: "Prison",                            francais: "Prison" },
+      { anglais: "Flag",                              francais: "Drapeau" },
+      { anglais: "National Assembly",                 francais: "Assemblée nationale" },
+      { anglais: "Declaration of the Rights of Man",  francais: "Déclaration des droits de l'homme" },
+      { anglais: "Constitution",                      francais: "Constitution" },
+      { anglais: "Republic",                          francais: "République" },
+      { anglais: "Monarchy",                          francais: "Monarchie" },
+      { anglais: "Guillotine",                        francais: "Guillotine" },
+      { anglais: "Justice",                           francais: "Justice" }
+    ]
   }
 
 };

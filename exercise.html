@@ -1644,6 +1644,132 @@
       color: var(--blue);
       flex: 1;
     }
+
+    /* ── Type : vocabu-bilingue ──────────────────────────────────────────── */
+    .vb-word-display {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--blue);
+      text-align: center;
+      padding: 20px 24px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 24px;
+      line-height: 1.25;
+    }
+    .vb-batch-indicator {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .vb-match-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .vb-match-col {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .vb-match-word {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 10px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 180ms, background 180ms, transform 140ms;
+      white-space: normal;
+      word-break: break-word;
+      line-height: 1.3;
+    }
+    .vb-match-word:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.05);
+      transform: translateY(-1px);
+    }
+    .vb-match-word.vb-selected {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.10);
+      color: var(--blue);
+    }
+    .vb-match-word.vb-locked {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.10);
+      color: #15803d;
+      cursor: default;
+    }
+    .vb-match-word.vb-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.08);
+      color: var(--red);
+    }
+    .vb-match-word:disabled:not(.vb-locked) {
+      opacity: 0.30;
+      cursor: default;
+    }
+    .vb-locked-card {
+      opacity: 0.48;
+      cursor: not-allowed !important;
+      pointer-events: none;
+    }
+    @media (max-width: 480px) {
+      .vb-match-word    { font-size: 11px; padding: 8px 6px; }
+      .vb-word-display  { font-size: 24px; padding: 16px 16px; }
+    }
+
+    /* ── Video & Quiz block ──────────────────────────────────────────────── */
+    .vr-block {
+      max-width: 720px;
+      margin: 56px auto 0;
+    }
+    .vr-section-title {
+      font-weight: 800;
+      font-size: 19px;
+      color: var(--blue);
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+    .vr-video-wrap {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-md);
+      background: #000;
+    }
+    .vr-video-wrap iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: 0;
+    }
+    .vr-quiz-section { margin-top: 40px; }
+    .vr-progress-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .vr-progress-label {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--blue);
+      letter-spacing: 0.04em;
+    }
   </style>
 </head>
 <body>
@@ -1735,6 +1861,28 @@
         </div>
 
       </div><!-- /.ex-container -->
+
+      <!-- ── Video & Quiz — vocabulaire-revolution-francaise ─────────────── -->
+      <div id="vr-video-quiz" class="ex-hidden vr-block">
+
+        <!-- Bloc 1 : Vidéo -->
+        <div class="vr-section-title">🎬 Watch the video</div>
+        <div class="vr-video-wrap">
+          <iframe src="https://www.youtube-nocookie.com/embed/xZSDBIXDaiU"
+                  title="The French Revolution"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen></iframe>
+        </div>
+
+        <!-- Bloc 2 : Quiz de compréhension -->
+        <div class="vr-quiz-section">
+          <div class="vr-section-title">✅ Comprehension quiz</div>
+          <div id="vr-quiz-area"></div>
+        </div>
+
+      </div><!-- /#vr-video-quiz -->
+
     </div><!-- /.page-content -->
   </div><!-- /.page-wrap -->
 
@@ -2006,6 +2154,9 @@
       } else if (currentType === "valeur-position") {
         vpInitSession();
         return;
+      } else if (currentType === "vocabu-bilingue") {
+        vbInitSession();
+        return;
       } else {
         bankSource = sessionData.bank;
       }
@@ -2116,6 +2267,8 @@
         renderNombreEntier(card, q);
       } else if (currentType === "valeur-position") {
         renderValeurPosition(card);
+      } else if (currentType === "vocabu-bilingue") {
+        /* session managed by vbInitSession / vbStartLevel — no-op here */
       }
     }
 
@@ -6014,8 +6167,595 @@
       });
     }
 
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : vocabu-bilingue
+       Trois niveaux déverrouillables — Associe / Choisis / Écris
+       ════════════════════════════════════════════════════════════════════════ */
+
+    let vbState = null;
+
+    /* ── Persistence ─────────────────────────────────────────────────────── */
+    function vbSlug() { return new URLSearchParams(window.location.search).get('slug'); }
+
+    function vbMaxLevel() {
+      return parseInt(localStorage.getItem('vb_' + vbSlug() + '_maxLevel') || '1', 10);
+    }
+    function vbSetMaxLevel(n) {
+      if (n > vbMaxLevel()) localStorage.setItem('vb_' + vbSlug() + '_maxLevel', String(n));
+    }
+    function vbLoadQueue(lv) {
+      try { const r = localStorage.getItem('vb_' + vbSlug() + '_q' + lv); return r ? JSON.parse(r) : []; }
+      catch { return []; }
+    }
+    function vbSaveQueue(lv, arr) {
+      localStorage.setItem('vb_' + vbSlug() + '_q' + lv, JSON.stringify(arr));
+    }
+
+    /* ── Init : sélection du niveau ──────────────────────────────────────── */
+    function vbInitSession() {
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      vbState        = null;
+      score          = 0;
+      currentIndex   = 0;
+      sessionStartTime = Date.now();
+
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      document.getElementById('q-total').textContent = '—';
+      document.getElementById('q-num').textContent   = '—';
+      document.getElementById('ex-bar-fill').style.width = '0%';
+
+      vbRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function vbRenderLevelSelect(card) {
+      const maxLv = vbMaxLevel();
+      const levels = [
+        { n: 1, icon: '🔗', name: 'Niveau 1 — Associe',  desc: 'Relie chaque mot anglais à sa traduction française (30 paires, par lots de 6)' },
+        { n: 2, icon: '🎯', name: 'Niveau 2 — Choisis', desc: 'Choisis la bonne traduction parmi 4 propositions (10 questions)' },
+        { n: 3, icon: '🔊', name: 'Niveau 3 — Écoute', desc: 'Écoute le mot et choisis sa traduction parmi 4 propositions (10 questions)' }
+      ];
+      card.innerHTML = `
+        <p class="ex-type-select-label">Quel niveau veux-tu pratiquer ?</p>
+        <div class="ex-type-grid">
+          ${levels.map(l => {
+            const locked = l.n > maxLv;
+            return `<button class="ex-type-card${locked ? ' vb-locked-card' : ''}"
+                            data-level="${l.n}"${locked ? ' disabled' : ''}>
+              <span class="ex-type-icon">${locked ? '🔒' : l.icon}</span>
+              <div>
+                <span class="ex-type-name">${l.name}</span>
+                <span class="ex-type-desc">${locked ? 'Complète le niveau précédent pour débloquer' : l.desc}</span>
+              </div>
+            </button>`;
+          }).join('')}
+        </div>
+      `;
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => vbStartLevel(parseInt(btn.dataset.level, 10)))
+      );
+    }
+
+    function vbStartLevel(n) {
+      if (n === 1) vbStartLevel1();
+      else if (n === 2) vbStartLevel2();
+      else if (n === 3) vbStartLevel3();
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       NIVEAU 1 — ASSOCIER (jeu d'appariement, lots de 6)
+       Score : +1 par paire réussie du premier coup
+       ════════════════════════════════════════════════════════════════════════ */
+    const VB_BATCH = 6;
+
+    function vbStartLevel1() {
+      const total = sessionData.vocabulaire.length;
+      vbState = {
+        level:          1,
+        allPairs:       shuffle([...sessionData.vocabulaire]),
+        batchIdx:       0,
+        matchedCount:   0,
+        score:          0,
+        wrongAttempted: new Set(),
+        selectedLeft:   null,
+        currentBatch:   null,
+        frOrder:        null,
+      };
+      document.getElementById('q-total').textContent = String(total);
+      vbRenderMatchBatch();
+    }
+
+    function vbRenderMatchBatch() {
+      const { allPairs, batchIdx, matchedCount } = vbState;
+      const start = batchIdx * VB_BATCH;
+      const batch = allPairs.slice(start, start + VB_BATCH);
+      const totalBatches = Math.ceil(allPairs.length / VB_BATCH);
+
+      vbState.currentBatch = batch;
+      vbState.selectedLeft = null;
+
+      const frShuffled = shuffle(batch.map(p => p.francais));
+      vbState.frOrder  = frShuffled;
+
+      document.getElementById('q-num').textContent   = String(matchedCount + 1);
+      document.getElementById('ex-bar-fill').style.width = (matchedCount / allPairs.length * 100) + '%';
+
+      const card = document.getElementById('ex-card');
+      card.innerHTML = `
+        <p class="ex-question-label">Clique sur un mot anglais, puis sur sa traduction française</p>
+        <div class="vb-batch-indicator">Lot ${batchIdx + 1} / ${totalBatches}</div>
+        <div class="vb-match-grid">
+          <div class="vb-match-col" id="vb-col-left">
+            ${batch.map((p, i) => `<button class="vb-match-word vb-left" data-idx="${i}">${p.anglais}</button>`).join('')}
+          </div>
+          <div class="vb-match-col" id="vb-col-right">
+            ${frShuffled.map((fr, j) => `<button class="vb-match-word vb-right" data-idx="${j}">${fr}</button>`).join('')}
+          </div>
+        </div>
+        <div class="ex-feedback-area" id="vb-feedback"></div>
+      `;
+
+      card.querySelectorAll('.vb-left').forEach(btn =>
+        btn.addEventListener('click', () => vbClickLeft(btn))
+      );
+      card.querySelectorAll('.vb-right').forEach(btn =>
+        btn.addEventListener('click', () => vbClickRight(btn))
+      );
+    }
+
+    function vbClickLeft(btn) {
+      if (btn.disabled) return;
+      const idx = parseInt(btn.dataset.idx, 10);
+      if (vbState.selectedLeft === idx) {
+        document.querySelectorAll('.vb-left').forEach(b => b.classList.remove('vb-selected'));
+        vbState.selectedLeft = null;
+        return;
+      }
+      document.querySelectorAll('.vb-left').forEach(b => b.classList.remove('vb-selected'));
+      vbState.selectedLeft = idx;
+      btn.classList.add('vb-selected');
+    }
+
+    function vbClickRight(btn) {
+      if (btn.disabled || vbState.selectedLeft === null) return;
+      const j   = parseInt(btn.dataset.idx, 10);
+      const i   = vbState.selectedLeft;
+      const clickedFr  = vbState.frOrder[j];
+      const expectedFr = vbState.currentBatch[i].francais;
+
+      if (clickedFr === expectedFr) {
+        /* ✅ Bonne paire */
+        const leftBtn = document.querySelector('.vb-left[data-idx="' + i + '"]');
+        leftBtn.classList.remove('vb-selected');
+        leftBtn.classList.add('vb-locked');
+        leftBtn.disabled = true;
+        btn.classList.add('vb-locked');
+        btn.disabled = true;
+
+        if (!vbState.wrongAttempted.has(i)) vbState.score++;
+        vbState.matchedCount++;
+        vbState.selectedLeft = null;
+
+        const n = vbState.matchedCount;
+        document.getElementById('q-num').textContent   = String(Math.min(n + 1, vbState.allPairs.length));
+        document.getElementById('ex-bar-fill').style.width = (n / vbState.allPairs.length * 100) + '%';
+
+        const remaining = document.querySelectorAll('.vb-left:not([disabled])').length;
+        if (remaining === 0) {
+          setTimeout(() => {
+            vbState.batchIdx++;
+            if (vbState.matchedCount >= vbState.allPairs.length) {
+              vbCompleteLevel(1, vbState.score, vbState.allPairs.length);
+            } else {
+              vbRenderMatchBatch();
+            }
+          }, 520);
+        }
+      } else {
+        /* ❌ Mauvaise paire — flash rouge puis réinitialiser */
+        vbState.wrongAttempted.add(i);
+        const leftBtn = document.querySelector('.vb-left[data-idx="' + i + '"]');
+        leftBtn.classList.add('vb-wrong');
+        btn.classList.add('vb-wrong');
+        setTimeout(() => {
+          leftBtn.classList.remove('vb-wrong', 'vb-selected');
+          btn.classList.remove('vb-wrong');
+          vbState.selectedLeft = null;
+        }, 560);
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       NIVEAU 2 — CHOIX MULTIPLE (QCM, 10 questions)
+       ════════════════════════════════════════════════════════════════════════ */
+
+    function vbStartLevel2() {
+      const vocab = sessionData.vocabulaire;
+      let queue = vbLoadQueue(2);
+      while (queue.length < 10) queue = [...queue, ...shuffle([...Array(vocab.length).keys()])];
+      const taken = queue.splice(0, 10);
+      vbSaveQueue(2, queue);
+
+      vbState = {
+        level:     2,
+        questions: taken.map((idx, i) => ({
+          pair:      vocab[idx],
+          direction: i % 2 === 0 ? 'en-fr' : 'fr-en'
+        })),
+        qIdx:  0,
+        score: 0
+      };
+      document.getElementById('q-total').textContent = '10';
+      vbRenderMCQ();
+    }
+
+    function vbRenderMCQ() {
+      const { questions, qIdx } = vbState;
+      const { pair, direction } = questions[qIdx];
+      const vocab = sessionData.vocabulaire;
+
+      const word   = direction === 'en-fr' ? pair.anglais  : pair.francais;
+      const answer = direction === 'en-fr' ? pair.francais : pair.anglais;
+      const label  = direction === 'en-fr' ? 'EN → FR' : 'FR → EN';
+
+      const distractors = shuffle(
+        vocab
+          .filter(p => (direction === 'en-fr' ? p.francais : p.anglais) !== answer)
+      ).slice(0, 3).map(p => direction === 'en-fr' ? p.francais : p.anglais);
+
+      const choices = shuffle([answer, ...distractors]);
+
+      document.getElementById('q-num').textContent   = String(qIdx + 1);
+      document.getElementById('ex-bar-fill').style.width = (qIdx / 10 * 100) + '%';
+
+      const card = document.getElementById('ex-card');
+      card.innerHTML = `
+        <p class="ex-question-label">${label} — Quelle est la traduction ?</p>
+        <div class="vb-word-display">${word}</div>
+        <div class="ex-choices-grid" id="vb-choices"></div>
+        <div class="ex-feedback-area" id="vb-feedback"></div>
+        <button class="ex-next-btn ex-hidden" id="vb-next-btn"></button>
+      `;
+
+      document.getElementById('vb-choices').innerHTML = choices
+        .map(c => `<button class="ex-choice" data-val="${c.replace(/"/g, '&quot;')}">${c}</button>`)
+        .join('');
+
+      document.querySelectorAll('#vb-choices .ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => vbHandleMCQ(btn, answer))
+      );
+    }
+
+    function vbHandleMCQ(btn, answer) {
+      document.querySelectorAll('#vb-choices .ex-choice').forEach(b => b.disabled = true);
+      const isRight = btn.dataset.val === answer;
+
+      document.querySelectorAll('#vb-choices .ex-choice').forEach(b => {
+        if (b.dataset.val === answer) b.classList.add('is-correct');
+      });
+      if (!isRight) btn.classList.add('is-wrong');
+
+      if (isRight) {
+        vbState.score++;
+        document.getElementById('vb-feedback').innerHTML =
+          `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+      } else {
+        document.getElementById('vb-feedback').innerHTML =
+          `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${answer}</strong></div>`;
+      }
+
+      const isLast = vbState.qIdx === 9;
+      const nxt = document.getElementById('vb-next-btn');
+      nxt.textContent = isLast ? 'Voir mes résultats' : 'Suivant →';
+      nxt.classList.remove('ex-hidden');
+      nxt.onclick = () => {
+        vbState.qIdx++;
+        if (vbState.qIdx >= 10) vbCompleteLevel(2, vbState.score, 10);
+        else vbRenderMCQ();
+      };
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       NIVEAU 3 — ÉCOUTE (synthèse vocale + QCM, 10 questions)
+       ════════════════════════════════════════════════════════════════════════ */
+
+    function vbSpeak(text, lang) {
+      window.speechSynthesis.cancel();
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = lang;
+      utt.rate = 0.82;
+      window.speechSynthesis.speak(utt);
+    }
+
+    function vbStartLevel3() {
+      const vocab = sessionData.vocabulaire;
+      let queue = vbLoadQueue(3);
+      while (queue.length < 10) queue = [...queue, ...shuffle([...Array(vocab.length).keys()])];
+      const taken = queue.splice(0, 10);
+      vbSaveQueue(3, queue);
+
+      vbState = {
+        level:     3,
+        questions: taken.map(idx => ({
+          pair:      vocab[idx],
+          direction: 'en-fr'
+        })),
+        qIdx:  0,
+        score: 0
+      };
+      document.getElementById('q-total').textContent = '10';
+      vbRenderListening();
+    }
+
+    function vbRenderListening() {
+      const { questions, qIdx } = vbState;
+      const { pair, direction } = questions[qIdx];
+      const vocab = sessionData.vocabulaire;
+
+      const word   = direction === 'en-fr' ? pair.anglais  : pair.francais;
+      const lang   = direction === 'en-fr' ? 'en-GB' : 'fr-FR';
+      const answer = direction === 'en-fr' ? pair.francais : pair.anglais;
+      const label  = direction === 'en-fr' ? 'EN → FR' : 'FR → EN';
+
+      const distractors = shuffle(
+        vocab.filter(p => (direction === 'en-fr' ? p.francais : p.anglais) !== answer)
+      ).slice(0, 3).map(p => direction === 'en-fr' ? p.francais : p.anglais);
+      const choices = shuffle([answer, ...distractors]);
+
+      document.getElementById('q-num').textContent   = String(qIdx + 1);
+      document.getElementById('ex-bar-fill').style.width = (qIdx / 10 * 100) + '%';
+
+      const card = document.getElementById('ex-card');
+      card.innerHTML = `
+        <p class="ex-question-label">${label} — Écoute le mot et choisis sa traduction</p>
+        <div style="text-align:center;margin-bottom:24px">
+          <button class="vp-audio-btn" id="vb-speak-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+            Écouter à nouveau
+          </button>
+        </div>
+        <div class="ex-choices-grid" id="vb-choices"></div>
+        <div class="ex-feedback-area" id="vb-feedback"></div>
+        <button class="ex-next-btn ex-hidden" id="vb-next-btn"></button>
+      `;
+
+      document.getElementById('vb-speak-btn').addEventListener('click', () => vbSpeak(word, lang));
+
+      document.getElementById('vb-choices').innerHTML = choices
+        .map(c => `<button class="ex-choice" data-val="${c.replace(/"/g, '&quot;')}">${c}</button>`)
+        .join('');
+
+      document.querySelectorAll('#vb-choices .ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => vbHandleListening(btn, answer, word, lang))
+      );
+
+      /* Lecture automatique à l'affichage de la question */
+      setTimeout(() => vbSpeak(word, lang), 350);
+    }
+
+    function vbHandleListening(btn, answer, word, lang) {
+      window.speechSynthesis.cancel();
+      document.querySelectorAll('#vb-choices .ex-choice').forEach(b => b.disabled = true);
+      document.getElementById('vb-speak-btn').disabled = true;
+
+      const isRight = btn.dataset.val === answer;
+      document.querySelectorAll('#vb-choices .ex-choice').forEach(b => {
+        if (b.dataset.val === answer) b.classList.add('is-correct');
+      });
+      if (!isRight) btn.classList.add('is-wrong');
+
+      if (isRight) {
+        vbState.score++;
+        document.getElementById('vb-feedback').innerHTML =
+          `<div class="ex-feedback-correct">${rand(SUCCESS)} Le mot était : <strong>${word}</strong></div>`;
+      } else {
+        document.getElementById('vb-feedback').innerHTML =
+          `<div class="ex-feedback-wrong">❌ Le mot était : <strong>${word}</strong><br>La bonne traduction est : <strong>${answer}</strong></div>`;
+      }
+
+      const isLast = vbState.qIdx === 9;
+      const nxt = document.getElementById('vb-next-btn');
+      nxt.textContent = isLast ? 'Voir mes résultats' : 'Suivant →';
+      nxt.classList.remove('ex-hidden');
+      nxt.onclick = () => {
+        window.speechSynthesis.cancel();
+        vbState.qIdx++;
+        if (vbState.qIdx >= 10) vbCompleteLevel(3, vbState.score, 10);
+        else vbRenderListening();
+      };
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       RÉSULTATS & DÉVERROUILLAGE
+       ════════════════════════════════════════════════════════════════════════ */
+
+    function vbCompleteLevel(lv, s, total) {
+      if (lv < 3) vbSetMaxLevel(lv + 1);
+
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+
+      const s20 = Math.round(s / total * 20);
+      const pct = Math.round(s / total * 100);
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   =
+        s + ' bonne' + (s > 1 ? 's' : '') + ' réponse' + (s > 1 ? 's' : '') + ' sur ' + total;
+
+      let msg;
+      if (pct === 100)    msg = '🏆 Incroyable ! Tu maîtrises ce vocabulaire.';
+      else if (pct >= 80) msg = '🌟 Très bien !';
+      else if (pct >= 60) msg = '👍 Continue comme ça !';
+      else                msg = '💪 Encore un petit effort !';
+
+      if (lv === 1 && vbMaxLevel() >= 2) msg += ' 🔓 Niveau 2 — Choisis est débloqué !';
+      if (lv === 2 && vbMaxLevel() >= 3) msg += ' 🔓 Niveau 3 — Écris est débloqué !';
+
+      document.getElementById('score-msg').textContent = msg;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug,
+        subject,
+        category,
+        exerciseType: 'vocabu-bilingue-l' + lv,
+        level:        lv,
+        score:        s,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       VIDEO & QUIZ — vocabulaire-revolution-francaise
+       Bloc indépendant, score propre, sans lien avec le vocabulaire
+       ════════════════════════════════════════════════════════════════════════ */
+
+    const quizRevolution = [
+      { question: "What kind of government did France have before the Revolution?",
+        options: ["A republic", "An absolute monarchy", "A democracy", "An empire"], correct: 1 },
+      { question: "Who held all the power and great privileges?",
+        options: ["The people", "The merchants", "The king and the nobles", "The soldiers"], correct: 2 },
+      { question: "Who had to pay many taxes and mostly lived in misery?",
+        options: ["The common people", "The nobles", "The clergy", "The king"], correct: 0 },
+      { question: "What did the disadvantaged classes form to ask for change?",
+        options: ["An army", "A national assembly", "A prison", "A monarchy"], correct: 1 },
+      { question: "What document did they decide to write?",
+        options: ["A letter to the king", "A constitution", "A map", "A song"], correct: 1 },
+      { question: "On what date did the people storm the Bastille?",
+        options: ["14 July 1789", "1 January 1800", "14 July 1689", "5 May 1789"], correct: 0 },
+      { question: "What was the Bastille?",
+        options: ["A castle for parties", "A church", "A prison", "A school"], correct: 2 },
+      { question: "Why did the people go to the Bastille?",
+        options: ["To visit the king", "To free the prisoners", "To pay taxes", "To find bread"], correct: 1 },
+      { question: "Which three values became the ideals of the Revolution?",
+        options: ["Power, money, glory", "Liberty, Equality, Fraternity", "King, Queen, Country", "Bread, Peace, Land"], correct: 1 }
+    ];
+
+    let vrState = null;
+
+    function vrInitBlock() {
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      if (slug !== 'vocabulaire-revolution-francaise') return;
+      document.getElementById('vr-video-quiz').classList.remove('ex-hidden');
+      vrStartQuiz();
+    }
+
+    function vrStartQuiz() {
+      vrState = {
+        questions: shuffle(quizRevolution).map(q => {
+          const order   = shuffle([0, 1, 2, 3]);
+          const options = order.map(i => q.options[i]);
+          const correct = order.indexOf(q.correct);
+          return { question: q.question, options, correct };
+        }),
+        qIdx:  0,
+        score: 0
+      };
+      vrRenderQuestion();
+    }
+
+    function vrRenderQuestion() {
+      const { questions, qIdx } = vrState;
+      const q     = questions[qIdx];
+      const total = questions.length;
+
+      document.getElementById('vr-quiz-area').innerHTML = `
+        <div class="ex-progress" style="margin-bottom:20px">
+          <div class="vr-progress-row">
+            <span class="vr-progress-label">Question ${qIdx + 1} / ${total}</span>
+          </div>
+          <div class="ex-bar-bg">
+            <div class="ex-bar-fill" style="width:${Math.round(qIdx / total * 100)}%"></div>
+          </div>
+        </div>
+        <div class="ex-card">
+          <p class="ex-question-label">${q.question}</p>
+          <div class="ex-choices-grid" id="vr-choices"></div>
+          <div class="ex-feedback-area" id="vr-feedback"></div>
+          <button class="ex-next-btn ex-hidden" id="vr-next-btn"></button>
+        </div>
+      `;
+
+      document.getElementById('vr-choices').innerHTML = q.options
+        .map((opt, i) => `<button class="ex-choice" data-idx="${i}">${opt}</button>`)
+        .join('');
+
+      document.querySelectorAll('#vr-choices .ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => vrHandleAnswer(btn, q))
+      );
+
+      document.getElementById('vr-quiz-area').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function vrHandleAnswer(btn, q) {
+      document.querySelectorAll('#vr-choices .ex-choice').forEach(b => b.disabled = true);
+      const picked  = parseInt(btn.dataset.idx, 10);
+      const isRight = picked === q.correct;
+
+      document.querySelectorAll('#vr-choices .ex-choice').forEach((b, i) => {
+        if (i === q.correct) b.classList.add('is-correct');
+      });
+      if (!isRight) btn.classList.add('is-wrong');
+
+      if (isRight) {
+        vrState.score++;
+        document.getElementById('vr-feedback').innerHTML =
+          `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+      } else {
+        document.getElementById('vr-feedback').innerHTML =
+          `<div class="ex-feedback-wrong">❌ The correct answer was: <strong>${q.options[q.correct]}</strong></div>`;
+      }
+
+      const isLast = vrState.qIdx === vrState.questions.length - 1;
+      const nxt = document.getElementById('vr-next-btn');
+      nxt.textContent = isLast ? 'See my results' : 'Next →';
+      nxt.classList.remove('ex-hidden');
+      nxt.onclick = () => {
+        vrState.qIdx++;
+        if (vrState.qIdx >= vrState.questions.length) vrShowResults();
+        else vrRenderQuestion();
+      };
+    }
+
+    function vrShowResults() {
+      const { score } = vrState;
+      const total = quizRevolution.length;
+      const s20   = Math.round(score / total * 20);
+      const pct   = Math.round(score / total * 100);
+
+      let msg;
+      if (pct === 100)    msg = '🏆 Perfect score! Excellent understanding!';
+      else if (pct >= 80) msg = '🌟 Very well done!';
+      else if (pct >= 60) msg = '👍 Good job, keep it up!';
+      else                msg = '💪 Watch the video again and try once more!';
+
+      document.getElementById('vr-quiz-area').innerHTML = `
+        <div class="ex-results-card">
+          <div class="ex-score-value">${s20} / 20</div>
+          <div class="ex-score-pct">${score} correct answer${score !== 1 ? 's' : ''} out of ${total}</div>
+          <div class="ex-score-msg">${msg}</div>
+          <div class="ex-results-btns" style="margin-top:32px">
+            <button class="ex-btn-primary" id="vr-retry-btn">🔄 Try again</button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('vr-retry-btn').addEventListener('click', vrStartQuiz);
+      document.getElementById('vr-quiz-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     /* ── Start ────────────────────────────────────────────────────────────── */
     init();
+    vrInitBlock();
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
