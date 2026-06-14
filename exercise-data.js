@@ -3816,6 +3816,7 @@ const EXERCISE_DATA = {
      ══════════════════════════════════════════════════════════════════════════ */
   "conjuguer-faire": {
     title: "Conjuguer le verbe FAIRE",
+    verb: "faire",
     levels: ["CM1", "CM2", "6e"],
     type: "faire-niveaux",
     questionsPerSession: 8,
@@ -3882,14 +3883,14 @@ const EXERCISE_DATA = {
       /* ── 6e : Impératif (×6) + Conditionnel (×6) ── */
       "6e": [
         /* Impératif */
-        { phrase: "___ attention en traversant !",          temps: "Impératif", reponse: "Fais",   explication: "À l'impératif, 2e pers. sing. → Fais." },
-        { phrase: "___ ton travail sérieusement.",          temps: "Impératif", reponse: "Fais",   explication: "À l'impératif, 2e pers. sing. → Fais." },
-        { phrase: "___ de ton mieux pour réussir !",        temps: "Impératif", reponse: "Fais",   explication: "À l'impératif, 2e pers. sing. → Fais." },
-        { phrase: "___ confiance à tes amis.",              temps: "Impératif", reponse: "Fais",   explication: "À l'impératif, 2e pers. sing. → Fais." },
-        { phrase: "___ vite les exercices de maths !",      temps: "Impératif", reponse: "Faites", explication: "À l'impératif pluriel, 2e pers. plur. → Faites." },
-        { phrase: "___ silence, s'il vous plaît !",         temps: "Impératif", reponse: "Faites", explication: "À l'impératif pluriel, 2e pers. plur. → Faites." },
-        { phrase: "Ne ___ pas de bruit dans le couloir.",   temps: "Impératif", reponse: "fais",   explication: "À l'impératif négatif, 2e pers. sing. → ne fais pas." },
-        { phrase: "Ne ___ pas semblant de ne pas savoir.",  temps: "Impératif", reponse: "fais",   explication: "À l'impératif négatif, 2e pers. sing. → ne fais pas." },
+        { phrase: "___ attention en traversant !",          temps: "Impératif", reponses: ["Fais","Faites"], explication: "À l'impératif : « Fais attention » (tu) ou « Faites attention » (vous)." },
+        { phrase: "___ ton travail sérieusement.",          temps: "Impératif", reponse: "Fais",             explication: "« ton » indique tu → Fais ton travail." },
+        { phrase: "___ de ton mieux pour réussir !",        temps: "Impératif", reponse: "Fais",             explication: "« ton » indique tu → Fais de ton mieux." },
+        { phrase: "___ confiance à tes amis.",              temps: "Impératif", reponse: "Fais",             explication: "« tes » indique tu → Fais confiance." },
+        { phrase: "___ vite les exercices de maths !",      temps: "Impératif", reponses: ["Fais","Faites"], explication: "À l'impératif : « Fais vite » (tu) ou « Faites vite » (vous)." },
+        { phrase: "___ silence, s'il vous plaît !",         temps: "Impératif", reponse: "Faites",           explication: "« vous plaît » indique vous → Faites silence." },
+        { phrase: "Ne ___ pas de bruit dans le couloir.",   temps: "Impératif", reponses: ["fais","faites"], explication: "À l'impératif négatif : « ne fais pas » (tu) ou « ne faites pas » (vous)." },
+        { phrase: "Ne ___ pas semblant de ne pas savoir.",  temps: "Impératif", reponses: ["fais","faites"], explication: "À l'impératif négatif : « ne fais pas » (tu) ou « ne faites pas » (vous)." },
         /* Conditionnel */
         { phrase: "Il ___ beau demain, dit la météo.",      temps: "Conditionnel", reponse: "ferait",    explication: "Au conditionnel, « il » → il ferait." },
         { phrase: "Je ___ mieux avec davantage de temps.",  temps: "Conditionnel", reponse: "ferais",    explication: "Au conditionnel, « je » → je ferais." },
@@ -3899,6 +3900,107 @@ const EXERCISE_DATA = {
         { phrase: "Vous ___ mieux de vous reposer avant.", temps: "Conditionnel", reponse: "feriez",    explication: "Au conditionnel, « vous » → vous feriez." },
         { phrase: "Elle ___ volontiers ce voyage.",         temps: "Conditionnel", reponse: "ferait",    explication: "Au conditionnel, « elle » → elle ferait." },
         { phrase: "Elles ___ des merveilles avec de l'aide.", temps: "Conditionnel", reponse: "feraient", explication: "Au conditionnel, « elles » → elles feraient." }
+      ]
+    }
+  },
+
+  /* ══════════════════════════════════════════════════════════════
+     CONJUGUER ALLER  (type : faire-niveaux)
+     CM1 : Présent + Imparfait + Futur simple + Passé composé
+     CM2 : Passé simple + Plus-que-parfait
+     6e  : Impératif + Conditionnel
+  ══════════════════════════════════════════════════════════════ */
+  "conjuguer-aller": {
+    title: "Conjuguer le verbe ALLER",
+    verb: "aller",
+    levels: ["CM1", "CM2", "6e"],
+    type: "faire-niveaux",
+    questionsPerSession: 8,
+    backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
+
+    pools: {
+
+      /* ── CM1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
+      "CM1": [
+        /* Présent */
+        { phrase: "Je ___ à l'école à pied chaque matin.",        temps: "Présent",       reponse: "vais",         explication: "Au présent, « je » → je vais (verbe irrégulier)." },
+        { phrase: "Tu ___ au parc après les cours.",               temps: "Présent",       reponse: "vas",          explication: "Au présent, « tu » → tu vas (verbe irrégulier)." },
+        { phrase: "Il ___ chez son ami le samedi.",                temps: "Présent",       reponse: "va",           explication: "Au présent, « il » → il va (verbe irrégulier)." },
+        { phrase: "Elle ___ à la piscine tous les jeudis.",        temps: "Présent",       reponse: "va",           explication: "Au présent, « elle » → elle va (verbe irrégulier)." },
+        { phrase: "Nous ___ au cinéma ce soir.",                   temps: "Présent",       reponse: "allons",       explication: "Au présent, « nous » → nous allons." },
+        { phrase: "Vous ___ à la médiathèque cet après-midi.",     temps: "Présent",       reponse: "allez",        explication: "Au présent, « vous » → vous allez." },
+        { phrase: "Ils ___ au marché le samedi matin.",            temps: "Présent",       reponse: "vont",         explication: "Au présent, « ils » → ils vont (verbe irrégulier)." },
+        { phrase: "Elles ___ en vacances demain.",                 temps: "Présent",       reponse: "vont",         explication: "Au présent, « elles » → elles vont (verbe irrégulier)." },
+
+        /* Imparfait */
+        { phrase: "J'___ à l'école à pied quand j'étais petit.",  temps: "Imparfait",     reponse: "allais",       explication: "À l'imparfait, « j' » → j'allais." },
+        { phrase: "Tu ___ chez ta grand-mère chaque dimanche.",    temps: "Imparfait",     reponse: "allais",       explication: "À l'imparfait, « tu » → tu allais." },
+        { phrase: "Elle ___ à la piscine tous les jeudis.",        temps: "Imparfait",     reponse: "allait",       explication: "À l'imparfait, « elle » → elle allait." },
+        { phrase: "Nous ___ au marché le dimanche matin.",         temps: "Imparfait",     reponse: "allions",      explication: "À l'imparfait, « nous » → nous allions." },
+        { phrase: "Vous ___ au parc après l'école.",               temps: "Imparfait",     reponse: "alliez",       explication: "À l'imparfait, « vous » → vous alliez." },
+        { phrase: "Ils ___ au stade chaque samedi.",               temps: "Imparfait",     reponse: "allaient",     explication: "À l'imparfait, « ils » → ils allaient." },
+
+        /* Futur simple */
+        { phrase: "J'___ à la mer cet été.",                      temps: "Futur simple",  reponse: "irai",         explication: "Au futur, « j' » → j'irai (radical irrégulier « ir- »)." },
+        { phrase: "Tu ___ chez mamie le week-end prochain.",       temps: "Futur simple",  reponse: "iras",         explication: "Au futur, « tu » → tu iras (radical irrégulier « ir- »)." },
+        { phrase: "Elle ___ mieux après quelques jours de repos.", temps: "Futur simple",  reponse: "ira",          explication: "Au futur, « elle » → elle ira (radical irrégulier « ir- »)." },
+        { phrase: "Nous ___ au musée vendredi.",                   temps: "Futur simple",  reponse: "irons",        explication: "Au futur, « nous » → nous irons (radical irrégulier « ir- »)." },
+        { phrase: "Vous ___ en voyage cet été.",                   temps: "Futur simple",  reponse: "irez",         explication: "Au futur, « vous » → vous irez (radical irrégulier « ir- »)." },
+        { phrase: "Ils ___ au stade dimanche.",                    temps: "Futur simple",  reponse: "iront",        explication: "Au futur, « ils » → ils iront (radical irrégulier « ir- »)." },
+
+        /* Passé composé (auxiliaire être → accord du participe) */
+        { phrase: "Il ___ au parc hier après-midi.",               temps: "Passé composé", reponse: "est allé",     explication: "Au passé composé, aller se conjugue avec être : il est allé." },
+        { phrase: "Elle ___ à la bibliothèque hier soir.",         temps: "Passé composé", reponse: "est allée",    explication: "Au passé composé, aller se conjugue avec être : elle est allée (accord)." },
+        { phrase: "Nous ___ au cinéma samedi dernier.",            temps: "Passé composé", reponse: "sommes allés", explication: "Au passé composé, aller se conjugue avec être : nous sommes allés." },
+        { phrase: "Ils ___ au stade hier soir.",                   temps: "Passé composé", reponse: "sont allés",   explication: "Au passé composé, aller se conjugue avec être : ils sont allés." },
+        { phrase: "Elles ___ à la piscine la semaine dernière.",   temps: "Passé composé", reponse: "sont allées",  explication: "Au passé composé, aller se conjugue avec être : elles sont allées (accord)." },
+        { phrase: "Je ___ chez mon ami hier après l'école.",       temps: "Passé composé", reponses: ["suis allé", "suis allée"], explication: "Au passé composé, aller se conjugue avec être : je suis allé(e) selon le genre." }
+      ],
+
+      /* ── CM2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
+      "CM2": [
+        /* Passé simple */
+        { phrase: "Il ___ chercher de l'aide au village.",                    temps: "Passé simple",      reponse: "alla",         explication: "Au passé simple, « il » → il alla." },
+        { phrase: "Elle ___ se réfugier dans la forêt.",                      temps: "Passé simple",      reponse: "alla",         explication: "Au passé simple, « elle » → elle alla." },
+        { phrase: "J'___ voir le directeur ce matin-là.",                     temps: "Passé simple",      reponse: "allai",        explication: "Au passé simple, « j' » → j'allai." },
+        { phrase: "Tu ___ à la bibliothèque après l'école.",                  temps: "Passé simple",      reponse: "allas",        explication: "Au passé simple, « tu » → tu allas." },
+        { phrase: "Nous ___ au château dès l'aube.",                          temps: "Passé simple",      reponse: "allâmes",      explication: "Au passé simple, « nous » → nous allâmes (accent circonflexe)." },
+        { phrase: "Vous ___ au bout du chemin sans vous retourner.",          temps: "Passé simple",      reponse: "allâtes",      explication: "Au passé simple, « vous » → vous allâtes (accent circonflexe)." },
+        { phrase: "Ils ___ au marché de bonne heure.",                        temps: "Passé simple",      reponse: "allèrent",     explication: "Au passé simple, « ils » → ils allèrent." },
+        { phrase: "Elles ___ chercher de l'eau à la fontaine.",               temps: "Passé simple",      reponse: "allèrent",     explication: "Au passé simple, « elles » → elles allèrent." },
+
+        /* Plus-que-parfait */
+        { phrase: "Il ___ chercher les clés avant de partir.",                temps: "Plus-que-parfait",  reponse: "était allé",   explication: "Au plus-que-parfait, « il » → il était allé (être à l'imparfait + participe)." },
+        { phrase: "Elle ___ à la plage la veille.",                           temps: "Plus-que-parfait",  reponse: "était allée",  explication: "Au plus-que-parfait, « elle » → elle était allée (accord du participe)." },
+        { phrase: "Nous ___ au cinéma avant l'orage.",                        temps: "Plus-que-parfait",  reponse: "étions allés", explication: "Au plus-que-parfait, « nous » → nous étions allés." },
+        { phrase: "Vous ___ faire les courses avant la fermeture.",           temps: "Plus-que-parfait",  reponse: "étiez allés",  explication: "Au plus-que-parfait, « vous » → vous étiez allés." },
+        { phrase: "Ils ___ à l'école avant tout le monde.",                   temps: "Plus-que-parfait",  reponse: "étaient allés", explication: "Au plus-que-parfait, « ils » → ils étaient allés." },
+        { phrase: "Elles ___ chercher de l'aide au village.",                 temps: "Plus-que-parfait",  reponse: "étaient allées", explication: "Au plus-que-parfait, « elles » → elles étaient allées (accord)." },
+        { phrase: "Je ___ rendre visite à mon oncle avant les vacances.",     temps: "Plus-que-parfait",  reponses: ["étais allé", "étais allée"], explication: "Au plus-que-parfait, je → j'étais allé(e) selon le genre." },
+        { phrase: "Tu ___ à la pharmacie ce matin-là.",                       temps: "Plus-que-parfait",  reponses: ["étais allé", "étais allée"], explication: "Au plus-que-parfait, « tu » → tu étais allé(e) selon le genre." }
+      ],
+
+      /* ── 6e : Impératif (×8) + Conditionnel (×8) ── */
+      "6e": [
+        /* Impératif */
+        { phrase: "___ vite te coucher, il est tard !",              temps: "Impératif", reponse: "Va",                        explication: "À l'impératif, « te » indique « tu » : Va ! (sans -s, c'est une exception)." },
+        { phrase: "___ chercher ton cartable dans ta chambre !",     temps: "Impératif", reponse: "Va",                        explication: "À l'impératif, « ton » indique « tu » : Va ! (pas de -s)." },
+        { phrase: "___ à votre place maintenant !",                  temps: "Impératif", reponse: "Allez",                     explication: "À l'impératif, « votre » indique « vous » : Allez !" },
+        { phrase: "___ jouer dehors avec tes amis !",                temps: "Impératif", reponse: "Va",                        explication: "À l'impératif, « tes » indique « tu » : Va ! (pas de -s)." },
+        { phrase: "___ tous ensemble au tableau !",                  temps: "Impératif", reponse: "Allons",                    explication: "À l'impératif pour « nous » : Allons ! (on invite le groupe à agir)." },
+        { phrase: "___ voir le directeur tout de suite !",           temps: "Impératif", reponses: ["Va", "Allez"],            explication: "À l'impératif : Va (tu) ou Allez (vous) selon la personne." },
+        { phrase: "N'___ pas là-bas, c'est dangereux !",            temps: "Impératif", reponses: ["va", "allez"],            explication: "À l'impératif négatif : ne va pas (tu) ou n'allez pas (vous)." },
+        { phrase: "___, on va rater le bus !",                       temps: "Impératif", reponses: ["Va", "Allez"],            explication: "À l'impératif : Va (tu) ou Allez (vous) selon la personne." },
+
+        /* Conditionnel */
+        { phrase: "Je ___ bien au cinéma ce soir.",                  temps: "Conditionnel", reponse: "irais",    explication: "Au conditionnel, « je » → j'irais (radical irrégulier « ir- »)." },
+        { phrase: "Tu ___ plus vite avec un bon vélo.",              temps: "Conditionnel", reponse: "irais",    explication: "Au conditionnel, « tu » → tu irais (radical irrégulier « ir- »)." },
+        { phrase: "Il ___ mieux avec quelques jours de repos.",      temps: "Conditionnel", reponse: "irait",    explication: "Au conditionnel, « il » → il irait (radical irrégulier « ir- »)." },
+        { phrase: "Elle ___ bien voir ses amis ce week-end.",        temps: "Conditionnel", reponse: "irait",    explication: "Au conditionnel, « elle » → elle irait (radical irrégulier « ir- »)." },
+        { phrase: "Nous ___ volontiers à la mer si c'était possible.", temps: "Conditionnel", reponse: "irions", explication: "Au conditionnel, « nous » → nous irions (radical irrégulier « ir- »)." },
+        { phrase: "Vous ___ plus vite par l'autoroute.",             temps: "Conditionnel", reponse: "iriez",    explication: "Au conditionnel, « vous » → vous iriez (radical irrégulier « ir- »)." },
+        { phrase: "Ils ___ bien en vacances ensemble.",              temps: "Conditionnel", reponse: "iraient",  explication: "Au conditionnel, « ils » → ils iraient (radical irrégulier « ir- »)." },
+        { phrase: "Elles ___ volontiers à Paris pour le week-end.",  temps: "Conditionnel", reponse: "iraient",  explication: "Au conditionnel, « elles » → elles iraient (radical irrégulier « ir- »)." }
       ]
     }
   }

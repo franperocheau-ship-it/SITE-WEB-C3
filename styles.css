@@ -508,6 +508,17 @@ button { font-family: inherit; cursor: pointer; }
   font-style: italic;
 }
 
+.footer-credit a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(138,138,138,0.35);
+  transition: border-color 200ms;
+}
+
+.footer-credit a:hover {
+  border-bottom-color: rgba(138,138,138,0.85);
+}
+
 /* ─── RESPONSIVE ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 1024px) {

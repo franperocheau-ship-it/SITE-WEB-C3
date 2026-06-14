@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mentions légales — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css?v=5">
+  <style>
+
+    .page-wrap {
+      background: var(--bg);
+      min-height: calc(100vh - 88px);
+      padding-bottom: 64px;
+    }
+
+    .page-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 64px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 20px 0 0;
+      opacity: 0.75;
+      transition: opacity 180ms;
+    }
+    .back-link:hover { opacity: 1; }
+
+    /* ── Page title ─────────────────────────────────────────────── */
+
+    .legal-page-header {
+      text-align: center;
+      padding: 28px 0 32px;
+    }
+
+    .legal-page-title {
+      font-weight: 900;
+      font-size: 32px;
+      color: var(--blue);
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .page-title-rule {
+      width: 44px;
+      height: 3px;
+      background: var(--red);
+      border-radius: 2px;
+      margin: 0 auto 14px;
+    }
+
+    .legal-page-date {
+      font-size: 13px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* ── Intro banner ───────────────────────────────────────────── */
+
+    .legal-intro {
+      max-width: 800px;
+      margin: 0 auto 40px;
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-left: 4px solid var(--blue);
+      border-radius: 12px;
+      padding: 20px 28px;
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.75;
+    }
+
+    .legal-intro strong {
+      color: var(--blue);
+      font-weight: 700;
+    }
+
+    /* ── Table of contents ──────────────────────────────────────── */
+
+    .legal-toc {
+      max-width: 800px;
+      margin: 0 auto 48px;
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 28px 32px;
+    }
+
+    .legal-toc-title {
+      font-weight: 800;
+      font-size: 11px;
+      color: var(--blue);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .legal-toc ol {
+      list-style: none;
+      counter-reset: toc;
+      padding: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 32px;
+    }
+
+    .legal-toc li { counter-increment: toc; }
+
+    .legal-toc a {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      line-height: 1.4;
+      transition: color 180ms;
+    }
+
+    .legal-toc a::before {
+      content: counter(toc, decimal-leading-zero);
+      font-size: 10.5px;
+      font-weight: 800;
+      color: var(--red);
+      letter-spacing: 0.04em;
+      min-width: 20px;
+      flex-shrink: 0;
+      padding-top: 1px;
+    }
+
+    .legal-toc a:hover { color: var(--blue); }
+
+    /* ── Sections ───────────────────────────────────────────────── */
+
+    .legal-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .legal-section {
+      margin-bottom: 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .legal-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .legal-section h2 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 17px;
+      color: var(--blue);
+      letter-spacing: 0.01em;
+      margin-bottom: 16px;
+    }
+
+    .section-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--red);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .legal-section p {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.8;
+      margin-bottom: 10px;
+    }
+
+    .legal-section p:last-of-type { margin-bottom: 0; }
+
+    .legal-section a {
+      color: var(--blue);
+      font-weight: 500;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .legal-section a:hover { color: var(--red); }
+
+    .legal-section ul {
+      list-style: disc;
+      padding-left: 24px;
+      margin: 10px 0;
+    }
+
+    .legal-section li {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.8;
+    }
+
+    /* ── CC badge ───────────────────────────────────────────────── */
+
+    .cc-badge-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .cc-badge-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 8px;
+      padding: 6px 10px;
+      border: 1.5px solid var(--border);
+      transition: border-color 200ms, color 200ms;
+      line-height: 1.3;
+    }
+
+    .cc-badge-link:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .cc-badge-link:hover .cc-badge-svg circle { fill: #D06A00; }
+
+    /* ── Responsive ─────────────────────────────────────────────── */
+
+    @media (max-width: 768px) {
+      .page-content { padding: 0 24px; }
+
+      .legal-toc ol {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .legal-toc { padding: 22px 20px; }
+      .legal-intro { padding: 18px 20px; }
+    }
+
+    @media (max-width: 480px) {
+      .legal-page-title { font-size: 24px; }
+      .legal-section h2 { font-size: 15px; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════ -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <img src="assets/lfm-logo.svg" alt="Lycée Français de Madrid" class="header-logo">
+        <div class="header-text">
+          <span class="header-name">LYCÉE FRANÇAIS DE MADRID</span>
+          <span class="header-sub">Ressources numériques pour le cycle 3</span>
+        </div>
+      </a>
+      <div class="header-actions">
+        <span class="lang-badge">FR</span>
+        <button class="menu-btn" aria-label="Ouvrir le menu">
+          <span class="mbar mbar-top"></span>
+          <span class="mbar mbar-mid"></span>
+          <span class="mbar mbar-mid2"></span>
+          <span class="mbar mbar-bot"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════
+       MAIN
+  ═══════════════════════════════════════════ -->
+  <div class="page-wrap">
+    <div class="page-content">
+
+      <a href="index.html" class="back-link">← Accueil</a>
+
+      <!-- Title -->
+      <div class="legal-page-header">
+        <h1 class="legal-page-title">Mentions légales</h1>
+        <div class="page-title-rule"></div>
+        <p class="legal-page-date">Dernière mise à jour : 14 juin 2026</p>
+      </div>
+
+      <!-- Intro banner -->
+      <div class="legal-intro" role="note">
+        Ce site est un <strong>projet pédagogique personnel</strong>, conçu et développé bénévolement
+        par un enseignant du Lycée Français de Madrid. Il n'a aucune vocation commerciale et est mis
+        à disposition librement, sous licence
+        <strong>Creative Commons BY-NC-SA 4.0</strong>.
+      </div>
+
+      <!-- Table of contents -->
+      <nav class="legal-toc" aria-label="Sommaire">
+        <p class="legal-toc-title">Sommaire</p>
+        <ol>
+          <li><a href="#section-1">Éditeur du site</a></li>
+          <li><a href="#section-2">Hébergement</a></li>
+          <li><a href="#section-3">Objet du site</a></li>
+          <li><a href="#section-4">Propriété intellectuelle</a></li>
+          <li><a href="#section-5">Utilisation du site</a></li>
+          <li><a href="#section-6">Données personnelles</a></li>
+          <li><a href="#section-7">Sécurité et accès</a></li>
+          <li><a href="#section-8">Cookies et stockage local</a></li>
+          <li><a href="#section-9">Liens externes</a></li>
+          <li><a href="#section-10">Évolution du site</a></li>
+          <li><a href="#section-11">Droit applicable</a></li>
+          <li><a href="#section-12">Crédits</a></li>
+        </ol>
+      </nav>
+
+      <!-- Sections -->
+      <article class="legal-content">
+
+        <!-- 1. Éditeur -->
+        <section id="section-1" class="legal-section">
+          <h2>
+            <span class="section-num" aria-hidden="true">1</span>
+            Éditeur du site
+          </h2>
+          <p>
+            <strong>François Perocheau</strong>, enseignant au Lycée Français de Madrid (LFM).
+          </p>
+          <p>
+            Ce site est un outil pédagogique personnel destiné aux élèves du cycle 3 (CM1, CM2, 6e).
+            Il n'est pas édité au nom de l'établissement.
+          </p>
+        </section>
+
+        <!-- 2. Hébergement -->
+        <section id="section-2" class="legal-section">
+          <h2>
+            <span class="section-num" aria-hidden="true">2</span>
+            Hébergement
+          </h2>
+          <p>
+            Les pages statiques du site sont hébergées sur <strong>GitHub Pages</strong>
+            (GitHub Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis).
+          </p>
+          <p>
+            La gestion des comptes utilisateurs et le suivi pédagogique s'appuient sur
+            <strong>Supabase</strong> (Supabase Inc.), un service d'infrastructure de base de données
+            PostgreSQL hébergé en Europe.
+          </p>
+        </section>
+
+        <!-- 3. Objet du site -->
+        <section id="section-3" class="legal-section">
+          <h2>
+            <span class="section-num" aria-hidden="true">3</span>
+            Objet du site
+          </h2>
+          <p>
+            Ce site propose des ressources pédagogiques gratuites — exercices interactifs, jeux,
+            révisions — à destination des élèves du cycle 3. L'accès est libre pour la consultation
+            et la pratique des exercices.
+          </p>
+          <p>
+            Certaines fonctionnalités de suivi (historique des résultats, tableau de bord personnalisé)
+            sont réservées aux comptes créés dans le cadre scolaire, sur invitation de l'enseignant.
+          </p>
+        </section>
+
+        <!-- 4. Propriété intellectuelle -->
+        <section id="section-4" class="legal-section">
+          <h2>
+            <span class="section-num" aria-hidden="true">4</span>
+            Propriété intellectuelle
+          </h2>
+          <p>
+            L'ensemble des contenus de ce site (exercices, textes, mises en page, illustrations)
+            est mis à disposition sous licence
+            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr" target="_blank" rel="noopener noreferrer">
+              Creative Commons Attribution – Pas d'Utilisation Commerciale – Partage dans les Mêmes Conditions 4.0 International
+            </a>.
+          </p>
+          <p>Cela signifie que vous pouvez librement :</p>
+          <ul>
+            <li>consulter, copier, télécharger et partager les contenus ;</li>
+            <li>les adapter et les modifier à des fins pédagogiques.</li>
+          </ul>
+          <p>À condition de :</p>
+          <ul>
+            <li>citer l'auteur : <em>François Perocheau – LFM</em> ;</li>
+            <li>ne pas en faire un usage commercial sans autorisation préalable ;</li>
+            <li>partager toute adaptation sous la même licence CC BY-NC-SA.</li>
+          </ul>
+          <div class="cc-badge-wrap">
+            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr" target="_blank" rel="noopener noreferrer" class="cc-badge-link" aria-label="Voir la licence CC BY-NC-SA 4.0">
+              <svg class="cc-badge-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 32" width="128" height="32" aria-hidden="true">
+                <title>CC BY-NC-SA 4.0</title>
+                <!-- CC -->
+                <circle cx="16" cy="16" r="15" fill="#EF9421"/>
+                <text x="16" y="21" text-anchor="middle" font-family="Georgia,serif" font-weight="900" font-size="13" fill="white">cc</text>
+                <!-- BY -->
+                <circle cx="48" cy="16" r="15" fill="#EF9421"/>
+                <circle cx="48" cy="11" r="4" fill="white"/>
+                <path d="M40,28 a9,8 0,0,1,16,0 z" fill="white"/>
+                <!-- NC -->
+                <circle cx="80" cy="16" r="15" fill="#EF9421"/>
+                <text x="80" y="21.5" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="white">¢</text>
+                <!-- SA -->
+                <circle cx="112" cy="16" r="15" fill="#EF9421"/>
+                <path d="M104,16 a8,8 0,1,1,7,7.5" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <polygon points="111,23.5 116,21 117,26.5" fill="white"/>
+              </svg>
+              CC BY-NC-SA 4.0
+            </a>
+          </div>
+        </section>
+
+        <!-- 5. Utilisation du site -->
+        <section id="section-5" class="legal-section">
+          <h2>
+            <span class="section-num" aria-hidden="true">5</span>
+            Utilisation du site
+          </h2>
+          <p>
+            Ce site est destiné à un usage pédagogique exclusivement. L'éditeur ne saurait être
+            tenu responsable d'éventuelles erreurs dans les contenus, d'interruptions de service,
+            ou de tout dommage direct ou indirect lié à l'utilisation du site.
+          </p>
+          <p>
+            L'accès au site et à ses ressources est fourni tel quel, sans garantie de disponibilité
+            permanente.
+          </p>
+        </section>
+
+        <!-- 6. Données personnelles -->
+        <section id="section-6" class="legal-section">
+          <h2>
+            <span class="section-num" aria-hidden="true">6</span>
+            Données personnelles
+          </h2>
+          <p><strong>a) Utilisation libre, sans compte</strong></p>
+          <p>
+            En simple visiteur, aucune donnée nominative n'est collectée. Aucune inscription n'est
+            requise pour accéder aux exercices et ressources.
+          </p>
+          <p><strong>b) Comptes utilisateurs</strong></p>
+          <p>
+            Les enseignants créent leur propre compte, puis créent les comptes de leurs élèves
+            (pseudo et mot de passe uniquement — aucun email n'est associé aux comptes élèves).
+          </p>
+          <p>Les données stockées se limitent à :</p>
+          <ul>
+            <li>un identifiant (pseudo choisi par l'enseignant) ;</li>
+            <li>la classe de l'élève ;</li>
+            <li>les résultats aux exercices et l'historique de progression.</li>
+          </ul>
+          <p>
+            Ces données ne sont jamais cédées à des tiers, ne sont pas utilisées à des fins
+            publicitaires, et restent sous le contrôle de l'enseignant responsable de la classe.
+          </p>
+        </section>
+
+        <!-- 7. Sécurité et accès -->
+        <section id="section-7" class="legal-section">
+          <h2>
+            <span class="section-num" aria-hidden="true">7</span>
+            Sécurité et accès
+          </h2>
+          <p>
+            Chaque élève connecté ne peut consulter que ses propres résultats. Chaque enseignant
+            n'accède qu'aux données de ses propres classes. L'administrateur du site intervient
+            uniquement pour la maintenance technique et n'interagit pas avec les données pédagogiques.
+          </p>
+        </section>
+
+        <!-- 8. Cookies et stockage local -->
+        <section id="section-8" class="legal-section">
+          <h2>
+            <span class="section-num" aria-hidden="true">8</span>
+            Cookies et stockage local
+          </h2>
+          <p>
+            Ce site utilise le <strong>localStorage</strong> du navigateur pour mémoriser
+            temporairement certaines préférences de navigation et des résultats d'exercices
+            en cours de session.
+          </p>
+          <p>
+            Aucun cookie de traçage, aucun outil de publicité ciblée et aucun système de profilage
+            commercial ne sont utilisés.
+          </p>
+        </section>
+
+        <!-- 9. Liens externes -->
+        <section id="section-9" class="legal-section">
+          <h2>
+            <span class="section-num" aria-hidden="true">9</span>
+            Liens externes
+          </h2>
+          <p>
+            Certaines pages peuvent contenir des liens vers des sites tiers (ressources éducatives,
+            licences, documentation). L'éditeur n'est pas responsable du contenu de ces sites
+            et ne les contrôle pas.
+          </p>
+        </section>
+
+        <!-- 10. Évolution du site -->
+        <section id="section-10" class="legal-section">
+          <h2>
+            <span class="section-num" aria-hidden="true">10</span>
+            Évolution du site
+          </h2>
+          <p>
+            Les contenus du site sont régulièrement mis à jour en fonction des programmes scolaires
+            en vigueur et des besoins pédagogiques observés en classe. Les présentes mentions légales
+            peuvent également être modifiées à tout moment.
+          </p>
+        </section>
+
+        <!-- 11. Droit applicable -->
+        <section id="section-11" class="legal-section">
+          <h2>
+            <span class="section-num" aria-hidden="true">11</span>
+            Droit applicable
+          </h2>
+          <p>
+            Ce site est soumis au droit français. En cas de litige relatif à l'utilisation du site
+            ou à ses contenus, une résolution amiable sera systématiquement privilégiée avant tout
+            recours judiciaire.
+          </p>
+        </section>
+
+        <!-- 12. Crédits -->
+        <section id="section-12" class="legal-section">
+          <h2>
+            <span class="section-num" aria-hidden="true">12</span>
+            Crédits
+          </h2>
+          <p>
+            <strong>Conception, développement et contenus :</strong> François Perocheau<br>
+            <strong>Établissement de rattachement :</strong> Lycée Français de Madrid (LFM)<br>
+            <strong>Technologies utilisées :</strong> HTML, CSS, JavaScript, GitHub Pages, Supabase<br>
+            <strong>Diffusion :</strong> sous licence Creative Commons BY-NC-SA 4.0
+          </p>
+          <div class="cc-badge-wrap">
+            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr" target="_blank" rel="noopener noreferrer" class="cc-badge-link" aria-label="Voir la licence CC BY-NC-SA 4.0">
+              <svg class="cc-badge-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 32" width="128" height="32" aria-hidden="true">
+                <title>CC BY-NC-SA 4.0</title>
+                <circle cx="16" cy="16" r="15" fill="#EF9421"/>
+                <text x="16" y="21" text-anchor="middle" font-family="Georgia,serif" font-weight="900" font-size="13" fill="white">cc</text>
+                <circle cx="48" cy="16" r="15" fill="#EF9421"/>
+                <circle cx="48" cy="11" r="4" fill="white"/>
+                <path d="M40,28 a9,8 0,0,1,16,0 z" fill="white"/>
+                <circle cx="80" cy="16" r="15" fill="#EF9421"/>
+                <text x="80" y="21.5" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="white">¢</text>
+                <circle cx="112" cy="16" r="15" fill="#EF9421"/>
+                <path d="M104,16 a8,8 0,1,1,7,7.5" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <polygon points="111,23.5 116,21 117,26.5" fill="white"/>
+              </svg>
+              CC BY-NC-SA 4.0
+            </a>
+          </div>
+        </section>
+
+      </article>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-rule"></div>
+        <div class="footer-body">
+          <p class="footer-text">
+            Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,<br>
+            dans le respect d'un <strong class="footer-em">usage mesuré</strong> des écrans.
+          </p>
+        </div>
+        <p class="footer-credit">© 2026 François Perocheau – LFM &nbsp;•&nbsp; CC BY-NC-SA 4.0 &nbsp;•&nbsp; <a href="mentions-legales.html">Mentions légales</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/menu.js"></script>
+</body>
+</html>
