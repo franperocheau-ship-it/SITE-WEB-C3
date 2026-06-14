@@ -9,7 +9,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/results.js"></script>
-  <script src="exercise-data.js?v=3"></script>
+  <script src="exercise-data.js?v=4"></script>
   <style>
     /* ── Page layout ────────────────────────────────────────── */
     .page-wrap {
@@ -540,6 +540,23 @@
       border-color: var(--blue);
       background: rgba(16,43,106,0.04);
       transform: translateY(-2px);
+    }
+
+    .ex-results-back-link {
+      display: block;
+      text-align: center;
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: underline;
+    }
+    .ex-results-back-link:hover { color: var(--blue); }
+
+    .ex-congrats-all {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 20px;
     }
 
     /* ── Text input ─────────────────────────────────────────── */
@@ -1268,6 +1285,54 @@
       background: rgba(22,163,74,0.06);
     }
 
+    /* ── Type : accord-participe-cod ───────────────────────────────────── */
+    .pp-sentence {
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.8;
+      padding: 18px 20px;
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      margin: 12px 0 18px;
+      text-align: center;
+    }
+    .pp-blank {
+      display: inline-block;
+      border-bottom: 3px solid var(--blue);
+      padding: 0 8px 2px;
+      color: rgba(16,43,106,0.4);
+      font-style: italic;
+      min-width: 56px;
+      text-align: center;
+    }
+    .apcod-choices {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 8px 0 4px;
+    }
+    .apcod-hint-agree {
+      background: rgba(22,163,74,0.08);
+      border: 1px solid rgba(22,163,74,0.25);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #15803d;
+      margin-bottom: 14px;
+    }
+    .apcod-hint-no-agree {
+      background: rgba(16,43,106,0.05);
+      border: 1px solid rgba(16,43,106,0.15);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--blue);
+      margin-bottom: 14px;
+    }
+
     /* ── Type : choix-etiquette ──────────────────────────────────────────── */
     .ex-label-display {
       font-size: 56px;
@@ -1770,6 +1835,106 @@
       color: var(--blue);
       letter-spacing: 0.04em;
     }
+
+    /* ── Type : faire-niveaux ───────────────────────────────────────────────── */
+    .faire-temps-badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 3px 10px;
+      margin-bottom: 14px;
+      line-height: 1;
+    }
+    .faire-temps-present        { background: #27ae60; color: #fff; }
+    .faire-temps-imparfait      { background: #2980b9; color: #fff; }
+    .faire-temps-futur          { background: #8e44ad; color: #fff; }
+    .faire-temps-passe-compose  { background: #e67e22; color: #fff; }
+    .faire-temps-passe-simple   { background: #c0392b; color: #fff; }
+    .faire-temps-plus-que-parf  { background: #922b21; color: #fff; }
+    .faire-temps-imperatif      { background: #1abc9c; color: #fff; }
+    .faire-temps-conditionnel   { background: #e91e8c; color: #fff; }
+
+    .faire-phrase-display {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      text-align: center;
+      padding: 22px 28px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .faire-input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .faire-text-input {
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-family: inherit;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      max-width: 220px;
+      width: 100%;
+      text-align: center;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+    .faire-text-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(16,43,106,0.10);
+    }
+    .faire-text-input.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.06);
+      color: #15803d;
+    }
+    .faire-text-input.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+    .faire-text-input:disabled { cursor: default; }
+
+    /* Confetti */
+    .faire-confetti-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      overflow: hidden;
+    }
+    .faire-confetti-piece {
+      position: absolute;
+      top: -20px;
+      border-radius: 2px;
+      animation: faireFall linear forwards;
+    }
+    @keyframes faireFall {
+      0%   { transform: translateY(0) rotate(0deg);    opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    @media (max-width: 600px) {
+      .faire-phrase-display { font-size: 18px; padding: 16px 16px; }
+      .faire-input-row      { flex-direction: column; align-items: stretch; }
+      .faire-text-input     { max-width: 100%; }
+    }
+
   </style>
 </head>
 <body>
@@ -1851,12 +2016,7 @@
             <div class="ex-score-value" id="score-value"></div>
             <div class="ex-score-pct"   id="score-pct"></div>
             <div class="ex-score-msg"   id="score-msg"></div>
-            <div class="ex-results-btns">
-              <button class="ex-btn-primary" id="restart-btn">Recommencer</button>
-              <a id="ex-back-btn" href="français-conjugaison.html" class="ex-btn-secondary">
-                Retour aux notions
-              </a>
-            </div>
+            <div id="ex-results-btns-wrap"></div>
           </div>
         </div>
 
@@ -1897,7 +2057,7 @@
             dans le respect d'un <strong class="footer-em">usage mesuré</strong> des écrans.
           </p>
         </div>
-        <p class="footer-credit">© François PEROCHEAU — LFM 2026</p>
+        <p class="footer-credit">© 2026 François Perocheau – LFM &nbsp;•&nbsp; CC BY-NC-SA 4.0 &nbsp;•&nbsp; <a href="mentions-legales.html">Mentions légales</a></p>
       </div>
     </div>
   </footer>
@@ -1928,6 +2088,13 @@
     let conjTableRows    = [];   /* conjugation-table type */
     let pfiSelectedLevel = null; /* produire-3-formes : niveau sélectionné */
     let accordLevel      = null; /* accord-ecrit      : niveau sélectionné */
+    let apcodLevel       = null; /* accord-participe-cod : niveau sélectionné */
+
+    /* Suivi générique du niveau courant (tous exercices à niveaux) */
+    let sessionLevelList   = [];   /* liste ordonnée des valeurs de niveau */
+    let sessionLevelLabels = [];   /* libellés d'affichage correspondants   */
+    let sessionLevelIdx    = -1;   /* index du niveau courant (-1 = pas de multi-niveaux) */
+    let sessionLevelLoader = null; /* fn(valeurNiveau) → charge les questions de ce niveau */
     let vpState      = null;     /* valeur-position  : état de session     */
     let vpTableSt    = null;     /* valeur-position  : état tableau étape 2 */
 
@@ -1980,12 +2147,6 @@
           return `<span class="badge ${cls}">${l}</span>`;
         }).join("");
 
-      /* Results back button */
-      document.getElementById("ex-back-btn").href = sessionData.backLink.href;
-
-      /* Bind restart */
-      document.getElementById("restart-btn").addEventListener("click", startSession);
-
       /* Total counter */
       document.getElementById("q-total").textContent = sessionData.questionsPerSession;
 
@@ -2003,6 +2164,11 @@
       nbEntierLevel    = null;
       cmpLevel         = null;
       encadrLevel      = null;
+      apcodLevel       = null;
+      sessionLevelList   = [];
+      sessionLevelLabels = [];
+      sessionLevelIdx    = -1;
+      sessionLevelLoader = null;
       /* Multiple types → show the choice screen; single type → start directly */
       if (sessionData.exerciseTypes && sessionData.exerciseTypes.length > 1) {
         showTypeSelect();
@@ -2076,7 +2242,19 @@
 
       grid.querySelectorAll(".ex-type-card").forEach(btn =>
         btn.addEventListener("click", () => {
-          pfiSelectedLevel = btn.dataset.level;
+          pfiSelectedLevel   = btn.dataset.level;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = [...levels];
+          sessionLevelIdx    = levels.indexOf(pfiSelectedLevel);
+          sessionLevelLoader = (lv) => {
+            pfiSelectedLevel = lv;
+            questions = shuffle(sessionData.bank).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+          };
           document.getElementById("level-select-screen").classList.add("ex-hidden");
           document.getElementById("exercise-screen").classList.remove("ex-hidden");
           showQuestion(0);
@@ -2123,6 +2301,21 @@
           questions = shuffle(filtered).slice(0, n);
           currentIndex = 0;
           score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = [...levels];
+          sessionLevelIdx    = levels.indexOf(accordLevel);
+          sessionLevelLoader = (lv) => {
+            accordLevel = lv;
+            const d  = diffMap[lv];
+            const fq = (sessionData.bank || []).filter(q => q.difficulty === d);
+            const nb = sessionData.questionsPerSession || 15;
+            questions = shuffle(fq).slice(0, nb);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+          };
           document.getElementById("q-total").textContent = questions.length;
           document.getElementById("level-select-screen").classList.add("ex-hidden");
           document.getElementById("exercise-screen").classList.remove("ex-hidden");
@@ -2156,6 +2349,9 @@
         return;
       } else if (currentType === "vocabu-bilingue") {
         vbInitSession();
+        return;
+      } else if (currentType === "faire-niveaux") {
+        faireInitSession();
         return;
       } else {
         bankSource = sessionData.bank;
@@ -2269,6 +2465,10 @@
         renderValeurPosition(card);
       } else if (currentType === "vocabu-bilingue") {
         /* session managed by vbInitSession / vbStartLevel — no-op here */
+      } else if (currentType === "faire-niveaux") {
+        /* session managed by faireInitSession — no-op here */
+      } else if (currentType === "accord-participe-cod") {
+        renderAccordParticipeCod(card, q);
       }
     }
 
@@ -2735,6 +2935,70 @@
 
     /* ── Results ──────────────────────────────────────────────────────────── */
 
+    /* Configure les boutons de l'écran de résultats selon qu'il reste un niveau suivant ou non. */
+    function _setupResultsScreen() {
+      const backHref  = sessionData?.backLink?.href  || '#';
+      const backLabel = sessionData?.backLink?.label || 'Retour';
+      const wrap      = document.getElementById('ex-results-btns-wrap');
+
+      const hasMulti  = sessionLevelIdx >= 0 && sessionLevelList.length > 1;
+      const isLast    = sessionLevelIdx >= sessionLevelList.length - 1;
+
+      if (hasMulti && !isLast) {
+        /* Pas dernier niveau : bouton principal "Niveau suivant" */
+        const nextLabel = sessionLevelLabels[sessionLevelIdx + 1];
+        wrap.innerHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="next-level-btn">Niveau suivant → ${nextLabel}</button>
+            <button class="ex-btn-secondary" id="restart-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>
+        `;
+        document.getElementById('next-level-btn').addEventListener('click', () => {
+          sessionLevelIdx++;
+          document.getElementById('results-screen').classList.add('ex-hidden');
+          document.getElementById('exercise-screen').classList.remove('ex-hidden');
+          sessionStartTime = Date.now();
+          sessionLevelLoader(sessionLevelList[sessionLevelIdx]);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        document.getElementById('restart-btn').addEventListener('click', () => {
+          document.getElementById('results-screen').classList.add('ex-hidden');
+          document.getElementById('exercise-screen').classList.remove('ex-hidden');
+          sessionStartTime = Date.now();
+          sessionLevelLoader(sessionLevelList[sessionLevelIdx]);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+      } else if (hasMulti && isLast) {
+        /* Dernier niveau : félicitations, pas de "Niveau suivant" */
+        wrap.innerHTML = `
+          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
+          <div class="ex-results-btns">
+            <button class="ex-btn-secondary" id="restart-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>
+        `;
+        document.getElementById('restart-btn').addEventListener('click', () => {
+          document.getElementById('results-screen').classList.add('ex-hidden');
+          document.getElementById('exercise-screen').classList.remove('ex-hidden');
+          sessionStartTime = Date.now();
+          sessionLevelLoader(sessionLevelList[sessionLevelIdx]);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+      } else {
+        /* Exercice sans multi-niveaux : comportement d'origine */
+        wrap.innerHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="restart-btn">Recommencer</button>
+            <a href="${backHref}" class="ex-btn-secondary">Retour aux notions</a>
+          </div>
+        `;
+        document.getElementById('restart-btn').addEventListener('click', startSession);
+      }
+    }
+
     /* Dérive subject/category depuis le href du backLink.
        Ex. "français-conjugaison.html" → { subject:"français", category:"conjugaison" }
            "mathématiques-nombres-entiers.html" → { subject:"mathématiques", category:"nombres-entiers" } */
@@ -2762,12 +3026,13 @@
       else                  msg = "💪 Encore un petit effort !";
 
       document.getElementById("score-msg").textContent = msg;
+      _setupResultsScreen();
       window.scrollTo({ top: 0, behavior: "smooth" });
 
       /* Enregistrement du résultat pour les élèves connectés */
       const slug = new URLSearchParams(window.location.search).get('slug');
       const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
-      const activeLevel = pfiSelectedLevel || accordLevel || fracLevel || rfLevel || nlLevel || nbEntierLevel || cmpLevel || encadrLevel || null;
+      const activeLevel = pfiSelectedLevel || accordLevel || apcodLevel || fracLevel || rfLevel || nlLevel || nbEntierLevel || cmpLevel || encadrLevel || null;
       saveExerciseResult({
         exerciseSlug: slug,
         subject,
@@ -4132,6 +4397,19 @@
             questions = shuffle(sessionData.bank.filter(it => it.difficulty === fracLevel))
                           .slice(0, sessionData.questionsPerSession);
             document.getElementById('q-total').textContent = questions.length;
+            sessionLevelList   = [1, 2];
+            sessionLevelLabels = ['Niveau 1', 'Niveau 2'];
+            sessionLevelIdx    = fracLevel - 1;
+            sessionLevelLoader = (lv) => {
+              fracLevel = lv;
+              questions = shuffle(sessionData.bank.filter(it => it.difficulty === lv))
+                            .slice(0, sessionData.questionsPerSession);
+              document.getElementById('q-total').textContent = questions.length;
+              document.getElementById('ex-bar-fill').style.width = '0%';
+              currentIndex = 0;
+              score        = 0;
+              showQuestion(0);
+            };
             currentIndex = 0;
             score = 0;
             showQuestion(0);
@@ -4249,6 +4527,19 @@
             questions = shuffle(sessionData.bank.filter(it => it.level === rfLevel))
                           .slice(0, sessionData.questionsPerSession);
             document.getElementById('q-total').textContent = questions.length;
+            sessionLevelList   = [1, 2];
+            sessionLevelLabels = ['Niveau 1', 'Niveau 2'];
+            sessionLevelIdx    = rfLevel - 1;
+            sessionLevelLoader = (lv) => {
+              rfLevel   = lv;
+              questions = shuffle(sessionData.bank.filter(it => it.level === lv))
+                            .slice(0, sessionData.questionsPerSession);
+              document.getElementById('q-total').textContent = questions.length;
+              document.getElementById('ex-bar-fill').style.width = '0%';
+              currentIndex = 0;
+              score        = 0;
+              showQuestion(0);
+            };
             currentIndex = 0;
             score        = 0;
             showQuestion(0);
@@ -4401,6 +4692,19 @@
             questions = shuffle(sessionData.bank.filter(it => it.level === nlLevel))
                           .slice(0, sessionData.questionsPerSession);
             document.getElementById('q-total').textContent = questions.length;
+            sessionLevelList   = [1, 2];
+            sessionLevelLabels = ['Niveau 1', 'Niveau 2'];
+            sessionLevelIdx    = nlLevel - 1;
+            sessionLevelLoader = (lv) => {
+              nlLevel   = lv;
+              questions = shuffle(sessionData.bank.filter(it => it.level === lv))
+                            .slice(0, sessionData.questionsPerSession);
+              document.getElementById('q-total').textContent = questions.length;
+              document.getElementById('ex-bar-fill').style.width = '0%';
+              currentIndex = 0;
+              score        = 0;
+              showQuestion(0);
+            };
             currentIndex = 0;
             score = 0;
             showQuestion(0);
@@ -4643,6 +4947,19 @@
             questions = shuffle(sessionData.bank.filter(it => it.level === cmpLevel))
                           .slice(0, sessionData.questionsPerSession);
             document.getElementById('q-total').textContent = questions.length;
+            sessionLevelList   = [1, 2, 3];
+            sessionLevelLabels = ['Niveau 1', 'Niveau 2', 'Niveau 3'];
+            sessionLevelIdx    = cmpLevel - 1;
+            sessionLevelLoader = (lv) => {
+              cmpLevel  = lv;
+              questions = shuffle(sessionData.bank.filter(it => it.level === lv))
+                            .slice(0, sessionData.questionsPerSession);
+              document.getElementById('q-total').textContent = questions.length;
+              document.getElementById('ex-bar-fill').style.width = '0%';
+              currentIndex = 0;
+              score        = 0;
+              showQuestion(0);
+            };
             currentIndex = 0;
             score        = 0;
             showQuestion(0);
@@ -5076,6 +5393,19 @@
             questions   = shuffle(sessionData.bank.filter(it => it.difficulty === encadrLevel))
                             .slice(0, sessionData.questionsPerSession);
             document.getElementById('q-total').textContent = questions.length;
+            sessionLevelList   = [1, 2];
+            sessionLevelLabels = ['Niveau 1 — CM1 / CM2', 'Niveau 2 — CM2 / 6e'];
+            sessionLevelIdx    = encadrLevel - 1;
+            sessionLevelLoader = (lv) => {
+              encadrLevel = lv;
+              questions   = shuffle(sessionData.bank.filter(it => it.difficulty === lv))
+                              .slice(0, sessionData.questionsPerSession);
+              document.getElementById('q-total').textContent = questions.length;
+              document.getElementById('ex-bar-fill').style.width = '0%';
+              currentIndex = 0;
+              score        = 0;
+              showQuestion(0);
+            };
             currentIndex = 0;
             score        = 0;
             showQuestion(0);
@@ -5331,6 +5661,7 @@
       else if (pct >= 60) msg = '👍 Continue comme ça !';
       else                msg = '💪 Encore un petit effort !';
       document.getElementById('score-msg').textContent = msg;
+      _setupResultsScreen();
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
       const slug = new URLSearchParams(window.location.search).get('slug');
@@ -5401,6 +5732,19 @@
             questions = shuffle(sessionData.bank.filter(it => it.level === nbEntierLevel))
                           .slice(0, sessionData.questionsPerSession);
             document.getElementById('q-total').textContent = questions.length;
+            sessionLevelList   = ['CM1', 'CM2'];
+            sessionLevelLabels = ['CM1', 'CM2'];
+            sessionLevelIdx    = ['CM1', 'CM2'].indexOf(nbEntierLevel);
+            sessionLevelLoader = (lv) => {
+              nbEntierLevel = lv;
+              questions = shuffle(sessionData.bank.filter(it => it.level === lv))
+                            .slice(0, sessionData.questionsPerSession);
+              document.getElementById('q-total').textContent = questions.length;
+              document.getElementById('ex-bar-fill').style.width = '0%';
+              currentIndex = 0;
+              score        = 0;
+              showQuestion(0);
+            };
             currentIndex = 0;
             score = 0;
             showQuestion(0);
@@ -6202,8 +6546,8 @@
       document.getElementById('results-screen').classList.add('ex-hidden');
       document.getElementById('exercise-screen').classList.remove('ex-hidden');
       document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
-      document.getElementById('q-total').textContent = '—';
-      document.getElementById('q-num').textContent   = '—';
+      const _vbProg = document.querySelector('#exercise-screen .ex-progress');
+      if (_vbProg) _vbProg.classList.add('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '0%';
 
       vbRenderLevelSelect(document.getElementById('ex-card'));
@@ -6239,6 +6583,8 @@
     }
 
     function vbStartLevel(n) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
       if (n === 1) vbStartLevel1();
       else if (n === 2) vbStartLevel2();
       else if (n === 3) vbStartLevel3();
@@ -6751,6 +7097,495 @@
 
       document.getElementById('vr-retry-btn').addEventListener('click', vrStartQuiz);
       document.getElementById('vr-quiz-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    /* ── Type : accord-participe-cod ────────────────────────────────────────
+       Niveau 1 (guidé) : étape 1 → clic sur le COD, étape 2 → écrire le PP
+       Niveau 2 (autonome) : l'élève écrit directement le PP correctement accordé
+    ────────────────────────────────────────────────────────────────────────── */
+
+    function renderAccordParticipeCod(card, q) {
+      if (apcodLevel === null) {
+        card.innerHTML = `
+          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
+            Quel niveau veux-tu pratiquer ?
+          </p>
+          <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
+            <button class="ex-type-card" data-level="1">
+              <span class="ex-type-icon">⭐</span>
+              <div>
+                <span class="ex-type-name">Niveau 1 — CM2</span>
+                <span class="ex-type-desc">Identifie d'abord le COD, puis écris le participe accordé</span>
+              </div>
+            </button>
+            <button class="ex-type-card" data-level="2">
+              <span class="ex-type-icon">⭐⭐</span>
+              <div>
+                <span class="ex-type-name">Niveau 2 — 6e</span>
+                <span class="ex-type-desc">Analyse seul(e) et écris directement le participe</span>
+              </div>
+            </button>
+          </div>
+        `;
+        document.getElementById('ex-bar-fill').style.width = '0%';
+        card.querySelectorAll('.ex-type-card').forEach(btn =>
+          btn.addEventListener('click', () => {
+            apcodLevel = parseInt(btn.dataset.level, 10);
+            questions  = shuffle(sessionData.bank).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            sessionLevelList   = [1, 2];
+            sessionLevelLabels = ['Niveau 1 — CM2', 'Niveau 2 — 6e'];
+            sessionLevelIdx    = apcodLevel - 1;
+            sessionLevelLoader = (lv) => {
+              apcodLevel = lv;
+              questions  = shuffle(sessionData.bank).slice(0, sessionData.questionsPerSession);
+              document.getElementById('q-total').textContent = questions.length;
+              document.getElementById('ex-bar-fill').style.width = '0%';
+              currentIndex = 0;
+              score        = 0;
+              showQuestion(0);
+            };
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+          })
+        );
+        return;
+      }
+      if (apcodLevel === 1) {
+        _renderApcodNiveau1(card, q);
+      } else {
+        _renderApcodNiveau2(card, q);
+      }
+    }
+
+    function _apcodSentenceHtml(q) {
+      return q.sentence.replace('___', `<span class="pp-blank">${q.base}…</span>`);
+    }
+
+    function _renderApcodNiveau1(card, q) {
+      let step1Correct = false;
+      const sentHtml   = _apcodSentenceHtml(q);
+      const correctChoice = q.choices.find(c => c.isCorrect);
+
+      const choicesHtml = shuffle([...q.choices]).map(c =>
+        `<button class="ex-choice apcod-cod-btn" data-correct="${c.isCorrect}">${c.label}</button>`
+      ).join('');
+
+      card.innerHTML = `
+        <div id="apcod-step1">
+          <p class="ex-question-label">Repère le COD placé <strong>avant</strong> le verbe. Clique sur le bon groupe.</p>
+          <div class="pp-sentence">${sentHtml}</div>
+          <div class="apcod-choices" id="apcod-choices">${choicesHtml}</div>
+          <div class="ex-feedback-area" id="apcod-fb1"></div>
+        </div>
+        <div id="apcod-step2" class="ex-hidden">
+          <div class="ex-step2-divider"></div>
+          <p class="ex-question-label">Écris le participe passé correctement accordé.</p>
+          <div id="apcod-agree-hint"></div>
+          <div class="ex-input-row">
+            <input type="text" class="ex-text-input" id="apcod-pp-input"
+                   autocomplete="off" autocorrect="off" autocapitalize="off"
+                   spellcheck="false" placeholder="Écris le participe passé…">
+            <button class="ex-validate-btn" id="apcod-pp-btn">Valider</button>
+          </div>
+          <div class="ex-feedback-area" id="apcod-fb2"></div>
+        </div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      card.querySelectorAll('.apcod-cod-btn').forEach(btn =>
+        btn.addEventListener('click', () => {
+          card.querySelectorAll('.apcod-cod-btn').forEach(b => b.disabled = true);
+          const isCorrect = btn.dataset.correct === 'true';
+          step1Correct = isCorrect;
+
+          card.querySelectorAll('.apcod-cod-btn').forEach(b => {
+            if (b.dataset.correct === 'true') b.classList.add('is-correct');
+          });
+          if (!isCorrect) btn.classList.add('is-wrong');
+
+          const hintEl = document.getElementById('apcod-agree-hint');
+          if (q.hasCodBefore) {
+            const fb = isCorrect
+              ? `<div class="ex-feedback-correct">${rand(SUCCESS)}<br><small style="font-size:12px">${q.codHint}</small></div>`
+              : `<div class="ex-feedback-wrong">❌ Le COD est <strong>« ${correctChoice.label} »</strong>.<br><small>${q.codHint}</small></div>`;
+            setFeedback('apcod-fb1', fb);
+            hintEl.innerHTML = `<div class="apcod-hint-agree">ℹ️ ${q.codHint} → accorde le participe !</div>`;
+          } else {
+            const fb = isCorrect
+              ? `<div class="ex-feedback-correct">${rand(SUCCESS)}<br><small style="font-size:12px">Il n'y a pas de COD avant le verbe → le participe ne s'accorde pas.</small></div>`
+              : `<div class="ex-feedback-wrong">❌ Ce groupe n'est pas le COD avant le verbe.<br><small>${q.explanation}</small></div>`;
+            setFeedback('apcod-fb1', fb);
+            hintEl.innerHTML = `<div class="apcod-hint-no-agree">ℹ️ Pas de COD avant le verbe → le participe passé ne s'accorde pas.</div>`;
+          }
+
+          setTimeout(() => {
+            document.getElementById('apcod-step2').classList.remove('ex-hidden');
+            document.getElementById('apcod-step2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            setTimeout(() => { const inp = document.getElementById('apcod-pp-input'); if (inp) inp.focus(); }, 80);
+          }, 820);
+        })
+      );
+
+      function validatePP() {
+        const input  = document.getElementById('apcod-pp-input');
+        const valBtn = document.getElementById('apcod-pp-btn');
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+        if (isRight) {
+          if (step1Correct) score++;
+          const extra = step1Correct ? '' : '<br><small style="font-size:12px">Pense à bien repérer le COD d\'abord !</small>';
+          setFeedback('apcod-fb2', `<div class="ex-feedback-correct">${rand(SUCCESS)}${extra}</div>`);
+        } else {
+          setFeedback('apcod-fb2', `
+            <div class="ex-feedback-wrong">
+              ❌ La bonne réponse est <strong>« ${q.answer} »</strong>.<br>
+              <small>${q.explanation}</small>
+            </div>`);
+        }
+        showNextBtn();
+      }
+
+      document.getElementById('apcod-pp-input').addEventListener('keydown', e => { if (e.key === 'Enter') validatePP(); });
+      document.getElementById('apcod-pp-btn').addEventListener('click', validatePP);
+    }
+
+    function _renderApcodNiveau2(card, q) {
+      const sentHtml = _apcodSentenceHtml(q);
+
+      card.innerHTML = `
+        <p class="ex-question-label">Repère le COD et écris le participe passé correctement accordé.</p>
+        <div class="pp-sentence">${sentHtml}</div>
+        <div class="ex-input-row" style="margin-top:14px">
+          <input type="text" class="ex-text-input" id="apcod-pp-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Écris le participe passé…">
+          <button class="ex-validate-btn" id="apcod-pp-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="apcod-fb1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const input  = document.getElementById('apcod-pp-input');
+      const valBtn = document.getElementById('apcod-pp-btn');
+      setTimeout(() => input.focus(), 50);
+
+      function validate() {
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+        if (isRight) {
+          score++;
+          setFeedback('apcod-fb1', `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+        } else {
+          setFeedback('apcod-fb1', `
+            <div class="ex-feedback-wrong">
+              ❌ La bonne réponse est <strong>« ${q.answer} »</strong>.<br>
+              <small>${q.explanation}</small>
+            </div>`);
+        }
+        showNextBtn();
+      }
+
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') validate(); });
+      valBtn.addEventListener('click', validate);
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       TYPE : faire-niveaux  —  Conjugaison du verbe FAIRE, 3 niveaux progressifs
+       CM1 (Présent / Imparfait / Futur / Passé composé)
+       CM2 (Passé simple / Plus-que-parfait)
+       6e  (Impératif / Conditionnel)
+       Progression verrouillée : seuil 80 %, persistance localStorage.
+       ══════════════════════════════════════════════════════════════════════════ */
+
+    const FAIRE_SEUIL = 0.8;
+    const FAIRE_LEVELS = ['CM1', 'CM2', '6e'];
+    const FAIRE_TEMPS_CLASS = {
+      'Présent':          'faire-temps-present',
+      'Imparfait':        'faire-temps-imparfait',
+      'Futur simple':     'faire-temps-futur',
+      'Passé composé':    'faire-temps-passe-compose',
+      'Passé simple':     'faire-temps-passe-simple',
+      'Plus-que-parfait': 'faire-temps-plus-que-parf',
+      'Impératif':        'faire-temps-imperatif',
+      'Conditionnel':     'faire-temps-conditionnel',
+    };
+    const FAIRE_POSITIFS = ['Excellent ! 🎉', 'Bravo ! ⭐', 'Parfait ! 🌟', 'Super ! 👏'];
+
+    let faireState = null;
+
+    function faireGetValidated() {
+      try { return JSON.parse(localStorage.getItem('faire_niveaux_valides') || '[]'); }
+      catch { return []; }
+    }
+    function faireSetValidated(arr) {
+      localStorage.setItem('faire_niveaux_valides', JSON.stringify(arr));
+    }
+
+    function faireShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function faireNorm(str) {
+      return str.toLowerCase().trim()
+        .replace(/\s+/g, ' ')
+        .replace(/[''`´'']/g, '');
+    }
+
+    /* ── Init : cache la barre de progression, affiche le choix de niveau ── */
+    function faireInitSession() {
+      faireState   = null;
+      score        = 0;
+      currentIndex = 0;
+      sessionStartTime = Date.now();
+
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      faireRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Écran de sélection de niveau (verrouillé / déverrouillé) ────────── */
+    function faireRenderLevelSelect(card) {
+      const validated = faireGetValidated();
+      const descs = [
+        'Présent, Imparfait, Futur simple, Passé composé',
+        'Passé simple, Plus-que-parfait',
+        'Impératif, Conditionnel',
+      ];
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="ex-type-grid">
+          ${FAIRE_LEVELS.map((lv, i) => {
+            const unlocked = i === 0 || validated.includes(FAIRE_LEVELS[i - 1]);
+            const done     = validated.includes(lv);
+            const icon     = !unlocked ? '🔒' : done ? '✅' : ['⭐', '⭐⭐', '⭐⭐⭐'][i];
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const disabled = !unlocked ? ' disabled' : '';
+            const desc     = !unlocked
+              ? 'Valide le niveau précédent pour débloquer'
+              : done ? descs[i] + ' · Niveau validé !'
+              : descs[i];
+            return `<button class="ex-type-card${cls}" data-level="${lv}"${disabled}>
+              <span class="ex-type-icon">${icon}</span>
+              <div>
+                <span class="ex-type-name">Niveau ${i + 1} — ${lv}</span>
+                <span class="ex-type-desc">${desc}</span>
+              </div>
+            </button>`;
+          }).join('')}
+        </div>
+      `;
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => faireStartLevel(btn.dataset.level))
+      );
+    }
+
+    /* ── Démarre un niveau : mélange le pool et lance la première question ── */
+    function faireStartLevel(lv) {
+      const pool = sessionData.pools[lv];
+      const qs   = faireShuffle(pool);
+
+      faireState = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      document.getElementById('q-total').textContent = qs.length;
+      faireRenderQuestion();
+    }
+
+    /* ── Affiche la question courante ────────────────────────────────────── */
+    function faireRenderQuestion() {
+      const { questions, idx, total } = faireState;
+      const q = questions[idx];
+
+      document.getElementById('q-num').textContent        = idx + 1;
+      document.getElementById('ex-bar-fill').style.width  = (idx / total * 100) + '%';
+
+      const cls  = FAIRE_TEMPS_CLASS[q.temps] || 'faire-temps-present';
+      const card = document.getElementById('ex-card');
+      card.innerHTML = `
+        <span class="faire-temps-badge ${cls}">${q.temps}</span>
+        <p class="ex-question-label">Conjugue le verbe <strong>faire</strong> dans cette phrase.</p>
+        <div class="faire-phrase-display">${q.phrase.replace('___', '<span style="color:var(--muted);font-style:italic">___</span>')}</div>
+        <div class="faire-input-row">
+          <input type="text" id="faire-input" class="faire-text-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="faire-validate-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="faire-feedback"></div>
+      `;
+      const input = document.getElementById('faire-input');
+      const btn   = document.getElementById('faire-validate-btn');
+      setTimeout(() => input.focus(), 50);
+      btn.addEventListener('click',  faireHandleValidate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') faireHandleValidate(); });
+    }
+
+    /* ── Validation de la réponse ────────────────────────────────────────── */
+    function faireHandleValidate() {
+      const input = document.getElementById('faire-input');
+      const btn   = document.getElementById('faire-validate-btn');
+      if (!input || !input.value.trim()) return;
+
+      input.disabled = true;
+      btn.disabled   = true;
+
+      const q       = faireState.questions[faireState.idx];
+      const isRight = faireNorm(input.value) === faireNorm(q.reponse);
+
+      if (isRight) {
+        faireState.score++;
+        input.classList.add('is-correct');
+        document.getElementById('faire-feedback').innerHTML =
+          `<div class="ex-feedback-correct">${FAIRE_POSITIFS[Math.floor(Math.random() * FAIRE_POSITIFS.length)]}</div>`;
+      } else {
+        input.classList.add('is-wrong');
+        document.getElementById('faire-feedback').innerHTML =
+          `<div class="ex-feedback-wrong">❌ La bonne réponse était : <strong>${q.reponse}</strong><br><em>${q.explication}</em></div>`;
+      }
+
+      setTimeout(() => {
+        faireState.idx++;
+        if (faireState.idx >= faireState.total) {
+          faireShowLevelResults();
+        } else {
+          faireRenderQuestion();
+        }
+      }, 1500);
+    }
+
+    /* ── Résultats d'un niveau ───────────────────────────────────────────── */
+    function faireShowLevelResults() {
+      const { level, score: lvScore, total } = faireState;
+      const pct    = lvScore / total;
+      const passed = pct >= FAIRE_SEUIL;
+
+      if (passed) {
+        const validated = faireGetValidated();
+        if (!validated.includes(level)) { validated.push(level); faireSetValidated(validated); }
+        faireShowConfetti();
+      }
+
+      const lvIdx   = FAIRE_LEVELS.indexOf(level);
+      const isLast  = lvIdx === FAIRE_LEVELS.length - 1;
+      const allDone = faireGetValidated().length >= FAIRE_LEVELS.length;
+      const nextLv  = !isLast ? FAIRE_LEVELS[lvIdx + 1] : null;
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(pct * 100) + ' %';
+
+      let msg, btnsHTML;
+      const backHref = sessionData.backLink?.href || 'français-conjugaison.html';
+
+      if (passed && allDone && isLast) {
+        msg = '🎊 Bravo ! Tu maîtrises la conjugaison du verbe FAIRE à tous les niveaux ! Tu es un(e) champion(ne) de conjugaison !';
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="faire-reset-btn">Recommencer depuis le début</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else if (passed) {
+        msg = `Niveau ${level} validé ! 🏆${nextLv ? ` Le niveau ${nextLv} est débloqué !` : ''}`;
+        btnsHTML = nextLv ? `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="faire-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-secondary" id="faire-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>` : `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="faire-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else {
+        msg = `Pas encore… Tu y es presque ! Score : ${lvScore}/${total}. Il faut 80 % pour passer. On réessaie ?`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="faire-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      }
+
+      document.getElementById('score-msg').textContent         = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('faire-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        faireStartLevel(faireState.level);
+      });
+      document.getElementById('faire-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        faireStartLevel(nextLv);
+      });
+      document.getElementById('faire-reset-btn')?.addEventListener('click', () => {
+        faireSetValidated([]);
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        faireInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug,
+        subject,
+        category,
+        exerciseType: 'faire-niveaux',
+        level:        faireState.level,
+        score:        faireState.score,
+        total:        faireState.total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ── Confettis CSS-only (20 divs animés) ────────────────────────────── */
+    function faireShowConfetti() {
+      const colors = ['#27ae60','#2980b9','#8e44ad','#e67e22','#c0392b','#1abc9c','#e91e8c','#f39c12'];
+      const container = document.createElement('div');
+      container.className = 'faire-confetti-container';
+      for (let i = 0; i < 20; i++) {
+        const p = document.createElement('div');
+        p.className = 'faire-confetti-piece';
+        p.style.left             = Math.random() * 100 + 'vw';
+        p.style.background       = colors[Math.floor(Math.random() * colors.length)];
+        p.style.width            = (8 + Math.random() * 8) + 'px';
+        p.style.height           = (8 + Math.random() * 8) + 'px';
+        p.style.animationDelay    = (Math.random() * 0.8) + 's';
+        p.style.animationDuration = (1.5 + Math.random()) + 's';
+        container.appendChild(p);
+      }
+      document.body.appendChild(container);
+      setTimeout(() => container.remove(), 3500);
     }
 
     /* ── Start ────────────────────────────────────────────────────────────── */

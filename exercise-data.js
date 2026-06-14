@@ -3497,6 +3497,277 @@ const EXERCISE_DATA = {
     ]
   },
 
+  /* ══════════════════════════════════════════════════════════════════════
+     ORTHOGRAPHE — ACCORD DU PARTICIPE PASSÉ AVEC LE COD
+  ══════════════════════════════════════════════════════════════════════ */
+
+  "ortho-accorder-participe-passe-cod": {
+    title: "Accorder le participe passé avec le COD",
+    type:  "accord-participe-cod",
+    levels: ["CM2", "6e"],
+    questionsPerSession: 8,
+    backLink: { href: "français-orthographe.html", label: "Orthographe" },
+
+    /* ── Banque de phrases ──────────────────────────────────────────────────
+       Chaque phrase contient un participe passé à compléter (marqué ___).
+       Trois situations :
+         A. COD placé AVANT le verbe via pronom relatif « que/qu' »  → accord
+         B. COD placé AVANT le verbe via déplacement + pronom perso  → accord
+         C. COD placé APRÈS le verbe ou absent                       → invariable
+       Champs :
+         sentence    — phrase affichée (avec « ___ » comme emplacement)
+         base        — forme de base du participe (masc. sing.)
+         answer      — forme correcte attendue
+         hasCodBefore — true si le COD est placé avant le verbe
+         choices     — boutons du niveau 1 : { label, isCorrect, gender?, number? }
+         codHint     — explication d'accord affichée après l'étape 1 (niv. 1)
+         explanation — explication complète pour le feedback de l'étape 2
+    ────────────────────────────────────────────────────────────────────── */
+    bank: [
+
+      /* ── A : COD avant le verbe — pronom relatif « que / qu' » ─────────── */
+      {
+        sentence:     "Les photos que j'ai ___ sont magnifiques.",
+        base:         "pris", answer: "prises",
+        hasCodBefore: true,
+        choices: [
+          { label: "les photos",                 isCorrect: true,  gender: "f", number: "p" },
+          { label: "Pas de COD avant le verbe",  isCorrect: false }
+        ],
+        codHint:     "Le COD « les photos » est féminin pluriel.",
+        explanation: "Le COD « les photos » (féminin pluriel) est avant le verbe → « prises »."
+      },
+      {
+        sentence:     "La lettre qu'il a ___ était très longue.",
+        base:         "écrit", answer: "écrite",
+        hasCodBefore: true,
+        choices: [
+          { label: "la lettre",                  isCorrect: true,  gender: "f", number: "s" },
+          { label: "Pas de COD avant le verbe",  isCorrect: false }
+        ],
+        codHint:     "Le COD « la lettre » est féminin singulier.",
+        explanation: "Le COD « la lettre » (féminin singulier) est avant le verbe → « écrite »."
+      },
+      {
+        sentence:     "Les livres que nous avons ___ étaient passionnants.",
+        base:         "lu", answer: "lus",
+        hasCodBefore: true,
+        choices: [
+          { label: "les livres",                 isCorrect: true,  gender: "m", number: "p" },
+          { label: "nous",                       isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: false }
+        ],
+        codHint:     "Le COD « les livres » est masculin pluriel.",
+        explanation: "Le COD « les livres » (masculin pluriel) est avant le verbe → « lus »."
+      },
+      {
+        sentence:     "La tarte que ma mère a ___ est délicieuse.",
+        base:         "fait", answer: "faite",
+        hasCodBefore: true,
+        choices: [
+          { label: "la tarte",                   isCorrect: true,  gender: "f", number: "s" },
+          { label: "ma mère",                    isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: false }
+        ],
+        codHint:     "Le COD « la tarte » est féminin singulier.",
+        explanation: "Le COD « la tarte » (féminin singulier) est avant le verbe → « faite »."
+      },
+      {
+        sentence:     "Les chansons qu'elles ont ___ étaient belles.",
+        base:         "chanté", answer: "chantées",
+        hasCodBefore: true,
+        choices: [
+          { label: "les chansons",               isCorrect: true,  gender: "f", number: "p" },
+          { label: "Pas de COD avant le verbe",  isCorrect: false }
+        ],
+        codHint:     "Le COD « les chansons » est féminin pluriel.",
+        explanation: "Le COD « les chansons » (féminin pluriel) est avant le verbe → « chantées »."
+      },
+      {
+        sentence:     "La robe que Julie a ___ est magnifique.",
+        base:         "choisi", answer: "choisie",
+        hasCodBefore: true,
+        choices: [
+          { label: "la robe",                    isCorrect: true,  gender: "f", number: "s" },
+          { label: "Julie",                      isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: false }
+        ],
+        codHint:     "Le COD « la robe » est féminin singulier.",
+        explanation: "Le COD « la robe » (féminin singulier) est avant le verbe → « choisie »."
+      },
+      {
+        sentence:     "Les devoirs que les élèves ont ___ étaient difficiles.",
+        base:         "rendu", answer: "rendus",
+        hasCodBefore: true,
+        choices: [
+          { label: "les devoirs",                isCorrect: true,  gender: "m", number: "p" },
+          { label: "les élèves",                 isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: false }
+        ],
+        codHint:     "Le COD « les devoirs » est masculin pluriel.",
+        explanation: "Le COD « les devoirs » (masculin pluriel) est avant le verbe → « rendus »."
+      },
+      {
+        sentence:     "La voiture que mon père a ___ est rouge.",
+        base:         "acheté", answer: "achetée",
+        hasCodBefore: true,
+        choices: [
+          { label: "la voiture",                 isCorrect: true,  gender: "f", number: "s" },
+          { label: "mon père",                   isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: false }
+        ],
+        codHint:     "Le COD « la voiture » est féminin singulier.",
+        explanation: "Le COD « la voiture » (féminin singulier) est avant le verbe → « achetée »."
+      },
+      {
+        sentence:     "Les fleurs que tu as ___ sentent bon.",
+        base:         "cueilli", answer: "cueillies",
+        hasCodBefore: true,
+        choices: [
+          { label: "les fleurs",                 isCorrect: true,  gender: "f", number: "p" },
+          { label: "Pas de COD avant le verbe",  isCorrect: false }
+        ],
+        codHint:     "Le COD « les fleurs » est féminin pluriel.",
+        explanation: "Le COD « les fleurs » (féminin pluriel) est avant le verbe → « cueillies »."
+      },
+      {
+        sentence:     "La leçon que l'enseignante a ___ était très claire.",
+        base:         "expliqué", answer: "expliquée",
+        hasCodBefore: true,
+        choices: [
+          { label: "la leçon",                   isCorrect: true,  gender: "f", number: "s" },
+          { label: "l'enseignante",              isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: false }
+        ],
+        codHint:     "Le COD « la leçon » est féminin singulier.",
+        explanation: "Le COD « la leçon » (féminin singulier) est avant le verbe → « expliquée »."
+      },
+
+      /* ── B : COD avant le verbe — déplacement + pronom personnel ──────── */
+      {
+        sentence:     "Cette émission, je l'ai ___ deux fois.",
+        base:         "regardé", answer: "regardée",
+        hasCodBefore: true,
+        choices: [
+          { label: "cette émission (→ l')",      isCorrect: true,  gender: "f", number: "s" },
+          { label: "deux fois",                  isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: false }
+        ],
+        codHint:     "Le COD « cette émission », repris par « l' », est féminin singulier.",
+        explanation: "Le COD « cette émission » (féminin singulier, repris par « l' ») est avant le verbe → « regardée »."
+      },
+      {
+        sentence:     "Ces gâteaux, maman les a ___ ce matin.",
+        base:         "préparé", answer: "préparés",
+        hasCodBefore: true,
+        choices: [
+          { label: "ces gâteaux (→ les)",        isCorrect: true,  gender: "m", number: "p" },
+          { label: "ce matin",                   isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: false }
+        ],
+        codHint:     "Le COD « ces gâteaux », repris par « les », est masculin pluriel.",
+        explanation: "Le COD « ces gâteaux » (masculin pluriel, repris par « les ») est avant le verbe → « préparés »."
+      },
+      {
+        sentence:     "Mes clés, je les ai ___ dans mon sac.",
+        base:         "mis", answer: "mises",
+        hasCodBefore: true,
+        choices: [
+          { label: "mes clés (→ les)",           isCorrect: true,  gender: "f", number: "p" },
+          { label: "mon sac",                    isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: false }
+        ],
+        codHint:     "Le COD « mes clés », repris par « les », est féminin pluriel.",
+        explanation: "Le COD « mes clés » (féminin pluriel, repris par « les ») est avant le verbe → « mises »."
+      },
+
+      /* ── C : COD après le verbe → pas d'accord ──────────────────────── */
+      {
+        sentence:     "J'ai ___ des fraises dans le jardin.",
+        base:         "cueilli", answer: "cueilli",
+        hasCodBefore: false,
+        choices: [
+          { label: "des fraises",                isCorrect: false },
+          { label: "le jardin",                  isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: true }
+        ],
+        codHint:     "",
+        explanation: "Le COD « des fraises » est placé APRÈS le verbe → pas d'accord : « cueilli »."
+      },
+      {
+        sentence:     "Nous avons ___ un beau château médiéval.",
+        base:         "visité", answer: "visité",
+        hasCodBefore: false,
+        choices: [
+          { label: "un beau château médiéval",   isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: true }
+        ],
+        codHint:     "",
+        explanation: "Le COD « un beau château médiéval » est après le verbe → pas d'accord : « visité »."
+      },
+      {
+        sentence:     "Elle a ___ une lettre à ses parents.",
+        base:         "envoyé", answer: "envoyé",
+        hasCodBefore: false,
+        choices: [
+          { label: "une lettre",                 isCorrect: false },
+          { label: "ses parents",                isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: true }
+        ],
+        codHint:     "",
+        explanation: "Le COD « une lettre » est après le verbe → pas d'accord : « envoyé »."
+      },
+      {
+        sentence:     "Les enfants ont ___ leurs jouets avant le dîner.",
+        base:         "rangé", answer: "rangé",
+        hasCodBefore: false,
+        choices: [
+          { label: "leurs jouets",               isCorrect: false },
+          { label: "le dîner",                   isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: true }
+        ],
+        codHint:     "",
+        explanation: "Le COD « leurs jouets » est placé après le verbe → pas d'accord : « rangé »."
+      },
+
+      /* ── C : verbe sans COD → pas d'accord ─────────────────────────── */
+      {
+        sentence:     "Nous avons ___ toute la journée.",
+        base:         "ri", answer: "ri",
+        hasCodBefore: false,
+        choices: [
+          { label: "la journée",                 isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: true }
+        ],
+        codHint:     "",
+        explanation: "Il n'y a pas de COD → le participe passé ne s'accorde pas : « ri »."
+      },
+      {
+        sentence:     "Elle a ___ très tard cette nuit-là.",
+        base:         "dormi", answer: "dormi",
+        hasCodBefore: false,
+        choices: [
+          { label: "cette nuit-là",              isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: true }
+        ],
+        codHint:     "",
+        explanation: "Il n'y a pas de COD → le participe passé ne s'accorde pas : « dormi »."
+      },
+      {
+        sentence:     "Ils ont ___ pendant toute la récréation.",
+        base:         "couru", answer: "couru",
+        hasCodBefore: false,
+        choices: [
+          { label: "la récréation",              isCorrect: false },
+          { label: "Pas de COD avant le verbe",  isCorrect: true }
+        ],
+        codHint:     "",
+        explanation: "Il n'y a pas de COD → le participe passé ne s'accorde pas : « couru »."
+      }
+
+    ]
+  },
+
   /* ── Vocabulaire bilingue : La Révolution française ─────────────────────── */
   "vocabulaire-revolution-francaise": {
     title: "Vocabulaire de la Révolution française",
@@ -3536,6 +3807,100 @@ const EXERCISE_DATA = {
       { anglais: "Guillotine",                        francais: "Guillotine" },
       { anglais: "Justice",                           francais: "Justice" }
     ]
+  },
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     conjuguer-faire  —  3 niveaux progressifs (CM1 / CM2 / 6e)
+     Type custom : "faire-niveaux"
+     Les pools sont mélangés (Fisher-Yates) à chaque tentative.
+     ══════════════════════════════════════════════════════════════════════════ */
+  "conjuguer-faire": {
+    title: "Conjuguer le verbe FAIRE",
+    levels: ["CM1", "CM2", "6e"],
+    type: "faire-niveaux",
+    questionsPerSession: 8,
+    backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
+
+    pools: {
+
+      /* ── CM1 : Présent (×4) + Imparfait (×4) + Futur simple (×4) + Passé composé (×4) ── */
+      "CM1": [
+        /* Présent */
+        { phrase: "Je ___ du vélo le week-end.",          temps: "Présent",       reponse: "fais",       explication: "Au présent, « je » → je fais." },
+        { phrase: "Tu ___ beaucoup de bruit.",            temps: "Présent",       reponse: "fais",       explication: "Au présent, « tu » → tu fais." },
+        { phrase: "Il ___ ses devoirs chaque soir.",      temps: "Présent",       reponse: "fait",       explication: "Au présent, « il » → il fait." },
+        { phrase: "Nous ___ une promenade ensemble.",     temps: "Présent",       reponse: "faisons",    explication: "Au présent, « nous » → nous faisons." },
+        { phrase: "Vous ___ de la peinture en classe.",   temps: "Présent",       reponse: "faites",     explication: "Au présent, « vous » → vous faites." },
+        { phrase: "Ils ___ la cuisine ce soir.",          temps: "Présent",       reponse: "font",       explication: "Au présent, « ils » → ils font." },
+        { phrase: "Elle ___ du sport le matin.",          temps: "Présent",       reponse: "fait",       explication: "Au présent, « elle » → elle fait." },
+        { phrase: "Elles ___ de leur mieux.",             temps: "Présent",       reponse: "font",       explication: "Au présent, « elles » → elles font." },
+        /* Imparfait */
+        { phrase: "Je ___ du vélo tous les jours.",       temps: "Imparfait",     reponse: "faisais",    explication: "À l'imparfait, « je » → je faisais." },
+        { phrase: "Tu ___ beaucoup de bruit avant.",      temps: "Imparfait",     reponse: "faisais",    explication: "À l'imparfait, « tu » → tu faisais." },
+        { phrase: "Nous ___ du bruit hier soir.",         temps: "Imparfait",     reponse: "faisions",   explication: "À l'imparfait, « nous » → nous faisions." },
+        { phrase: "Elle ___ la cuisine tous les soirs.",  temps: "Imparfait",     reponse: "faisait",    explication: "À l'imparfait, « elle » → elle faisait." },
+        { phrase: "Vous ___ du sport le matin.",          temps: "Imparfait",     reponse: "faisiez",    explication: "À l'imparfait, « vous » → vous faisiez." },
+        { phrase: "Ils ___ la fête chaque été.",          temps: "Imparfait",     reponse: "faisaient",  explication: "À l'imparfait, « ils » → ils faisaient." },
+        /* Futur simple */
+        { phrase: "Tu ___ tes devoirs ce soir.",          temps: "Futur simple",  reponse: "feras",      explication: "Au futur, « tu » → tu feras." },
+        { phrase: "Je ___ de mon mieux pour réussir.",    temps: "Futur simple",  reponse: "ferai",      explication: "Au futur, « je » → je ferai." },
+        { phrase: "Il ___ beau demain.",                  temps: "Futur simple",  reponse: "fera",       explication: "Au futur, « il » → il fera." },
+        { phrase: "Nous ___ une sortie la semaine prochaine.", temps: "Futur simple", reponse: "ferons", explication: "Au futur, « nous » → nous ferons." },
+        { phrase: "Vous ___ du bon travail.",             temps: "Futur simple",  reponse: "ferez",      explication: "Au futur, « vous » → vous ferez." },
+        { phrase: "Ils ___ la fête après l'examen.",      temps: "Futur simple",  reponse: "feront",     explication: "Au futur, « ils » → ils feront." },
+        /* Passé composé */
+        { phrase: "Ils ___ une erreur.",                  temps: "Passé composé", reponse: "ont fait",   explication: "Au passé composé, « ils » → ils ont fait." },
+        { phrase: "Elle ___ un long voyage.",             temps: "Passé composé", reponse: "a fait",     explication: "Au passé composé, « elle » → elle a fait." },
+        { phrase: "Tu ___ du bon travail aujourd'hui.",   temps: "Passé composé", reponse: "as fait",    explication: "Au passé composé, « tu » → tu as fait." },
+        { phrase: "Nous ___ nos bagages en vitesse.",     temps: "Passé composé", reponse: "avons fait", explication: "Au passé composé, « nous » → nous avons fait." },
+        { phrase: "J'___ de mon mieux pour aider.",       temps: "Passé composé", reponse: "ai fait",    explication: "Au passé composé, « j' » → j'ai fait." },
+        { phrase: "Vous ___ preuve de courage.",          temps: "Passé composé", reponse: "avez fait",  explication: "Au passé composé, « vous » → vous avez fait." }
+      ],
+
+      /* ── CM2 : Passé simple (×6) + Plus-que-parfait (×6) ── */
+      "CM2": [
+        /* Passé simple */
+        { phrase: "Elle ___ un long voyage au printemps.", temps: "Passé simple",   reponse: "fit",        explication: "Au passé simple, « elle » → elle fit." },
+        { phrase: "Ils ___ de gros efforts toute l'année.", temps: "Passé simple",  reponse: "firent",     explication: "Au passé simple, « ils » → ils firent." },
+        { phrase: "Je ___ semblant de dormir.",            temps: "Passé simple",   reponse: "fis",        explication: "Au passé simple, « je » → je fis." },
+        { phrase: "Il ___ un geste d'adieu de la main.",  temps: "Passé simple",   reponse: "fit",        explication: "Au passé simple, « il » → il fit." },
+        { phrase: "Nous ___ de notre mieux ce jour-là.",  temps: "Passé simple",   reponse: "fîmes",      explication: "Au passé simple, « nous » → nous fîmes." },
+        { phrase: "Vous ___ preuve d'un grand courage.",  temps: "Passé simple",   reponse: "fîtes",      explication: "Au passé simple, « vous » → vous fîtes." },
+        { phrase: "Elles ___ leurs adieux à la gare.",    temps: "Passé simple",   reponse: "firent",     explication: "Au passé simple, « elles » → elles firent." },
+        { phrase: "Tu ___ un beau dessin en classe.",     temps: "Passé simple",   reponse: "fis",        explication: "Au passé simple, « tu » → tu fis." },
+        /* Plus-que-parfait */
+        { phrase: "Nous ___ nos bagages avant le départ.", temps: "Plus-que-parfait", reponse: "avions fait",  explication: "Au plus-que-parfait, « nous » → nous avions fait." },
+        { phrase: "Il ___ ses devoirs avant d'aller jouer.", temps: "Plus-que-parfait", reponse: "avait fait", explication: "Au plus-que-parfait, « il » → il avait fait." },
+        { phrase: "Tu ___ une erreur sans t'en rendre compte.", temps: "Plus-que-parfait", reponse: "avais fait", explication: "Au plus-que-parfait, « tu » → tu avais fait." },
+        { phrase: "Ils ___ la fête la veille de notre arrivée.", temps: "Plus-que-parfait", reponse: "avaient fait", explication: "Au plus-que-parfait, « ils » → ils avaient fait." },
+        { phrase: "Vous ___ vos courses avant la tempête.", temps: "Plus-que-parfait", reponse: "aviez fait", explication: "Au plus-que-parfait, « vous » → vous aviez fait." },
+        { phrase: "J'___ mes adieux avant de partir.",    temps: "Plus-que-parfait", reponse: "avais fait",   explication: "Au plus-que-parfait, « j' » → j'avais fait." },
+        { phrase: "Elle ___ ses valises dès la veille.",  temps: "Plus-que-parfait", reponse: "avait fait",   explication: "Au plus-que-parfait, « elle » → elle avait fait." },
+        { phrase: "Elles ___ leurs devoirs avant le dîner.", temps: "Plus-que-parfait", reponse: "avaient fait", explication: "Au plus-que-parfait, « elles » → elles avaient fait." }
+      ],
+
+      /* ── 6e : Impératif (×6) + Conditionnel (×6) ── */
+      "6e": [
+        /* Impératif */
+        { phrase: "___ attention en traversant !",          temps: "Impératif", reponse: "Fais",   explication: "À l'impératif, 2e pers. sing. → Fais." },
+        { phrase: "___ ton travail sérieusement.",          temps: "Impératif", reponse: "Fais",   explication: "À l'impératif, 2e pers. sing. → Fais." },
+        { phrase: "___ de ton mieux pour réussir !",        temps: "Impératif", reponse: "Fais",   explication: "À l'impératif, 2e pers. sing. → Fais." },
+        { phrase: "___ confiance à tes amis.",              temps: "Impératif", reponse: "Fais",   explication: "À l'impératif, 2e pers. sing. → Fais." },
+        { phrase: "___ vite les exercices de maths !",      temps: "Impératif", reponse: "Faites", explication: "À l'impératif pluriel, 2e pers. plur. → Faites." },
+        { phrase: "___ silence, s'il vous plaît !",         temps: "Impératif", reponse: "Faites", explication: "À l'impératif pluriel, 2e pers. plur. → Faites." },
+        { phrase: "Ne ___ pas de bruit dans le couloir.",   temps: "Impératif", reponse: "fais",   explication: "À l'impératif négatif, 2e pers. sing. → ne fais pas." },
+        { phrase: "Ne ___ pas semblant de ne pas savoir.",  temps: "Impératif", reponse: "fais",   explication: "À l'impératif négatif, 2e pers. sing. → ne fais pas." },
+        /* Conditionnel */
+        { phrase: "Il ___ beau demain, dit la météo.",      temps: "Conditionnel", reponse: "ferait",    explication: "Au conditionnel, « il » → il ferait." },
+        { phrase: "Je ___ mieux avec davantage de temps.",  temps: "Conditionnel", reponse: "ferais",    explication: "Au conditionnel, « je » → je ferais." },
+        { phrase: "Tu ___ cela pour moi, n'est-ce pas ?",  temps: "Conditionnel", reponse: "ferais",    explication: "Au conditionnel, « tu » → tu ferais." },
+        { phrase: "Ils ___ la fête s'il venait nous voir.", temps: "Conditionnel", reponse: "feraient",  explication: "Au conditionnel, « ils » → ils feraient." },
+        { phrase: "Nous ___ une erreur en partant si tôt.", temps: "Conditionnel", reponse: "ferions",   explication: "Au conditionnel, « nous » → nous ferions." },
+        { phrase: "Vous ___ mieux de vous reposer avant.", temps: "Conditionnel", reponse: "feriez",    explication: "Au conditionnel, « vous » → vous feriez." },
+        { phrase: "Elle ___ volontiers ce voyage.",         temps: "Conditionnel", reponse: "ferait",    explication: "Au conditionnel, « elle » → elle ferait." },
+        { phrase: "Elles ___ des merveilles avec de l'aide.", temps: "Conditionnel", reponse: "feraient", explication: "Au conditionnel, « elles » → elles feraient." }
+      ]
+    }
   }
 
 };
