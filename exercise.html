@@ -9,7 +9,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/results.js"></script>
-  <script src="exercise-data.js?v=5"></script>
+  <script src="exercise-data.js?v=11"></script>
   <style>
     /* ── Page layout ────────────────────────────────────────── */
     .page-wrap {
@@ -1856,6 +1856,7 @@
     .faire-temps-plus-que-parf  { background: #922b21; color: #fff; }
     .faire-temps-imperatif      { background: #1abc9c; color: #fff; }
     .faire-temps-conditionnel   { background: #e91e8c; color: #fff; }
+    .faire-temps-subjonctif     { background: #00695c; color: #fff; }
 
     .faire-phrase-display {
       font-size: 22px;
@@ -1933,6 +1934,133 @@
       .faire-phrase-display { font-size: 18px; padding: 16px 16px; }
       .faire-input-row      { flex-direction: column; align-items: stretch; }
       .faire-text-input     { max-width: 100%; }
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       TYPE : pqp-niveaux — Plus-que-parfait
+       ══════════════════════════════════════════════════════════════ */
+
+    @keyframes pqpShake {
+      0%,100% { transform: translateX(0); }
+      20%     { transform: translateX(-6px); }
+      40%     { transform: translateX(6px); }
+      60%     { transform: translateX(-4px); }
+      80%     { transform: translateX(4px); }
+    }
+
+    .pqp-text-display {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 2.2;
+      padding: 22px 26px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .pqp-verb-btn {
+      display: inline;
+      background: rgba(16,43,106,0.06);
+      border: 1.5px solid rgba(16,43,106,0.20);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 180ms, background 180ms;
+      margin: 0 1px;
+    }
+
+    .pqp-verb-btn:hover:not(:disabled):not(.is-correct):not(.is-wrong) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.10);
+    }
+
+    .pqp-verb-btn.is-selected {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.13);
+      color: var(--blue);
+    }
+
+    .pqp-verb-btn.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.12);
+      color: #15803d;
+    }
+
+    .pqp-verb-btn.pqp-shake {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.08);
+      color: var(--red);
+      animation: pqpShake 400ms ease;
+    }
+
+    .pqp-verb-btn.is-missed {
+      border: 2px dashed #d97706;
+      background: rgba(217,119,6,0.06);
+      color: #92400e;
+    }
+
+    .pqp-verb-btn:disabled { cursor: default; }
+
+    .pqp-rule-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16,43,106,0.06);
+      border: 1px solid rgba(16,43,106,0.14);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--blue);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .pqp-sentence-display {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.7;
+      margin-bottom: 20px;
+      padding: 20px 24px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+    }
+
+    .pqp-infinitif-chip {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(16,43,106,0.08);
+      border: 1px solid rgba(16,43,106,0.20);
+      border-radius: 6px;
+      padding: 1px 7px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--blue);
+      margin: 0 2px;
+      font-style: italic;
+    }
+
+    .pqp-text-counter {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .pqp-error-part {
+      color: var(--red);
+      text-decoration: underline;
+      text-decoration-style: wavy;
     }
 
   </style>
@@ -2042,6 +2170,27 @@
         </div>
 
       </div><!-- /#vr-video-quiz -->
+
+      <!-- ── Video & Quiz — vocabulaire-napoleon-bonaparte ─────────────────── -->
+      <div id="vn-video-quiz" class="ex-hidden vr-block">
+
+        <!-- Bloc 1 : Vidéo -->
+        <div class="vr-section-title">🎬 Watch the video</div>
+        <div class="vr-video-wrap">
+          <iframe src="https://www.youtube-nocookie.com/embed/npl9G-lyRB0"
+                  title="Napoleon Bonaparte"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen></iframe>
+        </div>
+
+        <!-- Bloc 2 : Quiz de compréhension -->
+        <div class="vr-quiz-section">
+          <div class="vr-section-title">✅ Comprehension quiz</div>
+          <div id="vn-quiz-area"></div>
+        </div>
+
+      </div><!-- /#vn-video-quiz -->
 
     </div><!-- /.page-content -->
   </div><!-- /.page-wrap -->
@@ -2353,6 +2502,9 @@
       } else if (currentType === "faire-niveaux") {
         faireInitSession();
         return;
+      } else if (currentType === "pqp-niveaux") {
+        pqpInitSession();
+        return;
       } else {
         bankSource = sessionData.bank;
       }
@@ -2467,6 +2619,8 @@
         /* session managed by vbInitSession / vbStartLevel — no-op here */
       } else if (currentType === "faire-niveaux") {
         /* session managed by faireInitSession — no-op here */
+      } else if (currentType === "pqp-niveaux") {
+        /* session managed by pqpInitSession — no-op here */
       } else if (currentType === "accord-participe-cod") {
         renderAccordParticipeCod(card, q);
       }
@@ -6556,10 +6710,14 @@
 
     function vbRenderLevelSelect(card) {
       const maxLv = vbMaxLevel();
+      const total = sessionData.vocabulaire.length;
+      const isEcrit = sessionData.level3Type === 'ecrit';
       const levels = [
-        { n: 1, icon: '🔗', name: 'Niveau 1 — Associe',  desc: 'Relie chaque mot anglais à sa traduction française (30 paires, par lots de 6)' },
+        { n: 1, icon: '🔗', name: 'Niveau 1 — Associe',  desc: `Relie chaque mot anglais à sa traduction française (${total} paires, par lots de 6)` },
         { n: 2, icon: '🎯', name: 'Niveau 2 — Choisis', desc: 'Choisis la bonne traduction parmi 4 propositions (10 questions)' },
-        { n: 3, icon: '🔊', name: 'Niveau 3 — Écoute', desc: 'Écoute le mot et choisis sa traduction parmi 4 propositions (10 questions)' }
+        isEcrit
+          ? { n: 3, icon: '✏️', name: 'Niveau 3 — Écris', desc: 'Un mot s\'affiche : écris sa traduction (10 questions)' }
+          : { n: 3, icon: '🔊', name: 'Niveau 3 — Écoute', desc: 'Écoute le mot et choisis sa traduction parmi 4 propositions (10 questions)' }
       ];
       card.innerHTML = `
         <p class="ex-type-select-label">Quel niveau veux-tu pratiquer ?</p>
@@ -6816,6 +6974,10 @@
     }
 
     function vbStartLevel3() {
+      if (sessionData.level3Type === 'ecrit') {
+        vbStartLevel3Ecrit();
+        return;
+      }
       const vocab = sessionData.vocabulaire;
       let queue = vbLoadQueue(3);
       while (queue.length < 10) queue = [...queue, ...shuffle([...Array(vocab.length).keys()])];
@@ -6918,6 +7080,96 @@
     }
 
     /* ════════════════════════════════════════════════════════════════════════
+       NIVEAU 3 — ÉCRIS (production écrite, 10 questions, EN↔FR alternés)
+       ════════════════════════════════════════════════════════════════════════ */
+
+    function normalizeWriting(s) {
+      return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+    }
+
+    function vbStartLevel3Ecrit() {
+      const vocab = sessionData.vocabulaire;
+      let queue = vbLoadQueue(3);
+      while (queue.length < 10) queue = [...queue, ...shuffle([...Array(vocab.length).keys()])];
+      const taken = queue.splice(0, 10);
+      vbSaveQueue(3, queue);
+
+      vbState = {
+        level:     3,
+        questions: taken.map((idx, i) => ({
+          pair:      vocab[idx],
+          direction: i % 2 === 0 ? 'en-fr' : 'fr-en'
+        })),
+        qIdx:  0,
+        score: 0
+      };
+      document.getElementById('q-total').textContent = '10';
+      vbRenderWriting();
+    }
+
+    function vbRenderWriting() {
+      const { questions, qIdx } = vbState;
+      const { pair, direction } = questions[qIdx];
+
+      const word   = direction === 'en-fr' ? pair.anglais  : pair.francais;
+      const answer = direction === 'en-fr' ? pair.francais : pair.anglais;
+      const label  = direction === 'en-fr' ? 'EN → FR' : 'FR → EN';
+
+      document.getElementById('q-num').textContent   = String(qIdx + 1);
+      document.getElementById('ex-bar-fill').style.width = (qIdx / 10 * 100) + '%';
+
+      const card = document.getElementById('ex-card');
+      card.innerHTML = `
+        <p class="ex-question-label">${label} — Écris la traduction</p>
+        <div class="vb-word-display">${word}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="vb-write-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta traduction…">
+          <button class="ex-validate-btn" id="vb-write-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="vb-write-feedback"></div>
+        <button class="ex-next-btn ex-hidden" id="vb-next-btn"></button>
+      `;
+
+      const input = document.getElementById('vb-write-input');
+      const btn   = document.getElementById('vb-write-btn');
+      input.focus();
+
+      function doValidate() { vbHandleWriting(input, btn, answer); }
+      btn.addEventListener('click', doValidate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter' && !btn.disabled) doValidate(); });
+    }
+
+    function vbHandleWriting(input, btn, answer) {
+      if (btn.disabled) return;
+      btn.disabled   = true;
+      input.disabled = true;
+      const isRight = normalizeWriting(input.value) === normalizeWriting(answer);
+
+      if (isRight) {
+        vbState.score++;
+        input.classList.add('is-correct');
+        document.getElementById('vb-write-feedback').innerHTML =
+          `<div class="ex-feedback-correct">${rand(SUCCESS)} <strong>${answer}</strong></div>`;
+      } else {
+        input.classList.add('is-wrong');
+        document.getElementById('vb-write-feedback').innerHTML =
+          `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${answer}</strong></div>`;
+      }
+
+      const isLast = vbState.qIdx === 9;
+      const nxt = document.getElementById('vb-next-btn');
+      nxt.textContent = isLast ? 'Voir mes résultats' : 'Suivant →';
+      nxt.classList.remove('ex-hidden');
+      nxt.onclick = () => {
+        vbState.qIdx++;
+        if (vbState.qIdx >= 10) vbCompleteLevel(3, vbState.score, 10);
+        else vbRenderWriting();
+      };
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
        RÉSULTATS & DÉVERROUILLAGE
        ════════════════════════════════════════════════════════════════════════ */
 
@@ -6934,6 +7186,8 @@
       document.getElementById('score-pct').textContent   =
         s + ' bonne' + (s > 1 ? 's' : '') + ' réponse' + (s > 1 ? 's' : '') + ' sur ' + total;
 
+      const l3Name = sessionData.level3Type === 'ecrit' ? 'Écris' : 'Écoute';
+
       let msg;
       if (pct === 100)    msg = '🏆 Incroyable ! Tu maîtrises ce vocabulaire.';
       else if (pct >= 80) msg = '🌟 Très bien !';
@@ -6941,7 +7195,7 @@
       else                msg = '💪 Encore un petit effort !';
 
       if (lv === 1 && vbMaxLevel() >= 2) msg += ' 🔓 Niveau 2 — Choisis est débloqué !';
-      if (lv === 2 && vbMaxLevel() >= 3) msg += ' 🔓 Niveau 3 — Écris est débloqué !';
+      if (lv === 2 && vbMaxLevel() >= 3) msg += ` 🔓 Niveau 3 — ${l3Name} est débloqué !`;
 
       document.getElementById('score-msg').textContent = msg;
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -6958,6 +7212,43 @@
         total,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
       });
+
+      /* ── Boutons de navigation entre niveaux ───────────────────────────── */
+      const backHref  = sessionData?.backLink?.href  || '#';
+      const backLabel = sessionData?.backLink?.label || 'Retour';
+      const wrap      = document.getElementById('ex-results-btns-wrap');
+      const nextLv    = lv + 1;
+      const nextName  = nextLv === 2 ? 'Niveau 2 — Choisis'
+                      : (l3Name === 'Écris' ? 'Niveau 3 — Écris' : 'Niveau 3 — Écoute');
+
+      function showLevel(n) {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        sessionStartTime = Date.now();
+        vbStartLevel(n);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      if (lv < 3) {
+        wrap.innerHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary"   id="vb-next-btn-res">Niveau suivant → ${nextName}</button>
+            <button class="ex-btn-secondary" id="vb-retry-btn-res">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>
+        `;
+        document.getElementById('vb-next-btn-res').addEventListener('click',  () => showLevel(nextLv));
+        document.getElementById('vb-retry-btn-res').addEventListener('click', () => showLevel(lv));
+      } else {
+        wrap.innerHTML = `
+          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
+          <div class="ex-results-btns">
+            <button class="ex-btn-secondary" id="vb-retry-btn-res">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>
+        `;
+        document.getElementById('vb-retry-btn-res').addEventListener('click', () => showLevel(3));
+      }
     }
 
     /* ════════════════════════════════════════════════════════════════════════
@@ -7097,6 +7388,149 @@
 
       document.getElementById('vr-retry-btn').addEventListener('click', vrStartQuiz);
       document.getElementById('vr-quiz-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       VIDEO & QUIZ — vocabulaire-napoleon-bonaparte
+       Bloc indépendant, score propre, sans lien avec le vocabulaire
+       ════════════════════════════════════════════════════════════════════════ */
+
+    const quizNapoleon = [
+      { question: "Where was Napoleon born?",
+        options: ["In Paris", "On the island of Corsica", "In Italy", "In Spain"], correct: 1 },
+      { question: "What did young Napoleon train to become?",
+        options: ["A doctor", "A soldier", "A merchant", "A king"], correct: 1 },
+      { question: "During which big event did Napoleon become famous?",
+        options: ["The French Revolution", "World War I", "The Renaissance", "The Crusades"], correct: 0 },
+      { question: "What title did Napoleon take in 1804?",
+        options: ["King of France", "President", "Emperor of France", "Prime Minister"], correct: 2 },
+      { question: "What was Napoleon especially famous for?",
+        options: ["His paintings", "His battles and military genius", "His songs", "His ships"], correct: 1 },
+      { question: "What famous set of laws did Napoleon create?",
+        options: ["The Civil Code", "The Bill of Rights", "The Magna Carta", "The Constitution of the USA"], correct: 0 },
+      { question: "Which country's invasion turned into a disaster for Napoleon?",
+        options: ["England", "Russia", "Portugal", "Egypt"], correct: 1 },
+      { question: "What was Napoleon's final defeat called?",
+        options: ["The Battle of Austerlitz", "The Battle of Trafalgar", "The Battle of Waterloo", "The Battle of Paris"], correct: 2 },
+      { question: "Where was Napoleon sent into exile at the very end of his life?",
+        options: ["To Corsica", "To the island of Saint Helena", "To America", "To Russia"], correct: 1 },
+      { question: "In what year did Napoleon die?",
+        options: ["1769", "1804", "1815", "1821"], correct: 3 }
+    ];
+
+    let vnState = null;
+
+    function vnInitBlock() {
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      if (slug !== 'vocabulaire-napoleon-bonaparte') return;
+      document.getElementById('vn-video-quiz').classList.remove('ex-hidden');
+      vnStartQuiz();
+    }
+
+    function vnStartQuiz() {
+      vnState = {
+        questions: shuffle(quizNapoleon).map(q => {
+          const order   = shuffle([0, 1, 2, 3]);
+          const options = order.map(i => q.options[i]);
+          const correct = order.indexOf(q.correct);
+          return { question: q.question, options, correct };
+        }),
+        qIdx:  0,
+        score: 0
+      };
+      vnRenderQuestion(true);
+    }
+
+    function vnRenderQuestion(skipScroll) {
+      const { questions, qIdx } = vnState;
+      const q     = questions[qIdx];
+      const total = questions.length;
+
+      document.getElementById('vn-quiz-area').innerHTML = `
+        <div class="ex-progress" style="margin-bottom:20px">
+          <div class="vr-progress-row">
+            <span class="vr-progress-label">Question ${qIdx + 1} / ${total}</span>
+          </div>
+          <div class="ex-bar-bg">
+            <div class="ex-bar-fill" style="width:${Math.round(qIdx / total * 100)}%"></div>
+          </div>
+        </div>
+        <div class="ex-card">
+          <p class="ex-question-label">${q.question}</p>
+          <div class="ex-choices-grid" id="vn-choices"></div>
+          <div class="ex-feedback-area" id="vn-feedback"></div>
+          <button class="ex-next-btn ex-hidden" id="vn-next-btn"></button>
+        </div>
+      `;
+
+      document.getElementById('vn-choices').innerHTML = q.options
+        .map((opt, i) => `<button class="ex-choice" data-idx="${i}">${opt}</button>`)
+        .join('');
+
+      document.querySelectorAll('#vn-choices .ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => vnHandleAnswer(btn, q))
+      );
+
+      if (!skipScroll) {
+        document.getElementById('vn-quiz-area').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function vnHandleAnswer(btn, q) {
+      document.querySelectorAll('#vn-choices .ex-choice').forEach(b => b.disabled = true);
+      const picked  = parseInt(btn.dataset.idx, 10);
+      const isRight = picked === q.correct;
+
+      document.querySelectorAll('#vn-choices .ex-choice').forEach((b, i) => {
+        if (i === q.correct) b.classList.add('is-correct');
+      });
+      if (!isRight) btn.classList.add('is-wrong');
+
+      if (isRight) {
+        vnState.score++;
+        document.getElementById('vn-feedback').innerHTML =
+          `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+      } else {
+        document.getElementById('vn-feedback').innerHTML =
+          `<div class="ex-feedback-wrong">❌ The correct answer was: <strong>${q.options[q.correct]}</strong></div>`;
+      }
+
+      const isLast = vnState.qIdx === vnState.questions.length - 1;
+      const nxt = document.getElementById('vn-next-btn');
+      nxt.textContent = isLast ? 'See my results' : 'Next →';
+      nxt.classList.remove('ex-hidden');
+      nxt.onclick = () => {
+        vnState.qIdx++;
+        if (vnState.qIdx >= vnState.questions.length) vnShowResults();
+        else vnRenderQuestion();
+      };
+    }
+
+    function vnShowResults() {
+      const { score } = vnState;
+      const total = quizNapoleon.length;
+      const s20   = Math.round(score / total * 20);
+      const pct   = Math.round(score / total * 100);
+
+      let msg;
+      if (pct === 100)    msg = '🏆 Perfect score! Excellent understanding!';
+      else if (pct >= 80) msg = '🌟 Very well done!';
+      else if (pct >= 60) msg = '👍 Good job, keep it up!';
+      else                msg = '💪 Watch the video again and try once more!';
+
+      document.getElementById('vn-quiz-area').innerHTML = `
+        <div class="ex-results-card">
+          <div class="ex-score-value">${s20} / 20</div>
+          <div class="ex-score-pct">${score} correct answer${score !== 1 ? 's' : ''} out of ${total}</div>
+          <div class="ex-score-msg">${msg}</div>
+          <div class="ex-results-btns" style="margin-top:32px">
+            <button class="ex-btn-primary" id="vn-retry-btn">🔄 Try again</button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('vn-retry-btn').addEventListener('click', vnStartQuiz);
+      document.getElementById('vn-quiz-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     /* ── Type : accord-participe-cod ────────────────────────────────────────
@@ -7313,7 +7747,8 @@
       'Passé simple':     'faire-temps-passe-simple',
       'Plus-que-parfait': 'faire-temps-plus-que-parf',
       'Impératif':        'faire-temps-imperatif',
-      'Conditionnel':     'faire-temps-conditionnel',
+      'Conditionnel':        'faire-temps-conditionnel',
+      'Subjonctif présent': 'faire-temps-subjonctif',
     };
     const FAIRE_POSITIFS = ['Excellent ! 🎉', 'Bravo ! ⭐', 'Parfait ! 🌟', 'Super ! 👏'];
 
@@ -7590,9 +8025,391 @@
       setTimeout(() => container.remove(), 3500);
     }
 
+    /* ══════════════════════════════════════════════════════════════════════════
+       TYPE : pqp-niveaux — Plus-que-parfait
+       Deux niveaux déverrouillables (localStorage), seuil 80 %.
+       Niveau 1 : identifier les groupes PQP dans un texte (sélection + validation)
+       Niveau 2 : saisie libre de la forme conjuguée au plus-que-parfait
+       ══════════════════════════════════════════════════════════════════════════ */
+
+    const PQP_SEUIL    = 0.80;
+    const PQP_POSITIFS = ['Excellent ! 🎉', 'Bravo ! ⭐', 'Parfait ! 🌟', 'Super ! 👏'];
+    const PQP_REGLE    = 'Plus-que-parfait = auxiliaire <em>être</em> ou <em>avoir</em> à l\'imparfait + participe passé';
+
+    let pqpState = null;
+
+    function pqpSlugKey(suffix) {
+      const s = new URLSearchParams(window.location.search).get('slug') || 'pqp';
+      return s + '_' + suffix;
+    }
+    function pqpGetValidated() {
+      try { return JSON.parse(localStorage.getItem(pqpSlugKey('validated')) || '[]'); }
+      catch { return []; }
+    }
+    function pqpSetValidated(arr) {
+      localStorage.setItem(pqpSlugKey('validated'), JSON.stringify(arr));
+    }
+
+    function pqpNorm(str) {
+      return str.trim().toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/\s+/g, ' ')
+        .replace(/[''`´'']/g, "'");
+    }
+
+    function pqpShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    /* ── Init : cache la progression, affiche la sélection de niveau ─────── */
+    function pqpInitSession() {
+      pqpState     = null;
+      score        = 0;
+      currentIndex = 0;
+      sessionStartTime = Date.now();
+
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      pqpRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Sélection de niveau (verrouillé / déverrouillé) ───────────────────── */
+    function pqpRenderLevelSelect(card) {
+      const validated = pqpGetValidated();
+      const lvDefs = [
+        { lv: 1, icon: '⭐',   label: 'Niveau 1 — Repère le plus-que-parfait', desc: 'Lis un texte, identifie les verbes au plus-que-parfait' },
+        { lv: 2, icon: '⭐⭐', label: 'Niveau 2 — Complète au plus-que-parfait', desc: 'Conjugue des phrases à trous au plus-que-parfait' }
+      ];
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="pqp-rule-chip" style="display:flex;margin:0 auto 20px;max-width:520px">📌 ${PQP_REGLE}</div>
+        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
+          ${lvDefs.map((d, i) => {
+            const unlocked = i === 0 || validated.includes(i - 1);
+            const done     = validated.includes(i);
+            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const disabled = !unlocked ? ' disabled' : '';
+            const desc     = !unlocked
+              ? 'Valide le niveau précédent pour débloquer'
+              : done ? d.desc + ' · Validé !' : d.desc;
+            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${disabled}>
+              <span class="ex-type-icon">${icon}</span>
+              <div>
+                <span class="ex-type-name">${d.label}</span>
+                <span class="ex-type-desc">${desc}</span>
+              </div>
+            </button>`;
+          }).join('')}
+        </div>
+      `;
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => pqpStartLevel(parseInt(btn.dataset.level)))
+      );
+    }
+
+    /* ── Démarre un niveau ──────────────────────────────────────────────────── */
+    function pqpStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      if (lv === 1) {
+        const texts = pqpShuffle([...sessionData.identTexts]);
+        const total = texts.reduce((n, t) => n + t.tokens.filter(tk => tk.v && tk.pqp).length, 0);
+        pqpState = { level: 1, texts, idx: 0, score: 0, total };
+        document.getElementById('q-total').textContent = texts.length;
+        pqpRenderText(document.getElementById('ex-card'));
+      } else {
+        const questions = pqpShuffle([...sessionData.writeBank]);
+        pqpState = { level: 2, questions, idx: 0, score: 0, total: questions.length };
+        document.getElementById('q-total').textContent = questions.length;
+        pqpRenderWriteQ(document.getElementById('ex-card'));
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       NIVEAU 1 — Identification dans un texte
+       ══════════════════════════════════════════════════════════════════════════ */
+
+    function pqpRenderText(card) {
+      const { texts, idx } = pqpState;
+      const textObj   = texts[idx];
+      const pqpCount  = textObj.tokens.filter(tk => tk.v && tk.pqp).length;
+
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / texts.length * 100) + '%';
+
+      const htmlTokens = textObj.tokens.map((tk, i) =>
+        tk.v
+          ? `<button class="pqp-verb-btn" data-idx="${i}" data-pqp="${tk.pqp ? '1' : '0'}">${tk.t}</button>`
+          : `<span>${tk.t}</span>`
+      ).join('');
+
+      card.innerHTML = `
+        <p class="pqp-text-counter">Texte ${idx + 1} / ${texts.length}</p>
+        <p class="ex-question-label">Clique sur les verbes au <strong>plus-que-parfait</strong>, puis valide.</p>
+        <div class="pqp-text-display" id="pqp-text">${htmlTokens}</div>
+        <div class="ex-feedback-area" id="pqp-fb" style="min-height:20px;margin-bottom:12px"></div>
+        <button class="ex-choice" id="pqp-validate" style="width:100%">Valider ma sélection</button>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < texts.length ? 'Texte suivant →' : 'Voir les résultats →'}</button>
+      `;
+
+      const selected = new Set();
+      let answered = false;
+
+      card.querySelectorAll('.pqp-verb-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (answered) return;
+          const isPqp = btn.dataset.pqp === '1';
+          if (!isPqp) {
+            btn.classList.add('pqp-shake');
+            document.getElementById('pqp-fb').innerHTML =
+              `<div class="ex-feedback-wrong" style="font-size:13px;padding:8px 14px">⚠️ « <strong>${btn.textContent}</strong> » n'est pas au plus-que-parfait : l'auxiliaire n'est pas à l'imparfait.<br><small>📌 ${PQP_REGLE}</small></div>`;
+            setTimeout(() => btn.classList.remove('pqp-shake'), 500);
+          } else {
+            if (selected.has(btn)) {
+              selected.delete(btn);
+              btn.classList.remove('is-selected');
+            } else {
+              selected.add(btn);
+              btn.classList.add('is-selected');
+              document.getElementById('pqp-fb').innerHTML = '';
+            }
+          }
+        });
+      });
+
+      document.getElementById('pqp-validate').addEventListener('click', () => {
+        if (answered) return;
+        answered = true;
+        document.getElementById('pqp-validate').disabled = true;
+
+        let correct = 0, missed = 0;
+        card.querySelectorAll('.pqp-verb-btn').forEach(btn => {
+          btn.disabled = true;
+          const isPqp = btn.dataset.pqp === '1';
+          const isSel = selected.has(btn);
+          btn.classList.remove('is-selected');
+          if (isPqp && isSel)  { btn.classList.add('is-correct'); correct++; }
+          if (isPqp && !isSel) { btn.classList.add('is-missed');  missed++;  }
+        });
+
+        pqpState.score += correct;
+
+        let fbHtml;
+        if (missed === 0) {
+          fbHtml = `<div class="ex-feedback-correct">🎉 ${PQP_POSITIFS[Math.floor(Math.random()*PQP_POSITIFS.length)]} Tu as trouvé tous les plus-que-parfaits !<br><small>📌 ${PQP_REGLE}</small></div>`;
+        } else {
+          fbHtml = `<div class="ex-feedback-wrong">Tu as trouvé <strong>${correct}/${pqpCount}</strong> plus-que-parfait${pqpCount > 1 ? 's' : ''}. Les groupes manqués (en orange) devaient être sélectionnés.<br><small>📌 ${PQP_REGLE}</small></div>`;
+        }
+        document.getElementById('pqp-fb').innerHTML = fbHtml;
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        pqpState.idx++;
+        if (pqpState.idx >= pqpState.texts.length) {
+          pqpShowLevelResults();
+        } else {
+          pqpRenderText(document.getElementById('ex-card'));
+        }
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       NIVEAU 2 — Saisie libre
+       ══════════════════════════════════════════════════════════════════════════ */
+
+    function pqpRenderWriteQ(card) {
+      const { questions, idx, total } = pqpState;
+      const q = questions[idx];
+
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      const sentenceHtml = q.sentence
+        .replace(/\(([^)]+)\)/g, (_, inf) =>
+          `<span class="pqp-infinitif-chip">${inf}</span>`)
+        .replace(/___/, `<span style="color:var(--muted);font-style:italic">___</span>`);
+
+      card.innerHTML = `
+        <p class="ex-question-label">Conjugue le verbe au <strong>plus-que-parfait</strong>.</p>
+        <div class="pqp-rule-chip">📌 ${PQP_REGLE}</div>
+        <div class="pqp-sentence-display">${sentenceHtml}</div>
+        <div class="ex-input-row">
+          <input type="text" id="pqp-input" class="ex-text-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="pqp-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="pqp-write-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'}</button>
+      `;
+
+      const input = document.getElementById('pqp-input');
+      const vbtn  = document.getElementById('pqp-val-btn');
+      setTimeout(() => input.focus(), 50);
+
+      const doValidate = () => {
+        if (input.disabled || !input.value.trim()) return;
+        input.disabled = true;
+        vbtn.disabled  = true;
+
+        const userNorm    = pqpNorm(input.value);
+        const correctNorm = pqpNorm(q.answers[0]);
+        const isRight     = q.answers.some(a => pqpNorm(a) === userNorm);
+
+        if (isRight) {
+          pqpState.score++;
+          input.classList.add('is-correct');
+          document.getElementById('pqp-write-fb').innerHTML =
+            `<div class="ex-feedback-correct">${PQP_POSITIFS[Math.floor(Math.random()*PQP_POSITIFS.length)]}<br><small>📌 ${PQP_REGLE}</small></div>`;
+        } else {
+          input.classList.add('is-wrong');
+          document.getElementById('pqp-write-fb').innerHTML =
+            `<div class="ex-feedback-wrong">${pqpBuildErrorFeedback(userNorm, correctNorm, q.answers[0], q)}<br><small>📌 ${q.explication}</small></div>`;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      };
+
+      vbtn.addEventListener('click', doValidate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        pqpState.idx++;
+        if (pqpState.idx >= pqpState.questions.length) {
+          pqpShowLevelResults();
+        } else {
+          pqpRenderWriteQ(document.getElementById('ex-card'));
+        }
+      });
+    }
+
+    function pqpBuildErrorFeedback(userNorm, correctNorm, correctDisplay, q) {
+      const uWords = userNorm.split(' ');
+      const cWords = correctNorm.split(' ');
+      const reflexPfx = /^(s'|m'|t'|l'|se|me|te)$/i;
+
+      const skip   = reflexPfx.test(cWords[0]) ? 1 : 0;
+      const uAux   = uWords[skip]  || '';
+      const cAux   = cWords[skip]  || '';
+      const uPP    = uWords.slice(skip + 1).join(' ');
+      const cPP    = cWords.slice(skip + 1).join(' ');
+
+      let msg;
+      if (uAux !== cAux) {
+        msg = `L'auxiliaire est incorrect : tu as écrit <span class="pqp-error-part">${uAux || '?'}</span> au lieu de <strong>${cAux}</strong> (l'auxiliaire doit être à l'imparfait).`;
+      } else if (uPP !== cPP) {
+        msg = `Le participe passé est incorrect : tu as écrit <span class="pqp-error-part">${uPP || '?'}</span> au lieu de <strong>${cPP}</strong>${q.auxVerb === 'être' ? ' (accord avec le sujet !)' : ''}.`;
+      } else {
+        msg = `La bonne réponse est : <strong>${correctDisplay}</strong>.`;
+      }
+      return `❌ ${msg}`;
+    }
+
+    /* ── Résultats d'un niveau ──────────────────────────────────────────────── */
+    function pqpShowLevelResults() {
+      const { level, score: lvScore, total } = pqpState;
+      const pct    = lvScore / total;
+      const passed = pct >= PQP_SEUIL;
+      const pctPct = Math.round(pct * 100);
+
+      if (passed) {
+        const validated = pqpGetValidated();
+        if (!validated.includes(level - 1)) { validated.push(level - 1); pqpSetValidated(validated); }
+      }
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref = sessionData.backLink?.href || 'français-conjugaison.html';
+      const isLast   = (level === 2);
+      let msg, btnsHTML;
+      const stars = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 60 ? '⭐' : '';
+
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises le plus-que-parfait aux deux niveaux !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="pqp-restart-btn">Recommencer</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour à la Conjugaison</a>
+          </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau 1 validé ! 🏆 Le Niveau 2 est débloqué !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="pqp-next-btn">Niveau 2 — Complète →</button>
+            <button class="ex-btn-secondary" id="pqp-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour à la Conjugaison</a>`;
+      } else {
+        const needed = Math.ceil(total * PQP_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour passer. On réessaie ?`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="pqp-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour à la Conjugaison</a>
+          </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('pqp-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        pqpStartLevel(pqpState.level);
+      });
+      document.getElementById('pqp-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        pqpStartLevel(2);
+      });
+      document.getElementById('pqp-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        pqpInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug,
+        subject,
+        category,
+        exerciseType: 'pqp-niveaux',
+        level:        'Niveau ' + level,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
     /* ── Start ────────────────────────────────────────────────────────────── */
     init();
     vrInitBlock();
+    vnInitBlock();
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

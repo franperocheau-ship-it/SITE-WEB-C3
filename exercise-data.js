@@ -3809,6 +3809,38 @@ const EXERCISE_DATA = {
     ]
   },
 
+  /* ── Vocabulaire bilingue : Napoléon Bonaparte ────────────────────────── */
+  "vocabulaire-napoleon-bonaparte": {
+    title: "Vocabulaire — Napoléon Bonaparte",
+    levels: ["CM2"],
+    type: "vocabu-bilingue",
+    backLink: { href: "histoire.html", label: "Histoire EMILE" },
+
+    vocabulaire: [
+      { anglais: "Emperor",              francais: "Empereur" },
+      { anglais: "Army",                 francais: "Armée" },
+      { anglais: "Soldier",              francais: "Soldat" },
+      { anglais: "Battle",               francais: "Bataille" },
+      { anglais: "War",                  francais: "Guerre" },
+      { anglais: "Victory",              francais: "Victoire" },
+      { anglais: "Defeat",               francais: "Défaite" },
+      { anglais: "Corsica",              francais: "Corse" },
+      { anglais: "Island",               francais: "Île" },
+      { anglais: "Military school",      francais: "École militaire" },
+      { anglais: "Power",                francais: "Pouvoir" },
+      { anglais: "French Revolution",    francais: "Révolution française" },
+      { anglais: "Coronation",           francais: "Couronnement" },
+      { anglais: "Crown",                francais: "Couronne" },
+      { anglais: "Throne",               francais: "Trône" },
+      { anglais: "Civil Code",           francais: "Code civil" },
+      { anglais: "Law",                  francais: "Loi" },
+      { anglais: "Conquest",             francais: "Conquête" },
+      { anglais: "Enemy",                francais: "Ennemi" },
+      { anglais: "Leader",               francais: "Chef" },
+      { anglais: "Death",                francais: "Mort" }
+    ]
+  },
+
   /* ══════════════════════════════════════════════════════════════════════════
      conjuguer-faire  —  3 niveaux progressifs (CM1 / CM2 / 6e)
      Type custom : "faire-niveaux"
@@ -4003,6 +4035,779 @@ const EXERCISE_DATA = {
         { phrase: "Elles ___ volontiers à Paris pour le week-end.",  temps: "Conditionnel", reponse: "iraient",  explication: "Au conditionnel, « elles » → elles iraient (radical irrégulier « ir- »)." }
       ]
     }
+  },
+
+  /* ══════════════════════════════════════════════════════════════
+     CONJUGUER DIRE  (type : faire-niveaux)
+     CM1 : Présent + Imparfait + Futur simple + Passé composé
+     CM2 : Passé simple + Plus-que-parfait
+     6e  : Impératif + Conditionnel
+     Irrégularités clés : vous dites (pas disez), passé simple
+     je/tu/il = dis/dis/dit (homonymes du présent)
+  ══════════════════════════════════════════════════════════════ */
+  "conjuguer-dire": {
+    title: "Conjuguer le verbe DIRE",
+    verb: "dire",
+    levels: ["CM1", "CM2", "6e"],
+    type: "faire-niveaux",
+    questionsPerSession: 8,
+    backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
+
+    pools: {
+
+      /* ── CM1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
+      "CM1": [
+        /* Présent */
+        { phrase: "Je ___ toujours la vérité.",                       temps: "Présent",       reponse: "dis",       explication: "Au présent, « je » → je dis." },
+        { phrase: "Tu ___ des bêtises parfois.",                      temps: "Présent",       reponse: "dis",       explication: "Au présent, « tu » → tu dis." },
+        { phrase: "Il ___ bonjour à son voisin chaque matin.",        temps: "Présent",       reponse: "dit",       explication: "Au présent, « il » → il dit." },
+        { phrase: "Elle ___ au revoir en partant.",                   temps: "Présent",       reponse: "dit",       explication: "Au présent, « elle » → elle dit." },
+        { phrase: "Nous ___ les mots à voix haute.",                  temps: "Présent",       reponse: "disons",    explication: "Au présent, « nous » → nous disons." },
+        { phrase: "Vous ___ des poèmes en classe.",                   temps: "Présent",       reponse: "dites",     explication: "Au présent, « vous » → vous dites (attention : pas « disez », c'est irrégulier !)." },
+        { phrase: "Ils ___ des blagues pendant la récré.",            temps: "Présent",       reponse: "disent",    explication: "Au présent, « ils » → ils disent." },
+        { phrase: "Elles ___ toujours la vérité.",                    temps: "Présent",       reponse: "disent",    explication: "Au présent, « elles » → elles disent." },
+
+        /* Imparfait */
+        { phrase: "Je ___ toujours bonjour à la maîtresse.",          temps: "Imparfait",     reponse: "disais",    explication: "À l'imparfait, « je » → je disais." },
+        { phrase: "Tu ___ des mensonges quand tu étais petit.",       temps: "Imparfait",     reponse: "disais",    explication: "À l'imparfait, « tu » → tu disais." },
+        { phrase: "Elle ___ des histoires à ses enfants le soir.",    temps: "Imparfait",     reponse: "disait",    explication: "À l'imparfait, « elle » → elle disait." },
+        { phrase: "Nous ___ des poèmes chaque matin en classe.",      temps: "Imparfait",     reponse: "disions",   explication: "À l'imparfait, « nous » → nous disions." },
+        { phrase: "Vous ___ toujours la vérité.",                     temps: "Imparfait",     reponse: "disiez",    explication: "À l'imparfait, « vous » → vous disiez." },
+        { phrase: "Ils ___ des bêtises en classe.",                   temps: "Imparfait",     reponse: "disaient",  explication: "À l'imparfait, « ils » → ils disaient." },
+
+        /* Futur simple */
+        { phrase: "Je ___ la vérité quand ce sera le bon moment.",    temps: "Futur simple",  reponse: "dirai",     explication: "Au futur, « je » → je dirai." },
+        { phrase: "Tu ___ au revoir avant de partir.",                temps: "Futur simple",  reponse: "diras",     explication: "Au futur, « tu » → tu diras." },
+        { phrase: "Il ___ son discours devant toute la classe.",      temps: "Futur simple",  reponse: "dira",      explication: "Au futur, « il » → il dira." },
+        { phrase: "Nous ___ ce que nous pensons.",                    temps: "Futur simple",  reponse: "dirons",    explication: "Au futur, « nous » → nous dirons." },
+        { phrase: "Vous ___ vos mots de vocabulaire.",                temps: "Futur simple",  reponse: "direz",     explication: "Au futur, « vous » → vous direz." },
+        { phrase: "Elles ___ des poèmes à la fête de l'école.",      temps: "Futur simple",  reponse: "diront",    explication: "Au futur, « elles » → elles diront." },
+
+        /* Passé composé (auxiliaire avoir → pas d'accord) */
+        { phrase: "J'___ bonjour à tout le monde en entrant.",        temps: "Passé composé", reponse: "ai dit",    explication: "Au passé composé, dire se conjugue avec avoir : j'ai dit." },
+        { phrase: "Tu ___ la vérité, bravo !",                        temps: "Passé composé", reponse: "as dit",    explication: "Au passé composé, dire se conjugue avec avoir : tu as dit." },
+        { phrase: "Il ___ qu'il reviendrait demain.",                 temps: "Passé composé", reponse: "a dit",     explication: "Au passé composé, dire se conjugue avec avoir : il a dit." },
+        { phrase: "Nous ___ au revoir à nos amis.",                   temps: "Passé composé", reponse: "avons dit", explication: "Au passé composé, dire se conjugue avec avoir : nous avons dit." },
+        { phrase: "Vous ___ vos mots de vocabulaire correctement.",   temps: "Passé composé", reponse: "avez dit",  explication: "Au passé composé, dire se conjugue avec avoir : vous avez dit." },
+        { phrase: "Elles ___ la vérité à la maîtresse.",              temps: "Passé composé", reponse: "ont dit",   explication: "Au passé composé, dire se conjugue avec avoir : elles ont dit." }
+      ],
+
+      /* ── CM2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
+      "CM2": [
+        /* Passé simple  (attention : je/tu/il dis/dis/dit = homonymes du présent) */
+        { phrase: "Il ___ au roi qu'il avait eu tort.",                temps: "Passé simple",     reponse: "dit",       explication: "Au passé simple, « il » → il dit (même forme que le présent, le contexte l'indique)." },
+        { phrase: "Elle ___ au prince qu'elle partirait au lever du jour.", temps: "Passé simple", reponse: "dit",      explication: "Au passé simple, « elle » → elle dit." },
+        { phrase: "Je ___ adieu à mes amis ce soir-là.",               temps: "Passé simple",     reponse: "dis",       explication: "Au passé simple, « je » → je dis (même forme que le présent)." },
+        { phrase: "Tu ___ la vérité devant toute l'assemblée.",        temps: "Passé simple",     reponse: "dis",       explication: "Au passé simple, « tu » → tu dis." },
+        { phrase: "Nous ___ notre vœu en soufflant les bougies.",      temps: "Passé simple",     reponse: "dîmes",     explication: "Au passé simple, « nous » → nous dîmes (avec accent circonflexe)." },
+        { phrase: "Vous ___ des paroles que l'on ne peut oublier.",    temps: "Passé simple",     reponse: "dîtes",     explication: "Au passé simple, « vous » → vous dîtes (accent circonflexe, différent de l'impératif « dites »)." },
+        { phrase: "Ils ___ la même chose au même moment.",             temps: "Passé simple",     reponse: "dirent",    explication: "Au passé simple, « ils » → ils dirent." },
+        { phrase: "Elles ___ au revoir une dernière fois.",            temps: "Passé simple",     reponse: "dirent",    explication: "Au passé simple, « elles » → elles dirent." },
+
+        /* Plus-que-parfait (avoir à l'imparfait + dit → pas d'accord) */
+        { phrase: "Il ___ au roi ce qu'il pensait, bien avant l'audience.", temps: "Plus-que-parfait", reponse: "avait dit",   explication: "Au plus-que-parfait, « il » → il avait dit (avoir imparfait + dit)." },
+        { phrase: "Elle ___ au revoir la veille du départ.",           temps: "Plus-que-parfait", reponse: "avait dit",   explication: "Au plus-que-parfait, « elle » → elle avait dit." },
+        { phrase: "J'___ la vérité bien avant qu'on me le demande.",   temps: "Plus-que-parfait", reponse: "avais dit",   explication: "Au plus-que-parfait, « j' » → j'avais dit." },
+        { phrase: "Tu ___ que tu ne viendrais pas.",                   temps: "Plus-que-parfait", reponse: "avais dit",   explication: "Au plus-que-parfait, « tu » → tu avais dit." },
+        { phrase: "Nous ___ nos prières avant de nous endormir.",      temps: "Plus-que-parfait", reponse: "avions dit",  explication: "Au plus-que-parfait, « nous » → nous avions dit." },
+        { phrase: "Vous ___ au revoir avant de quitter la salle.",     temps: "Plus-que-parfait", reponse: "aviez dit",   explication: "Au plus-que-parfait, « vous » → vous aviez dit." },
+        { phrase: "Ils ___ les mêmes mots que nous.",                  temps: "Plus-que-parfait", reponse: "avaient dit", explication: "Au plus-que-parfait, « ils » → ils avaient dit." },
+        { phrase: "Elles ___ la même chose hier matin.",               temps: "Plus-que-parfait", reponse: "avaient dit", explication: "Au plus-que-parfait, « elles » → elles avaient dit." }
+      ],
+
+      /* ── 6e : Impératif (×8) + Conditionnel (×8) ── */
+      "6e": [
+        /* Impératif : dis (tu) / disons (nous) / dites (vous — irrégulier, pas disez) */
+        { phrase: "___ bonjour à ta maîtresse !",                      temps: "Impératif", reponse: "Dis",                        explication: "À l'impératif avec « ta », c'est « tu » : Dis !" },
+        { phrase: "___ la vérité à tes parents !",                     temps: "Impératif", reponse: "Dis",                        explication: "À l'impératif avec « tes », c'est « tu » : Dis !" },
+        { phrase: "___ au revoir à ton ami avant de partir !",         temps: "Impératif", reponse: "Dis",                        explication: "À l'impératif avec « ton », c'est « tu » : Dis !" },
+        { phrase: "___ vos mots de vocabulaire à voix haute !",        temps: "Impératif", reponse: "Dites",                      explication: "À l'impératif avec « vos », c'est « vous » : Dites ! (pas « disez », c'est irrégulier)." },
+        { phrase: "___ à votre professeur ce que vous avez compris !", temps: "Impératif", reponse: "Dites",                      explication: "À l'impératif avec « votre », c'est « vous » : Dites ! (irrégulier)." },
+        { phrase: "___ nos poèmes ensemble !",                         temps: "Impératif", reponse: "Disons",                     explication: "À l'impératif pour « nous » : Disons ! (on invite le groupe à agir)." },
+        { phrase: "___ la vérité !",                                   temps: "Impératif", reponses: ["Dis", "Disons", "Dites"],  explication: "À l'impératif : Dis (tu), Disons (nous) ou Dites (vous) selon la personne." },
+        { phrase: "N'___ pas de mensonges !",                         temps: "Impératif", reponses: ["dis", "disons", "dites"],  explication: "À l'impératif négatif : ne dis pas, ne disons pas ou ne dites pas selon la personne." },
+
+        /* Conditionnel */
+        { phrase: "Je ___ bien quelques mots si on me le demandait.",  temps: "Conditionnel", reponse: "dirais",   explication: "Au conditionnel, « je » → je dirais." },
+        { phrase: "Tu ___ la même chose à ma place.",                  temps: "Conditionnel", reponse: "dirais",   explication: "Au conditionnel, « tu » → tu dirais." },
+        { phrase: "Il ___ oui si tu lui posais la question.",          temps: "Conditionnel", reponse: "dirait",   explication: "Au conditionnel, « il » → il dirait." },
+        { phrase: "Elle ___ volontiers la vérité.",                    temps: "Conditionnel", reponse: "dirait",   explication: "Au conditionnel, « elle » → elle dirait." },
+        { phrase: "Nous ___ la même chose à votre place.",             temps: "Conditionnel", reponse: "dirions",  explication: "Au conditionnel, « nous » → nous dirions." },
+        { phrase: "Vous ___ le contraire si vous saviez la vérité.",  temps: "Conditionnel", reponse: "diriez",   explication: "Au conditionnel, « vous » → vous diriez." },
+        { phrase: "Ils ___ qu'ils ont raison.",                        temps: "Conditionnel", reponse: "diraient", explication: "Au conditionnel, « ils » → ils diraient." },
+        { phrase: "Elles ___ au revoir sans hésiter.",                 temps: "Conditionnel", reponse: "diraient", explication: "Au conditionnel, « elles » → elles diraient." }
+      ]
+    }
+  },
+
+  /* ══════════════════════════════════════════════════════════════
+     CONJUGUER VENIR  (type : faire-niveaux)
+     CM1 : Présent + Imparfait + Futur simple + Passé composé
+     CM2 : Passé simple + Plus-que-parfait
+     6e  : Impératif + Conditionnel
+     Irrégularités clés : présent (viens/viennent), radical
+     « viendr- » au futur et conditionnel, auxiliaire ÊTRE
+     au passé composé et plus-que-parfait (accord participe)
+  ══════════════════════════════════════════════════════════════ */
+  "conjuguer-venir": {
+    title: "Conjuguer le verbe VENIR",
+    verb: "venir",
+    levels: ["CM1", "CM2", "6e"],
+    type: "faire-niveaux",
+    questionsPerSession: 8,
+    backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
+
+    pools: {
+
+      /* ── CM1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
+      "CM1": [
+        /* Présent */
+        { phrase: "Je ___ te voir ce soir.",                           temps: "Présent",       reponse: "viens",     explication: "Au présent, « je » → je viens (verbe irrégulier)." },
+        { phrase: "Tu ___ jouer avec nous ?",                          temps: "Présent",       reponse: "viens",     explication: "Au présent, « tu » → tu viens (verbe irrégulier)." },
+        { phrase: "Il ___ à l'école en vélo chaque matin.",           temps: "Présent",       reponse: "vient",     explication: "Au présent, « il » → il vient (verbe irrégulier)." },
+        { phrase: "Elle ___ d'Espagne.",                               temps: "Présent",       reponse: "vient",     explication: "Au présent, « elle » → elle vient (verbe irrégulier)." },
+        { phrase: "Nous ___ te rendre visite.",                        temps: "Présent",       reponse: "venons",    explication: "Au présent, « nous » → nous venons." },
+        { phrase: "Vous ___ à la fête ce soir ?",                     temps: "Présent",       reponse: "venez",     explication: "Au présent, « vous » → vous venez." },
+        { phrase: "Ils ___ me voir chaque semaine.",                   temps: "Présent",       reponse: "viennent",  explication: "Au présent, « ils » → ils viennent (attention au double n)." },
+        { phrase: "Elles ___ de terminer l'exercice.",                 temps: "Présent",       reponse: "viennent",  explication: "Au présent, « elles » → elles viennent (attention au double n)." },
+
+        /* Imparfait */
+        { phrase: "Je ___ à l'école à pied quand j'étais petit.",     temps: "Imparfait",     reponse: "venais",    explication: "À l'imparfait, « je » → je venais." },
+        { phrase: "Tu ___ me voir chaque dimanche.",                   temps: "Imparfait",     reponse: "venais",    explication: "À l'imparfait, « tu » → tu venais." },
+        { phrase: "Elle ___ nous rendre visite chaque été.",           temps: "Imparfait",     reponse: "venait",    explication: "À l'imparfait, « elle » → elle venait." },
+        { phrase: "Nous ___ à la piscine ensemble le jeudi.",         temps: "Imparfait",     reponse: "venions",   explication: "À l'imparfait, « nous » → nous venions." },
+        { phrase: "Vous ___ toujours en retard.",                      temps: "Imparfait",     reponse: "veniez",    explication: "À l'imparfait, « vous » → vous veniez." },
+        { phrase: "Ils ___ de loin pour assister à la fête.",         temps: "Imparfait",     reponse: "venaient",  explication: "À l'imparfait, « ils » → ils venaient." },
+
+        /* Futur simple (radical irrégulier « viendr- ») */
+        { phrase: "Je ___ te voir demain matin.",                      temps: "Futur simple",  reponse: "viendrai",  explication: "Au futur, « je » → je viendrai (radical irrégulier « viendr- »)." },
+        { phrase: "Tu ___ avec nous au musée ?",                       temps: "Futur simple",  reponse: "viendras",  explication: "Au futur, « tu » → tu viendras (radical irrégulier « viendr- »)." },
+        { phrase: "Elle ___ nous rejoindre plus tard.",                temps: "Futur simple",  reponse: "viendra",   explication: "Au futur, « elle » → elle viendra (radical irrégulier « viendr- »)." },
+        { phrase: "Nous ___ te chercher à la gare.",                   temps: "Futur simple",  reponse: "viendrons", explication: "Au futur, « nous » → nous viendrons (radical irrégulier « viendr- »)." },
+        { phrase: "Vous ___ à la réunion de parents ?",               temps: "Futur simple",  reponse: "viendrez",  explication: "Au futur, « vous » → vous viendrez (radical irrégulier « viendr- »)." },
+        { phrase: "Ils ___ nous rendre visite cet été.",              temps: "Futur simple",  reponse: "viendront", explication: "Au futur, « ils » → ils viendront (radical irrégulier « viendr- »)." },
+
+        /* Passé composé (auxiliaire être → accord du participe) */
+        { phrase: "Il ___ me voir hier après-midi.",                   temps: "Passé composé", reponse: "est venu",     explication: "Au passé composé, venir se conjugue avec être : il est venu." },
+        { phrase: "Elle ___ à la fête hier soir.",                     temps: "Passé composé", reponse: "est venue",    explication: "Au passé composé, venir se conjugue avec être : elle est venue (accord)." },
+        { phrase: "Nous ___ à l'école à pied ce matin.",              temps: "Passé composé", reponse: "sommes venus", explication: "Au passé composé, venir se conjugue avec être : nous sommes venus." },
+        { phrase: "Ils ___ me rendre visite la semaine dernière.",    temps: "Passé composé", reponse: "sont venus",   explication: "Au passé composé, venir se conjugue avec être : ils sont venus." },
+        { phrase: "Elles ___ assister à la représentation.",          temps: "Passé composé", reponse: "sont venues",  explication: "Au passé composé, venir se conjugue avec être : elles sont venues (accord)." },
+        { phrase: "Je ___ te voir hier après les cours.",              temps: "Passé composé", reponses: ["suis venu", "suis venue"], explication: "Au passé composé, venir se conjugue avec être : je suis venu(e) selon le genre." }
+      ],
+
+      /* ── CM2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
+      "CM2": [
+        /* Passé simple */
+        { phrase: "Il ___ me voir un beau matin d'hiver.",            temps: "Passé simple",     reponse: "vint",      explication: "Au passé simple, « il » → il vint." },
+        { phrase: "Elle ___ frapper à ma porte à l'aube.",            temps: "Passé simple",     reponse: "vint",      explication: "Au passé simple, « elle » → elle vint." },
+        { phrase: "Je ___ à bout de mes efforts ce jour-là.",         temps: "Passé simple",     reponse: "vins",      explication: "Au passé simple, « je » → je vins." },
+        { phrase: "Tu ___ me rejoindre au bord du lac.",              temps: "Passé simple",     reponse: "vins",      explication: "Au passé simple, « tu » → tu vins." },
+        { phrase: "Nous ___ à bout de toutes les épreuves.",          temps: "Passé simple",     reponse: "vînmes",    explication: "Au passé simple, « nous » → nous vînmes (avec accent circonflexe)." },
+        { phrase: "Vous ___ enfin nous voir après tant d'années.",    temps: "Passé simple",     reponse: "vîntes",    explication: "Au passé simple, « vous » → vous vîntes (avec accent circonflexe)." },
+        { phrase: "Ils ___ de très loin pour assister à la cérémonie.", temps: "Passé simple",   reponse: "vinrent",   explication: "Au passé simple, « ils » → ils vinrent." },
+        { phrase: "Elles ___ toutes ensemble ce même jour.",           temps: "Passé simple",     reponse: "vinrent",   explication: "Au passé simple, « elles » → elles vinrent." },
+
+        /* Plus-que-parfait (être à l'imparfait + venu → accord) */
+        { phrase: "Il ___ me voir avant mon départ.",                  temps: "Plus-que-parfait", reponse: "était venu",   explication: "Au plus-que-parfait, « il » → il était venu (être imparfait + participe)." },
+        { phrase: "Elle ___ à la réunion la veille.",                  temps: "Plus-que-parfait", reponse: "était venue",  explication: "Au plus-que-parfait, « elle » → elle était venue (accord du participe)." },
+        { phrase: "Nous ___ à bout de nos peines avant l'hiver.",     temps: "Plus-que-parfait", reponse: "étions venus", explication: "Au plus-que-parfait, « nous » → nous étions venus." },
+        { phrase: "Vous ___ nous rendre visite avant les vacances.",  temps: "Plus-que-parfait", reponse: "étiez venus",  explication: "Au plus-que-parfait, « vous » → vous étiez venus." },
+        { phrase: "Ils ___ de très loin pour cette occasion.",        temps: "Plus-que-parfait", reponse: "étaient venus",  explication: "Au plus-que-parfait, « ils » → ils étaient venus." },
+        { phrase: "Elles ___ chercher leur prix le matin.",            temps: "Plus-que-parfait", reponse: "étaient venues", explication: "Au plus-que-parfait, « elles » → elles étaient venues (accord)." },
+        { phrase: "Je ___ te voir avant que tu partes.",               temps: "Plus-que-parfait", reponses: ["étais venu", "étais venue"], explication: "Au plus-que-parfait, je → j'étais venu(e) (être imparfait + participe, accord selon le genre)." },
+        { phrase: "Tu ___ me rejoindre avant la tombée de la nuit.",  temps: "Plus-que-parfait", reponses: ["étais venu", "étais venue"], explication: "Au plus-que-parfait, « tu » → tu étais venu(e) selon le genre." }
+      ],
+
+      /* ── 6e : Impératif (×8) + Conditionnel (×8) ── */
+      "6e": [
+        /* Impératif : viens (tu) / venons (nous) / venez (vous) */
+        { phrase: "___ chercher ton cartable !",                       temps: "Impératif", reponse: "Viens",                      explication: "À l'impératif avec « ton », c'est « tu » : Viens !" },
+        { phrase: "___ goûter ces gâteaux avec tes amis !",           temps: "Impératif", reponse: "Viens",                      explication: "À l'impératif avec « tes », c'est « tu » : Viens !" },
+        { phrase: "___ à votre place maintenant !",                    temps: "Impératif", reponse: "Venez",                      explication: "À l'impératif avec « votre », c'est « vous » : Venez !" },
+        { phrase: "___ voir ce que vous avez réalisé !",              temps: "Impératif", reponse: "Venez",                      explication: "À l'impératif avec « vous », c'est « vous » : Venez !" },
+        { phrase: "___ tous ensemble applaudir les artistes !",        temps: "Impératif", reponse: "Venons",                     explication: "À l'impératif pour « nous » : Venons ! (on invite le groupe à agir)." },
+        { phrase: "___ nous retrouver à la gare !",                    temps: "Impératif", reponses: ["Viens", "Venez"],          explication: "À l'impératif : Viens (tu) ou Venez (vous) selon la personne." },
+        { phrase: "___ ! Le dîner est prêt.",                         temps: "Impératif", reponses: ["Viens", "Venez"],          explication: "À l'impératif : Viens (tu) ou Venez (vous) selon la personne." },
+        { phrase: "N'___ pas sans prévenir !",                        temps: "Impératif", reponses: ["viens", "venez"],          explication: "À l'impératif négatif : ne viens pas (tu) ou ne venez pas (vous)." },
+
+        /* Conditionnel (radical irrégulier « viendr- ») */
+        { phrase: "Je ___ bien te voir si j'avais le temps.",         temps: "Conditionnel", reponse: "viendrais",  explication: "Au conditionnel, « je » → je viendrais (radical irrégulier « viendr- »)." },
+        { phrase: "Tu ___ avec nous si tu pouvais ?",                 temps: "Conditionnel", reponse: "viendrais",  explication: "Au conditionnel, « tu » → tu viendrais (radical irrégulier « viendr- »)." },
+        { phrase: "Il ___ nous aider s'il était disponible.",         temps: "Conditionnel", reponse: "viendrait",  explication: "Au conditionnel, « il » → il viendrait (radical irrégulier « viendr- »)." },
+        { phrase: "Elle ___ volontiers à la fête.",                    temps: "Conditionnel", reponse: "viendrait",  explication: "Au conditionnel, « elle » → elle viendrait (radical irrégulier « viendr- »)." },
+        { phrase: "Nous ___ te voir plus souvent si on habitait plus près.", temps: "Conditionnel", reponse: "viendrions", explication: "Au conditionnel, « nous » → nous viendrions (radical irrégulier « viendr- »)." },
+        { phrase: "Vous ___ avec nous si on vous invitait ?",         temps: "Conditionnel", reponse: "viendriez",  explication: "Au conditionnel, « vous » → vous viendriez (radical irrégulier « viendr- »)." },
+        { phrase: "Ils ___ nous rendre visite cet été s'ils pouvaient.", temps: "Conditionnel", reponse: "viendraient", explication: "Au conditionnel, « ils » → ils viendraient (radical irrégulier « viendr- »)." },
+        { phrase: "Elles ___ volontiers si on les invitait.",         temps: "Conditionnel", reponse: "viendraient", explication: "Au conditionnel, « elles » → elles viendraient (radical irrégulier « viendr- »)." }
+      ]
+    }
+  },
+
+  /* ══════════════════════════════════════════════════════════════
+     CONJUGUER POUVOIR  (type : faire-niveaux)
+     CM1 : Présent + Imparfait + Futur simple + Passé composé
+     CM2 : Passé simple + Plus-que-parfait
+     6e  : Conditionnel + Subjonctif présent
+     Irrégularités clés : présent (peux/peut/peuvent),
+     radical « pourr- » au futur et conditionnel,
+     pas d'impératif → 6e = Conditionnel + Subjonctif présent
+  ══════════════════════════════════════════════════════════════ */
+  "conjuguer-pouvoir": {
+    title: "Conjuguer le verbe POUVOIR",
+    verb: "pouvoir",
+    levels: ["CM1", "CM2", "6e"],
+    type: "faire-niveaux",
+    questionsPerSession: 8,
+    backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
+
+    pools: {
+
+      /* ── CM1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
+      "CM1": [
+        /* Présent */
+        { phrase: "Je ___ t'aider si tu veux.",                        temps: "Présent",       reponse: "peux",       explication: "Au présent, « je » → je peux (verbe irrégulier)." },
+        { phrase: "Tu ___ venir avec nous ?",                          temps: "Présent",       reponse: "peux",       explication: "Au présent, « tu » → tu peux (verbe irrégulier)." },
+        { phrase: "Il ___ courir très vite.",                          temps: "Présent",       reponse: "peut",       explication: "Au présent, « il » → il peut (verbe irrégulier)." },
+        { phrase: "Elle ___ chanter très bien.",                       temps: "Présent",       reponse: "peut",       explication: "Au présent, « elle » → elle peut (verbe irrégulier)." },
+        { phrase: "Nous ___ travailler ensemble.",                     temps: "Présent",       reponse: "pouvons",    explication: "Au présent, « nous » → nous pouvons." },
+        { phrase: "Vous ___ commencer quand vous voulez.",             temps: "Présent",       reponse: "pouvez",     explication: "Au présent, « vous » → vous pouvez." },
+        { phrase: "Ils ___ jouer dehors maintenant.",                  temps: "Présent",       reponse: "peuvent",    explication: "Au présent, « ils » → ils peuvent (verbe irrégulier)." },
+        { phrase: "Elles ___ terminer l'exercice.",                    temps: "Présent",       reponse: "peuvent",    explication: "Au présent, « elles » → elles peuvent (verbe irrégulier)." },
+
+        /* Imparfait */
+        { phrase: "Je ___ courir plus vite quand j'étais jeune.",     temps: "Imparfait",     reponse: "pouvais",    explication: "À l'imparfait, « je » → je pouvais." },
+        { phrase: "Tu ___ rester plus longtemps autrefois.",           temps: "Imparfait",     reponse: "pouvais",    explication: "À l'imparfait, « tu » → tu pouvais." },
+        { phrase: "Elle ___ nager très bien à cet âge.",              temps: "Imparfait",     reponse: "pouvait",    explication: "À l'imparfait, « elle » → elle pouvait." },
+        { phrase: "Nous ___ sortir le week-end.",                      temps: "Imparfait",     reponse: "pouvions",   explication: "À l'imparfait, « nous » → nous pouvions." },
+        { phrase: "Vous ___ parler plus fort.",                        temps: "Imparfait",     reponse: "pouviez",    explication: "À l'imparfait, « vous » → vous pouviez." },
+        { phrase: "Ils ___ jouer dehors jusqu'à la nuit.",            temps: "Imparfait",     reponse: "pouvaient",  explication: "À l'imparfait, « ils » → ils pouvaient." },
+
+        /* Futur simple (radical irrégulier « pourr- ») */
+        { phrase: "Je ___ t'aider demain.",                            temps: "Futur simple",  reponse: "pourrai",    explication: "Au futur, « je » → je pourrai (radical irrégulier « pourr- »)." },
+        { phrase: "Tu ___ venir avec nous le week-end prochain.",     temps: "Futur simple",  reponse: "pourras",    explication: "Au futur, « tu » → tu pourras (radical irrégulier « pourr- »)." },
+        { phrase: "Elle ___ venir à la fête.",                        temps: "Futur simple",  reponse: "pourra",     explication: "Au futur, « elle » → elle pourra (radical irrégulier « pourr- »)." },
+        { phrase: "Nous ___ commencer le projet lundi.",              temps: "Futur simple",  reponse: "pourrons",   explication: "Au futur, « nous » → nous pourrons (radical irrégulier « pourr- »)." },
+        { phrase: "Vous ___ partir quand vous voulez.",               temps: "Futur simple",  reponse: "pourrez",    explication: "Au futur, « vous » → vous pourrez (radical irrégulier « pourr- »)." },
+        { phrase: "Ils ___ jouer dans le jardin cet été.",            temps: "Futur simple",  reponse: "pourront",   explication: "Au futur, « ils » → ils pourront (radical irrégulier « pourr- »)." },
+
+        /* Passé composé (auxiliaire avoir → pas d'accord) */
+        { phrase: "J'___ terminer mon travail à temps.",              temps: "Passé composé", reponse: "ai pu",      explication: "Au passé composé, pouvoir se conjugue avec avoir : j'ai pu." },
+        { phrase: "Tu ___ venir à la fête, super !",                  temps: "Passé composé", reponse: "as pu",      explication: "Au passé composé, pouvoir se conjugue avec avoir : tu as pu." },
+        { phrase: "Il ___ courir malgré sa blessure.",                temps: "Passé composé", reponse: "a pu",       explication: "Au passé composé, pouvoir se conjugue avec avoir : il a pu." },
+        { phrase: "Nous ___ finir avant la récréation.",              temps: "Passé composé", reponse: "avons pu",   explication: "Au passé composé, pouvoir se conjugue avec avoir : nous avons pu." },
+        { phrase: "Vous ___ sortir malgré la pluie.",                 temps: "Passé composé", reponse: "avez pu",    explication: "Au passé composé, pouvoir se conjugue avec avoir : vous avez pu." },
+        { phrase: "Elles ___ terminer leur exposé à temps.",          temps: "Passé composé", reponse: "ont pu",     explication: "Au passé composé, pouvoir se conjugue avec avoir : elles ont pu." }
+      ],
+
+      /* ── CM2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
+      "CM2": [
+        /* Passé simple */
+        { phrase: "Il ___ enfin ouvrir la lourde porte.",             temps: "Passé simple",     reponse: "put",       explication: "Au passé simple, « il » → il put." },
+        { phrase: "Elle ___ traverser la forêt seule.",               temps: "Passé simple",     reponse: "put",       explication: "Au passé simple, « elle » → elle put." },
+        { phrase: "Je ___ soulever la pierre.",                        temps: "Passé simple",     reponse: "pus",       explication: "Au passé simple, « je » → je pus." },
+        { phrase: "Tu ___ convaincre tout le monde.",                  temps: "Passé simple",     reponse: "pus",       explication: "Au passé simple, « tu » → tu pus." },
+        { phrase: "Nous ___ arriver avant la nuit.",                   temps: "Passé simple",     reponse: "pûmes",     explication: "Au passé simple, « nous » → nous pûmes (avec accent circonflexe)." },
+        { phrase: "Vous ___ trouver la sortie.",                       temps: "Passé simple",     reponse: "pûtes",     explication: "Au passé simple, « vous » → vous pûtes (avec accent circonflexe)." },
+        { phrase: "Ils ___ résoudre le problème ensemble.",            temps: "Passé simple",     reponse: "purent",    explication: "Au passé simple, « ils » → ils purent." },
+        { phrase: "Elles ___ traverser la rivière.",                   temps: "Passé simple",     reponse: "purent",    explication: "Au passé simple, « elles » → elles purent." },
+
+        /* Plus-que-parfait (avoir à l'imparfait + pu → pas d'accord) */
+        { phrase: "Il ___ terminer son travail avant l'orage.",       temps: "Plus-que-parfait", reponse: "avait pu",   explication: "Au plus-que-parfait, « il » → il avait pu (avoir imparfait + pu)." },
+        { phrase: "Elle ___ venir à la réunion la veille.",           temps: "Plus-que-parfait", reponse: "avait pu",   explication: "Au plus-que-parfait, « elle » → elle avait pu." },
+        { phrase: "J'___ me reposer avant la course.",                temps: "Plus-que-parfait", reponse: "avais pu",   explication: "Au plus-que-parfait, « j' » → j'avais pu." },
+        { phrase: "Tu ___ apprendre la leçon avant le contrôle.",     temps: "Plus-que-parfait", reponse: "avais pu",   explication: "Au plus-que-parfait, « tu » → tu avais pu." },
+        { phrase: "Nous ___ finir avant la fermeture.",               temps: "Plus-que-parfait", reponse: "avions pu",  explication: "Au plus-que-parfait, « nous » → nous avions pu." },
+        { phrase: "Vous ___ partir avant l'embouteillage.",           temps: "Plus-que-parfait", reponse: "aviez pu",   explication: "Au plus-que-parfait, « vous » → vous aviez pu." },
+        { phrase: "Ils ___ sortir avant la pluie.",                   temps: "Plus-que-parfait", reponse: "avaient pu", explication: "Au plus-que-parfait, « ils » → ils avaient pu." },
+        { phrase: "Elles ___ terminer leur exposé à temps.",          temps: "Plus-que-parfait", reponse: "avaient pu", explication: "Au plus-que-parfait, « elles » → elles avaient pu." }
+      ],
+
+      /* ── 6e : Conditionnel (×8) + Subjonctif présent (×8) ── */
+      /* Note : « pouvoir » n'a pas d'impératif → Subjonctif présent à la place */
+      "6e": [
+        /* Conditionnel (radical irrégulier « pourr- ») */
+        { phrase: "Je ___ t'aider si j'avais le temps.",              temps: "Conditionnel", reponse: "pourrais",   explication: "Au conditionnel, « je » → je pourrais (radical irrégulier « pourr- »)." },
+        { phrase: "Tu ___ venir avec nous si tu voulais.",            temps: "Conditionnel", reponse: "pourrais",   explication: "Au conditionnel, « tu » → tu pourrais (radical irrégulier « pourr- »)." },
+        { phrase: "Il ___ courir plus vite avec de l'entraînement.", temps: "Conditionnel", reponse: "pourrait",   explication: "Au conditionnel, « il » → il pourrait (radical irrégulier « pourr- »)." },
+        { phrase: "Elle ___ chanter sur scène.",                      temps: "Conditionnel", reponse: "pourrait",   explication: "Au conditionnel, « elle » → elle pourrait (radical irrégulier « pourr- »)." },
+        { phrase: "Nous ___ partir plus tôt si on se dépêchait.",    temps: "Conditionnel", reponse: "pourrions",  explication: "Au conditionnel, « nous » → nous pourrions (radical irrégulier « pourr- »)." },
+        { phrase: "Vous ___ réussir si vous travailliez davantage.", temps: "Conditionnel", reponse: "pourriez",   explication: "Au conditionnel, « vous » → vous pourriez (radical irrégulier « pourr- »)." },
+        { phrase: "Ils ___ résoudre ce problème facilement.",        temps: "Conditionnel", reponse: "pourraient", explication: "Au conditionnel, « ils » → ils pourraient (radical irrégulier « pourr- »)." },
+        { phrase: "Elles ___ venir si elles étaient disponibles.",   temps: "Conditionnel", reponse: "pourraient", explication: "Au conditionnel, « elles » → elles pourraient (radical irrégulier « pourr- »)." },
+
+        /* Subjonctif présent */
+        { phrase: "Il faut que je ___ terminer avant ce soir.",      temps: "Subjonctif présent", reponse: "puisse",    explication: "Au subjonctif présent, « je » → que je puisse (verbe irrégulier)." },
+        { phrase: "Je veux que tu ___ venir à la fête.",             temps: "Subjonctif présent", reponse: "puisses",   explication: "Au subjonctif présent, « tu » → que tu puisses (verbe irrégulier)." },
+        { phrase: "Il faut qu'il ___ partir à l'heure.",             temps: "Subjonctif présent", reponse: "puisse",    explication: "Au subjonctif présent, « il » → qu'il puisse (verbe irrégulier)." },
+        { phrase: "Je souhaite qu'elle ___ venir avec nous.",        temps: "Subjonctif présent", reponse: "puisse",    explication: "Au subjonctif présent, « elle » → qu'elle puisse (verbe irrégulier)." },
+        { phrase: "Il faut que nous ___ travailler ensemble.",       temps: "Subjonctif présent", reponse: "puissions", explication: "Au subjonctif présent, « nous » → que nous puissions (verbe irrégulier)." },
+        { phrase: "Je veux que vous ___ réussir cet examen.",        temps: "Subjonctif présent", reponse: "puissiez",  explication: "Au subjonctif présent, « vous » → que vous puissiez (verbe irrégulier)." },
+        { phrase: "Il faut qu'ils ___ participer au projet.",        temps: "Subjonctif présent", reponse: "puissent",  explication: "Au subjonctif présent, « ils » → qu'ils puissent (verbe irrégulier)." },
+        { phrase: "Je souhaite qu'elles ___ venir à la cérémonie.", temps: "Subjonctif présent", reponse: "puissent",  explication: "Au subjonctif présent, « elles » → qu'elles puissent (verbe irrégulier)." }
+      ]
+    }
+  },
+
+  /* ══════════════════════════════════════════════════════════════
+     CONJUGUER VOIR  (type : faire-niveaux)
+     CM1 : Présent + Imparfait + Futur simple + Passé composé
+     CM2 : Passé simple + Plus-que-parfait
+     6e  : Impératif + Conditionnel
+     Irrégularités clés : présent (vois/voient vs voyons/voyez),
+     radical « verr- » au futur et conditionnel,
+     passé simple vit ≠ vit (vivre, contexte narratif)
+  ══════════════════════════════════════════════════════════════ */
+  "conjuguer-voir": {
+    title: "Conjuguer le verbe VOIR",
+    verb: "voir",
+    levels: ["CM1", "CM2", "6e"],
+    type: "faire-niveaux",
+    questionsPerSession: 8,
+    backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
+
+    pools: {
+
+      /* ── CM1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
+      "CM1": [
+        /* Présent */
+        { phrase: "Je ___ un beau coucher de soleil.",                 temps: "Présent",       reponse: "vois",      explication: "Au présent, « je » → je vois (verbe irrégulier)." },
+        { phrase: "Tu ___ bien sans lunettes ?",                       temps: "Présent",       reponse: "vois",      explication: "Au présent, « tu » → tu vois (verbe irrégulier)." },
+        { phrase: "Il ___ le tableau depuis sa place.",                temps: "Présent",       reponse: "voit",      explication: "Au présent, « il » → il voit (verbe irrégulier)." },
+        { phrase: "Elle ___ ses amis le week-end.",                    temps: "Présent",       reponse: "voit",      explication: "Au présent, « elle » → elle voit (verbe irrégulier)." },
+        { phrase: "Nous ___ un film ce soir.",                         temps: "Présent",       reponse: "voyons",    explication: "Au présent, « nous » → nous voyons." },
+        { phrase: "Vous ___ ce que je veux dire ?",                   temps: "Présent",       reponse: "voyez",     explication: "Au présent, « vous » → vous voyez." },
+        { phrase: "Ils ___ la mer depuis leur fenêtre.",              temps: "Présent",       reponse: "voient",    explication: "Au présent, « ils » → ils voient (attention au double radical : voi-/voy-)." },
+        { phrase: "Elles ___ souvent leurs cousins.",                  temps: "Présent",       reponse: "voient",    explication: "Au présent, « elles » → elles voient (attention au double radical : voi-/voy-)." },
+
+        /* Imparfait */
+        { phrase: "Je ___ très bien sans lunettes autrefois.",         temps: "Imparfait",     reponse: "voyais",    explication: "À l'imparfait, « je » → je voyais." },
+        { phrase: "Tu ___ tes amis chaque jour.",                      temps: "Imparfait",     reponse: "voyais",    explication: "À l'imparfait, « tu » → tu voyais." },
+        { phrase: "Elle ___ ses grands-parents chaque été.",           temps: "Imparfait",     reponse: "voyait",    explication: "À l'imparfait, « elle » → elle voyait." },
+        { phrase: "Nous ___ des films le vendredi soir.",              temps: "Imparfait",     reponse: "voyions",   explication: "À l'imparfait, « nous » → nous voyions." },
+        { phrase: "Vous ___ souvent vos voisins.",                     temps: "Imparfait",     reponse: "voyiez",    explication: "À l'imparfait, « vous » → vous voyiez." },
+        { phrase: "Ils ___ la montagne depuis leur maison.",           temps: "Imparfait",     reponse: "voyaient",  explication: "À l'imparfait, « ils » → ils voyaient." },
+
+        /* Futur simple (radical irrégulier « verr- ») */
+        { phrase: "Je ___ bien comment résoudre ce problème.",         temps: "Futur simple",  reponse: "verrai",    explication: "Au futur, « je » → je verrai (radical irrégulier « verr- »)." },
+        { phrase: "Tu ___ combien c'est beau en vrai.",               temps: "Futur simple",  reponse: "verras",    explication: "Au futur, « tu » → tu verras (radical irrégulier « verr- »)." },
+        { phrase: "Elle ___ ses amis pendant les vacances.",           temps: "Futur simple",  reponse: "verra",     explication: "Au futur, « elle » → elle verra (radical irrégulier « verr- »)." },
+        { phrase: "Nous ___ bien le spectacle depuis nos places.",     temps: "Futur simple",  reponse: "verrons",   explication: "Au futur, « nous » → nous verrons (radical irrégulier « verr- »)." },
+        { phrase: "Vous ___ le résultat demain.",                      temps: "Futur simple",  reponse: "verrez",    explication: "Au futur, « vous » → vous verrez (radical irrégulier « verr- »)." },
+        { phrase: "Ils ___ ce film à la télé ce soir.",               temps: "Futur simple",  reponse: "verront",   explication: "Au futur, « ils » → ils verront (radical irrégulier « verr- »)." },
+
+        /* Passé composé (auxiliaire avoir → pas d'accord) */
+        { phrase: "J'___ un arc-en-ciel ce matin.",                   temps: "Passé composé", reponse: "ai vu",     explication: "Au passé composé, voir se conjugue avec avoir : j'ai vu." },
+        { phrase: "Tu ___ le match hier soir ?",                       temps: "Passé composé", reponse: "as vu",     explication: "Au passé composé, voir se conjugue avec avoir : tu as vu." },
+        { phrase: "Il ___ le directeur ce matin.",                     temps: "Passé composé", reponse: "a vu",      explication: "Au passé composé, voir se conjugue avec avoir : il a vu." },
+        { phrase: "Nous ___ un beau spectacle hier.",                  temps: "Passé composé", reponse: "avons vu",  explication: "Au passé composé, voir se conjugue avec avoir : nous avons vu." },
+        { phrase: "Vous ___ ce film ?",                                temps: "Passé composé", reponse: "avez vu",   explication: "Au passé composé, voir se conjugue avec avoir : vous avez vu." },
+        { phrase: "Elles ___ leurs cousins pendant les vacances.",     temps: "Passé composé", reponse: "ont vu",    explication: "Au passé composé, voir se conjugue avec avoir : elles ont vu." }
+      ],
+
+      /* ── CM2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
+      "CM2": [
+        /* Passé simple (attention : « vit » = passé simple de voir ≠ « vit » de vivre) */
+        { phrase: "Il ___ le château se dresser devant lui.",          temps: "Passé simple",     reponse: "vit",       explication: "Au passé simple, « il » → il vit (contexte narratif)." },
+        { phrase: "Elle ___ une lumière au loin dans la nuit.",        temps: "Passé simple",     reponse: "vit",       explication: "Au passé simple, « elle » → elle vit." },
+        { phrase: "Je ___ quelque chose d'étrange ce soir-là.",       temps: "Passé simple",     reponse: "vis",       explication: "Au passé simple, « je » → je vis." },
+        { phrase: "Tu ___ la vérité de tes propres yeux.",            temps: "Passé simple",     reponse: "vis",       explication: "Au passé simple, « tu » → tu vis." },
+        { phrase: "Nous ___ le spectacle depuis le premier rang.",     temps: "Passé simple",     reponse: "vîmes",     explication: "Au passé simple, « nous » → nous vîmes (avec accent circonflexe)." },
+        { phrase: "Vous ___ le lever du soleil ce matin-là.",         temps: "Passé simple",     reponse: "vîtes",     explication: "Au passé simple, « vous » → vous vîtes (avec accent circonflexe)." },
+        { phrase: "Ils ___ la comète traverser le ciel.",             temps: "Passé simple",     reponse: "virent",    explication: "Au passé simple, « ils » → ils virent." },
+        { phrase: "Elles ___ la scène depuis leur fenêtre.",          temps: "Passé simple",     reponse: "virent",    explication: "Au passé simple, « elles » → elles virent." },
+
+        /* Plus-que-parfait (avoir à l'imparfait + vu → pas d'accord) */
+        { phrase: "Il ___ ce film avant d'en lire le livre.",         temps: "Plus-que-parfait", reponse: "avait vu",   explication: "Au plus-que-parfait, « il » → il avait vu (avoir imparfait + vu)." },
+        { phrase: "Elle ___ ses amis la veille.",                      temps: "Plus-que-parfait", reponse: "avait vu",   explication: "Au plus-que-parfait, « elle » → elle avait vu." },
+        { phrase: "J'___ cette scène en rêve la nuit d'avant.",       temps: "Plus-que-parfait", reponse: "avais vu",   explication: "Au plus-que-parfait, « j' » → j'avais vu." },
+        { phrase: "Tu ___ ce tableau au musée.",                       temps: "Plus-que-parfait", reponse: "avais vu",   explication: "Au plus-que-parfait, « tu » → tu avais vu." },
+        { phrase: "Nous ___ ce film avant la sortie en salle.",       temps: "Plus-que-parfait", reponse: "avions vu",  explication: "Au plus-que-parfait, « nous » → nous avions vu." },
+        { phrase: "Vous ___ le résultat avant tout le monde.",        temps: "Plus-que-parfait", reponse: "aviez vu",   explication: "Au plus-que-parfait, « vous » → vous aviez vu." },
+        { phrase: "Ils ___ l'accident avant l'arrivée des secours.",  temps: "Plus-que-parfait", reponse: "avaient vu", explication: "Au plus-que-parfait, « ils » → ils avaient vu." },
+        { phrase: "Elles ___ le spectacle la veille.",                 temps: "Plus-que-parfait", reponse: "avaient vu", explication: "Au plus-que-parfait, « elles » → elles avaient vu." }
+      ],
+
+      /* ── 6e : Impératif (×8) + Conditionnel (×8) ── */
+      "6e": [
+        /* Impératif : vois (tu) / voyons (nous) / voyez (vous) */
+        { phrase: "___ par toi-même, c'est magnifique !",             temps: "Impératif", reponse: "Vois",                     explication: "À l'impératif avec « toi », c'est « tu » : Vois !" },
+        { phrase: "___ tes résultats avant de te plaindre !",         temps: "Impératif", reponse: "Vois",                     explication: "À l'impératif avec « tes », c'est « tu » : Vois !" },
+        { phrase: "___ vos copies avant de les rendre !",             temps: "Impératif", reponse: "Voyez",                    explication: "À l'impératif avec « vos », c'est « vous » : Voyez !" },
+        { phrase: "___ le résultat de votre travail !",               temps: "Impératif", reponse: "Voyez",                    explication: "À l'impératif avec « votre », c'est « vous » : Voyez !" },
+        { phrase: "___ notre nouveau projet ensemble !",              temps: "Impératif", reponse: "Voyons",                   explication: "À l'impératif pour « nous » : Voyons ! (on invite le groupe à agir)." },
+        { phrase: "___ ce spectacle, c'est impressionnant !",         temps: "Impératif", reponses: ["Vois", "Voyez"],         explication: "À l'impératif : Vois (tu) ou Voyez (vous) selon la personne." },
+        { phrase: "N'___ pas les choses en noir !",                   temps: "Impératif", reponses: ["vois", "voyez"],         explication: "À l'impératif négatif : ne vois pas (tu) ou ne voyez pas (vous)." },
+        { phrase: "___ ! C'est exactement ce que je voulais dire.",   temps: "Impératif", reponses: ["Vois", "Voyez"],         explication: "À l'impératif : Vois (tu) ou Voyez (vous) selon la personne." },
+
+        /* Conditionnel (radical irrégulier « verr- ») */
+        { phrase: "Je ___ bien ce film ce soir.",                     temps: "Conditionnel", reponse: "verrais",   explication: "Au conditionnel, « je » → je verrais (radical irrégulier « verr- »)." },
+        { phrase: "Tu ___ mieux avec des lunettes.",                  temps: "Conditionnel", reponse: "verrais",   explication: "Au conditionnel, « tu » → tu verrais (radical irrégulier « verr- »)." },
+        { phrase: "Il ___ tout depuis ce rocher.",                    temps: "Conditionnel", reponse: "verrait",   explication: "Au conditionnel, « il » → il verrait (radical irrégulier « verr- »)." },
+        { phrase: "Elle ___ ses amis ce week-end si elle pouvait.",   temps: "Conditionnel", reponse: "verrait",   explication: "Au conditionnel, « elle » → elle verrait (radical irrégulier « verr- »)." },
+        { phrase: "Nous ___ mieux le tableau de là-bas.",             temps: "Conditionnel", reponse: "verrions",  explication: "Au conditionnel, « nous » → nous verrions (radical irrégulier « verr- »)." },
+        { phrase: "Vous ___ la différence si vous regardiez bien.",   temps: "Conditionnel", reponse: "verriez",   explication: "Au conditionnel, « vous » → vous verriez (radical irrégulier « verr- »)." },
+        { phrase: "Ils ___ la mer depuis leur nouvelle maison.",      temps: "Conditionnel", reponse: "verraient", explication: "Au conditionnel, « ils » → ils verraient (radical irrégulier « verr- »)." },
+        { phrase: "Elles ___ leurs amis plus souvent si elles habitaient plus près.", temps: "Conditionnel", reponse: "verraient", explication: "Au conditionnel, « elles » → elles verraient (radical irrégulier « verr- »)." }
+      ]
+    }
+  },
+
+  /* ══════════════════════════════════════════════════════════════
+     CONJUGUER VOULOIR  (type : faire-niveaux)
+     CM1 : Présent + Imparfait + Futur simple + Passé composé
+     CM2 : Passé simple + Plus-que-parfait
+     6e  : Impératif + Conditionnel
+     Irrégularités clés : présent (veux/veut/veulent),
+     radical « voudr- » au futur et conditionnel,
+     impératif : veux/veuille (tu), voulons/veuillons (nous),
+     voulez/veuillez (vous) — les deux formes acceptées
+  ══════════════════════════════════════════════════════════════ */
+  "conjuguer-vouloir": {
+    title: "Conjuguer le verbe VOULOIR",
+    verb: "vouloir",
+    levels: ["CM1", "CM2", "6e"],
+    type: "faire-niveaux",
+    questionsPerSession: 8,
+    backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
+
+    pools: {
+
+      /* ── CM1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
+      "CM1": [
+        /* Présent */
+        { phrase: "Je ___ devenir astronaute.",                        temps: "Présent",       reponse: "veux",       explication: "Au présent, « je » → je veux (verbe irrégulier)." },
+        { phrase: "Tu ___ venir avec nous ?",                          temps: "Présent",       reponse: "veux",       explication: "Au présent, « tu » → tu veux (verbe irrégulier)." },
+        { phrase: "Il ___ un nouveau vélo pour son anniversaire.",     temps: "Présent",       reponse: "veut",       explication: "Au présent, « il » → il veut (verbe irrégulier)." },
+        { phrase: "Elle ___ apprendre le piano.",                      temps: "Présent",       reponse: "veut",       explication: "Au présent, « elle » → elle veut (verbe irrégulier)." },
+        { phrase: "Nous ___ faire une excursion.",                     temps: "Présent",       reponse: "voulons",    explication: "Au présent, « nous » → nous voulons." },
+        { phrase: "Vous ___ partir maintenant ?",                      temps: "Présent",       reponse: "voulez",     explication: "Au présent, « vous » → vous voulez." },
+        { phrase: "Ils ___ jouer au football après l'école.",         temps: "Présent",       reponse: "veulent",    explication: "Au présent, « ils » → ils veulent (verbe irrégulier)." },
+        { phrase: "Elles ___ aller au cinéma ce soir.",               temps: "Présent",       reponse: "veulent",    explication: "Au présent, « elles » → elles veulent (verbe irrégulier)." },
+
+        /* Imparfait */
+        { phrase: "Je ___ devenir pompier quand j'étais petit.",      temps: "Imparfait",     reponse: "voulais",    explication: "À l'imparfait, « je » → je voulais." },
+        { phrase: "Tu ___ toujours le meilleur jouet.",               temps: "Imparfait",     reponse: "voulais",    explication: "À l'imparfait, « tu » → tu voulais." },
+        { phrase: "Elle ___ être vétérinaire.",                       temps: "Imparfait",     reponse: "voulait",    explication: "À l'imparfait, « elle » → elle voulait." },
+        { phrase: "Nous ___ partir en vacances ensemble.",            temps: "Imparfait",     reponse: "voulions",   explication: "À l'imparfait, « nous » → nous voulions." },
+        { phrase: "Vous ___ rester plus longtemps.",                  temps: "Imparfait",     reponse: "vouliez",    explication: "À l'imparfait, « vous » → vous vouliez." },
+        { phrase: "Ils ___ jouer dehors mais il pleuvait.",           temps: "Imparfait",     reponse: "voulaient",  explication: "À l'imparfait, « ils » → ils voulaient." },
+
+        /* Futur simple (radical irrégulier « voudr- ») */
+        { phrase: "Je ___ te parler demain.",                         temps: "Futur simple",  reponse: "voudrai",    explication: "Au futur, « je » → je voudrai (radical irrégulier « voudr- »)." },
+        { phrase: "Tu ___ encore du gâteau ?",                        temps: "Futur simple",  reponse: "voudras",    explication: "Au futur, « tu » → tu voudras (radical irrégulier « voudr- »)." },
+        { phrase: "Elle ___ choisir elle-même.",                      temps: "Futur simple",  reponse: "voudra",     explication: "Au futur, « elle » → elle voudra (radical irrégulier « voudr- »)." },
+        { phrase: "Nous ___ vous remercier après la cérémonie.",      temps: "Futur simple",  reponse: "voudrons",   explication: "Au futur, « nous » → nous voudrons (radical irrégulier « voudr- »)." },
+        { phrase: "Vous ___ bien nous aider ?",                       temps: "Futur simple",  reponse: "voudrez",    explication: "Au futur, « vous » → vous voudrez (radical irrégulier « voudr- »)." },
+        { phrase: "Ils ___ y aller en premiers.",                     temps: "Futur simple",  reponse: "voudront",   explication: "Au futur, « ils » → ils voudront (radical irrégulier « voudr- »)." },
+
+        /* Passé composé (auxiliaire avoir → pas d'accord) */
+        { phrase: "J'___ partir tôt ce matin.",                       temps: "Passé composé", reponse: "ai voulu",    explication: "Au passé composé, vouloir se conjugue avec avoir : j'ai voulu." },
+        { phrase: "Tu ___ venir mais tu n'as pas pu.",                temps: "Passé composé", reponse: "as voulu",    explication: "Au passé composé, vouloir se conjugue avec avoir : tu as voulu." },
+        { phrase: "Il ___ rester mais il devait partir.",             temps: "Passé composé", reponse: "a voulu",     explication: "Au passé composé, vouloir se conjugue avec avoir : il a voulu." },
+        { phrase: "Nous ___ vous aider du mieux possible.",           temps: "Passé composé", reponse: "avons voulu", explication: "Au passé composé, vouloir se conjugue avec avoir : nous avons voulu." },
+        { phrase: "Vous ___ changer les règles.",                     temps: "Passé composé", reponse: "avez voulu",  explication: "Au passé composé, vouloir se conjugue avec avoir : vous avez voulu." },
+        { phrase: "Elles ___ tout faire elles-mêmes.",                temps: "Passé composé", reponse: "ont voulu",   explication: "Au passé composé, vouloir se conjugue avec avoir : elles ont voulu." }
+      ],
+
+      /* ── CM2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
+      "CM2": [
+        /* Passé simple */
+        { phrase: "Il ___ partir sans dire au revoir.",               temps: "Passé simple",     reponse: "voulut",     explication: "Au passé simple, « il » → il voulut." },
+        { phrase: "Elle ___ rester seule.",                            temps: "Passé simple",     reponse: "voulut",     explication: "Au passé simple, « elle » → elle voulut." },
+        { phrase: "Je ___ tout de suite répondre.",                    temps: "Passé simple",     reponse: "voulus",     explication: "Au passé simple, « je » → je voulus." },
+        { phrase: "Tu ___ prendre la parole devant l'assemblée.",     temps: "Passé simple",     reponse: "voulus",     explication: "Au passé simple, « tu » → tu voulus." },
+        { phrase: "Nous ___ avancer malgré le danger.",               temps: "Passé simple",     reponse: "voulûmes",   explication: "Au passé simple, « nous » → nous voulûmes (avec accent circonflexe)." },
+        { phrase: "Vous ___ garder le secret.",                       temps: "Passé simple",     reponse: "voulûtes",   explication: "Au passé simple, « vous » → vous voulûtes (avec accent circonflexe)." },
+        { phrase: "Ils ___ changer d'avis à la dernière minute.",     temps: "Passé simple",     reponse: "voulurent",  explication: "Au passé simple, « ils » → ils voulurent." },
+        { phrase: "Elles ___ prendre une décision immédiatement.",    temps: "Passé simple",     reponse: "voulurent",  explication: "Au passé simple, « elles » → elles voulurent." },
+
+        /* Plus-que-parfait (avoir à l'imparfait + voulu → pas d'accord) */
+        { phrase: "Il ___ partir avant que la tempête arrive.",       temps: "Plus-que-parfait", reponse: "avait voulu",   explication: "Au plus-que-parfait, « il » → il avait voulu (avoir imparfait + voulu)." },
+        { phrase: "Elle ___ rester, mais ses parents avaient insisté.", temps: "Plus-que-parfait", reponse: "avait voulu", explication: "Au plus-que-parfait, « elle » → elle avait voulu." },
+        { phrase: "J'___ prévenir tout le monde.",                    temps: "Plus-que-parfait", reponse: "avais voulu",   explication: "Au plus-que-parfait, « j' » → j'avais voulu." },
+        { phrase: "Tu ___ venir mais tu étais malade.",               temps: "Plus-que-parfait", reponse: "avais voulu",   explication: "Au plus-que-parfait, « tu » → tu avais voulu." },
+        { phrase: "Nous ___ organiser une fête.",                     temps: "Plus-que-parfait", reponse: "avions voulu",  explication: "Au plus-que-parfait, « nous » → nous avions voulu." },
+        { phrase: "Vous ___ changer les règles avant notre arrivée.", temps: "Plus-que-parfait", reponse: "aviez voulu",   explication: "Au plus-que-parfait, « vous » → vous aviez voulu." },
+        { phrase: "Ils ___ partir plus tôt.",                         temps: "Plus-que-parfait", reponse: "avaient voulu", explication: "Au plus-que-parfait, « ils » → ils avaient voulu." },
+        { phrase: "Elles ___ tout faire par elles-mêmes.",            temps: "Plus-que-parfait", reponse: "avaient voulu", explication: "Au plus-que-parfait, « elles » → elles avaient voulu." }
+      ],
+
+      /* ── 6e : Impératif (×8) + Conditionnel (×8) ── */
+      /* Impératif : veux ou veuille (tu), voulons ou veuillons (nous), voulez ou veuillez (vous) */
+      "6e": [
+        /* Impératif */
+        { phrase: "___ fermer la porte s'il te plaît !",               temps: "Impératif", reponses: ["Veuille", "Veux"],         explication: "À l'impératif (tu) : Veux ou Veuille (forme soutenue). Les deux sont corrects." },
+        { phrase: "___ avoir la gentillesse de te calmer !",           temps: "Impératif", reponses: ["Veuille", "Veux"],         explication: "À l'impératif (tu) : Veux ou Veuille (forme soutenue). Les deux sont corrects." },
+        { phrase: "___ vous asseoir, s'il vous plaît.",                temps: "Impératif", reponses: ["Veuillez", "Voulez"],      explication: "À l'impératif (vous) : Voulez ou Veuillez (plus formel, très courant à l'écrit)." },
+        { phrase: "___ agréer, Madame, mes sincères salutations.",     temps: "Impératif", reponse: "Veuillez",                   explication: "Dans les formules de politesse épistolaires, on emploie toujours « Veuillez »." },
+        { phrase: "___ trouver ci-joint les documents demandés.",      temps: "Impératif", reponse: "Veuillez",                   explication: "Dans les courriers formels, on emploie « Veuillez » (forme polie de « vous »)." },
+        { phrase: "___ bien noter votre numéro de dossier.",           temps: "Impératif", reponses: ["Veuillez", "Voulez"],      explication: "À l'impératif (vous) : Voulez ou Veuillez (plus formel)." },
+        { phrase: "___ tous faire de notre mieux !",                   temps: "Impératif", reponses: ["Veuillons", "Voulons"],    explication: "À l'impératif (nous) : Voulons ou Veuillons (forme soutenue). Les deux sont corrects." },
+        { phrase: "___ bien m'excuser auprès de tes parents.",         temps: "Impératif", reponses: ["Veuille", "Veux"],         explication: "À l'impératif (tu) : Veux ou Veuille (forme soutenue). Les deux sont corrects." },
+
+        /* Conditionnel (radical irrégulier « voudr- ») */
+        { phrase: "Je ___ te parler en privé.",                        temps: "Conditionnel", reponse: "voudrais",   explication: "Au conditionnel, « je » → je voudrais (radical irrégulier « voudr- »)." },
+        { phrase: "Tu ___ encore du dessert ?",                        temps: "Conditionnel", reponse: "voudrais",   explication: "Au conditionnel, « tu » → tu voudrais (radical irrégulier « voudr- »)." },
+        { phrase: "Il ___ changer d'avis.",                            temps: "Conditionnel", reponse: "voudrait",   explication: "Au conditionnel, « il » → il voudrait (radical irrégulier « voudr- »)." },
+        { phrase: "Elle ___ devenir médecin.",                         temps: "Conditionnel", reponse: "voudrait",   explication: "Au conditionnel, « elle » → elle voudrait (radical irrégulier « voudr- »)." },
+        { phrase: "Nous ___ vous inviter à cette cérémonie.",          temps: "Conditionnel", reponse: "voudrions",  explication: "Au conditionnel, « nous » → nous voudrions (radical irrégulier « voudr- »)." },
+        { phrase: "Vous ___ bien nous aider ?",                        temps: "Conditionnel", reponse: "voudriez",   explication: "Au conditionnel, « vous » → vous voudriez (radical irrégulier « voudr- »)." },
+        { phrase: "Ils ___ partir en vacances ensemble.",              temps: "Conditionnel", reponse: "voudraient", explication: "Au conditionnel, « ils » → ils voudraient (radical irrégulier « voudr- »)." },
+        { phrase: "Elles ___ choisir elles-mêmes.",                    temps: "Conditionnel", reponse: "voudraient", explication: "Au conditionnel, « elles » → elles voudraient (radical irrégulier « voudr- »)." }
+      ]
+    }
+  },
+
+  /* ══════════════════════════════════════════════════════════════
+     CONJUGUER PRENDRE  (type : faire-niveaux)
+     CM1 : Présent + Imparfait + Futur simple + Passé composé
+     CM2 : Passé simple + Plus-que-parfait
+     6e  : Impératif + Conditionnel
+     Irrégularités clés : présent (prends/prend/prennent),
+     participe passé irrégulier « pris »,
+     passé simple : pris/prit/prîmes/prîtes/prirent
+  ══════════════════════════════════════════════════════════════ */
+  "conjuguer-prendre": {
+    title: "Conjuguer le verbe PRENDRE",
+    verb: "prendre",
+    levels: ["CM1", "CM2", "6e"],
+    type: "faire-niveaux",
+    questionsPerSession: 8,
+    backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
+
+    pools: {
+
+      /* ── CM1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
+      "CM1": [
+        /* Présent */
+        { phrase: "Je ___ mon cartable tous les matins.",              temps: "Présent",       reponse: "prends",     explication: "Au présent, « je » → je prends (verbe irrégulier)." },
+        { phrase: "Tu ___ le bus pour aller à l'école.",              temps: "Présent",       reponse: "prends",     explication: "Au présent, « tu » → tu prends (verbe irrégulier)." },
+        { phrase: "Il ___ son temps.",                                 temps: "Présent",       reponse: "prend",      explication: "Au présent, « il » → il prend (sans -s final)." },
+        { phrase: "Elle ___ un verre d'eau.",                          temps: "Présent",       reponse: "prend",      explication: "Au présent, « elle » → elle prend (sans -s final)." },
+        { phrase: "Nous ___ le train demain.",                         temps: "Présent",       reponse: "prenons",    explication: "Au présent, « nous » → nous prenons." },
+        { phrase: "Vous ___ votre temps.",                             temps: "Présent",       reponse: "prenez",     explication: "Au présent, « vous » → vous prenez." },
+        { phrase: "Ils ___ leur petit-déjeuner ensemble.",            temps: "Présent",       reponse: "prennent",   explication: "Au présent, « ils » → ils prennent (attention au double n)." },
+        { phrase: "Elles ___ le chemin le plus court.",               temps: "Présent",       reponse: "prennent",   explication: "Au présent, « elles » → elles prennent (attention au double n)." },
+
+        /* Imparfait */
+        { phrase: "Je ___ toujours le bus pour aller à l'école.",     temps: "Imparfait",     reponse: "prenais",    explication: "À l'imparfait, « je » → je prenais." },
+        { phrase: "Tu ___ ton vélo le week-end.",                      temps: "Imparfait",     reponse: "prenais",    explication: "À l'imparfait, « tu » → tu prenais." },
+        { phrase: "Elle ___ des leçons de piano chaque semaine.",     temps: "Imparfait",     reponse: "prenait",    explication: "À l'imparfait, « elle » → elle prenait." },
+        { phrase: "Nous ___ notre temps pour finir.",                  temps: "Imparfait",     reponse: "prenions",   explication: "À l'imparfait, « nous » → nous prenions." },
+        { phrase: "Vous ___ toujours ce chemin.",                      temps: "Imparfait",     reponse: "preniez",    explication: "À l'imparfait, « vous » → vous preniez." },
+        { phrase: "Ils ___ le train chaque vendredi soir.",           temps: "Imparfait",     reponse: "prenaient",  explication: "À l'imparfait, « ils » → ils prenaient." },
+
+        /* Futur simple */
+        { phrase: "Je ___ le train demain matin.",                     temps: "Futur simple",  reponse: "prendrai",   explication: "Au futur, « je » → je prendrai." },
+        { phrase: "Tu ___ ton petit-déjeuner avant de partir.",       temps: "Futur simple",  reponse: "prendras",   explication: "Au futur, « tu » → tu prendras." },
+        { phrase: "Elle ___ le chemin le plus court.",                 temps: "Futur simple",  reponse: "prendra",    explication: "Au futur, « elle » → elle prendra." },
+        { phrase: "Nous ___ notre décision demain.",                   temps: "Futur simple",  reponse: "prendrons",  explication: "Au futur, « nous » → nous prendrons." },
+        { phrase: "Vous ___ vos affaires avant de partir.",           temps: "Futur simple",  reponse: "prendrez",   explication: "Au futur, « vous » → vous prendrez." },
+        { phrase: "Ils ___ l'avion pour les vacances.",               temps: "Futur simple",  reponse: "prendront",  explication: "Au futur, « ils » → ils prendront." },
+
+        /* Passé composé (auxiliaire avoir + participe irrégulier « pris » → pas d'accord) */
+        { phrase: "J'___ mon manteau car il faisait froid.",          temps: "Passé composé", reponse: "ai pris",    explication: "Au passé composé, prendre se conjugue avec avoir : j'ai pris (participe irrégulier « pris »)." },
+        { phrase: "Tu ___ le bon chemin.",                             temps: "Passé composé", reponse: "as pris",    explication: "Au passé composé, prendre se conjugue avec avoir : tu as pris." },
+        { phrase: "Il ___ sa décision tout seul.",                    temps: "Passé composé", reponse: "a pris",     explication: "Au passé composé, prendre se conjugue avec avoir : il a pris." },
+        { phrase: "Nous ___ le train de 8 heures.",                   temps: "Passé composé", reponse: "avons pris", explication: "Au passé composé, prendre se conjugue avec avoir : nous avons pris." },
+        { phrase: "Vous ___ vos affaires.",                            temps: "Passé composé", reponse: "avez pris",  explication: "Au passé composé, prendre se conjugue avec avoir : vous avez pris." },
+        { phrase: "Elles ___ le bus ce matin.",                        temps: "Passé composé", reponse: "ont pris",   explication: "Au passé composé, prendre se conjugue avec avoir : elles ont pris." }
+      ],
+
+      /* ── CM2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
+      "CM2": [
+        /* Passé simple */
+        { phrase: "Il ___ la fuite en voyant le danger.",             temps: "Passé simple",     reponse: "prit",      explication: "Au passé simple, « il » → il prit." },
+        { phrase: "Elle ___ la parole devant toute l'assemblée.",     temps: "Passé simple",     reponse: "prit",      explication: "Au passé simple, « elle » → elle prit." },
+        { phrase: "Je ___ la décision de partir ce soir-là.",        temps: "Passé simple",     reponse: "pris",      explication: "Au passé simple, « je » → je pris." },
+        { phrase: "Tu ___ le premier chemin qui se présentait.",      temps: "Passé simple",     reponse: "pris",      explication: "Au passé simple, « tu » → tu pris." },
+        { phrase: "Nous ___ nos affaires et partîmes aussitôt.",      temps: "Passé simple",     reponse: "prîmes",    explication: "Au passé simple, « nous » → nous prîmes (avec accent circonflexe)." },
+        { phrase: "Vous ___ la bonne décision.",                       temps: "Passé simple",     reponse: "prîtes",    explication: "Au passé simple, « vous » → vous prîtes (avec accent circonflexe)." },
+        { phrase: "Ils ___ les armes pour défendre leur village.",    temps: "Passé simple",     reponse: "prirent",   explication: "Au passé simple, « ils » → ils prirent." },
+        { phrase: "Elles ___ le chemin du retour.",                    temps: "Passé simple",     reponse: "prirent",   explication: "Au passé simple, « elles » → elles prirent." },
+
+        /* Plus-que-parfait (avoir à l'imparfait + pris → pas d'accord) */
+        { phrase: "Il ___ sa décision avant l'arrivée de son père.", temps: "Plus-que-parfait", reponse: "avait pris",   explication: "Au plus-que-parfait, « il » → il avait pris (avoir imparfait + pris)." },
+        { phrase: "Elle ___ le train avant l'orage.",                 temps: "Plus-que-parfait", reponse: "avait pris",   explication: "Au plus-que-parfait, « elle » → elle avait pris." },
+        { phrase: "J'___ mon manteau avant de sortir.",               temps: "Plus-que-parfait", reponse: "avais pris",   explication: "Au plus-que-parfait, « j' » → j'avais pris." },
+        { phrase: "Tu ___ le mauvais chemin.",                        temps: "Plus-que-parfait", reponse: "avais pris",   explication: "Au plus-que-parfait, « tu » → tu avais pris." },
+        { phrase: "Nous ___ nos billets en avance.",                  temps: "Plus-que-parfait", reponse: "avions pris",  explication: "Au plus-que-parfait, « nous » → nous avions pris." },
+        { phrase: "Vous ___ vos affaires avant de partir.",           temps: "Plus-que-parfait", reponse: "aviez pris",   explication: "Au plus-que-parfait, « vous » → vous aviez pris." },
+        { phrase: "Ils ___ la bonne décision.",                        temps: "Plus-que-parfait", reponse: "avaient pris", explication: "Au plus-que-parfait, « ils » → ils avaient pris." },
+        { phrase: "Elles ___ le bus avant la fermeture.",             temps: "Plus-que-parfait", reponse: "avaient pris", explication: "Au plus-que-parfait, « elles » → elles avaient pris." }
+      ],
+
+      /* ── 6e : Impératif (×8) + Conditionnel (×8) ── */
+      "6e": [
+        /* Impératif : prends (tu) / prenons (nous) / prenez (vous) */
+        { phrase: "___ ton manteau, il fait froid !",                  temps: "Impératif", reponse: "Prends",                   explication: "À l'impératif avec « ton », c'est « tu » : Prends !" },
+        { phrase: "___ tes affaires et viens !",                       temps: "Impératif", reponse: "Prends",                   explication: "À l'impératif avec « tes », c'est « tu » : Prends !" },
+        { phrase: "___ soin de toi !",                                 temps: "Impératif", reponse: "Prends",                   explication: "À l'impératif avec « toi », c'est « tu » : Prends !" },
+        { phrase: "___ vos places, le spectacle va commencer.",        temps: "Impératif", reponse: "Prenez",                   explication: "À l'impératif avec « vos », c'est « vous » : Prenez !" },
+        { phrase: "___ votre temps, rien ne presse.",                  temps: "Impératif", reponse: "Prenez",                   explication: "À l'impératif avec « votre », c'est « vous » : Prenez !" },
+        { phrase: "___ nos vélos et partons à l'aventure !",          temps: "Impératif", reponse: "Prenons",                  explication: "À l'impératif pour « nous » : Prenons ! (on invite le groupe à agir)." },
+        { phrase: "___ le chemin le plus court !",                     temps: "Impératif", reponses: ["Prends", "Prenez"],      explication: "À l'impératif : Prends (tu) ou Prenez (vous) selon la personne." },
+        { phrase: "N'___ pas ce chemin, il est dangereux !",          temps: "Impératif", reponses: ["prends", "prenez"],      explication: "À l'impératif négatif : ne prends pas (tu) ou ne prenez pas (vous)." },
+
+        /* Conditionnel */
+        { phrase: "Je ___ bien un peu de gâteau.",                     temps: "Conditionnel", reponse: "prendrais",  explication: "Au conditionnel, « je » → je prendrais." },
+        { phrase: "Tu ___ le bus si tu étais en retard.",             temps: "Conditionnel", reponse: "prendrais",  explication: "Au conditionnel, « tu » → tu prendrais." },
+        { phrase: "Il ___ sa décision après réflexion.",              temps: "Conditionnel", reponse: "prendrait",  explication: "Au conditionnel, « il » → il prendrait." },
+        { phrase: "Elle ___ le chemin le plus court si elle pouvait.", temps: "Conditionnel", reponse: "prendrait", explication: "Au conditionnel, « elle » → elle prendrait." },
+        { phrase: "Nous ___ le train si nous avions le temps.",       temps: "Conditionnel", reponse: "prendrions", explication: "Au conditionnel, « nous » → nous prendrions." },
+        { phrase: "Vous ___ vos affaires avant de partir, normalement.", temps: "Conditionnel", reponse: "prendriez", explication: "Au conditionnel, « vous » → vous prendriez." },
+        { phrase: "Ils ___ l'avion s'ils avaient l'argent.",          temps: "Conditionnel", reponse: "prendraient", explication: "Au conditionnel, « ils » → ils prendraient." },
+        { phrase: "Elles ___ le bus si les horaires le permettaient.", temps: "Conditionnel", reponse: "prendraient", explication: "Au conditionnel, « elles » → elles prendraient." }
+      ]
+    }
+  },
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     conjuguer-plus-que-parfait  —  2 niveaux déverrouillables
+     Niveau 1 : Repère le plus-que-parfait (identification dans un texte)
+     Niveau 2 : Complète au plus-que-parfait (saisie libre)
+     ══════════════════════════════════════════════════════════════════════════ */
+  "conjuguer-plus-que-parfait": {
+    title: "Conjuguer au plus-que-parfait",
+    levels: ["CM2", "6e"],
+    type: "pqp-niveaux",
+    questionsPerSession: 10,
+    backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
+
+    /* ── Niveau 1 : 4 textes d'identification ───────────────────────────────
+       tokens : {t: texte, v: true = groupe verbal cliquable, pqp: true = cible}
+       Pièges : passé composé (auxiliaire au PRÉSENT) vs plus-que-parfait (aux à l'IMPARFAIT)
+    ──────────────────────────────────────────────────────────────────────── */
+    identTexts: [
+      /* Texte 1 — Le voyage en famille */
+      {
+        tokens: [
+          { t: "La veille du voyage, maman " },
+          { t: "avait préparé", v: true, pqp: true },
+          { t: " les valises avec soin. Le matin, Paul " },
+          { t: "s'était levé", v: true, pqp: true },
+          { t: " très tôt. Il réveilla sa sœur qui dormait encore. Ils " },
+          { t: "ont pris", v: true, pqp: false },
+          { t: " le train et " },
+          { t: "sont arrivés", v: true, pqp: false },
+          { t: " à destination." }
+        ]
+      },
+      /* Texte 2 — Le renard */
+      {
+        tokens: [
+          { t: "Ce soir-là, Léa raconta qu'elle " },
+          { t: "avait vu", v: true, pqp: true },
+          { t: " un renard dans le jardin. Son frère " },
+          { t: "a dessiné", v: true, pqp: false },
+          { t: " l'animal dans son cahier, mais il " },
+          { t: "avait oublié", v: true, pqp: true },
+          { t: " d'écrire son nom. Il " },
+          { t: "est rentré", v: true, pqp: false },
+          { t: " chez lui sans son dessin." }
+        ]
+      },
+      /* Texte 3 — Le château enchanté */
+      {
+        tokens: [
+          { t: "La sorcière habitait un château sombre. Avant l'arrivée du héros, elle " },
+          { t: "avait préparé", v: true, pqp: true },
+          { t: " un piège terrible. Les gardes " },
+          { t: "avaient fermé", v: true, pqp: true },
+          { t: " toutes les portes. Le héros " },
+          { t: "a frappé", v: true, pqp: false },
+          { t: " à la porte et " },
+          { t: "a crié", v: true, pqp: false },
+          { t: " son nom. Personne ne répondit." }
+        ]
+      },
+      /* Texte 4 — Jules à l'école */
+      {
+        tokens: [
+          { t: "Jules " },
+          { t: "était arrivé", v: true, pqp: true },
+          { t: " en avance car il " },
+          { t: "avait fini", v: true, pqp: true },
+          { t: " ses devoirs dès le réveil. La maîtresse " },
+          { t: "a regardé", v: true, pqp: false },
+          { t: " son travail et " },
+          { t: "a souri", v: true, pqp: false },
+          { t: ". Il lui " },
+          { t: "a montré", v: true, pqp: false },
+          { t: " fièrement son cahier." }
+        ]
+      }
+    ],
+
+    /* ── Niveau 2 : 10 phrases à trous ────────────────────────────────────
+       sentence : phrase avec ___ (trou) et (infinitif) comme aide
+       answers  : formes acceptées (tableau, pour couvrir variations genre)
+       auxVerb  : "avoir" | "être" — pour orienter le message d'erreur
+       explication : règle rappelée en cas d'erreur
+    ──────────────────────────────────────────────────────────────────────── */
+    writeBank: [
+      {
+        sentence:    "Quand nous sommes arrivés, le film (commencer) ___ déjà.",
+        answers:     ["avait commencé"],
+        auxVerb:     "avoir",
+        explication: "Le film → il : <strong>avait</strong> (avoir à l'imparfait) + <strong>commencé</strong> (participe invariable)."
+      },
+      {
+        sentence:    "Elle (partir) ___ bien avant que la pluie tombe.",
+        answers:     ["était partie"],
+        auxVerb:     "être",
+        explication: "Partir prend être : <strong>était</strong> (être à l'imparfait) + <strong>partie</strong> (accord avec elle → -e)."
+      },
+      {
+        sentence:    "Ils (manger) ___ avant d'aller jouer.",
+        answers:     ["avaient mangé"],
+        auxVerb:     "avoir",
+        explication: "Plus-que-parfait avec avoir : <strong>avaient</strong> + <strong>mangé</strong> (participe invariable)."
+      },
+      {
+        sentence:    "Tu (finir) ___ tes devoirs quand le téléphone a sonné.",
+        answers:     ["avais fini"],
+        auxVerb:     "avoir",
+        explication: "Plus-que-parfait avec avoir : <strong>avais</strong> + <strong>fini</strong> (participe invariable)."
+      },
+      {
+        sentence:    "Il (se lever) ___ si tôt qu'il n'y avait personne dans la rue.",
+        answers:     ["s'était levé"],
+        auxVerb:     "être",
+        explication: "Verbe pronominal avec être : <strong>s'était</strong> + <strong>levé</strong> (accord avec il → pas de -e)."
+      },
+      {
+        sentence:    "Vous (lire) ___ ce roman avant d'en discuter en classe.",
+        answers:     ["aviez lu"],
+        auxVerb:     "avoir",
+        explication: "Plus-que-parfait avec avoir : <strong>aviez</strong> + <strong>lu</strong> (participe invariable)."
+      },
+      {
+        sentence:    "Le chat (manger) ___ toute la nourriture avant notre retour.",
+        answers:     ["avait mangé"],
+        auxVerb:     "avoir",
+        explication: "Le chat → il : <strong>avait</strong> + <strong>mangé</strong> (participe invariable)."
+      },
+      {
+        sentence:    "Elles (rentrer) ___ depuis une heure quand il a téléphoné.",
+        answers:     ["étaient rentrées"],
+        auxVerb:     "être",
+        explication: "Rentrer prend être : <strong>étaient</strong> + <strong>rentrées</strong> (accord féminin pluriel → -ées)."
+      },
+      {
+        sentence:    "Nous (faire) ___ nos valises avant que le taxi arrive.",
+        answers:     ["avions fait"],
+        auxVerb:     "avoir",
+        explication: "Plus-que-parfait avec avoir : <strong>avions</strong> + <strong>fait</strong> (participe invariable)."
+      },
+      {
+        sentence:    "Comme j'(oublier) ___ mon sac, je suis retourné le chercher.",
+        answers:     ["avais oublié"],
+        auxVerb:     "avoir",
+        explication: "J' → je : <strong>avais</strong> + <strong>oublié</strong> (participe invariable)."
+      }
+    ]
   }
 
 };
