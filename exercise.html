@@ -9,7 +9,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/results.js"></script>
-  <script src="exercise-data.js?v=4"></script>
+  <script src="exercise-data.js?v=5"></script>
   <style>
     /* ── Page layout ────────────────────────────────────────── */
     .page-wrap {
@@ -7112,16 +7112,14 @@
           </p>
           <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
             <button class="ex-type-card" data-level="1">
-              <span class="ex-type-icon">⭐</span>
               <div>
-                <span class="ex-type-name">Niveau 1 — CM2</span>
+                <span class="ex-type-name">Niveau 1</span>
                 <span class="ex-type-desc">Identifie d'abord le COD, puis écris le participe accordé</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="2">
-              <span class="ex-type-icon">⭐⭐</span>
               <div>
-                <span class="ex-type-name">Niveau 2 — 6e</span>
+                <span class="ex-type-name">Niveau 2</span>
                 <span class="ex-type-desc">Analyse seul(e) et écris directement le participe</span>
               </div>
             </button>
@@ -7134,7 +7132,7 @@
             questions  = shuffle(sessionData.bank).slice(0, sessionData.questionsPerSession);
             document.getElementById('q-total').textContent = questions.length;
             sessionLevelList   = [1, 2];
-            sessionLevelLabels = ['Niveau 1 — CM2', 'Niveau 2 — 6e'];
+            sessionLevelLabels = ['Niveau 1', 'Niveau 2'];
             sessionLevelIdx    = apcodLevel - 1;
             sessionLevelLoader = (lv) => {
               apcodLevel = lv;
@@ -7322,11 +7320,13 @@
     let faireState = null;
 
     function faireGetValidated() {
-      try { return JSON.parse(localStorage.getItem('faire_niveaux_valides') || '[]'); }
+      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_niveaux_valides';
+      try { return JSON.parse(localStorage.getItem(key) || '[]'); }
       catch { return []; }
     }
     function faireSetValidated(arr) {
-      localStorage.setItem('faire_niveaux_valides', JSON.stringify(arr));
+      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_niveaux_valides';
+      localStorage.setItem(key, JSON.stringify(arr));
     }
 
     function faireShuffle(arr) {
@@ -7424,7 +7424,7 @@
       const card = document.getElementById('ex-card');
       card.innerHTML = `
         <span class="faire-temps-badge ${cls}">${q.temps}</span>
-        <p class="ex-question-label">Conjugue le verbe <strong>faire</strong> dans cette phrase.</p>
+        <p class="ex-question-label">Conjugue le verbe <strong>${sessionData.verb || 'faire'}</strong> dans cette phrase.</p>
         <div class="faire-phrase-display">${q.phrase.replace('___', '<span style="color:var(--muted);font-style:italic">___</span>')}</div>
         <div class="faire-input-row">
           <input type="text" id="faire-input" class="faire-text-input"
@@ -7450,8 +7450,10 @@
       input.disabled = true;
       btn.disabled   = true;
 
-      const q       = faireState.questions[faireState.idx];
-      const isRight = faireNorm(input.value) === faireNorm(q.reponse);
+      const q        = faireState.questions[faireState.idx];
+      const accepted = Array.isArray(q.reponses) ? q.reponses : [q.reponse];
+      const isRight  = accepted.some(a => faireNorm(input.value) === faireNorm(a));
+      const display  = accepted.join(' ou ');
 
       if (isRight) {
         faireState.score++;
@@ -7461,7 +7463,7 @@
       } else {
         input.classList.add('is-wrong');
         document.getElementById('faire-feedback').innerHTML =
-          `<div class="ex-feedback-wrong">❌ La bonne réponse était : <strong>${q.reponse}</strong><br><em>${q.explication}</em></div>`;
+          `<div class="ex-feedback-wrong">❌ La bonne réponse était : <strong>${display}</strong><br><em>${q.explication}</em></div>`;
       }
 
       setTimeout(() => {
