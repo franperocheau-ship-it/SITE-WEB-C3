@@ -943,10 +943,14 @@
       "conjuguer-faire"
     ]);
 
+    const CUSTOM_HREFS = {
+      "accorder-participe-passe-cod-avoir": "exercise.html?slug=ortho-accorder-participe-passe-cod"
+    };
+
     /* ── Skill card rendering ──────────────────────────────────────────────── */
     function renderSkillCard(skill, sectionId) {
-      const hasExercise = EXERCISE_SLUGS.has(skill.slug);
-      const href        = hasExercise ? `exercise.html?slug=${skill.slug}` : "#";
+      const hasExercise = EXERCISE_SLUGS.has(skill.slug) || skill.slug in CUSTOM_HREFS;
+      const href        = CUSTOM_HREFS[skill.slug] || (EXERCISE_SLUGS.has(skill.slug) ? `exercise.html?slug=${skill.slug}` : "#");
       const onclick     = hasExercise ? "" : `onclick="return false;"`;
       return `
         <a class="skill-card"
