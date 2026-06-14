@@ -5004,9 +5004,9 @@
 
     /* ── Niveau 1 renderer ───────────────────────────────────────────── */
     function _renderEncadrAvecDroite(card, q) {
-      const { numerator: num, denominator: den, lo, hi, isInteger } = q;
+      const { numerator: num, denominator: den, lo, hi } = q;
       const maxUnits = Math.floor(num / den) + 1;
-      const sign     = isInteger ? '≤' : '<';
+      const sign     = '<';
 
       let selectedIdx   = null;
       let placementDone = false;
@@ -5086,8 +5086,8 @@
 
     /* ── Niveau 2 renderer ───────────────────────────────────────────── */
     function _renderEncadrSansDroite(card, q) {
-      const { numerator: num, denominator: den, isInteger } = q;
-      const sign = isInteger ? '≤' : '<';
+      const { numerator: num, denominator: den } = q;
+      const sign = '<';
 
       card.innerHTML = `
         <p class="ex-question-label">Encadre cette fraction entre deux entiers consécutifs.</p>
@@ -5118,7 +5118,7 @@
 
     /* ── Shared validation ───────────────────────────────────────────── */
     function _validateEncadr(card, q, maxUnits) {
-      const { numerator: num, denominator: den, lo, hi, isInteger } = q;
+      const { numerator: num, denominator: den, lo, hi } = q;
       const loInput = card.querySelector('#encadr-lo');
       const hiInput = card.querySelector('#encadr-hi');
       const vBtn    = card.querySelector('#encadr-validate-btn');
@@ -5134,7 +5134,6 @@
       const loOk    = (loVal === lo);
       const hiOk    = (hiVal === hi);
       const isRight = loOk && hiOk;
-      const sign    = isInteger ? '≤' : '<';
 
       loInput.classList.add(loOk ? 'is-correct' : 'is-wrong');
       hiInput.classList.add(hiOk ? 'is-correct' : 'is-wrong');
@@ -5142,7 +5141,7 @@
       if (isRight) {
         score++;
         setFeedback('feedback1',
-          `<div class="ex-feedback-correct">✅ Bravo ! ${lo} ${sign} ${num}/${den} ${sign} ${hi}</div>`);
+          `<div class="ex-feedback-correct">✅ Bravo ! ${lo} < ${num}/${den} < ${hi}</div>`);
       } else {
         if (encadrLevel === 1 && maxUnits !== null) {
           const svgWrap = card.querySelector('#encadr-svg-wrap');
@@ -5150,12 +5149,7 @@
             svgWrap.innerHTML = _encadrNlineSvg(num, den, maxUnits, num, true, false, lo, hi);
           }
         }
-        let explanation;
-        if (isInteger) {
-          explanation = `${num}/${den} est égal à l'entier ${lo}. On écrit donc ${lo} ${sign} ${num}/${den} ${sign} ${lo}.`;
-        } else {
-          explanation = `${lo * den}/${den} = ${lo} et ${hi * den}/${den} = ${hi}, donc ${lo} ${sign} ${num}/${den} ${sign} ${hi}.`;
-        }
+        const explanation = `${lo * den}/${den} = ${lo} et ${hi * den}/${den} = ${hi}, donc ${lo} < ${num}/${den} < ${hi}.`;
         setFeedback('feedback1', `
           <div class="ex-feedback-wrong">
             ❌ Pas tout à fait.<br>${explanation}

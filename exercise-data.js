@@ -3428,24 +3428,24 @@ const EXERCISE_DATA = {
     bank: [
 
       /* Niveau 1 — avec droite graduée */
-      { numerator:  7, denominator: 4, lo: 1, hi: 2, isInteger: false, difficulty: 1 },
-      { numerator:  5, denominator: 2, lo: 2, hi: 3, isInteger: false, difficulty: 1 },
-      { numerator: 11, denominator: 3, lo: 3, hi: 4, isInteger: false, difficulty: 1 },
-      { numerator:  9, denominator: 4, lo: 2, hi: 3, isInteger: false, difficulty: 1 },
-      { numerator:  5, denominator: 3, lo: 1, hi: 2, isInteger: false, difficulty: 1 },
-      { numerator:  7, denominator: 2, lo: 3, hi: 4, isInteger: false, difficulty: 1 },
-      { numerator: 13, denominator: 5, lo: 2, hi: 3, isInteger: false, difficulty: 1 },
-      { numerator:  8, denominator: 4, lo: 2, hi: 2, isInteger: true,  difficulty: 1 },
+      { numerator:  7, denominator: 4, lo: 1, hi: 2, difficulty: 1 },
+      { numerator:  5, denominator: 2, lo: 2, hi: 3, difficulty: 1 },
+      { numerator: 11, denominator: 3, lo: 3, hi: 4, difficulty: 1 },
+      { numerator:  9, denominator: 4, lo: 2, hi: 3, difficulty: 1 },
+      { numerator:  5, denominator: 3, lo: 1, hi: 2, difficulty: 1 },
+      { numerator:  7, denominator: 2, lo: 3, hi: 4, difficulty: 1 },
+      { numerator: 13, denominator: 5, lo: 2, hi: 3, difficulty: 1 },
+      { numerator:  9, denominator: 2, lo: 4, hi: 5, difficulty: 1 },
 
       /* Niveau 2 — sans droite graduée */
-      { numerator: 47, denominator: 10, lo: 4, hi: 5, isInteger: false, difficulty: 2 },
-      { numerator: 23, denominator:  4, lo: 5, hi: 6, isInteger: false, difficulty: 2 },
-      { numerator: 38, denominator:  5, lo: 7, hi: 8, isInteger: false, difficulty: 2 },
-      { numerator: 31, denominator:  7, lo: 4, hi: 5, isInteger: false, difficulty: 2 },
-      { numerator: 53, denominator:  8, lo: 6, hi: 7, isInteger: false, difficulty: 2 },
-      { numerator: 29, denominator:  6, lo: 4, hi: 5, isInteger: false, difficulty: 2 },
-      { numerator: 41, denominator:  9, lo: 4, hi: 5, isInteger: false, difficulty: 2 },
-      { numerator: 30, denominator:  6, lo: 5, hi: 5, isInteger: true,  difficulty: 2 }
+      { numerator: 47, denominator: 10, lo: 4, hi: 5, difficulty: 2 },
+      { numerator: 23, denominator:  4, lo: 5, hi: 6, difficulty: 2 },
+      { numerator: 38, denominator:  5, lo: 7, hi: 8, difficulty: 2 },
+      { numerator: 31, denominator:  7, lo: 4, hi: 5, difficulty: 2 },
+      { numerator: 53, denominator:  8, lo: 6, hi: 7, difficulty: 2 },
+      { numerator: 29, denominator:  6, lo: 4, hi: 5, difficulty: 2 },
+      { numerator: 41, denominator:  9, lo: 4, hi: 5, difficulty: 2 },
+      { numerator: 43, denominator:  6, lo: 7, hi: 8, difficulty: 2 }
 
     ]
   },
