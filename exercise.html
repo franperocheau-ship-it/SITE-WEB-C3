@@ -9,7 +9,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/results.js"></script>
-  <script src="exercise-data.js?v=11"></script>
+  <script src="exercise-data.js?v=13"></script>
   <style>
     /* ── Page layout ────────────────────────────────────────── */
     .page-wrap {
@@ -377,6 +377,17 @@
       font-size: 14px;
       color: var(--text);
       line-height: 1.65;
+    }
+
+    .ex-note {
+      background: rgba(16,43,106,0.05);
+      border: 1.5px solid rgba(16,43,106,0.15);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--blue);
+      margin-top: 8px;
+      line-height: 1.6;
     }
 
     /* ── Step 2 ─────────────────────────────────────────────── */
@@ -1131,6 +1142,98 @@
       .encadr-sign  { font-size: 24px; }
     }
 
+    /* ── ecn-niveaux (Adjectif épithète / Complément du nom) ─── */
+    .ecn-noyau-hl { border-color: var(--blue) !important; background: rgba(16,43,106,0.10) !important; color: var(--blue) !important; font-weight: 800 !important; }
+    .ecn-noyau-span { background: rgba(22,163,74,0.09); color: #15803d; border-radius: 4px; padding: 1px 5px; font-weight: 700; }
+    .ecn-original-display { font-size: 20px; font-weight: 700; color: var(--text); padding: 16px 24px; background: var(--bg); border-radius: 14px; border: 1.5px solid var(--border); margin-bottom: 12px; text-align: center; }
+    .ecn-hl-expansion { color: var(--blue); background: rgba(16,43,106,0.09); border-radius: 4px; padding: 1px 5px; font-weight: 800; }
+    .ecn-prompt { font-size: 17px; font-weight: 600; color: var(--text); text-align: center; margin-bottom: 14px; }
+    .ecn-blank { display: inline-block; min-width: 60px; border-bottom: 3px solid var(--blue); padding: 0 4px 2px; color: rgba(16,43,106,0.4); font-style: italic; text-align: center; }
+    .ecn-dir-to-cdn { background: rgba(16,43,106,0.09); color: var(--blue); border: 1px solid rgba(16,43,106,0.20); }
+    .ecn-dir-to-epi { background: rgba(22,163,74,0.09); color: #15803d; border: 1px solid rgba(22,163,74,0.25); }
+
+    /* ── Type : psc-niveaux (pronom sujet / complément) ─────────────────── */
+    .psc-sentence-display {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.6;
+      padding: 22px 28px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .psc-pronoun-hl {
+      background: rgba(16,43,106,0.12);
+      color: var(--blue);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-weight: 900;
+      border: 1.5px solid rgba(16,43,106,0.25);
+    }
+    .psc-fn-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .psc-fn-btn {
+      flex: 1;
+      min-width: 150px;
+      max-width: 240px;
+      padding: 16px 14px;
+      border-radius: 14px;
+      border: 2px solid var(--border);
+      background: var(--bg);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      line-height: 1.4;
+      transition: border-color 200ms, background 200ms, transform 200ms;
+      text-align: center;
+    }
+    .psc-fn-btn:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.05);
+      transform: translateY(-2px);
+    }
+    .psc-fn-btn:disabled { cursor: default; }
+    .psc-fn-btn.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.09); color: #15803d; }
+    .psc-fn-btn.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.06); color: var(--red); }
+    .psc-arrow-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .psc-arrow-box {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .psc-arrow-subject-box { background: rgba(16,43,106,0.10); color: var(--blue);  border: 1.5px solid rgba(16,43,106,0.25); }
+    .psc-arrow-verb-box    { background: rgba(214,40,57,0.08); color: var(--red);   border: 1.5px solid rgba(214,40,57,0.20); }
+    .psc-arrow-compl-box   { background: rgba(22,163,74,0.09); color: #15803d;      border: 1.5px solid rgba(22,163,74,0.25); }
+    .psc-arrow-hl-box      { outline: 3px solid currentColor; outline-offset: 2px; }
+    .psc-arrow-line { font-size: 22px; color: var(--muted); font-weight: 700; user-select: none; }
+    .psc-replace-hl {
+      background: rgba(16,43,106,0.10);
+      color: var(--blue);
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+
     /* ── Utility ────────────────────────────────────────────── */
     .ex-hidden { display: none !important; }
 
@@ -1274,6 +1377,13 @@
     }
 
     /* ── Type : mots-cliquables ──────────────────────────────────────────── */
+    .ex-group-btn.is-selected {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.08);
+      color: var(--blue);
+      font-weight: 700;
+    }
+
     .ex-word-btn.is-selected {
       background: rgba(16,43,106,0.12);
       border-color: var(--blue);
@@ -1975,15 +2085,16 @@
       margin: 0 1px;
     }
 
-    .pqp-verb-btn:hover:not(:disabled):not(.is-correct):not(.is-wrong) {
+    .pqp-verb-btn:hover:not(:disabled):not(.is-correct):not(.is-wrong):not(.is-selected) {
       border-color: var(--blue);
       background: rgba(16,43,106,0.10);
     }
 
     .pqp-verb-btn.is-selected {
       border-color: var(--blue);
-      background: rgba(16,43,106,0.13);
-      color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(16,43,106,0.30);
     }
 
     .pqp-verb-btn.is-correct {
@@ -2061,6 +2172,351 @@
       color: var(--red);
       text-decoration: underline;
       text-decoration-style: wavy;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : sujet-inverse-niveaux
+       ══════════════════════════════════════════════════════════════════════ */
+
+    .si-sentence-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 24px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .si-word-btn {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 200ms, background 200ms, transform 200ms;
+    }
+    .si-word-btn:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.05);
+      transform: translateY(-2px);
+    }
+    .si-word-btn:disabled { cursor: default; }
+    .si-word-btn.is-selected {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+      font-weight: 700;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16,43,106,0.25);
+    }
+    .si-word-btn.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.09);
+      color: #15803d;
+      font-weight: 700;
+    }
+    .si-word-btn.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+
+    .si-verb-slot {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16,43,106,0.06);
+      color: var(--blue);
+      border: 1.5px solid rgba(16,43,106,0.18);
+      border-radius: 10px;
+      padding: 6px 14px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .si-blank {
+      display: inline-block;
+      min-width: 52px;
+      border-bottom: 2.5px solid var(--blue);
+      color: rgba(16,43,106,0.35);
+      font-style: italic;
+      font-size: 13px;
+      text-align: center;
+      padding: 0 4px;
+    }
+
+    .si-punct {
+      font-size: 18px;
+      color: var(--muted);
+      font-weight: 600;
+      user-select: none;
+    }
+
+    .si-tense-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16,43,106,0.07);
+      color: var(--blue);
+      border: 1px solid rgba(16,43,106,0.16);
+      border-radius: 100px;
+      padding: 5px 16px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .si-full-sentence {
+      font-size: 19px;
+      font-weight: 700;
+      color: #15803d;
+      background: rgba(22,163,74,0.07);
+      border: 1.5px solid rgba(22,163,74,0.22);
+      border-radius: 12px;
+      padding: 16px 22px;
+      text-align: center;
+      margin-top: 14px;
+    }
+
+    @keyframes si-shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-7px); }
+      40%      { transform: translateX(7px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
+    .si-shake { animation: si-shake 380ms cubic-bezier(.4,0,.2,1); }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       TYPE : epithete-attribut-niveaux
+       ══════════════════════════════════════════════════════════════════════════ */
+
+    .ea-rule-chip {
+      background: rgba(16,43,106,0.06);
+      border: 1px solid rgba(16,43,106,0.18);
+      border-radius: 100px;
+      padding: 7px 18px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue);
+      text-align: center;
+      margin: 0 auto 20px;
+      max-width: 520px;
+      display: block;
+    }
+
+    .ea-sentence-display {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      padding: 20px 24px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      text-align: center;
+    }
+
+    .ea-hl-verb {
+      background: rgba(214,40,57,0.12);
+      color: var(--red);
+      border-radius: 4px;
+      padding: 2px 5px;
+      font-weight: 800;
+    }
+
+    .ea-hl-adj {
+      background: rgba(16,43,106,0.12);
+      color: var(--blue);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-weight: 800;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .ea-rule-mini {
+      font-size: 12px;
+      color: var(--muted);
+      font-style: italic;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .ea-choice-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .ea-choice-btn {
+      flex: 1;
+      min-width: 140px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 13px 20px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 200ms, background 200ms, transform 200ms;
+      text-align: center;
+    }
+
+    .ea-choice-btn:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.04);
+      transform: translateY(-2px);
+    }
+
+    .ea-choice-btn:disabled { cursor: default; }
+
+    .ea-choice-btn.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.09);
+      color: #15803d;
+    }
+
+    .ea-choice-btn.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+
+    /* Animation feedback */
+    .ea-anim-bridge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 10px 0 4px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .ea-anim-box {
+      background: rgba(16,43,106,0.08);
+      border: 1.5px solid rgba(16,43,106,0.25);
+      border-radius: 8px;
+      padding: 5px 13px;
+      color: var(--blue);
+      animation: eaPopIn 400ms ease;
+    }
+
+    .ea-anim-box-verb {
+      background: rgba(214,40,57,0.08);
+      border: 1.5px solid rgba(214,40,57,0.3);
+      border-radius: 8px;
+      padding: 5px 13px;
+      color: var(--red);
+      animation: eaPopIn 500ms ease;
+    }
+
+    .ea-anim-arrow { font-size: 16px; color: var(--muted); }
+
+    .ea-anim-magnet {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      justify-content: center;
+      animation: eaMagnet 600ms ease;
+      margin: 10px 0 4px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    @keyframes eaPopIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes eaMagnet {
+      0%   { gap: 18px; }
+      100% { gap: 4px; }
+    }
+
+    /* Verb word buttons (level 2 verb click) */
+    .ea-word-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      padding: 12px 14px;
+      background: var(--bg);
+      border-radius: 12px;
+      border: 1.5px dashed rgba(16,43,106,0.22);
+      margin: 10px 0 14px;
+    }
+
+    .ea-word-btn {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 200ms, background 200ms, transform 200ms;
+    }
+
+    .ea-word-btn:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.04);
+      transform: translateY(-1px);
+    }
+
+    .ea-word-btn.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.09); color: #15803d; }
+    .ea-word-btn.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.06); color: var(--red); }
+    .ea-word-btn:disabled   { cursor: default; }
+
+    /* Level 3 */
+    .ea-original-display {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      padding: 16px 20px;
+      background: var(--bg);
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .ea-direction-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 14px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .ea-dir-to-attr { background: rgba(16,43,106,0.09); color: var(--blue); border: 1px solid rgba(16,43,106,0.2); }
+    .ea-dir-to-epi  { background: rgba(22,163,74,0.09);  color: #15803d;    border: 1px solid rgba(22,163,74,0.25); }
+
+    @media (max-width: 600px) {
+      .ea-sentence-display { font-size: 17px; padding: 14px 16px; }
+      .ea-choice-btn { font-size: 13px; padding: 11px 14px; }
     }
 
   </style>
@@ -2502,8 +2958,23 @@
       } else if (currentType === "faire-niveaux") {
         faireInitSession();
         return;
-      } else if (currentType === "pqp-niveaux") {
+      } else if (currentType === "pqp-niveaux" || currentType === "imp-niveaux" || currentType === "cond-niveaux" || currentType === "futur-niveaux" || currentType === "imparfait-niveaux") {
         pqpInitSession();
+        return;
+      } else if (currentType === "sujet-inverse-niveaux") {
+        siInitSession();
+        return;
+      } else if (currentType === "epithete-attribut-niveaux") {
+        eaInitSession();
+        return;
+      } else if (currentType === "ecn-niveaux") {
+        ecnInitSession();
+        return;
+      } else if (currentType === "psc-niveaux") {
+        pscInitSession();
+        return;
+      } else if (currentType === "det-demo-niveaux") {
+        ddnInitSession();
         return;
       } else {
         bankSource = sessionData.bank;
@@ -2619,8 +3090,16 @@
         /* session managed by vbInitSession / vbStartLevel — no-op here */
       } else if (currentType === "faire-niveaux") {
         /* session managed by faireInitSession — no-op here */
-      } else if (currentType === "pqp-niveaux") {
+      } else if (currentType === "pqp-niveaux" || currentType === "imp-niveaux" || currentType === "cond-niveaux" || currentType === "futur-niveaux" || currentType === "imparfait-niveaux") {
         /* session managed by pqpInitSession — no-op here */
+      } else if (currentType === "sujet-inverse-niveaux") {
+        /* session managed by siInitSession — no-op here */
+      } else if (currentType === "epithete-attribut-niveaux") {
+        /* session managed by eaInitSession — no-op here */
+      } else if (currentType === "psc-niveaux") {
+        /* session managed by pscInitSession — no-op here */
+      } else if (currentType === "det-demo-niveaux") {
+        /* session managed by ddnInitSession — no-op here */
       } else if (currentType === "accord-participe-cod") {
         renderAccordParticipeCod(card, q);
       }
@@ -4117,11 +4596,11 @@
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
       const container = document.getElementById("mc-words");
-      const selected  = new Set();
+      const selected  = new Set(); // Set de boutons (pas de valeurs clean)
       let answered    = false;
 
       q.sentence.split(/\s+/).forEach(token => {
-        const clean = token.replace(/[.,!?;:«»"""'']/g, "");
+        const clean = token.replace(/[.,!?;:«»"""]/g, "").replace(/['']/g, "'");
         if (!clean) return;
         const btn = document.createElement("button");
         btn.className    = "ex-word-btn";
@@ -4130,12 +4609,12 @@
 
         btn.addEventListener("click", () => {
           if (answered) return;
-          if (selected.has(clean)) {
-            selected.delete(clean);
+          if (selected.has(btn)) {
+            selected.delete(btn);
             btn.classList.remove("is-selected");
             document.getElementById("mc-piege").innerHTML = "";
           } else {
-            selected.add(clean);
+            selected.add(btn);
             btn.classList.add("is-selected");
             const piegeMsg = q.piege && (q.piege[clean] || q.piege[token]);
             if (piegeMsg) {
@@ -4155,7 +4634,7 @@
         container.querySelectorAll(".ex-word-btn").forEach(btn => {
           const clean      = btn.dataset.clean;
           const isTarget   = q.targets.includes(clean);
-          const wasSelected = selected.has(clean);
+          const wasSelected = selected.has(btn);
           btn.disabled = true;
           btn.classList.remove("is-selected");
 
@@ -4167,15 +4646,16 @@
         document.getElementById("mc-validate").disabled = true;
         document.getElementById("mc-piege").innerHTML   = "";
 
+        const noteHtml = q.note ? `<div class="ex-note">${q.note}</div>` : "";
         if (!hasWrong && !hasMissed) {
           score++;
-          setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+          setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>${noteHtml}`);
         } else {
           setFeedback("feedback1", `
             <div class="ex-feedback-wrong">
               ❌ Pas tout à fait !
               Les bonnes réponses sont en vert${hasMissed ? "; les mots manqués sont encadrés en pointillés" : ""}.
-            </div>`);
+            </div>${noteHtml}`);
         }
         showNextBtn();
       });
@@ -8066,6 +8546,10 @@
       return a;
     }
 
+    function pqpR(key, fallback) {
+      return sessionData?.niveauxConfig?.[key] ?? fallback;
+    }
+
     /* ── Init : cache la progression, affiche la sélection de niveau ─────── */
     function pqpInitSession() {
       pqpState     = null;
@@ -8080,20 +8564,26 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
 
-      pqpRenderLevelSelect(document.getElementById('ex-card'));
+      const lvDefs = pqpR('lvDefs', [{lv:1},{lv:2}]);
+      if (lvDefs.length === 1) {
+        pqpStartLevel(1);
+      } else {
+        pqpRenderLevelSelect(document.getElementById('ex-card'));
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     /* ── Sélection de niveau (verrouillé / déverrouillé) ───────────────────── */
     function pqpRenderLevelSelect(card) {
       const validated = pqpGetValidated();
-      const lvDefs = [
+      const lvDefs = pqpR('lvDefs', [
         { lv: 1, icon: '⭐',   label: 'Niveau 1 — Repère le plus-que-parfait', desc: 'Lis un texte, identifie les verbes au plus-que-parfait' },
         { lv: 2, icon: '⭐⭐', label: 'Niveau 2 — Complète au plus-que-parfait', desc: 'Conjugue des phrases à trous au plus-que-parfait' }
-      ];
+      ]);
+      const rule = pqpR('rule', PQP_REGLE);
       card.innerHTML = `
         <p class="ex-type-select-label">Choisis ton niveau</p>
-        <div class="pqp-rule-chip" style="display:flex;margin:0 auto 20px;max-width:520px">📌 ${PQP_REGLE}</div>
+        <div class="pqp-rule-chip" style="display:flex;margin:0 auto 20px;max-width:520px">📌 ${rule}</div>
         <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
           ${lvDefs.map((d, i) => {
             const unlocked = i === 0 || validated.includes(i - 1);
@@ -8159,7 +8649,7 @@
 
       card.innerHTML = `
         <p class="pqp-text-counter">Texte ${idx + 1} / ${texts.length}</p>
-        <p class="ex-question-label">Clique sur les verbes au <strong>plus-que-parfait</strong>, puis valide.</p>
+        <p class="ex-question-label">${pqpR('verb1Instruction', 'Clique sur les verbes au <strong>plus-que-parfait</strong>, puis valide.')}</p>
         <div class="pqp-text-display" id="pqp-text">${htmlTokens}</div>
         <div class="ex-feedback-area" id="pqp-fb" style="min-height:20px;margin-bottom:12px"></div>
         <button class="ex-choice" id="pqp-validate" style="width:100%">Valider ma sélection</button>
@@ -8176,7 +8666,7 @@
           if (!isPqp) {
             btn.classList.add('pqp-shake');
             document.getElementById('pqp-fb').innerHTML =
-              `<div class="ex-feedback-wrong" style="font-size:13px;padding:8px 14px">⚠️ « <strong>${btn.textContent}</strong> » n'est pas au plus-que-parfait : l'auxiliaire n'est pas à l'imparfait.<br><small>📌 ${PQP_REGLE}</small></div>`;
+              `<div class="ex-feedback-wrong" style="font-size:13px;padding:8px 14px">⚠️ « <strong>${btn.textContent}</strong> » ${pqpR('verb1NotTarget', "n'est pas au plus-que-parfait : l'auxiliaire n'est pas à l'imparfait")}.<br><small>📌 ${pqpR('rule', PQP_REGLE)}</small></div>`;
             setTimeout(() => btn.classList.remove('pqp-shake'), 500);
           } else {
             if (selected.has(btn)) {
@@ -8209,10 +8699,12 @@
         pqpState.score += correct;
 
         let fbHtml;
+        const _tName = pqpR('verb1TargetName', 'plus-que-parfait');
+        const _rule  = pqpR('rule', PQP_REGLE);
         if (missed === 0) {
-          fbHtml = `<div class="ex-feedback-correct">🎉 ${PQP_POSITIFS[Math.floor(Math.random()*PQP_POSITIFS.length)]} Tu as trouvé tous les plus-que-parfaits !<br><small>📌 ${PQP_REGLE}</small></div>`;
+          fbHtml = `<div class="ex-feedback-correct">🎉 ${PQP_POSITIFS[Math.floor(Math.random()*PQP_POSITIFS.length)]} ${pqpR('verb1FoundAll', 'Tu as trouvé tous les plus-que-parfaits !')}<br><small>📌 ${_rule}</small></div>`;
         } else {
-          fbHtml = `<div class="ex-feedback-wrong">Tu as trouvé <strong>${correct}/${pqpCount}</strong> plus-que-parfait${pqpCount > 1 ? 's' : ''}. Les groupes manqués (en orange) devaient être sélectionnés.<br><small>📌 ${PQP_REGLE}</small></div>`;
+          fbHtml = `<div class="ex-feedback-wrong">Tu as trouvé <strong>${correct}/${pqpCount}</strong> ${_tName}${pqpCount > 1 ? 's' : ''}. Les formes manquées (en orange) devaient être sélectionnées.<br><small>📌 ${_rule}</small></div>`;
         }
         document.getElementById('pqp-fb').innerHTML = fbHtml;
         document.getElementById('next-btn').classList.remove('ex-hidden');
@@ -8245,8 +8737,8 @@
         .replace(/___/, `<span style="color:var(--muted);font-style:italic">___</span>`);
 
       card.innerHTML = `
-        <p class="ex-question-label">Conjugue le verbe au <strong>plus-que-parfait</strong>.</p>
-        <div class="pqp-rule-chip">📌 ${PQP_REGLE}</div>
+        <p class="ex-question-label">${pqpR('verb2Instruction', 'Conjugue le verbe au <strong>plus-que-parfait</strong>.')}</p>
+        <div class="pqp-rule-chip">📌 ${pqpR('rule', PQP_REGLE)}</div>
         <div class="pqp-sentence-display">${sentenceHtml}</div>
         <div class="ex-input-row">
           <input type="text" id="pqp-input" class="ex-text-input"
@@ -8275,7 +8767,7 @@
           pqpState.score++;
           input.classList.add('is-correct');
           document.getElementById('pqp-write-fb').innerHTML =
-            `<div class="ex-feedback-correct">${PQP_POSITIFS[Math.floor(Math.random()*PQP_POSITIFS.length)]}<br><small>📌 ${PQP_REGLE}</small></div>`;
+            `<div class="ex-feedback-correct">${PQP_POSITIFS[Math.floor(Math.random()*PQP_POSITIFS.length)]}<br><small>📌 ${pqpR('rule', PQP_REGLE)}</small></div>`;
         } else {
           input.classList.add('is-wrong');
           document.getElementById('pqp-write-fb').innerHTML =
@@ -8298,6 +8790,9 @@
     }
 
     function pqpBuildErrorFeedback(userNorm, correctNorm, correctDisplay, q) {
+      if (sessionData?.niveauxConfig?.simpleErrorFeedback) {
+        return `❌ La bonne réponse est : <strong>${correctDisplay}</strong>.`;
+      }
       const uWords = userNorm.split(' ');
       const cWords = correctNorm.split(' ');
       const reflexPfx = /^(s'|m'|t'|l'|se|me|te)$/i;
@@ -8342,32 +8837,33 @@
       document.getElementById('score-pct').textContent   = pctPct + ' %';
 
       const backHref = sessionData.backLink?.href || 'français-conjugaison.html';
-      const isLast   = (level === 2);
+      const isLast   = level >= pqpR('lvDefs', [{lv:1},{lv:2}]).length;
       let msg, btnsHTML;
       const stars = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 60 ? '⭐' : '';
 
+      const backLabel = sessionData.backLink?.label ? `← Retour à la ${sessionData.backLink.label}` : '← Retour à la Conjugaison';
       if (passed && isLast) {
-        msg = `${stars} Bravo ! Tu maîtrises le plus-que-parfait aux deux niveaux !`;
+        msg = `${stars} Bravo ! ${pqpR('winMsg', 'Tu maîtrises le plus-que-parfait aux deux niveaux !')}`;
         btnsHTML = `
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="pqp-restart-btn">Recommencer</button>
-            <a href="${backHref}" class="ex-btn-secondary">← Retour à la Conjugaison</a>
+            <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
           </div>`;
       } else if (passed) {
         msg = `${stars} Niveau 1 validé ! 🏆 Le Niveau 2 est débloqué !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="pqp-next-btn">Niveau 2 — Complète →</button>
+            <button class="ex-btn-primary" id="pqp-next-btn">${pqpR('lv2NextBtnLabel', 'Niveau 2 — Complète →')}</button>
             <button class="ex-btn-secondary" id="pqp-retry-btn">Recommencer ce niveau</button>
           </div>
-          <a href="${backHref}" class="ex-results-back-link">← Retour à la Conjugaison</a>`;
+          <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
       } else {
         const needed = Math.ceil(total * PQP_SEUIL);
         msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour passer. On réessaie ?`;
         btnsHTML = `
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="pqp-retry-btn">Recommencer ce niveau</button>
-            <a href="${backHref}" class="ex-btn-secondary">← Retour à la Conjugaison</a>
+            <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
           </div>`;
       }
 
@@ -8398,10 +8894,2352 @@
         exerciseSlug: slug,
         subject,
         category,
-        exerciseType: 'pqp-niveaux',
+        exerciseType: currentType,
         level:        'Niveau ' + level,
         score:        lvScore,
         total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       TYPE : sujet-inverse-niveaux
+       2 niveaux déverrouillables. Chaque question se déroule en deux étapes :
+         1. Cliquer sur le sujet (placé après le verbe).
+         2. Écrire le verbe conjugué au bon temps.
+       ══════════════════════════════════════════════════════════════════════════ */
+
+    let siState = null;
+
+    function siSlugKey(suffix) {
+      const s = new URLSearchParams(window.location.search).get('slug') || 'si';
+      return s + '_' + suffix;
+    }
+    function siGetValidated() {
+      try { return JSON.parse(localStorage.getItem(siSlugKey('validated')) || '[]'); }
+      catch { return []; }
+    }
+    function siSetValidated(arr) {
+      localStorage.setItem(siSlugKey('validated'), JSON.stringify(arr));
+    }
+    function siNorm(str) {
+      return str.trim().toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/\s+/g, ' ');
+    }
+    function siShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    /* ── Init : affiche la sélection de niveau ─────────────────────────────── */
+    function siInitSession() {
+      siState = null;
+      score = 0;
+      currentIndex = 0;
+      sessionStartTime = Date.now();
+
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      siRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Sélection de niveau (avec verrouillage) ───────────────────────────── */
+    function siRenderLevelSelect(card) {
+      const validated = siGetValidated();
+      const lvDefs = [
+        { lv: 1, icon: '⭐',   label: 'Niveau 1 — Dans les questions',   desc: 'Sujet inversé dans les phrases interrogatives' },
+        { lv: 2, icon: '⭐⭐', label: 'Niveau 2 — Incises et tournures',  desc: 'Incises de dialogue et compléments en tête de phrase' }
+      ];
+
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div style="background:rgba(16,43,106,0.05);border:1px solid rgba(16,43,106,0.12);border-radius:12px;padding:12px 16px;margin:0 auto 20px;max-width:520px;font-size:13px;color:var(--blue);font-weight:600;text-align:center">
+          📌 Le sujet est placé après le verbe, mais le verbe s'accorde quand même avec lui.
+        </div>
+        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
+          ${lvDefs.map((d, i) => {
+            const unlocked = i === 0 || validated.includes(0);
+            const done     = validated.includes(i);
+            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const disabled = !unlocked ? ' disabled' : '';
+            const desc     = !unlocked
+              ? 'Valide le niveau 1 pour débloquer'
+              : done ? d.desc + ' · Validé !' : d.desc;
+            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${disabled}>
+              <span class="ex-type-icon">${icon}</span>
+              <div>
+                <span class="ex-type-name">${d.label}</span>
+                <span class="ex-type-desc">${desc}</span>
+              </div>
+            </button>`;
+          }).join('')}
+        </div>
+      `;
+
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => siStartLevel(parseInt(btn.dataset.level)))
+      );
+    }
+
+    /* ── Démarre un niveau ──────────────────────────────────────────────────── */
+    function siStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const bank = siShuffle([...(lv === 1 ? sessionData.lvl1Bank : sessionData.lvl2Bank)]);
+      siState = { level: lv, questions: bank, idx: 0, score: 0 };
+
+      document.getElementById('q-total').textContent = bank.length;
+      document.getElementById('q-num').textContent   = 1;
+      document.getElementById('ex-bar-fill').style.width = '0%';
+
+      siRenderQ(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* Transforme q.display en tableau de tokens pour l'affichage
+       "[infinitif]" → token verb ; ponctuation seule → token punct ; sinon → token word */
+    function siParseTokens(display) {
+      const PUNCT_ONLY = /^[—\-\.,!?;:«»"""''…]+$/;
+      return display.split(/\s+/).filter(Boolean).map(t => {
+        if (/^\[.+\]$/.test(t)) return { type: 'verb', inf: t.slice(1, -1) };
+        if (PUNCT_ONLY.test(t)) return { type: 'punct', text: t };
+        return { type: 'word', text: t };
+      });
+    }
+
+    /* ── Rendu d'une question (2 étapes) ──────────────────────────────────── */
+    function siRenderQ(card) {
+      const { questions, idx } = siState;
+      const q = questions[idx];
+
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / questions.length * 100) + '%';
+
+      const tokens = siParseTokens(q.display);
+      const inf    = tokens.find(t => t.type === 'verb')?.inf || '';
+      const isLast = idx + 1 >= questions.length;
+
+      /* Construire le HTML de la phrase (mots = boutons toggleables, reste = spans) */
+      const sentHtml = tokens.map((tk, i) => {
+        if (tk.type === 'verb')  return `<span class="si-verb-slot">(${tk.inf}) <span class="si-blank">___</span></span>`;
+        if (tk.type === 'punct') return `<span class="si-punct">${tk.text}</span>`;
+        const clean = tk.text.replace(/^[«»—""'']+/, '').replace(/[«»—""''.,!?;:]+$/, '') || tk.text;
+        return `<button class="si-word-btn" data-word="${clean}" data-tidx="${i}">${tk.text}</button>`;
+      }).join('');
+
+      card.innerHTML = `
+        <div id="si-step1">
+          <p class="ex-question-label">Étape 1 — Clique sur <strong>tous les mots</strong> du sujet du verbe&nbsp;<em>${inf}</em></p>
+          <div class="si-sentence-display" id="si-sent">${sentHtml}</div>
+          <div class="ex-feedback-area" id="si-fb1" style="min-height:20px"></div>
+          <button class="ex-choice" id="si-subj-val" style="width:100%;margin-top:8px">Valider le sujet</button>
+        </div>
+
+        <div id="si-step2" class="ex-hidden">
+          <div class="ex-step2-divider"></div>
+          <p class="ex-question-label">Étape 2 — Conjugue le verbe</p>
+          <div class="si-tense-badge">⏱ ${q.tense}</div>
+          <div class="ex-input-row">
+            <input type="text" class="ex-text-input" id="si-input"
+                   autocomplete="off" autocorrect="off" autocapitalize="off"
+                   spellcheck="false" placeholder="Écris le verbe conjugué…">
+            <button class="ex-validate-btn" id="si-val-btn">Valider</button>
+          </div>
+          <div class="ex-feedback-area" id="si-fb2"></div>
+          <div id="si-full" class="si-full-sentence ex-hidden"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">
+          ${isLast ? 'Voir les résultats →' : 'Question suivante →'}
+        </button>
+      `;
+
+      /* Étape 1 — toggle sélection des mots */
+      const wordBtns = card.querySelectorAll('.si-word-btn');
+      wordBtns.forEach(btn =>
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          btn.classList.toggle('is-selected');
+          setFeedback('si-fb1', '');
+        })
+      );
+
+      document.getElementById('si-subj-val').addEventListener('click', () =>
+        siValidateSubject(q, wordBtns)
+      );
+
+      /* Étape 2 — saisie du verbe */
+      const input  = document.getElementById('si-input');
+      const valBtn = document.getElementById('si-val-btn');
+      const doValidate = () => siHandleConjugaison(q, input, valBtn);
+      valBtn.addEventListener('click', doValidate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
+
+      /* Bouton suivant */
+      document.getElementById('next-btn').addEventListener('click', () => {
+        siState.idx++;
+        if (siState.idx >= siState.questions.length) {
+          siShowLevelResults();
+        } else {
+          siRenderQ(document.getElementById('ex-card'));
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+    }
+
+    /* ── Étape 1 : validation du groupe sujet ─────────────────────────────── */
+    function siValidateSubject(q, allBtns) {
+      const selected = [...allBtns]
+        .filter(b => b.classList.contains('is-selected'))
+        .map(b => siNorm(b.dataset.word));
+
+      if (selected.length === 0) {
+        setFeedback('si-fb1', `<div class="ex-feedback-wrong" style="font-size:13px;padding:8px 14px">⚠️ Clique d'abord sur les mots du sujet.</div>`);
+        return;
+      }
+
+      const expected = q.subjectWords.map(siNorm);
+      const isRight  = selected.length === expected.length &&
+                       expected.every(w => selected.includes(w));
+
+      if (isRight) {
+        allBtns.forEach(b => {
+          b.disabled = true;
+          if (b.classList.contains('is-selected')) b.classList.replace('is-selected', 'is-correct');
+        });
+        document.getElementById('si-subj-val').disabled = true;
+
+        const subjDisplay = q.subjectWords.join(' ');
+        setFeedback('si-fb1', `<div class="ex-feedback-correct">✓ Bonne trouvaille ! <strong>${subjDisplay}</strong> est bien le sujet, même placé après le verbe.</div>`);
+
+        setTimeout(() => {
+          const step2 = document.getElementById('si-step2');
+          if (step2) {
+            step2.classList.remove('ex-hidden');
+            setTimeout(() => document.getElementById('si-input')?.focus(), 50);
+          }
+        }, 420);
+      } else {
+        /* Secouer les boutons sélectionnés et vider la sélection */
+        allBtns.forEach(b => {
+          if (b.classList.contains('is-selected')) {
+            b.classList.add('si-shake');
+            b.addEventListener('animationend', () => {
+              b.classList.remove('si-shake', 'is-selected');
+            }, { once: true });
+          }
+        });
+        setFeedback('si-fb1', `<div class="ex-feedback-wrong">⚠️ Pas tout à fait. Cherche TOUS les mots du sujet (déterminant + nom…) : le sujet est placé après le verbe.</div>`);
+      }
+    }
+
+    /* ── Étape 2 : valider la conjugaison ─────────────────────────────────── */
+    function siHandleConjugaison(q, input, valBtn) {
+      if (input.disabled || !input.value.trim()) return;
+
+      input.disabled  = true;
+      valBtn.disabled = true;
+
+      const normInput  = siNorm(input.value);
+      const normAnswer = siNorm(q.answer);
+      const isRight    = normInput === normAnswer;
+
+      input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+      if (isRight) {
+        siState.score++;
+        setFeedback('si-fb2', `<div class="ex-feedback-correct">🎉 ${rand(SUCCESS)} La forme correcte est bien <strong>${q.answer}</strong>.</div>`);
+
+        /* Affiche la phrase complète avec le verbe mis en valeur */
+        const fullEl = document.getElementById('si-full');
+        if (fullEl) {
+          fullEl.innerHTML = q.fullSentence.replace(
+            q.answer,
+            `<strong style="background:rgba(22,163,74,0.18);border-radius:5px;padding:1px 7px;color:#15803d">${q.answer}</strong>`
+          );
+          fullEl.classList.remove('ex-hidden');
+        }
+      } else {
+        /* Reconstitue la bonne forme en soulignant la terminaison */
+        const stem      = q.stem || '';
+        const ending    = q.answer.slice(stem.length);
+        const stemPart  = `<span style="color:var(--text)">${q.answer.slice(0, stem.length)}</span>`;
+        const endPart   = `<span style="color:var(--red);text-decoration:underline wavy;font-weight:800">${ending}</span>`;
+
+        setFeedback('si-fb2', `<div class="ex-feedback-wrong">
+          ❌ Pas tout à fait. La bonne forme : ${stemPart}${endPart}<br>
+          <small>📌 Le sujet est inversé, mais le verbe s'accorde quand même avec lui (<em>${q.subjectWords.join(' ')}</em>).</small>
+        </div>`);
+      }
+
+      document.getElementById('next-btn').classList.remove('ex-hidden');
+    }
+
+    /* ── Résultats d'un niveau ─────────────────────────────────────────────── */
+    function siShowLevelResults() {
+      const { level, score: lvScore, questions } = siState;
+      const total  = questions.length;
+      const pct    = Math.round(lvScore / total * 100);
+      const passed = pct >= 60;
+
+      if (passed) {
+        const validated = siGetValidated();
+        if (!validated.includes(level - 1)) { validated.push(level - 1); siSetValidated(validated); }
+      }
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-conjugaison.html';
+      const backLabel = `← Retour à la ${sessionData.backLink?.label || 'Conjugaison'}`;
+      const stars     = pct === 100 ? '🌟🌟🌟' : pct >= 80 ? '⭐⭐' : pct >= 60 ? '⭐' : '';
+      const isLast    = level >= 2;
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises l'accord du verbe avec un sujet inversé !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="si-restart-btn">Recommencer</button>
+            <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+          </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau 1 validé ! Le Niveau 2 est débloqué ! 🏆`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="si-next-btn">Niveau 2 — Incises et tournures →</button>
+            <button class="ex-btn-secondary" id="si-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * 0.6);
+        msg = `${stars || '💪'} Continue ! Il faut ${needed}/${total} pour passer au niveau suivant.`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="si-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+          </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('si-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        siStartLevel(siState.level);
+      });
+      document.getElementById('si-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        siStartLevel(2);
+      });
+      document.getElementById('si-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        siInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug,
+        subject,
+        category,
+        exerciseType: currentType,
+        level:        'Niveau ' + level,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       TYPE : epithete-attribut-niveaux
+       3 niveaux déverrouillables (localStorage), seuil 75 %.
+       Niveau 1 : verbe d'état ou verbe d'action ? (8 phrases, binaire)
+       Niveau 2 : épithète ou attribut ? (10 phrases, 2 étapes)
+       Niveau 3 : transformer (6 phrases, saisie libre)
+       ══════════════════════════════════════════════════════════════════════════ */
+
+    const EA_SEUIL    = 0.75;
+    const EA_POSITIFS = ['Excellent ! 🎉', 'Bravo ! ⭐', 'Parfait ! 🌟', 'Super ! 👏'];
+    const EA_STATE_VERBS_NORM = ['est', 'semble', 'parait', 'devient', 'reste', 'demeure', 'a l air', 'etait', 'semblait', 'paraissait', 'devenait', 'restait', 'demeurait'];
+
+    let eaState = null;
+
+    function eaSlugKey(suffix) {
+      const s = new URLSearchParams(window.location.search).get('slug') || 'ea';
+      return s + '_' + suffix;
+    }
+    function eaGetValidated() {
+      try { return JSON.parse(localStorage.getItem(eaSlugKey('validated')) || '[]'); }
+      catch { return []; }
+    }
+    function eaSetValidated(arr) {
+      localStorage.setItem(eaSlugKey('validated'), JSON.stringify(arr));
+    }
+
+    function eaNorm(str) {
+      return str.trim().toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/\s+/g, ' ')
+        .replace(/[''`´‘’]/g, "'");
+    }
+
+    function eaShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    /* ── Init ───────────────────────────────────────────────────────────────── */
+    function eaInitSession() {
+      eaState = null;
+      score = 0;
+      currentIndex = 0;
+      sessionStartTime = Date.now();
+
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      eaRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Sélection de niveau ────────────────────────────────────────────────── */
+    function eaRenderLevelSelect(card) {
+      const validated = eaGetValidated();
+      const lvDefs = [
+        { lv: 1, icon: '⭐',     label: 'Niveau 1 — Verbe d\'état ou verbe d\'action ?', desc: 'Le prérequis : reconnaître les verbes d\'état' },
+        { lv: 2, icon: '⭐⭐',   label: 'Niveau 2 — Épithète ou attribut ?',              desc: 'Analyse l\'adjectif en deux étapes' },
+        { lv: 3, icon: '⭐⭐⭐', label: 'Niveau 3 — Transforme !',                         desc: 'Reformule la phrase en changeant la fonction de l\'adjectif' }
+      ];
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="ea-rule-chip">📌 Épithète = collé au nom · Attribut = relié au sujet par un verbe d'état</div>
+        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
+          ${lvDefs.map((d, i) => {
+            const unlocked = i === 0 || validated.includes(i - 1);
+            const done     = validated.includes(i);
+            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const disabled = !unlocked ? ' disabled' : '';
+            const desc     = !unlocked ? 'Valide le niveau précédent pour débloquer'
+                           : done ? d.desc + ' · Validé !' : d.desc;
+            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${disabled}>
+              <span class="ex-type-icon">${icon}</span>
+              <div>
+                <span class="ex-type-name">${d.label}</span>
+                <span class="ex-type-desc">${desc}</span>
+              </div>
+            </button>`;
+          }).join('')}
+        </div>
+      `;
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => eaStartLevel(parseInt(btn.dataset.level)))
+      );
+    }
+
+    /* ── Démarre un niveau ──────────────────────────────────────────────────── */
+    function eaStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      if (lv === 1) {
+        const questions = eaShuffle([...sessionData.lvl1Bank]);
+        eaState = { level: 1, questions, idx: 0, score: 0, total: questions.length };
+        document.getElementById('q-total').textContent = questions.length;
+        eaRenderLvl1(document.getElementById('ex-card'));
+
+      } else if (lv === 2) {
+        const questions = eaShuffle([...sessionData.lvl2Bank]);
+        eaState = { level: 2, questions, idx: 0, score: 0, total: questions.length };
+        document.getElementById('q-total').textContent = questions.length;
+        eaRenderLvl2(document.getElementById('ex-card'));
+
+      } else {
+        /* Niveau 3 : tirage sans répétition via localStorage */
+        const allQ  = sessionData.lvl3Bank;
+        const lsKey = eaSlugKey('lvl3used');
+        let used = [];
+        try { used = JSON.parse(localStorage.getItem(lsKey) || '[]'); } catch {}
+        if (used.length >= allQ.length) { used = []; localStorage.removeItem(lsKey); }
+        const available = allQ.filter((_, i) => !used.includes(i));
+        const picked    = eaShuffle(available).slice(0, Math.min(6, available.length));
+        const newUsed   = [...used, ...picked.map(q => allQ.indexOf(q))];
+        localStorage.setItem(lsKey, JSON.stringify(newUsed));
+
+        eaState = { level: 3, questions: picked, idx: 0, score: 0, total: picked.length };
+        document.getElementById('q-total').textContent = picked.length;
+        eaRenderLvl3(document.getElementById('ex-card'));
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       NIVEAU 1 — Verbe d'état ou verbe d'action ?
+       ══════════════════════════════════════════════════════════════════════════ */
+    function eaRenderLvl1(card) {
+      const { questions, idx, total } = eaState;
+      const q = questions[idx];
+
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      /* Surligner le verbe dans la phrase — "avoir l'air" peut contenir des apostrophes */
+      const sentenceHtml = q.sentence.replace(q.verb,
+        `<span class="ea-hl-verb">${q.verb}</span>`);
+
+      card.innerHTML = `
+        <p class="ex-question-label">Ce verbe est-il un <strong>verbe d'état</strong> ou un <strong>verbe d'action</strong> ?</p>
+        <div class="ea-sentence-display">${sentenceHtml}</div>
+        <div class="ea-rule-mini">Verbes d'état : <em>être, paraître, sembler, devenir, rester, demeurer, avoir l'air</em></div>
+        <div class="ea-choice-row">
+          <button class="ea-choice-btn" data-answer="etat">Verbe d'état</button>
+          <button class="ea-choice-btn" data-answer="action">Verbe d'action</button>
+        </div>
+        <div class="ex-feedback-area" id="ea-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Suivant →' : 'Voir les résultats →'}</button>
+      `;
+
+      card.querySelectorAll('.ea-choice-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          card.querySelectorAll('.ea-choice-btn').forEach(b => b.disabled = true);
+          const isRight = (btn.dataset.answer === 'etat') === q.isStateVerb;
+
+          if (isRight) {
+            eaState.score++;
+            btn.classList.add('is-correct');
+            document.getElementById('ea-fb').innerHTML =
+              `<div class="ex-feedback-correct">✓ ${EA_POSITIFS[Math.floor(Math.random()*EA_POSITIFS.length)]}<br><small>📌 ${q.feedback}</small></div>`;
+          } else {
+            btn.classList.add('is-wrong');
+            const correctAnswer = q.isStateVerb ? 'etat' : 'action';
+            card.querySelector(`.ea-choice-btn[data-answer="${correctAnswer}"]`).classList.add('is-correct');
+            document.getElementById('ea-fb').innerHTML =
+              `<div class="ex-feedback-wrong">❌ <strong>${q.verb}</strong> est un ${q.isStateVerb ? 'verbe d\'état' : 'verbe d\'action'}.<br><small>📌 ${q.feedback}</small></div>`;
+          }
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        eaState.idx++;
+        if (eaState.idx >= eaState.questions.length) eaShowLevelResults();
+        else eaRenderLvl1(document.getElementById('ex-card'));
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       NIVEAU 2 — Épithète ou attribut ? (2 étapes par phrase)
+       Étape 1 : Y a-t-il un verbe d'état ? (Oui/Non) + clic si Oui
+       Étape 2 : Épithète ou attribut ?
+       Animation dans le feedback selon la nature.
+       ══════════════════════════════════════════════════════════════════════════ */
+    function eaRenderLvl2(card) {
+      const { questions, idx, total } = eaState;
+      const q = questions[idx];
+
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      /* Surligner l'adjectif dans la phrase */
+      const adjRx = new RegExp('(' + q.adjective.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'i');
+      const sentenceHtml = q.sentence.replace(adjRx, '<span class="ea-hl-adj">$1</span>');
+
+      card.innerHTML = `
+        <p class="ex-question-label">L'adjectif surligné est-il relié au sujet par un <strong>verbe d'état</strong> ?</p>
+        <div class="ea-sentence-display" id="ea-sent-display">${sentenceHtml}</div>
+        <div class="ea-choice-row" id="ea-step1-btns">
+          <button class="ea-choice-btn" data-answer="oui">Oui</button>
+          <button class="ea-choice-btn" data-answer="non">Non</button>
+        </div>
+        <div class="ex-feedback-area" id="ea-step1-fb"></div>
+        <div id="ea-verb-select" class="ex-hidden">
+          <p class="ex-question-label" style="margin-top:18px">Clique sur le verbe d'état :</p>
+          <div class="ea-word-buttons" id="ea-verb-btns"></div>
+          <div class="ex-feedback-area" id="ea-verb-fb"></div>
+        </div>
+        <div id="ea-step2" class="ex-hidden">
+          <div class="ex-step2-divider"></div>
+          <p class="ex-question-label">L'adjectif est-il <strong>épithète</strong> ou <strong>attribut du sujet</strong> ?</p>
+          <div class="ea-choice-row" id="ea-nature-btns">
+            <button class="ea-choice-btn" data-nature="epithete">Épithète</button>
+            <button class="ea-choice-btn" data-nature="attribut">Attribut du sujet</button>
+          </div>
+          <div class="ex-feedback-area" id="ea-step2-fb"></div>
+        </div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Suivant →' : 'Voir les résultats →'}</button>
+      `;
+
+      let step1Ok = false;
+
+      /* ── Étape 1 : Oui / Non ─────────────────────────────────────────── */
+      card.querySelectorAll('#ea-step1-btns .ea-choice-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          card.querySelectorAll('#ea-step1-btns .ea-choice-btn').forEach(b => b.disabled = true);
+          const answered = btn.dataset.answer;
+          const correct  = q.hasStateVerb ? 'oui' : 'non';
+          step1Ok = answered === correct;
+
+          if (step1Ok) {
+            btn.classList.add('is-correct');
+            if (q.hasStateVerb) {
+              /* Montrer le sélecteur de verbe */
+              document.getElementById('ea-step1-fb').innerHTML =
+                `<div class="ex-feedback-correct" style="font-size:13px">✓ Oui ! Maintenant clique sur le verbe d'état dans la liste.</div>`;
+              eaBuildVerbSelect(card, q);
+            } else {
+              document.getElementById('ea-step1-fb').innerHTML =
+                `<div class="ex-feedback-correct" style="font-size:13px">✓ Correct, il n'y a pas de verbe d'état ici.</div>`;
+              eaShowStep2(card, q, true);
+            }
+          } else {
+            btn.classList.add('is-wrong');
+            card.querySelector(`#ea-step1-btns .ea-choice-btn[data-answer="${correct}"]`).classList.add('is-correct');
+            const msg = q.hasStateVerb
+              ? `❌ Le verbe d'état est <strong>${q.stateVerb}</strong> : il relie l'adjectif au sujet.`
+              : `❌ Il n'y a pas de verbe d'état ici : l'adjectif est directement rattaché au nom.`;
+            document.getElementById('ea-step1-fb').innerHTML = `<div class="ex-feedback-wrong" style="font-size:13px">${msg}</div>`;
+            setTimeout(() => eaShowStep2(card, q, false), 1400);
+          }
+        });
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        eaState.idx++;
+        if (eaState.idx >= eaState.questions.length) eaShowLevelResults();
+        else eaRenderLvl2(document.getElementById('ex-card'));
+      });
+    }
+
+    function eaBuildVerbSelect(card, q) {
+      const verbDiv = document.getElementById('ea-verb-select');
+      verbDiv.classList.remove('ex-hidden');
+      const btnsDiv = document.getElementById('ea-verb-btns');
+
+      /* Mélanger les choices (correct + distracteurs) */
+      const choices = eaShuffle([...q.stateVerbChoices]);
+      btnsDiv.innerHTML = choices.map(c =>
+        `<button class="ea-word-btn" data-verb="${c}">${c}</button>`
+      ).join('');
+
+      btnsDiv.querySelectorAll('.ea-word-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          btnsDiv.querySelectorAll('.ea-word-btn').forEach(b => b.disabled = true);
+          const isRight = btn.dataset.verb === q.stateVerb;
+          if (isRight) {
+            btn.classList.add('is-correct');
+            document.getElementById('ea-verb-fb').innerHTML =
+              `<div class="ex-feedback-correct" style="font-size:13px">✓ Oui, <strong>${q.stateVerb}</strong> est le verbe d'état !</div>`;
+          } else {
+            btn.classList.add('is-wrong');
+            btnsDiv.querySelector(`.ea-word-btn[data-verb="${q.stateVerb}"]`).classList.add('is-correct');
+            document.getElementById('ea-verb-fb').innerHTML =
+              `<div class="ex-feedback-wrong" style="font-size:13px">❌ C'est <strong>${q.stateVerb}</strong> le verbe d'état.</div>`;
+          }
+          setTimeout(() => eaShowStep2(card, q, true), 900);
+        });
+      });
+    }
+
+    function eaShowStep2(card, q, step1Correct) {
+      const step2 = document.getElementById('ea-step2');
+      step2.classList.remove('ex-hidden');
+
+      step2.querySelectorAll('.ea-choice-btn[data-nature]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          step2.querySelectorAll('.ea-choice-btn[data-nature]').forEach(b => b.disabled = true);
+          const isRight = btn.dataset.nature === q.nature;
+
+          if (isRight && step1Correct) eaState.score++;
+
+          if (isRight) {
+            btn.classList.add('is-correct');
+            const fbText = q.nature === 'attribut' ? q.feedbackAttribut : q.feedbackEpithete;
+            const animHtml = q.nature === 'attribut'
+              ? eaAnimAttribut(q)
+              : eaAnimEpithete(q);
+            document.getElementById('ea-step2-fb').innerHTML =
+              `<div class="ex-feedback-correct">✓ ${EA_POSITIFS[Math.floor(Math.random()*EA_POSITIFS.length)]}<br><small>📌 ${fbText}</small>${animHtml}</div>`;
+          } else {
+            btn.classList.add('is-wrong');
+            step2.querySelector(`.ea-choice-btn[data-nature="${q.nature}"]`).classList.add('is-correct');
+            const fbText = q.nature === 'attribut' ? q.feedbackAttribut : q.feedbackEpithete;
+            const animHtml = q.nature === 'attribut' ? eaAnimAttribut(q) : eaAnimEpithete(q);
+            document.getElementById('ea-step2-fb').innerHTML =
+              `<div class="ex-feedback-wrong">❌ L'adjectif est <strong>${q.nature === 'attribut' ? 'attribut du sujet' : 'épithète'}</strong>.<br><small>📌 ${fbText}</small>${animHtml}</div>`;
+          }
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+      });
+    }
+
+    /* Animation épithète : l'adjectif s'aimante vers le nom */
+    function eaAnimEpithete(q) {
+      return `
+        <div class="ea-anim-magnet" style="margin-top:10px">
+          <span class="ea-anim-box">${q.noun}</span>
+          <span style="color:var(--muted);font-size:11px">←→</span>
+          <span class="ea-anim-box" style="color:var(--blue)">${q.adjective}</span>
+        </div>
+        <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:4px">L'épithète fait partie du groupe nominal.</div>
+      `;
+    }
+
+    /* Animation attribut : pont sujet → verbe d'état → adjectif */
+    function eaAnimAttribut(q) {
+      return `
+        <div class="ea-anim-bridge" style="margin-top:10px">
+          <span class="ea-anim-box">${q.subject}</span>
+          <span class="ea-anim-arrow">→</span>
+          <span class="ea-anim-box-verb">${q.stateVerb}</span>
+          <span class="ea-anim-arrow">→</span>
+          <span class="ea-anim-box">${q.adjective}</span>
+        </div>
+        <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:4px">Le verbe d'état relie l'attribut au sujet.</div>
+      `;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       NIVEAU 3 — Transforme (saisie libre)
+       ══════════════════════════════════════════════════════════════════════════ */
+    function eaRenderLvl3(card) {
+      const { questions, idx, total } = eaState;
+      const q = questions[idx];
+
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      const isToAttr = q.direction === 'epithete-to-attribute';
+      const badgeClass = isToAttr ? 'ea-dir-to-attr' : 'ea-dir-to-epi';
+      const badgeLabel = isToAttr ? 'Épithète → Attribut' : 'Attribut → Épithète';
+
+      card.innerHTML = `
+        <span class="ea-direction-badge ${badgeClass}">${badgeLabel}</span>
+        <p class="ex-question-label">${q.instruction}</p>
+        <div class="ea-original-display">« ${q.original} »</div>
+        <div class="ex-input-row">
+          <input type="text" id="ea-input" class="ex-text-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta phrase…">
+          <button class="ex-validate-btn" id="ea-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="ea-lvl3-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Suivant →' : 'Voir les résultats →'}</button>
+      `;
+
+      const input = document.getElementById('ea-input');
+      const vbtn  = document.getElementById('ea-val-btn');
+      setTimeout(() => input.focus(), 50);
+
+      const doValidate = () => {
+        if (input.disabled || !input.value.trim()) return;
+        input.disabled = true;
+        vbtn.disabled  = true;
+
+        const result = eaValidateLvl3(input.value, q);
+
+        if (result.ok) {
+          eaState.score++;
+          input.classList.add('is-correct');
+          document.getElementById('ea-lvl3-fb').innerHTML =
+            `<div class="ex-feedback-correct">✓ ${EA_POSITIFS[Math.floor(Math.random()*EA_POSITIFS.length)]}<br><small>Exemple : <em>${q.example}</em></small></div>`;
+        } else {
+          input.classList.add('is-wrong');
+          const hint = eaLvl3ErrorMsg(result.reason, q);
+          document.getElementById('ea-lvl3-fb').innerHTML =
+            `<div class="ex-feedback-wrong">❌ ${hint}<br><small>Exemple : <em>${q.example}</em></small></div>`;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      };
+
+      vbtn.addEventListener('click', doValidate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        eaState.idx++;
+        if (eaState.idx >= eaState.questions.length) eaShowLevelResults();
+        else eaRenderLvl3(document.getElementById('ex-card'));
+      });
+    }
+
+    function eaValidateLvl3(userInput, q) {
+      const userNorm = eaNorm(userInput);
+
+      /* Correspondance exacte avec une réponse acceptée */
+      if (q.acceptedAnswers.some(a => eaNorm(a) === userNorm)) return { ok: true };
+
+      const hasStateVerb = EA_STATE_VERBS_NORM.some(v => userNorm.includes(v));
+      const adjForms     = q.adjectiveForms.map(eaNorm);
+      const hasAdj       = adjForms.some(f => userNorm.includes(f));
+
+      if (q.direction === 'epithete-to-attribute') {
+        if (!hasStateVerb) return { ok: false, reason: 'oubli-verbe-etat' };
+        if (!hasAdj)       return { ok: false, reason: 'oubli-adjectif' };
+        return { ok: true };          /* verbe d'état + adjectif présents */
+      } else {
+        /* attribute-to-epithet */
+        if (hasStateVerb)  return { ok: false, reason: 'verbe-etat-present' };
+        if (!hasAdj)       return { ok: false, reason: 'oubli-adjectif' };
+        return { ok: true };          /* pas de verbe d'état + adjectif présent */
+      }
+    }
+
+    function eaLvl3ErrorMsg(reason, q) {
+      if (reason === 'oubli-verbe-etat')
+        return 'Il manque un <strong>verbe d\'état</strong> (être, sembler, paraître, rester…) pour relier l\'adjectif au sujet.';
+      if (reason === 'verbe-etat-present')
+        return 'La phrase contient encore un verbe d\'état : retire-le et colle l\'adjectif directement au nom.';
+      if (reason === 'oubli-adjectif')
+        return `L\'adjectif <strong>${q.adjective}</strong> doit rester dans ta phrase (vérifie l\'accord !).`;
+      return 'Relis la consigne et réessaie.';
+    }
+
+    /* ── Résultats d'un niveau ──────────────────────────────────────────────── */
+    function eaShowLevelResults() {
+      const { level, score: lvScore, total } = eaState;
+      const pct    = lvScore / total;
+      const passed = pct >= EA_SEUIL;
+      const pctPct = Math.round(pct * 100);
+
+      if (passed) {
+        const validated = eaGetValidated();
+        if (!validated.includes(level - 1)) { validated.push(level - 1); eaSetValidated(validated); }
+      }
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-grammaire.html';
+      const backLabel = `← Retour à la ${sessionData.backLink?.label || 'Grammaire'}`;
+      const isLast    = level >= 3;
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 75 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+
+      const lvLabels = ['', 'Niveau 1', 'Niveau 2', 'Niveau 3'];
+      const lvNextLabels = ['', 'Niveau 2 — Épithète ou attribut ?', 'Niveau 3 — Transforme !', ''];
+
+      let msg, btnsHTML;
+
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises la différence entre épithète et attribut du sujet !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="ea-restart-btn">Recommencer</button>
+            <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+          </div>`;
+      } else if (passed) {
+        msg = `${stars} ${lvLabels[level]} validé ! 🏆 Le ${lvLabels[level + 1]} est débloqué !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="ea-next-btn">${lvNextLabels[level]} →</button>
+            <button class="ex-btn-secondary" id="ea-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * EA_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour passer. On réessaie ?`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="ea-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+          </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('ea-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        eaStartLevel(eaState.level);
+      });
+      document.getElementById('ea-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        eaStartLevel(eaState.level + 1);
+      });
+      document.getElementById('ea-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        eaInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug,
+        subject,
+        category,
+        exerciseType: currentType,
+        level:        'Niveau ' + level,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       TYPE : ecn-niveaux — Adjectif épithète / Complément du nom
+       Niv 1 : Trouve l'expansion (8 GNs, mots cliquables)
+       Niv 2 : Épithète ou complément du nom ? (10 items, 2 étapes)
+       Niv 3 : Transforme ! (6 items, saisie libre, validation souple)
+       ══════════════════════════════════════════════════════════════════════════ */
+
+    const ECN_SEUIL    = 0.75;
+    const ECN_POSITIFS = ['Excellent ! 🎉', 'Bravo ! ⭐', 'Parfait ! 🌟', 'Super ! 👏'];
+
+    let ecnState = null;
+
+    function ecnSlugKey(suffix) {
+      const s = new URLSearchParams(window.location.search).get('slug') || 'ecn';
+      return s + '_' + suffix;
+    }
+    function ecnGetValidated() {
+      try { return JSON.parse(localStorage.getItem(ecnSlugKey('validated')) || '[]'); }
+      catch { return []; }
+    }
+    function ecnSetValidated(arr) {
+      localStorage.setItem(ecnSlugKey('validated'), JSON.stringify(arr));
+    }
+    function ecnNorm(str) {
+      return str.trim().toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/\s+/g, ' ')
+        .replace(/[''`´'']/g, "'");
+    }
+    function ecnShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    /* ── Init ────────────────────────────────────────────────────────────── */
+    function ecnInitSession() {
+      ecnState = null;
+      score = 0; currentIndex = 0;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      ecnRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Sélection de niveau ─────────────────────────────────────────────── */
+    function ecnRenderLevelSelect(card) {
+      const validated = ecnGetValidated();
+      const lvDefs = [
+        { lv: 1, icon: '⭐',     label: 'Niveau 1 — Trouve l\'expansion du nom',
+          desc: 'Le prérequis : identifier le groupe qui enrichit le nom-noyau' },
+        { lv: 2, icon: '⭐⭐',   label: 'Niveau 2 — Épithète ou complément du nom ?',
+          desc: 'Analyse l\'expansion en deux étapes : préposition puis nature' },
+        { lv: 3, icon: '⭐⭐⭐', label: 'Niveau 3 — Transforme !',
+          desc: 'Réécris le GN en changeant le type d\'expansion' }
+      ];
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="ea-rule-chip">📌 Épithète = adjectif accolé au nom · Complément du nom = groupe introduit par une préposition</div>
+        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
+          ${lvDefs.map((d, i) => {
+            const unlocked = i === 0 || validated.includes(i - 1);
+            const done     = validated.includes(i);
+            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const dis      = !unlocked ? ' disabled' : '';
+            const desc     = !unlocked ? 'Valide le niveau précédent pour débloquer'
+                           : done ? d.desc + ' · Validé !' : d.desc;
+            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${dis}>
+              <span class="ex-type-icon">${icon}</span>
+              <div><span class="ex-type-name">${d.label}</span><span class="ex-type-desc">${desc}</span></div>
+            </button>`;
+          }).join('')}
+        </div>`;
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => ecnStartLevel(parseInt(btn.dataset.level)))
+      );
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function ecnStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      if (lv === 1) {
+        const qs = ecnShuffle([...sessionData.lvl1Bank]);
+        ecnState = { level: 1, questions: qs, idx: 0, score: 0, total: qs.length };
+        document.getElementById('q-total').textContent = qs.length;
+        ecnRenderLvl1(document.getElementById('ex-card'));
+
+      } else if (lv === 2) {
+        const qs = ecnShuffle([...sessionData.lvl2Bank]);
+        ecnState = { level: 2, questions: qs, idx: 0, score: 0, total: qs.length };
+        document.getElementById('q-total').textContent = qs.length;
+        ecnRenderLvl2(document.getElementById('ex-card'));
+
+      } else {
+        const allQ  = sessionData.lvl3Bank;
+        const lsKey = ecnSlugKey('lvl3used');
+        let used = [];
+        try { used = JSON.parse(localStorage.getItem(lsKey) || '[]'); } catch {}
+        if (used.length >= allQ.length) { used = []; localStorage.removeItem(lsKey); }
+        const avail  = allQ.filter((_, i) => !used.includes(i));
+        const picked = ecnShuffle(avail).slice(0, Math.min(6, avail.length));
+        localStorage.setItem(lsKey, JSON.stringify([...used, ...picked.map(q => allQ.indexOf(q))]));
+        ecnState = { level: 3, questions: picked, idx: 0, score: 0, total: picked.length };
+        document.getElementById('q-total').textContent = picked.length;
+        ecnRenderLvl3(document.getElementById('ex-card'));
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       NIVEAU 1 — Trouve l'expansion du nom (mots tous cliquables, multi-select)
+       ════════════════════════════════════════════════════════════════════════ */
+    function ecnRenderLvl1(card) {
+      const { questions, idx, total } = ecnState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      card.innerHTML = `
+        <p class="ex-question-label">Clique sur le ou les mots qui forment l'<strong>expansion du nom-noyau</strong></p>
+        <div class="ex-sentence-words" id="ecn-words">
+          ${q.words.map((w, i) => `<button class="ex-word-btn" data-idx="${i}">${w}</button>`).join('')}
+        </div>
+        <div style="text-align:center;margin-bottom:14px">
+          <button class="ex-validate-btn" id="ecn-val-btn" disabled style="border-radius:12px">Valider ma sélection</button>
+        </div>
+        <div class="ex-feedback-area" id="ecn-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Suivant →' : 'Voir les résultats →'}</button>`;
+
+      const selected     = new Set();
+      const expansionSet = new Set(q.expansionIdx);
+      const vbtn         = document.getElementById('ecn-val-btn');
+
+      card.querySelectorAll('.ex-word-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const i = parseInt(btn.dataset.idx);
+          if (selected.has(i)) { selected.delete(i); btn.classList.remove('is-selected'); }
+          else                  { selected.add(i);    btn.classList.add('is-selected'); }
+          vbtn.disabled = selected.size === 0;
+        });
+      });
+
+      vbtn.addEventListener('click', () => {
+        if (selected.size === 0) return;
+        card.querySelectorAll('.ex-word-btn').forEach(b => b.disabled = true);
+        vbtn.disabled = true;
+
+        const correct = selected.size === expansionSet.size &&
+                        [...selected].every(i => expansionSet.has(i));
+        if (correct) ecnState.score++;
+
+        card.querySelectorAll('.ex-word-btn').forEach(btn => {
+          const i = parseInt(btn.dataset.idx);
+          btn.classList.remove('is-selected');
+          if      (i === q.noyauIdx)                          btn.classList.add('ecn-noyau-hl');
+          else if (expansionSet.has(i) && selected.has(i))   btn.classList.add('is-correct');
+          else if (expansionSet.has(i))                       btn.classList.add('is-missed');
+          else if (selected.has(i))                           btn.classList.add('is-wrong');
+        });
+
+        const expWords = q.expansionIdx.map(i => q.words[i]).join(' ');
+        const expType  = q.type === 'epithete' ? 'adjectif épithète' : 'complément du nom';
+        document.getElementById('ecn-fb').innerHTML = correct
+          ? `<div class="ex-feedback-correct">✓ ${ECN_POSITIFS[Math.floor(Math.random()*ECN_POSITIFS.length)]}<br><small>📌 ${q.feedback}</small></div>`
+          : `<div class="ex-feedback-wrong">❌ L'expansion est « <strong>${expWords}</strong> » (${expType}).<br><small>📌 ${q.feedback}</small></div>`;
+
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        ecnState.idx++;
+        if (ecnState.idx >= ecnState.questions.length) ecnShowLevelResults();
+        else ecnRenderLvl1(document.getElementById('ex-card'));
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       NIVEAU 2 — Épithète ou complément du nom ? (2 étapes par item)
+       Étape 1 : Y a-t-il une préposition ? (Oui/Non) → clic sur la préposition
+       Étape 2 : Adjectif épithète ou complément du nom ?
+       ════════════════════════════════════════════════════════════════════════ */
+    function ecnRenderLvl2(card) {
+      const { questions, idx, total } = ecnState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      /* GN display : expansion en bleu souligné, nom-noyau en vert */
+      const gnHtml = q.gnWords.map((w, i) => {
+        if (q.expansionIdx.includes(i)) return `<span class="ea-hl-adj">${w}</span>`;
+        if (i === q.noyauIdx)           return `<span class="ecn-noyau-span">${w}</span>`;
+        return w;
+      }).join(' ');
+
+      card.innerHTML = `
+        <p class="ex-question-label">L'expansion surlignée est-elle introduite par une <strong>préposition</strong> (de, à, en, sans, pour, avec…) ?</p>
+        <div class="ea-sentence-display">${gnHtml}</div>
+        <div class="ea-choice-row" id="ecn-step1-btns">
+          <button class="ea-choice-btn" data-answer="oui">Oui</button>
+          <button class="ea-choice-btn" data-answer="non">Non</button>
+        </div>
+        <div class="ex-feedback-area" id="ecn-step1-fb"></div>
+
+        <div id="ecn-prep-select" class="ex-hidden">
+          <p class="ex-question-label" style="margin-top:18px">Clique sur la préposition dans l'expansion :</p>
+          <div class="ex-sentence-words" id="ecn-prep-btns" style="padding:12px 14px;gap:8px"></div>
+          <div class="ex-feedback-area" id="ecn-prep-fb"></div>
+        </div>
+
+        <div id="ecn-step2" class="ex-hidden">
+          <div class="ex-step2-divider"></div>
+          <p class="ex-question-label">L'expansion est-elle un <strong>adjectif épithète</strong> ou un <strong>complément du nom</strong> ?</p>
+          <div class="ea-choice-row" id="ecn-nature-btns">
+            <button class="ea-choice-btn" data-nature="epithete">Adjectif épithète</button>
+            <button class="ea-choice-btn" data-nature="complement-nom">Complément du nom</button>
+          </div>
+          <div class="ex-feedback-area" id="ecn-step2-fb"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Suivant →' : 'Voir les résultats →'}</button>`;
+
+      let step1Ok = false;
+
+      /* Étape 1 : Oui / Non */
+      card.querySelectorAll('#ecn-step1-btns .ea-choice-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          card.querySelectorAll('#ecn-step1-btns .ea-choice-btn').forEach(b => b.disabled = true);
+          const answered = btn.dataset.answer;
+          const correct  = q.hasPrep ? 'oui' : 'non';
+          step1Ok = answered === correct;
+
+          if (step1Ok) {
+            btn.classList.add('is-correct');
+            if (q.hasPrep) {
+              document.getElementById('ecn-step1-fb').innerHTML =
+                `<div class="ex-feedback-correct" style="font-size:13px">✓ Oui ! Maintenant clique sur la préposition dans l'expansion.</div>`;
+              ecnBuildPrepSelect(card, q);
+            } else {
+              document.getElementById('ecn-step1-fb').innerHTML =
+                `<div class="ex-feedback-correct" style="font-size:13px">✓ Correct. ${q.feedbackPrep}</div>`;
+              ecnShowStep2(card, q, true);
+            }
+          } else {
+            btn.classList.add('is-wrong');
+            card.querySelector(`#ecn-step1-btns .ea-choice-btn[data-answer="${correct}"]`).classList.add('is-correct');
+            const msg = q.hasPrep
+              ? `❌ Il y a bien une préposition ici. ${q.feedbackPrep}`
+              : `❌ Il n'y a pas de préposition ici. ${q.feedbackPrep}`;
+            document.getElementById('ecn-step1-fb').innerHTML =
+              `<div class="ex-feedback-wrong" style="font-size:13px">${msg}</div>`;
+            setTimeout(() => ecnShowStep2(card, q, false), 1400);
+          }
+        });
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        ecnState.idx++;
+        if (ecnState.idx >= ecnState.questions.length) ecnShowLevelResults();
+        else ecnRenderLvl2(document.getElementById('ex-card'));
+      });
+    }
+
+    function ecnBuildPrepSelect(card, q) {
+      document.getElementById('ecn-prep-select').classList.remove('ex-hidden');
+      const btnsDiv = document.getElementById('ecn-prep-btns');
+      btnsDiv.innerHTML = q.expansionIdx.map(i =>
+        `<button class="ex-word-btn" data-ridx="${i}">${q.gnWords[i]}</button>`
+      ).join('');
+
+      btnsDiv.querySelectorAll('.ex-word-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          btnsDiv.querySelectorAll('.ex-word-btn').forEach(b => b.disabled = true);
+          const ridx    = parseInt(btn.dataset.ridx);
+          const isRight = ridx === q.prepIdx;
+          if (isRight) {
+            btn.classList.add('is-correct');
+            const mergedNote = q.isMerged
+              ? ` <strong>${q.prepText}</strong> = <strong>${q.prepReal}</strong> : la préposition est cachée dans l'article contracté !`
+              : '';
+            document.getElementById('ecn-prep-fb').innerHTML =
+              `<div class="ex-feedback-correct" style="font-size:13px">✓ « ${q.prepText} » est bien la préposition !${mergedNote}</div>`;
+          } else {
+            btn.classList.add('is-wrong');
+            btnsDiv.querySelector(`.ex-word-btn[data-ridx="${q.prepIdx}"]`).classList.add('is-correct');
+            const mergedNote = q.isMerged ? ` (${q.prepText} = ${q.prepReal})` : '';
+            document.getElementById('ecn-prep-fb').innerHTML =
+              `<div class="ex-feedback-wrong" style="font-size:13px">❌ La préposition est <strong>${q.prepText}</strong>${mergedNote}.</div>`;
+          }
+          setTimeout(() => ecnShowStep2(card, q, true), 900);
+        });
+      });
+    }
+
+    function ecnShowStep2(card, q, step1Correct) {
+      document.getElementById('ecn-step2').classList.remove('ex-hidden');
+      document.getElementById('ecn-step2').querySelectorAll('.ea-choice-btn[data-nature]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.getElementById('ecn-step2').querySelectorAll('.ea-choice-btn[data-nature]').forEach(b => b.disabled = true);
+          const isRight = btn.dataset.nature === q.nature;
+          if (isRight && step1Correct) ecnState.score++;
+
+          const noyauWord = q.gnWords[q.noyauIdx];
+          const expWords  = q.expansionIdx.map(i => q.gnWords[i]).join(' ');
+          const animHtml  = q.nature === 'complement-nom'
+            ? ecnAnimCdn(noyauWord, expWords, q.prepText)
+            : ecnAnimEpithete(noyauWord, expWords);
+
+          if (isRight) {
+            btn.classList.add('is-correct');
+            document.getElementById('ecn-step2-fb').innerHTML =
+              `<div class="ex-feedback-correct">✓ ${ECN_POSITIFS[Math.floor(Math.random()*ECN_POSITIFS.length)]}<br><small>📌 ${q.feedbackFinal}</small>${animHtml}</div>`;
+          } else {
+            btn.classList.add('is-wrong');
+            document.getElementById('ecn-step2').querySelector(`.ea-choice-btn[data-nature="${q.nature}"]`).classList.add('is-correct');
+            document.getElementById('ecn-step2-fb').innerHTML =
+              `<div class="ex-feedback-wrong">❌ C'est un ${q.nature === 'complement-nom' ? 'complément du nom' : 'adjectif épithète'}.<br><small>📌 ${q.feedbackFinal}</small>${animHtml}</div>`;
+          }
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+      });
+    }
+
+    function ecnAnimEpithete(noyau, expansion) {
+      return `
+        <div class="ea-anim-magnet" style="margin-top:10px">
+          <span class="ea-anim-box">${noyau}</span>
+          <span style="font-size:18px">🧲</span>
+          <span class="ea-anim-box">${expansion}</span>
+        </div>
+        <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:4px">L'adjectif épithète s'aimante directement au nom.</div>`;
+    }
+
+    function ecnAnimCdn(noyau, expansion, prep) {
+      return `
+        <div class="ea-anim-bridge" style="margin-top:10px">
+          <span class="ea-anim-box">${noyau}</span>
+          <span class="ea-anim-arrow">→</span>
+          <span class="ea-anim-box-verb">${prep || 'prép.'}</span>
+          <span class="ea-anim-arrow">→</span>
+          <span class="ea-anim-box">${expansion}</span>
+        </div>
+        <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:4px">La préposition fait le pont entre le nom et son complément.</div>`;
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       NIVEAU 3 — Transforme ! (saisie libre, validation souple)
+       ════════════════════════════════════════════════════════════════════════ */
+    function ecnRenderLvl3(card) {
+      const { questions, idx, total } = ecnState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      const isToCdn     = q.direction === 'epithete-to-cdn';
+      const badgeCls    = isToCdn ? 'ecn-dir-to-cdn' : 'ecn-dir-to-epi';
+      const badgeLabel  = isToCdn ? 'Épithète → Complément du nom' : 'Complément du nom → Épithète';
+      const originalHl  = q.original.replace(q.highlight,
+        `<span class="ecn-hl-expansion">${q.highlight}</span>`);
+
+      card.innerHTML = `
+        <span class="ea-direction-badge ${badgeCls}">${badgeLabel}</span>
+        <p class="ex-question-label">Transforme ce groupe nominal en changeant le type d'expansion :</p>
+        <div class="ecn-original-display">« ${originalHl} »</div>
+        <p class="ecn-prompt">Complète : <em>${q.prompt.replace('___', '<span class="ecn-blank">___</span>')}</em></p>
+        <div class="ex-input-row">
+          <input type="text" id="ecn-input" class="ex-text-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Tape l'expansion…">
+          <button class="ex-validate-btn" id="ecn-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="ecn-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Suivant →' : 'Voir les résultats →'}</button>`;
+
+      const input = document.getElementById('ecn-input');
+      const vbtn  = document.getElementById('ecn-val-btn');
+      setTimeout(() => input.focus(), 50);
+
+      const doValidate = () => {
+        if (input.disabled || !input.value.trim()) return;
+        input.disabled = true;
+        vbtn.disabled  = true;
+
+        const userNorm = ecnNorm(input.value);
+        const ok = q.acceptedAnswers.some(a => ecnNorm(a) === userNorm) ||
+                   ecnFlexibleLvl3(userNorm, q);
+
+        if (ok) {
+          ecnState.score++;
+          input.classList.add('is-correct');
+          document.getElementById('ecn-fb').innerHTML =
+            `<div class="ex-feedback-correct">✓ ${ECN_POSITIFS[Math.floor(Math.random()*ECN_POSITIFS.length)]}<br><small>Exemple : <em>${q.example}</em></small></div>`;
+        } else {
+          input.classList.add('is-wrong');
+          document.getElementById('ecn-fb').innerHTML =
+            `<div class="ex-feedback-wrong">❌ ${q.feedback}<br><small>Exemple : <em>${q.example}</em></small></div>`;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      };
+
+      vbtn.addEventListener('click', doValidate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        ecnState.idx++;
+        if (ecnState.idx >= ecnState.questions.length) ecnShowLevelResults();
+        else ecnRenderLvl3(document.getElementById('ex-card'));
+      });
+    }
+
+    function ecnFlexibleLvl3(userNorm, q) {
+      const PREP_STARTERS = ["de ", "d'", "en ", "sans ", "avec ", "pour ", "a ", "plein", "rempli", "couvert", "parseme", "empreint", "debordant", "tout en", "crible"];
+      if (q.direction === 'epithete-to-cdn') {
+        return PREP_STARTERS.some(p => userNorm.startsWith(p));
+      } else {
+        /* cdn-to-epithete : doit être un adjectif (pas de starter prépositionnel, au moins 3 caractères) */
+        return !PREP_STARTERS.some(p => userNorm.startsWith(p)) && userNorm.replace(/\s/g, '').length >= 3;
+      }
+    }
+
+    /* ── Résultats d'un niveau ───────────────────────────────────────────── */
+    function ecnShowLevelResults() {
+      const { level, score: lvScore, total } = ecnState;
+      const pct    = lvScore / total;
+      const passed = pct >= ECN_SEUIL;
+      const pctPct = Math.round(pct * 100);
+
+      if (passed) {
+        const validated = ecnGetValidated();
+        if (!validated.includes(level - 1)) { validated.push(level - 1); ecnSetValidated(validated); }
+      }
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref     = sessionData.backLink?.href  || 'français-grammaire.html';
+      const backLabel    = `← Retour à la ${sessionData.backLink?.label || 'Grammaire'}`;
+      const isLast       = level >= 3;
+      const stars        = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 75 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const lvLabels     = ['', 'Niveau 1', 'Niveau 2', 'Niveau 3'];
+      const lvNextLabels = ['', 'Niveau 2 — Épithète ou complément du nom ?', 'Niveau 3 — Transforme !', ''];
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises la distinction entre adjectif épithète et complément du nom !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="ecn-restart-btn">Recommencer</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} ${lvLabels[level]} validé ! 🏆 Le ${lvLabels[level + 1]} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="ecn-next-btn">${lvNextLabels[level]} →</button>
+          <button class="ex-btn-secondary" id="ecn-retry-btn">Recommencer ce niveau</button>
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * ECN_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour passer. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="ecn-retry-btn">Recommencer ce niveau</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('ecn-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        ecnStartLevel(ecnState.level);
+      });
+      document.getElementById('ecn-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        ecnStartLevel(ecnState.level + 1);
+      });
+      document.getElementById('ecn-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        ecnInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: currentType,
+        level:        'Niveau ' + level,
+        score:        lvScore, total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : psc-niveaux
+       Distinguer pronom personnel sujet / pronom personnel complément
+       3 niveaux déverrouillables (localStorage)
+       ══════════════════════════════════════════════════════════════════════ */
+
+    const PSC_SEUIL    = 0.75;
+    const PSC_POSITIFS = ["Très bien !", "Parfait !", "Excellent !", "C'est juste !", "Bravo !"];
+    let pscState = null;
+
+    function pscSlugKey(suffix) {
+      const s = new URLSearchParams(window.location.search).get('slug') || 'psc';
+      return s + '_' + suffix;
+    }
+    function pscGetValidated() {
+      try { return JSON.parse(localStorage.getItem(pscSlugKey('validated')) || '[]'); } catch { return []; }
+    }
+    function pscSetValidated(arr) {
+      localStorage.setItem(pscSlugKey('validated'), JSON.stringify(arr));
+    }
+    function pscShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+    function pscNorm(str) {
+      return str.trim().toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/[.,;!?»«']/g, '').replace(/\s+/g, ' ').trim();
+    }
+    function pscPos() { return PSC_POSITIFS[Math.floor(Math.random() * PSC_POSITIFS.length)]; }
+
+    /* ── Init ───────────────────────────────────────────────────────────── */
+    function pscInitSession() {
+      pscState = null;
+      score = 0; currentIndex = 0;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      pscRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Sélection de niveau ─────────────────────────────────────────────── */
+    function pscRenderLevelSelect(card) {
+      const validated = pscGetValidated();
+      const lvDefs = [
+        { lv: 1, icon: '⭐',     label: 'Niveau 1 — Qui fait l\'action ?',
+          desc: 'Clique sur le pronom personnel sujet dans la phrase' },
+        { lv: 2, icon: '⭐⭐',   label: 'Niveau 2 — Sujet ou complément ?',
+          desc: 'Identifie la fonction du pronom mis en évidence' },
+        { lv: 3, icon: '⭐⭐⭐', label: 'Niveau 3 — Remplace par un pronom',
+          desc: 'Réécris la phrase en remplaçant un groupe par le bon pronom' }
+      ];
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="ea-rule-chip">📌 Pronom sujet → répond à <em>Qui est-ce qui + verbe ?</em> · Pronom complément → répond à <em>qui ? quoi ? à qui ?</em></div>
+        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
+          ${lvDefs.map((d, i) => {
+            const unlocked = i === 0 || validated.includes(i - 1);
+            const done     = validated.includes(i);
+            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const dis      = !unlocked ? ' disabled' : '';
+            const desc     = !unlocked ? 'Valide le niveau précédent pour débloquer'
+                           : done ? d.desc + ' · Validé !' : d.desc;
+            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${dis}>
+              <span class="ex-type-icon">${icon}</span>
+              <div><span class="ex-type-name">${d.label}</span><span class="ex-type-desc">${desc}</span></div>
+            </button>`;
+          }).join('')}
+        </div>`;
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => pscStartLevel(parseInt(btn.dataset.level)))
+      );
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function pscStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      if (lv === 1) {
+        const qs = pscShuffle([...sessionData.lvl1Bank]);
+        pscState = { level: 1, questions: qs, idx: 0, score: 0, total: qs.length };
+        document.getElementById('q-total').textContent = qs.length;
+        pscRenderLvl1(document.getElementById('ex-card'));
+
+      } else if (lv === 2) {
+        const qs = pscShuffle([...sessionData.lvl2Bank]);
+        pscState = { level: 2, questions: qs, idx: 0, score: 0, total: qs.length };
+        document.getElementById('q-total').textContent = qs.length;
+        pscRenderLvl2(document.getElementById('ex-card'));
+
+      } else {
+        const allQ  = sessionData.lvl3Bank;
+        const lsKey = pscSlugKey('lvl3used');
+        let used = [];
+        try { used = JSON.parse(localStorage.getItem(lsKey) || '[]'); } catch {}
+        if (used.length >= allQ.length) { used = []; localStorage.removeItem(lsKey); }
+        const avail  = allQ.filter((_, i) => !used.includes(i));
+        const picked = pscShuffle(avail).slice(0, Math.min(6, avail.length));
+        localStorage.setItem(lsKey, JSON.stringify([...used, ...picked.map(q => allQ.indexOf(q))]));
+        pscState = { level: 3, questions: picked, idx: 0, score: 0, total: picked.length };
+        document.getElementById('q-total').textContent = picked.length;
+        pscRenderLvl3(document.getElementById('ex-card'));
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════
+       NIVEAU 1 — Clique sur le pronom sujet
+       ════════════════════════════════════════════════════════════════════ */
+    function pscRenderLvl1(card) {
+      const { questions, idx, total } = pscState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      card.innerHTML = `
+        <p class="ex-question-label">Clique sur le <strong>pronom personnel sujet</strong> dans cette phrase</p>
+        <p style="text-align:center;font-size:12px;color:var(--muted);margin:-10px 0 18px;font-style:italic">💡 Test : <em>Qui est-ce qui + verbe ?</em></p>
+        <div class="ex-sentence-words" id="psc-words">
+          ${q.words.map((w, i) => `<button class="ex-word-btn" data-idx="${i}">${w}</button>`).join('')}
+        </div>
+        <div class="ex-feedback-area" id="psc-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'}</button>`;
+
+      let answered = false;
+
+      card.querySelectorAll('.ex-word-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (answered) return;
+          const i  = parseInt(btn.dataset.idx);
+          const wt = q.wordTypes[i];
+
+          if (wt === 'subject') {
+            answered = true;
+            card.querySelectorAll('.ex-word-btn').forEach(b => b.disabled = true);
+            btn.classList.add('is-correct');
+            pscState.score++;
+            document.getElementById('psc-fb').innerHTML =
+              `<div class="ex-feedback-correct">${pscPos()} ${q.feedbackCorrect}<div class="ex-note">${q.note}</div></div>`;
+            document.getElementById('next-btn').classList.remove('ex-hidden');
+
+          } else if (wt === 'complement') {
+            btn.classList.add('is-wrong');
+            document.getElementById('psc-fb').innerHTML =
+              `<div class="ex-feedback-wrong">❌ ${q.feedbackComplement || '« ' + q.words[i] + ' » est un pronom complément, pas le sujet.'}<br><small>📌 Test : <em>${q.testQ}</em> → <strong>${q.testA}</strong></small></div>`;
+            setTimeout(() => { btn.classList.remove('is-wrong'); document.getElementById('psc-fb').innerHTML = ''; }, 2800);
+
+          } else {
+            btn.classList.add('is-wrong');
+            setTimeout(() => btn.classList.remove('is-wrong'), 500);
+            document.getElementById('psc-fb').innerHTML =
+              `<div class="ex-feedback-wrong" style="font-size:13px;padding:8px 14px">« ${q.words[i]} » n'est pas un pronom personnel. Cherche le mot qui répond à : <em>${q.testQ}</em></div>`;
+            setTimeout(() => document.getElementById('psc-fb').innerHTML = '', 2000);
+          }
+        });
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        pscState.idx++;
+        if (pscState.idx >= pscState.questions.length) pscShowLevelResults();
+        else pscRenderLvl1(document.getElementById('ex-card'));
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════
+       NIVEAU 2 — Sujet ou complément ? (2 étapes : fonction → animation)
+       ════════════════════════════════════════════════════════════════════ */
+    function pscRenderLvl2(card) {
+      const { questions, idx, total } = pscState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      const wordsHtml = q.words.map((w, i) =>
+        i === q.highlightIdx ? `<span class="psc-pronoun-hl">${w}</span>` : w
+      ).join(' ');
+
+      card.innerHTML = `
+        <p class="ex-question-label">Quelle est la fonction du pronom en bleu ?</p>
+        <div class="psc-sentence-display">${wordsHtml}</div>
+        <p style="font-size:13px;color:var(--text);margin:-8px 0 18px;text-align:center;line-height:1.8">
+          Ce pronom <strong>fait-il l'action</strong> → réponse à <em>Qui est-ce qui ${q.verb} ?</em><br>
+          ou bien <strong>complète-t-il le verbe</strong> → réponse à <em>qui ? quoi ? à qui ?</em>
+        </p>
+        <div class="psc-fn-row" id="psc-fn-btns">
+          <button class="psc-fn-btn" data-fn="subject">Pronom<br><strong>sujet</strong></button>
+          <button class="psc-fn-btn" data-fn="complement">Pronom<br><strong>complément</strong></button>
+        </div>
+        <div class="ex-feedback-area" id="psc-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'}</button>`;
+
+      let answered = false;
+
+      card.querySelectorAll('.psc-fn-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (answered) return;
+          answered = true;
+          card.querySelectorAll('.psc-fn-btn').forEach(b => b.disabled = true);
+          const chosen  = btn.dataset.fn;
+          const correct = chosen === q.fn;
+
+          if (correct) { btn.classList.add('is-correct'); pscState.score++; }
+          else {
+            btn.classList.add('is-wrong');
+            card.querySelectorAll('.psc-fn-btn').forEach(b => { if (b.dataset.fn === q.fn) b.classList.add('is-correct'); });
+          }
+
+          const pronoun   = q.words[q.highlightIdx];
+          const arrowHtml = q.fn === 'subject'
+            ? `<div class="psc-arrow-diagram">
+                <span class="psc-arrow-box psc-arrow-subject-box psc-arrow-hl-box">${pronoun}</span>
+                <span class="psc-arrow-line">→</span>
+                <span class="psc-arrow-box psc-arrow-verb-box">${q.verb}</span>
+                <span style="font-size:11px;color:var(--muted);width:100%;text-align:center;margin-top:4px">Le sujet <em>commande</em> le verbe</span>
+              </div>`
+            : `<div class="psc-arrow-diagram">
+                <span class="psc-arrow-box psc-arrow-verb-box">${q.verb}</span>
+                <span class="psc-arrow-line">→</span>
+                <span class="psc-arrow-box psc-arrow-compl-box psc-arrow-hl-box">${pronoun}</span>
+                <span style="font-size:11px;color:var(--muted);width:100%;text-align:center;margin-top:4px">Le verbe <em>appelle</em> le complément</span>
+              </div>`;
+
+          const fbClass = correct ? 'ex-feedback-correct' : 'ex-feedback-wrong';
+          const icon    = correct ? `✓ ${pscPos()}` : '❌';
+          document.getElementById('psc-fb').innerHTML =
+            `<div class="${fbClass}">${icon} ${q.feedback}${arrowHtml}</div>`;
+
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        pscState.idx++;
+        if (pscState.idx >= pscState.questions.length) pscShowLevelResults();
+        else pscRenderLvl2(document.getElementById('ex-card'));
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════
+       NIVEAU 3 — Remplace par un pronom (saisie libre)
+       ════════════════════════════════════════════════════════════════════ */
+    function pscRenderLvl3(card) {
+      const { questions, idx, total } = pscState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      const fnBadge = q.fn === 'subject'
+        ? `<span style="background:rgba(16,43,106,0.09);color:var(--blue);border:1px solid rgba(16,43,106,0.20);border-radius:100px;padding:2px 10px;font-size:11px;font-weight:700;letter-spacing:0.05em">SUJET</span>`
+        : `<span style="background:rgba(22,163,74,0.09);color:#15803d;border:1px solid rgba(22,163,74,0.25);border-radius:100px;padding:2px 10px;font-size:11px;font-weight:700;letter-spacing:0.05em">COMPLÉMENT</span>`;
+
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <p class="ex-question-label" style="margin:0">${q.instruction}</p>
+          ${fnBadge}
+        </div>
+        <div class="psc-sentence-display" style="font-size:19px">${q.displayHtml}</div>
+        <p style="font-size:13px;color:var(--muted);margin:-8px 0 18px;text-align:center">Remplace <strong>« ${q.group} »</strong> par le bon pronom et réécris la phrase entière.</p>
+        <div class="ex-input-row">
+          <input type="text" id="psc-input" class="ex-text-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                 placeholder="Réécris la phrase…">
+          <button class="ex-validate-btn" id="psc-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="psc-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'}</button>`;
+
+      const input  = document.getElementById('psc-input');
+      const valBtn = document.getElementById('psc-val-btn');
+
+      input.focus();
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') valBtn.click(); });
+
+      valBtn.addEventListener('click', () => {
+        const raw = input.value.trim();
+        if (!raw) return;
+        valBtn.disabled = true;
+        input.disabled  = true;
+
+        const norm    = pscNorm(raw);
+        const correct = q.answers.some(a => pscNorm(a) === norm);
+
+        if (correct) {
+          input.classList.add('is-correct');
+          pscState.score++;
+          document.getElementById('psc-fb').innerHTML =
+            `<div class="ex-feedback-correct">✓ ${pscPos()} La phrase est correcte !
+              <div class="ex-note">📌 Le pronom <strong>${q.targetPronoun}</strong> (${q.fn === 'subject' ? 'sujet' : 'complément'}) remplace « ${q.group} » et se place ${q.fn === 'subject' ? 'avant le verbe à la place du sujet' : 'avant le verbe « ' + q.verb + ' »'}.</div>
+            </div>`;
+        } else {
+          input.classList.add('is-wrong');
+          const hasPronoun = norm.includes(pscNorm(q.targetPronoun));
+          const errMsg     = !hasPronoun ? q.feedbackWrongPronoun : q.feedbackBadPosition;
+          document.getElementById('psc-fb').innerHTML =
+            `<div class="ex-feedback-wrong">❌ ${errMsg}<br><small>Réponse correcte : <strong>${q.solution}</strong></small></div>`;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        pscState.idx++;
+        if (pscState.idx >= pscState.questions.length) pscShowLevelResults();
+        else pscRenderLvl3(document.getElementById('ex-card'));
+      });
+    }
+
+    /* ── Résultats d'un niveau ───────────────────────────────────────────── */
+    function pscShowLevelResults() {
+      const { level, score: lvScore, total } = pscState;
+      const pct    = lvScore / total;
+      const passed = pct >= PSC_SEUIL;
+      const pctPct = Math.round(pct * 100);
+
+      if (passed) {
+        const validated = pscGetValidated();
+        if (!validated.includes(level - 1)) { validated.push(level - 1); pscSetValidated(validated); }
+      }
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-grammaire.html';
+      const backLabel = `← Retour à la ${sessionData.backLink?.label || 'Grammaire'}`;
+      const isLast    = level >= 3;
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 75 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const lvNextLabels = ['', 'Niveau 2 — Sujet ou complément ?', 'Niveau 3 — Remplace par un pronom !', ''];
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises la distinction entre pronom personnel sujet et pronom personnel complément !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="psc-restart-btn">Recommencer</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="psc-next-btn">${lvNextLabels[level]} →</button>
+          <button class="ex-btn-secondary" id="psc-retry-btn">Recommencer ce niveau</button>
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * PSC_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour passer. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="psc-retry-btn">Recommencer ce niveau</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('psc-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        pscStartLevel(pscState.level);
+      });
+      document.getElementById('psc-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        pscStartLevel(pscState.level + 1);
+      });
+      document.getElementById('psc-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        pscInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: currentType,
+        level:        'Niveau ' + level,
+        score:        lvScore, total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       TYPE : det-demo-niveaux — Déterminant démonstratif (ce/cet/cette/ces)
+       Niveau 1 : cliquer sur le déterminant démonstratif dans une phrase
+       Niveau 2 : 2 étapes — observer le nom, puis choisir ce/cet/cette/ces
+       Niveau 3 : homophones ce / se — compléter 20 phrases à trous
+       Seuil 80 % — localStorage — déverrouillage progressif
+       ══════════════════════════════════════════════════════════════════════════ */
+
+    const DDN_SEUIL    = 0.8;
+    const DDN_POSITIFS = ['Bravo !', 'Excellent !', 'Parfait !', 'Très bien !', 'Super !'];
+
+    let ddnState = null;
+
+    function ddnSlugKey(suffix) {
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'det-demo';
+      return slug + '_' + suffix;
+    }
+    function ddnGetValidated() {
+      try { return JSON.parse(localStorage.getItem(ddnSlugKey('niveaux_valides')) || '[]'); }
+      catch { return []; }
+    }
+    function ddnSetValidated(arr) {
+      localStorage.setItem(ddnSlugKey('niveaux_valides'), JSON.stringify(arr));
+    }
+    function ddnShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+    function ddnPos() { return DDN_POSITIFS[Math.floor(Math.random() * DDN_POSITIFS.length)]; }
+
+    /* ── Init ───────────────────────────────────────────────────────────────── */
+    function ddnInitSession() {
+      ddnState = null;
+      score = 0; currentIndex = 0;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      ddnRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Sélecteur de niveau ────────────────────────────────────────────────── */
+    function ddnRenderLevelSelect(card) {
+      const validated = ddnGetValidated();
+      const lvDefs = [
+        { lv: 1, icon: '⭐',     label: 'Niveau 1 — Repère le déterminant démonstratif',
+          desc: 'Clique sur le déterminant démonstratif dans la phrase (ce, cet, cette, ces)' },
+        { lv: 2, icon: '⭐⭐',   label: 'Niveau 2 — Choisis le bon démonstratif',
+          desc: 'Observe le nom, analyse son genre et son nombre, puis choisis ce / cet / cette / ces' },
+        { lv: 3, icon: '⭐⭐⭐', label: 'Niveau 3 — ce ou se ?',
+          desc: 'Complète 20 phrases avec ce (déterminant devant un nom) ou se (pronom réfléchi devant un verbe)' }
+      ];
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="ea-rule-chip">📌 <em>ce / cet / cette / ces</em> se place <strong>devant un nom</strong> pour désigner quelque chose de précis.</div>
+        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
+          ${lvDefs.map((d, i) => {
+            const unlocked = i === 0 || validated.includes(i - 1);
+            const done     = validated.includes(i);
+            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const dis      = !unlocked ? ' disabled' : '';
+            const desc     = !unlocked ? 'Valide le niveau précédent pour débloquer'
+                           : done ? d.desc + ' · Validé !' : d.desc;
+            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${dis}>
+              <span class="ex-type-icon">${icon}</span>
+              <div><span class="ex-type-name">${d.label}</span><span class="ex-type-desc">${desc}</span></div>
+            </button>`;
+          }).join('')}
+        </div>`;
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => ddnStartLevel(parseInt(btn.dataset.level)))
+      );
+    }
+
+    /* ── Démarrer un niveau ─────────────────────────────────────────────────── */
+    function ddnStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      if (lv === 1) {
+        const qs = [...sessionData.lvl1Bank];
+        ddnState = { level: 1, questions: qs, idx: 0, score: 0, total: qs.length };
+        document.getElementById('q-total').textContent = qs.length;
+        ddnRenderLvl1(document.getElementById('ex-card'));
+
+      } else if (lv === 2) {
+        const qs = ddnShuffle([...sessionData.lvl2Bank]);
+        ddnState = { level: 2, questions: qs, idx: 0, score: 0, total: qs.length };
+        document.getElementById('q-total').textContent = qs.length;
+        ddnRenderLvl2(document.getElementById('ex-card'));
+
+      } else {
+        const qs = ddnShuffle([...sessionData.lvl3Bank]);
+        ddnState = { level: 3, questions: qs, idx: 0, score: 0, total: qs.length };
+        document.getElementById('q-total').textContent = qs.length;
+        ddnRenderLvl3(document.getElementById('ex-card'));
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       NIVEAU 1 — Cliquer sur le déterminant démonstratif
+       ══════════════════════════════════════════════════════════════════════════ */
+    function ddnRenderLvl1(card) {
+      const { questions, idx, total } = ddnState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      card.innerHTML = `
+        <p class="ex-question-label">Clique sur le <strong>déterminant démonstratif</strong> dans cette phrase</p>
+        <p style="text-align:center;font-size:12px;color:var(--muted);margin:-10px 0 18px;font-style:italic">
+          💡 Il se place <strong>devant un nom</strong> et sert à montrer, à désigner · formes : <em>ce, cet, cette, ces</em>
+        </p>
+        <div class="ex-sentence-words" id="ddn-words"></div>
+        <div class="ex-feedback-area" id="ddn-fb" style="margin-top:12px"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">
+          ${idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'}
+        </button>`;
+
+      const container = document.getElementById('ddn-words');
+      let answered = false;
+
+      q.sentence.split(/\s+/).forEach(token => {
+        if (!token) return;
+        const clean  = token.replace(/[.,!?;:«»"""]/g, '').replace(/[''`]/g, "'");
+        const isPunct = /^[.,!?;:]+$/.test(token);
+
+        if (isPunct) {
+          const span = document.createElement('span');
+          span.textContent = ' ' + token;
+          span.style.cssText = 'font-size:18px;font-weight:600;color:var(--muted)';
+          container.appendChild(span);
+          return;
+        }
+
+        const btn = document.createElement('button');
+        btn.className     = 'ex-word-btn';
+        btn.textContent   = token;
+        btn.dataset.clean = clean;
+
+        btn.addEventListener('click', () => {
+          if (answered) return;
+          answered = true;
+          container.querySelectorAll('.ex-word-btn').forEach(b => b.disabled = true);
+          const isCorrect = q.targets.includes(clean);
+
+          if (isCorrect) {
+            btn.classList.add('is-correct');
+            ddnState.score++;
+            document.getElementById('ddn-fb').innerHTML =
+              `<div class="ex-feedback-correct">✓ ${ddnPos()} ${q.feedbackOk}</div>`;
+          } else {
+            btn.classList.add('is-wrong');
+            container.querySelectorAll('.ex-word-btn').forEach(b => {
+              if (q.targets.includes(b.dataset.clean)) b.classList.add('is-correct');
+            });
+            document.getElementById('ddn-fb').innerHTML =
+              `<div class="ex-feedback-wrong">❌ ${q.feedbackErr}</div>`;
+          }
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+        container.appendChild(btn);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        ddnState.idx++;
+        if (ddnState.idx >= ddnState.questions.length) ddnShowLevelResults();
+        else ddnRenderLvl1(document.getElementById('ex-card'));
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       NIVEAU 2 — 2 étapes : observer le nom → choisir le déterminant
+       ══════════════════════════════════════════════════════════════════════════ */
+    function ddnRenderLvl2(card) {
+      const { questions, idx, total } = ddnState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      const phraseHtml = q.phrase.replace('___',
+        '<span style="color:var(--muted);font-style:italic;font-weight:700">___</span>');
+
+      card.innerHTML = `
+        <p class="ex-question-label">Quel déterminant démonstratif emploie-t-on devant <strong><em>${q.noun}</em></strong> ?</p>
+        <div class="ex-sentence-display" style="font-size:18px">${phraseHtml}</div>
+
+        <div id="ddn-step1">
+          <p style="font-size:13px;font-weight:700;color:var(--blue);margin:0 0 12px">
+            Étape 1 — Observe le nom <em>${q.noun}</em> :
+          </p>
+
+          <div style="margin-bottom:10px">
+            <p style="font-size:12px;color:var(--muted);margin:0 0 6px;font-style:italic">Il est…</p>
+            <div style="display:flex;gap:8px">
+              <button class="ex-group-btn ddn-obs-btn" data-grp="genre" data-val="masculin" style="flex:1">masculin</button>
+              <button class="ex-group-btn ddn-obs-btn" data-grp="genre" data-val="féminin"  style="flex:1">féminin</button>
+            </div>
+          </div>
+
+          <div style="margin-bottom:10px">
+            <p style="font-size:12px;color:var(--muted);margin:0 0 6px;font-style:italic">singulier ou pluriel ?</p>
+            <div style="display:flex;gap:8px">
+              <button class="ex-group-btn ddn-obs-btn" data-grp="nombre" data-val="singulier" style="flex:1">singulier</button>
+              <button class="ex-group-btn ddn-obs-btn" data-grp="nombre" data-val="pluriel"   style="flex:1">pluriel</button>
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px" id="ddn-initiale-section">
+            <p style="font-size:12px;color:var(--muted);margin:0 0 6px;font-style:italic">Il commence par…</p>
+            <div style="display:flex;gap:8px">
+              <button class="ex-group-btn ddn-obs-btn" data-grp="initiale" data-val="consonne" style="flex:1">une consonne</button>
+              <button class="ex-group-btn ddn-obs-btn" data-grp="initiale" data-val="voyelle"  style="flex:1">une voyelle</button>
+              <button class="ex-group-btn ddn-obs-btn" data-grp="initiale" data-val="h muet"   style="flex:1">un h muet</button>
+            </div>
+          </div>
+
+          <div class="ex-feedback-area" id="ddn-fb1"></div>
+          <button class="ex-next-btn ex-hidden" id="ddn-val-step1" style="margin-top:12px">
+            Valider mes observations →
+          </button>
+        </div>
+
+        <div id="ddn-step2" class="ex-hidden">
+          <div class="ex-step2-divider"></div>
+          <p class="ex-question-label">Étape 2 — Quel déterminant démonstratif employer ?</p>
+          <div class="ex-choices-grid" id="ddn-choices"></div>
+          <div class="ex-feedback-area" id="ddn-fb2"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">
+          ${idx + 1 < total ? 'Item suivant →' : 'Voir les résultats →'}
+        </button>`;
+
+      const obs = {};
+
+      function updateInitialeVisibility() {
+        const sec = document.getElementById('ddn-initiale-section');
+        if (!sec) return;
+        const isPluriel = obs.nombre === 'pluriel';
+        sec.style.opacity = isPluriel ? '0.35' : '1';
+        sec.querySelectorAll('.ddn-obs-btn').forEach(b => {
+          b.disabled = isPluriel;
+          if (isPluriel) b.classList.remove('is-selected');
+        });
+        if (isPluriel) delete obs.initiale;
+      }
+
+      function checkObsReady() {
+        const needsInitiale = obs.nombre !== 'pluriel';
+        const ready = obs.genre && obs.nombre && (!needsInitiale || obs.initiale);
+        document.getElementById('ddn-val-step1')?.classList.toggle('ex-hidden', !ready);
+      }
+
+      card.querySelectorAll('.ddn-obs-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const grp = btn.dataset.grp;
+          const val = btn.dataset.val;
+          obs[grp] = val;
+          card.querySelectorAll(`.ddn-obs-btn[data-grp="${grp}"]`).forEach(b =>
+            b.classList.toggle('is-selected', b === btn)
+          );
+          updateInitialeVisibility();
+          checkObsReady();
+        });
+      });
+
+      document.getElementById('ddn-val-step1').addEventListener('click', () => {
+        card.querySelectorAll('.ddn-obs-btn').forEach(b => b.disabled = true);
+        document.getElementById('ddn-val-step1').disabled = true;
+
+        let allOk = true;
+        ['genre', 'nombre'].forEach(grp => {
+          const sel = card.querySelector(`.ddn-obs-btn[data-grp="${grp}"].is-selected`);
+          if (!sel) return;
+          if (sel.dataset.val === q[grp]) {
+            sel.classList.add('is-correct');
+          } else {
+            sel.classList.add('is-wrong'); allOk = false;
+            card.querySelector(`.ddn-obs-btn[data-grp="${grp}"][data-val="${q[grp]}"]`)
+              ?.classList.add('is-correct');
+          }
+        });
+        if (q.nombre !== 'pluriel') {
+          const selInit = card.querySelector('.ddn-obs-btn[data-grp="initiale"].is-selected');
+          if (selInit) {
+            if (selInit.dataset.val === q.initiale) {
+              selInit.classList.add('is-correct');
+            } else {
+              selInit.classList.add('is-wrong'); allOk = false;
+              card.querySelector(`.ddn-obs-btn[data-grp="initiale"][data-val="${q.initiale}"]`)
+                ?.classList.add('is-correct');
+            }
+          }
+        }
+
+        const initLabel = q.nombre === 'pluriel' ? ''
+          : q.initiale === 'voyelle' ? ', commence par une voyelle'
+          : q.initiale === 'h muet'  ? ', commence par un h muet'
+          : ', commence par une consonne';
+
+        const fb1Html = allOk
+          ? `<div class="ex-feedback-correct" style="font-size:13px;padding:10px 14px">
+              ✓ Bien observé ! <em>${q.noun}</em> est <strong>${q.genre} ${q.nombre}</strong>${initLabel}.
+             </div>`
+          : `<div class="ex-feedback-wrong" style="font-size:13px;padding:10px 14px">
+              Attention : <em>${q.noun}</em> est <strong>${q.genre} ${q.nombre}</strong>${initLabel}. Les bonnes réponses sont en vert.
+             </div>`;
+        document.getElementById('ddn-fb1').innerHTML = fb1Html;
+
+        setTimeout(() => {
+          const step2 = document.getElementById('ddn-step2');
+          step2.classList.remove('ex-hidden');
+          step2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+          const choices = ['ce', 'cet', 'cette', 'ces'];
+          const grid    = document.getElementById('ddn-choices');
+          choices.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className   = 'ex-choice';
+            btn.textContent = c;
+            btn.addEventListener('click', () => {
+              grid.querySelectorAll('.ex-choice').forEach(b => b.disabled = true);
+              const isRight = c === q.answer;
+              grid.querySelectorAll('.ex-choice').forEach(b => {
+                if (b.textContent === q.answer) b.classList.add('is-correct');
+              });
+              if (!isRight) btn.classList.add('is-wrong');
+              if (isRight) ddnState.score++;
+
+              let fb2Html = isRight
+                ? `<div class="ex-feedback-correct">✓ ${ddnPos()} ${q.explication}</div>`
+                : `<div class="ex-feedback-wrong">❌ On dit : <strong>${q.answer} ${q.noun}</strong>.<br>${q.explication}</div>`;
+              if (q.noteSesCes) {
+                fb2Html += `<div class="ex-note">💡 À distinguer : <strong>ces</strong> (démonstratif) = on montre · <strong>ses</strong> (possessif) = ça appartient à quelqu'un.</div>`;
+              }
+              document.getElementById('ddn-fb2').innerHTML = fb2Html;
+              document.getElementById('next-btn').classList.remove('ex-hidden');
+            });
+            grid.appendChild(btn);
+          });
+        }, 600);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        ddnState.idx++;
+        if (ddnState.idx >= ddnState.questions.length) ddnShowLevelResults();
+        else ddnRenderLvl2(document.getElementById('ex-card'));
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       NIVEAU 3 — ce ou se ? (20 phrases à trous, score /20)
+       ══════════════════════════════════════════════════════════════════════════ */
+    function ddnRenderLvl3(card) {
+      const { questions, idx, total } = ddnState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      const displaySentence = q.sentence.replace('___',
+        '<span style="color:var(--muted);font-weight:700;font-style:italic">___</span>');
+
+      card.innerHTML = `
+        <p class="ex-question-label">Complète avec <strong>ce</strong> ou <strong>se</strong></p>
+        <div class="ex-note" style="margin-bottom:18px;font-size:13px">
+          📌 <strong>ce</strong> = déterminant démonstratif → placé <strong>devant un nom</strong> (<em>ce chien</em>)<br>
+          📌 <strong>se</strong> = pronom réfléchi → placé <strong>devant un verbe</strong>, remplaçable par <em>me</em> ou <em>te</em> (<em>il se lave → je me lave</em>)
+        </div>
+        <div class="ex-sentence-display" style="font-size:20px">${displaySentence}</div>
+        <div class="ex-input-row">
+          <input type="text" id="ddn-input" class="ex-text-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                 placeholder="ce ou se ?">
+          <button class="ex-validate-btn" id="ddn-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="ddn-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">
+          ${idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'}
+        </button>`;
+
+      const input  = document.getElementById('ddn-input');
+      const valBtn = document.getElementById('ddn-val-btn');
+
+      setTimeout(() => input.focus(), 50);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') valBtn.click(); });
+
+      valBtn.addEventListener('click', () => {
+        const raw = input.value.trim().toLowerCase();
+        if (!raw) return;
+        valBtn.disabled = true;
+        input.disabled  = true;
+
+        const isRight = raw === q.answer.toLowerCase();
+
+        if (isRight) {
+          input.classList.add('is-correct');
+          ddnState.score++;
+          document.getElementById('ddn-fb').innerHTML =
+            `<div class="ex-feedback-correct">✓ ${ddnPos()} ${q.explication}</div>`;
+        } else {
+          input.classList.add('is-wrong');
+          const wrongWord = raw;
+          const isWordAfterNoun = q.answer === 'ce';
+          document.getElementById('ddn-fb').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ On écrit <strong>${q.answer}</strong> ici.<br>
+              Test : y a-t-il un <strong>${isWordAfterNoun ? 'nom' : 'verbe'}</strong> juste après le blanc ?
+              → ${isWordAfterNoun
+                ? 'oui → <em>ce</em> est un déterminant démonstratif.'
+                : 'oui → <em>se</em> est un pronom réfléchi (remplaçable par <em>me</em> ou <em>te</em>).'}
+              <br><br>${q.explication}
+            </div>`;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        ddnState.idx++;
+        if (ddnState.idx >= ddnState.questions.length) ddnShowLevelResults();
+        else ddnRenderLvl3(document.getElementById('ex-card'));
+      });
+    }
+
+    /* ── Résultats de niveau (commun aux 3 niveaux) ─────────────────────────── */
+    function ddnShowLevelResults() {
+      const { level, score: lvScore, total } = ddnState;
+      const pct    = lvScore / total;
+      const passed = pct >= DDN_SEUIL;
+      const pctPct = Math.round(pct * 100);
+      const stars  = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+
+      if (passed) {
+        const validated = ddnGetValidated();
+        if (!validated.includes(level - 1)) { validated.push(level - 1); ddnSetValidated(validated); }
+      }
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-grammaire.html';
+      const backLabel = '← Retour à la ' + (sessionData.backLink?.label || 'Grammaire');
+      const isLast    = level >= 3;
+      const lvNextLabels = ['', 'Niveau 2 — Choisis le bon démonstratif →', 'Niveau 3 — ce ou se ? →', ''];
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Félicitations ! Tu maîtrises les déterminants démonstratifs et la distinction ce / se !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="ddn-restart-btn">Recommencer depuis le début</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="ddn-next-btn">${lvNextLabels[level]}</button>
+          <button class="ex-btn-secondary" id="ddn-retry-btn">Recommencer ce niveau</button>
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * DDN_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour passer au niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="ddn-retry-btn">Recommencer ce niveau</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('ddn-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        ddnStartLevel(ddnState.level);
+      });
+      document.getElementById('ddn-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        ddnStartLevel(ddnState.level + 1);
+      });
+      document.getElementById('ddn-restart-btn')?.addEventListener('click', () => {
+        ddnSetValidated([]);
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        ddnInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: currentType,
+        level:        'Niveau ' + level,
+        score:        lvScore, total,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
       });
     }

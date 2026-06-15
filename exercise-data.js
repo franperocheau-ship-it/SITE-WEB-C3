@@ -790,222 +790,233 @@ const EXERCISE_DATA = {
   },
 
   "conjuguer-imparfait": {
-    title: "Conjuguer des verbes à l'imparfait",
-    type: "text-input",
+    title: "Conjuguer à l'imparfait",
+    type: "imparfait-niveaux",
     levels: ["CM1", "CM2", "6e"],
-    questionsPerSession: 25,
-    sortByDifficulty: true,
+    questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
-    bank: [
-      /* ── ÊTRE (radical ét-) ── */
-      { subject: "j'",    infinitive: "être",    sentence: "J'________ fatigué après la course.",       answer: "étais",     difficulty: 2 },
-      { subject: "tu",    infinitive: "être",    sentence: "Tu ________ content de ton cadeau.",        answer: "étais",     difficulty: 2 },
-      { subject: "il",    infinitive: "être",    sentence: "Il ________ très courageux.",               answer: "était",     difficulty: 2 },
-      { subject: "nous",  infinitive: "être",    sentence: "Nous ________ en vacances.",                answer: "étions",    difficulty: 2 },
-      { subject: "vous",  infinitive: "être",    sentence: "Vous ________ très sages.",                 answer: "étiez",     difficulty: 2 },
-      { subject: "ils",   infinitive: "être",    sentence: "Ils ________ dans le jardin.",              answer: "étaient",   difficulty: 2 },
+    /* ── Niveau 1 : 4 textes d'identification ─────────────────────────────
+       pqp: true  = verbe à l'imparfait (cible)
+       pqp: false = distractor (présent ou passé composé)
+    ───────────────────────────────────────────────────────────────────── */
+    identTexts: [
+      /* Texte 1 — Quand j'étais petit */
+      {
+        tokens: [
+          { t: "Quand j'étais petit, je " },
+          { t: "jouais", v: true, pqp: true },
+          { t: " dans le jardin tous les après-midis. Ma grand-mère " },
+          { t: "aimait", v: true, pqp: true },
+          { t: " nous faire des gâteaux. Elle " },
+          { t: "a appris", v: true, pqp: false },
+          { t: " à cuisiner très jeune. Mon grand-père " },
+          { t: "lisait", v: true, pqp: true },
+          { t: " le journal chaque matin. Aujourd'hui ils " },
+          { t: "habitent", v: true, pqp: false },
+          { t: " loin de chez nous." }
+        ]
+      },
+      /* Texte 2 — La forêt enchantée */
+      {
+        tokens: [
+          { t: "Dans la forêt, les animaux " },
+          { t: "vivaient", v: true, pqp: true },
+          { t: " en paix. Un vieux hibou " },
+          { t: "gardait", v: true, pqp: true },
+          { t: " les secrets de la forêt. Chaque soir, les renards " },
+          { t: "dansaient", v: true, pqp: true },
+          { t: " sous les étoiles. Aujourd'hui cette forêt " },
+          { t: "appartient", v: true, pqp: false },
+          { t: " à un grand parc naturel. Les visiteurs " },
+          { t: "viennent", v: true, pqp: false },
+          { t: " la découvrir en été." }
+        ]
+      },
+      /* Texte 3 — L'école d'autrefois */
+      {
+        tokens: [
+          { t: "Autrefois, les enfants " },
+          { t: "portaient", v: true, pqp: true },
+          { t: " un tablier à l'école. La maîtresse " },
+          { t: "écrivait", v: true, pqp: true },
+          { t: " les leçons au tableau avec de la craie. Les élèves " },
+          { t: "copiaient", v: true, pqp: true },
+          { t: " tout dans leurs cahiers. Maintenant les enfants " },
+          { t: "utilisent", v: true, pqp: false },
+          { t: " des tablettes. Les écoles " },
+          { t: "ont beaucoup changé", v: true, pqp: false },
+          { t: " depuis cette époque." }
+        ]
+      },
+      /* Texte 4 — La tempête de neige */
+      {
+        tokens: [
+          { t: "Ce jour-là, il " },
+          { t: "neigeait", v: true, pqp: true },
+          { t: " fort dehors. Les enfants " },
+          { t: "regardaient", v: true, pqp: true },
+          { t: " la neige tomber par la fenêtre. Papa " },
+          { t: "a allumé", v: true, pqp: false },
+          { t: " la cheminée. Maman " },
+          { t: "préparait", v: true, pqp: true },
+          { t: " du chocolat chaud. Ce soir-là, le vent " },
+          { t: "souffle", v: true, pqp: false },
+          { t: " encore très fort." }
+        ]
+      }
+    ],
 
-      /* ── AVOIR (radical av-) ── */
-      { subject: "j'",    infinitive: "avoir",   sentence: "J'________ un petit chat.",                 answer: "avais",     difficulty: 2 },
-      { subject: "tu",    infinitive: "avoir",   sentence: "Tu ________ soif.",                         answer: "avais",     difficulty: 2 },
-      { subject: "elle",  infinitive: "avoir",   sentence: "Elle ________ les yeux bleus.",             answer: "avait",     difficulty: 2 },
-      { subject: "nous",  infinitive: "avoir",   sentence: "Nous ________ beaucoup d'amis.",            answer: "avions",    difficulty: 2 },
-      { subject: "vous",  infinitive: "avoir",   sentence: "Vous ________ un grand jardin.",            answer: "aviez",     difficulty: 2 },
-      { subject: "ils",   infinitive: "avoir",   sentence: "Ils ________ peur du tonnerre.",            answer: "avaient",   difficulty: 2 },
+    /* ── Niveau 2 : 10 phrases à trous ────────────────────────────────────
+       (infinitif) dans la phrase → affiché comme puce-aide
+       ___ → zone à compléter
+    ───────────────────────────────────────────────────────────────────── */
+    writeBank: [
+      { sentence: "J'(être) ___ fatigué après la course.",              answers: ["étais"],      explication: "À l'imparfait, « j' » + être → <strong>étais</strong> (radical irrégulier « ét- »)." },
+      { sentence: "Il (avoir) ___ peur du tonnerre.",                   answers: ["avait"],      explication: "À l'imparfait, « il » + avoir → <strong>avait</strong> (radical « av- »)." },
+      { sentence: "Elle (chanter) ___ dans la chorale.",                answers: ["chantait"],   explication: "À l'imparfait, 1<sup>er</sup> groupe : radical + <em>-ait</em> → <strong>chantait</strong>." },
+      { sentence: "Je (jouer) ___ aux billes dans la cour.",            answers: ["jouais"],     explication: "À l'imparfait, 1<sup>er</sup> groupe : radical + <em>-ais</em> → <strong>jouais</strong>." },
+      { sentence: "Ils (manger) ___ des crêpes le dimanche.",           answers: ["mangeaient"], explication: "À l'imparfait, « ils » + manger → <strong>mangeaient</strong> (on garde le <em>e</em> devant <em>-a</em>)." },
+      { sentence: "Il (finir) ___ sa lecture avant de dormir.",         answers: ["finissait"],  explication: "À l'imparfait, 2<sup>e</sup> groupe : radical <em>finiss-</em> + <em>-ait</em> → <strong>finissait</strong>." },
+      { sentence: "Nous (faire) ___ des bonhommes de neige.",           answers: ["faisions"],   explication: "À l'imparfait, « nous » + faire → <strong>faisions</strong> (radical irrégulier « fais- »)." },
+      { sentence: "Ils (aller) ___ au parc après l'école.",             answers: ["allaient"],   explication: "À l'imparfait, « ils » + aller → <strong>allaient</strong> (radical « all- »)." },
+      { sentence: "Tu (voir) ___ la mer depuis ta fenêtre.",            answers: ["voyais"],     explication: "À l'imparfait, « tu » + voir → <strong>voyais</strong> (radical irrégulier « voy- »)." },
+      { sentence: "Elle (venir) ___ souvent jouer ici.",                answers: ["venait"],     explication: "À l'imparfait, « elle » + venir → <strong>venait</strong> (radical « ven- »)." }
+    ],
 
-      /* ── 1er GROUPE : chanter (radical chant-) ── */
-      { subject: "je",    infinitive: "chanter", sentence: "Je ________ sous la douche.",               answer: "chantais",  difficulty: 1 },
-      { subject: "tu",    infinitive: "chanter", sentence: "Tu ________ une berceuse.",                 answer: "chantais",  difficulty: 1 },
-      { subject: "elle",  infinitive: "chanter", sentence: "Elle ________ dans la chorale.",            answer: "chantait",  difficulty: 1 },
-      { subject: "nous",  infinitive: "chanter", sentence: "Nous ________ en chœur chaque soir.",       answer: "chantions", difficulty: 2 },
-      { subject: "vous",  infinitive: "chanter", sentence: "Vous ________ faux !",                      answer: "chantiez",  difficulty: 2 },
-      { subject: "ils",   infinitive: "chanter", sentence: "Ils ________ autour du feu.",               answer: "chantaient",difficulty: 1 },
-
-      /* ── 1er GROUPE : jouer ── */
-      { subject: "je",    infinitive: "jouer",   sentence: "Je ________ aux billes.",                   answer: "jouais",    difficulty: 1 },
-      { subject: "il",    infinitive: "jouer",   sentence: "Il ________ au foot tous les jours.",       answer: "jouait",    difficulty: 1 },
-      { subject: "nous",  infinitive: "jouer",   sentence: "Nous ________ dans la cour.",               answer: "jouions",   difficulty: 2 },
-      { subject: "ils",   infinitive: "jouer",   sentence: "Ils ________ ensemble.",                    answer: "jouaient",  difficulty: 1 },
-
-      /* ── 1er GROUPE : regarder ── */
-      { subject: "tu",    infinitive: "regarder",sentence: "Tu ________ les étoiles.",                  answer: "regardais", difficulty: 1 },
-      { subject: "elle",  infinitive: "regarder",sentence: "Elle ________ par la fenêtre.",             answer: "regardait", difficulty: 1 },
-      { subject: "nous",  infinitive: "regarder",sentence: "Nous ________ un dessin animé.",            answer: "regardions",difficulty: 2 },
-      { subject: "ils",   infinitive: "regarder",sentence: "Ils ________ le match.",                    answer: "regardaient",difficulty: 1 },
-
-      /* ── 1er GROUPE : manger (-ger : e gardé devant a) ── */
-      { subject: "je",    infinitive: "manger",  sentence: "Je ________ une tarte aux pommes.",         answer: "mangeais",  difficulty: 2 },
-      { subject: "il",    infinitive: "manger",  sentence: "Il ________ lentement.",                    answer: "mangeait",  difficulty: 2 },
-      { subject: "nous",  infinitive: "manger",  sentence: "Nous ________ à la cantine.",               answer: "mangions",  difficulty: 2 },
-      { subject: "ils",   infinitive: "manger",  sentence: "Ils ________ des crêpes.",                  answer: "mangeaient",difficulty: 2 },
-
-      /* ── 2e GROUPE : finir (radical finiss-) ── */
-      { subject: "je",    infinitive: "finir",   sentence: "Je ________ toujours mon assiette.",        answer: "finissais", difficulty: 2 },
-      { subject: "tu",    infinitive: "finir",   sentence: "Tu ________ tes devoirs le soir.",          answer: "finissais", difficulty: 2 },
-      { subject: "il",    infinitive: "finir",   sentence: "Il ________ sa lecture avant de dormir.",   answer: "finissait", difficulty: 2 },
-      { subject: "nous",  infinitive: "finir",   sentence: "Nous ________ le cours à midi.",            answer: "finissions",difficulty: 3 },
-      { subject: "vous",  infinitive: "finir",   sentence: "Vous ________ avant les autres.",           answer: "finissiez", difficulty: 3 },
-      { subject: "ils",   infinitive: "finir",   sentence: "Ils ________ leur travail en silence.",     answer: "finissaient",difficulty: 2 },
-
-      /* ── 2e GROUPE : choisir ── */
-      { subject: "elle",  infinitive: "choisir", sentence: "Elle ________ toujours le même livre.",     answer: "choisissait",difficulty: 2 },
-      { subject: "nous",  infinitive: "choisir", sentence: "Nous ________ notre destination.",          answer: "choisissions",difficulty: 3 },
-      { subject: "ils",   infinitive: "choisir", sentence: "Ils ________ leurs équipes.",               answer: "choisissaient",difficulty: 2 },
-
-      /* ── 3e GROUPE : faire (radical fais-) ── */
-      { subject: "je",    infinitive: "faire",   sentence: "Je ________ du vélo.",                      answer: "faisais",   difficulty: 2 },
-      { subject: "tu",    infinitive: "faire",   sentence: "Tu ________ beaucoup de bruit.",            answer: "faisais",   difficulty: 2 },
-      { subject: "il",    infinitive: "faire",   sentence: "Il ________ froid ce jour-là.",             answer: "faisait",   difficulty: 2 },
-      { subject: "nous",  infinitive: "faire",   sentence: "Nous ________ des bonhommes de neige.",     answer: "faisions",  difficulty: 2 },
-      { subject: "ils",   infinitive: "faire",   sentence: "Ils ________ la fête.",                     answer: "faisaient", difficulty: 2 },
-
-      /* ── 3e GROUPE : aller (radical all-) ── */
-      { subject: "j'",    infinitive: "aller",   sentence: "J'________ à l'école à pied.",              answer: "allais",    difficulty: 2 },
-      { subject: "tu",    infinitive: "aller",   sentence: "Tu ________ chez ta grand-mère.",           answer: "allais",    difficulty: 2 },
-      { subject: "elle",  infinitive: "aller",   sentence: "Elle ________ à la piscine.",               answer: "allait",    difficulty: 2 },
-      { subject: "nous",  infinitive: "aller",   sentence: "Nous ________ au marché le dimanche.",      answer: "allions",   difficulty: 2 },
-      { subject: "ils",   infinitive: "aller",   sentence: "Ils ________ au parc après l'école.",       answer: "allaient",  difficulty: 2 },
-
-      /* ── 3e GROUPE : dire (radical dis-) ── */
-      { subject: "je",    infinitive: "dire",    sentence: "Je ________ toujours la vérité.",           answer: "disais",    difficulty: 2 },
-      { subject: "il",    infinitive: "dire",    sentence: "Il ________ que tout allait bien.",         answer: "disait",    difficulty: 2 },
-      { subject: "nous",  infinitive: "dire",    sentence: "Nous ________ bonsoir avant de dormir.",    answer: "disions",   difficulty: 2 },
-      { subject: "ils",   infinitive: "dire",    sentence: "Ils ________ des histoires.",               answer: "disaient",  difficulty: 2 },
-
-      /* ── 3e GROUPE : venir (radical ven-) ── */
-      { subject: "tu",    infinitive: "venir",   sentence: "Tu ________ me voir chaque semaine.",       answer: "venais",    difficulty: 2 },
-      { subject: "elle",  infinitive: "venir",   sentence: "Elle ________ souvent jouer ici.",          answer: "venait",    difficulty: 2 },
-      { subject: "nous",  infinitive: "venir",   sentence: "Nous ________ en voiture.",                 answer: "venions",   difficulty: 2 },
-      { subject: "ils",   infinitive: "venir",   sentence: "Ils ________ tous les étés.",               answer: "venaient",  difficulty: 2 },
-
-      /* ── 3e GROUPE : pouvoir (radical pouv-) ── */
-      { subject: "je",    infinitive: "pouvoir", sentence: "Je ________ courir très vite.",             answer: "pouvais",   difficulty: 2 },
-      { subject: "il",    infinitive: "pouvoir", sentence: "Il ________ soulever des charges lourdes.", answer: "pouvait",   difficulty: 2 },
-      { subject: "ils",   infinitive: "pouvoir", sentence: "Ils ________ jouer jusqu'à la nuit.",       answer: "pouvaient", difficulty: 2 },
-
-      /* ── 3e GROUPE : voir (radical voy-) ── */
-      { subject: "je",    infinitive: "voir",    sentence: "Je ________ la mer depuis ma fenêtre.",     answer: "voyais",    difficulty: 2 },
-      { subject: "elle",  infinitive: "voir",    sentence: "Elle ________ mal sans ses lunettes.",      answer: "voyait",    difficulty: 2 },
-      { subject: "nous",  infinitive: "voir",    sentence: "Nous ________ nos amis le week-end.",       answer: "voyions",   difficulty: 2 },
-      { subject: "ils",   infinitive: "voir",    sentence: "Ils ________ des oiseaux dans le ciel.",    answer: "voyaient",  difficulty: 2 },
-
-      /* ── 3e GROUPE : vouloir (radical voul-) ── */
-      { subject: "je",    infinitive: "vouloir", sentence: "Je ________ un chien.",                     answer: "voulais",   difficulty: 2 },
-      { subject: "il",    infinitive: "vouloir", sentence: "Il ________ devenir astronaute.",           answer: "voulait",   difficulty: 2 },
-      { subject: "ils",   infinitive: "vouloir", sentence: "Ils ________ partir en voyage.",            answer: "voulaient", difficulty: 2 },
-
-      /* ── 3e GROUPE : prendre (radical pren-) ── */
-      { subject: "je",    infinitive: "prendre", sentence: "Je ________ le bus chaque matin.",          answer: "prenais",   difficulty: 2 },
-      { subject: "tu",    infinitive: "prendre", sentence: "Tu ________ ton temps.",                    answer: "prenais",   difficulty: 2 },
-      { subject: "elle",  infinitive: "prendre", sentence: "Elle ________ soin de ses affaires.",       answer: "prenait",   difficulty: 2 },
-      { subject: "ils",   infinitive: "prendre", sentence: "Ils ________ leurs repas ensemble.",        answer: "prenaient", difficulty: 2 }
-    ]
+    niveauxConfig: {
+      rule:             "Imparfait : radical du verbe + terminaisons <em>-ais, -ais, -ait, -ions, -iez, -aient</em>",
+      lvDefs: [
+        { lv: 1, icon: '⭐',   label: "Niveau 1 — Repère l'imparfait",    desc: "Lis un texte et clique sur les verbes à l'imparfait" },
+        { lv: 2, icon: '⭐⭐', label: "Niveau 2 — Conjugue à l'imparfait", desc: "Complète des phrases en conjuguant le verbe à l'imparfait" }
+      ],
+      verb1Instruction: "Clique sur les verbes à l'<strong>imparfait</strong>, puis valide.",
+      verb1NotTarget:   "n'est pas à l'imparfait",
+      verb1TargetName:  "imparfait",
+      verb1FoundAll:    "Tu as trouvé tous les verbes à l'imparfait !",
+      verb2Instruction: "Conjugue le verbe à l'<strong>imparfait</strong>.",
+      lv2NextBtnLabel:  "Niveau 2 — Conjugue →",
+      winMsg:           "Tu maîtrises l'imparfait aux deux niveaux !",
+      simpleErrorFeedback: true
+    }
   },
 
   "conjuguer-futur": {
-    title: "Conjuguer des verbes au futur",
-    type: "text-input",
+    title: "Conjuguer au futur",
+    type: "futur-niveaux",
     levels: ["CM1", "CM2", "6e"],
-    questionsPerSession: 25,
-    sortByDifficulty: true,
+    questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
-    bank: [
-      /* ── ÊTRE (radical ser-) ── */
-      { subject: "je",    infinitive: "être",    sentence: "Je ________ médecin plus tard.",             answer: "serai",      difficulty: 2 },
-      { subject: "tu",    infinitive: "être",    sentence: "Tu ________ en retard.",                     answer: "seras",      difficulty: 2 },
-      { subject: "il",    infinitive: "être",    sentence: "Il ________ content demain.",                answer: "sera",       difficulty: 2 },
-      { subject: "nous",  infinitive: "être",    sentence: "Nous ________ à l'heure.",                   answer: "serons",     difficulty: 2 },
-      { subject: "vous",  infinitive: "être",    sentence: "Vous ________ les bienvenus.",               answer: "serez",      difficulty: 2 },
-      { subject: "ils",   infinitive: "être",    sentence: "Ils ________ très heureux.",                 answer: "seront",     difficulty: 2 },
+    /* ── Niveau 1 : 4 textes d'identification ─────────────────────────────
+       pqp: true  = verbe au futur simple (cible)
+       pqp: false = distractor (présent ou passé composé)
+    ───────────────────────────────────────────────────────────────────── */
+    identTexts: [
+      /* Texte 1 — Les vacances de Tom */
+      {
+        tokens: [
+          { t: "Cet été, Tom " },
+          { t: "ira", v: true, pqp: true },
+          { t: " en vacances à la mer. Il " },
+          { t: "nagera", v: true, pqp: true },
+          { t: " chaque jour avec ses cousins. Sa famille " },
+          { t: "a loué", v: true, pqp: false },
+          { t: " un appartement près de la plage. Le soir, ils " },
+          { t: "regardent", v: true, pqp: false },
+          { t: " le coucher de soleil. Tom " },
+          { t: "reviendra", v: true, pqp: true },
+          { t: " bronzé et heureux à la rentrée." }
+        ]
+      },
+      /* Texte 2 — La fête d'anniversaire */
+      {
+        tokens: [
+          { t: "Samedi, c'" },
+          { t: "est", v: true, pqp: false },
+          { t: " l'anniversaire de Léa. Ses amis " },
+          { t: "viendront", v: true, pqp: true },
+          { t: " à la fête. Ils " },
+          { t: "ont apporté", v: true, pqp: false },
+          { t: " des cadeaux la semaine dernière. On " },
+          { t: "mangera", v: true, pqp: true },
+          { t: " un gros gâteau au chocolat. Léa " },
+          { t: "soufflera", v: true, pqp: true },
+          { t: " les bougies et " },
+          { t: "fera", v: true, pqp: true },
+          { t: " un vœu." }
+        ]
+      },
+      /* Texte 3 — La rentrée des classes */
+      {
+        tokens: [
+          { t: "La semaine prochaine, ce " },
+          { t: "sera", v: true, pqp: true },
+          { t: " la rentrée. Les élèves " },
+          { t: "retrouveront", v: true, pqp: true },
+          { t: " leurs camarades avec joie. La maîtresse " },
+          { t: "distribue", v: true, pqp: false },
+          { t: " toujours les cahiers le premier jour. Les enfants " },
+          { t: "ont travaillé", v: true, pqp: false },
+          { t: " dur cet été. Ils " },
+          { t: "apprendront", v: true, pqp: true },
+          { t: " plein de choses nouvelles et " },
+          { t: "seront", v: true, pqp: true },
+          { t: " très contents." }
+        ]
+      },
+      /* Texte 4 — Le voyage dans l'espace */
+      {
+        tokens: [
+          { t: "Un jour, les hommes " },
+          { t: "iront", v: true, pqp: true },
+          { t: " sur Mars. Ils " },
+          { t: "construiront", v: true, pqp: true },
+          { t: " des fusées encore plus puissantes. Des astronautes " },
+          { t: "ont étudié", v: true, pqp: false },
+          { t: " ce projet depuis longtemps. La vie là-bas " },
+          { t: "sera", v: true, pqp: true },
+          { t: " difficile mais les scientifiques " },
+          { t: "travaillent", v: true, pqp: false },
+          { t: " sans relâche. Ils " },
+          { t: "réussiront", v: true, pqp: true },
+          { t: " peut-être un jour." }
+        ]
+      }
+    ],
 
-      /* ── AVOIR (radical aur-) ── */
-      { subject: "j'",    infinitive: "avoir",   sentence: "J'________ dix ans en mars.",                answer: "aurai",      difficulty: 2 },
-      { subject: "tu",    infinitive: "avoir",   sentence: "Tu ________ un vélo pour Noël.",             answer: "auras",      difficulty: 2 },
-      { subject: "elle",  infinitive: "avoir",   sentence: "Elle ________ un bébé frère.",               answer: "aura",       difficulty: 2 },
-      { subject: "nous",  infinitive: "avoir",   sentence: "Nous ________ une heure de récréation.",     answer: "aurons",     difficulty: 2 },
-      { subject: "vous",  infinitive: "avoir",   sentence: "Vous ________ les résultats demain.",        answer: "aurez",      difficulty: 2 },
-      { subject: "ils",   infinitive: "avoir",   sentence: "Ils ________ beaucoup de travail.",          answer: "auront",     difficulty: 2 },
+    /* ── Niveau 2 : 10 phrases à trous ────────────────────────────────────
+       (infinitif) dans la phrase → affiché comme puce-aide
+       ___ → zone à compléter
+    ───────────────────────────────────────────────────────────────────── */
+    writeBank: [
+      { sentence: "Je (être) ___ médecin plus tard.",               answers: ["serai"],     explication: "Au futur, « je » + être → <strong>serai</strong> (radical irrégulier « ser- »)." },
+      { sentence: "Tu (avoir) ___ un vélo pour Noël.",              answers: ["auras"],     explication: "Au futur, « tu » + avoir → <strong>auras</strong> (radical irrégulier « aur- »)." },
+      { sentence: "Il (chanter) ___ une chanson sur scène.",        answers: ["chantera"],  explication: "Au futur, 1<sup>er</sup> groupe : infinitif + <em>-a</em> → <strong>chantera</strong>." },
+      { sentence: "Nous (finir) ___ nos devoirs avant le dîner.",   answers: ["finirons"],  explication: "Au futur, 2<sup>e</sup> groupe : infinitif + <em>-ons</em> → <strong>finirons</strong>." },
+      { sentence: "Vous (parler) ___ devant toute la classe.",      answers: ["parlerez"],  explication: "Au futur, 1<sup>er</sup> groupe : infinitif + <em>-ez</em> → <strong>parlerez</strong>." },
+      { sentence: "Ils (jouer) ___ au football demain matin.",      answers: ["joueront"],  explication: "Au futur, 1<sup>er</sup> groupe : infinitif + <em>-ont</em> → <strong>joueront</strong>." },
+      { sentence: "Je (faire) ___ mes valises ce soir.",            answers: ["ferai"],     explication: "Au futur, « je » + faire → <strong>ferai</strong> (radical irrégulier « fer- »)." },
+      { sentence: "Elle (aller) ___ mieux demain.",                 answers: ["ira"],       explication: "Au futur, + aller → <strong>ira</strong> (radical irrégulier « ir- »)." },
+      { sentence: "Nous (venir) ___ vous rejoindre samedi.",        answers: ["viendrons"], explication: "Au futur, « nous » + venir → <strong>viendrons</strong> (radical irrégulier « viendr- »)." },
+      { sentence: "Tu (pouvoir) ___ m'aider après l'école ?",       answers: ["pourras"],   explication: "Au futur, « tu » + pouvoir → <strong>pourras</strong> (radical irrégulier « pourr- »)." }
+    ],
 
-      /* ── 1er GROUPE : chanter (infinitif + terminaison) ── */
-      { subject: "je",    infinitive: "chanter", sentence: "Je ________ une chanson demain.",            answer: "chanterai",  difficulty: 1 },
-      { subject: "tu",    infinitive: "chanter", sentence: "Tu ________ sur scène.",                     answer: "chanteras",  difficulty: 1 },
-      { subject: "il",    infinitive: "chanter", sentence: "Il ________ à la fête.",                     answer: "chantera",   difficulty: 1 },
-      { subject: "nous",  infinitive: "chanter", sentence: "Nous ________ en chœur.",                    answer: "chanterons", difficulty: 1 },
-      { subject: "vous",  infinitive: "chanter", sentence: "Vous ________ très bien.",                   answer: "chanterez",  difficulty: 1 },
-      { subject: "ils",   infinitive: "chanter", sentence: "Ils ________ toute la nuit.",                answer: "chanteront", difficulty: 1 },
-
-      /* ── 1er GROUPE : jouer ── */
-      { subject: "je",    infinitive: "jouer",   sentence: "Je ________ au foot ce soir.",               answer: "jouerai",    difficulty: 1 },
-      { subject: "elle",  infinitive: "jouer",   sentence: "Elle ________ du piano.",                    answer: "jouera",     difficulty: 1 },
-      { subject: "nous",  infinitive: "jouer",   sentence: "Nous ________ en équipe.",                   answer: "jouerons",   difficulty: 1 },
-      { subject: "ils",   infinitive: "jouer",   sentence: "Ils ________ contre nous.",                  answer: "joueront",   difficulty: 1 },
-
-      /* ── 1er GROUPE : parler ── */
-      { subject: "tu",    infinitive: "parler",  sentence: "Tu ________ devant la classe.",              answer: "parleras",   difficulty: 1 },
-      { subject: "il",    infinitive: "parler",  sentence: "Il ________ au directeur.",                  answer: "parlera",    difficulty: 1 },
-      { subject: "nous",  infinitive: "parler",  sentence: "Nous ________ de nos vacances.",             answer: "parlerons",  difficulty: 1 },
-
-      /* ── 2e GROUPE : finir (infinitif + terminaison) ── */
-      { subject: "je",    infinitive: "finir",   sentence: "Je ________ mes devoirs tôt.",               answer: "finirai",    difficulty: 1 },
-      { subject: "tu",    infinitive: "finir",   sentence: "Tu ________ avant moi.",                     answer: "finiras",    difficulty: 1 },
-      { subject: "elle",  infinitive: "finir",   sentence: "Elle ________ son livre ce soir.",           answer: "finira",     difficulty: 1 },
-      { subject: "nous",  infinitive: "finir",   sentence: "Nous ________ le projet vendredi.",          answer: "finirons",   difficulty: 1 },
-      { subject: "vous",  infinitive: "finir",   sentence: "Vous ________ en dernier.",                  answer: "finirez",    difficulty: 1 },
-      { subject: "ils",   infinitive: "finir",   sentence: "Ils ________ la course.",                    answer: "finiront",   difficulty: 1 },
-
-      /* ── 3e GROUPE : faire (radical fer-) ── */
-      { subject: "je",    infinitive: "faire",   sentence: "Je ________ mes valises.",                   answer: "ferai",      difficulty: 2 },
-      { subject: "tu",    infinitive: "faire",   sentence: "Tu ________ du sport demain.",               answer: "feras",      difficulty: 2 },
-      { subject: "il",    infinitive: "faire",   sentence: "Il ________ beau ce week-end.",              answer: "fera",       difficulty: 2 },
-      { subject: "nous",  infinitive: "faire",   sentence: "Nous ________ une sortie scolaire.",         answer: "ferons",     difficulty: 2 },
-      { subject: "vous",  infinitive: "faire",   sentence: "Vous ________ du bon travail.",              answer: "ferez",      difficulty: 2 },
-      { subject: "ils",   infinitive: "faire",   sentence: "Ils ________ la fête.",                      answer: "feront",     difficulty: 2 },
-
-      /* ── 3e GROUPE : aller (radical ir-) ── */
-      { subject: "j'",    infinitive: "aller",   sentence: "J'________ à la mer cet été.",               answer: "irai",       difficulty: 3 },
-      { subject: "tu",    infinitive: "aller",   sentence: "Tu ________ chez mamie.",                    answer: "iras",       difficulty: 3 },
-      { subject: "elle",  infinitive: "aller",   sentence: "Elle ________ mieux demain.",                answer: "ira",        difficulty: 3 },
-      { subject: "nous",  infinitive: "aller",   sentence: "Nous ________ au musée.",                    answer: "irons",      difficulty: 3 },
-      { subject: "vous",  infinitive: "aller",   sentence: "Vous ________ en voyage.",                   answer: "irez",       difficulty: 3 },
-      { subject: "ils",   infinitive: "aller",   sentence: "Ils ________ au stade.",                     answer: "iront",      difficulty: 3 },
-
-      /* ── 3e GROUPE : venir (radical viendr-) ── */
-      { subject: "je",    infinitive: "venir",   sentence: "Je ________ te voir samedi.",                answer: "viendrai",   difficulty: 3 },
-      { subject: "tu",    infinitive: "venir",   sentence: "Tu ________ à ma fête ?",                    answer: "viendras",   difficulty: 3 },
-      { subject: "il",    infinitive: "venir",   sentence: "Il ________ en avion.",                      answer: "viendra",    difficulty: 3 },
-      { subject: "nous",  infinitive: "venir",   sentence: "Nous ________ vous rejoindre.",              answer: "viendrons",  difficulty: 3 },
-      { subject: "ils",   infinitive: "venir",   sentence: "Ils ________ avec leurs parents.",           answer: "viendront",  difficulty: 3 },
-
-      /* ── 3e GROUPE : voir (radical verr-) ── */
-      { subject: "je",    infinitive: "voir",    sentence: "Je ________ mes amis ce soir.",              answer: "verrai",     difficulty: 3 },
-      { subject: "tu",    infinitive: "voir",    sentence: "Tu ________ comme c'est beau.",              answer: "verras",     difficulty: 3 },
-      { subject: "nous",  infinitive: "voir",    sentence: "Nous ________ ce film ensemble.",            answer: "verrons",    difficulty: 3 },
-      { subject: "ils",   infinitive: "voir",    sentence: "Ils ________ la différence.",                answer: "verront",    difficulty: 3 },
-
-      /* ── 3e GROUPE : pouvoir (radical pourr-) ── */
-      { subject: "je",    infinitive: "pouvoir", sentence: "Je ________ venir demain.",                  answer: "pourrai",    difficulty: 3 },
-      { subject: "tu",    infinitive: "pouvoir", sentence: "Tu ________ m'aider ?",                      answer: "pourras",    difficulty: 3 },
-      { subject: "il",    infinitive: "pouvoir", sentence: "Il ________ sortir ce soir.",                answer: "pourra",     difficulty: 3 },
-      { subject: "ils",   infinitive: "pouvoir", sentence: "Ils ________ jouer dehors.",                 answer: "pourront",   difficulty: 3 },
-
-      /* ── 3e GROUPE : vouloir (radical voudr-) ── */
-      { subject: "je",    infinitive: "vouloir", sentence: "Je ________ un chien pour Noël.",            answer: "voudrai",    difficulty: 3 },
-      { subject: "tu",    infinitive: "vouloir", sentence: "Tu ________ du gâteau ?",                    answer: "voudras",    difficulty: 3 },
-      { subject: "ils",   infinitive: "vouloir", sentence: "Ils ________ partir en premier.",            answer: "voudront",   difficulty: 3 },
-
-      /* ── 3e GROUPE : dire (radical dir-) ── */
-      { subject: "je",    infinitive: "dire",    sentence: "Je ________ la vérité.",                     answer: "dirai",      difficulty: 2 },
-      { subject: "tu",    infinitive: "dire",    sentence: "Tu ________ merci.",                         answer: "diras",      difficulty: 2 },
-      { subject: "ils",   infinitive: "dire",    sentence: "Ils ________ ce qu'ils pensent.",            answer: "diront",     difficulty: 2 },
-
-      /* ── 3e GROUPE : prendre (radical prendr-) ── */
-      { subject: "je",    infinitive: "prendre", sentence: "Je ________ le train.",                      answer: "prendrai",   difficulty: 2 },
-      { subject: "tu",    infinitive: "prendre", sentence: "Tu ________ ton manteau.",                   answer: "prendras",   difficulty: 2 },
-      { subject: "elle",  infinitive: "prendre", sentence: "Elle ________ soin de toi.",                 answer: "prendra",    difficulty: 2 },
-      { subject: "ils",   infinitive: "prendre", sentence: "Ils ________ leurs affaires.",               answer: "prendront",  difficulty: 2 }
-    ]
+    niveauxConfig: {
+      rule:             "Futur simple : terminaisons <em>-rai, -ras, -ra, -rons, -rez, -ront</em>",
+      lvDefs: [
+        { lv: 1, icon: '⭐',   label: 'Niveau 1 — Repère le futur',    desc: 'Lis un texte et clique sur les verbes au futur simple' },
+        { lv: 2, icon: '⭐⭐', label: 'Niveau 2 — Conjugue au futur',  desc: 'Complète des phrases en conjuguant le verbe au futur simple' }
+      ],
+      verb1Instruction: "Clique sur les verbes au <strong>futur simple</strong>, puis valide.",
+      verb1NotTarget:   "n'est pas au futur simple",
+      verb1TargetName:  "futur simple",
+      verb1FoundAll:    "Tu as trouvé tous les verbes au futur simple !",
+      verb2Instruction: "Conjugue le verbe au <strong>futur simple</strong>.",
+      lv2NextBtnLabel:  "Niveau 2 — Conjugue →",
+      winMsg:           "Tu maîtrises le futur simple aux deux niveaux !",
+      simpleErrorFeedback: true
+    }
   },
 
   "conjuguer-passe-simple": {
@@ -1789,43 +1800,46 @@ const EXERCISE_DATA = {
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
     bank: [
       {
-        instruction: "Clique sur tous les articles définis (le, la, les, l') dans la phrase.",
-        sentence: "Le chat dort sur le canapé .",
-        targets: ["Le", "le"],
-        piege: {}
+        instruction: "Clique sur tous les articles définis dans ce texte.",
+        sentence: "Le chien joue dans le jardin . Il renifle les fleurs et s' approche de la fontaine . Le soleil brille et l' air est doux .",
+        targets: ["Le", "le", "les", "la", "l'"],
+        piege: {},
+        note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet."
       },
       {
-        instruction: "Clique sur tous les articles définis (le, la, les, l') dans la phrase.",
-        sentence: "La maîtresse range les livres de l' école .",
-        targets: ["La", "les", "l'"],
-        piege: {}
+        instruction: "Clique sur tous les articles définis dans ce texte.",
+        sentence: "La classe prépare la pièce de théâtre . Les élèves apprennent le texte et l' institutrice sourit . Le spectacle aura lieu vendredi .",
+        targets: ["La", "la", "Les", "le", "l'", "Le"],
+        piege: {},
+        note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet."
       },
       {
-        instruction: "Clique sur tous les articles définis (le, la, les, l') dans la phrase.",
-        sentence: "Je le vois tous les jours .",
-        targets: ["les"],
-        piege: { "le": "Ici, « le » remplace un nom. C'est un pronom personnel, pas un article !" }
+        instruction: "Clique sur tous les articles définis dans ce texte.",
+        sentence: "L' hiver arrive dans la montagne . La neige recouvre les sapins et le sentier disparaît sous le blanc . Les randonneurs rentrent au refuge .",
+        targets: ["L'", "la", "La", "les", "le", "Les", "au"],
+        piege: {},
+        note: "💡 <b>L'</b> et <b>au</b> (= à + le) sont des articles définis contractés."
       },
       {
-        instruction: "Clique sur tous les articles définis (le, la, les, l') dans la phrase.",
-        sentence: "L' oiseau chante dans l' arbre .",
-        targets: ["L'", "l'"],
-        piege: {}
+        instruction: "Clique sur tous les articles définis dans ce texte.",
+        sentence: "Le soir , l' enfant lit le livre que sa maman lui a offert . Les illustrations sont magnifiques et les couleurs très vives .",
+        targets: ["Le", "l'", "le", "Les", "les"],
+        piege: {},
+        note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet."
       },
       {
-        instruction: "Clique sur tous les articles définis (le, la, les, l') dans la phrase.",
-        sentence: "Les enfants adorent la pizza .",
-        targets: ["Les", "la"],
-        piege: {}
+        instruction: "Clique sur tous les articles définis dans ce texte.",
+        sentence: "La fermière nourrit les poules avec le grain . L' après-midi , elle va au marché acheter les légumes . Le soir , elle ferme la porte .",
+        targets: ["La", "les", "le", "L'", "au", "Le", "la"],
+        piege: {},
+        note: "💡 <b>L'</b> et <b>au</b> (= à + le) sont des articles définis contractés."
       },
       {
-        instruction: "Clique sur tous les articles définis (le, la, les, l') dans la phrase. Attention, il y a peut-être un piège !",
-        sentence: "Il la regarde et les prend .",
-        targets: [],
-        piege: {
-          "la": "Ici, « la » et « les » remplacent des noms. Ce sont des pronoms personnels, pas des articles !",
-          "les": "Ici, « la » et « les » remplacent des noms. Ce sont des pronoms personnels, pas des articles !"
-        }
+        instruction: "Clique sur tous les articles définis dans ce texte. Attention, il y a peut-être un piège !",
+        sentence: "Les oiseaux font leur nid dans l' arbre près de la haie . Le chat les observe depuis la fenêtre sans bouger . Il les guette depuis des heures .",
+        targets: ["Les", "l'", "la", "Le"],
+        piege: { "les": "Ici, « les » remplace un nom (les oiseaux). C'est un pronom personnel, pas un article !" },
+        note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet."
       }
     ]
   },
@@ -1872,72 +1886,46 @@ const EXERCISE_DATA = {
   "identifier-article-indefini": {
     title: "Identifier les articles indéfinis",
     levels: ["CM1", "CM2", "6e"],
-    type: "choix-etiquette",
-    questionsPerSession: 8,
+    type: "mots-cliquables",
+    questionsPerSession: 6,
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
     bank: [
       {
-        instruction: "L'article en gras est-il défini ou indéfini ?",
-        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Une</b> grenouille saute dans l'étang.</span>",
-        word: "une",
-        choices: ["défini", "indéfini"],
-        answer: "indéfini"
+        instruction: "Clique sur tous les articles indéfinis dans ce texte.",
+        sentence: "Un enfant joue dans le jardin . Il trouve une coccinelle et des fourmis sous les pierres .",
+        targets: ["Un", "une", "des"],
+        piege: {}
       },
       {
-        instruction: "L'article en gras est-il défini ou indéfini ?",
-        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Les</b> étoiles brillent dans le ciel noir.</span>",
-        word: "les",
-        choices: ["défini", "indéfini"],
-        answer: "défini"
+        instruction: "Clique sur tous les articles indéfinis dans ce texte.",
+        sentence: "Des nuages arrivent dans le ciel . Un vent froid souffle et les feuilles tombent . Il faut une veste pour sortir .",
+        targets: ["Des", "Un", "une"],
+        piege: {}
       },
       {
-        instruction: "L'article en gras est-il défini ou indéfini ?",
-        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'>Je mange <b>un</b> gâteau au chocolat.</span>",
-        word: "un",
-        choices: ["défini", "indéfini"],
-        answer: "indéfini"
+        instruction: "Clique sur tous les articles indéfinis dans ce texte.",
+        sentence: "Dans une vieille maison , un fantôme habite . Des bruits étranges se font entendre la nuit . Les habitants ont très peur .",
+        targets: ["une", "un", "Des"],
+        piege: {}
       },
       {
-        instruction: "L'article en gras est-il défini ou indéfini ?",
-        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>La</b> lune est pleine ce soir.</span>",
-        word: "la",
-        choices: ["défini", "indéfini"],
-        answer: "défini"
+        instruction: "Clique sur tous les articles indéfinis dans ce texte.",
+        sentence: "Le boulanger prépare des croissants et des baguettes chaque matin . Une cliente arrive et achète un pain aux raisins .",
+        targets: ["des", "Une", "un"],
+        piege: {}
       },
       {
-        instruction: "L'article en gras est-il défini ou indéfini ?",
-        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Des</b> enfants jouent dans le parc.</span>",
-        word: "des",
-        choices: ["défini", "indéfini"],
-        answer: "indéfini"
+        instruction: "Clique sur tous les articles indéfinis dans ce texte.",
+        sentence: "Un explorateur découvre une grotte cachée dans la forêt . Des stalactites pendent et des cristaux scintillent sous sa lampe .",
+        targets: ["Un", "une", "Des", "des"],
+        piege: {}
       },
       {
-        instruction: "L'article en gras est-il défini ou indéfini ?",
-        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Le</b> directeur parle aux élèves.</span>",
-        word: "le",
-        choices: ["défini", "indéfini"],
-        answer: "défini"
-      },
-      {
-        instruction: "L'article en gras est-il défini ou indéfini ?",
-        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'>Il a trouvé <b>une</b> nouvelle cachette.</span>",
-        word: "une",
-        choices: ["défini", "indéfini"],
-        answer: "indéfini"
-      },
-      {
-        instruction: "L'article en gras est-il défini ou indéfini ?",
-        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>L'</b>hirondelle annonce le printemps.</span>",
-        word: "l'",
-        choices: ["défini", "indéfini"],
-        answer: "défini"
-      },
-      { instruction: "Quel article indéfini va avec ce nom ?", emoji: "🏠", word: "maison",     answer: "une", choices: ["un", "une", "des"] },
-      { instruction: "Quel article indéfini va avec ce nom ?", emoji: "👦", word: "garçons",    answer: "des", choices: ["un", "une", "des"] },
-      { instruction: "Quel article indéfini va avec ce nom ?", emoji: "🤖", word: "robot",      answer: "un",  choices: ["un", "une", "des"] },
-      { instruction: "Quel article indéfini va avec ce nom ?", emoji: "🌺", word: "fleur",      answer: "une", choices: ["un", "une", "des"] },
-      { instruction: "Quel article indéfini va avec ce nom ?", emoji: "🌳", word: "arbres",     answer: "des", choices: ["un", "une", "des"] },
-      { instruction: "Quel article indéfini va avec ce nom ?", emoji: "💻", word: "ordinateur", answer: "un",  choices: ["un", "une", "des"] }
+        instruction: "Clique sur tous les articles indéfinis dans ce texte.",
+        sentence: "Un matin de printemps , des hirondelles arrivent dans le village . Une hirondelle construit un nid sous le toit de la grange .",
+        targets: ["Un", "des", "Une", "un"],
+        piege: {}
+      }
     ]
   },
 
@@ -1977,73 +1965,174 @@ const EXERCISE_DATA = {
 
   /* ────────────────────────────────────────────────────────────────────────
      Identifier un déterminant démonstratif — ce / cet / cette / ces
-     Toutes les étapes fusionnées en choix-etiquette
+     3 niveaux déverrouillables (det-demo-niveaux)
   ─────────────────────────────────────────────────────────────────────────── */
   "identifier-determinant-demonstratif": {
-    title: "Identifier les déterminants démonstratifs",
+    title: "Identifier un déterminant démonstratif",
     levels: ["CM1", "CM2", "6e"],
-    type: "choix-etiquette",
-    questionsPerSession: 10,
+    type: "det-demo-niveaux",
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
-    bank: [
-      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "⚽", word: "ballon",     answer: "ce",    choices: ["ce", "cet", "cette", "ces"] },
-      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "✈️", word: "avion",      answer: "cet",   choices: ["ce", "cet", "cette", "ces"] },
-      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "🏠", word: "maison",     answer: "cette", choices: ["ce", "cet", "cette", "ces"] },
-      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "🌸", word: "fleurs",     answer: "ces",   choices: ["ce", "cet", "cette", "ces"] },
-      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "🏨", word: "hôtel",      answer: "cet",   choices: ["ce", "cet", "cette", "ces"] },
-      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "👟", word: "chaussures", answer: "ces",   choices: ["ce", "cet", "cette", "ces"] },
-      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "🐦", word: "oiseau",     answer: "cet",   choices: ["ce", "cet", "cette", "ces"] },
-      { instruction: "Quel déterminant démonstratif va devant ce nom ?", emoji: "📚", word: "livres",     answer: "ces",   choices: ["ce", "cet", "cette", "ces"] },
-      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "ce chien",      answer: "CE",    choices: ["CE", "CET", "CETTE", "CES"] },
-      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "cette pomme",   answer: "CETTE", choices: ["CE", "CET", "CETTE", "CES"] },
-      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "ces étoiles",   answer: "CES",   choices: ["CE", "CET", "CETTE", "CES"] },
-      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "cet ami",       answer: "CET",   choices: ["CE", "CET", "CETTE", "CES"] },
-      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "ce bureau",     answer: "CE",    choices: ["CE", "CET", "CETTE", "CES"] },
-      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "cette chanson", answer: "CETTE", choices: ["CE", "CET", "CETTE", "CES"] },
-      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "cet étudiant",  answer: "CET",   choices: ["CE", "CET", "CETTE", "CES"] },
-      { instruction: "Dans quelle catégorie se range ce groupe nominal ?", emoji: "", word: "ces outils",    answer: "CES",   choices: ["CE", "CET", "CETTE", "CES"] },
+
+    /* ── Niveau 1 : clique sur le déterminant démonstratif ─────────────────
+       targets = tableau des formes attendues (version "clean" sans ponctuation)
+    ─────────────────────────────────────────────────────────────────────── */
+    lvl1Bank: [
       {
-        instruction: "Ce déterminant est-il démonstratif ou possessif ?",
-        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'>Je range <b>ces</b> affaires dans mon sac.</span>",
-        word: "ces",
-        choices: ["démonstratif", "possessif"],
-        answer: "démonstratif"
+        sentence: "Ce matin, le soleil brille dans le ciel.",
+        targets: ["Ce"],
+        feedbackOk: "Oui ! <strong>Ce</strong> est un déterminant démonstratif : il est placé devant le nom <em>matin</em> pour désigner un moment précis.",
+        feedbackErr: "Le déterminant démonstratif est <strong>Ce</strong>, placé devant le nom <em>matin</em>. <em>Le</em> est un article défini, pas un démonstratif."
       },
       {
-        instruction: "Ce déterminant est-il démonstratif ou possessif ?",
-        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'>Je range <b>ses</b> affaires dans mon sac.</span>",
-        word: "ses",
-        choices: ["démonstratif", "possessif"],
-        answer: "possessif"
+        sentence: "J'ai lu cet article très intéressant.",
+        targets: ["cet"],
+        feedbackOk: "Bravo ! <strong>Cet</strong> s'emploie devant un nom masculin singulier qui commence par une <strong>voyelle</strong> (<em>article</em> commence par <em>a</em>).",
+        feedbackErr: "Le déterminant démonstratif est <strong>cet</strong>. On l'emploie devant un nom masculin singulier commençant par une voyelle ou un h muet (<em>article</em> → voyelle <em>a</em>)."
       },
       {
-        instruction: "Ce déterminant est-il démonstratif ou possessif ?",
-        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Ce</b> livre est vraiment passionnant !</span>",
-        word: "ce",
-        choices: ["démonstratif", "possessif"],
-        answer: "démonstratif"
+        sentence: "Regarde cette belle fleur dans le jardin !",
+        targets: ["cette"],
+        feedbackOk: "Oui ! <strong>Cette</strong> est le déterminant démonstratif féminin singulier, placé devant le nom <em>fleur</em>.",
+        feedbackErr: "Le déterminant démonstratif est <strong>cette</strong>, féminin singulier, devant le nom <em>fleur</em>. <em>Le</em> est un article défini."
       },
       {
-        instruction: "Ce déterminant est-il démonstratif ou possessif ?",
-        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Son</b> livre est vraiment passionnant !</span>",
-        word: "son",
-        choices: ["démonstratif", "possessif"],
-        answer: "possessif"
+        sentence: "Ces enfants jouent dans la cour de l'école.",
+        targets: ["Ces"],
+        feedbackOk: "Parfait ! <strong>Ces</strong> est la forme plurielle du déterminant démonstratif — il désigne plusieurs enfants à la fois.",
+        feedbackErr: "Le déterminant démonstratif est <strong>Ces</strong> (pluriel). <em>La</em> et <em>l'</em> sont des articles définis."
       },
       {
-        instruction: "Ce déterminant est-il démonstratif ou possessif ?",
-        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Ces</b> oiseaux chantent magnifiquement.</span>",
-        word: "ces",
-        choices: ["démonstratif", "possessif"],
-        answer: "démonstratif"
+        sentence: "Mon voisin promène son chien dans ce parc.",
+        targets: ["ce"],
+        feedbackOk: "Bien trouvé ! <strong>Ce</strong> est un déterminant démonstratif (masculin singulier devant consonne), placé devant le nom <em>parc</em>.",
+        feedbackErr: "Le déterminant démonstratif est <strong>ce</strong>, devant le nom <em>parc</em>. <em>Mon</em> et <em>son</em> sont des déterminants possessifs, pas démonstratifs."
       },
       {
-        instruction: "Ce déterminant est-il démonstratif ou possessif ?",
-        emoji: "<span style='font-size:17px;font-style:italic;line-height:1.5;display:block'><b>Ses</b> oiseaux chantent magnifiquement.</span>",
-        word: "ses",
-        choices: ["démonstratif", "possessif"],
-        answer: "possessif"
+        sentence: "Cet homme est très gentil avec les voisins.",
+        targets: ["Cet"],
+        feedbackOk: "Excellent ! <strong>Cet</strong> s'utilise devant un nom masculin commençant par un <strong>h muet</strong> (<em>homme</em>). On prononce « cet·homme » avec une liaison.",
+        feedbackErr: "Le déterminant démonstratif est <strong>Cet</strong>, devant <em>homme</em>. On emploie <em>cet</em> (et non <em>ce</em>) car <em>homme</em> commence par un h muet — le h muet entraîne la liaison comme une voyelle."
+      },
+      {
+        sentence: "Elle range ses affaires dans cette armoire.",
+        targets: ["cette"],
+        feedbackOk: "Bravo ! <strong>Cette</strong> est le déterminant démonstratif féminin singulier, placé devant le nom <em>armoire</em>.",
+        feedbackErr: "Le déterminant démonstratif est <strong>cette</strong>, devant le nom féminin <em>armoire</em>. <em>Ses</em> est un déterminant possessif (il indique l'appartenance)."
+      },
+      {
+        sentence: "Les élèves rangent leurs livres sur ces étagères.",
+        targets: ["ces"],
+        feedbackOk: "Oui ! <strong>Ces</strong> est le déterminant démonstratif pluriel, placé devant le nom <em>étagères</em> pour désigner des étagères précises.",
+        feedbackErr: "Le déterminant démonstratif est <strong>ces</strong> (pluriel), devant <em>étagères</em>. <em>Les</em> est un article défini et <em>leurs</em> est un déterminant possessif."
       }
+    ],
+
+    /* ── Niveau 2 : 2 étapes — observe le nom, puis choisis le démonstratif ──
+       genre    : "masculin" | "féminin"
+       nombre   : "singulier" | "pluriel"
+       initiale : "consonne" | "voyelle" | "h muet"  (ignoré si pluriel)
+       answer   : "ce" | "cet" | "cette" | "ces"
+    ─────────────────────────────────────────────────────────────────────── */
+    lvl2Bank: [
+      {
+        phrase: "___ avion décolle dans cinq minutes.",
+        noun: "avion", genre: "masculin", nombre: "singulier", initiale: "voyelle", answer: "cet",
+        explication: "<strong>Cet</strong> : masculin singulier commençant par une voyelle (<em>a</em>)."
+      },
+      {
+        phrase: "___ homme est arrivé ce matin.",
+        noun: "homme", genre: "masculin", nombre: "singulier", initiale: "h muet", answer: "cet",
+        explication: "<strong>Cet</strong> : masculin singulier commençant par un h muet (liaison comme une voyelle)."
+      },
+      {
+        phrase: "___ amie est très sympathique.",
+        noun: "amie", genre: "féminin", nombre: "singulier", initiale: "voyelle", answer: "cette",
+        explication: "<strong>Cette</strong> : féminin singulier. Même devant une voyelle, on dit <em>cette</em> et non *<em>cet</em>."
+      },
+      {
+        phrase: "___ oiseaux font leurs nids dans les arbres.",
+        noun: "oiseaux", genre: "masculin", nombre: "pluriel", initiale: "voyelle", answer: "ces",
+        explication: "<strong>Ces</strong> : toujours au pluriel, quel que soit le genre ou l'initiale."
+      },
+      {
+        phrase: "___ livre est vraiment passionnant.",
+        noun: "livre", genre: "masculin", nombre: "singulier", initiale: "consonne", answer: "ce",
+        explication: "<strong>Ce</strong> : masculin singulier commençant par une consonne."
+      },
+      {
+        phrase: "___ fleur sent très bon.",
+        noun: "fleur", genre: "féminin", nombre: "singulier", initiale: "consonne", answer: "cette",
+        explication: "<strong>Cette</strong> : féminin singulier."
+      },
+      {
+        phrase: "Regarde ___ beau château !",
+        noun: "château", genre: "masculin", nombre: "singulier", initiale: "consonne", answer: "ce",
+        explication: "<strong>Ce</strong> : masculin singulier devant consonne."
+      },
+      {
+        phrase: "___ chaussures sont toutes neuves.",
+        noun: "chaussures", genre: "féminin", nombre: "pluriel", initiale: "consonne", answer: "ces",
+        explication: "<strong>Ces</strong> : pluriel (ici féminin pluriel)."
+      },
+      {
+        phrase: "___ école est vraiment très grande.",
+        noun: "école", genre: "féminin", nombre: "singulier", initiale: "voyelle", answer: "cette",
+        explication: "<strong>Cette</strong> : féminin singulier. Contrairement au masculin, le féminin ne prend pas <em>cet</em> devant une voyelle."
+      },
+      {
+        phrase: "___ jouets sont éparpillés dans le salon.",
+        noun: "jouets", genre: "masculin", nombre: "pluriel", initiale: "consonne", answer: "ces",
+        explication: "<strong>Ces</strong> : pluriel. Ne pas confondre avec <em>ses</em> (possessif) : <em>ces jouets</em> = on montre des jouets précis ; <em>ses jouets</em> = les jouets lui appartiennent.",
+        noteSesCes: true
+      }
+    ],
+
+    /* ── Niveau 3 : ce ou se ? (20 items, score /20) ───────────────────────
+       answer : "ce" (déterminant devant nom) | "se" (pronom réfléchi devant verbe)
+    ─────────────────────────────────────────────────────────────────────── */
+    lvl3Bank: [
+      /* ── « ce » devant un nom ── */
+      { sentence: "___ chien aboie très fort.",                          answer: "ce",
+        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>chien</em>." },
+      { sentence: "J'aime beaucoup ___ film.",                           answer: "ce",
+        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>film</em>." },
+      { sentence: "___ problème est difficile à résoudre.",              answer: "ce",
+        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>problème</em>." },
+      { sentence: "Regarde ___ beau papillon !",                        answer: "ce",
+        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>papillon</em> (l'adjectif <em>beau</em> est intercalé)." },
+      { sentence: "___ livre est vraiment passionnant.",                 answer: "ce",
+        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>livre</em>." },
+      { sentence: "Elle habite dans ___ quartier depuis longtemps.",     answer: "ce",
+        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>quartier</em>." },
+      { sentence: "Il travaille dans ___ bureau depuis l'an dernier.",   answer: "ce",
+        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>bureau</em>." },
+      { sentence: "Prends ___ chemin, c'est plus court.",               answer: "ce",
+        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>chemin</em>." },
+      { sentence: "Nous allons voir ___ spectacle demain.",              answer: "ce",
+        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>spectacle</em>." },
+      { sentence: "___ matin, Paul se lève tôt.",                       answer: "ce",
+        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>matin</em>. Dans cette même phrase, <em>se</em> est un pronom réfléchi devant le verbe <em>lève</em>." },
+      /* ── « se » devant un verbe (pronom réfléchi) ── */
+      { sentence: "Le chat ___ lave les pattes.",                       answer: "se",
+        explication: "<strong>Se</strong> est un pronom réfléchi : placé devant le verbe <em>lave</em>. Test : on peut dire <em>je me lave</em> → c'est bien un pronom réfléchi." },
+      { sentence: "Il ___ lève tôt chaque matin.",                      answer: "se",
+        explication: "<strong>Se</strong> est un pronom réfléchi : placé devant le verbe <em>lève</em>. Test : <em>je me lève</em> → pronom réfléchi." },
+      { sentence: "Elle ___ promène dans le parc.",                     answer: "se",
+        explication: "<strong>Se</strong> est un pronom réfléchi : placé devant le verbe <em>promène</em>. Test : <em>je me promène</em>." },
+      { sentence: "Paul ___ dépêche d'aller à l'école.",                answer: "se",
+        explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>dépêche</em>. Test : <em>je me dépêche</em>." },
+      { sentence: "Les enfants ___ couchent à vingt et une heures.",    answer: "se",
+        explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>couchent</em>. Test : <em>je me couche</em>." },
+      { sentence: "Tom ___ regarde dans le miroir.",                    answer: "se",
+        explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>regarde</em>. Test : <em>je me regarde</em>." },
+      { sentence: "Ma sœur ___ peigne les cheveux chaque matin.",       answer: "se",
+        explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>peigne</em>. Test : <em>je me peigne</em>." },
+      { sentence: "Il ___ tait quand le professeur parle.",             answer: "se",
+        explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>tait</em>. Test : <em>je me tais</em>." },
+      { sentence: "Ils ___ parlent souvent après la classe.",           answer: "se",
+        explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>parlent</em>. Test : <em>nous nous parlons</em>." },
+      { sentence: "Ce matin, Paul ___ lève tôt.",                       answer: "se",
+        explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>lève</em>. Test : <em>je me lève</em>. Dans cette même phrase, <em>Ce</em> est un déterminant démonstratif devant le nom <em>matin</em>." }
     ]
   },
 
@@ -4806,6 +4895,1114 @@ const EXERCISE_DATA = {
         answers:     ["avais oublié"],
         auxVerb:     "avoir",
         explication: "J' → je : <strong>avais</strong> + <strong>oublié</strong> (participe invariable)."
+      }
+    ],
+    niveauxConfig: {
+      rule:             "Plus-que-parfait = auxiliaire <em>être</em> ou <em>avoir</em> à l'imparfait + participe passé",
+      lvDefs: [
+        { lv: 1, icon: '⭐',   label: 'Niveau 1 — Repère le plus-que-parfait', desc: 'Lis un texte, identifie les verbes au plus-que-parfait' },
+        { lv: 2, icon: '⭐⭐', label: 'Niveau 2 — Complète au plus-que-parfait', desc: 'Conjugue des phrases à trous au plus-que-parfait' }
+      ],
+      verb1Instruction: "Clique sur les verbes au <strong>plus-que-parfait</strong>, puis valide.",
+      verb1NotTarget:   "n'est pas au plus-que-parfait : l'auxiliaire n'est pas à l'imparfait",
+      verb1TargetName:  "plus-que-parfait",
+      verb1FoundAll:    "Tu as trouvé tous les plus-que-parfaits !",
+      verb2Instruction: "Conjugue le verbe au <strong>plus-que-parfait</strong>.",
+      lv2NextBtnLabel:  "Niveau 2 — Complète →",
+      winMsg:           "Tu maîtrises le plus-que-parfait aux deux niveaux !"
+    }
+  },
+
+  "conjuguer-imperatif-present": {
+    title:              "Conjuguer à l'impératif présent",
+    levels:             ["CM2", "6e"],
+    type:               "imp-niveaux",
+    questionsPerSession: 10,
+    backLink:           { href: "français-conjugaison.html", label: "Conjugaison" },
+    niveauxConfig: {
+      rule:             "Impératif présent : sans pronom sujet · <em>tu</em> (1<sup>er</sup> groupe : pas de -s) / <em>nous</em> / <em>vous</em>",
+      lvDefs: [
+        { lv: 1, icon: '⭐',   label: "Niveau 1 — Repère l'impératif", desc: "Lis un texte, identifie les verbes à l'impératif présent" },
+        { lv: 2, icon: '⭐⭐', label: "Niveau 2 — Écris à l'impératif", desc: "Conjugue des phrases à trous à l'impératif présent" }
+      ],
+      verb1Instruction: "Clique sur les verbes à l'<strong>impératif présent</strong>, puis valide.",
+      verb1NotTarget:   "n'est pas à l'impératif présent",
+      verb1TargetName:  "impératif",
+      verb1FoundAll:    "Tu as trouvé tous les impératifs !",
+      verb2Instruction: "Conjugue le verbe à l'<strong>impératif présent</strong>.",
+      lv2NextBtnLabel:  "Niveau 2 — Écris →",
+      winMsg:           "Tu maîtrises l'impératif présent aux deux niveaux !",
+      simpleErrorFeedback: true
+    },
+    identTexts: [
+      /* Texte 1 — La recette */
+      { tokens: [
+        { t: "Maman ouvrit le livre de cuisine. Elle dit : « " },
+        { t: "Prends", v: true, pqp: true },
+        { t: " deux œufs et " },
+        { t: "mélange", v: true, pqp: true },
+        { t: "-les bien. » Paul " },
+        { t: "prit", v: true, pqp: false },
+        { t: " les ingrédients sur l'étagère. Il " },
+        { t: "versa", v: true, pqp: false },
+        { t: " le lait dans le bol." }
+      ]},
+      /* Texte 2 — À l'école */
+      { tokens: [
+        { t: "La maîtresse se leva et dit aux élèves : « " },
+        { t: "Ouvrez", v: true, pqp: true },
+        { t: " vos cahiers et " },
+        { t: "écrivez", v: true, pqp: true },
+        { t: " la date. » Les enfants " },
+        { t: "ouvrirent", v: true, pqp: false },
+        { t: " leurs cahiers en silence. Théo " },
+        { t: "écrit", v: true, pqp: false },
+        { t: " très lentement." }
+      ]},
+      /* Texte 3 — La forêt magique */
+      { tokens: [
+        { t: "Un lutin apparut devant Hugo. « " },
+        { t: "Suis", v: true, pqp: true },
+        { t: "-moi jusqu'à la clairière et " },
+        { t: "ferme", v: true, pqp: true },
+        { t: " les yeux. » Hugo " },
+        { t: "suivit", v: true, pqp: false },
+        { t: " le lutin à travers les arbres. Il " },
+        { t: "ferma", v: true, pqp: false },
+        { t: " les yeux comme demandé." }
+      ]},
+      /* Texte 4 — Chez grand-mère */
+      { tokens: [
+        { t: "Grand-mère nous regarda et dit : « " },
+        { t: "Soyez", v: true, pqp: true },
+        { t: " sages pendant le dîner et " },
+        { t: "rangez", v: true, pqp: true },
+        { t: " vos affaires après. » Les enfants se regardèrent et " },
+        { t: "obéirent", v: true, pqp: false },
+        { t: " sans protester. Léa " },
+        { t: "rangea", v: true, pqp: false },
+        { t: " son sac en premier." }
+      ]}
+    ],
+    writeBank: [
+      {
+        sentence:    "(manger) ___ tes légumes avant d'aller jouer !",
+        answers:     ["Mange", "mange"],
+        explication: "1<sup>er</sup> groupe, tu : <strong>mange</strong> — pas de -s à l'impératif (tu manges → mange)."
+      },
+      {
+        sentence:    "(choisir) ___ votre place en silence, s'il vous plaît.",
+        answers:     ["Choisissez", "choisissez"],
+        explication: "2<sup>e</sup> groupe, vous : <strong>choisissez</strong> — même forme qu'au présent de l'indicatif."
+      },
+      {
+        sentence:    "(chanter) ___ la chanson tous ensemble !",
+        answers:     ["Chantons", "chantons"],
+        explication: "1<sup>er</sup> groupe, nous : <strong>chantons</strong> — même forme qu'au présent de l'indicatif."
+      },
+      {
+        sentence:    "(finir) ___ ton exercice avant la récréation.",
+        answers:     ["Finis", "finis"],
+        explication: "2<sup>e</sup> groupe, tu : <strong>finis</strong> — même forme qu'au présent de l'indicatif."
+      },
+      {
+        sentence:    "(être) ___ attentifs pendant toute la leçon !",
+        answers:     ["Soyez", "soyez"],
+        explication: "Être, vous : <strong>soyez</strong> — forme irrégulière (à mémoriser)."
+      },
+      {
+        sentence:    "(avoir) ___ confiance en vous !",
+        answers:     ["Ayez", "ayez"],
+        explication: "Avoir, vous : <strong>ayez</strong> — forme irrégulière (à mémoriser)."
+      },
+      {
+        sentence:    "(aller) ___ te coucher, il est tard !",
+        answers:     ["Va", "va"],
+        explication: "Aller, tu : <strong>va</strong> — pas de -s (exception : va-s-y avec le pronom y)."
+      },
+      {
+        sentence:    "Vous êtes prêts ? (avancer) ___ vers la sortie !",
+        answers:     ["Avancez", "avancez"],
+        explication: "1<sup>er</sup> groupe, vous : <strong>avancez</strong> — même forme qu'au présent."
+      },
+      {
+        sentence:    "(prendre) ___ ton manteau, il fait froid dehors.",
+        answers:     ["Prends", "prends"],
+        explication: "3<sup>e</sup> groupe, tu : <strong>prends</strong> — forme irrégulière, avec -ds."
+      },
+      {
+        sentence:    "(partir) ___ à l'aventure avant que la nuit tombe !",
+        answers:     ["Partons", "partons"],
+        explication: "3<sup>e</sup> groupe, nous : <strong>partons</strong> — même forme qu'au présent de l'indicatif."
+      }
+    ]
+  },
+
+  "conjuguer-conditionnel-present": {
+    title:               "Conjuguer au conditionnel présent",
+    levels:              ["6e"],
+    type:                "cond-niveaux",
+    questionsPerSession: 10,
+    backLink:            { href: "français-conjugaison.html", label: "Conjugaison" },
+    niveauxConfig: {
+      rule:             "Conditionnel présent = radical du futur + terminaisons de l'imparfait (-<em>ais</em>, -<em>ais</em>, -<em>ait</em>, -<em>ions</em>, -<em>iez</em>, -<em>aient</em>)",
+      lvDefs: [
+        { lv: 1, icon: '⭐',   label: "Niveau 1 — Repère le conditionnel", desc: "Lis un texte, identifie les verbes au conditionnel présent" },
+        { lv: 2, icon: '⭐⭐', label: "Niveau 2 — Complète au conditionnel", desc: "Conjugue des phrases à trous au conditionnel présent" }
+      ],
+      verb1Instruction: "Clique sur les verbes au <strong>conditionnel présent</strong>, puis valide.",
+      verb1NotTarget:   "n'est pas au conditionnel présent",
+      verb1TargetName:  "conditionnel",
+      verb1FoundAll:    "Tu as trouvé tous les conditionnels !",
+      verb2Instruction: "Conjugue le verbe au <strong>conditionnel présent</strong>.",
+      lv2NextBtnLabel:  "Niveau 2 — Complète →",
+      winMsg:           "Tu maîtrises le conditionnel présent aux deux niveaux !",
+      simpleErrorFeedback: true
+    },
+    identTexts: [
+      /* Texte 1 — La maison de rêve : conditionnels "achèterais", "aurait" ; imparfaits "rêvais", "préférait" */
+      { tokens: [
+        { t: "Si j'avais beaucoup d'argent, j'" },
+        { t: "achèterais", v: true, pqp: true },
+        { t: " une grande maison avec un jardin. Quand j'étais enfant, je " },
+        { t: "rêvais", v: true, pqp: false },
+        { t: " d'y habiter chaque soir. La maison " },
+        { t: "aurait", v: true, pqp: true },
+        { t: " une piscine et une bibliothèque. Mon frère " },
+        { t: "préférait", v: true, pqp: false },
+        { t: " un appartement en ville." }
+      ]},
+      /* Texte 2 — Le voyage imaginaire : "serait", "trouverait" ; "étudiaient", "publiaient" */
+      { tokens: [
+        { t: "D'après les explorateurs, cette île " },
+        { t: "serait", v: true, pqp: true },
+        { t: " magnifique. On y " },
+        { t: "trouverait", v: true, pqp: true },
+        { t: " des plantes inconnues. Les scientifiques " },
+        { t: "étudiaient", v: true, pqp: false },
+        { t: " la région depuis des années. Ils " },
+        { t: "publiaient", v: true, pqp: false },
+        { t: " leurs résultats chaque mois." }
+      ]},
+      /* Texte 3 — La météo : "neigerait", "descendraient" ; "s'inquiétaient", "préparaient" */
+      { tokens: [
+        { t: "Le journaliste annonça : « Il " },
+        { t: "neigerait", v: true, pqp: true },
+        { t: " ce week-end sur les sommets et les températures " },
+        { t: "descendraient", v: true, pqp: true },
+        { t: " sous zéro. » Les habitants " },
+        { t: "s'inquiétaient", v: true, pqp: false },
+        { t: " pour les routes. Ils " },
+        { t: "préparaient", v: true, pqp: false },
+        { t: " du bois pour se chauffer." }
+      ]},
+      /* Texte 4 — La fête : "aimeraient", "voudrait" ; "décoraient", "pensait" */
+      { tokens: [
+        { t: "Mes amis " },
+        { t: "aimeraient", v: true, pqp: true },
+        { t: " organiser une surprise pour mon anniversaire. Ils " },
+        { t: "décoraient", v: true, pqp: false },
+        { t: " la salle en secret chaque fois. Julia " },
+        { t: "voudrait", v: true, pqp: true },
+        { t: " inviter toute la classe. Elle " },
+        { t: "pensait", v: true, pqp: false },
+        { t: " à un thème différent." }
+      ]}
+    ],
+    writeBank: [
+      {
+        sentence:    "Si j'avais des ailes, j'(aimer) ___ voler au-dessus des nuages.",
+        answers:     ["aimerais"],
+        explication: "1<sup>er</sup> groupe, je : <strong>aim-</strong> (radical futur) + <strong>-ais</strong> → <strong>aimerais</strong>."
+      },
+      {
+        sentence:    "Avec un peu d'entraînement, tu (chanter) ___ encore mieux !",
+        answers:     ["chanterais"],
+        explication: "1<sup>er</sup> groupe, tu : <strong>chanter-</strong> + <strong>-ais</strong> → <strong>chanterais</strong>."
+      },
+      {
+        sentence:    "Il (finir) ___ son travail bien plus vite avec de l'aide.",
+        answers:     ["finirait"],
+        explication: "2<sup>e</sup> groupe, il : <strong>finir-</strong> + <strong>-ait</strong> → <strong>finirait</strong>."
+      },
+      {
+        sentence:    "Nous (voyager) ___ autour du monde si nous avions le temps.",
+        answers:     ["voyagerions"],
+        explication: "1<sup>er</sup> groupe, nous : <strong>voyager-</strong> + <strong>-ions</strong> → <strong>voyagerions</strong>."
+      },
+      {
+        sentence:    "Vous (arriver) ___ à l'heure si vous partiez maintenant.",
+        answers:     ["arriveriez"],
+        explication: "1<sup>er</sup> groupe, vous : <strong>arriver-</strong> + <strong>-iez</strong> → <strong>arriveriez</strong>."
+      },
+      {
+        sentence:    "Elles (choisir) ___ le menu si on leur demandait.",
+        answers:     ["choisiraient"],
+        explication: "2<sup>e</sup> groupe, elles : <strong>choisir-</strong> + <strong>-aient</strong> → <strong>choisiraient</strong>."
+      },
+      {
+        sentence:    "Sans la pluie, ce (être) ___ la journée parfaite.",
+        answers:     ["serait"],
+        explication: "Être, il/ce : radical irrégulier <strong>ser-</strong> + <strong>-ait</strong> → <strong>serait</strong>."
+      },
+      {
+        sentence:    "Elle (avoir) ___ peur si elle voyait une araignée géante.",
+        answers:     ["aurait"],
+        explication: "Avoir, elle : radical irrégulier <strong>aur-</strong> + <strong>-ait</strong> → <strong>aurait</strong>."
+      },
+      {
+        sentence:    "Tu (aller) ___ jouer dehors si le soleil revenait.",
+        answers:     ["irais"],
+        explication: "Aller, tu : radical irrégulier <strong>ir-</strong> + <strong>-ais</strong> → <strong>irais</strong>."
+      },
+      {
+        sentence:    "Nous (faire) ___ un gâteau si nous avions assez d'œufs.",
+        answers:     ["ferions"],
+        explication: "Faire, nous : radical irrégulier <strong>fer-</strong> + <strong>-ions</strong> → <strong>ferions</strong>."
+      }
+    ]
+  },
+
+  /* ── Accorder le verbe avec un sujet inversé ────────────────────────────── */
+  "accord-verbe-sujet-inverse": {
+    title: "Accorder le verbe avec un sujet inversé",
+    levels: ["CM1", "CM2", "6e"],
+    type: "sujet-inverse-niveaux",
+    questionsPerSession: 6,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+
+    /* ── Niveau 1 : Dans les questions ──────────────────────────────────────
+       Inversion du sujet dans des phrases interrogatives.
+       Tenses mélangés : présent / imparfait / futur.
+       display format : [infinitif] marks the verb slot ; all other words are
+       clickable ; subjectWords lists ALL tokens of the subject group.
+       stem + answer[stem.length..] = answer (used to highlight the ending).
+    ────────────────────────────────────────────────────────────────────────── */
+    lvl1Bank: [
+      {
+        display:       "Que [vouloir] tes amis ?",
+        subjectWords:  ["tes", "amis"],
+        tense:         "présent",
+        answer:        "veulent",
+        stem:          "veul",
+        fullSentence:  "Que veulent tes amis ?"
+      },
+      {
+        display:       "Quand [partir] les invités ?",
+        subjectWords:  ["les", "invités"],
+        tense:         "futur",
+        answer:        "partiront",
+        stem:          "partir",
+        fullSentence:  "Quand partiront les invités ?"
+      },
+      {
+        display:       "Que [penser] les élèves de ce livre ?",
+        subjectWords:  ["les", "élèves"],
+        tense:         "présent",
+        answer:        "pensent",
+        stem:          "pens",
+        fullSentence:  "Que pensent les élèves de ce livre ?"
+      },
+      {
+        display:       "Où [aller] les enfants ?",
+        subjectWords:  ["les", "enfants"],
+        tense:         "imparfait",
+        answer:        "allaient",
+        stem:          "all",
+        fullSentence:  "Où allaient les enfants ?"
+      },
+      {
+        display:       "Comment [chanter] ce chœur ?",
+        subjectWords:  ["ce", "chœur"],
+        tense:         "imparfait",
+        answer:        "chantait",
+        stem:          "chant",
+        fullSentence:  "Comment chantait ce chœur ?"
+      },
+      {
+        display:       "Quand [rentrer] ta sœur ?",
+        subjectWords:  ["ta", "sœur"],
+        tense:         "futur",
+        answer:        "rentrera",
+        stem:          "rentrer",
+        fullSentence:  "Quand rentrera ta sœur ?"
+      }
+    ],
+
+    /* ── Niveau 2 : Incises et tournures ────────────────────────────────────
+       Inversion dans les incises de dialogue et après un adverbe / complément
+       en tête de phrase. Pièges : sujet éloigné du verbe, sujet pluriel.
+    ────────────────────────────────────────────────────────────────────────── */
+    lvl2Bank: [
+      {
+        display:       "— Attention ! [crier] les enfants .",
+        subjectWords:  ["les", "enfants"],
+        tense:         "présent",
+        answer:        "crient",
+        stem:          "cri",
+        fullSentence:  "— Attention ! crient les enfants ."
+      },
+      {
+        display:       "— On se reverra ! [promettre] les deux amis .",
+        subjectWords:  ["les", "deux", "amis"],
+        tense:         "futur",
+        answer:        "promettront",
+        stem:          "promettr",
+        fullSentence:  "— On se reverra ! promettront les deux amis ."
+      },
+      {
+        display:       "— Bonne nuit ! [murmurer] le groupe .",
+        subjectWords:  ["le", "groupe"],
+        tense:         "imparfait",
+        answer:        "murmurait",
+        stem:          "murmur",
+        fullSentence:  "— Bonne nuit ! murmurait le groupe ."
+      },
+      {
+        display:       "Sur la branche [chanter] deux oiseaux .",
+        subjectWords:  ["deux", "oiseaux"],
+        tense:         "imparfait",
+        answer:        "chantaient",
+        stem:          "chant",
+        fullSentence:  "Sur la branche chantaient deux oiseaux ."
+      },
+      {
+        display:       "Peut-être [arriver] ses cousins ce soir .",
+        subjectWords:  ["ses", "cousins"],
+        tense:         "futur",
+        answer:        "arriveront",
+        stem:          "arriver",
+        fullSentence:  "Peut-être arriveront ses cousins ce soir ."
+      },
+      {
+        display:       "Ainsi [parler] autrefois les anciens .",
+        subjectWords:  ["les", "anciens"],
+        tense:         "imparfait",
+        answer:        "parlaient",
+        stem:          "parl",
+        fullSentence:  "Ainsi parlaient autrefois les anciens ."
+      }
+    ]
+  },
+
+  /* ────────────────────────────────────────────────────────────────────────
+     DIFFÉRENCIER ÉPITHÈTE ET ATTRIBUT DU SUJET
+     Type : epithete-attribut-niveaux
+     Niveau 1 — Verbe d'état ou verbe d'action ? (8 phrases, choix binaire)
+     Niveau 2 — Épithète ou attribut ? (10 phrases, 2 étapes par phrase)
+     Niveau 3 — Transforme ! (6 phrases, saisie libre)
+  ─────────────────────────────────────────────────────────────────────────── */
+
+  "differencier-epithete-attribut": {
+    title:   "Différencier l'adjectif épithète et l'attribut du sujet",
+    levels:  ["CM2", "6e"],
+    type:    "epithete-attribut-niveaux",
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+
+    /* ── Niveau 1 : Verbe d'état ou verbe d'action ? ────────────────────────
+       isStateVerb : true = verbe d'état (être, paraître, sembler, devenir,
+                             rester, demeurer, avoir l'air)
+       verb        : forme du verbe à mettre en évidence dans la phrase
+    ──────────────────────────────────────────────────────────────────────── */
+    lvl1Bank: [
+      { sentence: "Le ciel semble menaçant.",
+        verb: "semble", isStateVerb: true,
+        feedback: "« Semble » est un verbe d'état : il relie l'adjectif « menaçant » au sujet « le ciel »." },
+      { sentence: "Le chien court vite.",
+        verb: "court", isStateVerb: false,
+        feedback: "« Court » est un verbe d'action : il exprime ce que fait le chien (courir)." },
+      { sentence: "Cette fille devient grande.",
+        verb: "devient", isStateVerb: true,
+        feedback: "« Devient » est un verbe d'état : il exprime un changement d'état et relie « grande » au sujet." },
+      { sentence: "Le professeur explique la leçon.",
+        verb: "explique", isStateVerb: false,
+        feedback: "« Explique » est un verbe d'action : il décrit ce que fait le professeur." },
+      { sentence: "Le chat a l'air endormi.",
+        verb: "a l'air", isStateVerb: true,
+        feedback: "Piège ! « Avoir l'air » est un verbe d'état : il relie « endormi » au sujet « le chat ». Ne pas confondre avec le verbe « avoir » seul." },
+      { sentence: "La rose paraît fragile.",
+        verb: "paraît", isStateVerb: true,
+        feedback: "« Paraît » est un verbe d'état : il relie l'adjectif « fragile » au sujet « la rose »." },
+      { sentence: "Les enfants jouent dans la cour.",
+        verb: "jouent", isStateVerb: false,
+        feedback: "« Jouent » est un verbe d'action : il exprime ce que font les enfants." },
+      { sentence: "Il reste silencieux toute la journée.",
+        verb: "reste", isStateVerb: true,
+        feedback: "« Reste » est un verbe d'état : il exprime la continuité d'un état et relie « silencieux » au sujet." }
+    ],
+
+    /* ── Niveau 2 : Épithète ou attribut ? ─────────────────────────────────
+       adjective      : adjectif surligné
+       hasStateVerb   : true si un verbe d'état relie l'adjectif au sujet
+       stateVerb      : verbe d'état (null si hasStateVerb = false)
+       stateVerbChoices : [verbe correct, ...distracteurs] (pour le clic)
+       nature         : "epithete" | "attribut"
+       subject        : groupe sujet (pour l'animation attribut)
+       noun           : nom noyau (pour l'animation épithète)
+    ──────────────────────────────────────────────────────────────────────── */
+    lvl2Bank: [
+      { sentence: "Le vieux chat dort sur le canapé.",
+        adjective: "vieux", hasStateVerb: false, stateVerb: null,
+        stateVerbChoices: [], nature: "epithete",
+        subject: "Le vieux chat", noun: "chat",
+        feedbackEpithete: "« Vieux » est épithète : il est directement collé au nom « chat » sans verbe d'état.",
+        feedbackAttribut: "" },
+      { sentence: "Ma sœur semble triste.",
+        adjective: "triste", hasStateVerb: true, stateVerb: "semble",
+        stateVerbChoices: ["semble", "triste", "Ma sœur"],
+        nature: "attribut", subject: "Ma sœur", noun: null,
+        feedbackAttribut: "« Triste » est attribut : le verbe d'état « semble » relie l'adjectif au sujet « ma sœur ».",
+        feedbackEpithete: "" },
+      { sentence: "Le petit chien blanc aboie.",
+        adjective: "blanc", hasStateVerb: false, stateVerb: null,
+        stateVerbChoices: [], nature: "epithete",
+        subject: "Le petit chien blanc", noun: "chien",
+        feedbackEpithete: "« Blanc » est épithète (même éloigné du nom) : pas de verbe d'état — l'adjectif fait partie du groupe nominal.",
+        feedbackAttribut: "" },
+      { sentence: "Le ciel est bleu.",
+        adjective: "bleu", hasStateVerb: true, stateVerb: "est",
+        stateVerbChoices: ["est", "bleu", "Le ciel"],
+        nature: "attribut", subject: "Le ciel", noun: null,
+        feedbackAttribut: "« Bleu » est attribut : le verbe d'état « est » relie l'adjectif « bleu » au sujet « le ciel ».",
+        feedbackEpithete: "" },
+      { sentence: "L'élève studieux paraît fatigué.",
+        adjective: "fatigué", hasStateVerb: true, stateVerb: "paraît",
+        stateVerbChoices: ["paraît", "studieux", "fatigué"],
+        nature: "attribut", subject: "L'élève studieux", noun: null,
+        feedbackAttribut: "« Fatigué » est attribut du sujet « l'élève » via le verbe d'état « paraît ». (Piège : « studieux » est épithète — il y a les deux dans cette phrase !)",
+        feedbackEpithete: "" },
+      { sentence: "Un homme grand traversait la rue.",
+        adjective: "grand", hasStateVerb: false, stateVerb: null,
+        stateVerbChoices: [], nature: "epithete",
+        subject: "Un homme grand", noun: "homme",
+        feedbackEpithete: "« Grand » est épithète : il appartient au groupe nominal de « homme » sans verbe d'état.",
+        feedbackAttribut: "" },
+      { sentence: "La fleur reste belle même en hiver.",
+        adjective: "belle", hasStateVerb: true, stateVerb: "reste",
+        stateVerbChoices: ["reste", "belle", "La fleur"],
+        nature: "attribut", subject: "La fleur", noun: null,
+        feedbackAttribut: "« Belle » est attribut : le verbe d'état « reste » relie l'adjectif au sujet « la fleur ».",
+        feedbackEpithete: "" },
+      { sentence: "Les feuilles tombées couvrent le sol.",
+        adjective: "tombées", hasStateVerb: false, stateVerb: null,
+        stateVerbChoices: [], nature: "epithete",
+        subject: "Les feuilles tombées", noun: "feuilles",
+        feedbackEpithete: "Piège ! « Tombées » est un participe passé employé comme adjectif épithète : il qualifie « feuilles » sans verbe d'état.",
+        feedbackAttribut: "" },
+      { sentence: "Cette histoire est passionnante.",
+        adjective: "passionnante", hasStateVerb: true, stateVerb: "est",
+        stateVerbChoices: ["est", "passionnante", "Cette histoire"],
+        nature: "attribut", subject: "Cette histoire", noun: null,
+        feedbackAttribut: "« Passionnante » est attribut du sujet « cette histoire » via le verbe d'état « est ».",
+        feedbackEpithete: "" },
+      { sentence: "Le courageux chevalier avance.",
+        adjective: "courageux", hasStateVerb: false, stateVerb: null,
+        stateVerbChoices: [], nature: "epithete",
+        subject: "Le courageux chevalier", noun: "chevalier",
+        feedbackEpithete: "« Courageux » est épithète antéposé : il est placé avant le nom « chevalier » sans verbe d'état.",
+        feedbackAttribut: "" }
+    ],
+
+    /* ── Niveau 3 : Transformer ─────────────────────────────────────────────
+       direction        : "epithete-to-attribute" | "attribute-to-epithet"
+       adjective        : forme dans la phrase originale
+       adjectiveForms   : toutes les formes acceptées (m/f/s/p) après normalisation
+       acceptedAnswers  : liste de réponses exactes acceptées
+    ──────────────────────────────────────────────────────────────────────── */
+    lvl3Bank: [
+      { original:    "Le chien joyeux aboie.",
+        direction:   "epithete-to-attribute",
+        adjective:   "joyeux",
+        adjectiveForms: ["joyeux", "joyeuse", "joyeuses"],
+        instruction: "Réécris la phrase en utilisant l'adjectif comme <strong>attribut du sujet</strong> (avec un verbe d'état).",
+        example:     "Le chien est joyeux.",
+        acceptedAnswers: [
+          "Le chien est joyeux.", "Le chien semble joyeux.",
+          "Le chien paraît joyeux.", "Le chien reste joyeux.",
+          "Le chien devient joyeux.", "Le chien a l'air joyeux.",
+          "Le chien demeure joyeux."
+        ]
+      },
+      { original:    "La lune brillante éclaire la nuit.",
+        direction:   "epithete-to-attribute",
+        adjective:   "brillante",
+        adjectiveForms: ["brillant", "brillante", "brillants", "brillantes"],
+        instruction: "Réécris la phrase en utilisant l'adjectif comme <strong>attribut du sujet</strong>.",
+        example:     "La lune est brillante.",
+        acceptedAnswers: [
+          "La lune est brillante.", "La lune paraît brillante.",
+          "La lune semble brillante.", "La lune reste brillante.",
+          "La lune demeure brillante."
+        ]
+      },
+      { original:    "Un garçon courageux se défend.",
+        direction:   "epithete-to-attribute",
+        adjective:   "courageux",
+        adjectiveForms: ["courageux", "courageuse", "courageux", "courageuses"],
+        instruction: "Réécris la phrase en utilisant l'adjectif comme <strong>attribut du sujet</strong>.",
+        example:     "Le garçon est courageux.",
+        acceptedAnswers: [
+          "Le garçon est courageux.", "Il est courageux.",
+          "Le garçon semble courageux.", "Le garçon paraît courageux.",
+          "Le garçon reste courageux.", "Un garçon est courageux.",
+          "Ce garçon est courageux."
+        ]
+      },
+      { original:    "Le chat semble fatigué.",
+        direction:   "attribute-to-epithet",
+        adjective:   "fatigué",
+        adjectiveForms: ["fatigue", "fatigué", "fatiguee", "fatiguée", "fatigues", "fatigués", "fatiguees", "fatiguées"],
+        instruction: "Réécris la phrase en utilisant l'adjectif comme <strong>épithète</strong> (colle-le au nom, sans verbe d'état).",
+        example:     "Le chat fatigué dort.",
+        acceptedAnswers: [
+          "Le chat fatigué dort.", "Le chat fatigué mange.",
+          "Le chat fatigué se repose.", "Le chat fatigué ronronne.",
+          "Le chat fatigué reste immobile.", "Le chat fatigué bâille.",
+          "Le chat fatigué ferme les yeux.", "Un chat fatigué dort."
+        ]
+      },
+      { original:    "Le ciel est sombre.",
+        direction:   "attribute-to-epithet",
+        adjective:   "sombre",
+        adjectiveForms: ["sombre", "sombres"],
+        instruction: "Réécris la phrase en utilisant l'adjectif comme <strong>épithète</strong>.",
+        example:     "Le ciel sombre menace.",
+        acceptedAnswers: [
+          "Le ciel sombre menace.", "Le ciel sombre s'étend.",
+          "Le ciel sombre annonce la pluie.", "Le ciel sombre couvre la ville.",
+          "Le ciel sombre inquiète.", "Le ciel sombre pèse sur la ville.",
+          "Un ciel sombre annonce l'orage.", "Un ciel sombre menace."
+        ]
+      },
+      { original:    "Ma sœur semble triste.",
+        direction:   "attribute-to-epithet",
+        adjective:   "triste",
+        adjectiveForms: ["triste", "tristes"],
+        instruction: "Réécris la phrase en utilisant l'adjectif comme <strong>épithète</strong>.",
+        example:     "Ma sœur triste pleure.",
+        acceptedAnswers: [
+          "Ma sœur triste pleure.", "Ma sœur triste soupire.",
+          "Ma sœur triste ne parle plus.", "La sœur triste pleure.",
+          "Une sœur triste pleure.", "Ma sœur triste s'isole.",
+          "Ma sœur triste reste seule.", "Ma sœur triste boudait."
+        ]
+      }
+    ]
+  },
+
+  /* ════════════════════════════════════════════════════════════════════════
+     Exercice : Distinguer adjectif épithète et complément du nom
+     Niveau 1 — Trouve l'expansion du nom (8 GNs, mots cliquables)
+     Niveau 2 — Épithète ou complément du nom ? (10 items, 2 étapes)
+     Niveau 3 — Transforme ! (6 items, saisie libre, validation souple)
+  ═════════════════════════════════════════════════════════════════════════ */
+
+  "distinguer-epithete-complement-nom": {
+    title:   "Distinguer l'adjectif épithète et le complément du nom",
+    levels:  ["6e"],
+    type:    "ecn-niveaux",
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+
+    /* ── Niveau 1 : Trouve l'expansion du nom ────────────────────────────
+       words        : mots du GN (tous cliquables)
+       noyauIdx     : index du nom-noyau dans words[]
+       expansionIdx : indices des mots formant l'expansion
+       type         : "epithete" | "complement-nom"
+       feedback     : explication affichée après validation
+    ──────────────────────────────────────────────────────────────────────── */
+    lvl1Bank: [
+      { words: ["le", "vélo", "rouge"],
+        noyauIdx: 1, expansionIdx: [2], type: "epithete",
+        feedback: "« Vélo » est le nom-noyau. « Rouge » est un adjectif épithète : directement accolé au nom, il le précise sans préposition." },
+      { words: ["le", "vélo", "de", "course"],
+        noyauIdx: 1, expansionIdx: [2, 3], type: "complement-nom",
+        feedback: "« Vélo » est le nom-noyau. « De course » est un complément du nom : la préposition « de » introduit le groupe qui précise le vélo." },
+      { words: ["une", "belle", "maison"],
+        noyauIdx: 2, expansionIdx: [1], type: "epithete",
+        feedback: "« Maison » est le nom-noyau. « Belle » est un adjectif épithète : même placé avant le nom, il lui est directement rattaché — pas de préposition." },
+      { words: ["le", "chien", "du", "voisin"],
+        noyauIdx: 1, expansionIdx: [2, 3], type: "complement-nom",
+        feedback: "« Chien » est le nom-noyau. « Du voisin » est un complément du nom. Attention : « du » = « de + le » — une préposition est bien présente !" },
+      { words: ["un", "livre", "passionnant"],
+        noyauIdx: 1, expansionIdx: [2], type: "epithete",
+        feedback: "« Livre » est le nom-noyau. « Passionnant » est un adjectif épithète : il qualifie le livre directement, sans préposition." },
+      { words: ["la", "table", "en", "bois"],
+        noyauIdx: 1, expansionIdx: [2, 3], type: "complement-nom",
+        feedback: "« Table » est le nom-noyau. « En bois » est un complément du nom introduit par la préposition « en »." },
+      { words: ["un", "enfant", "courageux"],
+        noyauIdx: 1, expansionIdx: [2], type: "epithete",
+        feedback: "« Enfant » est le nom-noyau. « Courageux » est un adjectif épithète : il qualifie directement l'enfant, sans préposition." },
+      { words: ["un", "terrain", "de", "sport"],
+        noyauIdx: 1, expansionIdx: [2, 3], type: "complement-nom",
+        feedback: "« Terrain » est le nom-noyau. « De sport » est un complément du nom introduit par la préposition « de »." }
+    ],
+
+    /* ── Niveau 2 : Épithète ou complément du nom ? ──────────────────────
+       gn           : groupe nominal affiché
+       gnWords      : mots du GN
+       noyauIdx     : index du nom-noyau dans gnWords[]
+       expansion    : texte de l'expansion
+       expansionIdx : indices de l'expansion dans gnWords[]
+       hasPrep      : true si l'expansion est introduite par une préposition
+       prepText     : préposition telle qu'elle apparaît (ex. "du", "des", "en")
+       prepIdx      : index du mot-préposition dans gnWords[]
+       prepReal     : forme développée (ex. "de + le")
+       isMerged     : true si du/des (préposition fusionnée avec article)
+       nature       : "epithete" | "complement-nom"
+       feedbackPrep : explication de l'étape préposition
+       feedbackFinal: explication finale
+    ──────────────────────────────────────────────────────────────────────── */
+    lvl2Bank: [
+      { gn: "le manteau bleu",
+        gnWords: ["le", "manteau", "bleu"], noyauIdx: 1,
+        expansion: "bleu", expansionIdx: [2],
+        hasPrep: false, prepText: null, prepIdx: -1, prepReal: null, isMerged: false,
+        nature: "epithete",
+        feedbackPrep: "Aucune préposition : « bleu » est un adjectif directement collé au nom.",
+        feedbackFinal: "« Bleu » est un <strong>adjectif épithète</strong> : il s'accorde avec « manteau » (masc. sing.) et y est directement rattaché, sans préposition." },
+
+      { gn: "la maison du quartier",
+        gnWords: ["la", "maison", "du", "quartier"], noyauIdx: 1,
+        expansion: "du quartier", expansionIdx: [2, 3],
+        hasPrep: true, prepText: "du", prepIdx: 2, prepReal: "de + le", isMerged: true,
+        nature: "complement-nom",
+        feedbackPrep: "Piège classique ! « du » = « de + le » : la préposition « de » est fusionnée avec l'article « le ». Il y a bien une préposition !",
+        feedbackFinal: "« Du quartier » est un <strong>complément du nom</strong> introduit par la préposition « de » cachée dans « du » (de + le)." },
+
+      { gn: "un enfant sage",
+        gnWords: ["un", "enfant", "sage"], noyauIdx: 1,
+        expansion: "sage", expansionIdx: [2],
+        hasPrep: false, prepText: null, prepIdx: -1, prepReal: null, isMerged: false,
+        nature: "epithete",
+        feedbackPrep: "Aucune préposition : « sage » est un adjectif collé directement au nom.",
+        feedbackFinal: "« Sage » est un <strong>adjectif épithète</strong> : il qualifie l'enfant directement, sans préposition." },
+
+      { gn: "une robe sans manches",
+        gnWords: ["une", "robe", "sans", "manches"], noyauIdx: 1,
+        expansion: "sans manches", expansionIdx: [2, 3],
+        hasPrep: true, prepText: "sans", prepIdx: 2, prepReal: "sans", isMerged: false,
+        nature: "complement-nom",
+        feedbackPrep: "Oui ! « sans » est une préposition qui introduit le groupe « sans manches ».",
+        feedbackFinal: "« Sans manches » est un <strong>complément du nom</strong> introduit par la préposition « sans »." },
+
+      { gn: "le petit vélo de course",
+        gnWords: ["le", "petit", "vélo", "de", "course"], noyauIdx: 2,
+        expansion: "de course", expansionIdx: [3, 4],
+        hasPrep: true, prepText: "de", prepIdx: 3, prepReal: "de", isMerged: false,
+        nature: "complement-nom",
+        feedbackPrep: "Oui ! « de » est une préposition qui introduit « de course ».",
+        feedbackFinal: "« De course » est un <strong>complément du nom</strong>. 🔍 Bonus : dans ce GN, « petit » est aussi une expansion — mais c'est un adjectif épithète ! Ce GN a donc deux expansions de natures différentes." },
+
+      { gn: "une belle maison",
+        gnWords: ["une", "belle", "maison"], noyauIdx: 2,
+        expansion: "belle", expansionIdx: [1],
+        hasPrep: false, prepText: null, prepIdx: -1, prepReal: null, isMerged: false,
+        nature: "epithete",
+        feedbackPrep: "Aucune préposition : « belle » est un adjectif, même s'il est placé avant le nom.",
+        feedbackFinal: "Piège : même placé <em>avant</em> le nom, « belle » reste un <strong>adjectif épithète</strong>. La position (avant ou après) ne change pas sa nature." },
+
+      { gn: "le sac de sport",
+        gnWords: ["le", "sac", "de", "sport"], noyauIdx: 1,
+        expansion: "de sport", expansionIdx: [2, 3],
+        hasPrep: true, prepText: "de", prepIdx: 2, prepReal: "de", isMerged: false,
+        nature: "complement-nom",
+        feedbackPrep: "Oui ! « de » est une préposition qui introduit « de sport ».",
+        feedbackFinal: "« De sport » est un <strong>complément du nom</strong> introduit par la préposition « de »." },
+
+      { gn: "des chaussures confortables",
+        gnWords: ["des", "chaussures", "confortables"], noyauIdx: 1,
+        expansion: "confortables", expansionIdx: [2],
+        hasPrep: false, prepText: null, prepIdx: -1, prepReal: null, isMerged: false,
+        nature: "epithete",
+        feedbackPrep: "Aucune préposition : « confortables » est un adjectif directement accolé au nom.",
+        feedbackFinal: "« Confortables » est un <strong>adjectif épithète</strong> : il qualifie les chaussures et s'accorde en genre et en nombre (fém. plur.)." },
+
+      { gn: "la voiture des voisins",
+        gnWords: ["la", "voiture", "des", "voisins"], noyauIdx: 1,
+        expansion: "des voisins", expansionIdx: [2, 3],
+        hasPrep: true, prepText: "des", prepIdx: 2, prepReal: "de + les", isMerged: true,
+        nature: "complement-nom",
+        feedbackPrep: "Piège ! « des » = « de + les » : la préposition « de » est fusionnée avec l'article « les ». Il y a bien une préposition !",
+        feedbackFinal: "« Des voisins » est un <strong>complément du nom</strong> introduit par la préposition « de » cachée dans « des » (de + les)." },
+
+      { gn: "un livre passionnant",
+        gnWords: ["un", "livre", "passionnant"], noyauIdx: 1,
+        expansion: "passionnant", expansionIdx: [2],
+        hasPrep: false, prepText: null, prepIdx: -1, prepReal: null, isMerged: false,
+        nature: "epithete",
+        feedbackPrep: "Aucune préposition : « passionnant » est un adjectif directement accolé au nom.",
+        feedbackFinal: "« Passionnant » est un <strong>adjectif épithète</strong> : il qualifie le livre sans préposition." }
+    ],
+
+    /* ── Niveau 3 : Transforme ──────────────────────────────────────────
+       direction      : "cdn-to-epithete" | "epithete-to-cdn"
+       original       : GN d'origine
+       highlight      : expansion à mettre en évidence dans l'original
+       prompt         : GN avec ___ (l'élève tape l'expansion seule)
+       acceptedAnswers: formes correctes acceptées (expansion seule, après normalisation)
+       example        : exemple de bonne réponse
+       feedback       : explication en cas d'erreur
+    ──────────────────────────────────────────────────────────────────────── */
+    lvl3Bank: [
+      { direction: "cdn-to-epithete",
+        original: "une journée de pluie", highlight: "de pluie",
+        prompt: "une journée ___",
+        acceptedAnswers: ["pluvieuse", "tres pluvieuse", "bien pluvieuse"],
+        example: "une journée pluvieuse",
+        feedback: "Le CDN « de pluie » devient l'adjectif épithète « pluvieuse » — pense à accorder l'adjectif avec le nom (féminin singulier)." },
+
+      { direction: "epithete-to-cdn",
+        original: "la pollution terrestre", highlight: "terrestre",
+        prompt: "la pollution ___",
+        acceptedAnswers: ["de la Terre", "de la terre", "de notre planete", "de notre planète", "du monde", "de la planete", "de la planète"],
+        example: "la pollution de la Terre",
+        feedback: "L'adjectif épithète « terrestre » devient un complément du nom : introduis un groupe prépositionnel (« de la Terre », « de notre planète »…)." },
+
+      { direction: "cdn-to-epithete",
+        original: "un ciel d'orage", highlight: "d'orage",
+        prompt: "un ciel ___",
+        acceptedAnswers: ["orageux", "tres orageux", "bien orageux"],
+        example: "un ciel orageux",
+        feedback: "Le CDN « d'orage » devient l'adjectif épithète « orageux » — masculin singulier, accord avec « ciel »." },
+
+      { direction: "epithete-to-cdn",
+        original: "une manifestation étudiante", highlight: "étudiante",
+        prompt: "une manifestation ___",
+        acceptedAnswers: ["d'etudiants", "d'étudiants", "des etudiants", "des étudiants"],
+        example: "une manifestation d'étudiants",
+        feedback: "L'adjectif épithète « étudiante » devient un complément du nom : introduis un groupe prépositionnel (« d'étudiants »)." },
+
+      { direction: "cdn-to-epithete",
+        original: "une recette de famille", highlight: "de famille",
+        prompt: "une recette ___",
+        acceptedAnswers: ["familiale", "tres familiale", "bien familiale"],
+        example: "une recette familiale",
+        feedback: "Le CDN « de famille » devient l'adjectif épithète « familiale » — féminin singulier, accord avec « recette »." },
+
+      { direction: "cdn-to-epithete",
+        original: "une autorisation des parents", highlight: "des parents",
+        prompt: "une autorisation ___",
+        acceptedAnswers: ["parentale", "tres parentale"],
+        example: "une autorisation parentale",
+        feedback: "Le CDN « des parents » (des = de + les) devient l'adjectif épithète « parentale » — féminin singulier, accord avec « autorisation »." }
+    ]
+  },
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     Distinguer pronom personnel sujet / pronom personnel complément
+     CM2 / 6e — 3 niveaux déverrouillables
+  ════════════════════════════════════════════════════════════════════════ */
+  "distinguer-pronom-sujet-complement": {
+    title: "Distinguer le pronom personnel sujet et le pronom personnel complément",
+    levels: ["CM2", "6e"],
+    type: "psc-niveaux",
+    questionsPerSession: 10,
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+
+    /* ── Niveau 1 : cliquer sur le pronom sujet ─────────────────────────
+       wordTypes[] : "subject" | "complement" | null pour chaque token
+    ──────────────────────────────────────────────────────────────────── */
+    lvl1Bank: [
+      /* 1 — phrase-ancre : seul pronom = sujet */
+      {
+        words:    ["Ils", "jouent", "dans", "la", "cour", "."],
+        wordTypes:["subject", null, null, null, null, null],
+        testQ:    "Qui est-ce qui joue ?",
+        testA:    "Ils",
+        feedbackCorrect: "Exact ! <em>Qui est-ce qui joue ?</em> → <strong>Ils</strong>. C'est le pronom sujet.",
+        note:     "📌 Le pronom sujet fait l'action et commande l'accord du verbe."
+      },
+      /* 2 — phrase-ancre : seul pronom = sujet */
+      {
+        words:    ["Elle", "adore", "le", "chocolat", "."],
+        wordTypes:["subject", null, null, null, null],
+        testQ:    "Qui est-ce qui adore ?",
+        testA:    "Elle",
+        feedbackCorrect: "Bravo ! <em>Qui est-ce qui adore ?</em> → <strong>Elle</strong>. C'est le pronom sujet.",
+        note:     "📌 Le pronom sujet commande l'accord du verbe : elle adore (3ᵉ personne du singulier)."
+      },
+      /* 3 — piège : pronom complément avant le verbe */
+      {
+        words:    ["Il", "me", "regarde", "."],
+        wordTypes:["subject", "complement", null, null],
+        testQ:    "Qui est-ce qui regarde ?",
+        testA:    "Il",
+        feedbackCorrect: "Exact ! <em>Qui est-ce qui regarde ?</em> → <strong>Il</strong>. C'est le pronom sujet.",
+        feedbackComplement: "⚠️ « me » est avant le verbe, mais c'est un pronom <em>complément</em> : Il regarde <em>qui ?</em> → me. La position ne suffit pas !",
+        note:     "📌 Le pronom complément répond à « qui ? », « quoi ? » ou « à qui ? ». Il se place souvent avant le verbe, comme le sujet."
+      },
+      /* 4 — piège central : même forme nous / vous */
+      {
+        words:    ["Nous", "vous", "attendons", "."],
+        wordTypes:["subject", "complement", null, null],
+        testQ:    "Qui est-ce qui attend ?",
+        testA:    "Nous",
+        feedbackCorrect: "Exact ! <em>Qui est-ce qui attend ?</em> → <strong>Nous</strong>. C'est le pronom sujet.",
+        feedbackComplement: "⚠️ « vous » a la même forme comme sujet ET comme complément. Ici c'est un pronom <em>complément</em> : On attend <em>qui ?</em> → vous. C'est le rôle dans la phrase, pas la forme, qui décide !",
+        note:     "📌 Difficulté centrale : « nous » et « vous » ont la même forme sujet et complément. Seul le test <em>Qui est-ce qui + verbe ?</em> permet de trancher."
+      },
+      /* 5 — piège : « les » pronom vs article */
+      {
+        words:    ["Je", "les", "vois", "."],
+        wordTypes:["subject", "complement", null, null],
+        testQ:    "Qui est-ce qui voit ?",
+        testA:    "Je",
+        feedbackCorrect: "Bravo ! <em>Qui est-ce qui voit ?</em> → <strong>Je</strong>. C'est le pronom sujet.",
+        feedbackComplement: "⚠️ « les » est ici un pronom <em>complément</em> (Je vois <em>qui ?</em> → les). À ne pas confondre avec « les » article comme dans « les enfants ».",
+        note:     "📌 « le », « la », « les » peuvent être articles (devant un nom) ou pronoms compléments (à la place d'un nom)."
+      },
+      /* 6 — pronom complément indirect (lui) */
+      {
+        words:    ["Tu", "lui", "parles", "gentiment", "."],
+        wordTypes:["subject", "complement", null, null, null],
+        testQ:    "Qui est-ce qui parle ?",
+        testA:    "Tu",
+        feedbackCorrect: "Exact ! <em>Qui est-ce qui parle ?</em> → <strong>Tu</strong>. C'est le pronom sujet.",
+        feedbackComplement: "⚠️ « lui » est un pronom <em>complément indirect</em> (Tu parles <em>à qui ?</em> → lui).",
+        note:     "📌 « lui » complément répond à « à qui ? ». Ne pas le confondre avec un sujet."
+      },
+      /* 7 — piège : « leur » pronom vs déterminant possessif */
+      {
+        words:    ["On", "leur", "raconte", "une", "histoire", "."],
+        wordTypes:["subject", "complement", null, null, null, null],
+        testQ:    "Qui est-ce qui raconte ?",
+        testA:    "On",
+        feedbackCorrect: "Bravo ! <em>Qui est-ce qui raconte ?</em> → <strong>On</strong>. C'est le pronom sujet.",
+        feedbackComplement: "⚠️ « leur » est ici un pronom <em>complément indirect</em> (On raconte <em>à qui ?</em> → leur). À ne pas confondre avec « leur maison » (déterminant possessif).",
+        note:     "📌 « leur » pronom complément est invariable (On <em>leur</em> parle) ≠ « leur/leurs » déterminant qui s'accorde (leur maison / leurs maisons)."
+      },
+      /* 8 — piège : « vous » sujet, mais aussi possible complément */
+      {
+        words:    ["Vous", "m'", "écoutez", "attentivement", "."],
+        wordTypes:["subject", "complement", null, null, null],
+        testQ:    "Qui est-ce qui écoute ?",
+        testA:    "Vous",
+        feedbackCorrect: "Exact ! <em>Qui est-ce qui écoute ?</em> → <strong>Vous</strong>. C'est le pronom sujet.",
+        feedbackComplement: "⚠️ « m' » (= me) est un pronom <em>complément</em> (Vous écoutez <em>qui ?</em> → m'). Le sujet est « Vous ».",
+        note:     "📌 « vous » peut être sujet ou complément selon la phrase. Seul le test <em>Qui est-ce qui + verbe ?</em> permet de décider."
+      }
+    ],
+
+    /* ── Niveau 2 : sujet ou complément ? (2 étapes par phrase) ─────────
+       fn        : "subject" | "complement"
+       highlightIdx : index dans words[] du pronom mis en évidence
+    ──────────────────────────────────────────────────────────────────── */
+    lvl2Bank: [
+      /* 1 — piège position : pronom complément avant le verbe */
+      {
+        words: ["Je", "le", "vois", "chaque", "jour", "."],
+        highlightIdx: 1, fn: "complement", verb: "vois",
+        testQ: "Qui est-ce qui voit ?", testA: "Je",
+        compQ: "Je vois qui ?", compA: "le",
+        feedback: "« le » est avant le verbe comme un sujet, mais c'est un pronom <strong>complément</strong> : <em>Je vois qui ?</em> → <strong>le</strong>. La position avant le verbe ne suffit pas à identifier un sujet !",
+        trap: "position"
+      },
+      /* 2 — piège nous / vous — côté sujet */
+      {
+        words: ["Nous", "vous", "attendons", "."],
+        highlightIdx: 0, fn: "subject", verb: "attendons",
+        testQ: "Qui est-ce qui attend ?", testA: "Nous",
+        compQ: "Nous attendons qui ?", compA: "vous",
+        feedback: "« nous » et « vous » ont la même forme comme sujet ET comme complément. Ici <em>Qui est-ce qui attend ?</em> → <strong>Nous</strong>. « Nous » commande l'accord du verbe : c'est le <strong>sujet</strong>.",
+        trap: "nousVous"
+      },
+      /* 3 — piège nous / vous — côté complément */
+      {
+        words: ["Nous", "vous", "attendons", "."],
+        highlightIdx: 1, fn: "complement", verb: "attendons",
+        testQ: "Qui est-ce qui attend ?", testA: "Nous",
+        compQ: "Nous attendons qui ?", compA: "vous",
+        feedback: "Même si « vous » a la forme d'un sujet, ici c'est un pronom <strong>complément</strong> : <em>Nous attendons qui ?</em> → <strong>vous</strong>. C'est la <em>fonction</em>, pas la forme, qui décide !",
+        trap: "nousVous"
+      },
+      /* 4 — complément indirect (te) */
+      {
+        words: ["Il", "te", "téléphone", "souvent", "."],
+        highlightIdx: 1, fn: "complement", verb: "téléphone",
+        testQ: "Qui est-ce qui téléphone ?", testA: "Il",
+        compQ: "Il téléphone à qui ?", compA: "te",
+        feedback: "« te » répond à « <em>à qui ?</em> » (Il téléphone à qui ? → <strong>te</strong>). C'est un pronom <strong>complément indirect</strong>.",
+        trap: null
+      },
+      /* 5 — sujet simple */
+      {
+        words: ["Elle", "leur", "explique", "la", "leçon", "."],
+        highlightIdx: 0, fn: "subject", verb: "explique",
+        testQ: "Qui est-ce qui explique ?", testA: "Elle",
+        compQ: "Elle explique à qui ?", compA: "leur",
+        feedback: "<em>Qui est-ce qui explique ?</em> → <strong>Elle</strong>. C'est le pronom <strong>sujet</strong> qui commande l'accord du verbe.",
+        trap: null
+      },
+      /* 6 — piège : « les » article vs pronom complément */
+      {
+        words: ["Tu", "les", "emmènes", "au", "cinéma", "."],
+        highlightIdx: 1, fn: "complement", verb: "emmènes",
+        testQ: "Qui est-ce qui emmène ?", testA: "Tu",
+        compQ: "Tu emmènes qui ?", compA: "les",
+        feedback: "« les » est ici un pronom <strong>complément</strong> : <em>Tu emmènes qui ?</em> → <strong>les</strong>. À ne pas confondre avec « les » article (« les enfants »).",
+        trap: "lesArticle"
+      },
+      /* 7 — vous sujet (avec les complément) */
+      {
+        words: ["Vous", "les", "comprenez", "très", "bien", "."],
+        highlightIdx: 0, fn: "subject", verb: "comprenez",
+        testQ: "Qui est-ce qui comprend ?", testA: "Vous",
+        compQ: "Vous comprenez qui ?", compA: "les",
+        feedback: "<em>Qui est-ce qui comprend ?</em> → <strong>Vous</strong>. C'est le pronom <strong>sujet</strong>. « les » est le pronom complément.",
+        trap: "nousVous"
+      },
+      /* 8 — piège : « leur » pronom vs déterminant possessif */
+      {
+        words: ["Il", "leur", "écrit", "une", "lettre", "."],
+        highlightIdx: 1, fn: "complement", verb: "écrit",
+        testQ: "Qui est-ce qui écrit ?", testA: "Il",
+        compQ: "Il écrit à qui ?", compA: "leur",
+        feedback: "« leur » est ici un pronom <strong>complément indirect</strong> : <em>Il écrit à qui ?</em> → <strong>leur</strong>. À ne pas confondre avec « leur maison » (déterminant possessif).",
+        trap: "leurPossessif"
+      },
+      /* 9 — piège : « le » article vs pronom (sujet = GN, pas pronom) */
+      {
+        words: ["Le", "chat", "le", "regarde", "depuis", "la", "fenêtre", "."],
+        highlightIdx: 2, fn: "complement", verb: "regarde",
+        testQ: "Qui est-ce qui regarde ?", testA: "Le chat",
+        compQ: "Le chat regarde qui ?", compA: "le",
+        feedback: "« le » (3ᵉ mot) est un pronom <strong>complément</strong> : <em>Le chat regarde qui ?</em> → <strong>le</strong>. À ne pas confondre avec « Le » article dans « Le chat ».",
+        trap: "leArticle"
+      },
+      /* 10 — vous complément (sujet = ils), piège nous/vous */
+      {
+        words: ["Ils", "vous", "ont", "vus", "hier", "."],
+        highlightIdx: 1, fn: "complement", verb: "ont vus",
+        testQ: "Qui est-ce qui a vu ?", testA: "Ils",
+        compQ: "Ils ont vu qui ?", compA: "vous",
+        feedback: "« vous » est ici un pronom <strong>complément</strong> : <em>Ils ont vu qui ?</em> → <strong>vous</strong>. Le sujet est « Ils ». Même si « vous » a la forme d'un sujet, ici il complète le verbe.",
+        trap: "nousVous"
+      }
+    ],
+
+    /* ── Niveau 3 : remplace par un pronom (saisie libre) ───────────────
+       6 phrases tirées aléatoirement dans cette banque (localStorage anti-répétition)
+    ──────────────────────────────────────────────────────────────────── */
+    lvl3Bank: [
+      /* 1 — remplacer le SUJET */
+      {
+        sentence:    "Marie regarde le film .",
+        displayHtml: "<strong class='psc-replace-hl'>Marie</strong> regarde le film .",
+        instruction: "Remplace le groupe en gras par le bon pronom <strong>sujet</strong> et réécris la phrase complète.",
+        fn: "subject", group: "Marie", targetPronoun: "elle", verb: "regarde",
+        solution: "Elle regarde le film .",
+        answers:  ["elle regarde le film", "elle regarde le film ."],
+        feedbackWrongPronoun: "Pour remplacer « Marie » (féminin singulier), le pronom sujet est « elle ».",
+        feedbackBadPosition:  "Le pronom sujet se place avant le verbe, à la place du sujet.",
+        feedbackGeneric:      "Réponse attendue : « Elle regarde le film. »"
+      },
+      /* 2 — remplacer le COMPLÉMENT */
+      {
+        sentence:    "Marie regarde le film .",
+        displayHtml: "Marie regarde <strong class='psc-replace-hl'>le film</strong> .",
+        instruction: "Remplace le groupe en gras par le bon pronom <strong>complément</strong> et réécris la phrase complète.",
+        fn: "complement", group: "le film", targetPronoun: "le", verb: "regarde",
+        solution: "Marie le regarde .",
+        answers:  ["marie le regarde", "marie le regarde ."],
+        feedbackWrongPronoun: "Pour remplacer « le film » (masculin singulier, complément direct), le pronom est « le ».",
+        feedbackBadPosition:  "Le pronom complément se place AVANT le verbe : « Marie le regarde. »",
+        feedbackGeneric:      "Réponse attendue : « Marie le regarde. »"
+      },
+      /* 3 — remplacer le SUJET (pluriel) */
+      {
+        sentence:    "Les enfants jouent dans la cour .",
+        displayHtml: "<strong class='psc-replace-hl'>Les enfants</strong> jouent dans la cour .",
+        instruction: "Remplace le groupe en gras par le bon pronom <strong>sujet</strong> et réécris la phrase complète.",
+        fn: "subject", group: "Les enfants", targetPronoun: "ils", verb: "jouent",
+        solution: "Ils jouent dans la cour .",
+        answers:  ["ils jouent dans la cour", "ils jouent dans la cour ."],
+        feedbackWrongPronoun: "Pour remplacer « Les enfants » (masculin pluriel), le pronom sujet est « ils ».",
+        feedbackBadPosition:  "Le pronom sujet se place avant le verbe.",
+        feedbackGeneric:      "Réponse attendue : « Ils jouent dans la cour. »"
+      },
+      /* 4 — remplacer le COMPLÉMENT indirect (lui) */
+      {
+        sentence:    "Paul téléphone à sa mère .",
+        displayHtml: "Paul téléphone <strong class='psc-replace-hl'>à sa mère</strong> .",
+        instruction: "Remplace le groupe en gras par le bon pronom <strong>complément</strong> et réécris la phrase complète.",
+        fn: "complement", group: "à sa mère", targetPronoun: "lui", verb: "téléphone",
+        solution: "Paul lui téléphone .",
+        answers:  ["paul lui telephone", "paul lui téléphone", "paul lui téléphone ."],
+        feedbackWrongPronoun: "Pour remplacer « à sa mère » (complément indirect, féminin singulier), le pronom est « lui ».",
+        feedbackBadPosition:  "Le pronom complément se place AVANT le verbe : « Paul lui téléphone. »",
+        feedbackGeneric:      "Réponse attendue : « Paul lui téléphone. »"
+      },
+      /* 5 — remplacer le SUJET (féminin) */
+      {
+        sentence:    "La maîtresse aide les élèves .",
+        displayHtml: "<strong class='psc-replace-hl'>La maîtresse</strong> aide les élèves .",
+        instruction: "Remplace le groupe en gras par le bon pronom <strong>sujet</strong> et réécris la phrase complète.",
+        fn: "subject", group: "La maîtresse", targetPronoun: "elle", verb: "aide",
+        solution: "Elle aide les élèves .",
+        answers:  ["elle aide les eleves", "elle aide les élèves", "elle aide les élèves ."],
+        feedbackWrongPronoun: "Pour remplacer « La maîtresse » (féminin singulier), le pronom sujet est « elle ».",
+        feedbackBadPosition:  "Le pronom sujet se place avant le verbe.",
+        feedbackGeneric:      "Réponse attendue : « Elle aide les élèves. »"
+      },
+      /* 6 — remplacer le COMPLÉMENT direct (les) */
+      {
+        sentence:    "Les enfants adorent les bonbons .",
+        displayHtml: "Les enfants adorent <strong class='psc-replace-hl'>les bonbons</strong> .",
+        instruction: "Remplace le groupe en gras par le bon pronom <strong>complément</strong> et réécris la phrase complète.",
+        fn: "complement", group: "les bonbons", targetPronoun: "les", verb: "adorent",
+        solution: "Les enfants les adorent .",
+        answers:  ["les enfants les adorent", "les enfants les adorent ."],
+        feedbackWrongPronoun: "Pour remplacer « les bonbons » (pluriel, complément direct), le pronom est « les ».",
+        feedbackBadPosition:  "Le pronom complément se place AVANT le verbe : « Les enfants les adorent. »",
+        feedbackGeneric:      "Réponse attendue : « Les enfants les adorent. »"
+      },
+      /* 7 — remplacer le COMPLÉMENT indirect (lui, féminin) */
+      {
+        sentence:    "Zoé envoie une lettre à son amie .",
+        displayHtml: "Zoé envoie une lettre <strong class='psc-replace-hl'>à son amie</strong> .",
+        instruction: "Remplace le groupe en gras par le bon pronom <strong>complément</strong> et réécris la phrase complète.",
+        fn: "complement", group: "à son amie", targetPronoun: "lui", verb: "envoie",
+        solution: "Zoé lui envoie une lettre .",
+        answers:  ["zoe lui envoie une lettre", "zoé lui envoie une lettre", "zoé lui envoie une lettre ."],
+        feedbackWrongPronoun: "Pour remplacer « à son amie » (complément indirect, féminin singulier), le pronom est « lui ».",
+        feedbackBadPosition:  "Le pronom complément se place AVANT le verbe : « Zoé lui envoie une lettre. »",
+        feedbackGeneric:      "Réponse attendue : « Zoé lui envoie une lettre. »"
+      },
+      /* 8 — remplacer le SUJET (nous) */
+      {
+        sentence:    "Mon frère et moi regardons la télévision .",
+        displayHtml: "<strong class='psc-replace-hl'>Mon frère et moi</strong> regardons la télévision .",
+        instruction: "Remplace le groupe en gras par le bon pronom <strong>sujet</strong> et réécris la phrase complète.",
+        fn: "subject", group: "Mon frère et moi", targetPronoun: "nous", verb: "regardons",
+        solution: "Nous regardons la télévision .",
+        answers:  ["nous regardons la television", "nous regardons la télévision", "nous regardons la télévision ."],
+        feedbackWrongPronoun: "Pour remplacer « Mon frère et moi » (1ʳᵉ personne du pluriel), le pronom sujet est « nous ».",
+        feedbackBadPosition:  "Le pronom sujet se place avant le verbe.",
+        feedbackGeneric:      "Réponse attendue : « Nous regardons la télévision. »"
+      },
+      /* 9 — remplacer le COMPLÉMENT direct (les, pluriel) */
+      {
+        sentence:    "La directrice félicite les élèves .",
+        displayHtml: "La directrice félicite <strong class='psc-replace-hl'>les élèves</strong> .",
+        instruction: "Remplace le groupe en gras par le bon pronom <strong>complément</strong> et réécris la phrase complète.",
+        fn: "complement", group: "les élèves", targetPronoun: "les", verb: "félicite",
+        solution: "La directrice les félicite .",
+        answers:  ["la directrice les felicite", "la directrice les félicite", "la directrice les félicite ."],
+        feedbackWrongPronoun: "Pour remplacer « les élèves » (pluriel, complément direct), le pronom est « les ».",
+        feedbackBadPosition:  "Le pronom complément se place AVANT le verbe : « La directrice les félicite. »",
+        feedbackGeneric:      "Réponse attendue : « La directrice les félicite. »"
+      },
+      /* 10 — remplacer le SUJET (ils, pluriel masculin) */
+      {
+        sentence:    "Les oiseaux chantent dans le jardin .",
+        displayHtml: "<strong class='psc-replace-hl'>Les oiseaux</strong> chantent dans le jardin .",
+        instruction: "Remplace le groupe en gras par le bon pronom <strong>sujet</strong> et réécris la phrase complète.",
+        fn: "subject", group: "Les oiseaux", targetPronoun: "ils", verb: "chantent",
+        solution: "Ils chantent dans le jardin .",
+        answers:  ["ils chantent dans le jardin", "ils chantent dans le jardin ."],
+        feedbackWrongPronoun: "Pour remplacer « Les oiseaux » (masculin pluriel), le pronom sujet est « ils ».",
+        feedbackBadPosition:  "Le pronom sujet se place avant le verbe.",
+        feedbackGeneric:      "Réponse attendue : « Ils chantent dans le jardin. »"
       }
     ]
   }
