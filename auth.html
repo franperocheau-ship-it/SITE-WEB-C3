@@ -450,8 +450,17 @@
     }
 
     /* ── Détection du mode récupération de mot de passe ─────────────────── */
+    /* Le lien de reset crée une session valide dès le chargement de la page
+       (detectSessionInUrl), avant même que l'événement PASSWORD_RECOVERY ne
+       soit traité. On le détecte donc aussi de façon synchrone via l'URL,
+       pour empêcher la redirection automatique ci-dessous de s'exécuter
+       avant que l'enseignant ait choisi un nouveau mot de passe. */
+    let isPasswordRecovery = /type=recovery/.test(window.location.hash) ||
+                              /type=recovery/.test(window.location.search);
+
     lfmDb.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
+        isPasswordRecovery = true;
         document.getElementById('auth-icon').textContent     = '🔑';
         document.getElementById('auth-title').textContent    = 'Nouveau mot de passe';
         document.getElementById('auth-subtitle').textContent = 'Choisissez un mot de passe sécurisé';
@@ -467,6 +476,7 @@
 
     /* ── Redirection si déjà connecté ────────────────────────────────────── */
     (async () => {
+      if (isPasswordRecovery) return;
       const session = await lfmAuth.getSession();
       if (!session) return;
       const profile = await lfmAuth.getProfile();

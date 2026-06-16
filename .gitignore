@@ -17,3 +17,6 @@ dist/
 # Clés et secrets (ne jamais commiter)
 *service_role*
 *secret*
+
+# Supabase CLI (cache local)
+supabase/.temp/

@@ -36,12 +36,16 @@ const lfmAdmin = (() => {
     return data || [];
   }
 
+  /* Valide le compte ET confirme l'e-mail côté Supabase Auth (sinon
+     signInWithPassword échoue avec "Email not confirmed" — voir
+     supabase/functions/approve-teacher/index.ts) */
   async function approveTeacher(id) {
-    const { error } = await db
-      .from('profiles')
-      .update({ status: 'active' })
-      .eq('id', id);
-    if (error) throw error;
+    const { data, error } = await db.functions.invoke('approve-teacher', {
+      body: { teacher_id: id }
+    });
+    if (error) throw new Error(error.message || 'Erreur lors de la validation');
+    if (data && data.error) throw new Error(data.error);
+    return data;
   }
 
   async function rejectTeacher(id) {

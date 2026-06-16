@@ -2137,89 +2137,86 @@ const EXERCISE_DATA = {
   },
 
   /* ────────────────────────────────────────────────────────────────────────
-     Identifier un déterminant possessif
-     Étapes 1 + 3 : choix-etiquette
-     Étape 2 : slug « possessifs-dans-phrases »
+     Identifier un déterminant possessif — cliquer dans des phrases
+     10 phrases, toutes les formes (mon/ma/mes … leur/leurs), pièges inclus
   ─────────────────────────────────────────────────────────────────────────── */
   "identifier-determinant-possessif": {
     title: "Identifier les déterminants possessifs",
     levels: ["CM1", "CM2", "6e"],
-    type: "choix-etiquette",
-    questionsPerSession: 8,
+    type: "mots-cliquables",
+    questionsPerSession: 10,
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
     bank: [
       {
-        instruction: "<span style='font-style:italic;text-transform:none'>C'est le vélo de Paul.</span>",
-        emoji: "",
-        word: "C'est ___ vélo.",
-        choices: ["son", "sa", "ses", "leur"],
-        answer: "son"
+        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
+        sentence: "Je range mes affaires dans mon cartable .",
+        targets: ["mes", "mon"],
+        piege: {},
+        note: "📌 <strong>mes</strong> et <strong>mon</strong> indiquent l'appartenance à la 1<sup>re</sup> personne du singulier (<em>je</em>)."
       },
       {
-        instruction: "<span style='font-style:italic;text-transform:none'>C'est la chambre de Léa.</span>",
-        emoji: "",
-        word: "C'est ___ chambre.",
-        choices: ["son", "sa", "ses", "leur"],
-        answer: "sa"
+        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
+        sentence: "Tu as oublié ton stylo et tes cahiers .",
+        targets: ["ton", "tes"],
+        piege: {},
+        note: "📌 <strong>ton</strong> et <strong>tes</strong> : 2<sup>e</sup> personne du singulier (<em>tu</em>). <em>Ton</em> devant un nom masculin, <em>tes</em> au pluriel."
       },
       {
-        instruction: "<span style='font-style:italic;text-transform:none'>Ce sont les affaires de Tom.</span>",
-        emoji: "",
-        word: "Ce sont ___ affaires.",
-        choices: ["son", "sa", "ses", "leur"],
-        answer: "ses"
+        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
+        sentence: "Il promène son chien avec ses amis .",
+        targets: ["son", "ses"],
+        piege: {},
+        note: "📌 <strong>son</strong> et <strong>ses</strong> : 3<sup>e</sup> personne du singulier (<em>il</em>). <em>Son</em> devant un nom singulier, <em>ses</em> au pluriel."
       },
       {
-        instruction: "<span style='font-style:italic;text-transform:none'>C'est la voiture de Paul et Léa.</span>",
-        emoji: "",
-        word: "C'est ___ voiture.",
-        choices: ["son", "leur", "leurs", "sa"],
-        answer: "leur"
+        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
+        sentence: "Elle lit ses livres dans sa chambre .",
+        targets: ["ses", "sa"],
+        piege: {},
+        note: "📌 <strong>ses</strong> et <strong>sa</strong> : 3<sup>e</sup> personne du singulier (<em>elle</em>). <em>Sa</em> devant un nom féminin singulier."
       },
       {
-        instruction: "<span style='font-style:italic;text-transform:none'>Ce sont les jouets de Paul et Léa.</span>",
-        emoji: "",
-        word: "Ce sont ___ jouets.",
-        choices: ["leur", "leurs", "ses", "des"],
-        answer: "leurs"
+        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
+        sentence: "Nous adorons notre école et nos professeurs .",
+        targets: ["notre", "nos"],
+        piege: {},
+        note: "📌 <strong>notre</strong> et <strong>nos</strong> : 1<sup>re</sup> personne du pluriel (<em>nous</em>). <em>Notre</em> au singulier, <em>nos</em> au pluriel."
       },
       {
-        instruction: "<span style='font-style:italic;text-transform:none'>C'est le cahier de toi.</span>",
-        emoji: "",
-        word: "C'est ___ cahier.",
-        choices: ["ton", "ta", "tes", "votre"],
-        answer: "ton"
+        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
+        sentence: "Vous avez rangé votre sac et vos affaires .",
+        targets: ["votre", "vos"],
+        piege: {},
+        note: "📌 <strong>votre</strong> et <strong>vos</strong> : 2<sup>e</sup> personne du pluriel ou de politesse (<em>vous</em>)."
       },
       {
-        instruction: "<span style='font-style:italic;text-transform:none'>C'est la trousse de vous.</span>",
-        emoji: "",
-        word: "C'est ___ trousse.",
-        choices: ["votre", "vos", "notre", "ton"],
-        answer: "votre"
+        instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention au piège !",
+        sentence: "Les enfants jouent avec leurs jouets dans leur chambre .",
+        targets: ["leurs", "leur"],
+        piege: { "Les": "« Les » est un article défini, pas un déterminant possessif." },
+        note: "📌 <strong>leurs</strong> et <strong>leur</strong> : 3<sup>e</sup> personne du pluriel (<em>ils/elles</em>). <em>Leur</em> devant un nom singulier, <em>leurs</em> devant un nom pluriel."
       },
       {
-        instruction: "<span style='font-style:italic;text-transform:none'>C'est l'amie de Tom.</span>",
-        emoji: "",
-        word: "C'est ___ amie.",
-        choices: ["son", "sa", "ses", "mon"],
-        answer: "son"
+        instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention aux pièges !",
+        sentence: "Mon petit frère prête sa guitare à ses camarades le week-end .",
+        targets: ["Mon", "sa", "ses"],
+        piege: { "le": "« le » est un article défini, pas un déterminant possessif." },
+        note: "📌 Trois possessifs : <strong>Mon</strong> (masc. sing., 1<sup>re</sup> pers.), <strong>sa</strong> (fém. sing., 3<sup>e</sup> pers.), <strong>ses</strong> (plur., 3<sup>e</sup> pers.)."
       },
-      { instruction: "je range ___ affaires.",      emoji: "", word: "je",    choices: ["mes", "tes", "ses", "nos"],    answer: "mes"   },
-      { instruction: "tu ranges ___ affaires.",     emoji: "", word: "tu",    choices: ["mes", "tes", "ses", "nos"],    answer: "tes"   },
-      { instruction: "il range ___ affaires.",      emoji: "", word: "il",    choices: ["mes", "tes", "ses", "nos"],    answer: "ses"   },
-      { instruction: "nous rangeons ___ affaires.", emoji: "", word: "nous",  choices: ["mes", "tes", "ses", "nos"],    answer: "nos"   },
-      { instruction: "je lave ___ vélo.",           emoji: "", word: "je",    choices: ["mon", "ton", "son", "leur"],   answer: "mon"   },
-      { instruction: "tu laves ___ vélo.",          emoji: "", word: "tu",    choices: ["mon", "ton", "son", "leur"],   answer: "ton"   },
-      { instruction: "il lave ___ vélo.",           emoji: "", word: "il",    choices: ["mon", "ton", "son", "leur"],   answer: "son"   },
-      { instruction: "elles lavent ___ vélo.",      emoji: "", word: "elles", choices: ["mon", "ton", "son", "leur"],   answer: "leur"  },
-      { instruction: "je montre ___ photo.",        emoji: "", word: "je",    choices: ["ma", "ta", "sa", "votre"],     answer: "ma"    },
-      { instruction: "tu montres ___ photo.",       emoji: "", word: "tu",    choices: ["ma", "ta", "sa", "votre"],     answer: "ta"    },
-      { instruction: "elle montre ___ photo.",      emoji: "", word: "elle",  choices: ["ma", "ta", "sa", "votre"],     answer: "sa"    },
-      { instruction: "vous montrez ___ photo.",     emoji: "", word: "vous",  choices: ["ma", "ta", "sa", "votre"],     answer: "votre" },
-      { instruction: "je prends ___ livres.",       emoji: "", word: "je",    choices: ["mes", "ses", "nos", "leurs"],  answer: "mes"   },
-      { instruction: "il prend ___ livres.",        emoji: "", word: "il",    choices: ["mes", "ses", "nos", "leurs"],  answer: "ses"   },
-      { instruction: "nous prenons ___ livres.",    emoji: "", word: "nous",  choices: ["mes", "ses", "nos", "leurs"],  answer: "nos"   },
-      { instruction: "ils prennent ___ livres.",    emoji: "", word: "ils",   choices: ["mes", "ses", "nos", "leurs"],  answer: "leurs" }
+      {
+        instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention au piège !",
+        sentence: "Ta mère et ton père sont partis avec leurs valises ce matin .",
+        targets: ["Ta", "ton", "leurs"],
+        piege: { "ce": "« ce » est un déterminant démonstratif (il montre un moment précis), pas un possessif." },
+        note: "📌 <strong>Ta</strong> et <strong>ton</strong> (2<sup>e</sup> pers. sing.) + <strong>leurs</strong> (3<sup>e</sup> pers. plur.) dans la même phrase."
+      },
+      {
+        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
+        sentence: "Notre jardin et nos fleurs sont magnifiques en été .",
+        targets: ["Notre", "nos"],
+        piege: {},
+        note: "📌 <strong>Notre</strong> et <strong>nos</strong> : 1<sup>re</sup> personne du pluriel (<em>nous</em>)."
+      }
     ]
   },
 
@@ -6003,6 +6000,214 @@ const EXERCISE_DATA = {
         feedbackWrongPronoun: "Pour remplacer « Les oiseaux » (masculin pluriel), le pronom sujet est « ils ».",
         feedbackBadPosition:  "Le pronom sujet se place avant le verbe.",
         feedbackGeneric:      "Réponse attendue : « Ils chantent dans le jardin. »"
+      }
+    ]
+  },
+
+  /* ── ─────────────────────────────────────────────────────────────────────── */
+
+  "remplacer-gn-sujet-pronom": {
+    title: "Remplacer un groupe nominal sujet par un pronom personnel sujet",
+    type: "gnsp-niveaux",
+    levels: ["CM1", "CM2", "6e"],
+    backLink: { href: "français-grammaire.html", label: "Grammaire" },
+
+    /* ════════════════════════════════════════════════════════════════════
+       NIVEAU 1 — Trouve le groupe nominal sujet complet (8 phrases)
+       gnsIndices = indices (dans `words`) qui composent le GNS entier
+       ════════════════════════════════════════════════════════════════════ */
+    lvl1Bank: [
+      {
+        words:      ["Le", "chat", "dort", "sur", "le", "canapé", "."],
+        gnsIndices: [0, 1],
+        verb:       "dort",
+        testQ:      "Qui est-ce qui dort ?",
+        testA:      "Le chat",
+        note:       "Le GNS est « Le chat » : déterminant + nom-noyau."
+      },
+      {
+        words:      ["La", "petite", "fille", "mange", "une", "pomme", "."],
+        gnsIndices: [0, 1, 2],
+        verb:       "mange",
+        testQ:      "Qui est-ce qui mange ?",
+        testA:      "La petite fille",
+        note:       "Le GNS est « La petite fille » : il inclut l'adjectif « petite »."
+      },
+      {
+        words:      ["Le", "grand", "chien", "de", "mon", "voisin", "aboie", "."],
+        gnsIndices: [0, 1, 2, 3, 4, 5],
+        verb:       "aboie",
+        testQ:      "Qui est-ce qui aboie ?",
+        testA:      "Le grand chien de mon voisin",
+        note:       "Attention : le GNS entier est « Le grand chien de mon voisin ». Il faut prendre tout le groupe, y compris le complément du nom « de mon voisin », pas seulement le nom-noyau « chien »."
+      },
+      {
+        words:      ["Les", "élèves", "de", "la", "classe", "écoutent", "la", "maîtresse", "."],
+        gnsIndices: [0, 1, 2, 3, 4],
+        verb:       "écoutent",
+        testQ:      "Qui est-ce qui écoutent ?",
+        testA:      "Les élèves de la classe",
+        note:       "Le GNS « Les élèves de la classe » inclut le complément du nom « de la classe »."
+      },
+      {
+        words:      ["Mon", "petit", "frère", "joue", "dans", "le", "jardin", "."],
+        gnsIndices: [0, 1, 2],
+        verb:       "joue",
+        testQ:      "Qui est-ce qui joue ?",
+        testA:      "Mon petit frère",
+        note:       "Le GNS est « Mon petit frère »."
+      },
+      {
+        words:      ["La", "vieille", "maison", "de", "mes", "grands-parents", "est", "magnifique", "."],
+        gnsIndices: [0, 1, 2, 3, 4, 5],
+        verb:       "est",
+        testQ:      "Qui est-ce qui est magnifique ?",
+        testA:      "La vieille maison de mes grands-parents",
+        note:       "Le GNS complet « La vieille maison de mes grands-parents » comprend le déterminant, l'adjectif, le nom-noyau « maison » et son complément du nom « de mes grands-parents »."
+      },
+      {
+        words:      ["Les", "oiseaux", "chantent", "dans", "les", "arbres", "."],
+        gnsIndices: [0, 1],
+        verb:       "chantent",
+        testQ:      "Qui est-ce qui chantent ?",
+        testA:      "Les oiseaux",
+        note:       "Le GNS est « Les oiseaux »."
+      },
+      {
+        words:      ["Le", "livre", "de", "mathématiques", "est", "sur", "la", "table", "."],
+        gnsIndices: [0, 1, 2, 3],
+        verb:       "est",
+        testQ:      "Qui est-ce qui est sur la table ?",
+        testA:      "Le livre de mathématiques",
+        note:       "« de mathématiques » fait partie du GNS : c'est le complément du nom « livre »."
+      }
+    ],
+
+    /* ════════════════════════════════════════════════════════════════════
+       NIVEAU 2 — Quel pronom ? (10 items, 2 étapes : genre/nombre puis pronom)
+       ════════════════════════════════════════════════════════════════════ */
+    lvl2Bank: [
+      {
+        displayHtml: "<span class='psc-pronoun-hl'>La fillette</span> court dans la cour.",
+        gnsText: "La fillette", noyau: "fillette",
+        gender: "féminin", number: "singulier", pronoun: "elle",
+        noyauNote: "Le nom-noyau du groupe est « fillette ».",
+        trap: false
+      },
+      {
+        displayHtml: "<span class='psc-pronoun-hl'>Le grand chien de mon voisin</span> aboie toute la nuit.",
+        gnsText: "Le grand chien de mon voisin", noyau: "chien",
+        gender: "masculin", number: "singulier", pronoun: "il",
+        noyauNote: "Le nom-noyau est « chien » (masculin singulier), et non « voisin » qui fait partie du complément du nom « de mon voisin ».",
+        trap: true
+      },
+      {
+        displayHtml: "<span class='psc-pronoun-hl'>Les danseuses</span> montent sur scène.",
+        gnsText: "Les danseuses", noyau: "danseuses",
+        gender: "féminin", number: "pluriel", pronoun: "elles",
+        noyauNote: "Le nom-noyau est « danseuses » (féminin pluriel).",
+        trap: false
+      },
+      {
+        displayHtml: "<span class='psc-pronoun-hl'>Paul et Marie</span> arrivent en retard.",
+        gnsText: "Paul et Marie", noyau: "Paul et Marie",
+        gender: "masculin", number: "pluriel", pronoun: "ils",
+        noyauNote: "« Paul » (masculin) et « Marie » (féminin) forment un groupe de genres mélangés : dès qu'il y a un nom masculin, on emploie « ils ».",
+        trap: true
+      },
+      {
+        displayHtml: "<span class='psc-pronoun-hl'>Marie</span> chante très bien.",
+        gnsText: "Marie", noyau: "Marie",
+        gender: "féminin", number: "singulier", pronoun: "elle",
+        noyauNote: "« Marie » est un nom propre féminin singulier.",
+        trap: false
+      },
+      {
+        displayHtml: "<span class='psc-pronoun-hl'>Les enfants de la classe</span> jouent en récréation.",
+        gnsText: "Les enfants de la classe", noyau: "enfants",
+        gender: "masculin", number: "pluriel", pronoun: "ils",
+        noyauNote: "Le nom-noyau est « enfants » (masculin pluriel) ; « de la classe » est complément du nom.",
+        trap: true
+      },
+      {
+        displayHtml: "<span class='psc-pronoun-hl'>La belle robe de ma mère</span> est accrochée dans l'armoire.",
+        gnsText: "La belle robe de ma mère", noyau: "robe",
+        gender: "féminin", number: "singulier", pronoun: "elle",
+        noyauNote: "Le nom-noyau est « robe » (féminin singulier), pas « mère » qui est complément du nom.",
+        trap: true
+      },
+      {
+        displayHtml: "<span class='psc-pronoun-hl'>Les Dupont</span> partent en vacances demain.",
+        gnsText: "Les Dupont", noyau: "Dupont",
+        gender: "masculin", number: "pluriel", pronoun: "ils",
+        noyauNote: "« Les Dupont » désigne une famille (nom propre au pluriel) : on emploie « ils ».",
+        trap: true
+      },
+      {
+        displayHtml: "<span class='psc-pronoun-hl'>Les roses du jardin</span> embaument toute la pièce.",
+        gnsText: "Les roses du jardin", noyau: "roses",
+        gender: "féminin", number: "pluriel", pronoun: "elles",
+        noyauNote: "Le nom-noyau est « roses » (féminin pluriel) ; « du jardin » est complément du nom.",
+        trap: true
+      },
+      {
+        displayHtml: "<span class='psc-pronoun-hl'>Mon grand frère et sa meilleure amie</span> rentrent de l'école.",
+        gnsText: "Mon grand frère et sa meilleure amie", noyau: "frère et amie",
+        gender: "masculin", number: "pluriel", pronoun: "ils",
+        noyauNote: "Le groupe contient un nom masculin (« frère ») et un nom féminin (« amie ») : genres mélangés → on emploie « ils ».",
+        trap: true
+      }
+    ],
+
+    /* ════════════════════════════════════════════════════════════════════
+       NIVEAU 3 — Réécris la phrase (6 phrases, production écrite)
+       ════════════════════════════════════════════════════════════════════ */
+    lvl3Bank: [
+      {
+        sentence:    "Les enfants jouent dans le jardin .",
+        displayHtml: "<span class='psc-pronoun-hl'>Les enfants</span> jouent dans le jardin .",
+        gns: "Les enfants", pronoun: "Ils", verb: "jouent",
+        solution: "Ils jouent dans le jardin .",
+        answers:  ["ils jouent dans le jardin", "ils jouent dans le jardin ."],
+        noteOk:   "« Les enfants » est masculin pluriel → « Ils »."
+      },
+      {
+        sentence:    "La directrice de l'école parle aux parents .",
+        displayHtml: "<span class='psc-pronoun-hl'>La directrice de l'école</span> parle aux parents .",
+        gns: "La directrice de l'école", pronoun: "Elle", verb: "parle",
+        solution: "Elle parle aux parents .",
+        answers:  ["elle parle aux parents", "elle parle aux parents ."],
+        noteOk:   "Le nom-noyau du GNS long est « directrice » (féminin singulier) → « Elle »."
+      },
+      {
+        sentence:    "Paul et Marie chantent ensemble .",
+        displayHtml: "<span class='psc-pronoun-hl'>Paul et Marie</span> chantent ensemble .",
+        gns: "Paul et Marie", pronoun: "Ils", verb: "chantent",
+        solution: "Ils chantent ensemble .",
+        answers:  ["ils chantent ensemble", "ils chantent ensemble ."],
+        noteOk:   "Genres mélangés (Paul masculin, Marie féminin) → « Ils »."
+      },
+      {
+        sentence:    "Les danseuses montent sur scène .",
+        displayHtml: "<span class='psc-pronoun-hl'>Les danseuses</span> montent sur scène .",
+        gns: "Les danseuses", pronoun: "Elles", verb: "montent",
+        solution: "Elles montent sur scène .",
+        answers:  ["elles montent sur scene", "elles montent sur scène", "elles montent sur scène ."]
+      },
+      {
+        sentence:    "Mon petit frère regarde un film .",
+        displayHtml: "<span class='psc-pronoun-hl'>Mon petit frère</span> regarde un film .",
+        gns: "Mon petit frère", pronoun: "Il", verb: "regarde",
+        solution: "Il regarde un film .",
+        answers:  ["il regarde un film", "il regarde un film ."]
+      },
+      {
+        sentence:    "Les grands arbres du parc donnent de l'ombre .",
+        displayHtml: "<span class='psc-pronoun-hl'>Les grands arbres du parc</span> donnent de l'ombre .",
+        gns: "Les grands arbres du parc", pronoun: "Ils", verb: "donnent",
+        solution: "Ils donnent de l'ombre .",
+        answers:  ["ils donnent de l'ombre", "ils donnent de l ombre", "ils donnent de l'ombre ."],
+        noteOk:   "Le nom-noyau du GNS long est « arbres » (masculin pluriel) → « Ils »."
       }
     ]
   }
