@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signaler une erreur / Proposer une idée — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css?v=5">
+  <style>
+    /* ── Page layout (repris de français-grammaire.html) ──────────────── */
+    .page-wrap {
+      background: var(--bg);
+      min-height: calc(100vh - 88px);
+      padding-bottom: 64px;
+    }
+
+    .page-content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 64px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 20px 0 0;
+      opacity: 0.75;
+      transition: opacity 180ms;
+    }
+    .back-link:hover { opacity: 1; }
+
+    .page-header {
+      text-align: center;
+      padding: 28px 0 32px;
+    }
+
+    .page-header-icon {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .page-title {
+      font-weight: 900;
+      font-size: 32px;
+      color: var(--blue);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .page-title-rule {
+      width: 44px;
+      height: 3px;
+      background: var(--red);
+      border-radius: 2px;
+      margin: 0 auto 16px;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    /* ── Carte formulaire ──────────────────────────────────────────────── */
+    .feedback-form-box {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 32px;
+      margin-bottom: 40px;
+    }
+
+    /* Onglets type bug / idée (repris de .auth-tabs) */
+    .auth-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg);
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 24px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      background: none;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 180ms, color 180ms;
+    }
+
+    .auth-tab.is-active {
+      background: var(--card-bg);
+      color: var(--blue);
+      box-shadow: 0 2px 8px rgba(16,43,106,0.08);
+    }
+
+    .auth-form { display: flex; flex-direction: column; gap: 16px; }
+    .auth-field { display: flex; flex-direction: column; gap: 6px; }
+
+    .auth-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .auth-input,
+    .auth-textarea {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 180ms, box-shadow 180ms;
+    }
+
+    .auth-textarea { resize: vertical; min-height: 96px; }
+
+    .auth-input:focus,
+    .auth-textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(16,43,106,0.09);
+    }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .auth-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--blue);
+      color: #ffffff;
+      border: none;
+      border-radius: 100px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: background 180ms, transform 140ms;
+      letter-spacing: 0.01em;
+    }
+
+    .auth-submit:hover:not(:disabled) { background: #0d2255; transform: translateY(-1px); }
+    .auth-submit:disabled { opacity: 0.6; cursor: default; transform: none; }
+
+    .auth-msg {
+      display: none;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .auth-msg.is-error {
+      display: block;
+      background: rgba(214,40,57,0.07);
+      border: 1px solid rgba(214,40,57,0.22);
+      color: var(--red);
+    }
+
+    .auth-msg.is-success {
+      display: block;
+      background: rgba(22,163,74,0.07);
+      border: 1px solid rgba(22,163,74,0.22);
+      color: #15803d;
+    }
+
+    /* ── Filtre de la liste ────────────────────────────────────────────── */
+    .list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .list-title {
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--blue);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .level-filters { display: flex; gap: 8px; flex-shrink: 0; }
+
+    .level-btn {
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      color: var(--muted);
+      background: var(--card-bg);
+      cursor: pointer;
+      transition: border-color 200ms, color 200ms, background 200ms;
+    }
+
+    .level-btn:hover { border-color: var(--blue); color: var(--blue); }
+    .level-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+    /* ── Liste de feedback ─────────────────────────────────────────────── */
+    .feedback-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .feedback-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 20px 24px;
+      transition: opacity 200ms;
+    }
+
+    .feedback-card.is-done { opacity: 0.55; }
+
+    .fc-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .fc-icon { font-size: 20px; line-height: 1; flex-shrink: 0; }
+
+    .fc-title {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .badge-bug  { background: rgba(214,40,57,0.09); color: var(--red);  border: 1px solid rgba(214,40,57,0.2); }
+    .badge-idea { background: rgba(16,43,106,0.09); color: var(--blue); border: 1px solid rgba(16,43,106,0.2); }
+    .badge-done { background: #16a34a; color: #fff; }
+
+    .fc-desc {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.6;
+      margin-bottom: 10px;
+      white-space: pre-wrap;
+    }
+
+    .fc-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .fc-admin-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .fc-btn {
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 7px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      background: var(--card-bg);
+      transition: border-color 180ms, color 180ms, background 180ms;
+    }
+
+    .fc-btn-done { color: #15803d; }
+    .fc-btn-done:hover { border-color: #15803d; background: rgba(22,163,74,0.06); }
+
+    .fc-btn-delete { color: var(--red); }
+    .fc-btn-delete:hover { border-color: var(--red); background: rgba(214,40,57,0.06); }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 24px;
+      color: var(--muted);
+      font-size: 14px;
+      display: none;
+    }
+    .empty-state.visible { display: block; }
+
+    /* ── Zone administrateur ───────────────────────────────────────────── */
+    .admin-zone {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1.5px solid var(--border);
+    }
+
+    .admin-zone-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      transition: color 180ms;
+    }
+    .admin-zone-toggle:hover { color: var(--blue); }
+
+    .admin-login-box {
+      display: none;
+      margin-top: 14px;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    .admin-login-box.is-open { display: flex; }
+    .admin-login-box .auth-field { flex: 1; }
+
+    .admin-active-bar {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      font-size: 13px;
+      color: #15803d;
+      font-weight: 600;
+    }
+    .admin-active-bar.is-visible { display: flex; }
+
+    .admin-active-bar button {
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      color: var(--muted);
+      background: var(--card-bg);
+      cursor: pointer;
+    }
+
+    @media (max-width: 1024px) {
+      .page-content { padding: 0 40px; }
+    }
+
+    @media (max-width: 768px) {
+      .page-content { padding: 0 24px; }
+      .field-row { grid-template-columns: 1fr; }
+      .list-header { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <img src="assets/lfm-logo.svg" alt="Lycée Français de Madrid" class="header-logo">
+        <div class="header-text">
+          <span class="header-name">LYCÉE FRANÇAIS DE MADRID</span>
+          <span class="header-sub">Ressources numériques pour le cycle 3</span>
+        </div>
+      </a>
+      <div class="header-actions">
+        <span class="lang-badge">FR</span>
+        <button class="menu-btn" aria-label="Ouvrir le menu">
+          <span class="mbar mbar-top"></span>
+          <span class="mbar mbar-mid"></span>
+          <span class="mbar mbar-mid2"></span>
+          <span class="mbar mbar-bot"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <div class="page-wrap">
+    <div class="page-content">
+
+      <a href="index.html" class="back-link">← Accueil</a>
+
+      <div class="page-header">
+        <div class="page-header-icon">
+          <svg width="56" height="56" viewBox="0 0 64 64" fill="none">
+            <path d="M10 14 H54 V42 H30 L18 52 V42 H10 Z" stroke="#102B6A" stroke-width="2.5" stroke-linejoin="round" fill="none"/>
+            <circle cx="22" cy="28" r="2" fill="#D62839"/>
+            <circle cx="32" cy="28" r="2" fill="#D62839"/>
+            <circle cx="42" cy="28" r="2" fill="#D62839"/>
+          </svg>
+        </div>
+        <h1 class="page-title">SIGNALER UNE ERREUR<br>PROPOSER UNE IDÉE</h1>
+        <div class="page-title-rule"></div>
+        <p class="page-subtitle">Aide-nous à améliorer cet espace d'apprentissage.</p>
+      </div>
+
+      <!-- Formulaire -->
+      <div class="feedback-form-box">
+
+        <div class="auth-tabs" id="type-tabs">
+          <button class="auth-tab is-active" data-type="bug">🐞 Signaler une erreur</button>
+          <button class="auth-tab" data-type="idea">💡 Proposer une idée</button>
+        </div>
+
+        <div class="auth-msg" id="form-msg"></div>
+
+        <form class="auth-form" id="feedback-form" novalidate>
+          <div class="auth-field">
+            <label class="auth-label" for="fb-title" id="fb-title-label">Titre de l'erreur</label>
+            <input class="auth-input" id="fb-title" type="text" required placeholder="Ex : le bouton de validation ne répond pas">
+          </div>
+
+          <div class="field-row" id="bug-fields">
+            <div class="auth-field">
+              <label class="auth-label" for="fb-page">Page concernée</label>
+              <input class="auth-input" id="fb-page" type="text" placeholder="Ex : français-grammaire.html">
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" for="fb-ex">Exercice concerné</label>
+              <input class="auth-input" id="fb-ex" type="text" placeholder="Ex : identifier-adjectif">
+            </div>
+          </div>
+
+          <div class="auth-field">
+            <label class="auth-label" for="fb-desc" id="fb-desc-label">Décris l'erreur</label>
+            <textarea class="auth-textarea" id="fb-desc" required placeholder="Que se passe-t-il ? Que devrait-il se passer ?"></textarea>
+          </div>
+
+          <div class="auth-field">
+            <label class="auth-label" for="fb-author">Ton prénom (facultatif)</label>
+            <input class="auth-input" id="fb-author" type="text" placeholder="Pour qu'on puisse te répondre si besoin">
+          </div>
+
+          <button class="auth-submit" type="submit" id="fb-submit-btn">Envoyer le signalement</button>
+        </form>
+      </div>
+
+      <!-- Liste des feedbacks -->
+      <div class="list-header">
+        <span class="list-title">Suggestions et signalements de la communauté</span>
+        <div class="level-filters" id="list-filters">
+          <button class="level-btn active" data-filter="all">Tous</button>
+          <button class="level-btn" data-filter="bug">Erreurs</button>
+          <button class="level-btn" data-filter="idea">Idées</button>
+        </div>
+      </div>
+
+      <div class="feedback-list" id="feedback-list"></div>
+
+      <div class="empty-state" id="empty-state">
+        Aucun signalement pour le moment. Sois le premier à contribuer !
+      </div>
+
+      <!-- Zone administrateur -->
+      <div class="admin-zone">
+        <button class="admin-zone-toggle" id="admin-toggle-link">⚙ Administration</button>
+
+        <div class="admin-login-box" id="admin-login-box">
+          <div class="auth-field">
+            <label class="auth-label" for="admin-pwd">Mot de passe administrateur</label>
+            <input class="auth-input" id="admin-pwd" type="password" placeholder="••••••••">
+          </div>
+          <button class="auth-submit" id="admin-login-btn" style="width:auto;white-space:nowrap;">Activer</button>
+        </div>
+
+        <div class="admin-active-bar" id="admin-active-bar">
+          ✓ Mode administrateur actif
+          <button id="admin-logout-btn">Quitter le mode admin</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-rule"></div>
+        <div class="footer-body">
+          <p class="footer-text">
+            Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,<br>
+            dans le respect d'un <strong class="footer-em">usage mesuré</strong> des écrans.
+          </p>
+        </div>
+        <p class="footer-credit">© 2026 François Perocheau – LFM &nbsp;•&nbsp; CC BY-NC-SA 4.0 &nbsp;•&nbsp; <a href="mentions-legales.html">Mentions légales</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/menu.js"></script>
+  <script>
+    /* ─────────────────────────────────────────────────────────────────────
+       feedback.html
+       Utilise le client Supabase déjà configuré dans js/supabase-client.js
+       (window.lfmDb), comme toutes les autres pages du site, sur la table
+       "feedback" décrite ci-dessous.
+
+       SQL à exécuter dans l'éditeur SQL de Supabase pour créer la table
+       et les policies RLS :
+
+       create table public.feedback (
+         id         uuid primary key default gen_random_uuid(),
+         type       text not null check (type in ('bug', 'idea')),
+         title      text not null,
+         "desc"     text not null,
+         author     text,
+         page_ref   text,
+         ex_ref     text,
+         done       boolean not null default false,
+         created_at timestamptz not null default now()
+       );
+
+       alter table public.feedback enable row level security;
+
+       create policy "feedback_select_public"
+         on public.feedback for select
+         using (true);
+
+       create policy "feedback_insert_public"
+         on public.feedback for insert
+         with check (true);
+
+       create policy "feedback_update_public"
+         on public.feedback for update
+         using (true)
+         with check (true);
+
+       create policy "feedback_delete_public"
+         on public.feedback for delete
+         using (true);
+       ───────────────────────────────────────────────────────────────────── */
+
+    /* Mot de passe admin stocké en dur — à changer avant mise en production */
+    const ADMIN_PASSWORD = 'lfm-admin-2026';
+
+    let currentType   = 'bug';
+    let currentFilter  = 'all';
+    let feedbackItems  = [];
+    let isAdmin        = sessionStorage.getItem('lfm_feedback_admin') === '1';
+
+    /* ── Onglets bug / idée ──────────────────────────────────────────────── */
+    document.querySelectorAll('#type-tabs .auth-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('#type-tabs .auth-tab').forEach(t => t.classList.remove('is-active'));
+        tab.classList.add('is-active');
+        currentType = tab.dataset.type;
+        updateFormForType();
+      });
+    });
+
+    function updateFormForType() {
+      const isBug = currentType === 'bug';
+      document.getElementById('bug-fields').style.display = isBug ? '' : 'none';
+      document.getElementById('fb-title-label').textContent = isBug ? 'Titre de l\'erreur' : 'Titre de l\'idée';
+      document.getElementById('fb-desc-label').textContent  = isBug ? 'Décris l\'erreur' : 'Décris la compétence à travailler';
+      document.getElementById('fb-title').placeholder = isBug
+        ? 'Ex : le bouton de validation ne répond pas'
+        : 'Ex : exercice sur les compléments circonstanciels';
+      document.getElementById('fb-desc').placeholder = isBug
+        ? 'Que se passe-t-il ? Que devrait-il se passer ?'
+        : 'Quelle compétence ? Pour quel niveau ? Quel type d\'exercice ?';
+    }
+
+    /* ── Soumission du formulaire ───────────────────────────────────────── */
+    document.getElementById('feedback-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      clearMsg();
+
+      const title  = document.getElementById('fb-title').value.trim();
+      const desc   = document.getElementById('fb-desc').value.trim();
+      const author = document.getElementById('fb-author').value.trim();
+      const page   = document.getElementById('fb-page').value.trim();
+      const ex     = document.getElementById('fb-ex').value.trim();
+
+      if (!title || !desc) {
+        showMsg('Merci de remplir le titre et la description.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('fb-submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Envoi…';
+
+      try {
+        const { error } = await window.lfmDb.from('feedback').insert({
+          type:     currentType,
+          title:    title,
+          desc:     desc,
+          author:   author || null,
+          page_ref: currentType === 'bug' ? (page || null) : null,
+          ex_ref:   currentType === 'bug' ? (ex || null)   : null,
+          done:     false
+        });
+        if (error) throw error;
+
+        showMsg('Merci ! Ta contribution a bien été envoyée.', 'success');
+        document.getElementById('feedback-form').reset();
+        updateFormForType();
+        await loadFeedback();
+      } catch (err) {
+        console.error('[LFM] Erreur envoi feedback:', err);
+        showMsg('Impossible d\'envoyer le formulaire : ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Envoyer le signalement';
+      }
+    });
+
+    function showMsg(text, type) {
+      const el = document.getElementById('form-msg');
+      el.textContent = text;
+      el.className = 'auth-msg is-' + type;
+    }
+    function clearMsg() {
+      const el = document.getElementById('form-msg');
+      el.textContent = '';
+      el.className = 'auth-msg';
+    }
+
+    /* ── Filtres de la liste ────────────────────────────────────────────── */
+    document.querySelectorAll('#list-filters .level-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#list-filters .level-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        renderList();
+      });
+    });
+
+    /* ── Chargement depuis Supabase ─────────────────────────────────────── */
+    async function loadFeedback() {
+      try {
+        const { data, error } = await window.lfmDb
+          .from('feedback')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        feedbackItems = data || [];
+        renderList();
+      } catch (err) {
+        console.error('[LFM] Erreur chargement feedback:', err);
+      }
+    }
+
+    /* ── Rendu de la liste ──────────────────────────────────────────────── */
+    function renderList() {
+      const items = feedbackItems.filter(item => currentFilter === 'all' || item.type === currentFilter);
+      const listEl = document.getElementById('feedback-list');
+
+      listEl.innerHTML = items.map(renderCard).join('');
+      document.getElementById('empty-state').classList.toggle('visible', items.length === 0);
+    }
+
+    function renderCard(item) {
+      const icon      = item.type === 'bug' ? '🐞' : '💡';
+      const badgeCls  = item.type === 'bug' ? 'badge-bug' : 'badge-idea';
+      const badgeText = item.type === 'bug' ? 'Erreur' : 'Idée';
+      const date      = new Date(item.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      const metaParts = [];
+      if (item.author)   metaParts.push(`Par ${escHtml(item.author)}`);
+      if (item.page_ref) metaParts.push(`Page : ${escHtml(item.page_ref)}`);
+      if (item.ex_ref)   metaParts.push(`Exercice : ${escHtml(item.ex_ref)}`);
+      metaParts.push(date);
+
+      const adminActions = isAdmin ? `
+        <div class="fc-admin-actions">
+          ${item.done ? '' : `<button class="fc-btn fc-btn-done" onclick="markDone('${item.id}')">✓ Marquer comme traité</button>`}
+          <button class="fc-btn fc-btn-delete" onclick="deleteFeedback('${item.id}')">🗑 Supprimer</button>
+        </div>` : '';
+
+      return `
+        <div class="feedback-card ${item.done ? 'is-done' : ''}">
+          <div class="fc-top">
+            <span class="fc-icon">${icon}</span>
+            <span class="fc-title">${escHtml(item.title)}</span>
+            <span class="badge ${badgeCls}">${badgeText}</span>
+            ${item.done ? '<span class="badge badge-done">Traité</span>' : ''}
+          </div>
+          <p class="fc-desc">${escHtml(item.desc)}</p>
+          <div class="fc-meta">${metaParts.map(p => `<span>${p}</span>`).join('')}</div>
+          ${adminActions}
+        </div>
+      `;
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    /* ── Actions administrateur ────────────────────────────────────────── */
+    async function markDone(id) {
+      try {
+        const { error } = await window.lfmDb.from('feedback').update({ done: true }).eq('id', id);
+        if (error) throw error;
+        await loadFeedback();
+      } catch (err) {
+        console.error('[LFM] Erreur mise à jour feedback:', err);
+        alert('Impossible de marquer cette entrée comme traitée : ' + err.message);
+      }
+    }
+
+    async function deleteFeedback(id) {
+      if (!confirm('Supprimer définitivement cette entrée ?')) return;
+      try {
+        const { error } = await window.lfmDb.from('feedback').delete().eq('id', id);
+        if (error) throw error;
+        await loadFeedback();
+      } catch (err) {
+        console.error('[LFM] Erreur suppression feedback:', err);
+        alert('Impossible de supprimer cette entrée : ' + err.message);
+      }
+    }
+
+    /* ── Connexion / déconnexion administrateur ────────────────────────── */
+    function refreshAdminUI() {
+      document.getElementById('admin-login-box').classList.remove('is-open');
+      document.getElementById('admin-active-bar').classList.toggle('is-visible', isAdmin);
+      document.getElementById('admin-toggle-link').style.display = isAdmin ? 'none' : '';
+      renderList();
+    }
+
+    document.getElementById('admin-toggle-link').addEventListener('click', () => {
+      document.getElementById('admin-login-box').classList.toggle('is-open');
+    });
+
+    document.getElementById('admin-login-btn').addEventListener('click', () => {
+      const pwd = document.getElementById('admin-pwd').value;
+      if (pwd === ADMIN_PASSWORD) {
+        isAdmin = true;
+        sessionStorage.setItem('lfm_feedback_admin', '1');
+        document.getElementById('admin-pwd').value = '';
+        refreshAdminUI();
+      } else {
+        alert('Mot de passe incorrect.');
+      }
+    });
+
+    document.getElementById('admin-logout-btn').addEventListener('click', () => {
+      isAdmin = false;
+      sessionStorage.removeItem('lfm_feedback_admin');
+      refreshAdminUI();
+    });
+
+    /* ── Initialisation ─────────────────────────────────────────────────── */
+    updateFormForType();
+    refreshAdminUI();
+    loadFeedback();
+  </script>
+</body>
+</html>

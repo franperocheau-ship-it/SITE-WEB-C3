@@ -9,7 +9,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/results.js"></script>
-  <script src="exercise-data.js?v=13"></script>
+  <script src="exercise-data.js?v=15"></script>
   <style>
     /* ── Page layout ────────────────────────────────────────── */
     .page-wrap {
@@ -1234,6 +1234,29 @@
       padding: 1px 5px;
     }
 
+    /* ── Type : gnsp-niveaux (remplacer un GNS par un pronom sujet) ──────── */
+    .ex-word-btn.is-selected {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.10);
+      color: var(--blue);
+    }
+    .gnsp-gn-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .gnsp-gn-row .ex-choice { flex: 1; min-width: 130px; text-align: center; }
+    .gnsp-step-label {
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 18px 0 10px;
+    }
+    .gnsp-step-label:first-child { margin-top: 0; }
+
     /* ── Utility ────────────────────────────────────────────── */
     .ex-hidden { display: none !important; }
 
@@ -1582,6 +1605,88 @@
     @media (max-width: 600px) {
       .frac-field { font-size: 24px; width: 80px; }
       .frac-divider { width: 80px; }
+    }
+
+    /* ── Type : decomposer-fraction (CM2 — partie entière + fraction) ────── */
+    .decomp-input-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin: 0 auto 8px;
+    }
+    .decomp-int-block, .decomp-frac-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .decomp-plus {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--blue);
+      align-self: center;
+    }
+    .decomp-den-fixed {
+      width: 100px;
+      text-align: center;
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--blue);
+      padding: 4px 0;
+    }
+    @media (max-width: 600px) {
+      .decomp-den-fixed { font-size: 24px; width: 80px; }
+    }
+
+    /* ── Type : fractions-problemes ────────────────────────────────────── */
+    .fp-illustration {
+      margin: 18px 0 4px;
+      text-align: center;
+    }
+    .fp-illustration-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--blue);
+      margin-top: 8px;
+    }
+    .fp-ardoise-wrap {
+      display: flex;
+      gap: 18px;
+      align-items: stretch;
+      margin: 18px 0 4px;
+    }
+    .fp-ardoise-visual {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .fp-ardoise-panel {
+      flex: 1;
+      min-width: 0;
+      background: #1e293b;
+      color: #f1f5f9;
+      border-radius: 14px;
+      padding: 16px 18px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 13px;
+      line-height: 1.9;
+    }
+    .fp-ardoise-panel-title {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+    @media (max-width: 700px) {
+      .fp-ardoise-wrap { flex-direction: column; }
     }
 
     /* ── Type : representer-fraction ─────────────────────────────────────── */
@@ -2694,6 +2799,8 @@
     let pfiSelectedLevel = null; /* produire-3-formes : niveau sélectionné */
     let accordLevel      = null; /* accord-ecrit      : niveau sélectionné */
     let apcodLevel       = null; /* accord-participe-cod : niveau sélectionné */
+    let decompLevel      = null; /* decomposer-fraction : niveau sélectionné */
+    let fpLevel           = null; /* fractions-problemes : niveau sélectionné */
 
     /* Suivi générique du niveau courant (tous exercices à niveaux) */
     let sessionLevelList   = [];   /* liste ordonnée des valeurs de niveau */
@@ -2770,6 +2877,8 @@
       cmpLevel         = null;
       encadrLevel      = null;
       apcodLevel       = null;
+      decompLevel      = null;
+      fpLevel           = null;
       sessionLevelList   = [];
       sessionLevelLabels = [];
       sessionLevelIdx    = -1;
@@ -2973,8 +3082,14 @@
       } else if (currentType === "psc-niveaux") {
         pscInitSession();
         return;
+      } else if (currentType === "gnsp-niveaux") {
+        gnspInitSession();
+        return;
       } else if (currentType === "det-demo-niveaux") {
         ddnInitSession();
+        return;
+      } else if (currentType === "adv-niveaux") {
+        advInitSession();
         return;
       } else {
         bankSource = sessionData.bank;
@@ -3084,6 +3199,10 @@
         renderEncadrerFraction(card, q);
       } else if (currentType === "nombre-entier") {
         renderNombreEntier(card, q);
+      } else if (currentType === "decomposer-fraction") {
+        renderDecomposerFraction(card, q);
+      } else if (currentType === "fractions-problemes") {
+        renderFractionsProblemes(card, q);
       } else if (currentType === "valeur-position") {
         renderValeurPosition(card);
       } else if (currentType === "vocabu-bilingue") {
@@ -3098,8 +3217,12 @@
         /* session managed by eaInitSession — no-op here */
       } else if (currentType === "psc-niveaux") {
         /* session managed by pscInitSession — no-op here */
+      } else if (currentType === "gnsp-niveaux") {
+        /* session managed by gnspInitSession — no-op here */
       } else if (currentType === "det-demo-niveaux") {
         /* session managed by ddnInitSession — no-op here */
+      } else if (currentType === "adv-niveaux") {
+        /* session managed by advInitSession — no-op here */
       } else if (currentType === "accord-participe-cod") {
         renderAccordParticipeCod(card, q);
       }
@@ -3665,7 +3788,7 @@
       /* Enregistrement du résultat pour les élèves connectés */
       const slug = new URLSearchParams(window.location.search).get('slug');
       const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
-      const activeLevel = pfiSelectedLevel || accordLevel || apcodLevel || fracLevel || rfLevel || nlLevel || nbEntierLevel || cmpLevel || encadrLevel || null;
+      const activeLevel = pfiSelectedLevel || accordLevel || apcodLevel || fracLevel || rfLevel || nlLevel || nbEntierLevel || cmpLevel || encadrLevel || decompLevel || fpLevel || null;
       saveExerciseResult({
         exerciseSlug: slug,
         subject,
@@ -6470,6 +6593,716 @@
       }
 
       valBtn.addEventListener('click', validate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') validate(); });
+    }
+
+    /* ── Type : decomposer-fraction ──────────────────────────────────────────
+       CM1 : QCM (3 choix)
+       CM2 : saisie de 2 champs (partie entière + numérateur, dénominateur fixe)
+       6e  : saisie libre "a + b/c"
+    ────────────────────────────────────────────────────────────────────────── */
+
+    function decompFracHtml(num, den) {
+      return `<span class="rfrac-display" style="font-size:32px">
+        <span class="rfrac-num">${num}</span>
+        <span class="rfrac-bar"></span>
+        <span class="rfrac-den">${den}</span>
+      </span>`;
+    }
+
+    function decompExplain(q) {
+      const right = q.reste === 0 ? `${q.entiere}` : `${q.entiere} + ${q.reste}/${q.den}`;
+      return `${q.num} ÷ ${q.den} = ${q.entiere} reste ${q.reste} → ${right}`;
+    }
+
+    function renderDecomposerFraction(card, q) {
+      if (decompLevel === null && currentIndex === 0) {
+        card.innerHTML = `
+          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
+            Quel niveau veux-tu pratiquer ?
+          </p>
+          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
+            <button class="ex-type-card" data-level="CM1">
+              <span class="ex-type-icon">⭐</span>
+              <div>
+                <span class="ex-type-name">CM1</span>
+                <span class="ex-type-desc">Choisis la bonne décomposition</span>
+              </div>
+            </button>
+            <button class="ex-type-card" data-level="CM2">
+              <span class="ex-type-icon">⭐⭐</span>
+              <div>
+                <span class="ex-type-name">CM2</span>
+                <span class="ex-type-desc">Trouve la partie entière et le numérateur</span>
+              </div>
+            </button>
+            <button class="ex-type-card" data-level="6e">
+              <span class="ex-type-icon">⭐⭐⭐</span>
+              <div>
+                <span class="ex-type-name">6e</span>
+                <span class="ex-type-desc">Écris la décomposition complète</span>
+              </div>
+            </button>
+          </div>
+        `;
+        document.getElementById('ex-bar-fill').style.width = '0%';
+        card.querySelectorAll('.ex-type-card').forEach(btn =>
+          btn.addEventListener('click', () => {
+            decompLevel = btn.dataset.level;
+            questions = shuffle(sessionData.bank.filter(it => it.level === decompLevel))
+                          .slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            sessionLevelList   = ['CM1', 'CM2', '6e'];
+            sessionLevelLabels = ['CM1', 'CM2', '6e'];
+            sessionLevelIdx    = sessionLevelList.indexOf(decompLevel);
+            sessionLevelLoader = (lv) => {
+              decompLevel = lv;
+              questions = shuffle(sessionData.bank.filter(it => it.level === lv))
+                            .slice(0, sessionData.questionsPerSession);
+              document.getElementById('q-total').textContent = questions.length;
+              document.getElementById('ex-bar-fill').style.width = '0%';
+              currentIndex = 0;
+              score        = 0;
+              showQuestion(0);
+            };
+            currentIndex = 0;
+            score = 0;
+            showQuestion(0);
+          })
+        );
+        return;
+      }
+
+      if (q.inputMode === 'qcm') {
+        renderDecompQCM(card, q);
+      } else if (q.inputMode === 'fill-two') {
+        renderDecompFillTwo(card, q);
+      } else {
+        renderDecompFreeText(card, q);
+      }
+    }
+
+    /* Étape 1 (CM1) : placer la fraction sur une droite graduée pour aider
+       l'élève à voir entre quels entiers elle se trouve, avant de répondre
+       au QCM. Réutilise la logique de buildSvg de renderPlacerFractionDroite. */
+    function decompBuildNumberLineSvg(q, selectedIdx) {
+      const { num, den, entiere } = q;
+      const totalIntervals = (entiere + 1) * den;
+      const totalTicks     = totalIntervals + 1;
+      const tickSpacing    = Math.max(36, Math.min(72, Math.floor(560 / totalIntervals)));
+      const padL = 28, padR = 44;
+      const lineWidth = totalIntervals * tickSpacing;
+      const W = lineWidth + padL + padR;
+      const H = 90;
+      const lineY = 42;
+
+      let s = '';
+      s += `<line x1="${padL}" y1="${lineY}" x2="${padL + lineWidth + 8}" y2="${lineY}"
+             stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>`;
+      s += `<polygon points="${padL + lineWidth + 16},${lineY} ${padL + lineWidth + 6},${lineY - 5} ${padL + lineWidth + 6},${lineY + 5}" fill="#94a3b8"/>`;
+
+      for (let i = 0; i < totalTicks; i++) {
+        const x       = padL + i * tickSpacing;
+        const isMajor = i % den === 0;
+        const tH      = isMajor ? 22 : 12;
+
+        s += `<line x1="${x}" y1="${lineY - tH / 2}" x2="${x}" y2="${lineY + tH / 2}"
+               stroke="${isMajor ? '#102b6a' : '#64748b'}"
+               stroke-width="${isMajor ? 2 : 1.5}"/>`;
+
+        if (isMajor) {
+          s += `<text x="${x}" y="${lineY + 13 + 16}"
+                 text-anchor="middle" font-family="sans-serif"
+                 font-size="13" font-weight="700" fill="#102b6a">${i / den}</text>`;
+        }
+
+        s += `<rect x="${x - 18}" y="2" width="36" height="${H - 4}"
+               fill="transparent" class="nline-hit" data-idx="${i}"
+               style="cursor:pointer"/>`;
+      }
+
+      if (selectedIdx !== null) {
+        const dx = padL + selectedIdx * tickSpacing;
+        s += `<circle cx="${dx}" cy="${lineY}" r="9"
+               fill="#3b82f6" stroke="#1d4ed8" stroke-width="2.5"
+               pointer-events="none"/>`;
+      }
+
+      return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"
+               style="display:block;max-width:100%;overflow:visible">${s}</svg>`;
+    }
+
+    function decompStep1NumberLine(card, q, onSuccess) {
+      let selectedIdx = null;
+      let answered    = false;
+
+      card.innerHTML = `
+        <p class="ex-question-label">Place cette fraction sur la droite graduée pour t'aider à la décomposer.</p>
+        <div class="nline-question-area">${decompFracHtml(q.num, q.den)}</div>
+        <div class="nline-scroll-wrap" id="nline-svg-wrap">${decompBuildNumberLineSvg(q, null)}</div>
+        <p class="nline-status" id="nline-status">Clique sur une graduation pour la sélectionner.</p>
+        <div class="rfrac-validate-row">
+          <button class="ex-validate-btn" id="nline-validate" disabled>Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+      `;
+
+      const svgWrap  = card.querySelector('#nline-svg-wrap');
+      const statusEl = card.querySelector('#nline-status');
+      const vBtn     = card.querySelector('#nline-validate');
+
+      function bindTickClicks() {
+        svgWrap.querySelectorAll('.nline-hit').forEach(rect => {
+          rect.addEventListener('click', () => {
+            if (answered) return;
+            selectedIdx = parseInt(rect.dataset.idx, 10);
+            svgWrap.innerHTML = decompBuildNumberLineSvg(q, selectedIdx);
+            bindTickClicks();
+            statusEl.textContent = `Graduation sélectionnée : ${selectedIdx}/${q.den}`;
+            vBtn.disabled = false;
+          });
+        });
+      }
+
+      bindTickClicks();
+
+      vBtn.addEventListener('click', () => {
+        if (selectedIdx === null || answered) return;
+        answered = true;
+        vBtn.disabled = true;
+        svgWrap.querySelectorAll('.nline-hit').forEach(r => { r.style.pointerEvents = 'none'; });
+
+        const isRight = selectedIdx === q.num;
+
+        if (isRight) {
+          setFeedback('feedback1',
+            `<div class="ex-feedback-correct">✅ Bien vu ! Continue pour choisir la bonne décomposition.</div>`);
+          setTimeout(onSuccess, 900);
+        } else {
+          setFeedback('feedback1', `
+            <div class="ex-feedback-wrong" style="margin-bottom:12px">
+              ❌ Pas tout à fait. La fraction ${decompFracHtml(q.num, q.den)}
+              correspond à la graduation <strong>${q.num}/${q.den}</strong>.
+            </div>
+            <button class="ex-validate-btn" id="nline-retry">Modifier ma réponse</button>
+          `);
+          card.querySelector('#nline-retry').addEventListener('click', () => {
+            answered    = false;
+            selectedIdx = null;
+            svgWrap.innerHTML = decompBuildNumberLineSvg(q, null);
+            bindTickClicks();
+            svgWrap.querySelectorAll('.nline-hit').forEach(r => { r.style.pointerEvents = ''; });
+            statusEl.textContent = 'Clique sur une graduation pour la sélectionner.';
+            vBtn.disabled = true;
+            document.getElementById('feedback1').innerHTML = '';
+          });
+        }
+      });
+    }
+
+    function renderDecompQCM(card, q) {
+      decompStep1NumberLine(card, q, () => decompQCMChoices(card, q));
+    }
+
+    function decompQCMChoices(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">Maintenant, décompose cette fraction :</p>
+        <div class="frac-display-area">${decompFracHtml(q.num, q.den)}</div>
+        <div class="ex-choices-grid" id="ex-choices-grid"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      const grid = document.getElementById('ex-choices-grid');
+      shuffle([...q.choices]).forEach(c => {
+        const btn = document.createElement('button');
+        btn.className   = 'ex-choice';
+        btn.textContent = c;
+        btn.addEventListener('click', () => {
+          grid.querySelectorAll('.ex-choice').forEach(b => b.disabled = true);
+          const isRight = c === q.answer;
+          grid.querySelectorAll('.ex-choice').forEach(b => {
+            if (b.textContent === q.answer) b.classList.add('is-correct');
+          });
+          if (!isRight) btn.classList.add('is-wrong');
+          if (isRight) {
+            score++;
+            setFeedback('feedback1', `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+          } else {
+            setFeedback('feedback1', `
+              <div class="ex-feedback-wrong">
+                ❌ Ce n'est pas la bonne réponse.<br>
+                La bonne réponse était : <strong>${q.answer}</strong><br>
+                ${decompExplain(q)}
+              </div>`);
+          }
+          showNextBtn();
+        });
+        grid.appendChild(btn);
+      });
+    }
+
+    function renderDecompFillTwo(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">Décompose cette fraction : partie entière + fraction propre.</p>
+        <div class="frac-display-area">${decompFracHtml(q.num, q.den)}</div>
+        <div class="decomp-input-row">
+          <div class="decomp-int-block">
+            <span class="frac-input-label">Partie entière</span>
+            <input type="text" inputmode="numeric" class="frac-field" id="decomp-inp-e"
+                   autocomplete="off" autocorrect="off" spellcheck="false"
+                   placeholder="?" maxlength="3" aria-label="partie entière">
+          </div>
+          <span class="decomp-plus">+</span>
+          <div class="decomp-frac-block">
+            <span class="frac-input-label">Numérateur</span>
+            <input type="text" inputmode="numeric" class="frac-field" id="decomp-inp-n"
+                   autocomplete="off" autocorrect="off" spellcheck="false"
+                   placeholder="?" maxlength="3" aria-label="numérateur">
+            <div class="frac-divider"></div>
+            <div class="decomp-den-fixed">${q.den}</div>
+          </div>
+        </div>
+        <div class="frac-validate-row">
+          <button class="ex-validate-btn" id="decomp-validate">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const eInp = document.getElementById('decomp-inp-e');
+      const nInp = document.getElementById('decomp-inp-n');
+      const vBtn = document.getElementById('decomp-validate');
+
+      setTimeout(() => eInp.focus(), 50);
+      eInp.addEventListener('keydown', e => { if (e.key === 'Enter') nInp.focus(); });
+      nInp.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
+      vBtn.addEventListener('click', doValidate);
+
+      function doValidate() {
+        if (!eInp.value.trim() || !nInp.value.trim()) return;
+        eInp.disabled = nInp.disabled = vBtn.disabled = true;
+
+        const e = parseInt(eInp.value.trim(), 10);
+        const n = parseInt(nInp.value.trim(), 10);
+        const isRight = e === q.entiere && n === q.reste;
+
+        eInp.classList.add(isRight ? 'is-correct' : 'is-wrong');
+        nInp.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          score++;
+          setFeedback('feedback1', `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+        } else {
+          setFeedback('feedback1', `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              ${decompExplain(q)} → partie entière = <strong>${q.entiere}</strong>,
+              fraction = <strong>${q.reste}/${q.den}</strong>
+            </div>`);
+        }
+        showNextBtn();
+      }
+    }
+
+    function decompParseFreeAnswer(str) {
+      const cleaned = str.trim();
+      if (/^\d+$/.test(cleaned)) {
+        return { entiere: parseInt(cleaned, 10), num: 0, den: null, isIntOnly: true };
+      }
+      const m = cleaned.match(/^(\d+)\s*\+\s*(\d+)\s*\/\s*(\d+)$/);
+      if (m) {
+        return { entiere: parseInt(m[1], 10), num: parseInt(m[2], 10), den: parseInt(m[3], 10), isIntOnly: false };
+      }
+      return null;
+    }
+
+    function renderDecompFreeText(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">Décompose cette fraction sous la forme « partie entière + fraction » :</p>
+        <div class="frac-display-area">${decompFracHtml(q.num, q.den)}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="decomp-free-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="ex. 3 + 5/6">
+          <button class="ex-validate-btn" id="decomp-free-validate">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const input = document.getElementById('decomp-free-input');
+      const vBtn  = document.getElementById('decomp-free-validate');
+      setTimeout(() => input.focus(), 50);
+
+      function validate() {
+        if (!input.value.trim()) return;
+        input.disabled = true;
+        vBtn.disabled  = true;
+
+        const parsed = decompParseFreeAnswer(input.value);
+        let isRight = false;
+        let errMsg  = null;
+
+        if (!parsed) {
+          errMsg = `Réponse non reconnue. Écris ta réponse sous la forme « a + b/c ».`;
+        } else if (parsed.isIntOnly) {
+          if (q.reste === 0) {
+            isRight = parsed.entiere === q.entiere;
+          } else {
+            errMsg = `Il manque la fraction propre.`;
+          }
+        } else if (parsed.num >= parsed.den) {
+          errMsg = `La fraction ${parsed.num}/${parsed.den} n'est pas propre car ${parsed.num} ${parsed.num === parsed.den ? '=' : '>'} ${parsed.den}. Il faut que le numérateur soit inférieur au dénominateur.`;
+        } else {
+          isRight = parsed.entiere === q.entiere && parsed.num === q.reste && parsed.den === q.den;
+        }
+
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          score++;
+          setFeedback('feedback1', `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+        } else {
+          setFeedback('feedback1', `
+            <div class="ex-feedback-wrong">
+              ❌ ${errMsg || `Ce n'est pas la bonne réponse.`}<br>
+              ${decompExplain(q)}
+            </div>`);
+        }
+        showNextBtn();
+      }
+
+      vBtn.addEventListener('click', validate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') validate(); });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       TYPE : fractions-problemes — Utiliser les fractions dans des problèmes
+       CM1 : QCM (lecture d'une fraction dans un énoncé)
+       CM2 : saisie libre (fraction d'une quantité)
+       6e  : problème à étapes, saisie libre, équivalences acceptées
+       ═══════════════════════════════════════════════════════════════════════ */
+
+    /* ── Illustrations SVG inline ─────────────────────────────────────────── */
+
+    function fpCercleSvg(n, d) {
+      const r = 70, cx = 80, cy = 80;
+      let s = '';
+      for (let i = 0; i < d; i++) {
+        const a0 = (i / d) * 2 * Math.PI - Math.PI / 2;
+        const a1 = ((i + 1) / d) * 2 * Math.PI - Math.PI / 2;
+        const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
+        const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+        const fill = i < n ? '#f97316' : '#e5e7eb';
+        s += `<path d="M${cx},${cy} L${x0.toFixed(2)},${y0.toFixed(2)} A${r},${r} 0 0 1 ${x1.toFixed(2)},${y1.toFixed(2)} Z"
+               fill="${fill}" stroke="#fff" stroke-width="2"/>`;
+      }
+      return `
+        <svg viewBox="0 0 160 160" width="160" height="160">${s}</svg>
+        <div class="fp-illustration-label">${n}/${d}</div>
+      `;
+    }
+
+    function fpRectangleSvg(n, d) {
+      const W = 220, H = 90, partW = W / d;
+      let s = '';
+      for (let i = 0; i < d; i++) {
+        const fill = i < n ? '#f97316' : '#e5e7eb';
+        s += `<rect x="${(i * partW).toFixed(2)}" y="0" width="${partW.toFixed(2)}" height="${H}"
+               fill="${fill}" stroke="#fff" stroke-width="2"/>`;
+      }
+      return `
+        <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${s}</svg>
+        <div class="fp-illustration-label">${n}/${d}</div>
+      `;
+    }
+
+    /* Barre de proportion générique — réutilisée pour CM1 (longueurs) et CM2
+       (fraction d'une quantité). color personnalise la teinte des parts choisies. */
+    function fpBandeSvg(n, d, color) {
+      const W = 280, H = 56, partW = W / d;
+      let s = '';
+      for (let i = 0; i < d; i++) {
+        const fill = i < n ? color : '#e5e7eb';
+        s += `<rect x="${(i * partW).toFixed(2)}" y="0" width="${(partW - 2).toFixed(2)}" height="${H}"
+               rx="4" fill="${fill}" stroke="#fff" stroke-width="2"/>`;
+      }
+      return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block;max-width:100%">${s}</svg>`;
+    }
+
+    function fpBarreSvg(ill) {
+      const label = `${ill.n}/${ill.d} de ${ill.total}${ill.unite ? ' ' + ill.unite : ''} = ${ill.resultat}${ill.unite ? ' ' + ill.unite : ''}`;
+      return `${fpBandeSvg(ill.n, ill.d, '#f97316')}<div class="fp-illustration-label">${label}</div>`;
+    }
+
+    function fpProportionSvg(ill) {
+      const label = `← ${ill.n}/${ill.d} de ${ill.total}${ill.unite ? ' ' + ill.unite : ''} = ${ill.resultat}${ill.unite ? ' ' + ill.unite : ''} →`;
+      return `${fpBandeSvg(ill.n, ill.d, '#7c3aed')}<div class="fp-illustration-label">${label}</div>`;
+    }
+
+    /* ── Visuel gauche du panneau "ardoise" (6e) ──────────────────────────── */
+    function fpArdoiseVisual(v) {
+      if (v.kind === 'complement') {
+        const part = Math.round(v.total / v.d * v.n);
+        const label = `${v.n}/${v.d} de ${v.total}${v.unite ? ' ' + v.unite : ''} = ${part}${v.unite ? ' ' + v.unite : ''}`;
+        return `<div>${fpBandeSvg(v.n, v.d, '#7c3aed')}<div class="fp-illustration-label">${label}</div></div>`;
+      }
+      if (v.kind === 'diffsame') {
+        return `
+          <div>
+            ${fpBandeSvg(v.n1, v.d, '#7c3aed')}
+            <div class="fp-illustration-label">${v.n1}/${v.d}${v.unite ? ' ' + v.unite : ''}</div>
+            ${fpBandeSvg(v.n2, v.d, '#d62839')}
+            <div class="fp-illustration-label">− ${v.n2}/${v.d}${v.unite ? ' ' + v.unite : ''}</div>
+          </div>
+        `;
+      }
+      if (v.kind === 'sum2') {
+        const part1 = Math.round(v.total / v.d1 * v.n1);
+        const part2 = Math.round(v.total / v.d2 * v.n2);
+        return `
+          <div>
+            ${fpBandeSvg(v.n1, v.d1, '#7c3aed')}
+            <div class="fp-illustration-label">${v.n1}/${v.d1} de ${v.total} = ${part1}</div>
+            ${fpBandeSvg(v.n2, v.d2, '#f97316')}
+            <div class="fp-illustration-label">${v.n2}/${v.d2} de ${v.total} = ${part2}</div>
+          </div>
+        `;
+      }
+      return '';
+    }
+
+    function fpArdoiseSvg(ill, steps) {
+      return `
+        <div class="fp-ardoise-wrap">
+          <div class="fp-ardoise-visual">${fpArdoiseVisual(ill.visual)}</div>
+          <div class="fp-ardoise-panel">
+            <div class="fp-ardoise-panel-title">Décomposition</div>
+            ${steps.map(s => `<div>${s}</div>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function fpIllustrationHtml(q) {
+      const ill = q.illustration;
+      if (!ill) return '';
+      if (ill.type === 'cercle')    return `<div class="fp-illustration">${fpCercleSvg(ill.n, ill.d)}</div>`;
+      if (ill.type === 'rectangle') return `<div class="fp-illustration">${fpRectangleSvg(ill.n, ill.d)}</div>`;
+      if (ill.type === 'barre')     return `<div class="fp-illustration">${fpBarreSvg(ill)}</div>`;
+      if (ill.type === 'proportion') return `<div class="fp-illustration">${fpProportionSvg(ill)}</div>`;
+      if (ill.type === 'ardoise')   return fpArdoiseSvg(ill, q.steps);
+      return '';
+    }
+
+    /* ── Dispatcher de niveau ─────────────────────────────────────────────── */
+    function renderFractionsProblemes(card, q) {
+      if (fpLevel === null && currentIndex === 0) {
+        card.innerHTML = `
+          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
+            Quel niveau veux-tu pratiquer ?
+          </p>
+          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
+            <button class="ex-type-card" data-level="CM1">
+              <span class="ex-type-icon">⭐</span>
+              <div>
+                <span class="ex-type-name">CM1</span>
+                <span class="ex-type-desc">Lis l'énoncé et choisis la bonne fraction</span>
+              </div>
+            </button>
+            <button class="ex-type-card" data-level="CM2">
+              <span class="ex-type-icon">⭐⭐</span>
+              <div>
+                <span class="ex-type-name">CM2</span>
+                <span class="ex-type-desc">Calcule une fraction d'une quantité</span>
+              </div>
+            </button>
+            <button class="ex-type-card" data-level="6e">
+              <span class="ex-type-icon">⭐⭐⭐</span>
+              <div>
+                <span class="ex-type-name">6e</span>
+                <span class="ex-type-desc">Résous un problème à étapes</span>
+              </div>
+            </button>
+          </div>
+        `;
+        document.getElementById('ex-bar-fill').style.width = '0%';
+        card.querySelectorAll('.ex-type-card').forEach(btn =>
+          btn.addEventListener('click', () => {
+            fpLevel = btn.dataset.level;
+            questions = shuffle(sessionData.bank.filter(it => it.level === fpLevel))
+                          .slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            sessionLevelList   = ['CM1', 'CM2', '6e'];
+            sessionLevelLabels = ['CM1', 'CM2', '6e'];
+            sessionLevelIdx    = sessionLevelList.indexOf(fpLevel);
+            sessionLevelLoader = (lv) => {
+              fpLevel = lv;
+              questions = shuffle(sessionData.bank.filter(it => it.level === lv))
+                            .slice(0, sessionData.questionsPerSession);
+              document.getElementById('q-total').textContent = questions.length;
+              document.getElementById('ex-bar-fill').style.width = '0%';
+              currentIndex = 0;
+              score        = 0;
+              showQuestion(0);
+            };
+            currentIndex = 0;
+            score = 0;
+            showQuestion(0);
+          })
+        );
+        return;
+      }
+
+      if (q.inputMode === 'qcm') {
+        fpRenderQcm(card, q);
+      } else if (q.inputMode === 'free-text') {
+        fpRenderFreeText(card, q);
+      } else {
+        fpRenderMultiStep(card, q);
+      }
+    }
+
+    /* ── CM1 : QCM ─────────────────────────────────────────────────────────── */
+    function fpRenderQcm(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">${q.question}</p>
+        <div class="ex-choices-grid" id="ex-choices-grid"></div>
+        <div id="fp-illustration-slot"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      const grid = document.getElementById('ex-choices-grid');
+      shuffle([...q.choices]).forEach(c => {
+        const btn = document.createElement('button');
+        btn.className   = 'ex-choice';
+        btn.textContent = c;
+        btn.addEventListener('click', () => {
+          grid.querySelectorAll('.ex-choice').forEach(b => b.disabled = true);
+          const isRight = c === q.answer;
+          grid.querySelectorAll('.ex-choice').forEach(b => {
+            if (b.textContent === q.answer) b.classList.add('is-correct');
+          });
+          if (!isRight) btn.classList.add('is-wrong');
+          document.getElementById('fp-illustration-slot').innerHTML = fpIllustrationHtml(q);
+          if (isRight) {
+            score++;
+            setFeedback('feedback1', `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+          } else {
+            setFeedback('feedback1', `
+              <div class="ex-feedback-wrong">
+                ❌ Ce n'est pas la bonne réponse.<br>
+                La bonne réponse était : <strong>${q.answer}</strong>
+              </div>`);
+          }
+          showNextBtn();
+        });
+        grid.appendChild(btn);
+      });
+    }
+
+    /* ── CM2 : saisie libre — fraction d'une quantité ─────────────────────── */
+    function fpParseQuantityAnswer(str) {
+      const cleaned = str.trim().replace(/\s+/g, ' ');
+      const m = cleaned.match(/^(-?\d+(?:[.,]\d+)?)/);
+      if (!m) return null;
+      return parseFloat(m[1].replace(',', '.'));
+    }
+
+    function fpRenderFreeText(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">${q.question}</p>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="fp-free-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse">
+          <button class="ex-validate-btn" id="fp-free-validate">Valider</button>
+        </div>
+        <div id="fp-illustration-slot"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const input = document.getElementById('fp-free-input');
+      const vBtn  = document.getElementById('fp-free-validate');
+      setTimeout(() => input.focus(), 50);
+
+      function validate() {
+        if (!input.value.trim()) return;
+        input.disabled = true;
+        vBtn.disabled  = true;
+
+        const value   = fpParseQuantityAnswer(input.value);
+        const isRight = value !== null && Math.abs(value - q.resultat) < 0.01;
+
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+        document.getElementById('fp-illustration-slot').innerHTML = fpIllustrationHtml(q);
+
+        if (isRight) {
+          score++;
+          setFeedback('feedback1', `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+        } else {
+          setFeedback('feedback1', `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              ${q.total} ÷ ${q.d} = ${(q.total / q.d)} → ${q.n}/${q.d} de ${q.total} = ${q.resultat}${q.unite ? ' ' + q.unite : ''}
+            </div>`);
+        }
+        showNextBtn();
+      }
+
+      vBtn.addEventListener('click', validate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') validate(); });
+    }
+
+    /* ── 6e : problème à étapes, équivalences acceptées ───────────────────── */
+    function fpNormalizeFractionAnswer(str) {
+      return str.trim().replace(/\s+/g, '').replace(/m2\b/i, 'm²');
+    }
+
+    function fpRenderMultiStep(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label">${q.question}</p>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="fp-ms-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse">
+          <button class="ex-validate-btn" id="fp-ms-validate">Valider</button>
+        </div>
+        <div id="fp-illustration-slot"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const input = document.getElementById('fp-ms-input');
+      const vBtn  = document.getElementById('fp-ms-validate');
+      setTimeout(() => input.focus(), 50);
+
+      function validate() {
+        if (!input.value.trim()) return;
+        input.disabled = true;
+        vBtn.disabled  = true;
+
+        const given   = fpNormalizeFractionAnswer(input.value);
+        const isRight = q.accept.some(a => fpNormalizeFractionAnswer(a) === given);
+
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+        document.getElementById('fp-illustration-slot').innerHTML = fpIllustrationHtml(q);
+
+        if (isRight) {
+          score++;
+          setFeedback('feedback1', `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+        } else {
+          setFeedback('feedback1', `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.display}</strong>
+            </div>`);
+        }
+        showNextBtn();
+      }
+
+      vBtn.addEventListener('click', validate);
       input.addEventListener('keydown', e => { if (e.key === 'Enter') validate(); });
     }
 
@@ -10330,6 +11163,439 @@
       });
     }
 
+    /* ══════════════════════════════════════════════════════════════════════════
+       TYPE : adv-niveaux — Identifier les adverbes
+       3 niveaux déverrouillables (localStorage), seuil 75 %.
+       Niveau 1 : reconnaître l'unique adverbe d'une phrase (mots-cliquables)
+       Niveau 2 : trouver tous les adverbes d'une phrase (mots-cliquables, multi)
+       Niveau 3 : identifier l'adverbe puis ce qu'il modifie (2 étapes, retry)
+       ══════════════════════════════════════════════════════════════════════════ */
+
+    const ADV_SEUIL    = 0.75;
+    const ADV_POSITIFS  = ["✅ Bravo !", "✨ Très bien !", "🌟 Exact !", "👏 Super !"];
+    const ADV_CHOICES3  = ["un verbe", "un adjectif", "un autre adverbe", "une phrase entière"];
+
+    let advState = null;
+
+    function advSlugKey(suffix) {
+      const s = new URLSearchParams(window.location.search).get('slug') || 'adv';
+      return s + '_' + suffix;
+    }
+    function advGetValidated() {
+      try { return JSON.parse(localStorage.getItem(advSlugKey('validated')) || '[]'); }
+      catch { return []; }
+    }
+    function advSetValidated(arr) {
+      localStorage.setItem(advSlugKey('validated'), JSON.stringify(arr));
+    }
+    function advShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    /* ── Init ───────────────────────────────────────────────────────────────── */
+    function advInitSession() {
+      advState = null;
+      score = 0;
+      currentIndex = 0;
+      sessionStartTime = Date.now();
+
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      advRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Sélection de niveau ────────────────────────────────────────────────── */
+    function advRenderLevelSelect(card) {
+      const validated = advGetValidated();
+      const lvDefs = [
+        { lv: 1, icon: '⭐',     label: 'Niveau 1 — Reconnaître un adverbe',        desc: 'Clique sur le seul adverbe de la phrase' },
+        { lv: 2, icon: '⭐⭐',   label: 'Niveau 2 — Trouver tous les adverbes',     desc: 'Certaines phrases en contiennent plusieurs' },
+        { lv: 3, icon: '⭐⭐⭐', label: 'Niveau 3 — Que modifie l\'adverbe ?',      desc: 'Identifie l\'adverbe puis ce qu\'il modifie' }
+      ];
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
+          ${lvDefs.map((d, i) => {
+            const unlocked = i === 0 || validated.includes(i - 1);
+            const done     = validated.includes(i);
+            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const disabled = !unlocked ? ' disabled' : '';
+            const desc     = !unlocked ? 'Valide le niveau précédent pour débloquer'
+                           : done ? d.desc + ' · Validé !' : d.desc;
+            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${disabled}>
+              <span class="ex-type-icon">${icon}</span>
+              <div>
+                <span class="ex-type-name">${d.label}</span>
+                <span class="ex-type-desc">${desc}</span>
+              </div>
+            </button>`;
+          }).join('')}
+        </div>
+      `;
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => advStartLevel(parseInt(btn.dataset.level)))
+      );
+    }
+
+    /* ── Démarre un niveau ──────────────────────────────────────────────────── */
+    function advStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const bankKey = lv === 1 ? 'lvl1Bank' : lv === 2 ? 'lvl2Bank' : 'lvl3Bank';
+      const questions = advShuffle([...sessionData[bankKey]]);
+      advState = { level: lv, questions, idx: 0, score: 0, total: questions.length };
+      document.getElementById('q-total').textContent = questions.length;
+
+      if (lv === 1) advRenderLvl1(document.getElementById('ex-card'));
+      else if (lv === 2) advRenderLvl2(document.getElementById('ex-card'));
+      else advRenderLvl3(document.getElementById('ex-card'));
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       NIVEAU 1 & 2 — mots-cliquables (un seul ou plusieurs adverbes attendus)
+       ══════════════════════════════════════════════════════════════════════════ */
+    function advRenderLvl1(card) { advRenderMC(card, 1); }
+    function advRenderLvl2(card) { advRenderMC(card, 2); }
+
+    function advBuildClassNote(q) {
+      if (!q.classes) return '';
+      const items = q.targets
+        .filter(t => q.classes[t])
+        .map(t => `<b>${t}</b> (${q.classes[t]})`)
+        .join(', ');
+      return items ? `💡 Adverbe${q.targets.length > 1 ? 's' : ''} attendu${q.targets.length > 1 ? 's' : ''} : ${items}.` : '';
+    }
+
+    function advRenderMC(card, level) {
+      const { questions, idx, total } = advState;
+      const q = questions[idx];
+
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction}</p>
+        <div class="ex-sentence-words" id="adv-mc-words"></div>
+        <div class="ex-feedback-area" id="adv-mc-piege" style="min-height:24px"></div>
+        <button class="ex-choice" id="adv-mc-validate" style="margin-top:10px;width:100%">Valider ma sélection</button>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Suivant →' : 'Voir les résultats →'}</button>
+      `;
+
+      const container = document.getElementById('adv-mc-words');
+      const selected  = new Set();
+      let answered    = false;
+
+      q.sentence.split(/\s+/).forEach(token => {
+        const clean = token.replace(/[.,!?;:«»"""]/g, '').replace(/['']/g, "'");
+        if (!clean) return;
+        const btn = document.createElement('button');
+        btn.className     = 'ex-word-btn';
+        btn.textContent   = token;
+        btn.dataset.clean = clean;
+
+        btn.addEventListener('click', () => {
+          if (answered) return;
+          if (selected.has(btn)) {
+            selected.delete(btn);
+            btn.classList.remove('is-selected');
+            document.getElementById('adv-mc-piege').innerHTML = '';
+          } else {
+            selected.add(btn);
+            btn.classList.add('is-selected');
+            const piegeMsg = q.piege && (q.piege[clean] || q.piege[token]);
+            if (piegeMsg) {
+              document.getElementById('adv-mc-piege').innerHTML =
+                `<div class="ex-feedback-wrong" style="font-size:13px;padding:8px 12px">⚠️ ${piegeMsg}</div>`;
+            }
+          }
+        });
+        container.appendChild(btn);
+      });
+
+      document.getElementById('adv-mc-validate').addEventListener('click', () => {
+        if (answered) return;
+        answered = true;
+        let hasWrong = false, hasMissed = false;
+
+        container.querySelectorAll('.ex-word-btn').forEach(btn => {
+          const clean       = btn.dataset.clean;
+          const isTarget    = q.targets.includes(clean);
+          const wasSelected = selected.has(btn);
+          btn.disabled = true;
+          btn.classList.remove('is-selected');
+
+          if      (isTarget && wasSelected)  { btn.classList.add('is-correct'); }
+          else if (isTarget && !wasSelected) { btn.classList.add('is-missed'); hasMissed = true; }
+          else if (!isTarget && wasSelected) { btn.classList.add('is-wrong'); btn.classList.add('shake'); hasWrong = true; }
+        });
+
+        document.getElementById('adv-mc-validate').disabled = true;
+        document.getElementById('adv-mc-piege').innerHTML   = '';
+
+        const noteHtml = `<div class="ex-note">${advBuildClassNote(q)}</div>`;
+        if (!hasWrong && !hasMissed) {
+          advState.score++;
+          document.getElementById('feedback1').innerHTML =
+            `<div class="ex-feedback-correct">${rand(ADV_POSITIFS)}</div>${noteHtml}`;
+        } else {
+          document.getElementById('feedback1').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Pas tout à fait ! Les bonnes réponses sont en vert${hasMissed ? " ; les mots manqués sont encadrés en pointillés" : ""}.
+            </div>${noteHtml}`;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        advState.idx++;
+        if (advState.idx >= advState.total) advShowLevelResults();
+        else if (level === 1) advRenderLvl1(document.getElementById('ex-card'));
+        else advRenderLvl2(document.getElementById('ex-card'));
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       NIVEAU 3 — Identifier l'adverbe ET ce qu'il modifie (2 étapes)
+       Étape 1 : clic sur l'adverbe — 1re erreur = retry sans pénalité,
+                 2e erreur = point perdu (et on passe à l'étape 2).
+       Étape 2 : QCM — verbe / adjectif / autre adverbe / phrase entière.
+       ══════════════════════════════════════════════════════════════════════════ */
+    function advRenderLvl3(card) {
+      const { questions, idx, total } = advState;
+      const q = questions[idx];
+
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      card.innerHTML = `
+        <p class="ex-question-label">Étape 1 — Clique sur l'adverbe de cette phrase.</p>
+        <div class="ex-sentence-words" id="adv3-words"></div>
+        <div class="ex-feedback-area" id="adv3-fb1"></div>
+
+        <div id="adv3-step2" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title">Étape 2 — Que modifie cet adverbe ?</div>
+          <div class="ex-choices-grid" id="adv3-choices2"></div>
+          <div class="ex-feedback-area" id="feedback1"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Suivant →' : 'Voir les résultats →'}</button>
+      `;
+
+      const wordsEl = document.getElementById('adv3-words');
+      let attempts1     = 0;
+      let step1Locked   = false;
+      let step1Correct  = false;
+
+      q.sentence.split(/\s+/).forEach(token => {
+        const clean = token.replace(/[.,!?;:«»"""'']/g, '');
+        if (!clean) return;
+        const btn = document.createElement('button');
+        btn.className     = 'ex-word-btn';
+        btn.textContent   = token;
+        btn.dataset.clean = clean;
+
+        btn.addEventListener('click', () => {
+          if (step1Locked) return;
+          const isRight = clean === q.adverb;
+
+          if (isRight) {
+            step1Correct = true;
+            step1Locked  = true;
+            wordsEl.querySelectorAll('.ex-word-btn').forEach(b => b.disabled = true);
+            btn.classList.add('is-correct');
+            document.getElementById('adv3-fb1').innerHTML =
+              `<div class="ex-feedback-correct" style="font-size:13px">${rand(ADV_POSITIFS)}</div>`;
+            setTimeout(() => advShowStep2(card, q, true), 500);
+            return;
+          }
+
+          attempts1++;
+          if (attempts1 === 1) {
+            btn.classList.add('is-wrong', 'shake');
+            setTimeout(() => btn.classList.remove('is-wrong', 'shake'), 500);
+            document.getElementById('adv3-fb1').innerHTML =
+              `<div class="ex-feedback-wrong" style="font-size:13px">❌ Ce n'est pas l'adverbe attendu. Réessaie !</div>`;
+          } else {
+            step1Locked  = true;
+            step1Correct = false;
+            btn.classList.add('is-wrong');
+            wordsEl.querySelectorAll('.ex-word-btn').forEach(b => {
+              b.disabled = true;
+              if (b.dataset.clean === q.adverb) b.classList.add('is-correct');
+            });
+            document.getElementById('adv3-fb1').innerHTML =
+              `<div class="ex-feedback-wrong" style="font-size:13px">❌ L'adverbe était <strong>${q.adverb}</strong>. Point perdu pour cette phrase.</div>`;
+            setTimeout(() => advShowStep2(card, q, false), 900);
+          }
+        });
+        wordsEl.appendChild(btn);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        advState.idx++;
+        if (advState.idx >= advState.total) advShowLevelResults();
+        else advRenderLvl3(document.getElementById('ex-card'));
+      });
+    }
+
+    function advHighlightedSentence(q) {
+      const rx = new RegExp('(' + q.adverb.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')');
+      return q.sentence.replace(rx, '<span class="ea-hl-adj">$1</span>');
+    }
+
+    function advShowStep2(card, q, step1Correct) {
+      const step2 = document.getElementById('adv3-step2');
+      step2.classList.remove('ex-hidden');
+      step2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      const choicesEl = document.getElementById('adv3-choices2');
+      advShuffle(ADV_CHOICES3).forEach(c => {
+        const btn = document.createElement('button');
+        btn.className   = 'ex-choice';
+        btn.textContent = c;
+        btn.addEventListener('click', () => {
+          choicesEl.querySelectorAll('.ex-choice').forEach(b => b.disabled = true);
+          const isRight = c === q.step2Answer;
+          choicesEl.querySelectorAll('.ex-choice').forEach(b => {
+            if (b.textContent === q.step2Answer) b.classList.add('is-correct');
+          });
+          if (!isRight) btn.classList.add('is-wrong');
+
+          if (isRight && step1Correct) advState.score++;
+
+          const targetLabel = q.modifiedWord ? `<strong>${q.modifiedWord}</strong>` : "la phrase entière";
+          const recapHtml = `
+            <div class="ea-sentence-display" style="margin-top:10px">${advHighlightedSentence(q)}</div>
+            <div style="text-align:center;font-size:12px;color:var(--muted);margin-top:4px">
+              <strong>${q.adverb}</strong> modifie ${targetLabel} — classe : <em>${q.semClass}</em>
+            </div>`;
+
+          if (isRight && step1Correct) {
+            document.getElementById('feedback1').innerHTML =
+              `<div class="ex-feedback-correct">${rand(ADV_POSITIFS)}${recapHtml}</div>`;
+          } else if (isRight) {
+            document.getElementById('feedback1').innerHTML =
+              `<div class="ex-feedback-correct" style="opacity:0.85">✓ Bonne réponse à l'étape 2 (mais l'étape 1 n'était pas validée).${recapHtml}</div>`;
+          } else {
+            document.getElementById('feedback1').innerHTML = `
+              <div class="ex-feedback-wrong">
+                ❌ La bonne réponse est : <strong>${q.step2Answer}</strong>.${recapHtml}
+              </div>`;
+          }
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+        choicesEl.appendChild(btn);
+      });
+    }
+
+    /* ── Résultats d'un niveau ──────────────────────────────────────────────── */
+    function advShowLevelResults() {
+      const { level, score: lvScore, total } = advState;
+      const pct    = lvScore / total;
+      const passed = pct >= ADV_SEUIL;
+      const pctPct = Math.round(pct * 100);
+
+      if (passed) {
+        const validated = advGetValidated();
+        if (!validated.includes(level - 1)) { validated.push(level - 1); advSetValidated(validated); }
+      }
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-grammaire.html';
+      const backLabel = `← Retour à la ${sessionData.backLink?.label || 'Grammaire'}`;
+      const isLast    = level >= 3;
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 75 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+
+      const lvLabels     = ['', 'Niveau 1', 'Niveau 2', 'Niveau 3'];
+      const lvNextLabels = ['', 'Niveau 2 — Trouver tous les adverbes', 'Niveau 3 — Que modifie l\'adverbe ?', ''];
+
+      let msg, btnsHTML;
+
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises l'identification des adverbes !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="adv-restart-btn">Recommencer</button>
+            <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+          </div>`;
+      } else if (passed) {
+        msg = `${stars} ${lvLabels[level]} validé ! 🏆 Le ${lvLabels[level + 1]} est débloqué !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="adv-next-btn">${lvNextLabels[level]} →</button>
+            <button class="ex-btn-secondary" id="adv-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * ADV_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour passer. On réessaie ?`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="adv-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+          </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('adv-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        advStartLevel(advState.level);
+      });
+      document.getElementById('adv-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        advStartLevel(advState.level + 1);
+      });
+      document.getElementById('adv-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        advInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug,
+        subject,
+        category,
+        exerciseType: currentType,
+        level:        'Niveau ' + level,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
     /* ══════════════════════════════════════════════════════════════════════
        TYPE : psc-niveaux
        Distinguer pronom personnel sujet / pronom personnel complément
@@ -10713,6 +11979,411 @@
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
         pscInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: currentType,
+        level:        'Niveau ' + level,
+        score:        lvScore, total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       TYPE : gnsp-niveaux — Remplacer un GNS par un pronom personnel sujet
+       Niveau 1 : trouver le groupe nominal sujet complet (mots cliquables)
+       Niveau 2 : genre/nombre du noyau puis pronom (il/elle/ils/elles)
+       Niveau 3 : réécrire la phrase entière avec le pronom (saisie libre)
+       Seuil 75 % — localStorage — déverrouillage progressif
+       ══════════════════════════════════════════════════════════════════════════ */
+
+    const GNSP_SEUIL    = 0.75;
+    const GNSP_POSITIFS = ["Très bien !", "Parfait !", "Excellent !", "C'est juste !", "Bravo !"];
+    let gnspState = null;
+
+    function gnspSlugKey(suffix) {
+      const s = new URLSearchParams(window.location.search).get('slug') || 'gnsp';
+      return s + '_' + suffix;
+    }
+    function gnspGetValidated() {
+      try { return JSON.parse(localStorage.getItem(gnspSlugKey('validated')) || '[]'); } catch { return []; }
+    }
+    function gnspSetValidated(arr) {
+      localStorage.setItem(gnspSlugKey('validated'), JSON.stringify(arr));
+    }
+    function gnspShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+    function gnspNorm(str) {
+      return str.trim().toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/[.,;!?»«']/g, '').replace(/\s+/g, ' ').trim();
+    }
+    function gnspPos() { return GNSP_POSITIFS[Math.floor(Math.random() * GNSP_POSITIFS.length)]; }
+
+    /* ── Init ───────────────────────────────────────────────────────────── */
+    function gnspInitSession() {
+      gnspState = null;
+      score = 0; currentIndex = 0;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      gnspRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Sélection de niveau ─────────────────────────────────────────────── */
+    function gnspRenderLevelSelect(card) {
+      const validated = gnspGetValidated();
+      const lvDefs = [
+        { lv: 1, icon: '⭐',     label: 'Niveau 1 — Trouve le groupe nominal sujet',
+          desc: 'Clique sur tous les mots qui composent le GNS' },
+        { lv: 2, icon: '⭐⭐',   label: 'Niveau 2 — Quel pronom ?',
+          desc: 'Trouve le genre et le nombre, puis choisis le pronom' },
+        { lv: 3, icon: '⭐⭐⭐', label: 'Niveau 3 — Réécris la phrase',
+          desc: 'Remplace le GNS par le bon pronom dans la phrase entière' }
+      ];
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="ea-rule-chip">📌 Test du sujet : <em>Qui est-ce qui + verbe ?</em> — on remplace TOUT le groupe nominal sujet, pas seulement le nom-noyau.</div>
+        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
+          ${lvDefs.map((d, i) => {
+            const unlocked = i === 0 || validated.includes(i - 1);
+            const done     = validated.includes(i);
+            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const dis      = !unlocked ? ' disabled' : '';
+            const desc     = !unlocked ? 'Valide le niveau précédent pour débloquer'
+                           : done ? d.desc + ' · Validé !' : d.desc;
+            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${dis}>
+              <span class="ex-type-icon">${icon}</span>
+              <div><span class="ex-type-name">${d.label}</span><span class="ex-type-desc">${desc}</span></div>
+            </button>`;
+          }).join('')}
+        </div>`;
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => gnspStartLevel(parseInt(btn.dataset.level)))
+      );
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function gnspStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      if (lv === 1) {
+        const qs = gnspShuffle([...sessionData.lvl1Bank]);
+        gnspState = { level: 1, questions: qs, idx: 0, score: 0, total: qs.length };
+        document.getElementById('q-total').textContent = qs.length;
+        gnspRenderLvl1(document.getElementById('ex-card'));
+
+      } else if (lv === 2) {
+        const qs = gnspShuffle([...sessionData.lvl2Bank]);
+        gnspState = { level: 2, questions: qs, idx: 0, score: 0, total: qs.length };
+        document.getElementById('q-total').textContent = qs.length;
+        gnspRenderLvl2(document.getElementById('ex-card'));
+
+      } else {
+        const qs = gnspShuffle([...sessionData.lvl3Bank]);
+        gnspState = { level: 3, questions: qs, idx: 0, score: 0, total: qs.length };
+        document.getElementById('q-total').textContent = qs.length;
+        gnspRenderLvl3(document.getElementById('ex-card'));
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════
+       NIVEAU 1 — Clique sur tous les mots du GNS, puis Valider
+       ════════════════════════════════════════════════════════════════════ */
+    function gnspRenderLvl1(card) {
+      const { questions, idx, total } = gnspState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      const selected = new Set();
+
+      card.innerHTML = `
+        <p class="ex-question-label">Clique sur <strong>tous les mots</strong> du groupe nominal sujet (GNS)</p>
+        <p style="text-align:center;font-size:12px;color:var(--muted);margin:-10px 0 18px;font-style:italic">💡 Test : <em>Qui est-ce qui ${q.verb} ?</em> — prends tout le groupe, pas seulement le nom-noyau.</p>
+        <div class="ex-sentence-words" id="gnsp-words">
+          ${q.words.map((w, i) => `<button class="ex-word-btn" data-idx="${i}">${w}</button>`).join('')}
+        </div>
+        <button class="ex-validate-btn" id="gnsp-val-btn" style="display:block;margin:0 auto 4px">Valider ma sélection</button>
+        <div class="ex-feedback-area" id="gnsp-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'}</button>`;
+
+      card.querySelectorAll('.ex-word-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const i = parseInt(btn.dataset.idx);
+          if (selected.has(i)) { selected.delete(i); btn.classList.remove('is-selected'); }
+          else { selected.add(i); btn.classList.add('is-selected'); }
+        });
+      });
+
+      document.getElementById('gnsp-val-btn').addEventListener('click', () => {
+        const correctSet = new Set(q.gnsIndices);
+        const isCorrect  = selected.size === correctSet.size && [...selected].every(i => correctSet.has(i));
+
+        document.getElementById('gnsp-val-btn').disabled = true;
+        card.querySelectorAll('.ex-word-btn').forEach(b => {
+          b.disabled = true;
+          const i = parseInt(b.dataset.idx);
+          if (correctSet.has(i)) b.classList.add('is-correct');
+          else if (selected.has(i)) b.classList.add('is-wrong');
+        });
+
+        if (isCorrect) {
+          gnspState.score++;
+          document.getElementById('gnsp-fb').innerHTML =
+            `<div class="ex-feedback-correct">✓ ${gnspPos()} Le GNS est bien « ${q.testA} ».</div>`;
+        } else {
+          document.getElementById('gnsp-fb').innerHTML =
+            `<div class="ex-feedback-wrong">❌ Le GNS complet est « ${q.testA} ».<br><small>📌 Test : <em>${q.testQ}</em> → <strong>${q.testA}</strong></small><div class="ex-note">${q.note}</div></div>`;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        gnspState.idx++;
+        if (gnspState.idx >= gnspState.questions.length) gnspShowLevelResults();
+        else gnspRenderLvl1(document.getElementById('ex-card'));
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════
+       NIVEAU 2 — Genre/nombre du noyau, puis pronom (2 étapes)
+       ════════════════════════════════════════════════════════════════════ */
+    function gnspRenderLvl2(card) {
+      const { questions, idx, total } = gnspState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      card.innerHTML = `
+        <p class="ex-question-label">Repère le nom-noyau du groupe en bleu, puis trouve le bon pronom</p>
+        <div class="psc-sentence-display">${q.displayHtml}</div>
+        <p class="gnsp-step-label">Étape 1 — Le nom-noyau est-il…</p>
+        <div class="gnsp-gn-row" id="gnsp-gn-btns">
+          <button class="ex-choice" data-gender="masculin" data-number="singulier">Masculin singulier</button>
+          <button class="ex-choice" data-gender="féminin"  data-number="singulier">Féminin singulier</button>
+          <button class="ex-choice" data-gender="masculin" data-number="pluriel">Masculin pluriel</button>
+          <button class="ex-choice" data-gender="féminin"  data-number="pluriel">Féminin pluriel</button>
+        </div>
+        <div id="gnsp-step2"></div>
+        <div class="ex-feedback-area" id="gnsp-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'}</button>`;
+
+      let step1Done = false;
+
+      card.querySelectorAll('#gnsp-gn-btns .ex-choice').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (step1Done) return;
+          const chosenGender = btn.dataset.gender, chosenNumber = btn.dataset.number;
+          const correct = chosenGender === q.gender && chosenNumber === q.number;
+
+          if (correct) {
+            step1Done = true;
+            card.querySelectorAll('#gnsp-gn-btns .ex-choice').forEach(b => b.disabled = true);
+            btn.classList.add('is-correct');
+            document.getElementById('gnsp-fb').innerHTML =
+              `<div class="ex-feedback-correct">✓ ${gnspPos()} ${q.noyauNote}</div>`;
+            gnspShowStep2(card, q);
+          } else {
+            btn.classList.add('is-wrong');
+            setTimeout(() => btn.classList.remove('is-wrong'), 700);
+            document.getElementById('gnsp-fb').innerHTML =
+              `<div class="ex-feedback-wrong">❌ Regarde bien le nom-noyau (pas le complément du nom). Réessaie !</div>`;
+          }
+        });
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        gnspState.idx++;
+        if (gnspState.idx >= gnspState.questions.length) gnspShowLevelResults();
+        else gnspRenderLvl2(document.getElementById('ex-card'));
+      });
+    }
+
+    function gnspShowStep2(card, q) {
+      const wrap = document.getElementById('gnsp-step2');
+      wrap.innerHTML = `
+        <p class="gnsp-step-label">Étape 2 — Quel pronom personnel sujet remplace « ${q.gnsText} » ?</p>
+        <div class="ex-choices-grid" id="gnsp-pn-btns">
+          <button class="ex-choice" data-pn="il">il</button>
+          <button class="ex-choice" data-pn="elle">elle</button>
+          <button class="ex-choice" data-pn="ils">ils</button>
+          <button class="ex-choice" data-pn="elles">elles</button>
+        </div>`;
+
+      let answered = false;
+      card.querySelectorAll('#gnsp-pn-btns .ex-choice').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (answered) return;
+          answered = true;
+          card.querySelectorAll('#gnsp-pn-btns .ex-choice').forEach(b => b.disabled = true);
+          const chosen  = btn.dataset.pn;
+          const correct = chosen === q.pronoun;
+
+          if (correct) {
+            btn.classList.add('is-correct');
+            gnspState.score++;
+            document.getElementById('gnsp-fb').innerHTML =
+              `<div class="ex-feedback-correct">✓ ${gnspPos()} « ${q.gnsText} » se remplace par « ${q.pronoun} ».</div>`;
+          } else {
+            btn.classList.add('is-wrong');
+            card.querySelectorAll('#gnsp-pn-btns .ex-choice').forEach(b => { if (b.dataset.pn === q.pronoun) b.classList.add('is-correct'); });
+            document.getElementById('gnsp-fb').innerHTML =
+              `<div class="ex-feedback-wrong">❌ Le bon pronom est « ${q.pronoun} ».<div class="ex-note">${q.noyauNote}</div></div>`;
+          }
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════
+       NIVEAU 3 — Réécris la phrase entière (saisie libre)
+       ════════════════════════════════════════════════════════════════════ */
+    function gnspRenderLvl3(card) {
+      const { questions, idx, total } = gnspState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      card.innerHTML = `
+        <p class="ex-question-label">Réécris la phrase en remplaçant le groupe en bleu par le bon pronom personnel sujet</p>
+        <div class="psc-sentence-display" style="font-size:19px">${q.displayHtml}</div>
+        <p style="font-size:13px;color:var(--muted);margin:-8px 0 18px;text-align:center">Remplace <strong>« ${q.gns} »</strong> et garde le verbe correctement accordé.</p>
+        <div class="ex-input-row">
+          <input type="text" id="gnsp-input" class="ex-text-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                 placeholder="Réécris la phrase…">
+          <button class="ex-validate-btn" id="gnsp-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="gnsp-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'}</button>`;
+
+      const input  = document.getElementById('gnsp-input');
+      const valBtn = document.getElementById('gnsp-val-btn');
+
+      input.focus();
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') valBtn.click(); });
+
+      valBtn.addEventListener('click', () => {
+        const raw = input.value.trim();
+        if (!raw) return;
+        valBtn.disabled = true;
+        input.disabled  = true;
+
+        const norm    = gnspNorm(raw);
+        const correct = q.answers.some(a => gnspNorm(a) === norm);
+
+        if (correct) {
+          input.classList.add('is-correct');
+          gnspState.score++;
+          document.getElementById('gnsp-fb').innerHTML =
+            `<div class="ex-feedback-correct">✓ ${gnspPos()} La phrase est correcte !${q.noteOk ? `<div class="ex-note">${q.noteOk}</div>` : ''}</div>`;
+        } else {
+          input.classList.add('is-wrong');
+          const hasPronoun  = norm.includes(gnspNorm(q.pronoun));
+          const hasVerb     = norm.includes(gnspNorm(q.verb));
+          let errMsg;
+          if (!hasPronoun)      errMsg = `Le pronom attendu est « ${q.pronoun} ».`;
+          else if (!hasVerb)    errMsg = `Le verbe doit rester « ${q.verb} », bien accordé.`;
+          else                  errMsg = `Vérifie l'orthographe et l'ordre des mots.`;
+          document.getElementById('gnsp-fb').innerHTML =
+            `<div class="ex-feedback-wrong">❌ ${errMsg}<br><small>Réponse correcte : <strong>${q.solution}</strong></small></div>`;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        gnspState.idx++;
+        if (gnspState.idx >= gnspState.questions.length) gnspShowLevelResults();
+        else gnspRenderLvl3(document.getElementById('ex-card'));
+      });
+    }
+
+    /* ── Résultats d'un niveau ───────────────────────────────────────────── */
+    function gnspShowLevelResults() {
+      const { level, score: lvScore, total } = gnspState;
+      const pct    = lvScore / total;
+      const passed = pct >= GNSP_SEUIL;
+      const pctPct = Math.round(pct * 100);
+
+      if (passed) {
+        const validated = gnspGetValidated();
+        if (!validated.includes(level - 1)) { validated.push(level - 1); gnspSetValidated(validated); }
+      }
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-grammaire.html';
+      const backLabel = `← Retour à la ${sessionData.backLink?.label || 'Grammaire'}`;
+      const isLast    = level >= 3;
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 75 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const lvNextLabels = ['', 'Niveau 2 — Quel pronom ?', 'Niveau 3 — Réécris la phrase !', ''];
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu sais remplacer un groupe nominal sujet par le bon pronom personnel sujet !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="gnsp-restart-btn">Recommencer</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="gnsp-next-btn">${lvNextLabels[level]} →</button>
+          <button class="ex-btn-secondary" id="gnsp-retry-btn">Recommencer ce niveau</button>
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * GNSP_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour passer. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="gnsp-retry-btn">Recommencer ce niveau</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('gnsp-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        gnspStartLevel(gnspState.level);
+      });
+      document.getElementById('gnsp-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        gnspStartLevel(gnspState.level + 1);
+      });
+      document.getElementById('gnsp-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        gnspInitSession();
       });
 
       window.scrollTo({ top: 0, behavior: 'smooth' });

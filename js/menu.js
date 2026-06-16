@@ -228,6 +228,14 @@
       name: 'Espace administrateur',
       desc: 'Gérez les utilisateurs et les paramètres',
       href: profile?.role === 'admin' ? 'dashboard-admin.html' : 'auth.html?role=admin'
+    },
+    {
+      key:  'feedback',
+      icon: '💬',
+      cls:  'lfm-icon-a',
+      name: 'Signaler une erreur / Proposer une idée',
+      desc: 'Aide-nous à améliorer cet espace',
+      href: 'feedback.html'
     }
   ];
 

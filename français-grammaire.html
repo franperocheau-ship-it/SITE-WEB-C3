@@ -471,7 +471,8 @@
       "accord-verbe-sujet-inverse",
       "differencier-epithete-attribut",
       "distinguer-epithete-complement-nom",
-      "distinguer-pronom-sujet-complement"
+      "distinguer-pronom-sujet-complement",
+      "remplacer-gn-sujet-pronom"
     ]);
 
     /* ── Standalone exercise pages (not using the generic engine) ─────────── */
@@ -480,9 +481,9 @@
     /* ── Data ──────────────────────────────────────────────────────────────── */
     const SECTIONS = [
       {
-        id: "la-phrase",
+        id: "phrase-types-formes",
         emoji: "📄",
-        title: "La phrase",
+        title: "La phrase, les types et formes de phrases",
         subSections: [
           {
             label: "Types et formes de phrases",
@@ -502,13 +503,24 @@
             skills: [
               { title: "Distinguer phrase simple et phrase complexe",                    slug: "distinguer-phrase-simple-complexe",      levels: ["CM2","6e"] },
             ]
+          },
+          {
+            label: "La phrase complexe : juxtaposition, coordination, subordination",
+            skills: [
+              { title: "Repérer le nombre de verbes conjugués",                        slug: "reperer-verbes-conjugues",              levels: ["CM2","6e"] },
+              { title: "Comprendre la notion de proposition",                          slug: "notion-proposition",                    levels: ["6e"] },
+              { title: "Repérer les propositions dans une phrase complexe",            slug: "reperer-propositions",                  levels: ["6e"] },
+              { title: "Identifier une juxtaposition",                                slug: "identifier-juxtaposition",              levels: ["6e"] },
+              { title: "Identifier une coordination",                                 slug: "identifier-coordination",               levels: ["6e"] },
+              { title: "Identifier une subordination",                                slug: "identifier-subordination",              levels: ["6e"] },
+            ]
           }
         ]
       },
       {
-        id: "mots-variables",
+        id: "nature-des-mots",
         emoji: "🔤",
-        title: "Les classes grammaticales — Mots variables",
+        title: "La nature des mots",
         subSections: [
           {
             label: "Déterminants",
@@ -529,8 +541,6 @@
             label: "Adjectifs",
             skills: [
               { title: "Identifier un adjectif",                                         slug: "identifier-adjectif",                   levels: ["CM1","CM2","6e"] },
-              { title: "Différencier épithète et attribut du sujet",                     slug: "differencier-epithete-attribut",         levels: ["CM2","6e"] },
-              { title: "Distinguer adjectif épithète et complément du nom",              slug: "distinguer-epithete-complement-nom",     levels: ["6e"] },
             ]
           },
           {
@@ -549,18 +559,11 @@
             skills: [
               { title: "Identifier le verbe conjugué",                                   slug: "identifier-verbe-conjugue",             levels: ["CM1","CM2","6e"] },
             ]
-          }
-        ]
-      },
-      {
-        id: "mots-invariables",
-        emoji: "🔗",
-        title: "Les classes grammaticales — Mots invariables",
-        subSections: [
+          },
           {
-            label: null,
+            label: "Mots invariables : adverbes, prépositions, conjonctions",
             skills: [
-              { title: "Identifier un adverbe fréquent",                                 slug: "identifier-adverbe-frequent",           levels: ["CM1","CM2","6e"] },
+              { title: "Identifier les adverbes",                                        slug: "identifier-adverbe-frequent",           levels: ["CM1","CM2","6e"] },
               { title: "Reconnaître qu'un adverbe est invariable",                       slug: "adverbe-invariable",                    levels: ["CM1","CM2","6e"] },
               { title: "Identifier une préposition",                                     slug: "identifier-preposition",                levels: ["CM2","6e"] },
               { title: "Identifier une conjonction de coordination",                     slug: "identifier-conjonction-coordination",   levels: ["CM1","CM2","6e"] },
@@ -589,14 +592,16 @@
               { title: "Identifier un groupe nominal prépositionnel",                   slug: "identifier-gnp",                        levels: ["CM2","6e"] },
               { title: "Identifier un complément du nom",                               slug: "identifier-complement-nom",             levels: ["CM2","6e"] },
               { title: "Identifier un groupe nominal quelle que soit sa fonction",      slug: "identifier-gn-fonction",                levels: ["6e"] },
+              // à vérifier : compétence à la frontière entre nature (adjectif) et fonction (épithète/complément du nom)
+              { title: "Distinguer adjectif épithète et complément du nom",              slug: "distinguer-epithete-complement-nom",     levels: ["6e"] },
             ]
           }
         ]
       },
       {
-        id: "fonctions-grammaticales",
+        id: "fonctions-dans-la-phrase",
         emoji: "🎯",
-        title: "Les fonctions grammaticales",
+        title: "Les fonctions dans la phrase",
         subSections: [
           {
             label: "Le sujet",
@@ -629,24 +634,8 @@
             skills: [
               { title: "Identifier un attribut du sujet",                              slug: "identifier-attribut-sujet",             levels: ["CM2","6e"] },
               { title: "Accorder l'attribut du sujet avec le sujet",                  slug: "accorder-attribut-sujet",               levels: ["CM2","6e"] },
-            ]
-          }
-        ]
-      },
-      {
-        id: "phrase-complexe",
-        emoji: "🏗️",
-        title: "La phrase complexe",
-        subSections: [
-          {
-            label: null,
-            skills: [
-              { title: "Repérer le nombre de verbes conjugués",                        slug: "reperer-verbes-conjugues",              levels: ["CM2","6e"] },
-              { title: "Comprendre la notion de proposition",                          slug: "notion-proposition",                    levels: ["6e"] },
-              { title: "Repérer les propositions dans une phrase complexe",            slug: "reperer-propositions",                  levels: ["6e"] },
-              { title: "Identifier une juxtaposition",                                slug: "identifier-juxtaposition",              levels: ["6e"] },
-              { title: "Identifier une coordination",                                 slug: "identifier-coordination",               levels: ["6e"] },
-              { title: "Identifier une subordination",                                slug: "identifier-subordination",              levels: ["6e"] },
+              // à vérifier : compétence à la frontière entre nature (adjectif) et fonction (épithète/attribut)
+              { title: "Différencier épithète et attribut du sujet",                     slug: "differencier-epithete-attribut",         levels: ["CM2","6e"] },
             ]
           }
         ]

@@ -220,6 +220,11 @@
     .btn-reject:hover { background: rgba(214,40,57,0.14); }
     .btn-reject:disabled { opacity: 0.5; cursor: default; }
 
+    /* Badges type feedback */
+    .badge-bug  { background: rgba(214,40,57,0.09); color: var(--red);  border: 1px solid rgba(214,40,57,0.2); }
+    .badge-idea { background: rgba(16,43,106,0.09); color: var(--blue); border: 1px solid rgba(16,43,106,0.2); }
+    .badge-done { background: #16a34a; color: #fff; }
+
     /* Toast */
     .toast {
       position: fixed; bottom: 28px; left: 50%;
@@ -324,6 +329,16 @@
           <div class="section-card-title">Toutes les classes</div>
         </div>
         <div id="classes-body">
+          <div class="tbl-loading">Chargement…</div>
+        </div>
+      </div>
+
+      <!-- Section : Signalements & propositions (feedback.html) -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-card-title">Signalements & propositions</div>
+        </div>
+        <div id="feedback-body">
           <div class="tbl-loading">Chargement…</div>
         </div>
       </div>
@@ -596,6 +611,66 @@
       document.getElementById('classes-body').innerHTML =
         `<div class="tbl-empty" style="color:var(--red)">Erreur : ${escHtml(e.message)}</div>`;
     }
+
+    /* ── Signalements & propositions (feedback) ──────────────────────────── */
+    async function loadFeedbackAdmin() {
+      const body = document.getElementById('feedback-body');
+      try {
+        const { data, error } = await window.lfmDb
+          .from('feedback')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          body.innerHTML = '<div class="tbl-empty">Aucun signalement.</div>';
+          return;
+        }
+
+        body.innerHTML = `<table class="data-table">
+          <thead><tr>
+            <th>Type</th><th>Titre</th><th>Auteur</th><th>Date</th><th></th><th></th>
+          </tr></thead>
+          <tbody>
+            ${data.map(f => {
+              const date = new Date(f.created_at).toLocaleDateString('fr-FR',
+                { day: '2-digit', month: '2-digit', year: 'numeric' });
+              const badgeCls  = f.type === 'bug' ? 'badge-bug' : 'badge-idea';
+              const badgeText = f.type === 'bug' ? 'Erreur' : 'Idée';
+              return `<tr id="tr-feedback-${f.id}">
+                <td><span class="badge ${badgeCls}">${badgeText}</span></td>
+                <td style="font-weight:600">${escHtml(f.title)}</td>
+                <td style="color:var(--muted);font-size:13px">${escHtml(f.author || '—')}</td>
+                <td style="color:var(--muted);font-size:13px">${date}</td>
+                <td>${f.done ? '<span class="badge badge-done">Traité</span>' : ''}</td>
+                <td>
+                  <button class="btn-teacher-del" data-id="${f.id}">✕ Supprimer</button>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>`;
+      } catch (e) {
+        body.innerHTML = `<div class="tbl-empty" style="color:var(--red)">Erreur : ${escHtml(e.message)}</div>`;
+      }
+    }
+    await loadFeedbackAdmin();
+
+    document.getElementById('feedback-body').addEventListener('click', async e => {
+      const btn = e.target.closest('.btn-teacher-del');
+      if (!btn) return;
+      if (!confirm('Supprimer définitivement ce signalement ?')) return;
+      btn.disabled = true;
+      try {
+        const { error } = await window.lfmDb.from('feedback').delete().eq('id', btn.dataset.id);
+        if (error) throw error;
+        document.getElementById('tr-feedback-' + btn.dataset.id)?.remove();
+        showToast('Signalement supprimé');
+      } catch (err) {
+        showToast('Erreur : ' + err.message, 'error');
+        btn.disabled = false;
+      }
+    });
 
     /* ── Export CSV ──────────────────────────────────────────────────────── */
     document.getElementById('export-btn').addEventListener('click', async () => {
