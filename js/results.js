@@ -24,16 +24,23 @@ async function saveExerciseResult({
     /* La contrainte DB n'accepte que ces deux valeurs */
     if (!['français', 'mathématiques'].includes(subject)) return;
 
+    /* Titre lisible depuis EXERCISE_DATA (chargé dans exercise.html) */
+    const exerciseTitle =
+      (typeof EXERCISE_DATA !== 'undefined' && EXERCISE_DATA[exerciseSlug])
+        ? EXERCISE_DATA[exerciseSlug].title
+        : null;
+
     const { error } = await window.lfmDb.from('exercise_results').insert({
-      student_id:    session.user.id,
-      exercise_slug: exerciseSlug,
+      student_id:     session.user.id,
+      exercise_slug:  exerciseSlug,
+      exercise_title: exerciseTitle,
       subject,
-      category:      category     || null,
-      exercise_type: exerciseType || null,
-      level:         level        || null,
+      category:       category     || 'général',
+      exercise_type:  exerciseType || null,
+      level:          level        || null,
       score,
       total,
-      duration_secs: durationSecs || null
+      duration_secs:  durationSecs || null
     });
 
     if (error) console.warn('[LFM] saveExerciseResult:', error.message);

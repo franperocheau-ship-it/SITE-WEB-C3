@@ -1607,7 +1607,7 @@
       .frac-divider { width: 80px; }
     }
 
-    /* ── Type : decomposer-fraction (CM2 — partie entière + fraction) ────── */
+    /* ── Type : decomposer-fraction (Niveau 2 — partie entière + fraction) ────── */
     .decomp-input-row {
       display: flex;
       align-items: center;
@@ -2810,6 +2810,8 @@
     let vpState      = null;     /* valeur-position  : état de session     */
     let vpTableSt    = null;     /* valeur-position  : état tableau étape 2 */
 
+    const LEVEL_LABELS = { "CM1": "Niveau 1", "CM2": "Niveau 2", "6e": "Niveau 3" };
+
     const SUCCESS = ["✅ Bravo !", "✨ Très bien !", "🌟 Exact !"];
 
     const TYPE_META = {
@@ -2856,7 +2858,7 @@
                     : l === "CM2" ? "badge-cm2"
                     : l === "6e"  ? "badge-6e"
                     : "badge-cm1";
-          return `<span class="badge ${cls}">${l}</span>`;
+          return `<span class="badge ${cls}">${LEVEL_LABELS[l] ?? l}</span>`;
         }).join("");
 
       /* Total counter */
@@ -2946,10 +2948,10 @@
       grid.innerHTML = levels.map(l => `
         <button class="ex-type-card" data-level="${l}">
           <span class="ex-type-icon">
-            <span class="badge ${badgeCls[l] || 'badge-cm1'}" style="font-size:13px;padding:4px 12px">${l}</span>
+            <span class="badge ${badgeCls[l] || 'badge-cm1'}" style="font-size:13px;padding:4px 12px">${LEVEL_LABELS[l] ?? l}</span>
           </span>
           <div>
-            <span class="ex-type-name">${l}</span>
+            <span class="ex-type-name">${LEVEL_LABELS[l] ?? l}</span>
             <span class="ex-type-desc">${descs[l] || ''}</span>
           </div>
         </button>`).join('');
@@ -2958,7 +2960,7 @@
         btn.addEventListener("click", () => {
           pfiSelectedLevel   = btn.dataset.level;
           sessionLevelList   = [...levels];
-          sessionLevelLabels = [...levels];
+          sessionLevelLabels = levels.map(l => LEVEL_LABELS[l] ?? l);
           sessionLevelIdx    = levels.indexOf(pfiSelectedLevel);
           sessionLevelLoader = (lv) => {
             pfiSelectedLevel = lv;
@@ -2998,10 +3000,10 @@
       grid.innerHTML = levels.map(l => `
         <button class="ex-type-card" data-level="${l}">
           <span class="ex-type-icon">
-            <span class="badge ${badgeCls[l] || 'badge-cm1'}" style="font-size:13px;padding:4px 12px">${l}</span>
+            <span class="badge ${badgeCls[l] || 'badge-cm1'}" style="font-size:13px;padding:4px 12px">${LEVEL_LABELS[l] ?? l}</span>
           </span>
           <div>
-            <span class="ex-type-name">${l}</span>
+            <span class="ex-type-name">${LEVEL_LABELS[l] ?? l}</span>
             <span class="ex-type-desc">${descs[l] || ''}</span>
           </div>
         </button>`).join('');
@@ -3016,7 +3018,7 @@
           currentIndex = 0;
           score        = 0;
           sessionLevelList   = [...levels];
-          sessionLevelLabels = [...levels];
+          sessionLevelLabels = levels.map(l => LEVEL_LABELS[l] ?? l);
           sessionLevelIdx    = levels.indexOf(accordLevel);
           sessionLevelLoader = (lv) => {
             accordLevel = lv;
@@ -3761,7 +3763,7 @@
     function deriveSubjectCategory(href) {
       const base = (href || '').replace('.html', '');
       const idx  = base.indexOf('-');
-      if (idx === -1) return { subject: base || null, category: null };
+      if (idx === -1) return { subject: base || null, category: 'général' };
       return { subject: base.slice(0, idx), category: base.slice(idx + 1) };
     }
 
@@ -4215,7 +4217,6 @@
     }
 
     function renderTransformInterrogative(card, q) {
-      let remainingAttempts = 2;
       let scored       = false;
       let bonusTryMode = false;
 
@@ -4296,34 +4297,20 @@
         } else {
           /* Réponse invalide */
           inp.classList.add("is-wrong");
-          remainingAttempts--;
 
           const errMsg = result.reason === 'no-question-mark'
             ? "Une phrase interrogative se termine par un point d'interrogation ( ? )."
             : "Pense à conserver les mots importants de la phrase de départ.";
 
-          if (remainingAttempts <= 0) {
-            /* Plus d'essais : afficher les réponses modèles */
-            setFeedback("feedback1", `
-              <div class="ex-feedback-wrong">
-                ❌ ${errMsg}<br><br>
-                <strong>Réponses modèles :</strong><br>
-                <em>« ${q.modelEcQ} »</em><br>
-                <em>« ${q.modelInv} »</em>
-              </div>
-            `);
-            showNextBtn();
-          } else {
-            /* 1 essai restant */
-            setFeedback("feedback1", `
-              <div class="ex-feedback-wrong" style="margin-bottom:12px">
-                ❌ ${errMsg}<br>
-                <span style="font-size:12px;opacity:0.8">Il te reste 1 essai.</span>
-              </div>
-              <button class="ex-validate-btn" id="ti-retry-btn">Réessayer</button>
-            `);
-            document.getElementById("ti-retry-btn").addEventListener("click", enableRetry);
-          }
+          setFeedback("feedback1", `
+            <div class="ex-feedback-wrong">
+              ❌ ${errMsg}<br><br>
+              <strong>Réponses modèles :</strong><br>
+              <em>« ${q.modelEcQ} »</em><br>
+              <em>« ${q.modelInv} »</em>
+            </div>
+          `);
+          showNextBtn();
         }
       }
     }
@@ -4381,7 +4368,6 @@
     }
 
     function renderTransformNegative(card, q) {
-      let remainingAttempts = 2;
       let scored = false;
 
       card.innerHTML = `
@@ -4448,7 +4434,6 @@
 
         } else {
           inp.classList.add("is-wrong");
-          remainingAttempts--;
 
           const errMsg = result.reason === 'no-period'
             ? "Une phrase se termine par un point ( . )."
@@ -4458,32 +4443,21 @@
             ? "Pense à ajouter la négation : <strong>ne … pas</strong> autour du verbe."
             : "Pense à conserver les mots importants de la phrase de départ.";
 
-          if (remainingAttempts <= 0) {
-            setFeedback("feedback1", `
-              <div class="ex-feedback-wrong">
-                ❌ ${errMsg}<br><br>
-                <strong>Réponse modèle :</strong><br>
-                <em>« ${q.modelNeg} »</em>
-              </div>
-            `);
-            showNextBtn();
-          } else {
-            setFeedback("feedback1", `
-              <div class="ex-feedback-wrong" style="margin-bottom:12px">
-                ❌ ${errMsg}<br>
-                <span style="font-size:12px;opacity:0.8">Il te reste 1 essai.</span>
-              </div>
-              <button class="ex-validate-btn" id="tn-retry-btn">Réessayer</button>
-            `);
-            document.getElementById("tn-retry-btn").addEventListener("click", () => enableRetry(false));
-          }
+          setFeedback("feedback1", `
+            <div class="ex-feedback-wrong">
+              ❌ ${errMsg}<br><br>
+              <strong>Réponse modèle :</strong><br>
+              <em>« ${q.modelNeg} »</em>
+            </div>
+          `);
+          showNextBtn();
         }
       }
     }
 
     /* ── Type: produire-3-formes ────────────────────────────────────────────
        6 phrases déclaratives → 3 champs (intonation / est-ce que / inversion)
-       CM1 : champ inversion = bonus (non obligatoire)
+       Niveau 1 : champ inversion = bonus (non obligatoire)
        2 essais par champ, puis réponse modèle pour ce champ uniquement
     ─────────────────────────────────────────────────────────────────────── */
 
@@ -4625,7 +4599,7 @@
           const fb  = document.getElementById(`pfi-fb-${i}`);
           const val = inp.value;
 
-          /* CM1 bonus field empty while required fields still open → skip */
+          /* Niveau 1 bonus field empty while required fields still open → skip */
           if (!val.trim()) continue;
 
           const res = pfiValidateField(i, val, q);
@@ -4642,28 +4616,18 @@
             ];
             fb.innerHTML = `<div class="ex-feedback-correct" style="font-size:13px;padding:10px 14px;margin-top:6px">${okMsgs[i]}</div>`;
           } else {
-            fs[i].attempts++;
+            fs[i].done = true;
             inp.classList.add('is-wrong');
-
-            if (fs[i].attempts >= 2) {
-              fs[i].done = true;
-              inp.disabled = true;
-              fb.innerHTML = `
-                <div class="ex-feedback-wrong" style="font-size:13px;padding:10px 14px;margin-top:6px">
-                  ❌ ${pfiErrMsg(res.reason)}<br>
-                  <strong>Réponse modèle :</strong> <em>« ${models[i]} »</em>
-                </div>`;
-            } else {
-              fb.innerHTML = `
-                <div class="ex-feedback-wrong" style="font-size:13px;padding:10px 14px;margin-top:6px">
-                  ❌ ${pfiErrMsg(res.reason)}
-                  <span style="display:block;font-size:11px;opacity:0.75;margin-top:3px">Il te reste 1 essai pour ce champ.</span>
-                </div>`;
-            }
+            inp.disabled = true;
+            fb.innerHTML = `
+              <div class="ex-feedback-wrong" style="font-size:13px;padding:10px 14px;margin-top:6px">
+                ❌ ${pfiErrMsg(res.reason)}<br>
+                <strong>Réponse modèle :</strong> <em>« ${models[i]} »</em>
+              </div>`;
           }
         }
 
-        /* CM1 : if required fields done and bonus field empty → close it */
+        /* Niveau 1 : if required fields done and bonus field empty → close it */
         if (cm1 && !fs[2].done && fs[0].done && fs[1].done) {
           const inp3 = document.getElementById('pfi-inp-2');
           if (!inp3.value.trim()) {
@@ -5341,7 +5305,7 @@
       }
 
       const counterText = n =>
-        `${n} part${n !== 1 ? 's' : ''} coloriée${n !== 1 ? 's' : ''} — objectif : ${correctTotal}`;
+        `${n} part${n !== 1 ? 's' : ''} coloriée${n !== 1 ? 's' : ''}`;
 
       card.innerHTML = `
         <p class="ex-question-label">Colorie les parts pour représenter cette fraction.</p>
@@ -5396,15 +5360,14 @@
           showNextBtn();
         } else {
           setFeedback('feedback1', `
-            <div class="ex-feedback-wrong" style="margin-bottom:12px">
+            <div class="ex-feedback-wrong">
               ❌ Tu as colorié <strong>${colored} part${colored !== 1 ? 's' : ''}</strong>
               au lieu de <strong>${correctTotal}</strong>.<br>
               Pour représenter ${_rfracHtml(numerator, denominator)},
               il faut exactement <strong>${correctTotal} part${correctTotal !== 1 ? 's' : ''}</strong>.
             </div>
-            <button class="ex-validate-btn" id="rfrac-retry">Modifier ma réponse</button>
           `);
-          card.querySelector('#rfrac-retry').addEventListener('click', enableRetry);
+          showNextBtn();
         }
       });
     }
@@ -5554,7 +5517,7 @@
             selectedIdx = parseInt(rect.dataset.idx, 10);
             svgWrap.innerHTML = buildSvg();
             bindTickClicks();
-            statusEl.textContent = `Graduation sélectionnée : ${selectedIdx}/${denominator}`;
+            statusEl.textContent = 'Graduation sélectionnée. Clique sur « Valider » pour confirmer.';
             vBtn.disabled = false;
           });
         });
@@ -5578,23 +5541,13 @@
         } else {
           const ord = numerator === 1 ? '1re' : `${numerator}e`;
           setFeedback('feedback1', `
-            <div class="ex-feedback-wrong" style="margin-bottom:12px">
+            <div class="ex-feedback-wrong">
               ❌ Pas tout à fait. La fraction ${_rfracHtml(numerator, denominator)}
               correspond à la ${ord} graduation depuis 0
               (l'unité est partagée en <strong>${denominator} parts</strong> égales).
             </div>
-            <button class="ex-validate-btn" id="nline-retry">Modifier ma réponse</button>
           `);
-          card.querySelector('#nline-retry').addEventListener('click', () => {
-            answered    = false;
-            selectedIdx = null;
-            svgWrap.innerHTML = buildSvg();
-            bindTickClicks();
-            svgWrap.querySelectorAll('.nline-hit').forEach(r => { r.style.pointerEvents = ''; });
-            statusEl.textContent = 'Clique sur une graduation pour la sélectionner.';
-            vBtn.disabled = true;
-            document.getElementById('feedback1').innerHTML = '';
-          });
+          showNextBtn();
         }
       });
     }
@@ -5604,8 +5557,8 @@
        1. Coloriage du disque gauche  → validé en vert
        2. Coloriage du disque droit   → validé en vert
        3. Saisie du signe < > =       → feedback immédiat + explication si erreur
-       level 1 : même dénominateur (CM1)
-       level 2 : dénominateurs différents, approche visuelle des aires (CM2/6e)
+       level 1 : même dénominateur (Niveau 1)
+       level 2 : dénominateurs différents, approche visuelle des aires (Niveau 2/Niveau 3)
     ────────────────────────────────────────────────────────────────────────── */
 
     let cmpLevel = null;
@@ -6034,10 +5987,11 @@
       nlBtn.addEventListener('click', () => {
         if (phase === 1) {
           if (leftSel !== leftIdx) {
-            fbEl.textContent = 'Ce n\'est pas la bonne graduation. Essaie encore !';
-            leftSel = null; nlBtn.disabled = true;
-            statusEl.textContent = 'Clique sur une graduation.';
-            redraw(); return;
+            nlBtn.disabled = true;
+            svgWrap.querySelectorAll('.cmp-nline-hit').forEach(r => { r.style.pointerEvents = 'none'; });
+            statusEl.style.display = 'none';
+            fbEl.innerHTML = `<div class="ex-feedback-wrong" style="margin-top:8px">❌ Ce n'est pas la bonne graduation pour ${_rfracHtml(left.num, left.den)}.</div>`;
+            showNextBtn(); return;
           }
           phase = 2;
           fbEl.textContent = '';
@@ -6050,10 +6004,11 @@
 
         } else if (phase === 2) {
           if (rightSel !== rightIdx) {
-            fbEl.textContent = 'Ce n\'est pas la bonne graduation. Essaie encore !';
-            rightSel = null; nlBtn.disabled = true;
-            statusEl.textContent = 'Clique sur une graduation.';
-            redraw(); return;
+            nlBtn.disabled = true;
+            svgWrap.querySelectorAll('.cmp-nline-hit').forEach(r => { r.style.pointerEvents = 'none'; });
+            statusEl.style.display = 'none';
+            fbEl.innerHTML = `<div class="ex-feedback-wrong" style="margin-top:8px">❌ Ce n'est pas la bonne graduation pour ${_rfracHtml(right.num, right.den)}.</div>`;
+            showNextBtn(); return;
           }
           phase = 3;
           fbEl.textContent = '';
@@ -6130,14 +6085,14 @@
             <button class="ex-type-card" data-level="1">
               <span class="ex-type-icon">⭐</span>
               <div>
-                <span class="ex-type-name">Niveau 1 — CM1 / CM2</span>
+                <span class="ex-type-name">Niveau 1</span>
                 <span class="ex-type-desc">Avec droite graduée pour t'aider</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="2">
               <span class="ex-type-icon">⭐⭐</span>
               <div>
-                <span class="ex-type-name">Niveau 2 — CM2 / 6e</span>
+                <span class="ex-type-name">Niveau 2</span>
                 <span class="ex-type-desc">Par le calcul, sans droite graduée</span>
               </div>
             </button>
@@ -6151,7 +6106,7 @@
                             .slice(0, sessionData.questionsPerSession);
             document.getElementById('q-total').textContent = questions.length;
             sessionLevelList   = [1, 2];
-            sessionLevelLabels = ['Niveau 1 — CM1 / CM2', 'Niveau 2 — CM2 / 6e'];
+            sessionLevelLabels = ['Niveau 1', 'Niveau 2'];
             sessionLevelIdx    = encadrLevel - 1;
             sessionLevelLoader = (lv) => {
               encadrLevel = lv;
@@ -6469,14 +6424,14 @@
             <button class="ex-type-card" data-level="CM1">
               <span class="ex-type-icon">⭐</span>
               <div>
-                <span class="ex-type-name">CM1</span>
+                <span class="ex-type-name">Niveau 1</span>
                 <span class="ex-type-desc">Nombres jusqu'à 999 999</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="CM2">
               <span class="ex-type-icon">⭐⭐</span>
               <div>
-                <span class="ex-type-name">CM2</span>
+                <span class="ex-type-name">Niveau 2</span>
                 <span class="ex-type-desc">Nombres jusqu'à 999 999 999</span>
               </div>
             </button>
@@ -6490,7 +6445,7 @@
                           .slice(0, sessionData.questionsPerSession);
             document.getElementById('q-total').textContent = questions.length;
             sessionLevelList   = ['CM1', 'CM2'];
-            sessionLevelLabels = ['CM1', 'CM2'];
+            sessionLevelLabels = ['Niveau 1', 'Niveau 2'];
             sessionLevelIdx    = ['CM1', 'CM2'].indexOf(nbEntierLevel);
             sessionLevelLoader = (lv) => {
               nbEntierLevel = lv;
@@ -6597,9 +6552,9 @@
     }
 
     /* ── Type : decomposer-fraction ──────────────────────────────────────────
-       CM1 : QCM (3 choix)
-       CM2 : saisie de 2 champs (partie entière + numérateur, dénominateur fixe)
-       6e  : saisie libre "a + b/c"
+       Niveau 1 : QCM (3 choix)
+       Niveau 2 : saisie de 2 champs (partie entière + numérateur, dénominateur fixe)
+       Niveau 3 : saisie libre "a + b/c"
     ────────────────────────────────────────────────────────────────────────── */
 
     function decompFracHtml(num, den) {
@@ -6625,21 +6580,21 @@
             <button class="ex-type-card" data-level="CM1">
               <span class="ex-type-icon">⭐</span>
               <div>
-                <span class="ex-type-name">CM1</span>
+                <span class="ex-type-name">Niveau 1</span>
                 <span class="ex-type-desc">Choisis la bonne décomposition</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="CM2">
               <span class="ex-type-icon">⭐⭐</span>
               <div>
-                <span class="ex-type-name">CM2</span>
+                <span class="ex-type-name">Niveau 2</span>
                 <span class="ex-type-desc">Trouve la partie entière et le numérateur</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="6e">
               <span class="ex-type-icon">⭐⭐⭐</span>
               <div>
-                <span class="ex-type-name">6e</span>
+                <span class="ex-type-name">Niveau 3</span>
                 <span class="ex-type-desc">Écris la décomposition complète</span>
               </div>
             </button>
@@ -6653,7 +6608,7 @@
                           .slice(0, sessionData.questionsPerSession);
             document.getElementById('q-total').textContent = questions.length;
             sessionLevelList   = ['CM1', 'CM2', '6e'];
-            sessionLevelLabels = ['CM1', 'CM2', '6e'];
+            sessionLevelLabels = ['Niveau 1', 'Niveau 2', 'Niveau 3'];
             sessionLevelIdx    = sessionLevelList.indexOf(decompLevel);
             sessionLevelLoader = (lv) => {
               decompLevel = lv;
@@ -6682,7 +6637,7 @@
       }
     }
 
-    /* Étape 1 (CM1) : placer la fraction sur une droite graduée pour aider
+    /* Étape 1 (Niveau 1) : placer la fraction sur une droite graduée pour aider
        l'élève à voir entre quels entiers elle se trouve, avant de répondre
        au QCM. Réutilise la logique de buildSvg de renderPlacerFractionDroite. */
     function decompBuildNumberLineSvg(q, selectedIdx) {
@@ -6978,9 +6933,9 @@
 
     /* ═══════════════════════════════════════════════════════════════════════
        TYPE : fractions-problemes — Utiliser les fractions dans des problèmes
-       CM1 : QCM (lecture d'une fraction dans un énoncé)
-       CM2 : saisie libre (fraction d'une quantité)
-       6e  : problème à étapes, saisie libre, équivalences acceptées
+       Niveau 1 : QCM (lecture d'une fraction dans un énoncé)
+       Niveau 2 : saisie libre (fraction d'une quantité)
+       Niveau 3 : problème à étapes, saisie libre, équivalences acceptées
        ═══════════════════════════════════════════════════════════════════════ */
 
     /* ── Illustrations SVG inline ─────────────────────────────────────────── */
@@ -7017,7 +6972,7 @@
       `;
     }
 
-    /* Barre de proportion générique — réutilisée pour CM1 (longueurs) et CM2
+    /* Barre de proportion générique — réutilisée pour Niveau 1 (longueurs) et Niveau 2
        (fraction d'une quantité). color personnalise la teinte des parts choisies. */
     function fpBandeSvg(n, d, color) {
       const W = 280, H = 56, partW = W / d;
@@ -7040,7 +6995,7 @@
       return `${fpBandeSvg(ill.n, ill.d, '#7c3aed')}<div class="fp-illustration-label">${label}</div>`;
     }
 
-    /* ── Visuel gauche du panneau "ardoise" (6e) ──────────────────────────── */
+    /* ── Visuel gauche du panneau "ardoise" (Niveau 3) ──────────────────────── */
     function fpArdoiseVisual(v) {
       if (v.kind === 'complement') {
         const part = Math.round(v.total / v.d * v.n);
@@ -7106,21 +7061,21 @@
             <button class="ex-type-card" data-level="CM1">
               <span class="ex-type-icon">⭐</span>
               <div>
-                <span class="ex-type-name">CM1</span>
+                <span class="ex-type-name">Niveau 1</span>
                 <span class="ex-type-desc">Lis l'énoncé et choisis la bonne fraction</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="CM2">
               <span class="ex-type-icon">⭐⭐</span>
               <div>
-                <span class="ex-type-name">CM2</span>
+                <span class="ex-type-name">Niveau 2</span>
                 <span class="ex-type-desc">Calcule une fraction d'une quantité</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="6e">
               <span class="ex-type-icon">⭐⭐⭐</span>
               <div>
-                <span class="ex-type-name">6e</span>
+                <span class="ex-type-name">Niveau 3</span>
                 <span class="ex-type-desc">Résous un problème à étapes</span>
               </div>
             </button>
@@ -7134,7 +7089,7 @@
                           .slice(0, sessionData.questionsPerSession);
             document.getElementById('q-total').textContent = questions.length;
             sessionLevelList   = ['CM1', 'CM2', '6e'];
-            sessionLevelLabels = ['CM1', 'CM2', '6e'];
+            sessionLevelLabels = ['Niveau 1', 'Niveau 2', 'Niveau 3'];
             sessionLevelIdx    = sessionLevelList.indexOf(fpLevel);
             sessionLevelLoader = (lv) => {
               fpLevel = lv;
@@ -7163,7 +7118,7 @@
       }
     }
 
-    /* ── CM1 : QCM ─────────────────────────────────────────────────────────── */
+    /* ── Niveau 1 : QCM ─────────────────────────────────────────────────────────── */
     function fpRenderQcm(card, q) {
       card.innerHTML = `
         <p class="ex-question-label">${q.question}</p>
@@ -7201,7 +7156,7 @@
       });
     }
 
-    /* ── CM2 : saisie libre — fraction d'une quantité ─────────────────────── */
+    /* ── Niveau 2 : saisie libre — fraction d'une quantité ─────────────────────── */
     function fpParseQuantityAnswer(str) {
       const cleaned = str.trim().replace(/\s+/g, ' ');
       const m = cleaned.match(/^(-?\d+(?:[.,]\d+)?)/);
@@ -7255,7 +7210,7 @@
       input.addEventListener('keydown', e => { if (e.key === 'Enter') validate(); });
     }
 
-    /* ── 6e : problème à étapes, équivalences acceptées ───────────────────── */
+    /* ── Niveau 3 : problème à étapes, équivalences acceptées ───────────────────── */
     function fpNormalizeFractionAnswer(str) {
       return str.trim().replace(/\s+/g, '').replace(/m2\b/i, 'm²');
     }
@@ -9044,9 +8999,9 @@
 
     /* ══════════════════════════════════════════════════════════════════════════
        TYPE : faire-niveaux  —  Conjugaison du verbe FAIRE, 3 niveaux progressifs
-       CM1 (Présent / Imparfait / Futur / Passé composé)
-       CM2 (Passé simple / Plus-que-parfait)
-       6e  (Impératif / Conditionnel)
+       Niveau 1 (Présent / Imparfait / Futur / Passé composé)
+       Niveau 2 (Passé simple / Plus-que-parfait)
+       Niveau 3 (Impératif / Conditionnel)
        Progression verrouillée : seuil 80 %, persistance localStorage.
        ══════════════════════════════════════════════════════════════════════════ */
 

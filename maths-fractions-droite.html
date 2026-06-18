@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fractions — Droite graduée — Mathématiques — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css?v=5">
+  <style>
+    .page-wrap {
+      background: var(--bg);
+      min-height: calc(100vh - 88px);
+      padding-bottom: 64px;
+    }
+
+    .page-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 64px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 20px 0 0;
+      opacity: 0.75;
+      transition: opacity 180ms;
+    }
+    .back-link:hover { opacity: 1; }
+
+    .ex-container { max-width: 720px; margin: 0 auto; }
+
+    /* ── Page header ─────────────────────────────────────────── */
+    .ex-page-header { text-align: center; padding: 28px 0 36px; }
+
+    .ex-page-badges { display: flex; justify-content: center; gap: 6px; margin-bottom: 14px; }
+
+    .badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 6px; font-weight: 700; font-size: 10px;
+      letter-spacing: 0.06em; padding: 3px 8px; flex-shrink: 0; line-height: 1;
+    }
+    .badge-cm1 { background: rgba(16,43,106,0.09); color: var(--blue); border: 1px solid rgba(16,43,106,0.18); }
+
+    .ex-page-title {
+      font-weight: 800; font-size: 21px; color: var(--blue);
+      line-height: 1.35; max-width: 560px; margin: 0 auto 10px;
+    }
+    .ex-page-rule { width: 44px; height: 3px; background: var(--red); border-radius: 2px; margin: 0 auto; }
+
+    /* ── Card ────────────────────────────────────────────────── */
+    .ex-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-md);
+      padding: 36px 40px;
+    }
+
+    /* ── Fraction (plain, no border box) ─────────────────────── */
+    .fraction-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+    .fraction-question {
+      font-size: 13px; font-weight: 600; color: var(--muted);
+      margin-bottom: 16px; text-align: center;
+    }
+    .fraction-num { font-size: 44px; font-weight: 800; color: var(--blue); line-height: 1; }
+    .fraction-bar { width: 60px; height: 3px; background: var(--blue); border-radius: 2px; margin: 8px 0; }
+    .fraction-den { font-size: 44px; font-weight: 800; color: var(--blue); line-height: 1; }
+
+    /* ── Number line ─────────────────────────────────────────── */
+    .number-line-hint {
+      text-align: center; font-size: 13px; color: var(--muted);
+      font-style: italic; margin-bottom: 10px;
+    }
+    .number-line-svg {
+      width: 100%; display: block;
+      border-radius: 10px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      cursor: crosshair;
+      margin-bottom: 20px;
+    }
+    .number-line-svg.locked { cursor: default; }
+
+    /* ── Encadrement (apparaît sous le SVG après validation) ─── */
+    .enc-wrap {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 24px 20px;
+      margin-bottom: 20px;
+    }
+    .enc-label {
+      font-weight: 800; font-size: 11px; color: var(--muted);
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 16px; text-align: center;
+    }
+    .encadrement-row {
+      display: flex; align-items: center; justify-content: center;
+      gap: 14px; flex-wrap: wrap;
+    }
+    .encadrement-input {
+      width: 68px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 0;
+      font-family: inherit; font-size: 22px; font-weight: 700;
+      color: var(--text); background: var(--card-bg);
+      outline: none; text-align: center;
+      transition: border-color 200ms, box-shadow 200ms;
+      -moz-appearance: textfield;
+    }
+    .encadrement-input::-webkit-outer-spin-button,
+    .encadrement-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .encadrement-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(16,43,106,0.10); }
+    .encadrement-input.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.06); color: #15803d; }
+    .encadrement-input.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.06); color: var(--red); }
+    .encadrement-input:disabled   { cursor: default; }
+
+    .encadrement-symbol { font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; }
+    .encadrement-fraction { display: inline-flex; flex-direction: column; align-items: center; }
+    .enc-num, .enc-den { font-size: 22px; font-weight: 800; color: var(--blue); line-height: 1; }
+    .enc-bar { width: 34px; height: 2.5px; background: var(--blue); border-radius: 2px; margin: 5px 0; }
+
+    /* ── Feedback ────────────────────────────────────────────── */
+    .ex-feedback {
+      font-size: 14px; font-weight: 700; text-align: center;
+      margin-bottom: 18px; padding: 10px 16px; border-radius: 10px;
+    }
+    .ex-feedback.correct { background: rgba(22,163,74,0.09); color: #15803d; }
+    .ex-feedback.wrong   { background: rgba(214,40,57,0.06); color: var(--red); }
+
+    /* ── Buttons ─────────────────────────────────────────────── */
+    .ex-validate-btn {
+      width: 100%; background: var(--blue); color: #fff;
+      border: none; border-radius: 12px; padding: 15px 24px;
+      font-family: inherit; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: background 200ms, transform 200ms;
+    }
+    .ex-validate-btn:hover:not(:disabled) { background: #0d2255; transform: translateY(-2px); }
+    .ex-validate-btn:disabled { opacity: 0.45; cursor: default; transform: none; }
+
+    .ex-btn-secondary {
+      width: 100%; background: var(--card-bg); color: var(--blue);
+      border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 14px 24px; font-family: inherit; font-size: 15px;
+      font-weight: 700; cursor: pointer; margin-top: 12px;
+      transition: border-color 200ms, background 200ms, transform 200ms;
+    }
+    .ex-btn-secondary:hover { border-color: var(--blue); background: rgba(16,43,106,0.04); transform: translateY(-2px); }
+
+    /* ── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .page-content { padding: 0 24px; }
+      .ex-card { padding: 24px 20px; }
+      .enc-wrap { padding: 14px 16px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <img src="assets/lfm-logo.svg" alt="Lycée Français de Madrid" class="header-logo">
+        <div class="header-text">
+          <span class="header-name">LYCÉE FRANÇAIS DE MADRID</span>
+          <span class="header-sub">Ressources numériques pour le cycle 3</span>
+        </div>
+      </a>
+      <div class="header-actions">
+        <span class="lang-badge">FR</span>
+        <button class="menu-btn" aria-label="Ouvrir le menu">
+          <span class="mbar mbar-top"></span>
+          <span class="mbar mbar-mid"></span>
+          <span class="mbar mbar-mid2"></span>
+          <span class="mbar mbar-bot"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <div class="page-wrap">
+    <div class="page-content">
+      <a href="mathématiques-fractions.html" class="back-link">← Fractions</a>
+
+      <div class="ex-container">
+        <div class="ex-page-header">
+          <div class="ex-page-badges">
+            <span class="badge badge-cm1">CM1</span>
+          </div>
+          <h1 class="ex-page-title">Fractions — Droite graduée</h1>
+          <div class="ex-page-rule"></div>
+        </div>
+
+        <div class="ex-card">
+
+          <!-- 1. FRACTION (plain) -->
+          <div class="fraction-display">
+            <div class="fraction-question">Place cette fraction sur la droite graduée :</div>
+            <span class="fraction-num" id="frac-num">1</span>
+            <div class="fraction-bar"></div>
+            <span class="fraction-den" id="frac-den">2</span>
+          </div>
+
+          <!-- 2. DROITE GRADUÉE -->
+          <div class="number-line-hint" id="nl-hint">Clique sur la droite pour poser ton point.</div>
+          <svg
+            id="number-line-svg"
+            class="number-line-svg"
+            viewBox="0 0 620 90"
+            preserveAspectRatio="xMidYMid meet"
+            aria-label="Droite graduée de 0 à 4"
+          ></svg>
+
+          <!-- 3. ENCADREMENT — hidden at start, appears under SVG after validation -->
+          <div id="enc-wrap" class="enc-wrap" style="display:none">
+            <div class="enc-label">Maintenant, encadre la fraction</div>
+            <div class="encadrement-row">
+              <input type="number" class="encadrement-input" id="enc-left"
+                     min="0" max="3" inputmode="numeric" placeholder="?">
+              <span class="encadrement-symbol">&lt;</span>
+              <div class="encadrement-fraction">
+                <span class="enc-num" id="enc-num">1</span>
+                <div class="enc-bar"></div>
+                <span class="enc-den" id="enc-den">2</span>
+              </div>
+              <span class="encadrement-symbol">&lt;</span>
+              <input type="number" class="encadrement-input" id="enc-right"
+                     min="1" max="4" inputmode="numeric" placeholder="?">
+            </div>
+          </div>
+
+          <!-- Feedback étape 1 -->
+          <div id="feedback1" class="ex-feedback" style="display:none"></div>
+
+          <!-- Bouton valider étape 1 -->
+          <button id="validate1-btn" class="ex-validate-btn" disabled>Valider</button>
+
+          <!-- Boutons étape 2 — hidden at start -->
+          <div id="step2-actions" style="display:none">
+            <div id="feedback2" class="ex-feedback" style="display:none"></div>
+            <button id="validate2-btn" class="ex-validate-btn">Valider</button>
+            <button id="new-fraction-btn" class="ex-btn-secondary">Nouvelle fraction</button>
+          </div>
+
+        </div><!-- /.ex-card -->
+      </div><!-- /.ex-container -->
+    </div><!-- /.page-content -->
+  </div><!-- /.page-wrap -->
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-rule"></div>
+        <div class="footer-body">
+          <p class="footer-text">
+            Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,<br>
+            dans le respect d'un <strong class="footer-em">usage mesuré</strong> des écrans.
+          </p>
+        </div>
+        <p class="footer-credit">© 2026 François Perocheau – LFM &nbsp;•&nbsp; CC BY-NC-SA 4.0 &nbsp;•&nbsp; <a href="mentions-legales.html">Mentions légales</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ── Fraction pool ───────────────────────────────────────── */
+    const FRACTIONS = [
+      {num:1,den:2},{num:1,den:3},{num:2,den:3},
+      {num:1,den:4},{num:3,den:4},
+      {num:1,den:5},{num:2,den:5},{num:3,den:5},{num:4,den:5},
+      {num:1,den:6},{num:5,den:6},
+      {num:3,den:8},{num:5,den:8},{num:7,den:8},
+      {num:3,den:10},{num:7,den:10},{num:9,den:10}
+    ];
+
+    /* ── SVG geometry ────────────────────────────────────────── */
+    const SVG_W       = 620;
+    const X0          = 40;
+    const X4          = 580;
+    const PX_PER_UNIT = (X4 - X0) / 4;   /* 135 px per unit */
+    const Y_AXIS      = 50;
+    const TOLERANCE   = 0.18;
+    const NS          = "http://www.w3.org/2000/svg";
+
+    /* ── State ───────────────────────────────────────────────── */
+    let current   = null;
+    let userSvgX  = null;
+    let step1Done = false;
+
+    /* ── DOM refs ────────────────────────────────────────────── */
+    const svg       = document.getElementById("number-line-svg");
+    const nlHint    = document.getElementById("nl-hint");
+    const fracNum   = document.getElementById("frac-num");
+    const fracDen   = document.getElementById("frac-den");
+    const feedback1 = document.getElementById("feedback1");
+    const validate1 = document.getElementById("validate1-btn");
+    const encWrap   = document.getElementById("enc-wrap");
+    const encLeft   = document.getElementById("enc-left");
+    const encRight  = document.getElementById("enc-right");
+    const encNum    = document.getElementById("enc-num");
+    const encDen    = document.getElementById("enc-den");
+    const step2Acts = document.getElementById("step2-actions");
+    const feedback2 = document.getElementById("feedback2");
+    const validate2 = document.getElementById("validate2-btn");
+    const newBtn    = document.getElementById("new-fraction-btn");
+
+    /* ── SVG helpers ─────────────────────────────────────────── */
+    function valueToX(v) { return X0 + v * PX_PER_UNIT; }
+    function xToValue(x) { return (x - X0) / PX_PER_UNIT; }
+    function mouseToSvgX(evt) {
+      const r = svg.getBoundingClientRect();
+      return (evt.clientX - r.left) * (SVG_W / r.width);
+    }
+    function svgEl(tag, attrs) {
+      const el = document.createElementNS(NS, tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    /* ── Build static SVG (axis + ticks + labels) ────────────── */
+    let userDot = null, correctDot = null;
+
+    function buildStaticSVG() {
+      svg.appendChild(svgEl("line", {
+        x1: X0-10, y1: Y_AXIS, x2: X4+10, y2: Y_AXIS,
+        stroke: "#94A3B8", "stroke-width": 2, "stroke-linecap": "round"
+      }));
+      svg.appendChild(svgEl("polygon", {
+        points: `${X4+10},${Y_AXIS} ${X4+2},${Y_AXIS-5} ${X4+2},${Y_AXIS+5}`,
+        fill: "#94A3B8"
+      }));
+      for (let i = 0; i <= 4; i++) {
+        const x = valueToX(i);
+        svg.appendChild(svgEl("line", {
+          x1: x, y1: Y_AXIS-9, x2: x, y2: Y_AXIS+9,
+          stroke: "#102B6A", "stroke-width": 2, "stroke-linecap": "round"
+        }));
+        const t = svgEl("text", {
+          x, y: Y_AXIS+27, "text-anchor": "middle",
+          "font-size": 14, "font-weight": 700,
+          fill: "#102B6A", "font-family": "Inter, sans-serif"
+        });
+        t.textContent = i;
+        svg.appendChild(t);
+      }
+      /* click target strip */
+      svg.appendChild(svgEl("rect", { x: X0, y: 0, width: X4-X0, height: 90, fill: "transparent" }));
+
+      userDot = svgEl("circle", { r: 8, fill: "#102B6A", stroke: "#fff", "stroke-width": 2.5 });
+      userDot.style.display = "none";
+      svg.appendChild(userDot);
+
+      correctDot = svgEl("circle", { r: 8, fill: "#16a34a", stroke: "#fff", "stroke-width": 2.5 });
+      correctDot.style.display = "none";
+      svg.appendChild(correctDot);
+    }
+
+    /* ── Show/hide helpers (inline style only — no CSS conflict) ─ */
+    function show(el, displayVal) { el.style.display = displayVal || "block"; }
+    function hide(el)             { el.style.display = "none"; }
+
+    function setFeedback(el, msg, cls) {
+      el.textContent = msg;
+      el.className   = "ex-feedback" + (cls ? " " + cls : "");
+      msg ? show(el) : hide(el);
+    }
+
+    /* ── Pick fraction (no immediate repeat) ─────────────────── */
+    function pick() {
+      const pool = current
+        ? FRACTIONS.filter(f => !(f.num===current.num && f.den===current.den))
+        : FRACTIONS;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    /* ── Full reset ──────────────────────────────────────────── */
+    function reset() {
+      current   = pick();
+      userSvgX  = null;
+      step1Done = false;
+
+      fracNum.textContent = current.num;
+      fracDen.textContent = current.den;
+
+      userDot.style.display    = "none";
+      correctDot.style.display = "none";
+      svg.classList.remove("locked");
+      show(nlHint);
+
+      setFeedback(feedback1, "", null);
+      validate1.disabled    = false;
+      validate1.disabled    = true;
+      show(validate1);
+
+      hide(encWrap);
+      encNum.textContent = current.num;
+      encDen.textContent = current.den;
+      encLeft.value  = "";
+      encRight.value = "";
+      encLeft.disabled  = false;
+      encRight.disabled = false;
+      encLeft.classList.remove("is-correct", "is-wrong");
+      encRight.classList.remove("is-correct", "is-wrong");
+
+      hide(step2Acts);
+      setFeedback(feedback2, "", null);
+      validate2.disabled = false;
+    }
+
+    /* ── SVG click ───────────────────────────────────────────── */
+    svg.addEventListener("click", evt => {
+      if (step1Done) return;
+      const x = mouseToSvgX(evt);
+      if (x < X0 || x > X4) return;
+      userSvgX = x;
+      userDot.setAttribute("cx", x);
+      userDot.setAttribute("cy", Y_AXIS);
+      userDot.setAttribute("fill", "#102B6A");
+      userDot.style.display = "";
+      validate1.disabled = false;
+      setFeedback(feedback1, "", null);
+    });
+
+    /* ── Validate step 1 ─────────────────────────────────────── */
+    validate1.addEventListener("click", () => {
+      if (userSvgX === null) return;
+
+      const correct = current.num / current.den;
+      const placed  = xToValue(userSvgX);
+      const ok      = Math.abs(placed - correct) <= TOLERANCE;
+
+      if (ok) {
+        userDot.setAttribute("fill", "#16a34a");
+        setFeedback(feedback1, "✓ Bravo ! Tu as bien placé la fraction.", "correct");
+      } else {
+        const lo = Math.floor(correct);
+        userDot.setAttribute("fill", "#D62839");
+        correctDot.setAttribute("cx", valueToX(correct));
+        correctDot.setAttribute("cy", Y_AXIS);
+        correctDot.style.display = "";
+        setFeedback(feedback1,
+          `✗ Pas tout à fait. La fraction se place entre ${lo} et ${lo + 1}.`, "wrong");
+      }
+
+      step1Done = true;
+      validate1.disabled = true;
+      hide(validate1);
+      hide(nlHint);
+      svg.classList.add("locked");
+
+      setTimeout(() => {
+        encNum.textContent = current.num;
+        encDen.textContent = current.den;
+        show(encWrap);
+        show(step2Acts);
+        encLeft.focus();
+      }, 900);
+    });
+
+    /* ── Validate step 2 ─────────────────────────────────────── */
+    validate2.addEventListener("click", () => {
+      const lo    = Math.floor(current.num / current.den);
+      const hi    = lo + 1;
+      const left  = parseInt(encLeft.value,  10);
+      const right = parseInt(encRight.value, 10);
+      const lok = left  === lo;
+      const rok = right === hi;
+
+      encLeft.classList.toggle("is-correct",  lok);
+      encLeft.classList.toggle("is-wrong",   !lok);
+      encRight.classList.toggle("is-correct",  rok);
+      encRight.classList.toggle("is-wrong",   !rok);
+
+      if (lok && rok) {
+        setFeedback(feedback2,
+          `✓ Bravo ! ${lo} < ${current.num}/${current.den} < ${hi}`, "correct");
+      } else {
+        setFeedback(feedback2,
+          `✗ Rappelle-toi : la fraction est entre ${lo} et ${hi}.`, "wrong");
+      }
+      encLeft.disabled  = true;
+      encRight.disabled = true;
+      validate2.disabled = true;
+    });
+
+    [encLeft, encRight].forEach(inp => {
+      inp.addEventListener("keydown", e => {
+        if (e.key === "Enter" && !validate2.disabled) validate2.click();
+      });
+    });
+
+    newBtn.addEventListener("click", reset);
+
+    /* ── Init ────────────────────────────────────────────────── */
+    buildStaticSVG();
+    reset();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/menu.js"></script>
+</body>
+</html>

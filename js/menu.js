@@ -70,20 +70,20 @@
 
     /* Bouton fermer (×) — reprend l'apparence du bouton hamburger */
     .lfm-close {
+      position: relative;
+      width: 34px;
+      height: 34px;
       background: none;
       border: none;
       cursor: pointer;
-      padding: 4px;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
+      padding: 0;
       flex-shrink: 0;
     }
-    .lfm-close .b { display: block; width: 26px; height: 2.5px; border-radius: 2px; }
-    .lfm-close .b1 { background: #D62839; transform: rotate(45deg) translate(5.5px, 5.5px); }
-    .lfm-close .b2 { background: #102B6A; opacity: 0; }
-    .lfm-close .b3 { background: #D62839; transform: rotate(-45deg) translate(5.5px, -5.5px); }
-    .lfm-close .b4 { background: #102B6A; transform: rotate(-45deg) translate(-5.5px, 5.5px); }
+    .lfm-close .b { display: block; width: 26px; height: 2.5px; border-radius: 2px; position: absolute; top: 50%; left: 50%; }
+    .lfm-close .b1 { background: #D62839; transform: translate(-50%, -50%) rotate(45deg); }
+    .lfm-close .b2 { display: none; }
+    .lfm-close .b3 { background: #D62839; transform: translate(-50%, -50%) rotate(-45deg); }
+    .lfm-close .b4 { display: none; }
 
     /* Corps du drawer */
     .lfm-body { padding: 20px; flex: 1; }

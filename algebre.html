@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Algèbre — Mathématiques — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css?v=5">
+  <style>
+    .page-wrap {
+      background: var(--bg);
+      min-height: calc(100vh - 88px);
+      padding-bottom: 64px;
+    }
+
+    .page-content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 64px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 20px 0 0;
+      opacity: 0.75;
+      transition: opacity 180ms;
+    }
+    .back-link:hover { opacity: 1; }
+
+    .page-header {
+      text-align: center;
+      padding: 28px 0 36px;
+    }
+
+    .page-header-icon { display: flex; justify-content: center; margin-bottom: 14px; }
+
+    .page-title {
+      font-weight: 900;
+      font-size: 32px;
+      color: var(--blue);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .page-title-rule {
+      width: 44px;
+      height: 3px;
+      background: var(--red);
+      border-radius: 2px;
+      margin: 0 auto 16px;
+    }
+
+    .page-subtitle { font-size: 14px; color: var(--muted); font-weight: 400; }
+
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .hub-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 32px 16px 0;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      min-height: 200px;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 250ms ease, box-shadow 250ms ease;
+    }
+
+    .hub-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .hub-card-emoji {
+      font-size: 36px;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .hub-card-title {
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--blue);
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .hub-card-desc {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 0 8px;
+      margin-bottom: 14px;
+    }
+
+    .hub-card-rule {
+      width: 36px;
+      height: 3px;
+      background: var(--red);
+      border-radius: 2px;
+      margin: 0 auto;
+    }
+
+    .hub-card-btn {
+      background: var(--blue);
+      color: #ffffff;
+      border-radius: 100px;
+      padding: 9px 24px;
+      font-weight: 700;
+      font-size: 13px;
+      margin-top: auto;
+      margin-bottom: 24px;
+      display: inline-block;
+    }
+
+    .hub-card:hover .hub-card-btn { background: var(--red); }
+
+    .hub-card-accent {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+    }
+
+    @media (max-width: 1024px) { .page-content { padding: 0 40px; } }
+    @media (max-width: 768px) {
+      .page-content { padding: 0 24px; }
+      .hub-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) { .hub-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="header-brand">
+        <img src="assets/lfm-logo.svg" alt="Lycée Français de Madrid" class="header-logo">
+        <div class="header-text">
+          <span class="header-name">LYCÉE FRANÇAIS DE MADRID</span>
+          <span class="header-sub">Ressources numériques pour le cycle 3</span>
+        </div>
+      </a>
+      <div class="header-actions">
+        <span class="lang-badge">FR</span>
+        <button class="menu-btn" aria-label="Ouvrir le menu">
+          <span class="mbar mbar-top"></span>
+          <span class="mbar mbar-mid"></span>
+          <span class="mbar mbar-mid2"></span>
+          <span class="mbar mbar-bot"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <div class="page-wrap">
+    <div class="page-content">
+
+      <a href="mathématiques.html" class="back-link">← Mathématiques</a>
+
+      <div class="page-header">
+        <div class="page-header-icon">
+          <svg width="56" height="56" viewBox="0 0 64 64" fill="none">
+            <rect x="10" y="10" width="44" height="44" rx="8" stroke="#102B6A" stroke-width="2.5"/>
+            <text x="32" y="40" text-anchor="middle" font-size="26" fill="#D62839" font-weight="800">?</text>
+          </svg>
+        </div>
+        <h1 class="page-title">ALGÈBRE</h1>
+        <div class="page-title-rule"></div>
+        <p class="page-subtitle">Chaque symbole cache un nombre. Choisis un niveau pour les démasquer !</p>
+      </div>
+
+      <div class="hub-grid">
+
+        <a class="hub-card" href="algebre-cm1.html">
+          <span class="hub-card-emoji">🎅</span>
+          <div class="hub-card-title">Niveau 1</div>
+          <div class="hub-card-desc">2 symboles, additions et multiplications</div>
+          <span class="hub-card-btn">Jouer →</span>
+          <div class="hub-card-accent" style="background:#2EA05A"></div>
+        </a>
+
+        <a class="hub-card" href="algebre-cm2.html">
+          <span class="hub-card-emoji">🥾</span>
+          <div class="hub-card-title">Niveau 2</div>
+          <div class="hub-card-desc">3 symboles, additions, soustractions, multiplications</div>
+          <span class="hub-card-btn">Jouer →</span>
+          <div class="hub-card-accent" style="background:#E68C14"></div>
+        </a>
+
+        <a class="hub-card" href="algebre-6e.html">
+          <span class="hub-card-emoji">❄️</span>
+          <div class="hub-card-title">Niveau 3</div>
+          <div class="hub-card-desc">4 symboles, toutes les opérations, parfois des décimaux</div>
+          <span class="hub-card-btn">Jouer →</span>
+          <div class="hub-card-accent" style="background:#D62839"></div>
+        </a>
+
+        <a class="hub-card" href="algebre-systemes-cm2.html">
+          <span class="hub-card-emoji">🧩</span>
+          <div class="hub-card-title">Niveau 4</div>
+          <div class="hub-card-desc">Systèmes d'équations imagées avec parenthèses — CM2</div>
+          <span class="hub-card-btn">Jouer →</span>
+          <div class="hub-card-accent" style="background:#7C3AED"></div>
+        </a>
+
+        <a class="hub-card" href="algebre-systemes-6e.html">
+          <span class="hub-card-emoji">🔭</span>
+          <div class="hub-card-title">Niveau 5</div>
+          <div class="hub-card-desc">Systèmes avancés, parenthèses variables, résolution en cascade — 6e</div>
+          <span class="hub-card-btn">Jouer →</span>
+          <div class="hub-card-accent" style="background:#0891B2"></div>
+        </a>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-rule"></div>
+        <div class="footer-body">
+          <p class="footer-text">
+            Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,<br>
+            dans le respect d'un <strong class="footer-em">usage mesuré</strong> des écrans.
+          </p>
+        </div>
+        <p class="footer-credit">© 2026 François Perocheau – LFM &nbsp;•&nbsp; CC BY-NC-SA 4.0 &nbsp;•&nbsp; <a href="mentions-legales.html">Mentions légales</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/menu.js"></script>
+</body>
+</html>

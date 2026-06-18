@@ -241,6 +241,83 @@
     @media (max-width: 400px) {
       .stats-row-3    { grid-template-columns: 1fr; }
     }
+
+    /* ── Tabs ───────────────────────────────────────────────────────────────── */
+    .view-tabs {
+      display: flex; gap: 4px; margin-bottom: 20px;
+      background: var(--bg); border-radius: 10px; padding: 4px;
+      border: 1px solid var(--border); width: fit-content;
+    }
+    .tab-btn {
+      padding: 8px 18px; border-radius: 8px;
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      border: none; cursor: pointer; background: transparent;
+      color: var(--muted); transition: background 180ms, color 180ms;
+    }
+    .tab-btn.active { background: var(--card-bg); color: var(--blue); box-shadow: var(--shadow-sm); }
+
+    /* ── Bilan par compétence ────────────────────────────────────────────────── */
+    .bilan-domaine {
+      margin-bottom: 20px; background: var(--card-bg);
+      border-radius: var(--radius-card); box-shadow: var(--shadow-sm); overflow: hidden;
+    }
+    .bilan-domaine-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 16px 20px; cursor: pointer; user-select: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .bilan-domaine-header:hover { background: rgba(16,43,106,0.02); }
+    .bilan-domaine-title  { font-weight: 800; font-size: 16px; color: var(--blue); }
+    .bilan-domaine-count  { font-size: 12px; color: var(--muted); }
+    .bilan-chevron        { margin-left: auto; color: var(--muted); font-size: 16px; transition: transform 200ms; }
+    .bilan-domaine.closed .bilan-chevron      { transform: rotate(-90deg); }
+    .bilan-domaine.closed .bilan-domaine-body { display: none; }
+
+    /* sous-domaine (ex : Conjugaison, Grammaire, Fractions) */
+    .bilan-sous-domaine { border-bottom: 1px solid var(--border); }
+    .bilan-sous-domaine:last-child { border-bottom: none; }
+    .bilan-sous-domaine-title {
+      font-size: 11px; font-weight: 800; color: var(--blue);
+      text-transform: uppercase; letter-spacing: 0.07em;
+      padding: 14px 20px 6px;
+    }
+    /* compétence (ex : Être au présent, Types de phrases : déclarative) */
+    .bilan-competence { padding: 8px 20px 14px 28px; border-bottom: 1px solid rgba(16,43,106,0.07); }
+    .bilan-competence:last-child { border-bottom: none; }
+    .bilan-competence-title { font-weight: 700; font-size: 14px; color: var(--text); margin-bottom: 10px; }
+    .bilan-level-block { margin-bottom: 14px; }
+    .bilan-level-block:last-child { margin-bottom: 0; }
+
+    /* ── Impression PDF ─────────────────────────────────────────────────────── */
+    .print-header, .print-footer { display: none; }
+
+    @media print {
+      .header, footer, nav.breadcrumb, .nav-footer, .view-tabs,
+      #export-class-btn, #print-bilan-btn, #view-classes, #view-student,
+      #view-loading, #panel-eleves, .class-info-bar > div:last-child { display: none !important; }
+
+      .dash-wrap    { padding: 0; background: #fff; min-height: unset; }
+      .dash-content { max-width: 100%; padding: 0; }
+
+      .print-header { display: block !important; margin-bottom: 20px; }
+      .print-footer { display: block !important; margin-top: 24px;
+        font-size: 11pt; color: #555; border-top: 1px solid #ccc; padding-top: 8px; }
+
+      .bilan-domaine { box-shadow: none; border: 1px solid #ccc; margin-bottom: 16px; break-inside: avoid; }
+      .bilan-domaine.closed .bilan-domaine-body { display: block !important; }
+      .bilan-domaine-header { border-bottom: 1px solid #ccc; }
+      .bilan-chevron        { display: none; }
+
+      .bilan-competence { break-inside: avoid; border-bottom: 1px solid #ddd; }
+      .bilan-level-block { break-inside: avoid; }
+
+      .table-wrap { box-shadow: none; border-radius: 0; }
+      .result-table th, .result-table td {
+        border: 1px solid #333 !important; font-size: 10pt; color: #000 !important;
+        padding: 5px 8px; background: #fff !important;
+      }
+      .score-pill { background: #fff !important; color: #000 !important; border: 1px solid #999; }
+    }
   </style>
 </head>
 <body>
@@ -291,29 +368,58 @@
 
       <!-- ── Vue B : Élèves d'une classe ───────────────────────────────────── -->
       <div id="view-students" style="display:none">
+        <!-- Barre d'info classe -->
         <div class="class-info-bar">
           <div>
             <div class="class-info-name" id="class-info-name">—</div>
             <div class="class-info-meta" id="class-info-meta">—</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" id="print-bilan-btn" style="display:none"
+              onclick="printBilan()">📄 Imprimer les résultats</button>
             <button class="btn btn-ghost btn-sm" id="export-class-btn">⬇ Export CSV</button>
           </div>
         </div>
-        <div class="table-wrap">
-          <table class="result-table">
-            <thead>
-              <tr>
-                <th>Élève</th>
-                <th>Exercices</th>
-                <th>Moyenne</th>
-                <th>Dernière activité</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="students-tbody"></tbody>
-          </table>
+
+        <!-- Onglets -->
+        <div class="view-tabs">
+          <button class="tab-btn active" id="tab-btn-eleves" onclick="switchClassTab('eleves')">Élèves</button>
+          <button class="tab-btn" id="tab-btn-bilan" onclick="switchClassTab('bilan')">Par compétence</button>
         </div>
+
+        <!-- Panneau Élèves -->
+        <div id="panel-eleves">
+          <div class="table-wrap">
+            <table class="result-table">
+              <thead>
+                <tr>
+                  <th>Élève</th>
+                  <th>Exercices</th>
+                  <th>Moyenne</th>
+                  <th>Dernière activité</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="students-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Panneau Bilan par compétence -->
+        <div id="panel-bilan" style="display:none">
+          <!-- En-tête impression uniquement -->
+          <div class="print-header" id="print-header">
+            <div style="font-weight:800;font-size:20px;color:var(--blue)" id="print-title">Résultats — LFM</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:4px" id="print-date"></div>
+            <hr style="margin:16px 0;border:none;border-top:2px solid var(--border)">
+          </div>
+          <div id="bilan-content">
+            <div class="view-loading">Chargement du bilan…</div>
+          </div>
+          <!-- Pied de page impression uniquement -->
+          <div class="print-footer">© François Perocheau – LFM</div>
+        </div>
+
         <div class="nav-footer">
           <button class="btn btn-ghost btn-sm" onclick="navigate({view:'classes'})">← Retour aux classes</button>
         </div>
@@ -327,6 +433,8 @@
             <div class="student-header-name" id="student-header-name">—</div>
             <div class="student-header-meta" id="student-header-meta">—</div>
           </div>
+          <button class="btn btn-ghost btn-sm" id="print-student-btn" style="margin-left:auto;display:none"
+            onclick="printStudentBilan()">📄 Synthèse PDF</button>
         </div>
 
         <div class="stats-row-3" id="student-stats-row"></div>
@@ -342,20 +450,9 @@
           </div>
         </div>
 
-        <div class="history-card">
-          <div class="history-card-title">20 derniers exercices</div>
-          <table class="result-table">
-            <thead>
-              <tr>
-                <th>Exercice</th>
-                <th>Matière</th>
-                <th>Score</th>
-                <th>Résultat</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody id="history-tbody"></tbody>
-          </table>
+        <!-- Bilan par compétence (remplace l'historique) -->
+        <div id="student-bilan" style="margin-top:4px">
+          <div class="view-loading">Chargement du bilan…</div>
         </div>
 
         <div class="nav-footer" id="student-nav-footer"></div>
@@ -385,10 +482,87 @@
   /* ═══════════════════════════════════════════════════════════════════════════
      STATE
   ═══════════════════════════════════════════════════════════════════════════ */
-  let _classes       = [];
-  let _currentClass  = null;   // { id, name, level, school_year, student_count }
-  let _currentStudent = null;  // { auth_user_id, display_name, class_name }
-  let _charts        = {};
+  let _classes        = [];
+  let _currentClass   = null;   // { id, name, level, school_year, student_count }
+  let _currentStudent = null;   // { auth_user_id, display_name, class_name }
+  let _charts         = {};
+  let _bilanLoaded    = false;
+  let _bilanClassId   = null;
+
+  /* ── Métadonnées exercices (domaine + compétence + titre) ─────────────────── */
+  const EXERCISE_META = {
+    // Français — Conjugaison
+    "retrouver-infinitif-verbe-conjugue":       { domaine:"Français", competence:"Conjugaison — Identifier l'infinitif et le groupe",      title:"Retrouver l'infinitif d'un verbe conjugué puis son groupe" },
+    "identifier-verbe-conjugue":                { domaine:"Français", competence:"Conjugaison — Identifier le verbe conjugué",              title:"Identifier le verbe conjugué" },
+    "identifier-auxiliaire":                    { domaine:"Français", competence:"Conjugaison — Auxiliaires être / avoir",                  title:"Identifier l'auxiliaire" },
+    "retrouver-infinitif-passe-compose":        { domaine:"Français", competence:"Conjugaison — Passé composé",                            title:"Retrouver l'infinitif d'un verbe au passé composé" },
+    "conjuguer-etre-present":                   { domaine:"Français", competence:"Conjugaison — Être au présent",                          title:"Conjuguer le verbe être au présent" },
+    "conjuguer-avoir-present":                  { domaine:"Français", competence:"Conjugaison — Avoir au présent",                         title:"Conjuguer le verbe avoir au présent" },
+    "conjuguer-1er-groupe-present":             { domaine:"Français", competence:"Conjugaison — 1er groupe au présent",                    title:"Conjuguer les verbes réguliers du 1er groupe au présent" },
+    "conjuguer-verbes-particuliers-1er-groupe": { domaine:"Français", competence:"Conjugaison — Verbes particuliers du 1er groupe",        title:"Conjuguer les verbes particuliers du 1er groupe au présent" },
+    "conjuguer-2e-groupe-present":              { domaine:"Français", competence:"Conjugaison — 2e groupe au présent",                     title:"Conjuguer les verbes du 2e groupe au présent" },
+    "conjuguer-3e-groupe-present":              { domaine:"Français", competence:"Conjugaison — 3e groupe au présent",                     title:"Conjuguer les verbes fréquents du 3e groupe au présent" },
+    "conjuguer-imparfait":                      { domaine:"Français", competence:"Conjugaison — Imparfait",                                title:"Conjuguer à l'imparfait" },
+    "conjuguer-futur":                          { domaine:"Français", competence:"Conjugaison — Futur simple",                             title:"Conjuguer au futur" },
+    "conjuguer-passe-simple":                   { domaine:"Français", competence:"Conjugaison — Passé simple",                             title:"Conjuguer des verbes au passé simple" },
+    "conjuguer-plus-que-parfait":               { domaine:"Français", competence:"Conjugaison — Plus-que-parfait",                         title:"Conjuguer au plus-que-parfait" },
+    "conjuguer-imperatif-present":              { domaine:"Français", competence:"Conjugaison — Impératif présent",                        title:"Conjuguer à l'impératif présent" },
+    "conjuguer-conditionnel-present":           { domaine:"Français", competence:"Conjugaison — Conditionnel présent",                     title:"Conjuguer au conditionnel présent" },
+    "conjuguer-faire":                          { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : FAIRE",               title:"Conjuguer le verbe FAIRE" },
+    "conjuguer-aller":                          { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : ALLER",               title:"Conjuguer le verbe ALLER" },
+    "conjuguer-dire":                           { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : DIRE",                title:"Conjuguer le verbe DIRE" },
+    "conjuguer-venir":                          { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : VENIR",               title:"Conjuguer le verbe VENIR" },
+    "conjuguer-pouvoir":                        { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : POUVOIR",             title:"Conjuguer le verbe POUVOIR" },
+    "conjuguer-voir":                           { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : VOIR",                title:"Conjuguer le verbe VOIR" },
+    "conjuguer-vouloir":                        { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : VOULOIR",             title:"Conjuguer le verbe VOULOIR" },
+    "conjuguer-prendre":                        { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : PRENDRE",             title:"Conjuguer le verbe PRENDRE" },
+    // Français — Grammaire
+    "identifier-phrase-declarative":            { domaine:"Français", competence:"Grammaire — Types de phrases : déclarative",             title:"Identifier une phrase déclarative" },
+    "transformer-declarative-interrogative":    { domaine:"Français", competence:"Grammaire — Types de phrases : interrogative",           title:"Transformer une phrase déclarative en phrase interrogative" },
+    "transformer-affirmative-negative":         { domaine:"Français", competence:"Grammaire — Types de phrases : négative",               title:"Transformer une phrase affirmative en phrase négative" },
+    "identifier-phrase-interrogative":          { domaine:"Français", competence:"Grammaire — Types de phrases : interrogative",           title:"Identifier une phrase interrogative" },
+    "identifier-phrase-imperative":             { domaine:"Français", competence:"Grammaire — Types de phrases : impérative",             title:"Identifier une phrase impérative" },
+    "identifier-phrase-negative":               { domaine:"Français", competence:"Grammaire — Types de phrases : négative",               title:"Identifier une phrase négative" },
+    "identifier-phrase-exclamative":            { domaine:"Français", competence:"Grammaire — Types de phrases : exclamative",            title:"Identifier une phrase exclamative" },
+    "identifier-article-defini":                { domaine:"Français", competence:"Grammaire — Déterminants : articles définis",           title:"Identifier les articles définis" },
+    "articles-definis-choix":                   { domaine:"Français", competence:"Grammaire — Déterminants : articles définis",           title:"Choisir l'article défini — le / la / les / l'" },
+    "articles-definis-completer":               { domaine:"Français", competence:"Grammaire — Déterminants : articles définis",           title:"Compléter avec l'article défini — Le printemps" },
+    "identifier-article-indefini":              { domaine:"Français", competence:"Grammaire — Déterminants : articles indéfinis",         title:"Identifier les articles indéfinis" },
+    "articles-indefinis-premiere-rencontre":    { domaine:"Français", competence:"Grammaire — Déterminants : articles indéfinis",         title:"Articles indéfinis — Première et deuxième mention" },
+    "identifier-determinant-demonstratif":      { domaine:"Français", competence:"Grammaire — Déterminants démonstratifs",                title:"Identifier un déterminant démonstratif" },
+    "identifier-determinant-possessif":         { domaine:"Français", competence:"Grammaire — Déterminants possessifs",                   title:"Identifier les déterminants possessifs" },
+    "possessifs-dans-phrases":                  { domaine:"Français", competence:"Grammaire — Déterminants possessifs",                   title:"Repérer les déterminants possessifs dans une phrase" },
+    "identifier-adjectif":                      { domaine:"Français", competence:"Grammaire — L'adjectif",                               title:"Identifier les adjectifs" },
+    "identifier-adverbe-frequent":              { domaine:"Français", competence:"Grammaire — L'adverbe",                                title:"Identifier les adverbes" },
+    "identifier-nom-phrase":                    { domaine:"Français", competence:"Grammaire — Le nom",                                   title:"Identifier les noms dans une phrase" },
+    "distinguer-phrase-simple-complexe":        { domaine:"Français", competence:"Grammaire — Phrase simple et complexe",                 title:"Distinguer phrase simple et phrase complexe" },
+    "phrases-connecteurs":                      { domaine:"Français", competence:"Grammaire — Connecteurs et conjonctions",               title:"Relier deux phrases avec la bonne conjonction" },
+    "produire-formes-interrogatives":           { domaine:"Français", competence:"Grammaire — Formes de phrases interrogatives",          title:"Produire différentes formes de phrases interrogatives" },
+    "accord-verbe-sujet-inverse":               { domaine:"Français", competence:"Grammaire — Accord sujet-verbe inversé",               title:"Accorder le verbe avec un sujet inversé" },
+    "differencier-epithete-attribut":           { domaine:"Français", competence:"Grammaire — Épithète et attribut du sujet",            title:"Différencier l'adjectif épithète et l'attribut du sujet" },
+    "distinguer-epithete-complement-nom":       { domaine:"Français", competence:"Grammaire — Épithète et complément du nom",            title:"Distinguer l'adjectif épithète et le complément du nom" },
+    "distinguer-pronom-sujet-complement":       { domaine:"Français", competence:"Grammaire — Pronoms personnels",                        title:"Distinguer le pronom personnel sujet et le pronom personnel complément" },
+    "remplacer-gn-sujet-pronom":                { domaine:"Français", competence:"Grammaire — Pronoms personnels",                        title:"Remplacer un groupe nominal sujet par un pronom personnel sujet" },
+    // Français — Orthographe
+    "ortho-accorder-determinant-nom":           { domaine:"Français", competence:"Orthographe — Accord déterminant/nom",                 title:"Accorder le déterminant avec le nom" },
+    "ortho-accorder-adjectif-nom":              { domaine:"Français", competence:"Orthographe — Accord adjectif/nom",                    title:"Accorder l'adjectif avec le nom" },
+    "ortho-accorder-participe-passe-cod":       { domaine:"Français", competence:"Orthographe — Accord participe passé (COD)",           title:"Accorder le participe passé avec le COD" },
+    // Mathématiques — Fractions
+    "representer-fraction":                     { domaine:"Mathématiques", competence:"Fractions — Représenter",                          title:"Représenter une fraction" },
+    "lire-fraction":                            { domaine:"Mathématiques", competence:"Fractions — Lire et écrire",                       title:"Lire une fraction" },
+    "decomposer-fraction-partie-entiere":       { domaine:"Mathématiques", competence:"Fractions — Décomposer",                           title:"Décomposer une fraction (partie entière + fraction)" },
+    "utiliser-fractions-problemes":             { domaine:"Mathématiques", competence:"Fractions — Problèmes",                            title:"Utiliser les fractions dans des problèmes" },
+    "placer-fraction-droite-graduee":           { domaine:"Mathématiques", competence:"Fractions — Droite graduée",                       title:"Placer une fraction sur une droite graduée" },
+    "encadrer-fraction":                        { domaine:"Mathématiques", competence:"Fractions — Encadrer",                             title:"Encadrer une fraction entre deux entiers consécutifs" },
+    "comparer-fractions":                       { domaine:"Mathématiques", competence:"Fractions — Comparer",                             title:"Comparer deux fractions" },
+    // Mathématiques — Nombres entiers
+    "ecrire-nombre-entier-chiffres":            { domaine:"Mathématiques", competence:"Nombres entiers — Écriture chiffrée",              title:"Écrire un nombre en chiffres" },
+    "ecrire-nombre-entier-lettres":             { domaine:"Mathématiques", competence:"Nombres entiers — Écriture en lettres",            title:"Écrire un nombre en lettres" },
+    "identifier-valeur-chiffre-position":       { domaine:"Mathématiques", competence:"Nombres entiers — Valeur positionnelle",           title:"Identifier la valeur d'un chiffre selon sa position" },
+    // Histoire EMILE
+    "vocabulaire-revolution-francaise":         { domaine:"Histoire", competence:"EMILE — Révolution française",                          title:"Vocabulaire de la Révolution française" },
+    "vocabulaire-napoleon-bonaparte":           { domaine:"Histoire", competence:"EMILE — Napoléon Bonaparte",                            title:"Vocabulaire — Napoléon Bonaparte" },
+  };
 
   /* ═══════════════════════════════════════════════════════════════════════════
      INIT
@@ -407,6 +581,281 @@
   })();
 
   window.addEventListener('popstate', applyView);
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     ONGLETS CLASSE (Élèves / Par compétence)
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function switchClassTab(tab) {
+    document.getElementById('tab-btn-eleves').classList.toggle('active', tab === 'eleves');
+    document.getElementById('tab-btn-bilan').classList.toggle('active',  tab === 'bilan');
+    document.getElementById('panel-eleves').style.display = tab === 'eleves' ? '' : 'none';
+    document.getElementById('panel-bilan').style.display  = tab === 'bilan'  ? '' : 'none';
+    document.getElementById('print-bilan-btn').style.display = tab === 'bilan' ? '' : 'none';
+
+    if (tab === 'bilan') {
+      const classId = new URLSearchParams(window.location.search).get('class');
+      await renderCompetences(classId);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     BILAN PAR COMPÉTENCE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function renderCompetences(classId) {
+    if (_bilanLoaded && _bilanClassId === classId) return;
+    _bilanLoaded  = false;
+    _bilanClassId = classId;
+
+    const container = document.getElementById('bilan-content');
+    container.innerHTML = '<div class="view-loading">Chargement du bilan…</div>';
+
+    try {
+      const students = await lfmTeacher.getStudents(classId);
+      const authIds  = students.filter(s => s.auth_user_id).map(s => s.auth_user_id);
+      const studentMap = {};
+      students.forEach(s => { if (s.auth_user_id) studentMap[s.auth_user_id] = s.display_name; });
+
+      if (authIds.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Aucun élève connecté dans cette classe.</div></div>';
+        return;
+      }
+
+      const { data, error } = await window.lfmDb
+        .from('exercise_results')
+        .select('student_id, exercise_slug, exercise_title, level, score, total, pct, completed_at')
+        .in('student_id', authIds)
+        .order('completed_at', { ascending: false });
+
+      if (error) throw error;
+
+      /* Un seul résultat par (élève × exercice) : le plus récent (déjà ordonné DESC) */
+      const seen   = new Set();
+      const latest = [];
+      for (const r of (data || [])) {
+        const key = r.student_id + '|' + r.exercise_slug;
+        if (!seen.has(key)) { seen.add(key); latest.push(r); }
+      }
+
+      if (latest.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Aucun résultat enregistré pour cette classe.</div></div>';
+        return;
+      }
+
+      /* Grouper domaine → compétence → niveau */
+      const LEVEL_ORDER  = ['CE2', 'CM1', 'CM2', '6e'];
+      const DOMAIN_ORDER = ['Français', 'Mathématiques', 'Histoire'];
+      const byDomaine    = {};
+
+      for (const r of latest) {
+        const meta = EXERCISE_META[r.exercise_slug];
+        if (!meta) continue;
+        const { domaine, competence } = meta;
+        const sep         = competence.indexOf(' — ');
+        const sousDomaine = sep >= 0 ? competence.slice(0, sep)      : competence;
+        const compLabel   = sep >= 0 ? competence.slice(sep + 3)     : competence;
+        const level       = r.level || '—';
+        const studentName = studentMap[r.student_id] || '?';
+        const exTitle     = r.exercise_title || meta.title || r.exercise_slug.replace(/-/g, ' ');
+
+        if (!byDomaine[domaine])                                   byDomaine[domaine] = {};
+        if (!byDomaine[domaine][sousDomaine])                      byDomaine[domaine][sousDomaine] = {};
+        if (!byDomaine[domaine][sousDomaine][compLabel])           byDomaine[domaine][sousDomaine][compLabel] = {};
+        if (!byDomaine[domaine][sousDomaine][compLabel][level])    byDomaine[domaine][sousDomaine][compLabel][level] = [];
+        byDomaine[domaine][sousDomaine][compLabel][level].push({
+          name: studentName, exTitle,
+          score: r.score, total: r.total,
+          pct: parseFloat(r.pct), date: r.completed_at
+        });
+      }
+
+      /* Rendu HTML */
+      const domaineKeys = DOMAIN_ORDER.filter(d => byDomaine[d]);
+      Object.keys(byDomaine).forEach(d => { if (!domaineKeys.includes(d)) domaineKeys.push(d); });
+
+      const DOMAIN_ICONS = { Français: '📚', Mathématiques: '📐', Histoire: '🏛' };
+      let html = '';
+
+      domaineKeys.forEach(domaine => {
+        const sousDomaineMap = byDomaine[domaine];
+        const totalRows = Object.values(sousDomaineMap).reduce((n, comps) =>
+          n + Object.values(comps).reduce((m, lvls) =>
+            m + Object.values(lvls).reduce((k, arr) => k + arr.length, 0), 0), 0);
+        const icon = DOMAIN_ICONS[domaine] || '📖';
+
+        html += `<div class="bilan-domaine">
+          <div class="bilan-domaine-header" onclick="toggleDomaine(this)">
+            <span class="bilan-domaine-title">${icon} ${escHtml(domaine)}</span>
+            <span class="bilan-domaine-count">${totalRows} résultat${totalRows > 1 ? 's' : ''}</span>
+            <span class="bilan-chevron">▾</span>
+          </div>
+          <div class="bilan-domaine-body">`;
+
+        Object.entries(sousDomaineMap).forEach(([sousDomaine, comps]) => {
+          html += `<div class="bilan-sous-domaine">
+            <div class="bilan-sous-domaine-title">${escHtml(sousDomaine)}</div>`;
+
+          Object.entries(comps).forEach(([compLabel, levels]) => {
+            const compKey = encodeURIComponent(domaine + '||' + sousDomaine + '||' + compLabel);
+            html += `<div class="bilan-competence" data-comp-key="${compKey}">
+              <div class="bilan-competence-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <span>${escHtml(compLabel)}</span>
+                <button class="btn btn-ghost btn-sm" style="flex-shrink:0;font-size:11px;padding:5px 10px"
+                  onclick="printCompetence(this)">📄 PDF</button>
+              </div>`;
+
+            const sortedLevels = Object.keys(levels).sort((a, b) => {
+              const ia = LEVEL_ORDER.indexOf(a), ib = LEVEL_ORDER.indexOf(b);
+              return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+            });
+
+            sortedLevels.forEach(level => {
+              const items    = levels[level];
+              const levelCls = { CM1: 'badge-cm1', CM2: 'badge-cm2', '6e': 'badge-6e' }[level] || 'badge-cm1';
+              html += `<div class="bilan-level-block">
+                <span class="badge ${levelCls}" style="margin-bottom:8px;display:inline-block">${escHtml(level)}</span>
+                <div class="table-wrap" style="border-radius:8px">
+                  <table class="result-table">
+                    <thead><tr>
+                      <th>Élève</th><th>Exercice</th><th>Score</th><th>Résultat</th><th>Date</th>
+                    </tr></thead>
+                    <tbody>`;
+
+              items.sort((a, b) => a.name.localeCompare(b.name, 'fr')).forEach(item => {
+                const pillCls = item.pct >= 70 ? 'score-high' : item.pct >= 50 ? 'score-mid' : 'score-low';
+                const date    = new Date(item.date).toLocaleDateString('fr-FR',
+                  { day: '2-digit', month: '2-digit', year: '2-digit' });
+                const t = item.exTitle.charAt(0).toUpperCase() + item.exTitle.slice(1);
+                html += `<tr>
+                  <td style="font-weight:600">${escHtml(item.name)}</td>
+                  <td style="font-size:12px;color:var(--muted);max-width:180px;
+                      overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                      title="${escHtml(t)}">${escHtml(t)}</td>
+                  <td>${item.score}/${item.total}</td>
+                  <td><span class="score-pill ${pillCls}">${Math.round(item.pct)}%</span></td>
+                  <td style="color:var(--muted);font-size:13px">${date}</td>
+                </tr>`;
+              });
+
+              html += `</tbody></table></div></div>`;
+            });
+
+            html += `</div>`;  /* bilan-competence */
+          });
+
+          html += `</div>`;  /* bilan-sous-domaine */
+        });
+
+        html += `</div></div>`;  /* bilan-domaine-body + bilan-domaine */
+      });
+
+      container.innerHTML = html;
+      _bilanLoaded = true;
+
+    } catch (e) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Erreur lors du chargement du bilan.</div></div>';
+      console.warn('[LFM] renderCompetences:', e.message);
+    }
+  }
+
+  function toggleDomaine(header) {
+    header.closest('.bilan-domaine').classList.toggle('closed');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     IMPRESSION PDF
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function printBilan() {
+    /* Ouvrir tous les accordéons fermés */
+    document.querySelectorAll('.bilan-domaine.closed').forEach(d => d.classList.remove('closed'));
+    /* Remplir l'en-tête */
+    const p     = new URLSearchParams(window.location.search);
+    const cname = decodeURIComponent(p.get('cname') || (_currentClass?.name || 'Classe'));
+    document.getElementById('print-title').textContent =
+      `Résultats — ${cname} — LFM`;
+    document.getElementById('print-date').textContent =
+      `Imprimé le ${new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}`;
+    window.print();
+  }
+
+  /* ── PDF par compétence ────────────────────────────────────────────────── */
+  function printCompetence(btn) {
+    const block      = btn.closest('.bilan-competence');
+    const compLabel  = block.querySelector('.bilan-competence-title span').textContent.trim();
+    const sousDom    = block.closest('.bilan-sous-domaine')
+                            ?.querySelector('.bilan-sous-domaine-title')?.textContent.trim() || '';
+    const competence = sousDom ? `${sousDom} — ${compLabel}` : compLabel;
+    const domaine    = block.closest('.bilan-domaine')
+                           .querySelector('.bilan-domaine-title').textContent.trim();
+
+    const p     = new URLSearchParams(window.location.search);
+    const cname = decodeURIComponent(p.get('cname') || (_currentClass?.name || 'Classe'));
+    const today = new Date().toLocaleDateString('fr-FR',
+      { day: '2-digit', month: 'long', year: 'numeric' });
+
+    /* Construire les tableaux par niveau à partir du DOM */
+    let tablesHtml = '';
+    block.querySelectorAll('.bilan-level-block').forEach(lb => {
+      const badgeEl  = lb.querySelector('.badge');
+      const badgeTxt = badgeEl ? badgeEl.textContent.trim() : '';
+      const badgeCls = badgeEl ? badgeEl.className.replace('badge', '').trim() : '';
+
+      let rows = '';
+      lb.querySelectorAll('tbody tr').forEach(tr => {
+        const cells = tr.querySelectorAll('td');
+        if (cells.length < 5) return;
+        const pct     = cells[3].querySelector('.score-pill')?.textContent.trim() || '';
+        const pctVal  = parseFloat(pct);
+        const color   = pctVal >= 70 ? '#15803d' : pctVal >= 50 ? '#a16207' : '#D62839';
+        rows += `<tr>
+          <td style="font-weight:600">${cells[0].textContent.trim()}</td>
+          <td style="font-size:9pt;color:#555">${cells[1].textContent.trim()}</td>
+          <td>${cells[2].textContent.trim()}</td>
+          <td><span style="color:${color};font-weight:700">${pct}</span></td>
+          <td style="color:#555">${cells[4].textContent.trim()}</td>
+        </tr>`;
+      });
+
+      tablesHtml += `
+        <p style="margin:12px 0 4px">
+          <span class="badge ${badgeCls}">${badgeTxt}</span>
+        </p>
+        <table>
+          <thead><tr>
+            <th>Élève</th><th>Exercice</th><th>Score</th><th>Résultat</th><th>Date</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    });
+
+    const w = window.open('', '_blank');
+    w.document.write(`<!DOCTYPE html>
+<html lang="fr"><head>
+  <meta charset="UTF-8">
+  <title>${competence} — ${cname} — LFM</title>
+  <style>
+    body  { font-family: system-ui, sans-serif; margin: 28px; color: #000; font-size: 11pt; }
+    h1    { font-size: 15pt; color: #102B6A; margin: 0 0 2px; }
+    .meta { font-size: 10pt; color: #555; margin-bottom: 18px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+    th    { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+            border: 1px solid #333; padding: 5px 8px; background: #f0f4f8; text-align: left; }
+    td    { font-size: 10pt; border: 1px solid #ccc; padding: 5px 8px; }
+    .badge       { display:inline-block; padding:2px 9px; border-radius:4px; font-size:10pt; font-weight:700; }
+    .badge-cm1   { background:rgba(16,43,106,.1); color:#102B6A; border:1px solid rgba(16,43,106,.3); }
+    .badge-cm2   { background:#102B6A; color:#fff; }
+    .badge-6e    { background:#D62839; color:#fff; }
+    footer { margin-top:24px; font-size:9pt; color:#666; border-top:1px solid #ccc; padding-top:6px; }
+    @media print { body { margin: 12px; } }
+  </style>
+</head><body>
+  <h1>${domaine} — ${competence}</h1>
+  <div class="meta">Classe : ${cname} &nbsp;·&nbsp; Imprimé le ${today}</div>
+  ${tablesHtml}
+  <footer>© François Perocheau – LFM</footer>
+  <script>window.onload = () => setTimeout(() => { window.print(); }, 250);<\/script>
+</body></html>`);
+    w.document.close();
+  }
 
   /* ═══════════════════════════════════════════════════════════════════════════
      NAVIGATION
@@ -515,6 +964,16 @@
      VUE B — ÉLÈVES D'UNE CLASSE
   ═══════════════════════════════════════════════════════════════════════════ */
   async function renderStudents(classId) {
+    /* Réinitialiser les onglets et le cache bilan à chaque nouvelle classe */
+    _bilanLoaded = false;
+    document.getElementById('tab-btn-eleves').classList.add('active');
+    document.getElementById('tab-btn-bilan').classList.remove('active');
+    document.getElementById('panel-eleves').style.display  = '';
+    document.getElementById('panel-bilan').style.display   = 'none';
+    document.getElementById('print-bilan-btn').style.display = 'none';
+    document.getElementById('bilan-content').innerHTML =
+      '<div class="view-loading">Chargement du bilan…</div>';
+
     const p = new URLSearchParams(window.location.search);
     const cname  = decodeURIComponent(p.get('cname') || '');
     const clevel = p.get('clevel') || '';
@@ -618,7 +1077,7 @@
     renderStudentStats(stats);
     renderLineChart(stats?.chartData || []);
     renderDoughnutChart(stats?.subjects || []);
-    renderHistory(stats?.recent || []);
+    renderStudentBilan(s.auth_user_id);
 
     const p = new URLSearchParams(window.location.search);
     document.getElementById('student-nav-footer').innerHTML = `
@@ -729,6 +1188,227 @@
         }
       }
     });
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     BILAN PAR COMPÉTENCE — FICHE ÉLÈVE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function renderStudentBilan(authUserId) {
+    const container = document.getElementById('student-bilan');
+    container.innerHTML = '<div class="view-loading">Chargement du bilan…</div>';
+    document.getElementById('print-student-btn').style.display = 'none';
+
+    try {
+      const { data, error } = await window.lfmDb
+        .from('exercise_results')
+        .select('exercise_slug, exercise_title, level, score, total, pct, completed_at')
+        .eq('student_id', authUserId)
+        .order('completed_at', { ascending: false });
+
+      if (error) throw error;
+
+      /* Garder uniquement le résultat le plus récent par exercice */
+      const seen   = new Set();
+      const latest = [];
+      for (const r of (data || [])) {
+        if (!seen.has(r.exercise_slug)) { seen.add(r.exercise_slug); latest.push(r); }
+      }
+
+      if (latest.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Aucun exercice enregistré.</div></div>';
+        return;
+      }
+
+      /* Grouper domaine → sous-domaine → compétence → niveau */
+      const LEVEL_ORDER  = ['CE2', 'CM1', 'CM2', '6e'];
+      const DOMAIN_ORDER = ['Français', 'Mathématiques', 'Histoire'];
+      const byDomaine    = {};
+
+      for (const r of latest) {
+        const meta = EXERCISE_META[r.exercise_slug];
+        if (!meta) continue;
+        const { domaine, competence } = meta;
+        const sep         = competence.indexOf(' — ');
+        const sousDomaine = sep >= 0 ? competence.slice(0, sep)  : competence;
+        const compLabel   = sep >= 0 ? competence.slice(sep + 3) : competence;
+        const level   = r.level || '—';
+        const exTitle = r.exercise_title || meta.title || r.exercise_slug.replace(/-/g, ' ');
+
+        if (!byDomaine[domaine])                                   byDomaine[domaine] = {};
+        if (!byDomaine[domaine][sousDomaine])                      byDomaine[domaine][sousDomaine] = {};
+        if (!byDomaine[domaine][sousDomaine][compLabel])           byDomaine[domaine][sousDomaine][compLabel] = {};
+        if (!byDomaine[domaine][sousDomaine][compLabel][level])    byDomaine[domaine][sousDomaine][compLabel][level] = [];
+        byDomaine[domaine][sousDomaine][compLabel][level].push({
+          exTitle, score: r.score, total: r.total,
+          pct: parseFloat(r.pct), date: r.completed_at
+        });
+      }
+
+      const domaineKeys = DOMAIN_ORDER.filter(d => byDomaine[d]);
+      Object.keys(byDomaine).forEach(d => { if (!domaineKeys.includes(d)) domaineKeys.push(d); });
+
+      const DOMAIN_ICONS = { Français: '📚', Mathématiques: '📐', Histoire: '🏛' };
+      let html = '';
+
+      domaineKeys.forEach(domaine => {
+        const sousDomaineMap = byDomaine[domaine];
+        const totalEx = Object.values(sousDomaineMap).reduce((n, comps) =>
+          n + Object.values(comps).reduce((m, lvls) =>
+            m + Object.values(lvls).reduce((k, arr) => k + arr.length, 0), 0), 0);
+        const icon = DOMAIN_ICONS[domaine] || '📖';
+
+        html += `<div class="bilan-domaine">
+          <div class="bilan-domaine-header" onclick="toggleDomaine(this)">
+            <span class="bilan-domaine-title">${icon} ${escHtml(domaine)}</span>
+            <span class="bilan-domaine-count">${totalEx} exercice${totalEx > 1 ? 's' : ''}</span>
+            <span class="bilan-chevron">▾</span>
+          </div>
+          <div class="bilan-domaine-body">`;
+
+        Object.entries(sousDomaineMap).forEach(([sousDomaine, comps]) => {
+          html += `<div class="bilan-sous-domaine">
+            <div class="bilan-sous-domaine-title">${escHtml(sousDomaine)}</div>`;
+
+          Object.entries(comps).forEach(([compLabel, levels]) => {
+            html += `<div class="bilan-competence">
+              <div class="bilan-competence-title">${escHtml(compLabel)}</div>`;
+
+            const sortedLevels = Object.keys(levels).sort((a, b) => {
+              const ia = LEVEL_ORDER.indexOf(a), ib = LEVEL_ORDER.indexOf(b);
+              return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+            });
+
+            sortedLevels.forEach(level => {
+              const items    = levels[level];
+              const levelCls = { CM1: 'badge-cm1', CM2: 'badge-cm2', '6e': 'badge-6e' }[level] || 'badge-cm1';
+              html += `<div class="bilan-level-block">
+                <span class="badge ${levelCls}" style="margin-bottom:8px;display:inline-block">${escHtml(level)}</span>
+                <div class="table-wrap" style="border-radius:8px">
+                  <table class="result-table">
+                    <thead><tr>
+                      <th>Exercice</th><th>Score</th><th>Résultat</th><th>Date</th>
+                    </tr></thead>
+                    <tbody>`;
+
+              items.forEach(item => {
+                const pillCls = item.pct >= 70 ? 'score-high' : item.pct >= 50 ? 'score-mid' : 'score-low';
+                const date    = new Date(item.date).toLocaleDateString('fr-FR',
+                  { day: '2-digit', month: '2-digit', year: '2-digit' });
+                const t = item.exTitle.charAt(0).toUpperCase() + item.exTitle.slice(1);
+                html += `<tr>
+                  <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                      title="${escHtml(t)}">${escHtml(t)}</td>
+                  <td>${item.score}/${item.total}</td>
+                  <td><span class="score-pill ${pillCls}">${Math.round(item.pct)}%</span></td>
+                  <td style="color:var(--muted);font-size:13px">${date}</td>
+                </tr>`;
+              });
+
+              html += `</tbody></table></div></div>`;
+            });
+
+            html += `</div>`;  /* bilan-competence */
+          });
+
+          html += `</div>`;  /* bilan-sous-domaine */
+        });
+
+        html += `</div></div>`;
+      });
+
+      container.innerHTML = html;
+      document.getElementById('print-student-btn').style.display = '';
+
+    } catch (e) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Erreur lors du chargement du bilan.</div></div>';
+      console.warn('[LFM] renderStudentBilan:', e.message);
+    }
+  }
+
+  /* ── Synthèse PDF élève ─────────────────────────────────────────────────── */
+  function printStudentBilan() {
+    document.querySelectorAll('#student-bilan .bilan-domaine.closed')
+      .forEach(d => d.classList.remove('closed'));
+
+    const name  = document.getElementById('student-header-name').textContent;
+    const meta  = document.getElementById('student-header-meta').textContent;
+    const today = new Date().toLocaleDateString('fr-FR',
+      { day: '2-digit', month: 'long', year: 'numeric' });
+
+    /* Construire le HTML des blocs compétence depuis le DOM */
+    let bodyHtml = '';
+    document.querySelectorAll('#student-bilan .bilan-domaine').forEach(dom => {
+      const domaineTitle = dom.querySelector('.bilan-domaine-title')?.textContent.trim() || '';
+      bodyHtml += `<h2 style="font-size:14pt;color:#102B6A;margin:20px 0 6px;
+        border-bottom:2px solid #102B6A;padding-bottom:4px">${domaineTitle}</h2>`;
+
+      dom.querySelectorAll('.bilan-sous-domaine').forEach(sd => {
+        const sdTitle = sd.querySelector('.bilan-sous-domaine-title')?.textContent.trim() || '';
+        bodyHtml += `<h3 style="font-size:11pt;color:#102B6A;margin:14px 0 4px;
+          font-weight:800;text-transform:uppercase;letter-spacing:.05em;font-size:9pt">${sdTitle}</h3>`;
+
+      sd.querySelectorAll('.bilan-competence').forEach(comp => {
+        const compTitle = comp.querySelector('.bilan-competence-title')?.textContent.trim() || '';
+        bodyHtml += `<h4 style="font-size:11pt;color:#333;margin:10px 0 6px;font-weight:700">${compTitle}</h4>`;
+
+        comp.querySelectorAll('.bilan-level-block').forEach(lb => {
+          const badgeEl  = lb.querySelector('.badge');
+          const badgeTxt = badgeEl?.textContent.trim() || '';
+          const badgeCls = badgeEl?.className.replace('badge', '').trim() || '';
+
+          let rows = '';
+          lb.querySelectorAll('tbody tr').forEach(tr => {
+            const cells = tr.querySelectorAll('td');
+            if (cells.length < 4) return;
+            const pct    = cells[2].querySelector('.score-pill')?.textContent.trim() || '';
+            const pctVal = parseFloat(pct);
+            const color  = pctVal >= 70 ? '#15803d' : pctVal >= 50 ? '#a16207' : '#D62839';
+            rows += `<tr>
+              <td>${cells[0].textContent.trim()}</td>
+              <td>${cells[1].textContent.trim()}</td>
+              <td><span style="color:${color};font-weight:700">${pct}</span></td>
+              <td style="color:#555">${cells[3].textContent.trim()}</td>
+            </tr>`;
+          });
+
+          bodyHtml += `<p style="margin:4px 0 2px">
+            <span class="badge ${badgeCls}">${badgeTxt}</span></p>
+            <table><thead><tr>
+              <th>Exercice</th><th>Score</th><th>Résultat</th><th>Date</th>
+            </tr></thead><tbody>${rows}</tbody></table>`;
+        });
+      });
+      });  /* fin sd.querySelectorAll */
+    });
+
+    const w = window.open('', '_blank');
+    w.document.write(`<!DOCTYPE html>
+<html lang="fr"><head>
+  <meta charset="UTF-8">
+  <title>Synthèse — ${name} — LFM</title>
+  <style>
+    body  { font-family: system-ui, sans-serif; margin: 28px; color: #000; font-size: 11pt; }
+    h1    { font-size: 16pt; color: #102B6A; margin: 0 0 2px; }
+    .meta { font-size: 10pt; color: #555; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+    th    { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing:.06em;
+            border: 1px solid #333; padding: 5px 8px; background: #f0f4f8; text-align: left; }
+    td    { font-size: 10pt; border: 1px solid #ccc; padding: 5px 8px; }
+    .badge       { display:inline-block; padding:2px 9px; border-radius:4px; font-size:10pt; font-weight:700; }
+    .badge-cm1   { background:rgba(16,43,106,.1); color:#102B6A; border:1px solid rgba(16,43,106,.3); }
+    .badge-cm2   { background:#102B6A; color:#fff; }
+    .badge-6e    { background:#D62839; color:#fff; }
+    footer { margin-top:24px; font-size:9pt; color:#666; border-top:1px solid #ccc; padding-top:6px; }
+    @media print { body { margin: 12px; } }
+  </style>
+</head><body>
+  <h1>Synthèse — ${escHtml(name)}</h1>
+  <div class="meta">${escHtml(meta)} &nbsp;·&nbsp; Imprimé le ${today}</div>
+  ${bodyHtml}
+  <footer>© François Perocheau – LFM</footer>
+  <script>window.onload = () => setTimeout(() => window.print(), 250);<\/script>
+</body></html>`);
+    w.document.close();
   }
 
   function renderHistory(recent) {

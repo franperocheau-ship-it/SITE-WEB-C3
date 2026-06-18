@@ -7,6 +7,8 @@ const EXERCISE_DATA = {
 
   "retrouver-infinitif-verbe-conjugue": {
     title: "Retrouver l'infinitif d'un verbe conjugué puis son groupe",
+    domaine:    "Français",
+    competence: "Conjugaison — Identifier l'infinitif et le groupe",
     levels: ["CM1", "CM2", "6e"],
     type: "infinitif-et-groupe",
     questionsPerSession: 20,
@@ -291,6 +293,8 @@ const EXERCISE_DATA = {
 
   "conjuguer-etre-present": {
     title: "Conjuguer le verbe être au présent",
+    domaine:    "Français",
+    competence: "Conjugaison — Être au présent",
     verb: "être",
     levels: ["CM1", "CM2", "6e"],
     exerciseTypes: ["fill-blank", "multiple-choice", "matching", "find-error", "conjugation-table", "guess-subject", "word-order"],
@@ -384,6 +388,8 @@ const EXERCISE_DATA = {
 
   "conjuguer-1er-groupe-present": {
     title: "Conjuguer les verbes réguliers du 1er groupe au présent",
+    domaine:    "Français",
+    competence: "Conjugaison — 1er groupe au présent",
     type: "text-input",
     levels: ["CM1", "CM2", "6e"],
     questionsPerSession: 25,
@@ -499,6 +505,8 @@ const EXERCISE_DATA = {
 
   "conjuguer-verbes-particuliers-1er-groupe": {
     title: "Conjuguer les verbes particuliers du 1er groupe au présent",
+    domaine:    "Français",
+    competence: "Conjugaison — Verbes particuliers du 1er groupe",
     type: "text-input",
     levels: ["CM1", "CM2", "6e"],
     questionsPerSession: 25,
@@ -614,6 +622,8 @@ const EXERCISE_DATA = {
 
   "conjuguer-2e-groupe-present": {
     title: "Conjuguer les verbes du 2e groupe au présent",
+    domaine:    "Français",
+    competence: "Conjugaison — 2e groupe au présent",
     type: "text-input",
     levels: ["CM1", "CM2", "6e"],
     questionsPerSession: 25,
@@ -709,6 +719,8 @@ const EXERCISE_DATA = {
 
   "conjuguer-3e-groupe-present": {
     title: "Conjuguer les verbes fréquents du 3e groupe au présent",
+    domaine:    "Français",
+    competence: "Conjugaison — 3e groupe au présent",
     type: "text-input",
     levels: ["CM1", "CM2", "6e"],
     questionsPerSession: 25,
@@ -791,6 +803,8 @@ const EXERCISE_DATA = {
 
   "conjuguer-imparfait": {
     title: "Conjuguer à l'imparfait",
+    domaine:    "Français",
+    competence: "Conjugaison — Imparfait",
     type: "imparfait-niveaux",
     levels: ["CM1", "CM2", "6e"],
     questionsPerSession: 10,
@@ -903,6 +917,8 @@ const EXERCISE_DATA = {
 
   "conjuguer-futur": {
     title: "Conjuguer au futur",
+    domaine:    "Français",
+    competence: "Conjugaison — Futur simple",
     type: "futur-niveaux",
     levels: ["CM1", "CM2", "6e"],
     questionsPerSession: 10,
@@ -1021,6 +1037,8 @@ const EXERCISE_DATA = {
 
   "conjuguer-passe-simple": {
     title: "Conjuguer des verbes au passé simple",
+    domaine:    "Français",
+    competence: "Conjugaison — Passé simple",
     type: "text-input",
     levels: ["CM2", "6e"],
     questionsPerSession: 25,
@@ -1130,6 +1148,8 @@ const EXERCISE_DATA = {
 
   "conjuguer-avoir-present": {
     title: "Conjuguer le verbe avoir au présent",
+    domaine:    "Français",
+    competence: "Conjugaison — Avoir au présent",
     verb: "avoir",
     levels: ["CM1", "CM2", "6e"],
     exerciseTypes: ["fill-blank", "multiple-choice", "matching", "find-error", "conjugation-table", "guess-subject", "word-order"],
@@ -1223,6 +1243,8 @@ const EXERCISE_DATA = {
 
   "retrouver-infinitif-passe-compose": {
     title: "Retrouver l'infinitif d'un verbe au passé composé",
+    domaine:    "Français",
+    competence: "Conjugaison — Passé composé",
     type: "infinitif-passe-compose",
     levels: ["CM1", "CM2", "6e"],
     questionsPerSession: 15,
@@ -1266,6 +1288,8 @@ const EXERCISE_DATA = {
 
   "identifier-auxiliaire": {
     title: "Identifier l'auxiliaire",
+    domaine:    "Français",
+    competence: "Conjugaison — Auxiliaires être / avoir",
     type: "auxiliaire-identifier",
     levels: ["CM1", "CM2", "6e"],
     questionsPerSession: 15,
@@ -1306,6 +1330,8 @@ const EXERCISE_DATA = {
 
   "identifier-phrase-declarative": {
     title: "Identifier une phrase déclarative",
+    domaine:    "Français",
+    competence: "Grammaire — Types de phrases : déclarative",
     levels: ["CM1", "CM2", "6e"],
     type: "yes-no",
     questionsPerSession: 15,
@@ -1355,6 +1381,8 @@ const EXERCISE_DATA = {
 
   "transformer-declarative-interrogative": {
     title: "Transformer une phrase déclarative en phrase interrogative",
+    domaine:    "Français",
+    competence: "Grammaire — Types de phrases : interrogative",
     levels: ["CM1", "CM2", "6e"],
     type: "transform-interrogative",
     questionsPerSession: 10,
@@ -1426,6 +1454,8 @@ const EXERCISE_DATA = {
 
   "transformer-affirmative-negative": {
     title: "Transformer une phrase affirmative en phrase négative",
+    domaine:    "Français",
+    competence: "Grammaire — Types de phrases : négative",
     levels: ["CM1", "CM2", "6e"],
     type: "transform-negative",
     questionsPerSession: 10,
@@ -1487,6 +1517,8 @@ const EXERCISE_DATA = {
 
   "identifier-phrase-interrogative": {
     title: "Identifier une phrase interrogative",
+    domaine:    "Français",
+    competence: "Grammaire — Types de phrases : interrogative",
     levels: ["CM1", "CM2", "6e"],
     type: "yes-no",
     questionsPerSession: 15,
@@ -1517,6 +1549,8 @@ const EXERCISE_DATA = {
 
   "identifier-phrase-imperative": {
     title: "Identifier une phrase impérative",
+    domaine:    "Français",
+    competence: "Grammaire — Types de phrases : impérative",
     levels: ["CM1", "CM2", "6e"],
     type: "yes-no",
     questionsPerSession: 15,
@@ -1547,6 +1581,8 @@ const EXERCISE_DATA = {
 
   "identifier-phrase-negative": {
     title: "Identifier une phrase négative",
+    domaine:    "Français",
+    competence: "Grammaire — Types de phrases : négative",
     levels: ["CM1", "CM2", "6e"],
     type: "yes-no",
     questionsPerSession: 15,
@@ -1577,6 +1613,8 @@ const EXERCISE_DATA = {
 
   "identifier-phrase-exclamative": {
     title: "Identifier une phrase exclamative",
+    domaine:    "Français",
+    competence: "Grammaire — Types de phrases : exclamative",
     levels: ["CM1", "CM2", "6e"],
     type: "yes-no",
     questionsPerSession: 15,
@@ -1607,6 +1645,8 @@ const EXERCISE_DATA = {
 
   "identifier-verbe-conjugue": {
     title: "Identifier le verbe conjugué",
+    domaine:    "Français",
+    competence: "Conjugaison — Identifier le verbe conjugué",
     levels: ["CE2", "CM1", "CM2"],
     type: "find-conjugated-verb",
     questionsPerSession: 10,
@@ -1781,8 +1821,8 @@ const EXERCISE_DATA = {
      Produire différentes formes de phrases interrogatives
      Type custom : produire-3-formes
      3 champs par phrase (intonation / est-ce que / inversion)
-     CM1 → 2 formes obligatoires (inversion = bonus)
-     CM2 / 6e → 3 formes obligatoires
+     Niveau 1 → 2 formes obligatoires (inversion = bonus)
+     Niveau 2 / Niveau 3 → 3 formes obligatoires
   ───────────────────────────────────────────────────────────────────────── */
 
   /* ─── Grammaire : déterminants, noms, adjectifs, phrase complexe ──────── */
@@ -1794,6 +1834,8 @@ const EXERCISE_DATA = {
   ─────────────────────────────────────────────────────────────────────────── */
   "identifier-article-defini": {
     title: "Identifier les articles définis",
+    domaine:    "Français",
+    competence: "Grammaire — Déterminants : articles définis",
     levels: ["CM1", "CM2", "6e"],
     type: "mots-cliquables",
     questionsPerSession: 6,
@@ -1846,6 +1888,8 @@ const EXERCISE_DATA = {
 
   "articles-definis-choix": {
     title: "Choisir l'article défini — le / la / les / l'",
+    domaine:    "Français",
+    competence: "Grammaire — Déterminants : articles définis",
     levels: ["CM1", "CM2", "6e"],
     type: "choix-etiquette",
     questionsPerSession: 8,
@@ -1864,6 +1908,8 @@ const EXERCISE_DATA = {
 
   "articles-definis-completer": {
     title: "Compléter avec l'article défini — Le printemps",
+    domaine:    "Français",
+    competence: "Grammaire — Déterminants : articles définis",
     levels: ["CM1", "CM2", "6e"],
     type: "glisser-deposer",
     questionsPerSession: 1,
@@ -1885,6 +1931,8 @@ const EXERCISE_DATA = {
   ─────────────────────────────────────────────────────────────────────────── */
   "identifier-article-indefini": {
     title: "Identifier les articles indéfinis",
+    domaine:    "Français",
+    competence: "Grammaire — Déterminants : articles indéfinis",
     levels: ["CM1", "CM2", "6e"],
     type: "mots-cliquables",
     questionsPerSession: 6,
@@ -1931,6 +1979,8 @@ const EXERCISE_DATA = {
 
   "articles-indefinis-premiere-rencontre": {
     title: "Articles indéfinis — Première et deuxième mention",
+    domaine:    "Français",
+    competence: "Grammaire — Déterminants : articles indéfinis",
     levels: ["CM1", "CM2", "6e"],
     type: "glisser-deposer",
     questionsPerSession: 4,
@@ -1969,6 +2019,8 @@ const EXERCISE_DATA = {
   ─────────────────────────────────────────────────────────────────────────── */
   "identifier-determinant-demonstratif": {
     title: "Identifier un déterminant démonstratif",
+    domaine:    "Français",
+    competence: "Grammaire — Déterminants démonstratifs",
     levels: ["CM1", "CM2", "6e"],
     type: "det-demo-niveaux",
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
@@ -2142,6 +2194,8 @@ const EXERCISE_DATA = {
   ─────────────────────────────────────────────────────────────────────────── */
   "identifier-determinant-possessif": {
     title: "Identifier les déterminants possessifs",
+    domaine:    "Français",
+    competence: "Grammaire — Déterminants possessifs",
     levels: ["CM1", "CM2", "6e"],
     type: "mots-cliquables",
     questionsPerSession: 10,
@@ -2222,6 +2276,8 @@ const EXERCISE_DATA = {
 
   "possessifs-dans-phrases": {
     title: "Repérer les déterminants possessifs dans une phrase",
+    domaine:    "Français",
+    competence: "Grammaire — Déterminants possessifs",
     levels: ["CM1", "CM2", "6e"],
     type: "mots-cliquables",
     questionsPerSession: 5,
@@ -2266,6 +2322,8 @@ const EXERCISE_DATA = {
   ─────────────────────────────────────────────────────────────────────────── */
   "identifier-adjectif": {
     title: "Identifier les adjectifs",
+    domaine:    "Français",
+    competence: "Grammaire — L'adjectif",
     levels: ["CM1", "CM2", "6e"],
     type: "mots-cliquables",
     questionsPerSession: 8,
@@ -2399,6 +2457,8 @@ const EXERCISE_DATA = {
   ─────────────────────────────────────────────────────────────────────────── */
   "identifier-adverbe-frequent": {
     title:   "Identifier les adverbes",
+    domaine:    "Français",
+    competence: "Grammaire — L'adverbe",
     levels:  ["CM1", "CM2", "6e"],
     type:    "adv-niveaux",
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
@@ -2579,6 +2639,8 @@ const EXERCISE_DATA = {
   ─────────────────────────────────────────────────────────────────────────── */
   "identifier-nom-phrase": {
     title: "Identifier les noms dans une phrase",
+    domaine:    "Français",
+    competence: "Grammaire — Le nom",
     levels: ["CM1", "CM2", "6e"],
     type: "mots-cliquables",
     questionsPerSession: 8,
@@ -2680,6 +2742,8 @@ const EXERCISE_DATA = {
   ─────────────────────────────────────────────────────────────────────────── */
   "distinguer-phrase-simple-complexe": {
     title: "Distinguer phrase simple et phrase complexe",
+    domaine:    "Français",
+    competence: "Grammaire — Phrase simple et complexe",
     levels: ["CM2", "6e"],
     type: "classification-etapes",
     questionsPerSession: 8,
@@ -2834,6 +2898,8 @@ const EXERCISE_DATA = {
 
   "phrases-connecteurs": {
     title: "Relier deux phrases avec la bonne conjonction",
+    domaine:    "Français",
+    competence: "Grammaire — Connecteurs et conjonctions",
     levels: ["CM2", "6e"],
     type: "choix-etiquette",
     questionsPerSession: 4,
@@ -2872,6 +2938,8 @@ const EXERCISE_DATA = {
 
   "produire-formes-interrogatives": {
     title: "Produire différentes formes de phrases interrogatives",
+    domaine:    "Français",
+    competence: "Grammaire — Formes de phrases interrogatives",
     levels: ["CM1", "CM2", "6e"],
     type: "produire-3-formes",
     questionsPerSession: 6,
@@ -2929,6 +2997,8 @@ const EXERCISE_DATA = {
 
   "representer-fraction": {
     title: "Représenter une fraction",
+    domaine:    "Mathématiques",
+    competence: "Fractions — Représenter",
     type: "representer-fraction",
     levels: ["CM1"],
     questionsPerSession: 10,
@@ -2973,6 +3043,8 @@ const EXERCISE_DATA = {
 
   "lire-fraction": {
     title: "Lire une fraction",
+    domaine:    "Mathématiques",
+    competence: "Fractions — Lire et écrire",
     type: "lire-fraction",
     levels: ["CM1"],
     questionsPerSession: 10,
@@ -3015,6 +3087,8 @@ const EXERCISE_DATA = {
 
   "decomposer-fraction-partie-entiere": {
     title: "Décomposer une fraction (partie entière + fraction)",
+    domaine:    "Mathématiques",
+    competence: "Fractions — Décomposer",
     type: "decomposer-fraction",
     levels: ["CM1", "CM2", "6e"],
     questionsPerSession: 10,
@@ -3024,11 +3098,11 @@ const EXERCISE_DATA = {
        num / den   : fraction de départ (num > den)
        entiere     : partie entière      = Math.floor(num / den)
        reste       : numérateur restant  = num % den (fraction propre = reste/den)
-       inputMode   : "qcm" (CM1) | "fill-two" (CM2) | "free-text" (6e)
+       inputMode   : "qcm" (Niveau 1) | "fill-two" (Niveau 2) | "free-text" (Niveau 3)
        choices/answer : uniquement pour inputMode "qcm"
     ────────────────────────────────────────────────────────────────────── */
     bank: [
-      /* CM1 — QCM */
+      /* Niveau 1 — QCM */
       { level: "CM1", inputMode: "qcm", num: 7,  den: 2,  entiere: 3, reste: 1,
         answer: "3 + 1/2", choices: ["3 + 1/2", "2 + 1/2", "3 + 2/2"] },
       { level: "CM1", inputMode: "qcm", num: 11, den: 4,  entiere: 2, reste: 3,
@@ -3054,7 +3128,7 @@ const EXERCISE_DATA = {
       { level: "CM1", inputMode: "qcm", num: 16, den: 5,  entiere: 3, reste: 1,
         answer: "3 + 1/5", choices: ["3 + 1/5", "2 + 1/5", "3 + 2/5"] },
 
-      /* CM2 — saisie libre (partie entière + numérateur, dénominateur affiché) */
+      /* Niveau 2 — saisie libre (partie entière + numérateur, dénominateur affiché) */
       { level: "CM2", inputMode: "fill-two", num: 23, den: 6,  entiere: 3, reste: 5 },
       { level: "CM2", inputMode: "fill-two", num: 19, den: 7,  entiere: 2, reste: 5 },
       { level: "CM2", inputMode: "fill-two", num: 31, den: 9,  entiere: 3, reste: 4 },
@@ -3068,7 +3142,7 @@ const EXERCISE_DATA = {
       { level: "CM2", inputMode: "fill-two", num: 38, den: 9,  entiere: 4, reste: 2 },
       { level: "CM2", inputMode: "fill-two", num: 27, den: 8,  entiere: 3, reste: 3 },
 
-      /* 6e — saisie libre forme mixte "a + b/c" */
+      /* Niveau 3 — saisie libre forme mixte "a + b/c" */
       { level: "6e", inputMode: "free-text", num: 23, den: 6,  entiere: 3, reste: 5 },
       { level: "6e", inputMode: "free-text", num: 19, den: 7,  entiere: 2, reste: 5 },
       { level: "6e", inputMode: "free-text", num: 31, den: 9,  entiere: 3, reste: 4 },
@@ -3086,19 +3160,21 @@ const EXERCISE_DATA = {
 
   "utiliser-fractions-problemes": {
     title: "Utiliser les fractions dans des problèmes",
+    domaine:    "Mathématiques",
+    competence: "Fractions — Problèmes",
     type: "fractions-problemes",
     levels: ["CM1", "CM2", "6e"],
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
     /* ── Banque de questions ─────────────────────────────────────────────
-       CM1 (inputMode "qcm")       : lecture d'une fraction simple dans un énoncé
-       CM2 (inputMode "free-text") : calcul d'une fraction d'une quantité
-       6e  (inputMode "multi-step"): problème à étapes, saisie libre, équivalences acceptées
+       Niveau 1 (inputMode "qcm")       : lecture d'une fraction simple dans un énoncé
+       Niveau 2 (inputMode "free-text") : calcul d'une fraction d'une quantité
+       Niveau 3  (inputMode "multi-step"): problème à étapes, saisie libre, équivalences acceptées
        illustration : { type: "cercle"|"rectangle"|"barre"|"proportion"|"ardoise", ... }
     ────────────────────────────────────────────────────────────────────── */
     bank: [
-      /* ── CM1 — QCM ──────────────────────────────────────────────────── */
+      /* ── Niveau 1 — QCM ──────────────────────────────────────────────────── */
       { level: "CM1", inputMode: "qcm",
         question: "Une pizza est coupée en 4 parts égales. Léa mange 3 parts. Quelle fraction de la pizza a-t-elle mangée ?",
         choices: ["3/4", "1/4", "4/3"], answer: "3/4",
@@ -3148,7 +3224,7 @@ const EXERCISE_DATA = {
         choices: ["3/4", "1/4", "4/3"], answer: "3/4",
         illustration: { type: "rectangle", n: 3, d: 4 } },
 
-      /* ── CM2 — saisie libre : fraction d'une quantité ─────────────────── */
+      /* ── Niveau 2 — saisie libre : fraction d'une quantité ─────────────────── */
       { level: "CM2", inputMode: "free-text",
         question: "Une classe a 24 élèves. 1/4 sont absents. Combien d'élèves sont absents ?",
         total: 24, n: 1, d: 4, resultat: 6, unite: "élèves",
@@ -3198,7 +3274,7 @@ const EXERCISE_DATA = {
         total: 32, n: 5, d: 8, resultat: 20, unite: "photos",
         illustration: { type: "proportion", n: 5, d: 8, total: 32, resultat: 20, unite: "photos" } },
 
-      /* ── 6e — problèmes à étapes, saisie libre, équivalences acceptées ──
+      /* ── Niveau 3 — problèmes à étapes, saisie libre, équivalences acceptées ──
          accept : toutes les écritures valides de la réponse
          steps  : étapes numérotées affichées dans le panneau "ardoise"
          visual : description du schéma de gauche
@@ -3280,6 +3356,8 @@ const EXERCISE_DATA = {
 
   "placer-fraction-droite-graduee": {
     title: "Placer une fraction sur une droite graduée",
+    domaine:    "Mathématiques",
+    competence: "Fractions — Droite graduée",
     type: "placer-fraction-droite",
     levels: ["CM2"],
     questionsPerSession: 10,
@@ -3326,6 +3404,8 @@ const EXERCISE_DATA = {
 
   "ecrire-nombre-entier-chiffres": {
     title: "Écrire un nombre en chiffres",
+    domaine:    "Mathématiques",
+    competence: "Nombres entiers — Écriture chiffrée",
     type: "nombre-entier",
     levels: ["CM1", "CM2"],
     questionsPerSession: 12,
@@ -3333,7 +3413,7 @@ const EXERCISE_DATA = {
 
     bank: [
 
-      /* ── CM1 — 15 questions, jusqu'à 999 999 ──────────────────────────── */
+      /* ── Niveau 1 — 15 questions, jusqu'à 999 999 ──────────────────────────── */
       { level: "CM1", inputMode: "qcm",
         instruction: "Écris en chiffres :", word: "soixante-cinq",
         answer: "65", choices: ["65", "56", "605", "650"] },
@@ -3380,7 +3460,7 @@ const EXERCISE_DATA = {
         instruction: "Écris en chiffres :", word: "neuf-cent-mille-neuf-cent-un",
         answer: "900 901", choices: ["900 901", "990 901", "900 191", "900 910"] },
 
-      /* ── CM2 — 15 questions, jusqu'à 999 999 999 ──────────────────────── */
+      /* ── Niveau 2 — 15 questions, jusqu'à 999 999 999 ──────────────────────── */
       { level: "CM2", inputMode: "qcm",
         instruction: "Écris en chiffres :", word: "un-million",
         answer: "1 000 000", choices: ["1 000 000", "100 000", "1 000", "10 000 000"] },
@@ -3431,13 +3511,15 @@ const EXERCISE_DATA = {
 
   "ecrire-nombre-entier-lettres": {
     title: "Écrire un nombre en lettres",
+    domaine:    "Mathématiques",
+    competence: "Nombres entiers — Écriture en lettres",
     type: "nombre-entier",
     levels: ["CM1", "CM2"],
     questionsPerSession: 12,
     backLink: { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
     bank: [
 
-      /* ── CM1 — 15 questions, jusqu'à 999 999 ──────────────────────────── */
+      /* ── Niveau 1 — 15 questions, jusqu'à 999 999 ──────────────────────────── */
       /* Pièges : accord de -vingts/-cent/-cents, invariabilité de mille     */
       { level: "CM1", inputMode: "qcm",
         instruction: "Choisis l'écriture correcte en lettres :", word: "80",
@@ -3493,7 +3575,7 @@ const EXERCISE_DATA = {
         instruction: "Écris ce nombre en lettres :", word: "200 400",
         answer: "deux-cent-mille-quatre-cents" },
 
-      /* ── CM2 — 15 questions, millions et milliards ─────────────────────── */
+      /* ── Niveau 2 — 15 questions, millions et milliards ─────────────────────── */
       /* Pièges : million/millions, cent devant million, milliard             */
       { level: "CM2", inputMode: "qcm",
         instruction: "Choisis l'écriture correcte en lettres :", word: "1 000 000",
@@ -3563,6 +3645,8 @@ const EXERCISE_DATA = {
      ═══════════════════════════════════════════════════════════════════════ */
   "identifier-valeur-chiffre-position": {
     title: "Identifier la valeur d'un chiffre selon sa position",
+    domaine:    "Mathématiques",
+    competence: "Nombres entiers — Valeur positionnelle",
     type:  "valeur-position",
     levels: ["CM1", "CM2", "6e"],
     questionsPerSession: 13,
@@ -3631,11 +3715,13 @@ const EXERCISE_DATA = {
 
   /* ═══════════════════════════════════════════════════════════════════════════
      ORTHOGRAPHE — ACCORDS DANS LE GROUPE NOMINAL
-     Programmes 2025 : CM1 → CM2 → 6e
+     Programmes 2025 : Niveau 1 → Niveau 2 → Niveau 3
   ═══════════════════════════════════════════════════════════════════════════ */
 
   "ortho-accorder-determinant-nom": {
     title: "Accorder le déterminant avec le nom",
+    domaine:    "Français",
+    competence: "Orthographe — Accord déterminant/nom",
     type:  "accord-ecrit",
     levels: ["CM1", "CM2", "6e"],
     questionsPerSession: 15,
@@ -3646,7 +3732,7 @@ const EXERCISE_DATA = {
       "6e":  "Partitifs, contractés, « tout » et cas complexes"
     },
     bank: [
-      /* ── CM1 (difficulty 1) : articles définis et indéfinis ───────────────
+      /* ── Niveau 1 (difficulty 1) : articles définis et indéfinis ───────────────
          Objectif : comprendre que le déterminant s'accorde en genre
          et en nombre avec le nom qui le suit.
       ──────────────────────────────────────────────────────────────────────── */
@@ -3691,7 +3777,7 @@ const EXERCISE_DATA = {
       { instruction: "Écris ce nom avec l'article indéfini qui convient.",
         prompt: "gomme", answer: "une gomme", difficulty: 1 },
 
-      /* ── CM2 (difficulty 2) : possessifs, démonstratifs, élision ──────────
+      /* ── Niveau 2 (difficulty 2) : possessifs, démonstratifs, élision ──────────
          Objectif : maîtriser les déterminants possessifs et démonstratifs ;
          comprendre l'élision et la forme « cet/mon/ton/son » devant voyelle.
       ──────────────────────────────────────────────────────────────────────── */
@@ -3736,7 +3822,7 @@ const EXERCISE_DATA = {
       { instruction: "Écris ce nom avec le déterminant possessif « mon/ma ». (Attention : « mon » devant voyelle même au féminin !)",
         prompt: "amie", answers: ["mon amie"], difficulty: 2 },
 
-      /* ── 6e (difficulty 3) : partitifs, contractés, « tout », cas complexes
+      /* ── Niveau 3 (difficulty 3) : partitifs, contractés, « tout », cas complexes
          Objectif : utiliser l'ensemble des déterminants dans des contextes
          variés ; maîtriser les articles partitifs, les formes contractées
          et l'accord de « tout ».
@@ -3786,6 +3872,8 @@ const EXERCISE_DATA = {
 
   "ortho-accorder-adjectif-nom": {
     title: "Accorder l'adjectif avec le nom",
+    domaine:    "Français",
+    competence: "Orthographe — Accord adjectif/nom",
     type:  "accord-ecrit",
     levels: ["CM1", "CM2", "6e"],
     questionsPerSession: 15,
@@ -3796,7 +3884,7 @@ const EXERCISE_DATA = {
       "6e":  "Adjectifs invariables, participes, cas complexes"
     },
     bank: [
-      /* ── CM1 (difficulty 1) : accord basique des adjectifs ────────────────
+      /* ── Niveau 1 (difficulty 1) : accord basique des adjectifs ────────────────
          Objectif : comprendre que l'adjectif s'accorde en genre et en nombre
          avec le nom qu'il qualifie ; maîtriser les terminaisons -e, -s, -es.
       ──────────────────────────────────────────────────────────────────────── */
@@ -3841,7 +3929,7 @@ const EXERCISE_DATA = {
       { instruction: "Mets ce groupe nominal au pluriel.",
         prompt: "une fleur blanche", answer: "des fleurs blanches", difficulty: 1 },
 
-      /* ── CM2 (difficulty 2) : formes irrégulières ─────────────────────────
+      /* ── Niveau 2 (difficulty 2) : formes irrégulières ─────────────────────────
          Objectif : maîtriser les adjectifs irréguliers : -al/-aux au
          masculin pluriel, beau/bel/belle, nouveau/nouvel/nouvelle,
          vieux/vieil/vieille, -eux/-euse, -if/-ive, -er/-ère, -eur/-euse.
@@ -3887,7 +3975,7 @@ const EXERCISE_DATA = {
       { instruction: "Mets ce groupe nominal au féminin pluriel.",
         prompt: "un ami courageux", answer: "des amies courageuses", difficulty: 2 },
 
-      /* ── 6e (difficulty 3) : cas avancés ──────────────────────────────────
+      /* ── Niveau 3 (difficulty 3) : cas avancés ──────────────────────────────────
          Objectif : identifier les adjectifs invariables (couleurs dérivées
          de noms), accorder les participes passés employés comme adjectifs,
          maîtriser les formes complexes (doux/douce, faux/fausse, etc.)
@@ -3946,15 +4034,17 @@ const EXERCISE_DATA = {
 
   "encadrer-fraction": {
     title: "Encadrer une fraction entre deux entiers consécutifs",
+    domaine:    "Mathématiques",
+    competence: "Fractions — Encadrer",
     levels: ["CM1", "CM2", "6e"],
     type: "encadrer-fraction",
     questionsPerSession: 6,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
     /* ── Banque de questions ──────────────────────────────────────────────
-       difficulty 1 — avec droite graduée (CM1 / CM2)
+       difficulty 1 — avec droite graduée (Niveau 1 / Niveau 2)
          Fractions > 1, petits dénominateurs. Un cas entier : 8/4 = 2 (signe ≤).
-       difficulty 2 — sans droite graduée, par le calcul (CM2 / 6e)
+       difficulty 2 — sans droite graduée, par le calcul (Niveau 2 / Niveau 3)
          Fractions plus grandes ou en dixièmes. Un cas entier : 30/6 = 5.
        Champs : numerator, denominator, lo (entier inf.), hi (entier sup.),
                 isInteger (true quand la fraction vaut exactement un entier)
@@ -3986,16 +4076,18 @@ const EXERCISE_DATA = {
 
   "comparer-fractions": {
     title: "Comparer deux fractions",
+    domaine:    "Mathématiques",
+    competence: "Fractions — Comparer",
     levels: ["CM1", "CM2", "6e"],
     type: "comparer-fractions",
     questionsPerSession: 6,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
     /* ── Banque de questions ──────────────────────────────────────────────
-       level 1 — même dénominateur (CM1)
+       level 1 — même dénominateur (Niveau 1)
          → comparer revient à comparer les numérateurs
          → inclut au moins un cas d'égalité
-       level 2 — dénominateurs différents (CM2 / 6e)
+       level 2 — dénominateurs différents (Niveau 2 / Niveau 3)
          → approche visuelle : même taille de disque, partages différents
          → inclut : fractions équivalentes, pièges (1/2 > 1/3),
                     cas où grand dénominateur ≠ grande fraction
@@ -4037,6 +4129,8 @@ const EXERCISE_DATA = {
 
   "ortho-accorder-participe-passe-cod": {
     title: "Accorder le participe passé avec le COD",
+    domaine:    "Français",
+    competence: "Orthographe — Accord participe passé (COD)",
     type:  "accord-participe-cod",
     levels: ["CM2", "6e"],
     questionsPerSession: 8,
@@ -4305,6 +4399,8 @@ const EXERCISE_DATA = {
   /* ── Vocabulaire bilingue : La Révolution française ─────────────────────── */
   "vocabulaire-revolution-francaise": {
     title: "Vocabulaire de la Révolution française",
+    domaine:    "Histoire",
+    competence: "EMILE — Révolution française",
     levels: ["CM1"],
     type: "vocabu-bilingue",
     backLink: { href: "histoire.html", label: "Histoire EMILE" },
@@ -4346,6 +4442,8 @@ const EXERCISE_DATA = {
   /* ── Vocabulaire bilingue : Napoléon Bonaparte ────────────────────────── */
   "vocabulaire-napoleon-bonaparte": {
     title: "Vocabulaire — Napoléon Bonaparte",
+    domaine:    "Histoire",
+    competence: "EMILE — Napoléon Bonaparte",
     levels: ["CM2"],
     type: "vocabu-bilingue",
     backLink: { href: "histoire.html", label: "Histoire EMILE" },
@@ -4376,12 +4474,14 @@ const EXERCISE_DATA = {
   },
 
   /* ══════════════════════════════════════════════════════════════════════════
-     conjuguer-faire  —  3 niveaux progressifs (CM1 / CM2 / 6e)
+     conjuguer-faire  —  3 niveaux progressifs (Niveau 1 / Niveau 2 / Niveau 3)
      Type custom : "faire-niveaux"
      Les pools sont mélangés (Fisher-Yates) à chaque tentative.
      ══════════════════════════════════════════════════════════════════════════ */
   "conjuguer-faire": {
     title: "Conjuguer le verbe FAIRE",
+    domaine:    "Français",
+    competence: "Conjugaison — Verbes irréguliers : FAIRE",
     verb: "faire",
     levels: ["CM1", "CM2", "6e"],
     type: "faire-niveaux",
@@ -4390,7 +4490,7 @@ const EXERCISE_DATA = {
 
     pools: {
 
-      /* ── CM1 : Présent (×4) + Imparfait (×4) + Futur simple (×4) + Passé composé (×4) ── */
+      /* ── Niveau 1 : Présent (×4) + Imparfait (×4) + Futur simple (×4) + Passé composé (×4) ── */
       "CM1": [
         /* Présent */
         { phrase: "Je ___ du vélo le week-end.",          temps: "Présent",       reponse: "fais",       explication: "Au présent, « je » → je fais." },
@@ -4424,7 +4524,7 @@ const EXERCISE_DATA = {
         { phrase: "Vous ___ preuve de courage.",          temps: "Passé composé", reponse: "avez fait",  explication: "Au passé composé, « vous » → vous avez fait." }
       ],
 
-      /* ── CM2 : Passé simple (×6) + Plus-que-parfait (×6) ── */
+      /* ── Niveau 2 : Passé simple (×6) + Plus-que-parfait (×6) ── */
       "CM2": [
         /* Passé simple */
         { phrase: "Elle ___ un long voyage au printemps.", temps: "Passé simple",   reponse: "fit",        explication: "Au passé simple, « elle » → elle fit." },
@@ -4446,7 +4546,7 @@ const EXERCISE_DATA = {
         { phrase: "Elles ___ leurs devoirs avant le dîner.", temps: "Plus-que-parfait", reponse: "avaient fait", explication: "Au plus-que-parfait, « elles » → elles avaient fait." }
       ],
 
-      /* ── 6e : Impératif (×6) + Conditionnel (×6) ── */
+      /* ── Niveau 3 : Impératif (×6) + Conditionnel (×6) ── */
       "6e": [
         /* Impératif */
         { phrase: "___ attention en traversant !",          temps: "Impératif", reponses: ["Fais","Faites"], explication: "À l'impératif : « Fais attention » (tu) ou « Faites attention » (vous)." },
@@ -4472,12 +4572,14 @@ const EXERCISE_DATA = {
 
   /* ══════════════════════════════════════════════════════════════
      CONJUGUER ALLER  (type : faire-niveaux)
-     CM1 : Présent + Imparfait + Futur simple + Passé composé
-     CM2 : Passé simple + Plus-que-parfait
-     6e  : Impératif + Conditionnel
+     Niveau 1 : Présent + Imparfait + Futur simple + Passé composé
+     Niveau 2 : Passé simple + Plus-que-parfait
+     Niveau 3  : Impératif + Conditionnel
   ══════════════════════════════════════════════════════════════ */
   "conjuguer-aller": {
     title: "Conjuguer le verbe ALLER",
+    domaine:    "Français",
+    competence: "Conjugaison — Verbes irréguliers : ALLER",
     verb: "aller",
     levels: ["CM1", "CM2", "6e"],
     type: "faire-niveaux",
@@ -4486,7 +4588,7 @@ const EXERCISE_DATA = {
 
     pools: {
 
-      /* ── CM1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
+      /* ── Niveau 1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
       "CM1": [
         /* Présent */
         { phrase: "Je ___ à l'école à pied chaque matin.",        temps: "Présent",       reponse: "vais",         explication: "Au présent, « je » → je vais (verbe irrégulier)." },
@@ -4523,7 +4625,7 @@ const EXERCISE_DATA = {
         { phrase: "Je ___ chez mon ami hier après l'école.",       temps: "Passé composé", reponses: ["suis allé", "suis allée"], explication: "Au passé composé, aller se conjugue avec être : je suis allé(e) selon le genre." }
       ],
 
-      /* ── CM2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
+      /* ── Niveau 2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
       "CM2": [
         /* Passé simple */
         { phrase: "Il ___ chercher de l'aide au village.",                    temps: "Passé simple",      reponse: "alla",         explication: "Au passé simple, « il » → il alla." },
@@ -4546,7 +4648,7 @@ const EXERCISE_DATA = {
         { phrase: "Tu ___ à la pharmacie ce matin-là.",                       temps: "Plus-que-parfait",  reponses: ["étais allé", "étais allée"], explication: "Au plus-que-parfait, « tu » → tu étais allé(e) selon le genre." }
       ],
 
-      /* ── 6e : Impératif (×8) + Conditionnel (×8) ── */
+      /* ── Niveau 3 : Impératif (×8) + Conditionnel (×8) ── */
       "6e": [
         /* Impératif */
         { phrase: "___ vite te coucher, il est tard !",              temps: "Impératif", reponse: "Va",                        explication: "À l'impératif, « te » indique « tu » : Va ! (sans -s, c'est une exception)." },
@@ -4573,14 +4675,16 @@ const EXERCISE_DATA = {
 
   /* ══════════════════════════════════════════════════════════════
      CONJUGUER DIRE  (type : faire-niveaux)
-     CM1 : Présent + Imparfait + Futur simple + Passé composé
-     CM2 : Passé simple + Plus-que-parfait
-     6e  : Impératif + Conditionnel
+     Niveau 1 : Présent + Imparfait + Futur simple + Passé composé
+     Niveau 2 : Passé simple + Plus-que-parfait
+     Niveau 3  : Impératif + Conditionnel
      Irrégularités clés : vous dites (pas disez), passé simple
      je/tu/il = dis/dis/dit (homonymes du présent)
   ══════════════════════════════════════════════════════════════ */
   "conjuguer-dire": {
     title: "Conjuguer le verbe DIRE",
+    domaine:    "Français",
+    competence: "Conjugaison — Verbes irréguliers : DIRE",
     verb: "dire",
     levels: ["CM1", "CM2", "6e"],
     type: "faire-niveaux",
@@ -4589,7 +4693,7 @@ const EXERCISE_DATA = {
 
     pools: {
 
-      /* ── CM1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
+      /* ── Niveau 1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
       "CM1": [
         /* Présent */
         { phrase: "Je ___ toujours la vérité.",                       temps: "Présent",       reponse: "dis",       explication: "Au présent, « je » → je dis." },
@@ -4626,7 +4730,7 @@ const EXERCISE_DATA = {
         { phrase: "Elles ___ la vérité à la maîtresse.",              temps: "Passé composé", reponse: "ont dit",   explication: "Au passé composé, dire se conjugue avec avoir : elles ont dit." }
       ],
 
-      /* ── CM2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
+      /* ── Niveau 2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
       "CM2": [
         /* Passé simple  (attention : je/tu/il dis/dis/dit = homonymes du présent) */
         { phrase: "Il ___ au roi qu'il avait eu tort.",                temps: "Passé simple",     reponse: "dit",       explication: "Au passé simple, « il » → il dit (même forme que le présent, le contexte l'indique)." },
@@ -4649,7 +4753,7 @@ const EXERCISE_DATA = {
         { phrase: "Elles ___ la même chose hier matin.",               temps: "Plus-que-parfait", reponse: "avaient dit", explication: "Au plus-que-parfait, « elles » → elles avaient dit." }
       ],
 
-      /* ── 6e : Impératif (×8) + Conditionnel (×8) ── */
+      /* ── Niveau 3 : Impératif (×8) + Conditionnel (×8) ── */
       "6e": [
         /* Impératif : dis (tu) / disons (nous) / dites (vous — irrégulier, pas disez) */
         { phrase: "___ bonjour à ta maîtresse !",                      temps: "Impératif", reponse: "Dis",                        explication: "À l'impératif avec « ta », c'est « tu » : Dis !" },
@@ -4676,15 +4780,17 @@ const EXERCISE_DATA = {
 
   /* ══════════════════════════════════════════════════════════════
      CONJUGUER VENIR  (type : faire-niveaux)
-     CM1 : Présent + Imparfait + Futur simple + Passé composé
-     CM2 : Passé simple + Plus-que-parfait
-     6e  : Impératif + Conditionnel
+     Niveau 1 : Présent + Imparfait + Futur simple + Passé composé
+     Niveau 2 : Passé simple + Plus-que-parfait
+     Niveau 3  : Impératif + Conditionnel
      Irrégularités clés : présent (viens/viennent), radical
      « viendr- » au futur et conditionnel, auxiliaire ÊTRE
      au passé composé et plus-que-parfait (accord participe)
   ══════════════════════════════════════════════════════════════ */
   "conjuguer-venir": {
     title: "Conjuguer le verbe VENIR",
+    domaine:    "Français",
+    competence: "Conjugaison — Verbes irréguliers : VENIR",
     verb: "venir",
     levels: ["CM1", "CM2", "6e"],
     type: "faire-niveaux",
@@ -4693,7 +4799,7 @@ const EXERCISE_DATA = {
 
     pools: {
 
-      /* ── CM1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
+      /* ── Niveau 1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
       "CM1": [
         /* Présent */
         { phrase: "Je ___ te voir ce soir.",                           temps: "Présent",       reponse: "viens",     explication: "Au présent, « je » → je viens (verbe irrégulier)." },
@@ -4730,7 +4836,7 @@ const EXERCISE_DATA = {
         { phrase: "Je ___ te voir hier après les cours.",              temps: "Passé composé", reponses: ["suis venu", "suis venue"], explication: "Au passé composé, venir se conjugue avec être : je suis venu(e) selon le genre." }
       ],
 
-      /* ── CM2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
+      /* ── Niveau 2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
       "CM2": [
         /* Passé simple */
         { phrase: "Il ___ me voir un beau matin d'hiver.",            temps: "Passé simple",     reponse: "vint",      explication: "Au passé simple, « il » → il vint." },
@@ -4753,7 +4859,7 @@ const EXERCISE_DATA = {
         { phrase: "Tu ___ me rejoindre avant la tombée de la nuit.",  temps: "Plus-que-parfait", reponses: ["étais venu", "étais venue"], explication: "Au plus-que-parfait, « tu » → tu étais venu(e) selon le genre." }
       ],
 
-      /* ── 6e : Impératif (×8) + Conditionnel (×8) ── */
+      /* ── Niveau 3 : Impératif (×8) + Conditionnel (×8) ── */
       "6e": [
         /* Impératif : viens (tu) / venons (nous) / venez (vous) */
         { phrase: "___ chercher ton cartable !",                       temps: "Impératif", reponse: "Viens",                      explication: "À l'impératif avec « ton », c'est « tu » : Viens !" },
@@ -4780,15 +4886,17 @@ const EXERCISE_DATA = {
 
   /* ══════════════════════════════════════════════════════════════
      CONJUGUER POUVOIR  (type : faire-niveaux)
-     CM1 : Présent + Imparfait + Futur simple + Passé composé
-     CM2 : Passé simple + Plus-que-parfait
-     6e  : Conditionnel + Subjonctif présent
+     Niveau 1 : Présent + Imparfait + Futur simple + Passé composé
+     Niveau 2 : Passé simple + Plus-que-parfait
+     Niveau 3  : Conditionnel + Subjonctif présent
      Irrégularités clés : présent (peux/peut/peuvent),
      radical « pourr- » au futur et conditionnel,
-     pas d'impératif → 6e = Conditionnel + Subjonctif présent
+     pas d'impératif → Niveau 3 = Conditionnel + Subjonctif présent
   ══════════════════════════════════════════════════════════════ */
   "conjuguer-pouvoir": {
     title: "Conjuguer le verbe POUVOIR",
+    domaine:    "Français",
+    competence: "Conjugaison — Verbes irréguliers : POUVOIR",
     verb: "pouvoir",
     levels: ["CM1", "CM2", "6e"],
     type: "faire-niveaux",
@@ -4797,7 +4905,7 @@ const EXERCISE_DATA = {
 
     pools: {
 
-      /* ── CM1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
+      /* ── Niveau 1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
       "CM1": [
         /* Présent */
         { phrase: "Je ___ t'aider si tu veux.",                        temps: "Présent",       reponse: "peux",       explication: "Au présent, « je » → je peux (verbe irrégulier)." },
@@ -4834,7 +4942,7 @@ const EXERCISE_DATA = {
         { phrase: "Elles ___ terminer leur exposé à temps.",          temps: "Passé composé", reponse: "ont pu",     explication: "Au passé composé, pouvoir se conjugue avec avoir : elles ont pu." }
       ],
 
-      /* ── CM2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
+      /* ── Niveau 2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
       "CM2": [
         /* Passé simple */
         { phrase: "Il ___ enfin ouvrir la lourde porte.",             temps: "Passé simple",     reponse: "put",       explication: "Au passé simple, « il » → il put." },
@@ -4857,7 +4965,7 @@ const EXERCISE_DATA = {
         { phrase: "Elles ___ terminer leur exposé à temps.",          temps: "Plus-que-parfait", reponse: "avaient pu", explication: "Au plus-que-parfait, « elles » → elles avaient pu." }
       ],
 
-      /* ── 6e : Conditionnel (×8) + Subjonctif présent (×8) ── */
+      /* ── Niveau 3 : Conditionnel (×8) + Subjonctif présent (×8) ── */
       /* Note : « pouvoir » n'a pas d'impératif → Subjonctif présent à la place */
       "6e": [
         /* Conditionnel (radical irrégulier « pourr- ») */
@@ -4885,15 +4993,17 @@ const EXERCISE_DATA = {
 
   /* ══════════════════════════════════════════════════════════════
      CONJUGUER VOIR  (type : faire-niveaux)
-     CM1 : Présent + Imparfait + Futur simple + Passé composé
-     CM2 : Passé simple + Plus-que-parfait
-     6e  : Impératif + Conditionnel
+     Niveau 1 : Présent + Imparfait + Futur simple + Passé composé
+     Niveau 2 : Passé simple + Plus-que-parfait
+     Niveau 3  : Impératif + Conditionnel
      Irrégularités clés : présent (vois/voient vs voyons/voyez),
      radical « verr- » au futur et conditionnel,
      passé simple vit ≠ vit (vivre, contexte narratif)
   ══════════════════════════════════════════════════════════════ */
   "conjuguer-voir": {
     title: "Conjuguer le verbe VOIR",
+    domaine:    "Français",
+    competence: "Conjugaison — Verbes irréguliers : VOIR",
     verb: "voir",
     levels: ["CM1", "CM2", "6e"],
     type: "faire-niveaux",
@@ -4902,7 +5012,7 @@ const EXERCISE_DATA = {
 
     pools: {
 
-      /* ── CM1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
+      /* ── Niveau 1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
       "CM1": [
         /* Présent */
         { phrase: "Je ___ un beau coucher de soleil.",                 temps: "Présent",       reponse: "vois",      explication: "Au présent, « je » → je vois (verbe irrégulier)." },
@@ -4939,7 +5049,7 @@ const EXERCISE_DATA = {
         { phrase: "Elles ___ leurs cousins pendant les vacances.",     temps: "Passé composé", reponse: "ont vu",    explication: "Au passé composé, voir se conjugue avec avoir : elles ont vu." }
       ],
 
-      /* ── CM2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
+      /* ── Niveau 2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
       "CM2": [
         /* Passé simple (attention : « vit » = passé simple de voir ≠ « vit » de vivre) */
         { phrase: "Il ___ le château se dresser devant lui.",          temps: "Passé simple",     reponse: "vit",       explication: "Au passé simple, « il » → il vit (contexte narratif)." },
@@ -4962,7 +5072,7 @@ const EXERCISE_DATA = {
         { phrase: "Elles ___ le spectacle la veille.",                 temps: "Plus-que-parfait", reponse: "avaient vu", explication: "Au plus-que-parfait, « elles » → elles avaient vu." }
       ],
 
-      /* ── 6e : Impératif (×8) + Conditionnel (×8) ── */
+      /* ── Niveau 3 : Impératif (×8) + Conditionnel (×8) ── */
       "6e": [
         /* Impératif : vois (tu) / voyons (nous) / voyez (vous) */
         { phrase: "___ par toi-même, c'est magnifique !",             temps: "Impératif", reponse: "Vois",                     explication: "À l'impératif avec « toi », c'est « tu » : Vois !" },
@@ -4989,9 +5099,9 @@ const EXERCISE_DATA = {
 
   /* ══════════════════════════════════════════════════════════════
      CONJUGUER VOULOIR  (type : faire-niveaux)
-     CM1 : Présent + Imparfait + Futur simple + Passé composé
-     CM2 : Passé simple + Plus-que-parfait
-     6e  : Impératif + Conditionnel
+     Niveau 1 : Présent + Imparfait + Futur simple + Passé composé
+     Niveau 2 : Passé simple + Plus-que-parfait
+     Niveau 3  : Impératif + Conditionnel
      Irrégularités clés : présent (veux/veut/veulent),
      radical « voudr- » au futur et conditionnel,
      impératif : veux/veuille (tu), voulons/veuillons (nous),
@@ -4999,6 +5109,8 @@ const EXERCISE_DATA = {
   ══════════════════════════════════════════════════════════════ */
   "conjuguer-vouloir": {
     title: "Conjuguer le verbe VOULOIR",
+    domaine:    "Français",
+    competence: "Conjugaison — Verbes irréguliers : VOULOIR",
     verb: "vouloir",
     levels: ["CM1", "CM2", "6e"],
     type: "faire-niveaux",
@@ -5007,7 +5119,7 @@ const EXERCISE_DATA = {
 
     pools: {
 
-      /* ── CM1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
+      /* ── Niveau 1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
       "CM1": [
         /* Présent */
         { phrase: "Je ___ devenir astronaute.",                        temps: "Présent",       reponse: "veux",       explication: "Au présent, « je » → je veux (verbe irrégulier)." },
@@ -5044,7 +5156,7 @@ const EXERCISE_DATA = {
         { phrase: "Elles ___ tout faire elles-mêmes.",                temps: "Passé composé", reponse: "ont voulu",   explication: "Au passé composé, vouloir se conjugue avec avoir : elles ont voulu." }
       ],
 
-      /* ── CM2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
+      /* ── Niveau 2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
       "CM2": [
         /* Passé simple */
         { phrase: "Il ___ partir sans dire au revoir.",               temps: "Passé simple",     reponse: "voulut",     explication: "Au passé simple, « il » → il voulut." },
@@ -5067,7 +5179,7 @@ const EXERCISE_DATA = {
         { phrase: "Elles ___ tout faire par elles-mêmes.",            temps: "Plus-que-parfait", reponse: "avaient voulu", explication: "Au plus-que-parfait, « elles » → elles avaient voulu." }
       ],
 
-      /* ── 6e : Impératif (×8) + Conditionnel (×8) ── */
+      /* ── Niveau 3 : Impératif (×8) + Conditionnel (×8) ── */
       /* Impératif : veux ou veuille (tu), voulons ou veuillons (nous), voulez ou veuillez (vous) */
       "6e": [
         /* Impératif */
@@ -5095,15 +5207,17 @@ const EXERCISE_DATA = {
 
   /* ══════════════════════════════════════════════════════════════
      CONJUGUER PRENDRE  (type : faire-niveaux)
-     CM1 : Présent + Imparfait + Futur simple + Passé composé
-     CM2 : Passé simple + Plus-que-parfait
-     6e  : Impératif + Conditionnel
+     Niveau 1 : Présent + Imparfait + Futur simple + Passé composé
+     Niveau 2 : Passé simple + Plus-que-parfait
+     Niveau 3  : Impératif + Conditionnel
      Irrégularités clés : présent (prends/prend/prennent),
      participe passé irrégulier « pris »,
      passé simple : pris/prit/prîmes/prîtes/prirent
   ══════════════════════════════════════════════════════════════ */
   "conjuguer-prendre": {
     title: "Conjuguer le verbe PRENDRE",
+    domaine:    "Français",
+    competence: "Conjugaison — Verbes irréguliers : PRENDRE",
     verb: "prendre",
     levels: ["CM1", "CM2", "6e"],
     type: "faire-niveaux",
@@ -5112,7 +5226,7 @@ const EXERCISE_DATA = {
 
     pools: {
 
-      /* ── CM1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
+      /* ── Niveau 1 : Présent (×8) + Imparfait (×6) + Futur simple (×6) + Passé composé (×6) ── */
       "CM1": [
         /* Présent */
         { phrase: "Je ___ mon cartable tous les matins.",              temps: "Présent",       reponse: "prends",     explication: "Au présent, « je » → je prends (verbe irrégulier)." },
@@ -5149,7 +5263,7 @@ const EXERCISE_DATA = {
         { phrase: "Elles ___ le bus ce matin.",                        temps: "Passé composé", reponse: "ont pris",   explication: "Au passé composé, prendre se conjugue avec avoir : elles ont pris." }
       ],
 
-      /* ── CM2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
+      /* ── Niveau 2 : Passé simple (×8) + Plus-que-parfait (×8) ── */
       "CM2": [
         /* Passé simple */
         { phrase: "Il ___ la fuite en voyant le danger.",             temps: "Passé simple",     reponse: "prit",      explication: "Au passé simple, « il » → il prit." },
@@ -5172,7 +5286,7 @@ const EXERCISE_DATA = {
         { phrase: "Elles ___ le bus avant la fermeture.",             temps: "Plus-que-parfait", reponse: "avaient pris", explication: "Au plus-que-parfait, « elles » → elles avaient pris." }
       ],
 
-      /* ── 6e : Impératif (×8) + Conditionnel (×8) ── */
+      /* ── Niveau 3 : Impératif (×8) + Conditionnel (×8) ── */
       "6e": [
         /* Impératif : prends (tu) / prenons (nous) / prenez (vous) */
         { phrase: "___ ton manteau, il fait froid !",                  temps: "Impératif", reponse: "Prends",                   explication: "À l'impératif avec « ton », c'est « tu » : Prends !" },
@@ -5204,6 +5318,8 @@ const EXERCISE_DATA = {
      ══════════════════════════════════════════════════════════════════════════ */
   "conjuguer-plus-que-parfait": {
     title: "Conjuguer au plus-que-parfait",
+    domaine:    "Français",
+    competence: "Conjugaison — Plus-que-parfait",
     levels: ["CM2", "6e"],
     type: "pqp-niveaux",
     questionsPerSession: 10,
@@ -5360,6 +5476,8 @@ const EXERCISE_DATA = {
 
   "conjuguer-imperatif-present": {
     title:              "Conjuguer à l'impératif présent",
+    domaine:    "Français",
+    competence: "Conjugaison — Impératif présent",
     levels:             ["CM2", "6e"],
     type:               "imp-niveaux",
     questionsPerSession: 10,
@@ -5485,6 +5603,8 @@ const EXERCISE_DATA = {
 
   "conjuguer-conditionnel-present": {
     title:               "Conjuguer au conditionnel présent",
+    domaine:    "Français",
+    competence: "Conjugaison — Conditionnel présent",
     levels:              ["6e"],
     type:                "cond-niveaux",
     questionsPerSession: 10,
@@ -5611,6 +5731,8 @@ const EXERCISE_DATA = {
   /* ── Accorder le verbe avec un sujet inversé ────────────────────────────── */
   "accord-verbe-sujet-inverse": {
     title: "Accorder le verbe avec un sujet inversé",
+    domaine:    "Français",
+    competence: "Grammaire — Accord sujet-verbe inversé",
     levels: ["CM1", "CM2", "6e"],
     type: "sujet-inverse-niveaux",
     questionsPerSession: 6,
@@ -5740,6 +5862,8 @@ const EXERCISE_DATA = {
 
   "differencier-epithete-attribut": {
     title:   "Différencier l'adjectif épithète et l'attribut du sujet",
+    domaine:    "Français",
+    competence: "Grammaire — Épithète et attribut du sujet",
     levels:  ["CM2", "6e"],
     type:    "epithete-attribut-niveaux",
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
@@ -5944,6 +6068,8 @@ const EXERCISE_DATA = {
 
   "distinguer-epithete-complement-nom": {
     title:   "Distinguer l'adjectif épithète et le complément du nom",
+    domaine:    "Français",
+    competence: "Grammaire — Épithète et complément du nom",
     levels:  ["6e"],
     type:    "ecn-niveaux",
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
@@ -6135,10 +6261,12 @@ const EXERCISE_DATA = {
 
   /* ═══════════════════════════════════════════════════════════════════════
      Distinguer pronom personnel sujet / pronom personnel complément
-     CM2 / 6e — 3 niveaux déverrouillables
+     Niveau 2 / Niveau 3 — 3 niveaux déverrouillables
   ════════════════════════════════════════════════════════════════════════ */
   "distinguer-pronom-sujet-complement": {
     title: "Distinguer le pronom personnel sujet et le pronom personnel complément",
+    domaine:    "Français",
+    competence: "Grammaire — Pronoms personnels",
     levels: ["CM2", "6e"],
     type: "psc-niveaux",
     questionsPerSession: 10,
@@ -6456,6 +6584,8 @@ const EXERCISE_DATA = {
 
   "remplacer-gn-sujet-pronom": {
     title: "Remplacer un groupe nominal sujet par un pronom personnel sujet",
+    domaine:    "Français",
+    competence: "Grammaire — Pronoms personnels",
     type: "gnsp-niveaux",
     levels: ["CM1", "CM2", "6e"],
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
