@@ -9,7 +9,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/results.js"></script>
-  <script src="exercise-data.js?v=15"></script>
+  <script src="exercise-data.js?v=16"></script>
   <style>
     /* ── Page layout ────────────────────────────────────────── */
     .page-wrap {
@@ -2280,6 +2280,107 @@
     }
 
     /* ══════════════════════════════════════════════════════════════════════
+       TYPE : pc-avoir-niveaux — Passé composé avec avoir (3 niveaux)
+       ══════════════════════════════════════════════════════════════════════ */
+
+    .pca-blank-current {
+      display: inline-block;
+      border-bottom: 3px solid var(--blue);
+      padding: 0 14px 2px;
+      color: rgba(16,43,106,0.30);
+      font-style: italic;
+      min-width: 80px;
+      text-align: center;
+      margin: 0 3px;
+    }
+
+    .pca-blank-future {
+      display: inline-block;
+      border-bottom: 2px dashed var(--border);
+      padding: 0 10px 2px;
+      color: var(--muted);
+      opacity: 0.45;
+      margin: 0 2px;
+    }
+
+    .pca-ans-correct {
+      display: inline-block;
+      color: #15803d;
+      font-weight: 700;
+      border-bottom: 2px solid #16a34a;
+      padding: 0 4px 2px;
+      margin: 0 2px;
+    }
+
+    .pca-ans-wrong {
+      display: inline-block;
+      color: var(--red);
+      font-weight: 700;
+      border-bottom: 2px solid var(--red);
+      padding: 0 4px 2px;
+      margin: 0 2px;
+      text-decoration: line-through;
+    }
+
+    .pca-blank-trap {
+      display: inline-block;
+      color: #d97706;
+      font-weight: 600;
+      border-bottom: 2px dashed rgba(217,119,6,0.50);
+      padding: 0 6px 2px;
+      margin: 0 2px;
+    }
+
+    .pca-hint-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pca-hint-btn {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 7px 16px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 200ms, color 200ms;
+    }
+
+    .pca-hint-btn:hover:not(:disabled) {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .pca-hint-btn:disabled { opacity: 0.45; cursor: default; }
+
+    .pca-hint-display {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--blue);
+      letter-spacing: 0.14em;
+      font-family: monospace;
+      background: rgba(16,43,106,0.07);
+      padding: 4px 14px;
+      border-radius: 8px;
+    }
+
+    .pca-trap-fb {
+      background: rgba(217,119,6,0.08);
+      border: 1.5px solid rgba(217,119,6,0.28);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 14px;
+      color: #92400e;
+      line-height: 1.65;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
        TYPE : sujet-inverse-niveaux
        ══════════════════════════════════════════════════════════════════════ */
 
@@ -2947,7 +3048,7 @@
       const grid = document.getElementById("ex-level-grid");
       grid.innerHTML = levels.map(l => `
         <button class="ex-type-card" data-level="${l}">
-          <span class="ex-type-icon">
+          <span class="ex-type-icon" style="width:auto">
             <span class="badge ${badgeCls[l] || 'badge-cm1'}" style="font-size:13px;padding:4px 12px">${LEVEL_LABELS[l] ?? l}</span>
           </span>
           <div>
@@ -2999,7 +3100,7 @@
       const grid = document.getElementById("ex-level-grid");
       grid.innerHTML = levels.map(l => `
         <button class="ex-type-card" data-level="${l}">
-          <span class="ex-type-icon">
+          <span class="ex-type-icon" style="width:auto">
             <span class="badge ${badgeCls[l] || 'badge-cm1'}" style="font-size:13px;padding:4px 12px">${LEVEL_LABELS[l] ?? l}</span>
           </span>
           <div>
@@ -3066,6 +3167,9 @@
       } else if (currentType === "vocabu-bilingue") {
         vbInitSession();
         return;
+      } else if (currentType === "gn-pluriel-niveaux") {
+        gnpInitSession();
+        return;
       } else if (currentType === "faire-niveaux") {
         faireInitSession();
         return;
@@ -3092,6 +3196,18 @@
         return;
       } else if (currentType === "adv-niveaux") {
         advInitSession();
+        return;
+      } else if (currentType === "genre-niveaux") {
+        genreInitSession();
+        return;
+      } else if (currentType === "donneur-niveaux") {
+        donneurInitSession();
+        return;
+      } else if (currentType === "pc-avoir-niveaux") {
+        pcaInitSession();
+        return;
+      } else if (currentType === "etre-ou-avoir-niveaux") {
+        eoaInitSession();
         return;
       } else {
         bankSource = sessionData.bank;
@@ -3209,6 +3325,8 @@
         renderValeurPosition(card);
       } else if (currentType === "vocabu-bilingue") {
         /* session managed by vbInitSession / vbStartLevel — no-op here */
+      } else if (currentType === "gn-pluriel-niveaux") {
+        /* session managed by gnpInitSession — no-op here */
       } else if (currentType === "faire-niveaux") {
         /* session managed by faireInitSession — no-op here */
       } else if (currentType === "pqp-niveaux" || currentType === "imp-niveaux" || currentType === "cond-niveaux" || currentType === "futur-niveaux" || currentType === "imparfait-niveaux") {
@@ -3225,6 +3343,14 @@
         /* session managed by ddnInitSession — no-op here */
       } else if (currentType === "adv-niveaux") {
         /* session managed by advInitSession — no-op here */
+      } else if (currentType === "genre-niveaux") {
+        /* session managed by genreInitSession — no-op here */
+      } else if (currentType === "donneur-niveaux") {
+        /* session managed by donneurInitSession — no-op here */
+      } else if (currentType === "pc-avoir-niveaux") {
+        /* session managed by pcaInitSession — no-op here */
+      } else if (currentType === "etre-ou-avoir-niveaux") {
+        /* session managed by eoaInitSession — no-op here */
       } else if (currentType === "accord-participe-cod") {
         renderAccordParticipeCod(card, q);
       }
@@ -5096,14 +5222,14 @@
           </p>
           <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
             <button class="ex-type-card" data-level="1">
-              <span class="ex-type-icon">⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
               <div>
                 <span class="ex-type-name">Niveau 1</span>
                 <span class="ex-type-desc">Fractions simples avec petits nombres</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="2">
-              <span class="ex-type-icon">⭐⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
               <div>
                 <span class="ex-type-name">Niveau 2</span>
                 <span class="ex-type-desc">Fractions variées, y compris supérieures à 1</span>
@@ -5226,14 +5352,14 @@
           </p>
           <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
             <button class="ex-type-card" data-level="1">
-              <span class="ex-type-icon">⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
               <div>
                 <span class="ex-type-name">Niveau 1</span>
                 <span class="ex-type-desc">Fraction simple — la bande est partagée selon le dénominateur</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="2">
-              <span class="ex-type-icon">⭐⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
               <div>
                 <span class="ex-type-name">Niveau 2</span>
                 <span class="ex-type-desc">Partage différent — introduction aux fractions équivalentes</span>
@@ -5390,14 +5516,14 @@
           </p>
           <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
             <button class="ex-type-card" data-level="1">
-              <span class="ex-type-icon">⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
               <div>
                 <span class="ex-type-name">Niveau 1</span>
                 <span class="ex-type-desc">Fractions inférieures à 1</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="2">
-              <span class="ex-type-icon">⭐⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
               <div>
                 <span class="ex-type-name">Niveau 2</span>
                 <span class="ex-type-desc">Fractions supérieures à 1</span>
@@ -5628,21 +5754,21 @@
           </p>
           <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
             <button class="ex-type-card" data-level="1">
-              <span class="ex-type-icon" style="height:36px;border-radius:50%;background:rgba(16,43,106,0.08);border:1.5px solid rgba(16,43,106,0.2);display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--blue)">1</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
               <div>
                 <span class="ex-type-name">Niveau 1</span>
                 <span class="ex-type-desc">Même dénominateur — compare les parts coloriées</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="2">
-              <span class="ex-type-icon" style="height:36px;border-radius:50%;background:rgba(16,43,106,0.08);border:1.5px solid rgba(16,43,106,0.2);display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--blue)">2</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
               <div>
                 <span class="ex-type-name">Niveau 2</span>
                 <span class="ex-type-desc">Dénominateurs différents — compare les aires visuellement</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="3">
-              <span class="ex-type-icon" style="height:36px;border-radius:50%;background:rgba(16,43,106,0.08);border:1.5px solid rgba(16,43,106,0.2);display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--blue)">3</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-6e" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 3</span></span>
               <div>
                 <span class="ex-type-name">Niveau 3</span>
                 <span class="ex-type-desc">Fractions &lt; 1 et &gt; 1 — place-les sur une droite graduée</span>
@@ -6083,14 +6209,14 @@
           </p>
           <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
             <button class="ex-type-card" data-level="1">
-              <span class="ex-type-icon">⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
               <div>
                 <span class="ex-type-name">Niveau 1</span>
                 <span class="ex-type-desc">Avec droite graduée pour t'aider</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="2">
-              <span class="ex-type-icon">⭐⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
               <div>
                 <span class="ex-type-name">Niveau 2</span>
                 <span class="ex-type-desc">Par le calcul, sans droite graduée</span>
@@ -6422,14 +6548,14 @@
           </p>
           <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
             <button class="ex-type-card" data-level="CM1">
-              <span class="ex-type-icon">⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
               <div>
                 <span class="ex-type-name">Niveau 1</span>
                 <span class="ex-type-desc">Nombres jusqu'à 999 999</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="CM2">
-              <span class="ex-type-icon">⭐⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
               <div>
                 <span class="ex-type-name">Niveau 2</span>
                 <span class="ex-type-desc">Nombres jusqu'à 999 999 999</span>
@@ -6578,21 +6704,21 @@
           </p>
           <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
             <button class="ex-type-card" data-level="CM1">
-              <span class="ex-type-icon">⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
               <div>
                 <span class="ex-type-name">Niveau 1</span>
                 <span class="ex-type-desc">Choisis la bonne décomposition</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="CM2">
-              <span class="ex-type-icon">⭐⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
               <div>
                 <span class="ex-type-name">Niveau 2</span>
                 <span class="ex-type-desc">Trouve la partie entière et le numérateur</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="6e">
-              <span class="ex-type-icon">⭐⭐⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-6e" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 3</span></span>
               <div>
                 <span class="ex-type-name">Niveau 3</span>
                 <span class="ex-type-desc">Écris la décomposition complète</span>
@@ -7059,21 +7185,21 @@
           </p>
           <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
             <button class="ex-type-card" data-level="CM1">
-              <span class="ex-type-icon">⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
               <div>
                 <span class="ex-type-name">Niveau 1</span>
                 <span class="ex-type-desc">Lis l'énoncé et choisis la bonne fraction</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="CM2">
-              <span class="ex-type-icon">⭐⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
               <div>
                 <span class="ex-type-name">Niveau 2</span>
                 <span class="ex-type-desc">Calcule une fraction d'une quantité</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="6e">
-              <span class="ex-type-icon">⭐⭐⭐</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-6e" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 3</span></span>
               <div>
                 <span class="ex-type-name">Niveau 3</span>
                 <span class="ex-type-desc">Résous un problème à étapes</span>
@@ -7987,16 +8113,20 @@
           ? { n: 3, icon: '✏️', name: 'Niveau 3 — Écris', desc: 'Un mot s\'affiche : écris sa traduction (10 questions)' }
           : { n: 3, icon: '🔊', name: 'Niveau 3 — Écoute', desc: 'Écoute le mot et choisis sa traduction parmi 4 propositions (10 questions)' }
       ];
+      const _vbBadgeCls = ['badge-cm1', 'badge-cm2', 'badge-6e'];
       card.innerHTML = `
         <p class="ex-type-select-label">Quel niveau veux-tu pratiquer ?</p>
         <div class="ex-type-grid">
           ${levels.map(l => {
-            const locked = l.n > maxLv;
+            const locked  = l.n > maxLv;
+            const bdgCls  = _vbBadgeCls[l.n - 1] || 'badge-cm1';
             return `<button class="ex-type-card${locked ? ' vb-locked-card' : ''}"
                             data-level="${l.n}"${locked ? ' disabled' : ''}>
-              <span class="ex-type-icon">${locked ? '🔒' : l.icon}</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${l.n}</span>
+              </span>
               <div>
-                <span class="ex-type-name">${l.name}</span>
+                <span class="ex-type-name">Niveau ${l.n}</span>
                 <span class="ex-type-desc">${locked ? 'Complète le niveau précédent pour débloquer' : l.desc}</span>
               </div>
             </button>`;
@@ -8814,12 +8944,14 @@
           </p>
           <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
             <button class="ex-type-card" data-level="1">
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
               <div>
                 <span class="ex-type-name">Niveau 1</span>
                 <span class="ex-type-desc">Identifie d'abord le COD, puis écris le participe accordé</span>
               </div>
             </button>
             <button class="ex-type-card" data-level="2">
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
               <div>
                 <span class="ex-type-name">Niveau 2</span>
                 <span class="ex-type-desc">Analyse seul(e) et écris directement le participe</span>
@@ -9073,13 +9205,13 @@
         'Passé simple, Plus-que-parfait',
         'Impératif, Conditionnel',
       ];
+      const _faireBadgeCls = { "CM1": "badge-cm1", "CM2": "badge-cm2", "6e": "badge-6e" };
       card.innerHTML = `
         <p class="ex-type-select-label">Choisis ton niveau</p>
         <div class="ex-type-grid">
           ${FAIRE_LEVELS.map((lv, i) => {
             const unlocked = i === 0 || validated.includes(FAIRE_LEVELS[i - 1]);
             const done     = validated.includes(lv);
-            const icon     = !unlocked ? '🔒' : done ? '✅' : ['⭐', '⭐⭐', '⭐⭐⭐'][i];
             const cls      = !unlocked ? ' vb-locked-card' : '';
             const disabled = !unlocked ? ' disabled' : '';
             const desc     = !unlocked
@@ -9087,9 +9219,11 @@
               : done ? descs[i] + ' · Niveau validé !'
               : descs[i];
             return `<button class="ex-type-card${cls}" data-level="${lv}"${disabled}>
-              <span class="ex-type-icon">${icon}</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${_faireBadgeCls[lv] || 'badge-cm1'}" style="font-size:13px;padding:4px 12px;white-space:nowrap">${LEVEL_LABELS[lv] ?? lv}</span>
+              </span>
               <div>
-                <span class="ex-type-name">Niveau ${i + 1} — ${lv}</span>
+                <span class="ex-type-name">${LEVEL_LABELS[lv] ?? lv}</span>
                 <span class="ex-type-desc">${desc}</span>
               </div>
             </button>`;
@@ -9376,16 +9510,18 @@
           ${lvDefs.map((d, i) => {
             const unlocked = i === 0 || validated.includes(i - 1);
             const done     = validated.includes(i);
-            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
             const cls      = !unlocked ? ' vb-locked-card' : '';
             const disabled = !unlocked ? ' disabled' : '';
             const desc     = !unlocked
               ? 'Valide le niveau précédent pour débloquer'
               : done ? d.desc + ' · Validé !' : d.desc;
+            const bdgCls   = ['badge-cm1', 'badge-cm2', 'badge-6e'][i] || 'badge-cm1';
             return `<button class="ex-type-card${cls}" data-level="${d.lv}"${disabled}>
-              <span class="ex-type-icon">${icon}</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
+              </span>
               <div>
-                <span class="ex-type-name">${d.label}</span>
+                <span class="ex-type-name">Niveau ${d.lv}</span>
                 <span class="ex-type-desc">${desc}</span>
               </div>
             </button>`;
@@ -9759,16 +9895,18 @@
           ${lvDefs.map((d, i) => {
             const unlocked = i === 0 || validated.includes(0);
             const done     = validated.includes(i);
-            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
             const cls      = !unlocked ? ' vb-locked-card' : '';
             const disabled = !unlocked ? ' disabled' : '';
             const desc     = !unlocked
               ? 'Valide le niveau 1 pour débloquer'
               : done ? d.desc + ' · Validé !' : d.desc;
+            const bdgCls   = ['badge-cm1', 'badge-cm2', 'badge-6e'][i] || 'badge-cm1';
             return `<button class="ex-type-card${cls}" data-level="${d.lv}"${disabled}>
-              <span class="ex-type-icon">${icon}</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
+              </span>
               <div>
-                <span class="ex-type-name">${d.label}</span>
+                <span class="ex-type-name">Niveau ${d.lv}</span>
                 <span class="ex-type-desc">${desc}</span>
               </div>
             </button>`;
@@ -10139,15 +10277,17 @@
           ${lvDefs.map((d, i) => {
             const unlocked = i === 0 || validated.includes(i - 1);
             const done     = validated.includes(i);
-            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
             const cls      = !unlocked ? ' vb-locked-card' : '';
             const disabled = !unlocked ? ' disabled' : '';
             const desc     = !unlocked ? 'Valide le niveau précédent pour débloquer'
                            : done ? d.desc + ' · Validé !' : d.desc;
+            const bdgCls   = ['badge-cm1', 'badge-cm2', 'badge-6e'][i] || 'badge-cm1';
             return `<button class="ex-type-card${cls}" data-level="${d.lv}"${disabled}>
-              <span class="ex-type-icon">${icon}</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
+              </span>
               <div>
-                <span class="ex-type-name">${d.label}</span>
+                <span class="ex-type-name">Niveau ${d.lv}</span>
                 <span class="ex-type-desc">${desc}</span>
               </div>
             </button>`;
@@ -10677,14 +10817,16 @@
           ${lvDefs.map((d, i) => {
             const unlocked = i === 0 || validated.includes(i - 1);
             const done     = validated.includes(i);
-            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
             const cls      = !unlocked ? ' vb-locked-card' : '';
             const dis      = !unlocked ? ' disabled' : '';
             const desc     = !unlocked ? 'Valide le niveau précédent pour débloquer'
                            : done ? d.desc + ' · Validé !' : d.desc;
+            const bdgCls   = ['badge-cm1', 'badge-cm2', 'badge-6e'][i] || 'badge-cm1';
             return `<button class="ex-type-card${cls}" data-level="${d.lv}"${dis}>
-              <span class="ex-type-icon">${icon}</span>
-              <div><span class="ex-type-name">${d.label}</span><span class="ex-type-desc">${desc}</span></div>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
+              </span>
+              <div><span class="ex-type-name">Niveau ${d.lv}</span><span class="ex-type-desc">${desc}</span></div>
             </button>`;
           }).join('')}
         </div>`;
@@ -11184,15 +11326,17 @@
           ${lvDefs.map((d, i) => {
             const unlocked = i === 0 || validated.includes(i - 1);
             const done     = validated.includes(i);
-            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
             const cls      = !unlocked ? ' vb-locked-card' : '';
             const disabled = !unlocked ? ' disabled' : '';
             const desc     = !unlocked ? 'Valide le niveau précédent pour débloquer'
                            : done ? d.desc + ' · Validé !' : d.desc;
+            const bdgCls   = ['badge-cm1', 'badge-cm2', 'badge-6e'][i] || 'badge-cm1';
             return `<button class="ex-type-card${cls}" data-level="${d.lv}"${disabled}>
-              <span class="ex-type-icon">${icon}</span>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
+              </span>
               <div>
-                <span class="ex-type-name">${d.label}</span>
+                <span class="ex-type-name">Niveau ${d.lv}</span>
                 <span class="ex-type-desc">${desc}</span>
               </div>
             </button>`;
@@ -11618,14 +11762,16 @@
           ${lvDefs.map((d, i) => {
             const unlocked = i === 0 || validated.includes(i - 1);
             const done     = validated.includes(i);
-            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
             const cls      = !unlocked ? ' vb-locked-card' : '';
             const dis      = !unlocked ? ' disabled' : '';
             const desc     = !unlocked ? 'Valide le niveau précédent pour débloquer'
                            : done ? d.desc + ' · Validé !' : d.desc;
+            const bdgCls   = ['badge-cm1', 'badge-cm2', 'badge-6e'][i] || 'badge-cm1';
             return `<button class="ex-type-card${cls}" data-level="${d.lv}"${dis}>
-              <span class="ex-type-icon">${icon}</span>
-              <div><span class="ex-type-name">${d.label}</span><span class="ex-type-desc">${desc}</span></div>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
+              </span>
+              <div><span class="ex-type-name">Niveau ${d.lv}</span><span class="ex-type-desc">${desc}</span></div>
             </button>`;
           }).join('')}
         </div>`;
@@ -12018,14 +12164,16 @@
           ${lvDefs.map((d, i) => {
             const unlocked = i === 0 || validated.includes(i - 1);
             const done     = validated.includes(i);
-            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
             const cls      = !unlocked ? ' vb-locked-card' : '';
             const dis      = !unlocked ? ' disabled' : '';
             const desc     = !unlocked ? 'Valide le niveau précédent pour débloquer'
                            : done ? d.desc + ' · Validé !' : d.desc;
+            const bdgCls   = ['badge-cm1', 'badge-cm2', 'badge-6e'][i] || 'badge-cm1';
             return `<button class="ex-type-card${cls}" data-level="${d.lv}"${dis}>
-              <span class="ex-type-icon">${icon}</span>
-              <div><span class="ex-type-name">${d.label}</span><span class="ex-type-desc">${desc}</span></div>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
+              </span>
+              <div><span class="ex-type-name">Niveau ${d.lv}</span><span class="ex-type-desc">${desc}</span></div>
             </button>`;
           }).join('')}
         </div>`;
@@ -12420,14 +12568,16 @@
           ${lvDefs.map((d, i) => {
             const unlocked = i === 0 || validated.includes(i - 1);
             const done     = validated.includes(i);
-            const icon     = !unlocked ? '🔒' : done ? '✅' : d.icon;
             const cls      = !unlocked ? ' vb-locked-card' : '';
             const dis      = !unlocked ? ' disabled' : '';
             const desc     = !unlocked ? 'Valide le niveau précédent pour débloquer'
                            : done ? d.desc + ' · Validé !' : d.desc;
+            const bdgCls   = ['badge-cm1', 'badge-cm2', 'badge-6e'][i] || 'badge-cm1';
             return `<button class="ex-type-card${cls}" data-level="${d.lv}"${dis}>
-              <span class="ex-type-icon">${icon}</span>
-              <div><span class="ex-type-name">${d.label}</span><span class="ex-type-desc">${desc}</span></div>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
+              </span>
+              <div><span class="ex-type-name">Niveau ${d.lv}</span><span class="ex-type-desc">${desc}</span></div>
             </button>`;
           }).join('')}
         </div>`;
@@ -12866,6 +13016,1862 @@
         exerciseType: currentType,
         level:        'Niveau ' + level,
         score:        lvScore, total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       TYPE : gn-pluriel-niveaux
+       Orthographe — Transformer un groupe nominal du singulier au pluriel
+       Niveau 1 ★  : pluriels réguliers en -s
+       Niveau 2 ★★ : pluriels irréguliers + adjectif
+       Niveau 3 ★★★: adjectifs irréguliers, exceptions, noms composés
+       Progression verrouillée : seuil 80 %, persistance localStorage.
+    ══════════════════════════════════════════════════════════════════════════ */
+
+    const GNP_SEUIL  = 0.8;
+    const GNP_LEVELS = [1, 2, 3];
+
+    let gnpState = null;
+
+    function gnpGetValidated() {
+      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_gnp_valides';
+      try { return JSON.parse(localStorage.getItem(key) || '[]'); }
+      catch { return []; }
+    }
+
+    function gnpSetValidated(arr) {
+      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_gnp_valides';
+      localStorage.setItem(key, JSON.stringify(arr));
+    }
+
+    function gnpNorm(str) {
+      return str.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[''`´'']/g, '');
+    }
+
+    function gnpEscape(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    /* Compare mot à mot et surligne en rouge les mots erronés */
+    function gnpDiffHtml(student, correct) {
+      const sRaw = student.trim().split(/\s+/);
+      const cNorm = gnpNorm(correct).split(' ');
+      return sRaw.map((w, i) => {
+        const expected = cNorm[i] || '';
+        const wNorm    = gnpNorm(w);
+        return wNorm === expected
+          ? `<span style="color:#15803d;font-weight:700">${gnpEscape(w)}</span>`
+          : `<span style="color:var(--red);font-weight:700;text-decoration:underline wavy">${gnpEscape(w)}</span>`;
+      }).join(' ');
+    }
+
+    function gnpInitSession() {
+      gnpState     = null;
+      score        = 0;
+      currentIndex = 0;
+      sessionStartTime = Date.now();
+
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      gnpRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function gnpRenderLevelSelect(card) {
+      const validated = gnpGetValidated();
+      const descs = [
+        'Pluriels réguliers en -s — déterminant + nom simple',
+        'Pluriels irréguliers (-aux, -eux, -x, invariables) + adjectif',
+        'Adjectifs irréguliers (bel/vieil/nouvel), exceptions et noms composés',
+      ];
+      const _gnpBadgeCls = ['badge-cm1', 'badge-cm2', 'badge-6e'];
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="ex-type-grid">
+          ${GNP_LEVELS.map((lv, i) => {
+            const prevLv   = i > 0 ? GNP_LEVELS[i - 1] : null;
+            const unlocked = i === 0 || validated.includes(prevLv);
+            const done     = validated.includes(lv);
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const disabled = !unlocked ? ' disabled' : '';
+            const desc     = !unlocked
+              ? 'Valide le niveau précédent pour débloquer'
+              : done ? descs[i] + ' · Niveau validé !'
+              : descs[i];
+            const bdgCls   = _gnpBadgeCls[i] || 'badge-cm1';
+            return `<button class="ex-type-card${cls}" data-level="${lv}"${disabled}>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${i + 1}</span>
+              </span>
+              <div>
+                <span class="ex-type-name">Niveau ${i + 1}</span>
+                <span class="ex-type-desc">${desc}</span>
+              </div>
+            </button>`;
+          }).join('')}
+        </div>
+      `;
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => gnpStartLevel(parseInt(btn.dataset.level, 10)))
+      );
+    }
+
+    function gnpStartLevel(lv) {
+      const pool = [...(sessionData.pools[lv] || [])];
+      const qs   = shuffle(pool);
+      gnpState = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      document.getElementById('q-total').textContent = qs.length;
+      gnpRenderQuestion();
+    }
+
+    function gnpRenderQuestion() {
+      const { questions, idx, total } = gnpState;
+      const q = questions[idx];
+
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      const card = document.getElementById('ex-card');
+      card.innerHTML = `
+        <p class="ex-question-label">Écris ce groupe nominal au pluriel.</p>
+        <div class="ex-verb-display">${gnpEscape(q.prompt)}</div>
+        <div class="ex-input-row" style="margin-top:18px">
+          <input type="text" class="ex-text-input" id="gnp-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Écris la forme plurielle…">
+          <button class="ex-validate-btn" id="gnp-validate-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="gnp-feedback"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const input = document.getElementById('gnp-input');
+      const btn   = document.getElementById('gnp-validate-btn');
+      setTimeout(() => input.focus(), 50);
+
+      btn.addEventListener('click', gnpHandleValidate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') gnpHandleValidate(); });
+    }
+
+    function gnpHandleValidate() {
+      const input = document.getElementById('gnp-input');
+      const btn   = document.getElementById('gnp-validate-btn');
+      if (!input || !input.value.trim()) return;
+
+      input.disabled = true;
+      btn.disabled   = true;
+
+      const q        = gnpState.questions[gnpState.idx];
+      const accepted = Array.isArray(q.answers) ? q.answers : [q.answer];
+      const isRight  = accepted.some(a => gnpNorm(input.value) === gnpNorm(a));
+
+      if (isRight) {
+        gnpState.score++;
+        input.classList.add('is-correct');
+        const msgs = ['✅ Bravo !', '✨ Très bien !', '🌟 Exact !', '👏 Parfait !'];
+        document.getElementById('gnp-feedback').innerHTML =
+          `<div class="ex-feedback-correct">${msgs[Math.floor(Math.random() * msgs.length)]}</div>`;
+      } else {
+        input.classList.add('is-wrong');
+        const correct  = accepted[0];
+        const diffHtml = gnpDiffHtml(input.value, correct);
+        document.getElementById('gnp-feedback').innerHTML = `
+          <div class="ex-feedback-wrong">
+            ❌ Ta réponse : ${diffHtml}<br>
+            Forme correcte : <strong>${gnpEscape(correct)}</strong>
+          </div>
+          <div class="ex-note">📌 ${q.rule}</div>
+        `;
+      }
+
+      const nextBtn = document.getElementById('next-btn');
+      const isLast  = gnpState.idx === gnpState.total - 1;
+      nextBtn.textContent = isLast ? 'Voir mes résultats' : 'Suivant →';
+      nextBtn.classList.remove('ex-hidden');
+      nextBtn.onclick = () => {
+        gnpState.idx++;
+        if (gnpState.idx >= gnpState.total) {
+          gnpShowLevelResults();
+        } else {
+          gnpRenderQuestion();
+          document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+    }
+
+    function gnpShowLevelResults() {
+      const { level, score: lvScore, total } = gnpState;
+      const pct    = lvScore / total;
+      const passed = pct >= GNP_SEUIL;
+
+      if (passed) {
+        const validated = gnpGetValidated();
+        if (!validated.includes(level)) { validated.push(level); gnpSetValidated(validated); }
+        faireShowConfetti();
+      }
+
+      const lvIdx  = GNP_LEVELS.indexOf(level);
+      const isLast = lvIdx === GNP_LEVELS.length - 1;
+      const nextLv = !isLast ? GNP_LEVELS[lvIdx + 1] : null;
+      const allDone = gnpGetValidated().length >= GNP_LEVELS.length;
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      const s20    = Math.round(lvScore / total * 20);
+      const pct100 = Math.round(pct * 100);
+      const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : s20 >= 1 ? ' ⭐' : '';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   =
+        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') + ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+
+      const backHref = sessionData.backLink?.href || 'français-orthographe.html';
+      let msg, btnsHTML;
+
+      if (passed && allDone && isLast) {
+        msg = '🎊 Félicitations ! Tu maîtrises le pluriel du groupe nominal à tous les niveaux !' + stars;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="gnp-reset-btn">Recommencer depuis le début</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else if (passed) {
+        msg = `Niveau ${level} validé !` + (nextLv ? ` Le niveau ${nextLv} est débloqué ! 🔓` : '') + stars;
+        btnsHTML = nextLv ? `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="gnp-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-secondary" id="gnp-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>` : `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="gnp-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else {
+        const needed = Math.ceil(GNP_SEUIL * total);
+        msg = `Pas encore… Score : ${lvScore}/${total}. Il faut ${needed} bonnes réponses (80 %) pour passer. On réessaie ?` + stars;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="gnp-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('gnp-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        gnpStartLevel(gnpState.level);
+      });
+      document.getElementById('gnp-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        gnpStartLevel(nextLv);
+      });
+      document.getElementById('gnp-reset-btn')?.addEventListener('click', () => {
+        gnpSetValidated([]);
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        gnpInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'gn-pluriel-niveaux',
+        level:        level,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       TYPE : genre-niveaux
+       Orthographe — Transformer un groupe nominal du masculin au féminin
+       Niveau 1 ★   : féminisation régulière (terminaisons courantes)
+       Niveau 2 ★★  : GN avec adjectif épithète (tous les mots à féminiser)
+       Niveau 3 ★★★ : féminins irréguliers et supplétifs
+       Progression verrouillée : seuil 80 %, persistance localStorage.
+       Scoring : chaque question vaut 1 pt ; −0,5 pt si indice utilisé ;
+                 −0,5 pt si 1re tentative incorrecte ; minimum 0.
+                 s20 = Math.round(score / total × 20) → chaque pénalité ≈ −1/20.
+    ══════════════════════════════════════════════════════════════════════════ */
+
+    const GENRE_SEUIL  = 0.8;
+    const GENRE_LEVELS = [1, 2, 3];
+    const GENRE_LEVEL_DESCS = [
+      'Féminisation régulière : un chat → une chatte, le nageur → la nageuse…',
+      'GN avec adjectif : le vieux chat gris → la vieille chatte grise…',
+      'Féminins supplétifs : un roi → une reine, un neveu → une nièce…',
+    ];
+
+    let genreState = null;
+
+    function genreGetValidated() {
+      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_genre_valides';
+      try { return JSON.parse(localStorage.getItem(key) || '[]'); }
+      catch { return []; }
+    }
+
+    function genreSetValidated(arr) {
+      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_genre_valides';
+      localStorage.setItem(key, JSON.stringify(arr));
+    }
+
+    function genreNorm(str) {
+      return str.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[''`´'']/g, '');
+    }
+
+    function genreEsc(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    /* Silhouette de la terminaison féminine : "_ _ _ euse" pour "chanteuse" */
+    function genreSilhouette(noun) {
+      const endings = ['ienne', 'euse', 'esse', 'rice', 'onne', 'elle', 'ière',
+                       'ère', 'mme', 'gne', 'sse', 'ive', 'tte', 'ée', 'lle', 'ce', 'ne'];
+      const lc = noun.toLowerCase();
+      for (const e of endings) {
+        if (lc.endsWith(e)) {
+          const hidden = noun.slice(0, noun.length - e.length);
+          const dots   = Array.from(hidden).map(() => '_').join(' ');
+          return (dots ? dots + ' ' : '') + noun.slice(-e.length);
+        }
+      }
+      const hidden = noun.slice(0, Math.max(0, noun.length - 2));
+      const dots   = Array.from(hidden).map(() => '_').join(' ');
+      return (dots ? dots + ' ' : '') + noun.slice(-2);
+    }
+
+    /* Diff mot à mot puis lettre à lettre sur les mots erronés */
+    function genreDiffHtml(student, correct) {
+      const sWords  = student.trim().split(/\s+/);
+      const cNorm   = genreNorm(correct).split(' ');
+      const cRaw    = correct.trim().split(/\s+/);
+      return sWords.map((sw, wi) => {
+        const cwNorm = cNorm[wi] || '';
+        if (genreNorm(sw) === cwNorm) {
+          return `<span style="color:#15803d;font-weight:700">${genreEsc(sw)}</span>`;
+        }
+        const cwLC   = cwNorm;
+        const chars  = sw.split('');
+        const diff   = chars.map((ch, ci) => {
+          const ok = ci < cwLC.length && ch.toLowerCase() === cwLC[ci];
+          return ok
+            ? genreEsc(ch)
+            : `<span style="color:var(--red);font-weight:700;text-decoration:underline wavy 2px">${genreEsc(ch)}</span>`;
+        }).join('');
+        return `<span style="font-weight:700">${diff}</span>`;
+      }).join(' ');
+    }
+
+    function genreInitSession() {
+      genreState   = null;
+      score        = 0;
+      currentIndex = 0;
+      sessionStartTime = Date.now();
+
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      genreRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function genreRenderLevelSelect(card) {
+      const validated = genreGetValidated();
+      const badgeCls  = ['badge-cm1', 'badge-cm2', 'badge-6e'];
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="ex-type-grid">
+          ${GENRE_LEVELS.map((lv, i) => {
+            const prevLv   = i > 0 ? GENRE_LEVELS[i - 1] : null;
+            const unlocked = i === 0 || validated.includes(prevLv);
+            const done     = validated.includes(lv);
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const dis      = !unlocked ? ' disabled' : '';
+            const desc     = !unlocked
+              ? 'Valide le niveau précédent pour débloquer'
+              : done
+                ? GENRE_LEVEL_DESCS[i] + ' · Niveau validé !'
+                : GENRE_LEVEL_DESCS[i];
+            const bdgCls   = badgeCls[i] || 'badge-cm1';
+            return `<button class="ex-type-card${cls}" data-level="${lv}"${dis}>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${i + 1}</span>
+              </span>
+              <div>
+                <span class="ex-type-name">Niveau ${i + 1}</span>
+                <span class="ex-type-desc">${desc}</span>
+              </div>
+            </button>`;
+          }).join('')}
+        </div>
+      `;
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => genreStartLevel(parseInt(btn.dataset.level, 10)))
+      );
+    }
+
+    function genreStartLevel(lv) {
+      const pool = [...(sessionData.pools[lv] || [])];
+      const qs   = shuffle(pool);
+      genreState  = { level: lv, questions: qs, idx: 0, score: 0, correctCount: 0, total: qs.length };
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      document.getElementById('q-total').textContent = qs.length;
+      genreRenderQuestion();
+    }
+
+    function genreRenderQuestion() {
+      const { questions, idx, total } = genreState;
+      const q = questions[idx];
+
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      const card = document.getElementById('ex-card');
+      card.innerHTML = `
+        <p class="ex-question-label">Écris ce groupe nominal au féminin.</p>
+        <div class="ex-verb-display">${genreEsc(q.masculine)}</div>
+        <div class="ex-input-row" style="margin-top:8px">
+          <input type="text" class="ex-text-input" id="genre-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Écris la forme féminine…">
+          <button class="ex-validate-btn" id="genre-validate-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="genre-feedback"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const input    = document.getElementById('genre-input');
+      const valBtn   = document.getElementById('genre-validate-btn');
+
+      let potential = 1.0;  /* réduit de 0,5 par 1re tentative ratée */
+      let attempt   = 0;
+
+      setTimeout(() => input.focus(), 50);
+
+      function validate() {
+        const raw = input.value.trim();
+        if (!raw) return;
+        attempt++;
+
+        const isRight = genreNorm(raw) === genreNorm(q.answer);
+
+        if (isRight) {
+          genreState.correctCount++;
+          genreState.score += potential;
+          input.disabled  = true;
+          valBtn.disabled = true;
+          input.classList.add('is-correct');
+          const msgs = ['✅ Bravo !', '✨ Très bien !', '🌟 Exact !', '👏 Parfait !'];
+          document.getElementById('genre-feedback').innerHTML =
+            `<div class="ex-feedback-correct">${msgs[Math.floor(Math.random() * msgs.length)]}</div>`;
+          genreShowNextBtn();
+
+        } else if (attempt === 1) {
+          /* Première tentative incorrecte : pénalité, puis 2e chance */
+          potential = Math.max(0, potential - 0.5);
+          const diffHtml = genreDiffHtml(raw, q.answer);
+          document.getElementById('genre-feedback').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ta réponse : ${diffHtml}<br>
+              Regarde bien chaque terminaison et réessaie.
+            </div>
+          `;
+          /* Réactiver le champ après un court délai */
+          setTimeout(() => {
+            input.classList.remove('is-wrong');
+            input.value   = '';
+            input.disabled = false;
+            valBtn.disabled = false;
+            input.focus();
+          }, 1400);
+          input.disabled  = true;
+          valBtn.disabled = true;
+
+        } else {
+          /* Deuxième tentative incorrecte : correction complète */
+          input.disabled  = true;
+          valBtn.disabled = true;
+          input.classList.add('is-wrong');
+          document.getElementById('genre-feedback').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ La forme correcte est : <strong>${genreEsc(q.answer)}</strong>
+            </div>
+            <div class="ex-note">📌 ${genreEsc(q.rule)}</div>
+          `;
+          genreShowNextBtn();
+        }
+      }
+
+      valBtn.addEventListener('click', validate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') validate(); });
+    }
+
+    function genreShowNextBtn() {
+      const nextBtn = document.getElementById('next-btn');
+      const isLast  = genreState.idx === genreState.total - 1;
+      nextBtn.textContent = isLast ? 'Voir mes résultats' : 'Suivant →';
+      nextBtn.classList.remove('ex-hidden');
+      nextBtn.onclick = () => {
+        genreState.idx++;
+        if (genreState.idx >= genreState.total) {
+          genreShowLevelResults();
+        } else {
+          genreRenderQuestion();
+          document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+    }
+
+    function genreShowLevelResults() {
+      const { level, score: rawScore, correctCount, total } = genreState;
+      const correctPct = correctCount / total;
+      const passed     = correctPct >= GENRE_SEUIL;
+
+      if (passed) {
+        const validated = genreGetValidated();
+        if (!validated.includes(level)) { validated.push(level); genreSetValidated(validated); }
+        faireShowConfetti();
+      }
+
+      const lvIdx  = GENRE_LEVELS.indexOf(level);
+      const isLast = lvIdx === GENRE_LEVELS.length - 1;
+      const nextLv = !isLast ? GENRE_LEVELS[lvIdx + 1] : null;
+      const allDone = genreGetValidated().length >= GENRE_LEVELS.length;
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      const s20   = Math.round(rawScore / total * 20);
+      const stars = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : s20 >= 1 ? ' ⭐' : '';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   =
+        correctCount + ' bonne' + (correctCount !== 1 ? 's' : '') +
+        ' réponse' + (correctCount !== 1 ? 's' : '') + ' sur ' + total;
+
+      const backHref = sessionData.backLink?.href || 'français-orthographe.html';
+      let msg, btnsHTML;
+
+      if (passed && allDone && isLast) {
+        msg = '🎊 Félicitations ! Tu maîtrises le genre du groupe nominal à tous les niveaux !' + stars;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="genre-reset-btn">Recommencer depuis le début</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else if (passed) {
+        msg = `Niveau ${level} validé !` + (nextLv ? ` Le niveau ${nextLv} est débloqué ! 🔓` : '') + stars;
+        btnsHTML = nextLv ? `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="genre-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-secondary" id="genre-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>` : `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="genre-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else {
+        const needed = Math.ceil(GENRE_SEUIL * total);
+        msg = `Pas encore… ${correctCount}/${total} bonnes réponses. Il faut ${needed} réponses correctes (80 %) pour passer. On réessaie ?` + stars;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="genre-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('genre-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        genreStartLevel(genreState.level);
+      });
+      document.getElementById('genre-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        genreStartLevel(nextLv);
+      });
+      document.getElementById('genre-reset-btn')?.addEventListener('click', () => {
+        genreSetValidated([]);
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        genreInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'genre-niveaux',
+        level,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : donneur-niveaux — Qui commande l'accord ?
+       Niveau 1 ★   : Donneur dans un GN simple (clic nom + sélecteurs genre/nb)
+       Niveau 2 ★★  : Sujet donneur dans une phrase (clic sujet + sélecteurs)
+       Niveau 3 ★★★ : Donneur du participe passé (3 temps : PP → donneur → sélecteurs)
+       Scoring : 2 pts si tout correct, 1 pt si ID correct mais genre/nb faux, 0 sinon.
+       Seuil : 75 % pour valider un niveau. Persistance localStorage.
+       ══════════════════════════════════════════════════════════════════════ */
+
+    const DA_SEUIL    = 0.75;
+    const DA_POSITIFS = ["Parfait !", "Excellent !", "Très bien !", "Bravo !", "Exact !"];
+
+    let daState = null;
+
+    function daPos() { return DA_POSITIFS[Math.floor(Math.random() * DA_POSITIFS.length)]; }
+
+    function daSlugKey(s) {
+      return (new URLSearchParams(window.location.search).get('slug') || 'da') + '_' + s;
+    }
+    function daGetValidated() {
+      try { return JSON.parse(localStorage.getItem(daSlugKey('validated')) || '[]'); } catch { return []; }
+    }
+    function daSetValidated(arr) { localStorage.setItem(daSlugKey('validated'), JSON.stringify(arr)); }
+
+    /* ── Init ──────────────────────────────────────────────────────────────── */
+    function donneurInitSession() {
+      daState = null;
+      score = 0; currentIndex = 0;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      daRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Sélection de niveau ───────────────────────────────────────────────── */
+    function daRenderLevelSelect(card) {
+      const validated = daGetValidated();
+      const defs = [
+        { lv: 1, bdg: 'badge-cm1', desc: 'Clique sur le nom donneur dans un groupe nominal' },
+        { lv: 2, bdg: 'badge-cm2', desc: 'Identifie le sujet donneur dans une phrase complète' }
+      ];
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
+          ${defs.map((d, i) => {
+            const unlocked = i === 0 || validated.includes(i - 1);
+            const done     = validated.includes(i);
+            const cls = !unlocked ? ' vb-locked-card' : '';
+            const dis = !unlocked ? ' disabled' : '';
+            const desc = !unlocked ? 'Valide le niveau précédent pour débloquer'
+                       : done ? d.desc + ' · Validé !' : d.desc;
+            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${dis}>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${d.bdg}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
+              </span>
+              <div>
+                <span class="ex-type-name">Niveau ${d.lv}</span>
+                <span class="ex-type-desc">${desc}</span>
+              </div>
+            </button>`;
+          }).join('')}
+        </div>
+      `;
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => daStartLevel(+btn.dataset.level))
+      );
+    }
+
+    /* ── Démarrer un niveau ────────────────────────────────────────────────── */
+    function daStartLevel(lv) {
+      const bankKey = lv === 1 ? 'lvl1Bank' : 'lvl2Bank';
+      const qs = shuffle([...sessionData[bankKey]]);
+      daState = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = qs.length;
+      daRenderQuestion();
+    }
+
+    function daRenderQuestion() {
+      const { level } = daState;
+      if (level === 1) daRenderLvl1(document.getElementById('ex-card'));
+      else             daRenderLvl2(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Utilitaire : clean token ──────────────────────────────────────────── */
+    function daClean(token) {
+      return token.replace(/[.,!?;:«»"""]/g, '').replace(/['']/g, "'");
+    }
+
+    /* ── Sélecteurs genre / nombre ─────────────────────────────────────────── */
+    function daRenderSelectors(q, firstClickCorrect, onDone) {
+      const area = document.getElementById('da-sel-area');
+      area.innerHTML = `
+        <div class="ex-step2-divider"></div>
+        <p style="font-weight:700;font-size:12px;color:var(--blue);letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px">Précise le genre et le nombre du donneur :</p>
+        <div style="display:grid;grid-template-columns:56px 1fr;align-items:center;gap:10px 12px;margin-bottom:16px">
+          <span style="font-weight:700;font-size:13px;color:var(--muted)">Genre</span>
+          <div class="ex-choices-grid" id="da-genre-grid" style="margin:0;grid-template-columns:repeat(2,1fr)"></div>
+          <span style="font-weight:700;font-size:13px;color:var(--muted)">Nombre</span>
+          <div class="ex-choices-grid" id="da-nombre-grid" style="margin:0;grid-template-columns:repeat(2,1fr)"></div>
+        </div>
+        <div class="ex-feedback-area" id="da-sel-fb"></div>
+      `;
+
+      let selGenre = null, selNombre = null, selResolved = false;
+
+      function daCheckSel() {
+        if (selGenre === null || selNombre === null || selResolved) return;
+        selResolved = true;
+        const gOk = selGenre === q.genre;
+        const nOk = selNombre === q.nombre;
+        onDone(firstClickCorrect ? (gOk && nOk ? 2 : 1) : 0, gOk, nOk);
+      }
+
+      ['masculin', 'féminin'].forEach(g => {
+        const btn = document.createElement('button');
+        btn.className = 'ex-choice'; btn.style.cssText = 'padding:10px 0;text-align:center'; btn.textContent = g;
+        btn.addEventListener('click', () => {
+          if (selGenre !== null) return;
+          selGenre = g;
+          document.getElementById('da-genre-grid').querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === q.genre) b.classList.add('is-correct');
+          });
+          if (g !== q.genre) btn.classList.add('is-wrong');
+          daCheckSel();
+        });
+        document.getElementById('da-genre-grid').appendChild(btn);
+      });
+
+      ['singulier', 'pluriel'].forEach(n => {
+        const btn = document.createElement('button');
+        btn.className = 'ex-choice'; btn.style.cssText = 'padding:10px 0;text-align:center'; btn.textContent = n;
+        btn.addEventListener('click', () => {
+          if (selNombre !== null) return;
+          selNombre = n;
+          document.getElementById('da-nombre-grid').querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === q.nombre) b.classList.add('is-correct');
+          });
+          if (n !== q.nombre) btn.classList.add('is-wrong');
+          daCheckSel();
+        });
+        document.getElementById('da-nombre-grid').appendChild(btn);
+      });
+    }
+
+    /* ── Niveau 1 — GN simple ──────────────────────────────────────────────── */
+    function daRenderLvl1(card) {
+      const { questions, idx, total } = daState;
+      const q = questions[idx];
+
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      card.innerHTML = `
+        <p class="ex-question-label">Clique sur le nom donneur d'accord.</p>
+        <div class="ex-sentence-words" id="da-words"></div>
+        <div class="ex-feedback-area" id="da-fb1" style="min-height:20px"></div>
+        <div id="da-sel-area"></div>
+        <button class="ex-next-btn ex-hidden" id="da-next">${idx + 1 < total ? 'Suivant →' : 'Voir les résultats →'}</button>
+      `;
+
+      let firstClick = null, nounFound = false;
+      const wordsEl = document.getElementById('da-words');
+
+      q.gn.split(/\s+/).forEach(token => {
+        const clean = daClean(token);
+        if (!clean) return;
+        const role = q.wordRoles[clean] || 'autre';
+        const btn = document.createElement('button');
+        btn.className = 'ex-word-btn'; btn.textContent = token; btn.dataset.clean = clean;
+
+        btn.addEventListener('click', () => {
+          if (nounFound) return;
+          if (firstClick === null) firstClick = clean;
+
+          if (role === 'nom') {
+            nounFound = true;
+            const firstClickCorrect = (firstClick === clean);
+            wordsEl.querySelectorAll('.ex-word-btn').forEach(b => { b.disabled = true; b.classList.remove('is-selected'); });
+            btn.classList.add('is-correct');
+
+            const intro = firstClickCorrect ? 'Bien !' : '✓ Trouvé !';
+            document.getElementById('da-fb1').innerHTML =
+              `<div class="ex-feedback-correct" style="font-size:14px">${intro} <strong>${clean}</strong> est le nom donneur. Précise son genre et son nombre.</div>`;
+
+            daRenderSelectors(q, firstClickCorrect, (pts, gOk, nOk) => {
+              daState.score += pts;
+              let fb2;
+              if (pts === 2) {
+                fb2 = `<div class="ex-feedback-correct">${daPos()} <strong>${q.noun}</strong> est ${q.genre} ${q.nombre} : les receveurs prendront ces marques.</div>`;
+              } else if (pts === 1) {
+                const w = !gOk
+                  ? `Le genre est incorrect — <strong>${q.noun}</strong> est ${q.genre}.`
+                  : `Le nombre est incorrect — <strong>${q.noun}</strong> est au ${q.nombre}.`;
+                fb2 = `<div class="ex-feedback-wrong">❌ ${w}</div>`;
+              } else {
+                fb2 = `<div class="ex-feedback-wrong">❌ La bonne réponse : <strong>${q.noun}</strong> est ${q.genre} ${q.nombre}.</div>`;
+              }
+              document.getElementById('da-sel-fb').innerHTML = fb2;
+              const nxt = document.getElementById('da-next');
+              nxt.classList.remove('ex-hidden');
+              nxt.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            });
+
+          } else {
+            btn.classList.add('is-wrong', 'shake');
+            setTimeout(() => btn.classList.remove('shake'), 600);
+            const fb = role === 'det'
+              ? `Non — <strong>${clean}</strong> est le déterminant : il reçoit l'accord, il ne le donne pas.`
+              : role === 'adj'
+              ? `Non — <strong>${clean}</strong> est l'adjectif : il s'accorde avec le nom, il ne commande pas.`
+              : `Non — <strong>${clean}</strong> n'est pas le donneur d'accord ici.`;
+            document.getElementById('da-fb1').innerHTML = `<div class="ex-feedback-wrong" style="font-size:13px">❌ ${fb}</div>`;
+            document.getElementById('da-next').classList.remove('ex-hidden');
+          }
+        });
+
+        wordsEl.appendChild(btn);
+      });
+
+      document.getElementById('da-next').addEventListener('click', () => {
+        daState.idx++;
+        if (daState.idx >= daState.total) daShowLevelResults();
+        else daRenderQuestion();
+      });
+    }
+
+    /* ── Niveau 2 — Sujet du verbe ─────────────────────────────────────────── */
+    function daRenderLvl2(card) {
+      const { questions, idx, total } = daState;
+      const q = questions[idx];
+
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      const rawTokens = q.sentence.split(/\s+/).filter(t => t.length > 0);
+      const verbClean = daClean(q.verb);
+
+      card.innerHTML = `
+        <p class="ex-question-label">Clique sur <strong>tous les mots</strong> du groupe sujet, puis valide.<br><span style="font-size:13px;color:#6b7280">(Le verbe est en bleu — il n'est pas dans le groupe sujet.)</span></p>
+        <div class="ex-sentence-words" id="da-words" style="row-gap:6px"></div>
+        <button class="ex-btn-secondary" id="da-validate" style="margin-top:12px">Valider ma sélection</button>
+        <div class="ex-feedback-area" id="da-fb1" style="min-height:20px;margin-top:10px"></div>
+        <div id="da-sel-area"></div>
+        <button class="ex-next-btn ex-hidden" id="da-next">${idx + 1 < total ? 'Suivant →' : 'Voir les résultats →'}</button>
+      `;
+
+      const wordsEl = document.getElementById('da-words');
+      const selected = new Set();
+      let validated = false;
+
+      rawTokens.forEach((token, i) => {
+        const clean = daClean(token);
+        const btn = document.createElement('button');
+        btn.className = 'ex-word-btn';
+        btn.textContent = token;
+        btn.dataset.idx = i;
+
+        if (clean === verbClean) {
+          btn.style.cssText = 'border-color:var(--blue);background:rgba(16,43,106,0.06);color:var(--blue);font-weight:700;border-bottom:3px solid var(--blue)';
+        }
+
+        btn.addEventListener('click', () => {
+          if (validated) return;
+          if (selected.has(i)) {
+            selected.delete(i);
+            btn.classList.remove('is-selected');
+            if (clean === verbClean) {
+              btn.style.cssText = 'border-color:var(--blue);background:rgba(16,43,106,0.06);color:var(--blue);font-weight:700;border-bottom:3px solid var(--blue)';
+            }
+          } else {
+            selected.add(i);
+            btn.classList.add('is-selected');
+          }
+        });
+
+        wordsEl.appendChild(btn);
+      });
+
+      document.getElementById('da-validate').addEventListener('click', () => {
+        if (validated) return;
+        if (selected.size === 0) return;
+        validated = true;
+
+        const target = new Set(q.subjectIndices);
+        const isCorrect = selected.size === target.size && [...target].every(j => selected.has(j));
+
+        wordsEl.querySelectorAll('.ex-word-btn').forEach(btn => {
+          const j = parseInt(btn.dataset.idx);
+          btn.classList.remove('is-selected');
+          if (target.has(j)) btn.classList.add('is-correct');
+          else if (selected.has(j)) btn.classList.add('is-wrong');
+        });
+        document.getElementById('da-validate').disabled = true;
+
+        const noteHtml = q.note ? `<div class="ex-note">${q.note}</div>` : '';
+
+        if (isCorrect) {
+          document.getElementById('da-fb1').innerHTML =
+            `<div class="ex-feedback-correct" style="font-size:14px">✓ <strong>${q.subjectDisplay}</strong> est le groupe sujet. Précise son genre et son nombre.</div>${noteHtml}`;
+
+          daRenderSelectors(q, true, (pts, gOk, nOk) => {
+            daState.score += pts;
+            let fb2;
+            if (pts === 2) {
+              fb2 = `<div class="ex-feedback-correct">${daPos()} <strong>${q.subjectDisplay}</strong> est ${q.genre} ${q.nombre} : le verbe prendra ces marques.</div>`;
+            } else if (pts === 1) {
+              const w = !gOk
+                ? `Le genre est incorrect — <strong>${q.subjectDisplay}</strong> est ${q.genre}.`
+                : `Le nombre est incorrect — <strong>${q.subjectDisplay}</strong> est au ${q.nombre}.`;
+              fb2 = `<div class="ex-feedback-wrong">❌ ${w}</div>`;
+            } else {
+              fb2 = `<div class="ex-feedback-wrong">❌ <strong>${q.subjectDisplay}</strong> est ${q.genre} ${q.nombre}.</div>`;
+            }
+            document.getElementById('da-sel-fb').innerHTML = fb2;
+            const nxt = document.getElementById('da-next');
+            nxt.classList.remove('ex-hidden');
+            nxt.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          });
+        } else {
+          document.getElementById('da-fb1').innerHTML =
+            `<div class="ex-feedback-wrong" style="font-size:13px">❌ Le groupe sujet est <strong>${q.subjectDisplay}</strong> (en vert).</div>${noteHtml}`;
+          document.getElementById('da-next').classList.remove('ex-hidden');
+        }
+      });
+
+      document.getElementById('da-next').addEventListener('click', () => {
+        daState.idx++;
+        if (daState.idx >= daState.total) daShowLevelResults();
+        else daRenderQuestion();
+      });
+    }
+
+    /* ── Résultats d'un niveau ─────────────────────────────────────────────── */
+    function daShowLevelResults() {
+      const { level, score: lvScore, total } = daState;
+      const maxPts = total * 2;
+      const pct    = lvScore / maxPts;
+      const passed = pct >= DA_SEUIL;
+      const s20    = Math.round(lvScore / maxPts * 20);
+
+      if (passed) {
+        const validated = daGetValidated();
+        if (!validated.includes(level - 1)) { validated.push(level - 1); daSetValidated(validated); }
+      }
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   = `(${lvScore} / ${maxPts} pts · ${Math.round(pct * 100)} %)`;
+
+      const backHref  = sessionData.backLink?.href  || 'français-orthographe.html';
+      const backLabel = `← Retour à l'${sessionData.backLink?.label || 'Orthographe'}`;
+      const isLast    = level >= 2;
+      const stars     = s20 >= 18 ? '🌟🌟🌟' : s20 >= 14 ? '⭐⭐' : s20 >= 10 ? '⭐' : '';
+      const lvNext    = ['', 'Niveau 2 — Sujet du verbe →', ''];
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises l'identification du donneur d'accord !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="da-restart-btn">Recommencer</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="da-next-lv-btn">${lvNext[level]}</button>
+          <button class="ex-btn-secondary" id="da-retry-btn">Recommencer ce niveau</button>
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(maxPts * DA_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed} / ${maxPts} pts pour passer. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="da-retry-btn">Recommencer ce niveau</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('da-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        daStartLevel(daState.level);
+      });
+      document.getElementById('da-next-lv-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        daStartLevel(daState.level + 1);
+      });
+      document.getElementById('da-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        donneurInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'donneur-niveaux',
+        level:        'Niveau ' + level,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       TYPE : pc-avoir-niveaux — Passé composé avec avoir
+       3 niveaux déverrouillables (localStorage), seuil 80 %.
+       Chaque item = 1 ou 2 blancs (champ texte libre).
+       Scoring : 2 pts max par blanc ; −1 si indice ou 2e tentative.
+       Score affiché /20 (normalisé sur le total des blancs scorés).
+       ══════════════════════════════════════════════════════════════════════════ */
+
+    const PCA_SEUIL    = 0.80;
+    const PCA_POSITIFS = ['Excellent ! 🎉', 'Bravo ! ⭐', 'Parfait ! 🌟', 'Super ! 👏'];
+
+    let pcaState = null;
+
+    function pcaSlugKey(suffix) {
+      const s = new URLSearchParams(window.location.search).get('slug') || 'pca';
+      return s + '_' + suffix;
+    }
+    function pcaGetValidated() {
+      try { return JSON.parse(localStorage.getItem(pcaSlugKey('validated')) || '[]'); }
+      catch { return []; }
+    }
+    function pcaSetValidated(arr) {
+      localStorage.setItem(pcaSlugKey('validated'), JSON.stringify(arr));
+    }
+
+    /* Normalisation : insensible à la casse et aux espaces, mais sensible aux accents */
+    function pcaNorm(str) {
+      return str.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[''`´'']/g, "'");
+    }
+
+    function pcaShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    /* Génère la silhouette de l'indice : auxiliaire visible + participe masqué sauf terminaison */
+    function pcaSilhouette(answer) {
+      const parts = answer.split(' ');
+      const pp    = parts[parts.length - 1];
+      const aux   = parts.slice(0, -1).join(' ');
+
+      let endLen = 1;
+      if (/eint$|aint$|oint$/.test(pp)) endLen = 4;
+      else if (/is$|it$/.test(pp))      endLen = 2;
+
+      const hidden = pp.slice(0, pp.length - endLen).split('').map(() => '_').join(' ');
+      const shown  = pp.slice(pp.length - endLen);
+      const ppHint = (hidden ? hidden + ' ' : '') + shown;
+
+      return aux + ' ' + ppHint;
+    }
+
+    /* Construit le HTML de la phrase avec les blancs rendus selon leur état */
+    function pcaBuildSentenceHtml(sentence, blanks, blankIdx, prevAnswers) {
+      const parts = sentence.split('___');
+      let html = '';
+      for (let i = 0; i < parts.length; i++) {
+        /* Remplace (infinitif) par une puce */
+        html += parts[i].replace(/\(([^)]+)\)/g, (_, inf) =>
+          `<span class="pqp-infinitif-chip">${inf}</span>`
+        );
+        if (i < blanks.length) {
+          const b = blanks[i];
+          if (i < blankIdx) {
+            const ans = prevAnswers[i];
+            if (ans) {
+              html += `<span class="${ans.correct ? 'pca-ans-correct' : 'pca-ans-wrong'}">${ans.display}</span>`;
+            }
+          } else if (i === blankIdx) {
+            html += b.trap
+              ? `<span class="pca-blank-trap">⚠ ___</span>`
+              : `<span class="pca-blank-current">___</span>`;
+          } else {
+            html += `<span class="pca-blank-future">___</span>`;
+          }
+        }
+      }
+      return html;
+    }
+
+    /* ── Init session ─────────────────────────────────────────────────────────── */
+    function pcaInitSession() {
+      pcaState = null;
+      score = 0; currentIndex = 0;
+      sessionStartTime = Date.now();
+
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      pcaRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Sélection de niveau ─────────────────────────────────────────────────── */
+    function pcaRenderLevelSelect(card) {
+      const validated = pcaGetValidated();
+      const lvDefs = [
+        { lv: 1, desc: "Participes en -é et -i (1<sup>er</sup> et 2<sup>e</sup> groupe)" },
+        { lv: 2, desc: "Participes irréguliers en -s, -u, -t (3<sup>e</sup> groupe)" },
+        { lv: 3, desc: "Mélange des trois groupes · phrases complexes" }
+      ];
+      const badgeCls = ['badge-cm1', 'badge-cm2', 'badge-6e'];
+
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="pqp-rule-chip" style="display:flex;margin:0 auto 20px;max-width:520px">
+          📌 Passé composé = <em>avoir</em> au présent + participe passé
+        </div>
+        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
+          ${lvDefs.map((d, i) => {
+            const unlocked = i === 0 || validated.includes(i - 1);
+            const done     = validated.includes(i);
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const disabled = !unlocked ? ' disabled' : '';
+            const desc     = !unlocked
+              ? 'Valide le niveau précédent pour débloquer (80 % requis)'
+              : done ? d.desc + ' · <strong>Validé ✓</strong>' : d.desc;
+            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${disabled}>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${badgeCls[i]}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
+              </span>
+              <div>
+                <span class="ex-type-name">Niveau ${d.lv}</span>
+                <span class="ex-type-desc">${desc}</span>
+              </div>
+            </button>`;
+          }).join('')}
+        </div>
+      `;
+
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => pcaStartLevel(parseInt(btn.dataset.level)))
+      );
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────────── */
+    function pcaStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const bankKey = lv === 1 ? 'level1Bank' : lv === 2 ? 'level2Bank' : 'level3Bank';
+      const bank    = sessionData[bankKey] || [];
+      const n       = sessionData.questionsPerSession || 10;
+      const items   = pcaShuffle([...bank]).slice(0, n);
+
+      pcaState = {
+        lv, items,
+        itemIdx: 0, blankIdx: 0,
+        prevAnswers: [],
+        rawScore: 0, rawMax: 0
+      };
+
+      document.getElementById('q-total').textContent = items.length;
+      pcaRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Rendu d'un blanc ────────────────────────────────────────────────────── */
+    function pcaRenderQuestion(card) {
+      const { lv, items, itemIdx, blankIdx, prevAnswers } = pcaState;
+      const item  = items[itemIdx];
+      const blank = item.blanks[blankIdx];
+      const totalBlanks = item.blanks.length;
+      const isLastBlank = blankIdx >= totalBlanks - 1;
+      const total = items.length;
+
+      document.getElementById('q-num').textContent       = itemIdx + 1;
+      document.getElementById('ex-bar-fill').style.width = (itemIdx / total * 100) + '%';
+
+      const rulesByLevel = {
+        1: "Passé composé = <em>avoir</em> au présent + participe passé. 1<sup>er</sup> gr. : -er → <strong>-é</strong> · 2<sup>e</sup> gr. : -ir → <strong>-i</strong>.",
+        2: "Les verbes du 3<sup>e</sup> groupe ont des participes passés irréguliers : <strong>mis, pris, su, pu, vu, fait, dit, écrit…</strong>",
+        3: "Identifie le groupe du verbe avant de choisir la terminaison. 1<sup>er</sup> gr. : -<strong>é</strong> · 2<sup>e</sup> gr. : -<strong>i</strong> · 3<sup>e</sup> gr. : irrégulier."
+      };
+
+      const blankLabel = totalBlanks > 1 ? ` <span style="color:var(--muted);font-weight:500;font-size:13px">(verbe ${blankIdx + 1}/${totalBlanks})</span>` : '';
+      const isTrap = blank.trap;
+
+      const sentHtml = pcaBuildSentenceHtml(item.sentence, item.blanks, blankIdx, prevAnswers);
+
+      card.innerHTML = `
+        <p class="ex-question-label">Conjugue au <strong>passé composé avec avoir</strong>${blankLabel}</p>
+        <div class="pqp-rule-chip">📌 ${rulesByLevel[lv]}</div>
+        <div class="pqp-sentence-display">${sentHtml}</div>
+        ${isTrap ? `<p style="font-size:13px;color:#d97706;font-weight:600;margin-bottom:12px">⚠ Ce verbe semble être un piège — essaie quand même !</p>` : ''}
+        <div class="ex-input-row">
+          <input type="text" id="pca-input" class="ex-text-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                 placeholder="${isTrap ? 'Essaie de conjuguer…' : 'Écris le passé composé…'}">
+          <button class="ex-validate-btn" id="pca-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="pca-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          isLastBlank
+            ? (itemIdx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →')
+            : 'Verbe suivant →'
+        }</button>
+      `;
+
+      const input = document.getElementById('pca-input');
+      const vbtn  = document.getElementById('pca-val-btn');
+      setTimeout(() => input.focus(), 60);
+
+      const doValidate = () => {
+        if (input.disabled || !input.value.trim()) return;
+
+        if (isTrap) {
+          /* Piège être — non pénalisant, passage auto après 2 s */
+          input.disabled = true;
+          vbtn.disabled  = true;
+          const usesAvoir = /\b(ai|as|a|avons|avez|ont)\b/.test(pcaNorm(input.value));
+          const msg = usesAvoir ? `⚠ ${blank.trapMessage}` : `ℹ️ ${blank.trapMessage}`;
+          document.getElementById('pca-fb').innerHTML =
+            `<div class="pca-trap-fb">${msg}<br><small style="opacity:.75">Ce piège ne compte <strong>pas</strong> dans le score.</small></div>`;
+          setTimeout(() => pcaAdvanceBlank(), 2000);
+          return;
+        }
+
+        const userNorm    = pcaNorm(input.value);
+        const correctNorm = pcaNorm(blank.answer);
+        const isRight     = userNorm === correctNorm;
+
+        input.disabled = true;
+        vbtn.disabled  = true;
+        pcaState.rawMax += 1;
+
+        if (isRight) {
+          pcaState.rawScore += 1;
+          input.classList.add('is-correct');
+          document.getElementById('pca-fb').innerHTML =
+            `<div class="ex-feedback-correct">${PCA_POSITIFS[Math.floor(Math.random() * PCA_POSITIFS.length)]}</div>`;
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        } else {
+          input.classList.add('is-wrong');
+          document.getElementById('pca-fb').innerHTML =
+            `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${blank.answer}</strong>. ${pcaBuildErrorFeedback(userNorm, correctNorm, blank.answer, blank, lv)}</div>`;
+          pcaState.prevAnswers[blankIdx] = { display: blank.answer, correct: false };
+          setTimeout(() => pcaAdvanceBlank(), 2000);
+        }
+      };
+
+      vbtn.addEventListener('click', doValidate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        /* Enregistre la réponse affichée pour ce blanc */
+        if (!isTrap) {
+          const ok = input.classList.contains('is-correct');
+          pcaState.prevAnswers[blankIdx] = {
+            display: ok ? input.value : blank.answer,
+            correct: ok
+          };
+        }
+        pcaAdvanceBlank();
+      });
+    }
+
+    /* ── Avance au blanc suivant ou à la phrase suivante ─────────────────────── */
+    function pcaAdvanceBlank() {
+      const item = pcaState.items[pcaState.itemIdx];
+      if (pcaState.blankIdx < item.blanks.length - 1) {
+        /* Prochain blanc du même item */
+        pcaState.blankIdx++;
+      } else {
+        /* Prochain item */
+        pcaState.itemIdx++;
+        pcaState.blankIdx    = 0;
+        pcaState.prevAnswers = [];
+      }
+      if (pcaState.itemIdx >= pcaState.items.length) {
+        pcaShowLevelResults();
+      } else {
+        pcaRenderQuestion(document.getElementById('ex-card'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    /* ── Feedback d'erreur ───────────────────────────────────────────────────── */
+    function pcaBuildErrorFeedback(userNorm, correctNorm, correctDisplay, blank, level) {
+      const cWords = correctNorm.split(' ');
+      const uWords = userNorm.split(' ');
+      const cAux   = cWords.slice(0, -1).join(' ');
+      const cPP    = cWords[cWords.length - 1];
+      const uAux   = uWords.length > 1 ? uWords.slice(0, -1).join(' ') : '';
+      const uPP    = uWords[uWords.length - 1];
+
+      /* Auxiliaire incorrect */
+      if (uAux && uAux !== cAux) {
+        return `L'auxiliaire est incorrect : tu as écrit <span class="pqp-error-part">${uAux}</span> au lieu de <strong>${cAux}</strong>. Avec <em>avoir</em> : j'ai / tu as / il a / nous avons / vous avez / ils ont.`;
+      }
+
+      /* Participe passé incorrect */
+      if (uWords.length >= 2 && uPP !== cPP) {
+        if (blank.feedbackBadPP) return blank.feedbackBadPP;
+        if (level === 1) {
+          if (cPP.endsWith('é')) return `Ce verbe est du 1<sup>er</sup> groupe : son participe passé se termine en <strong>-é</strong> (→ <em>${cPP}</em>).`;
+          if (cPP.endsWith('i')) {
+            if (uPP.endsWith('ié')) return `Ce verbe est du 2<sup>e</sup> groupe : son participe passé se termine en <strong>-i</strong>, pas en -ié (→ <em>${cPP}</em>).`;
+            return `Ce verbe est du 2<sup>e</sup> groupe : son participe passé se termine en <strong>-i</strong> (→ <em>${cPP}</em>).`;
+          }
+        }
+        return `Le participe passé est incorrect : la forme attendue est <strong>${correctDisplay}</strong>.`;
+      }
+
+      return `La bonne réponse est : <strong>${correctDisplay}</strong>.`;
+    }
+
+    /* ── Résultats d'un niveau ───────────────────────────────────────────────── */
+    function pcaShowLevelResults() {
+      const { lv, rawScore, rawMax } = pcaState;
+      const pct    = rawMax > 0 ? rawScore / rawMax : 0;
+      const passed = pct >= PCA_SEUIL;
+      const s20    = rawMax > 0 ? Math.round(pct * 20) : 0;
+      const pctPct = Math.round(pct * 100);
+
+      if (passed) {
+        const validated = pcaGetValidated();
+        if (!validated.includes(lv - 1)) { validated.push(lv - 1); pcaSetValidated(validated); }
+      }
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const stars    = s20 >= 19 ? '🌟🌟🌟' : s20 >= 16 ? '⭐⭐' : s20 >= 10 ? '⭐' : '';
+      const isLast   = lv >= 3;
+      const backHref  = sessionData.backLink?.href  || 'français-conjugaison.html';
+      const backLabel = `← Retour à la ${sessionData.backLink?.label || 'Conjugaison'}`;
+      const lvNextLabel = ['', 'Niveau 2 — Participes irréguliers →', 'Niveau 3 — Mélange & phrases complexes →', ''];
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises le passé composé avec avoir aux trois niveaux !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="pca-restart-btn">Recommencer</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${lv} validé ! 🏆 Le Niveau ${lv + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="pca-next-btn">${lvNextLabel[lv]}</button>
+          <button class="ex-btn-secondary" id="pca-retry-btn">Recommencer ce niveau</button>
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(rawMax * PCA_SEUIL);
+        const neededS20 = Math.round(needed / rawMax * 20);
+        msg = `${stars || '💪'} Pas encore… il faut ${neededS20}/20 pour passer au niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="pca-retry-btn">Recommencer ce niveau</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('pca-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        pcaStartLevel(pcaState.lv);
+      });
+      document.getElementById('pca-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        pcaStartLevel(pcaState.lv + 1);
+      });
+      document.getElementById('pca-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        pcaInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'pc-avoir-niveaux',
+        level:        'Niveau ' + lv,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       ÊTRE OU AVOIR ?  —  type : etre-ou-avoir-niveaux
+       Format : 2 temps  (1) bouton être/avoir  (2) saisie de la forme conjuguée
+       Scoring : 2 pts si les deux temps sont corrects du premier coup ;
+                 1 pt  si auxiliaire bon mais forme fausse au 1er essai ;
+                 0 pt  si mauvais auxiliaire.
+    ══════════════════════════════════════════════════════════════════════════ */
+
+    const EOA_SEUIL    = 0.80;
+    const EOA_POSITIFS = ['Excellent ! 🎉', 'Bravo ! ⭐', 'Parfait ! 🌟', 'Super ! 👏', 'Très bien ! 👍'];
+
+    let eoaState = null;
+
+    function eoaSlugKey(suffix) {
+      const s = new URLSearchParams(window.location.search).get('slug') || 'eoa';
+      return s + '_' + suffix;
+    }
+    function eoaGetValidated() {
+      try { return JSON.parse(localStorage.getItem(eoaSlugKey('validated')) || '[]'); }
+      catch { return []; }
+    }
+    function eoaSetValidated(arr) {
+      localStorage.setItem(eoaSlugKey('validated'), JSON.stringify(arr));
+    }
+
+    function eoaNorm(str) {
+      return str.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[''`´'']/g, "'");
+    }
+
+    function eoaShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    /* Tables de conjugaison pour la bulle d'aide */
+    const EOA_TABLES = {
+      "être": [
+        { subj: "je / j'", form: "suis"   },
+        { subj: "tu",       form: "es"     },
+        { subj: "il / elle",form: "est"    },
+        { subj: "nous",     form: "sommes" },
+        { subj: "vous",     form: "êtes"   },
+        { subj: "ils / elles", form: "sont" }
+      ],
+      "avoir": [
+        { subj: "j'",        form: "ai"    },
+        { subj: "tu",        form: "as"    },
+        { subj: "il / elle", form: "a"     },
+        { subj: "nous",      form: "avons" },
+        { subj: "vous",      form: "avez"  },
+        { subj: "ils / elles", form: "ont" }
+      ]
+    };
+
+    /* Trouve la ligne à mettre en évidence dans le tableau */
+    function eoaHighlightForm(answer) {
+      const n = eoaNorm(answer);
+      const forms = ["suis","es","est","sommes","êtes","sont","ai","as","a","avons","avez","ont"];
+      for (const f of forms) {
+        if (n === f || n.endsWith(' ' + f) || n.endsWith("'" + f)) return f;
+      }
+      return null;
+    }
+
+    function eoaConjTableHtml(auxiliary, answer) {
+      const rows   = EOA_TABLES[auxiliary] || [];
+      const target = eoaHighlightForm(answer);
+      const rowsHtml = rows.map(r => {
+        const active = r.form === target ? ' is-active' : '';
+        return `<div class="ex-conj-row${active}">
+          <div class="ex-conj-subject">${r.subj}</div>
+          <div class="ex-conj-form">${r.form}</div>
+        </div>`;
+      }).join('');
+      return `<div class="ex-conj-table" style="margin-top:12px">${rowsHtml}</div>`;
+    }
+
+    /* Feedback step 1 en cas de mauvais auxiliaire */
+    function eoaStep1Feedback(q, lv) {
+      if (lv === 3) {
+        let msg = '❌ Ce verbe change d\'auxiliaire selon le sens. COD présent → <strong>avoir</strong>. Mouvement sans COD → <strong>être</strong>.';
+        if (q.cod) {
+          const sentWithCod = q.sentence.replace('___', q.answer).replace(
+            q.cod,
+            `<span style="background:#fef08a;padding:0 3px;border-radius:3px">${q.cod}</span>`
+          );
+          msg += `<br><em>« ${sentWithCod} »</em>`;
+        }
+        return `<div class="ex-feedback-wrong">${msg}</div>`;
+      }
+      if (lv === 2) {
+        const ft = q.feedbackType;
+        let detail = '';
+        if (ft === 'pronominal')   detail = 'Les verbes pronominaux (<em>se lever, se souvenir…</em>) se conjuguent toujours avec <strong>être</strong>.';
+        else if (ft === 'trap-avoir') detail = '<em>Avoir</em> se conjugue avec <strong>avoir</strong> : j\'ai eu, tu as eu…';
+        else if (ft === 'trap-etre')  detail = '<em>Être</em> se conjugue avec <strong>avoir</strong> : j\'ai été, tu as été…';
+        else if (ft === 'trap-passer') detail = 'Ici <em>passer</em> exprime une durée (sans COD) — on utilise <strong>avoir</strong>.';
+        else detail = `On utilise l'auxiliaire <strong>${q.auxiliary}</strong> ici.`;
+        return `<div class="ex-feedback-wrong">❌ ${detail}</div>`;
+      }
+      return `<div class="ex-feedback-wrong">❌ Les verbes de mouvement ou d'état (<em>aller, partir, arriver, naître…</em>) se conjuguent avec <strong>être</strong>. Les autres prennent généralement <strong>avoir</strong>.</div>`;
+    }
+
+    /* ── Init ────────────────────────────────────────────────────────────── */
+    function eoaInitSession() {
+      eoaState = null;
+      score = 0; currentIndex = 0;
+      sessionStartTime = Date.now();
+
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      eoaRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Sélection de niveau ─────────────────────────────────────────────── */
+    function eoaRenderLevelSelect(card) {
+      const validated = eoaGetValidated();
+      const lvDefs = [
+        { lv: 1, desc: "Verbes courants — être ou avoir, cas non ambigu" },
+        { lv: 2, desc: "Pronominaux et pièges (avoir lui-même, être lui-même, passer…)" },
+        { lv: 3, desc: "Verbes à double auxiliaire selon le sens (monter, sortir…)" }
+      ];
+      const badgeCls = ['badge-cm1', 'badge-cm2', 'badge-6e'];
+
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="pqp-rule-chip" style="display:flex;margin:0 auto 20px;max-width:520px">
+          📌 Passé composé = <em>être</em> ou <em>avoir</em> au présent + participe passé
+        </div>
+        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
+          ${lvDefs.map((d, i) => {
+            const unlocked = i === 0 || validated.includes(i - 1);
+            const done     = validated.includes(i);
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const disabled = !unlocked ? ' disabled' : '';
+            const desc     = !unlocked
+              ? 'Valide le niveau précédent pour débloquer (80 % requis)'
+              : done ? d.desc + ' · <strong>Validé ✓</strong>' : d.desc;
+            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${disabled}>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${badgeCls[i]}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
+              </span>
+              <div>
+                <span class="ex-type-name">Niveau ${d.lv}</span>
+                <span class="ex-type-desc">${desc}</span>
+              </div>
+            </button>`;
+          }).join('')}
+        </div>
+      `;
+
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => eoaStartLevel(parseInt(btn.dataset.level)))
+      );
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function eoaStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const bankKey = lv === 1 ? 'level1Bank' : lv === 2 ? 'level2Bank' : 'level3Bank';
+      const bank    = sessionData[bankKey] || [];
+      const n       = sessionData.questionsPerSession || bank.length;
+      const items   = eoaShuffle([...bank]).slice(0, n);
+
+      eoaState = { lv, items, idx: 0, rawScore: 0, rawMax: 0 };
+
+      document.getElementById('q-total').textContent = items.length;
+      eoaRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Rendu d'une question ────────────────────────────────────────────── */
+    function eoaRenderQuestion(card) {
+      const { lv, items, idx } = eoaState;
+      const q     = items[idx];
+      const total = items.length;
+
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      /* Scoring :
+         step1FirstClick = vrai si le 1er clic sur l'auxiliaire était correct
+         step2FirstTry   = vrai si le 1er essai de conjugaison était correct
+         2 pts si les deux bons du 1er coup ; 1 pt si aux. ok mais conj. fausse ; 0 si mauvais aux. */
+      let step1FirstClick = true;  /* passe à false dès le 1er mauvais clic */
+      let step2FirstTry   = true;  /* passe à false dès la 1re mauvaise saisie */
+      let step2Scored     = false; /* rawMax/rawScore ne s'incrémentent qu'une fois par question */
+
+      const sentDisplay = q.sentence.replace('___', '<span style="color:var(--red);font-weight:900">___</span>');
+
+      card.innerHTML = `
+        <p class="ex-question-label">Quel auxiliaire faut-il utiliser ?</p>
+        <div class="ex-sentence-display">${sentDisplay}</div>
+
+        <div id="eoa-step1">
+          <div class="ex-group-row" id="eoa-aux-btns">
+            <button class="ex-group-btn" data-aux="être">ÊTRE</button>
+            <button class="ex-group-btn" data-aux="avoir">AVOIR</button>
+          </div>
+          <div class="ex-feedback-area" id="eoa-fb1"></div>
+        </div>
+
+        <div id="eoa-step2" class="ex-hidden">
+          <div class="ex-step2-divider"></div>
+          <p class="ex-question-label">Bien ! Maintenant conjugue <strong>${q.auxiliary}</strong> à la bonne personne.</p>
+          <div class="ex-input-row">
+            <input type="text" class="ex-text-input" id="eoa-input"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                   placeholder="Ta réponse…">
+            <button class="ex-validate-btn" id="eoa-val-btn">Valider</button>
+          </div>
+          <div class="ex-feedback-area" id="eoa-fb2"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      /* ── Step 1 : choix de l'auxiliaire ─────────────────────────────── */
+      card.querySelectorAll('#eoa-aux-btns .ex-group-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const chosen  = btn.dataset.aux;
+          const isRight = chosen === q.auxiliary;
+
+          if (isRight) {
+            card.querySelectorAll('#eoa-aux-btns .ex-group-btn').forEach(b => {
+              b.disabled = true;
+              if (b.dataset.aux === q.auxiliary) b.classList.add('is-correct');
+            });
+            document.getElementById('eoa-fb1').innerHTML =
+              `<div class="ex-feedback-correct">✅ ${q.auxiliary.charAt(0).toUpperCase() + q.auxiliary.slice(1)} — c'est exact !</div>`;
+            setTimeout(() => {
+              document.getElementById('eoa-step2').classList.remove('ex-hidden');
+              document.getElementById('eoa-step2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              setTimeout(() => document.getElementById('eoa-input')?.focus(), 80);
+            }, 500);
+          } else {
+            /* Premier mauvais clic → score tombera à 0 pour cette question */
+            step1FirstClick = false;
+            btn.classList.add('pqp-shake');
+            setTimeout(() => btn.classList.remove('pqp-shake'), 450);
+            document.getElementById('eoa-fb1').innerHTML = eoaStep1Feedback(q, lv);
+          }
+        });
+      });
+
+      /* ── Step 2 : saisie de la forme conjuguée ───────────────────────── */
+      const doValidate = () => {
+        const input  = document.getElementById('eoa-input');
+        const valBtn = document.getElementById('eoa-val-btn');
+        if (!input || !input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+
+        const isRight = eoaNorm(input.value) === eoaNorm(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          if (!step2Scored) {
+            step2Scored = true;
+            eoaState.rawMax += 2;
+            if (step1FirstClick && step2FirstTry)    eoaState.rawScore += 2;
+            else if (step1FirstClick)                 eoaState.rawScore += 1;
+            /* 0 pt si step1FirstClick === false */
+          }
+          const praise = (step1FirstClick && step2FirstTry)
+            ? EOA_POSITIFS[Math.floor(Math.random() * EOA_POSITIFS.length)]
+            : 'Correct !';
+          document.getElementById('eoa-fb2').innerHTML =
+            `<div class="ex-feedback-correct">${praise}<br>
+             <em>« ${q.sentence.replace('___', q.answer)} »</em></div>`;
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        } else {
+          step2FirstTry = false;
+          document.getElementById('eoa-fb2').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Pas tout à fait — consulte le tableau et réessaie.
+              ${eoaConjTableHtml(q.auxiliary, q.answer)}
+            </div>`;
+          input.disabled  = false;
+          valBtn.disabled = false;
+          input.value     = '';
+          input.classList.remove('is-wrong');
+          setTimeout(() => input.focus(), 60);
+        }
+      };
+
+      document.getElementById('eoa-val-btn').addEventListener('click', doValidate);
+      document.getElementById('eoa-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') doValidate();
+      });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        eoaState.idx++;
+        if (eoaState.idx >= eoaState.items.length) {
+          eoaShowLevelResults();
+        } else {
+          eoaRenderQuestion(document.getElementById('ex-card'));
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+    }
+
+    /* ── Résultats d'un niveau ───────────────────────────────────────────── */
+    function eoaShowLevelResults() {
+      const { lv, rawScore, rawMax } = eoaState;
+      const pct    = rawMax > 0 ? rawScore / rawMax : 0;
+      const passed = pct >= EOA_SEUIL;
+      const s20    = rawMax > 0 ? Math.round(pct * 20) : 0;
+      const pctPct = Math.round(pct * 100);
+
+      if (passed) {
+        const validated = eoaGetValidated();
+        if (!validated.includes(lv - 1)) { validated.push(lv - 1); eoaSetValidated(validated); }
+      }
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const stars  = s20 >= 19 ? '🌟🌟🌟' : s20 >= 16 ? '⭐⭐' : s20 >= 10 ? '⭐' : '';
+      const isLast = lv >= 3;
+      const backHref  = sessionData.backLink?.href  || 'français-conjugaison.html';
+      const backLabel = `← Retour à la ${sessionData.backLink?.label || 'Conjugaison'}`;
+      const lvNextLabel = ['', 'Niveau 2 — Pronominaux et pièges →', 'Niveau 3 — Double auxiliaire →', ''];
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises le choix de l'auxiliaire aux trois niveaux !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="eoa-restart-btn">Recommencer</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${lv} validé ! 🏆 Le Niveau ${lv + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="eoa-next-btn">${lvNextLabel[lv]}</button>
+          <button class="ex-btn-secondary" id="eoa-retry-btn">Recommencer ce niveau</button>
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        msg = `${stars || '💪'} Pas encore… il faut 80 % pour passer au niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="eoa-retry-btn">Recommencer ce niveau</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('eoa-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        eoaStartLevel(eoaState.lv);
+      });
+      document.getElementById('eoa-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        eoaStartLevel(eoaState.lv + 1);
+      });
+      document.getElementById('eoa-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        eoaInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'etre-ou-avoir-niveaux',
+        level:        'Niveau ' + lv,
+        score:        s20,
+        total:        20,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
       });
     }

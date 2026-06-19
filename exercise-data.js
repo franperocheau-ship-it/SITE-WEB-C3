@@ -3942,35 +3942,35 @@ const EXERCISE_DATA = {
         prompt: "le texte régional", answer: "les textes régionaux", difficulty: 2 },
       { instruction: "Mets ce groupe nominal au masculin pluriel.",
         prompt: "un résultat normal", answer: "des résultats normaux", difficulty: 2 },
-      { instruction: "Mets ce groupe nominal au masculin pluriel. (Attention : -eux ne change pas au pluriel !)",
+      { instruction: "Mets ce groupe nominal au masculin pluriel.",
         prompt: "un élève courageux", answer: "des élèves courageux", difficulty: 2 },
-      { instruction: "Mets ce groupe nominal au masculin pluriel. (Attention : -eux ne change pas au pluriel !)",
+      { instruction: "Mets ce groupe nominal au masculin pluriel.",
         prompt: "un ami sérieux", answer: "des amis sérieux", difficulty: 2 },
-      { instruction: "Mets ce groupe nominal au féminin singulier. (Attention au féminin de « beau » !)",
+      { instruction: "Mets ce groupe nominal au féminin singulier.",
         prompt: "un beau voisin", answer: "une belle voisine", difficulty: 2 },
-      { instruction: "Mets ce groupe nominal au féminin singulier. (Attention : « bel » devant voyelle → « belle » au féminin.)",
+      { instruction: "Mets ce groupe nominal au féminin singulier.",
         prompt: "un bel ami", answer: "une belle amie", difficulty: 2 },
-      { instruction: "Mets ce groupe nominal au féminin singulier. (Attention au féminin de « nouveau » !)",
+      { instruction: "Mets ce groupe nominal au féminin singulier.",
         prompt: "un nouvel ami", answer: "une nouvelle amie", difficulty: 2 },
-      { instruction: "Mets ce groupe nominal au féminin singulier. (Attention au féminin de « nouveau » !)",
+      { instruction: "Mets ce groupe nominal au féminin singulier.",
         prompt: "un nouveau voisin", answer: "une nouvelle voisine", difficulty: 2 },
-      { instruction: "Mets ce groupe nominal au féminin singulier. (Attention au féminin de « vieux » !)",
+      { instruction: "Mets ce groupe nominal au féminin singulier.",
         prompt: "un vieil ami", answer: "une vieille amie", difficulty: 2 },
-      { instruction: "Mets ce groupe nominal au féminin singulier. (Attention au féminin de « vieux » !)",
+      { instruction: "Mets ce groupe nominal au féminin singulier.",
         prompt: "un vieux voisin", answer: "une vieille voisine", difficulty: 2 },
-      { instruction: "Mets ce groupe nominal au féminin. (-eux → -euse)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un élève courageux", answer: "une élève courageuse", difficulty: 2 },
-      { instruction: "Mets ce groupe nominal au féminin. (-eux → -euse)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un ami heureux", answer: "une amie heureuse", difficulty: 2 },
-      { instruction: "Mets ce groupe nominal au féminin. (-eux → -euse)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un voisin sérieux", answer: "une voisine sérieuse", difficulty: 2 },
-      { instruction: "Mets ce groupe nominal au féminin. (-eur → -euse)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un ami menteur", answer: "une amie menteuse", difficulty: 2 },
-      { instruction: "Mets ce groupe nominal au féminin. (-if → -ive)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un ami sportif", answer: "une amie sportive", difficulty: 2 },
-      { instruction: "Mets ce groupe nominal au féminin. (-if → -ive)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un élève actif", answer: "une élève active", difficulty: 2 },
-      { instruction: "Mets ce groupe nominal au féminin. (-er → -ère)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un voisin étranger", answer: "une voisine étrangère", difficulty: 2 },
       { instruction: "Mets ce groupe nominal au féminin pluriel.",
         prompt: "un ami courageux", answer: "des amies courageuses", difficulty: 2 },
@@ -3981,45 +3981,45 @@ const EXERCISE_DATA = {
          maîtriser les formes complexes (doux/douce, faux/fausse, etc.)
          et distinguer adjectif épithète et attribut.
       ──────────────────────────────────────────────────────────────────────── */
-      { instruction: "Mets ce groupe nominal au pluriel. (Attention : cet adjectif de couleur est invariable !)",
+      { instruction: "Mets ce groupe nominal au pluriel.",
         prompt: "un pantalon marron", answer: "des pantalons marron", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au féminin pluriel. (Attention : cet adjectif de couleur est invariable !)",
+      { instruction: "Mets ce groupe nominal au féminin pluriel.",
         prompt: "un pull orange", answer: "des pulls orange", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au pluriel. (Attention : cet adjectif de couleur est invariable !)",
+      { instruction: "Mets ce groupe nominal au pluriel.",
         prompt: "une veste kaki", answer: "des vestes kaki", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au pluriel. (« roux » est un adjectif de couleur qui s'accorde.)",
+      { instruction: "Mets ce groupe nominal au pluriel.",
         prompt: "un chat roux", answer: "des chats roux", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au féminin pluriel. (« roux » s'accorde !)",
+      { instruction: "Mets ce groupe nominal au féminin pluriel.",
         prompt: "un chat roux", answer: "des chattes rousses", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au pluriel. (Le participe passé s'accorde.)",
+      { instruction: "Mets ce groupe nominal au pluriel.",
         prompt: "un livre ouvert", answer: "des livres ouverts", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au pluriel. (Le participe passé s'accorde.)",
+      { instruction: "Mets ce groupe nominal au pluriel.",
         prompt: "la porte fermée", answer: "les portes fermées", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au pluriel. (Le participe passé s'accorde.)",
+      { instruction: "Mets ce groupe nominal au pluriel.",
         prompt: "une fenêtre cassée", answer: "des fenêtres cassées", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au féminin. (-oux → -ouce)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un ami doux", answer: "une amie douce", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au féminin. (-aux → -ausse)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un voisin faux", answer: "une voisine fausse", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au féminin. (-ou → -olle)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un élève fou", answer: "une élève folle", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au féminin. (-eur → -eure)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un artiste supérieur", answer: "une artiste supérieure", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au féminin. (-eur → -eure)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un collègue meilleur", answer: "une collègue meilleure", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au féminin pluriel. (-al/-ale → -ales)",
+      { instruction: "Mets ce groupe nominal au féminin pluriel.",
         prompt: "un artiste génial", answer: "des artistes géniales", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au masculin pluriel. (-al → -aux)",
+      { instruction: "Mets ce groupe nominal au masculin pluriel.",
         prompt: "un accord général", answer: "des accords généraux", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au pluriel. (Attention : adjectif composé, seul le second élément s'accorde.)",
+      { instruction: "Mets ce groupe nominal au pluriel.",
         prompt: "un accord franco-allemand", answer: "des accords franco-allemands", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au féminin. (Adjectif composé.)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un artiste franco-allemand", answer: "une artiste franco-allemande", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au féminin. (-gu → -guë, avec tréma)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un élève ambigu", answer: "une élève ambiguë", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au féminin. (-et → -ète)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un élève complet", answer: "une élève complète", difficulty: 3 },
-      { instruction: "Mets ce groupe nominal au féminin. (-et → -ette)",
+      { instruction: "Mets ce groupe nominal au féminin.",
         prompt: "un voisin muet", answer: "une voisine muette", difficulty: 3 }
     ]
   },
@@ -6787,6 +6787,648 @@ const EXERCISE_DATA = {
         answers:  ["ils donnent de l'ombre", "ils donnent de l ombre", "ils donnent de l'ombre ."],
         noteOk:   "Le nom-noyau du GNS long est « arbres » (masculin pluriel) → « Ils »."
       }
+    ]
+  },
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     Orthographe — Transformer un GN du singulier au pluriel
+     Type : gn-pluriel-niveaux
+     Niveau 1 ★  : pluriels réguliers en -s (déterminant + nom simple)
+     Niveau 2 ★★ : pluriels irréguliers (-aux/-eux/-x/invariables) + adjectif
+     Niveau 3 ★★★: adjectifs irréguliers (bel/vieil/nouvel), exceptions,
+                   noms composés
+     Progression verrouillée : seuil 80 %, persistance localStorage.
+  ══════════════════════════════════════════════════════════════════════════ */
+
+  "ortho-transformer-gn-pluriel": {
+    title:      "Transformer un GN du singulier au pluriel",
+    domaine:    "Français",
+    competence: "Orthographe — Accord dans le groupe nominal",
+    type:       "gn-pluriel-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    backLink:   { href: "français-orthographe.html", label: "Orthographe" },
+
+    pools: {
+
+      /* ── Niveau 1 ★ — Pluriels réguliers en -s ───────────────────────────
+         Seuls les GN déterminant + nom dont le pluriel se forme par simple
+         ajout de -s. Aucun adjectif. Aucun nom en -eau/-au/-eu/-al/-ou.
+      ──────────────────────────────────────────────────────────────────────── */
+      1: [
+        { prompt: "un chat",     answer: "des chats",    rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "la fleur",    answer: "les fleurs",   rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "une trousse", answer: "des trousses", rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "le livre",    answer: "les livres",   rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "une étoile",  answer: "des étoiles",  rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "le ballon",   answer: "les ballons",  rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "une pomme",   answer: "des pommes",   rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "le stylo",    answer: "les stylos",   rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "un chien",    answer: "des chiens",   rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "la maison",   answer: "les maisons",  rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "un arbre",    answer: "des arbres",   rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "le jardin",   answer: "les jardins",  rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "une table",   answer: "des tables",   rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "le cahier",   answer: "les cahiers",  rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "une feuille", answer: "des feuilles", rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "un canard",   answer: "des canards",  rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "la porte",    answer: "les portes",   rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "le crayon",   answer: "les crayons",  rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "une lampe",   answer: "des lampes",   rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." },
+        { prompt: "une forêt",   answer: "des forêts",   rule: "En général, on forme le pluriel en ajoutant -s au nom. Le déterminant change aussi : un/une → des, le/la → les." }
+      ],
+
+      /* ── Niveau 2 ★★ — Pluriels irréguliers + adjectif simple ───────────
+         Noms en -al → -aux, en -eau/-au → -eaux/-aux, en -eu → -eux,
+         invariables (-s/-x déjà en place), et GN avec adjectif à accord
+         régulier.
+      ──────────────────────────────────────────────────────────────────────── */
+      2: [
+        { prompt: "un cheval rapide",    answer: "des chevaux rapides",    rule: "Les noms en -al font leur pluriel en -aux (cheval → chevaux). L'adjectif s'accorde en genre et en nombre avec le nom." },
+        { prompt: "le beau château",     answer: "les beaux châteaux",     rule: "Les noms en -eau prennent un -x au pluriel (château → châteaux). L'adjectif beau fait beaux au pluriel." },
+        { prompt: "un journal local",    answer: "des journaux locaux",    rule: "Les noms et adjectifs en -al font leur pluriel en -aux (journal → journaux, local → locaux)." },
+        { prompt: "un feu de camp",      answer: "des feux de camp",       rule: "Les noms en -eu prennent un -x au pluriel (feu → feux)." },
+        { prompt: "le nez rouge",        answer: "les nez rouges",         rule: "Certains noms sont invariables au pluriel : ils gardent la même forme (nez, bras, voix…). L'adjectif s'accorde quand même." },
+        { prompt: "un gâteau fondant",   answer: "des gâteaux fondants",   rule: "Les noms en -eau prennent un -x au pluriel. L'adjectif s'accorde en genre et en nombre avec le nom." },
+        { prompt: "un œil bleu",         answer: "des yeux bleus",         rule: "L'œil fait yeux au pluriel : c'est un pluriel supplétif (forme entièrement différente). L'adjectif s'accorde." },
+        { prompt: "le tuyau rouillé",    answer: "les tuyaux rouillés",    rule: "Les noms en -au prennent un -x au pluriel (tuyau → tuyaux). L'adjectif s'accorde en genre et en nombre." },
+        { prompt: "un animal sauvage",   answer: "des animaux sauvages",   rule: "Les noms en -al font leur pluriel en -aux (animal → animaux). L'adjectif s'accorde en genre et en nombre." },
+        { prompt: "le canal principal",  answer: "les canaux principaux",  rule: "Les noms et adjectifs en -al font leur pluriel en -aux (canal → canaux, principal → principaux)." },
+        { prompt: "un chapeau gris",     answer: "des chapeaux gris",      rule: "Les noms en -eau prennent un -x au pluriel. L'adjectif gris est invariable au pluriel car il se termine déjà par -s." },
+        { prompt: "le genou douloureux", answer: "les genoux douloureux",  rule: "Certains noms en -ou prennent -x au pluriel (bijou, caillou, chou, genou, hibou, joujou, pou). L'adjectif en -eux est invariable au masculin pluriel." },
+        { prompt: "un bras musclé",      answer: "des bras musclés",       rule: "Les noms qui se terminent par -s, -x ou -z ne changent pas au pluriel (bras → bras). L'adjectif s'accorde." },
+        { prompt: "la voix douce",       answer: "les voix douces",        rule: "Les noms qui se terminent par -x ne changent pas au pluriel (voix → voix). L'adjectif s'accorde." },
+        { prompt: "un bureau propre",    answer: "des bureaux propres",    rule: "Les noms en -eau prennent un -x au pluriel (bureau → bureaux). L'adjectif s'accorde en genre et en nombre." },
+        { prompt: "le cheval blanc",     answer: "les chevaux blancs",     rule: "Les noms en -al font leur pluriel en -aux (cheval → chevaux). L'adjectif s'accorde en genre et en nombre." },
+        { prompt: "un neveu joyeux",     answer: "des neveux joyeux",      rule: "Les noms en -eu prennent un -x au pluriel (neveu → neveux). L'adjectif en -eux ne change pas au masculin pluriel." },
+        { prompt: "un signal lumineux",  answer: "des signaux lumineux",   rule: "Les noms en -al font leur pluriel en -aux (signal → signaux). L'adjectif en -eux ne change pas au masculin pluriel." },
+        { prompt: "un bateau léger",     answer: "des bateaux légers",     rule: "Les noms en -eau prennent un -x au pluriel (bateau → bateaux). L'adjectif s'accorde en genre et en nombre." },
+        { prompt: "le pieu planté",      answer: "les pieux plantés",      rule: "Les noms en -eu prennent un -x au pluriel (pieu → pieux). L'adjectif s'accorde en genre et en nombre." }
+      ],
+
+      /* ── Niveau 3 ★★★ — Adjectifs irréguliers, exceptions, noms composés ─
+         Formes bel/vieil/nouvel → beaux/vieux/nouveaux ; exceptions -al :
+         bal → bals, carnaval → carnavals, festival → festivals,
+         récital → récitals ; noms composés.
+      ──────────────────────────────────────────────────────────────────────── */
+      3: [
+        { prompt: "le vieil arbre tordu",          answer: "les vieux arbres tordus",          rule: "Beau, nouveau, vieux s'emploient bel, nouvel, vieil devant un nom masculin commençant par une voyelle ou un h muet au singulier, mais leur pluriel est toujours beaux, nouveaux, vieux." },
+        { prompt: "un nouvel élève sérieux",       answer: "des nouveaux élèves sérieux",      rule: "Beau, nouveau, vieux s'emploient bel, nouvel, vieil devant un nom masculin commençant par une voyelle ou un h muet au singulier, mais leur pluriel est toujours beaux, nouveaux, vieux." },
+        { prompt: "un grand-père souriant",        answer: "des grands-pères souriants",        rule: "Dans un nom composé adjectif + nom, les deux éléments prennent généralement la marque du pluriel." },
+        { prompt: "le bal masqué",                 answer: "les bals masqués",                  rule: "Certains noms en -al ne font pas -aux au pluriel : bal → bals, carnaval → carnavals, festival → festivals, récital → récitals." },
+        { prompt: "un festival musical",           answer: "des festivals musicaux",            rule: "Festival, bal, carnaval et récital ne font pas -aux au pluriel. L'adjectif musical fait musicaux." },
+        { prompt: "un carnaval animé",             answer: "des carnavals animés",              rule: "Certains noms en -al ne font pas -aux au pluriel : carnaval → carnavals, festival → festivals, récital → récitals, bal → bals." },
+        { prompt: "le chef-d'œuvre ancien",        answer: "les chefs-d'œuvre anciens",         rule: "Dans un nom composé, le nom principal (ici chef) prend la marque du pluriel. L'adjectif s'accorde aussi." },
+        { prompt: "un récital classique",          answer: "des récitals classiques",           rule: "Récital, festival, bal et carnaval ne font pas -aux au pluriel. L'adjectif s'accorde en genre et en nombre." },
+        { prompt: "le bel oiseau coloré",          answer: "les beaux oiseaux colorés",         rule: "Beau s'emploie bel devant une voyelle au singulier, mais son pluriel est toujours beaux. Les noms en -eau prennent -x au pluriel." },
+        { prompt: "un nouvel ami fidèle",          answer: "des nouveaux amis fidèles",         rule: "Nouveau s'emploie nouvel devant une voyelle au singulier, mais son pluriel est toujours nouveaux." },
+        { prompt: "le vieil homme sage",           answer: "les vieux hommes sages",            rule: "Vieux s'emploie vieil devant une voyelle ou un h muet au singulier, mais son pluriel est toujours vieux." },
+        { prompt: "un beau-frère gentil",          answer: "des beaux-frères gentils",          rule: "Dans un nom composé adjectif + nom, les deux éléments prennent généralement la marque du pluriel." },
+        { prompt: "le bel enfant curieux",         answer: "les beaux enfants curieux",         rule: "Beau s'emploie bel devant une voyelle au singulier, mais son pluriel est toujours beaux. L'adjectif curieux est invariable au masculin pluriel." },
+        { prompt: "un bal populaire",              answer: "des bals populaires",               rule: "Bal ne fait pas -aux au pluriel : bal → bals." },
+        { prompt: "le vieil outil rouillé",        answer: "les vieux outils rouillés",         rule: "Vieux s'emploie vieil devant une voyelle ou un h muet au singulier, mais son pluriel est toujours vieux. L'adjectif s'accorde." },
+        { prompt: "un nouvel hôtel confortable",   answer: "des nouveaux hôtels confortables",  rule: "Nouveau s'emploie nouvel devant un h muet au singulier, mais son pluriel est toujours nouveaux." },
+        { prompt: "un long discours ennuyeux",     answer: "de longs discours ennuyeux",        rule: "Quand un adjectif précède le nom au pluriel, on utilise de à la place de des (de longs discours). Les noms en -s sont invariables au pluriel. L'adjectif en -eux ne change pas au masculin pluriel.", answers: ["de longs discours ennuyeux", "des longs discours ennuyeux"] },
+        { prompt: "un récital musical",            answer: "des récitals musicaux",             rule: "Récital ne fait pas -aux au pluriel : récital → récitals. L'adjectif musical fait musicaux." },
+        { prompt: "le bel appartement vide",       answer: "les beaux appartements vides",      rule: "Beau s'emploie bel devant une voyelle au singulier, mais son pluriel est toujours beaux." },
+        { prompt: "un festival régional",          answer: "des festivals régionaux",           rule: "Festival ne fait pas -aux au pluriel : festival → festivals. L'adjectif régional fait régionaux." }
+      ]
+    }
+  },
+
+  /* ── ─────────────────────────────────────────────────────────────────────── */
+
+  "ortho-transformer-gn-feminin": {
+    title: "Change de genre !",
+    domaine:    "Français",
+    competence: "Orthographe — Transformer un groupe nominal du masculin au féminin",
+    levels: ["CM1", "CM2", "6e"],
+    type: "genre-niveaux",
+    backLink: { href: "français-orthographe.html", label: "Orthographe" },
+
+    /* ── Pools par niveau ───────────────────────────────────────────────────
+       hintNoun : nom féminin utilisé pour générer la silhouette d'indice.
+       rule     : phrase rappelée en cas d'erreur sur la terminaison.
+    ─────────────────────────────────────────────────────────────────────── */
+    pools: {
+
+      /* Niveau 1 ★ — Féminisation régulière (12 items)
+         Déterminant + nom uniquement ; terminaisons courantes.            */
+      1: [
+        { masculine: "un chat",        answer: "une chatte",        hintNoun: "chatte",       rule: "Certains noms doublent leur consonne finale au féminin : chat → chatte." },
+        { masculine: "le voisin",      answer: "la voisine",        hintNoun: "voisine",      rule: "On forme le féminin de nombreux noms en ajoutant -e au masculin : voisin → voisine." },
+        { masculine: "un ami",         answer: "une amie",          hintNoun: "amie",         rule: "On forme le féminin de nombreux noms en ajoutant -e au masculin : ami → amie." },
+        { masculine: "le chanteur",    answer: "la chanteuse",      hintNoun: "chanteuse",    rule: "Les noms en -eur font souvent leur féminin en -euse : chanteur → chanteuse." },
+        { masculine: "un directeur",   answer: "une directrice",    hintNoun: "directrice",   rule: "Certains noms en -eur font -rice au féminin : directeur → directrice, acteur → actrice." },
+        { masculine: "le boulanger",   answer: "la boulangère",     hintNoun: "boulangère",   rule: "Les noms en -er font -ère au féminin : boulanger → boulangère." },
+        { masculine: "un lion",        answer: "une lionne",        hintNoun: "lionne",       rule: "Les noms en -on doublent le n au féminin : lion → lionne." },
+        { masculine: "le nageur",      answer: "la nageuse",        hintNoun: "nageuse",      rule: "Les noms en -eur font souvent leur féminin en -euse : nageur → nageuse." },
+        { masculine: "un baron",       answer: "une baronne",       hintNoun: "baronne",      rule: "Les noms en -on doublent le n au féminin : baron → baronne." },
+        { masculine: "le pharmacien",  answer: "la pharmacienne",   hintNoun: "pharmacienne", rule: "Les noms en -ien doublent le n au féminin : pharmacien → pharmacienne." },
+        { masculine: "un sportif",     answer: "une sportive",      hintNoun: "sportive",     rule: "Les noms en -f font leur féminin en -ve : sportif → sportive." },
+        { masculine: "le berger",      answer: "la bergère",        hintNoun: "bergère",      rule: "Les noms en -er font -ère au féminin : berger → bergère." }
+      ],
+
+      /* Niveau 2 ★★ — GN avec adjectif épithète (12 items)
+         Déterminant + (adj) + nom + (adj) ; tous les mots à féminiser.   */
+      2: [
+        { masculine: "un petit chien noir",       answer: "une petite chienne noire",     hintNoun: "chienne",    rule: "Les noms en -ien doublent le n au féminin : chien → chienne. Les adjectifs s'accordent aussi." },
+        { masculine: "le vieux chat gris",        answer: "la vieille chatte grise",      hintNoun: "chatte",     rule: "Vieux → vieille au féminin (forme irrégulière à mémoriser). Le nom et l'adjectif s'accordent en genre." },
+        { masculine: "un beau garçon blond",      answer: "une belle fille blonde",       hintNoun: "fille",      rule: "Beau → belle au féminin (forme irrégulière). Le nom garçon/fille change entièrement." },
+        { masculine: "le nouveau directeur",      answer: "la nouvelle directrice",       hintNoun: "directrice", rule: "Nouveau → nouvelle au féminin (forme irrégulière). Directeur → directrice (-eur → -rice)." },
+        { masculine: "un bon boulanger",          answer: "une bonne boulangère",         hintNoun: "boulangère", rule: "Bon → bonne au féminin (consonne doublée). Boulanger → boulangère (-er → -ère)." },
+        { masculine: "le jeune sportif rapide",   answer: "la jeune sportive rapide",     hintNoun: "sportive",   rule: "Jeune et rapide sont invariables (même forme au féminin). Sportif → sportive (-f → -ve)." },
+        { masculine: "un doux agneau blanc",      answer: "une douce agnelle blanche",    hintNoun: "agnelle",    rule: "Doux → douce au féminin. Agneau → agnelle (forme à retenir). Blanc → blanche (ajout de -he)." },
+        { masculine: "le grand nageur champion",  answer: "la grande nageuse championne", hintNoun: "nageuse",    rule: "Grand → grande (+e). Nageur → nageuse (-eur → -euse). Champion → championne (-on → -onne)." },
+        { masculine: "un vieux berger discret",   answer: "une vieille bergère discrète", hintNoun: "bergère",    rule: "Vieux → vieille (irrégulier). Berger → bergère (-er → -ère). Discret → discrète (accent + e)." },
+        { masculine: "le faux ami dangereux",     answer: "la fausse amie dangereuse",    hintNoun: "amie",       rule: "Faux → fausse au féminin (-x → -sse). Ami → amie (+e). Dangereux → dangereuse (-eux → -euse)." },
+        { masculine: "un beau chanteur célèbre",  answer: "une belle chanteuse célèbre",  hintNoun: "chanteuse",  rule: "Beau → belle (irrégulier). Chanteur → chanteuse (-eur → -euse). Célèbre est invariable." },
+        { masculine: "le nouveau voisin curieux", answer: "la nouvelle voisine curieuse", hintNoun: "voisine",    rule: "Nouveau → nouvelle (irrégulier). Voisin → voisine (+e). Curieux → curieuse (-eux → -euse)." }
+      ],
+
+      /* Niveau 3 ★★★ — Féminins irréguliers et supplétifs (10 items)
+         Formes entièrement différentes : féminins supplétifs à mémoriser. */
+      3: [
+        { masculine: "un roi courageux",    answer: "une reine courageuse",    hintNoun: "reine",      rule: "Roi → reine : féminin supplétif entièrement différent, à mémoriser. Courageux → courageuse (-eux → -euse)." },
+        { masculine: "le fils aîné",        answer: "la fille aînée",          hintNoun: "fille",      rule: "Fils → fille : féminin supplétif à mémoriser. Aîné → aînée (+e)." },
+        { masculine: "un homme fort",       answer: "une femme forte",         hintNoun: "femme",      rule: "Homme → femme : féminin supplétif à mémoriser. Fort → forte (+e)." },
+        { masculine: "le neveu studieux",   answer: "la nièce studieuse",      hintNoun: "nièce",      rule: "Neveu → nièce : féminin supplétif à mémoriser. Studieux → studieuse (-eux → -euse)." },
+        { masculine: "un héros célèbre",    answer: "une héroïne célèbre",     hintNoun: "héroïne",    rule: "Héros → héroïne : féminin supplétif à mémoriser. Célèbre est invariable." },
+        { masculine: "le duc puissant",     answer: "la duchesse puissante",   hintNoun: "duchesse",   rule: "Duc → duchesse : forme féminine irrégulière à mémoriser. Puissant → puissante (+e)." },
+        { masculine: "un copain fidèle",    answer: "une copine fidèle",       hintNoun: "copine",     rule: "Copain → copine : transformation irrégulière à mémoriser. Fidèle est invariable." },
+        { masculine: "le comte riche",      answer: "la comtesse riche",       hintNoun: "comtesse",   rule: "Comte → comtesse : forme féminine irrégulière à mémoriser. Riche est invariable." },
+        { masculine: "un compagnon loyal",  answer: "une compagne loyale",     hintNoun: "compagne",   rule: "Compagnon → compagne : féminin supplétif à mémoriser. Loyal → loyale (+e)." },
+        { masculine: "le traître rusé",     answer: "la traîtresse rusée",     hintNoun: "traîtresse", rule: "Traître → traîtresse : forme féminine irrégulière à mémoriser. Rusé → rusée (+e)." }
+      ]
+    }
+  },
+
+  /* ── ─────────────────────────────────────────────────────────────────────── */
+
+  "ortho-identifier-donneur-accord": {
+    title: "Qui commande l'accord ?",
+    domaine:    "Français",
+    competence: "Orthographe — Identifier le donneur d'accord",
+    levels: ["CM1", "CM2", "6e"],
+    type: "donneur-niveaux",
+    backLink: { href: "français-orthographe.html", label: "Orthographe" },
+
+    /* ── Niveau 1 — Donneur dans un GN simple ───────────────────────────────
+       wordRoles : "det" | "adj" | "nom"
+       Cliquer le nom = correct ; det ou adj = feedback ciblé.
+    ─────────────────────────────────────────────────────────────────────── */
+    lvl1Bank: [
+      { gn: "les petits chats",
+        noun: "chats", wordRoles: { "les": "det", "petits": "adj", "chats": "nom" },
+        genre: "masculin", nombre: "pluriel" },
+      { gn: "une belle journée",
+        noun: "journée", wordRoles: { "une": "det", "belle": "adj", "journée": "nom" },
+        genre: "féminin", nombre: "singulier" },
+      { gn: "des livres illustrés",
+        noun: "livres", wordRoles: { "des": "det", "livres": "nom", "illustrés": "adj" },
+        genre: "masculin", nombre: "pluriel" },
+      { gn: "mon vieux vélo",
+        noun: "vélo", wordRoles: { "mon": "det", "vieux": "adj", "vélo": "nom" },
+        genre: "masculin", nombre: "singulier" },
+      { gn: "ces grandes fenêtres",
+        noun: "fenêtres", wordRoles: { "ces": "det", "grandes": "adj", "fenêtres": "nom" },
+        genre: "féminin", nombre: "pluriel" },
+      { gn: "un élève attentif",
+        noun: "élève", wordRoles: { "un": "det", "élève": "nom", "attentif": "adj" },
+        genre: "masculin", nombre: "singulier" },
+      { gn: "leurs nouvelles chaussures",
+        noun: "chaussures", wordRoles: { "leurs": "det", "nouvelles": "adj", "chaussures": "nom" },
+        genre: "féminin", nombre: "pluriel" },
+      { gn: "le ciel étoilé",
+        noun: "ciel", wordRoles: { "le": "det", "ciel": "nom", "étoilé": "adj" },
+        genre: "masculin", nombre: "singulier" },
+      { gn: "une forêt mystérieuse",
+        noun: "forêt", wordRoles: { "une": "det", "forêt": "nom", "mystérieuse": "adj" },
+        genre: "féminin", nombre: "singulier" },
+      { gn: "des oiseaux colorés",
+        noun: "oiseaux", wordRoles: { "des": "det", "oiseaux": "nom", "colorés": "adj" },
+        genre: "masculin", nombre: "pluriel" },
+      { gn: "son premier dessin",
+        noun: "dessin", wordRoles: { "son": "det", "premier": "adj", "dessin": "nom" },
+        genre: "masculin", nombre: "singulier" },
+      { gn: "les meilleures idées",
+        noun: "idées", wordRoles: { "les": "det", "meilleures": "adj", "idées": "nom" },
+        genre: "féminin", nombre: "pluriel" }
+    ],
+
+    /* ── Niveau 2 — Donneur dans une phrase : sujet du verbe ────────────────
+       wordRoles    : "sujet" | "cod" | "cc" | "compl-nom" | "coi"
+       subjectWords : tokens valides (clicking any = correct)
+       verb         : token souligné en bleu (non-cliquable)
+       coordinated  : true → message spécial sujets coordonnés
+    ─────────────────────────────────────────────────────────────────────── */
+    lvl2Bank: [
+      { sentence: "Les filles chantent dans la cour.",
+        verb: "chantent", subjectDisplay: "Les filles",
+        subjectIndices: [0, 1],
+        genre: "féminin", nombre: "pluriel" },
+
+      { sentence: "Ma sœur aime les fraises.",
+        verb: "aime", subjectDisplay: "Ma sœur",
+        subjectIndices: [0, 1],
+        genre: "féminin", nombre: "singulier" },
+
+      { sentence: "Dans la forêt vivent des renards.",
+        verb: "vivent", subjectDisplay: "des renards",
+        subjectIndices: [4, 5],
+        genre: "masculin", nombre: "pluriel",
+        note: "Sujet inversé : des renards est placé après le verbe, mais c'est bien lui qui commande l'accord de vivent." },
+
+      { sentence: "Le chien de mes voisins aboie toute la nuit.",
+        verb: "aboie", subjectDisplay: "Le chien",
+        subjectIndices: [0, 1],
+        genre: "masculin", nombre: "singulier",
+        note: "Piège : voisins est complément du nom de chien, pas le sujet. Le nom noyau du sujet est chien (singulier)." },
+
+      { sentence: "Elle mange une pomme chaque matin.",
+        verb: "mange", subjectDisplay: "Elle",
+        subjectIndices: [0],
+        genre: "féminin", nombre: "singulier" },
+
+      { sentence: "Les oiseaux que tu observes chantent fort.",
+        verb: "chantent", subjectDisplay: "Les oiseaux",
+        subjectIndices: [0, 1],
+        genre: "masculin", nombre: "pluriel",
+        note: "La proposition relative que tu observes est enchâssée dans le groupe sujet. C'est oiseaux qui commande l'accord de chantent." },
+
+      { sentence: "Tous les lundis, Paul et Léa font du sport.",
+        verb: "font", subjectDisplay: "Paul et Léa",
+        subjectIndices: [3, 4, 5],
+        genre: "masculin", nombre: "pluriel",
+        note: "Deux sujets coordonnés → pluriel. Le genre dépend du mélange : masculin l'emporte si l'un est masculin." },
+
+      { sentence: "Lentement, la neige tombe sur la ville.",
+        verb: "tombe", subjectDisplay: "la neige",
+        subjectIndices: [1, 2],
+        genre: "féminin", nombre: "singulier",
+        note: "Le CC Lentement est en tête de phrase. Le sujet reste la neige." },
+
+      { sentence: "Ce livre me plaît beaucoup.",
+        verb: "plaît", subjectDisplay: "Ce livre",
+        subjectIndices: [0, 1],
+        genre: "masculin", nombre: "singulier" },
+
+      { sentence: "Mes parents et moi partons en vacances.",
+        verb: "partons", subjectDisplay: "Mes parents et moi",
+        subjectIndices: [0, 1, 2, 3],
+        genre: "masculin", nombre: "pluriel",
+        note: "moi + parents : deux sujets coordonnés incluant un pronom de 1re personne → pluriel." },
+
+      { sentence: "La directrice parle aux parents.",
+        verb: "parle", subjectDisplay: "La directrice",
+        subjectIndices: [0, 1],
+        genre: "féminin", nombre: "singulier" },
+
+      { sentence: "Les résultats de l'examen sont affichés.",
+        verb: "sont", subjectDisplay: "Les résultats",
+        subjectIndices: [0, 1],
+        genre: "masculin", nombre: "pluriel",
+        note: "Piège : examen est complément du nom résultats, pas le sujet. Le sujet est bien résultats (pluriel)." }
+    ]
+  },
+
+  /* ── ─────────────────────────────────────────────────────────────────────── */
+
+  "conjuguer-passe-compose-avoir": {
+    title: "Le passé composé avec avoir",
+    domaine:    "Français",
+    competence: "Conjugaison — Passé composé avec avoir",
+    type: "pc-avoir-niveaux",
+    levels: ["CM1", "CM2", "6e"],
+    questionsPerSession: 10,
+    backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
+
+    /* ── Niveau 1 — Participes en -é (1er groupe) et -i (2e groupe) ──────────
+       Pool de 14 items, tirage de 10 par session.
+    ─────────────────────────────────────────────────────────────────────────── */
+    level1Bank: [
+      /* 1er groupe — participe en -é */
+      {
+        sentence: "Hier, nous ___ (manger) une pizza.",
+        blanks: [{ infinitive: "manger", answer: "avons mangé", trap: false, group: 1 }]
+      },
+      {
+        sentence: "Elle ___ (chanter) toute la journée.",
+        blanks: [{ infinitive: "chanter", answer: "a chanté", trap: false, group: 1 }]
+      },
+      {
+        sentence: "J'___ (regarder) un film ce soir.",
+        blanks: [{ infinitive: "regarder", answer: "ai regardé", trap: false, group: 1 }]
+      },
+      {
+        sentence: "Le chien ___ (sauter) par-dessus la barrière.",
+        blanks: [{ infinitive: "sauter", answer: "a sauté", trap: false, group: 1 }]
+      },
+      {
+        sentence: "Tu ___ (écouter) de la musique ?",
+        blanks: [{ infinitive: "écouter", answer: "as écouté", trap: false, group: 1 }]
+      },
+      {
+        sentence: "Elle ___ (dessiner) un château.",
+        blanks: [{ infinitive: "dessiner", answer: "a dessiné", trap: false, group: 1 }]
+      },
+      {
+        sentence: "Vous ___ (danser) toute la nuit.",
+        blanks: [{ infinitive: "danser", answer: "avez dansé", trap: false, group: 1 }]
+      },
+      /* 2e groupe — participe en -i */
+      {
+        sentence: "Tu ___ (finir) tes devoirs ?",
+        blanks: [{ infinitive: "finir", answer: "as fini", trap: false, group: 2 }]
+      },
+      {
+        sentence: "Ils ___ (choisir) le chemin le plus court.",
+        blanks: [{ infinitive: "choisir", answer: "ont choisi", trap: false, group: 2 }]
+      },
+      {
+        sentence: "Vous ___ (remplir) le formulaire.",
+        blanks: [{ infinitive: "remplir", answer: "avez rempli", trap: false, group: 2 }]
+      },
+      {
+        sentence: "Nous ___ (obéir) aux consignes.",
+        blanks: [{ infinitive: "obéir", answer: "avons obéi", trap: false, group: 2 }]
+      },
+      {
+        sentence: "Ils ___ (applaudir) très fort.",
+        blanks: [{ infinitive: "applaudir", answer: "ont applaudi", trap: false, group: 2 }]
+      },
+      {
+        sentence: "J'___ (réfléchir) longtemps avant de répondre.",
+        blanks: [{ infinitive: "réfléchir", answer: "ai réfléchi", trap: false, group: 2 }]
+      },
+      {
+        sentence: "Nous ___ (avertir) les secours.",
+        blanks: [{ infinitive: "avertir", answer: "avons averti", trap: false, group: 2 }]
+      }
+    ],
+
+    /* ── Niveau 2 — Participes irréguliers en -s, -u, -t (3e groupe) ─────────
+       Pool de 15 items, tirage de 10 par session.
+    ─────────────────────────────────────────────────────────────────────────── */
+    level2Bank: [
+      /* Participes en -s */
+      {
+        sentence: "J'___ (prendre) le mauvais bus.",
+        blanks: [{ infinitive: "prendre", answer: "ai pris", trap: false,
+          feedbackBadPP: "prendre → <strong>pris</strong> (même famille : surpris, appris, compris)." }]
+      },
+      {
+        sentence: "Elle ___ (mettre) son manteau.",
+        blanks: [{ infinitive: "mettre", answer: "a mis", trap: false,
+          feedbackBadPP: "mettre → <strong>mis</strong>. Les verbes en -<em>ettre</em> font leur participe en -<em>is</em>." }]
+      },
+      {
+        sentence: "Nous ___ (apprendre) une nouvelle chanson.",
+        blanks: [{ infinitive: "apprendre", answer: "avons appris", trap: false,
+          feedbackBadPP: "apprendre → <strong>appris</strong> (même famille : pris, compris, surpris)." }]
+      },
+      {
+        sentence: "Ils ___ (comprendre) la leçon.",
+        blanks: [{ infinitive: "comprendre", answer: "ont compris", trap: false,
+          feedbackBadPP: "comprendre → <strong>compris</strong> (même famille : pris, appris, surpris)." }]
+      },
+      {
+        sentence: "Tu ___ (promettre) de revenir.",
+        blanks: [{ infinitive: "promettre", answer: "as promis", trap: false,
+          feedbackBadPP: "promettre → <strong>promis</strong>. Les verbes en -<em>ettre</em> font leur participe en -<em>is</em>." }]
+      },
+      /* Participes en -u */
+      {
+        sentence: "Il ___ (pouvoir) terminer à temps.",
+        blanks: [{ infinitive: "pouvoir", answer: "a pu", trap: false,
+          feedbackBadPP: "pouvoir → <strong>pu</strong>. Participe passé court et invariable." }]
+      },
+      {
+        sentence: "Vous ___ (savoir) répondre.",
+        blanks: [{ infinitive: "savoir", answer: "avez su", trap: false,
+          feedbackBadPP: "savoir → <strong>su</strong>. Participe passé court et invariable." }]
+      },
+      {
+        sentence: "J'___ (vouloir) partir tôt.",
+        blanks: [{ infinitive: "vouloir", answer: "ai voulu", trap: false,
+          feedbackBadPP: "vouloir → <strong>voulu</strong>. Participe irrégulier en -<em>u</em>." }]
+      },
+      {
+        sentence: "Nous ___ (voir) un aigle dans le ciel.",
+        blanks: [{ infinitive: "voir", answer: "avons vu", trap: false,
+          feedbackBadPP: "voir → <strong>vu</strong>. Participe passé court et invariable." }]
+      },
+      {
+        sentence: "Elles ___ (recevoir) une lettre.",
+        blanks: [{ infinitive: "recevoir", answer: "ont reçu", trap: false,
+          feedbackBadPP: "recevoir → <strong>reçu</strong>. Attention au ç ! Participe en -<em>u</em>." }]
+      },
+      /* Participes en -t */
+      {
+        sentence: "Tu ___ (faire) un effort.",
+        blanks: [{ infinitive: "faire", answer: "as fait", trap: false,
+          feedbackBadPP: "faire → <strong>fait</strong>. Verbe irrégulier très fréquent." }]
+      },
+      {
+        sentence: "Il ___ (dire) la vérité.",
+        blanks: [{ infinitive: "dire", answer: "a dit", trap: false,
+          feedbackBadPP: "dire → <strong>dit</strong>. Verbe irrégulier." }]
+      },
+      {
+        sentence: "Nous ___ (écrire) une histoire.",
+        blanks: [{ infinitive: "écrire", answer: "avons écrit", trap: false,
+          feedbackBadPP: "écrire → <strong>écrit</strong>. Les verbes en -<em>ire</em> font leur participe en -<em>it</em>." }]
+      },
+      {
+        sentence: "J'___ (conduire) jusqu'à Madrid.",
+        blanks: [{ infinitive: "conduire", answer: "ai conduit", trap: false,
+          feedbackBadPP: "conduire → <strong>conduit</strong>. Les verbes en -<em>uire</em> font leur participe en -<em>it</em>." }]
+      },
+      {
+        sentence: "Elles ___ (peindre) un tableau.",
+        blanks: [{ infinitive: "peindre", answer: "ont peint", trap: false,
+          feedbackBadPP: "peindre → <strong>peint</strong>. Les verbes en -<em>eindre</em> font leur participe en -<em>eint</em>." }]
+      }
+    ],
+
+    /* ── Niveau 3 — Mélange des trois groupes + phrases complexes ────────────
+       Pool de 14 items, tirage de 10 par session.
+       Pièges être (trap:true) : non pénalisants, juste un éveil.
+    ─────────────────────────────────────────────────────────────────────────── */
+    level3Bank: [
+      {
+        sentence: "Ce matin, Paul et Léa ___ (finir) leur petit-déjeuner rapidement.",
+        blanks: [{ infinitive: "finir", answer: "ont fini", trap: false,
+          feedbackBadPP: "finir → <strong>fini</strong> (2<sup>e</sup> groupe, participe en -<em>i</em>)." }]
+      },
+      {
+        sentence: "Hier soir, nous ___ (voir) un très beau coucher de soleil.",
+        blanks: [{ infinitive: "voir", answer: "avons vu", trap: false,
+          feedbackBadPP: "voir → <strong>vu</strong> (3<sup>e</sup> groupe, participe irrégulier en -<em>u</em>)." }]
+      },
+      {
+        sentence: "Tu ___ (manger) et ensuite tu ___ (partir)… non, attends !",
+        blanks: [
+          { infinitive: "manger", answer: "as mangé", trap: false,
+            feedbackBadPP: "manger → <strong>mangé</strong> (1<sup>er</sup> groupe, participe en -<em>é</em>)." },
+          { infinitive: "partir", answer: null, trap: true,
+            trapMessage: "<em>Partir</em> se conjugue avec <strong>être</strong>, pas avoir ! On dit : tu <em>es parti(e)</em>." }
+        ]
+      },
+      {
+        sentence: "Elle ___ (écrire) une longue lettre à sa grand-mère.",
+        blanks: [{ infinitive: "écrire", answer: "a écrit", trap: false,
+          feedbackBadPP: "écrire → <strong>écrit</strong> (3<sup>e</sup> groupe, verbes en -<em>ire</em> → participe en -<em>it</em>)." }]
+      },
+      {
+        sentence: "Ils ___ (choisir) le bon chemin et ___ (prendre) la bonne décision.",
+        blanks: [
+          { infinitive: "choisir", answer: "ont choisi", trap: false,
+            feedbackBadPP: "choisir → <strong>choisi</strong> (2<sup>e</sup> groupe, participe en -<em>i</em>)." },
+          { infinitive: "prendre", answer: "ont pris", trap: false,
+            feedbackBadPP: "prendre → <strong>pris</strong> (3<sup>e</sup> groupe, participe en -<em>is</em>)." }
+        ]
+      },
+      {
+        sentence: "J'___ (vouloir) appeler mais je n'___ (pouvoir) pas.",
+        blanks: [
+          { infinitive: "vouloir", answer: "ai voulu", trap: false,
+            feedbackBadPP: "vouloir → <strong>voulu</strong> (3<sup>e</sup> groupe, participe en -<em>u</em>)." },
+          { infinitive: "pouvoir", answer: "ai pu", trap: false,
+            feedbackBadPP: "pouvoir → <strong>pu</strong> (3<sup>e</sup> groupe, participe irrégulier court)." }
+        ]
+      },
+      {
+        sentence: "Vous ___ (apprendre) cette règle et vous ___ (réussir) le test.",
+        blanks: [
+          { infinitive: "apprendre", answer: "avez appris", trap: false,
+            feedbackBadPP: "apprendre → <strong>appris</strong> (3<sup>e</sup> groupe, famille : pris, compris)." },
+          { infinitive: "réussir", answer: "avez réussi", trap: false,
+            feedbackBadPP: "réussir → <strong>réussi</strong> (2<sup>e</sup> groupe, participe en -<em>i</em>)." }
+        ]
+      },
+      {
+        sentence: "Le chat ___ (sauter) sur la table et ___ (renverser) le verre.",
+        blanks: [
+          { infinitive: "sauter", answer: "a sauté", trap: false,
+            feedbackBadPP: "sauter → <strong>sauté</strong> (1<sup>er</sup> groupe, participe en -<em>é</em>)." },
+          { infinitive: "renverser", answer: "a renversé", trap: false,
+            feedbackBadPP: "renverser → <strong>renversé</strong> (1<sup>er</sup> groupe, participe en -<em>é</em>)." }
+        ]
+      },
+      {
+        sentence: "Nous ___ (dire) bonjour et nous ___ (repartir).",
+        blanks: [
+          { infinitive: "dire", answer: "avons dit", trap: false,
+            feedbackBadPP: "dire → <strong>dit</strong> (3<sup>e</sup> groupe, verbe irrégulier)." },
+          { infinitive: "repartir", answer: null, trap: true,
+            trapMessage: "<em>Repartir</em> se conjugue avec <strong>être</strong>, pas avoir ! On dit : nous <em>sommes repartis</em>." }
+        ]
+      },
+      {
+        sentence: "Elle ___ (peindre) toute la matinée puis elle ___ (ranger) ses affaires.",
+        blanks: [
+          { infinitive: "peindre", answer: "a peint", trap: false,
+            feedbackBadPP: "peindre → <strong>peint</strong>. Les verbes en -<em>eindre</em> font leur participe en -<em>eint</em>." },
+          { infinitive: "ranger", answer: "a rangé", trap: false,
+            feedbackBadPP: "ranger → <strong>rangé</strong> (1<sup>er</sup> groupe, participe en -<em>é</em>)." }
+        ]
+      },
+      {
+        sentence: "Tu ___ (recevoir) le colis que j'___ (envoyer) ?",
+        blanks: [
+          { infinitive: "recevoir", answer: "as reçu", trap: false,
+            feedbackBadPP: "recevoir → <strong>reçu</strong> (3<sup>e</sup> groupe, participe irrégulier). Attention au ç !" },
+          { infinitive: "envoyer", answer: "ai envoyé", trap: false,
+            feedbackBadPP: "envoyer → <strong>envoyé</strong> (1<sup>er</sup> groupe, participe en -<em>é</em>)." }
+        ]
+      },
+      {
+        sentence: "Ils ___ (mettre) la table et ___ (servir) le repas.",
+        blanks: [
+          { infinitive: "mettre", answer: "ont mis", trap: false,
+            feedbackBadPP: "mettre → <strong>mis</strong> (3<sup>e</sup> groupe, verbes en -<em>ettre</em> → participe en -<em>is</em>)." },
+          { infinitive: "servir", answer: "ont servi", trap: false,
+            feedbackBadPP: "servir → <strong>servi</strong> (3<sup>e</sup> groupe, participe en -<em>i</em> comme le 2<sup>e</sup> groupe)." }
+        ]
+      },
+      {
+        sentence: "Nous ___ (comprendre) la question mais nous ___ (répondre) trop vite.",
+        blanks: [
+          { infinitive: "comprendre", answer: "avons compris", trap: false,
+            feedbackBadPP: "comprendre → <strong>compris</strong> (3<sup>e</sup> groupe, famille : pris, appris)." },
+          { infinitive: "répondre", answer: "avons répondu", trap: false,
+            feedbackBadPP: "répondre → <strong>répondu</strong> (3<sup>e</sup> groupe, participe en -<em>u</em>)." }
+        ]
+      },
+      {
+        sentence: "J'___ (conduire) jusqu'au village et j'___ (découvrir) un marché.",
+        blanks: [
+          { infinitive: "conduire", answer: "ai conduit", trap: false,
+            feedbackBadPP: "conduire → <strong>conduit</strong> (3<sup>e</sup> groupe, verbes en -<em>uire</em> → participe en -<em>it</em>)." },
+          { infinitive: "découvrir", answer: "ai découvert", trap: false,
+            feedbackBadPP: "découvrir → <strong>découvert</strong> (3<sup>e</sup> groupe, verbes en -<em>vrir</em> → participe en -<em>vert</em>)." }
+        ]
+      }
+    ]
+  },
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     ÊTRE OU AVOIR ?  —  3 niveaux déverrouillables à 80 %
+     Slug : etre-ou-avoir   |   Type : etre-ou-avoir-niveaux
+  ══════════════════════════════════════════════════════════════════════════ */
+  "etre-ou-avoir": {
+    title: "Être ou avoir ?",
+    domaine:    "Français",
+    competence: "Conjugaison — Choisir l'auxiliaire être ou avoir au passé composé",
+    type: "etre-ou-avoir-niveaux",
+    levels: ["CM1", "CM2", "6e"],
+    questionsPerSession: 12,
+    backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
+
+    /* Niveau 1 — verbes clairement être ou avoir, cas non ambigus */
+    level1Bank: [
+      { sentence: "Hier, elle ___ partie tôt.",     auxiliary: "être",  answer: "est"   },
+      { sentence: "Nous ___ mangé une pizza.",       auxiliary: "avoir", answer: "avons" },
+      { sentence: "Ils ___ arrivés en retard.",      auxiliary: "être",  answer: "sont"  },
+      { sentence: "Tu ___ fini tes devoirs ?",       auxiliary: "avoir", answer: "as"    },
+      { sentence: "Je ___ allé au parc.",            auxiliary: "être",  answer: "suis"  },
+      { sentence: "Vous ___ choisi le bon chemin.",  auxiliary: "avoir", answer: "avez"  },
+      { sentence: "Elle ___ née en avril.",          auxiliary: "être",  answer: "est"   },
+      { sentence: "Nous ___ écrit une lettre.",      auxiliary: "avoir", answer: "avons" },
+      { sentence: "Il ___ tombé dans la cour.",      auxiliary: "être",  answer: "est"   },
+      { sentence: "Elles ___ venues nous voir.",     auxiliary: "être",  answer: "sont"  },
+      { sentence: "Tu ___ pris ton sac.",            auxiliary: "avoir", answer: "as"    },
+      { sentence: "J'___ fait un gâteau.",           auxiliary: "avoir", answer: "ai"    }
+    ],
+
+    /* Niveau 2 — pronominaux + pièges */
+    level2Bank: [
+      { sentence: "Elle ___ levée à 7h.",              auxiliary: "être",  answer: "s'est",        feedbackType: "pronominal"  },
+      { sentence: "Il ___ souvenu de moi.",             auxiliary: "être",  answer: "s'est",        feedbackType: "pronominal"  },
+      { sentence: "Elles ___ dépêchées ce matin.",      auxiliary: "être",  answer: "se sont",      feedbackType: "pronominal"  },
+      { sentence: "Il ___ trompé de route.",            auxiliary: "être",  answer: "s'est",        feedbackType: "pronominal"  },
+      { sentence: "Nous ___ promenés dans le parc.",    auxiliary: "être",  answer: "nous sommes",  feedbackType: "pronominal"  },
+      { sentence: "Tu ___ eu peur.",                    auxiliary: "avoir", answer: "as",           feedbackType: "trap-avoir"  },
+      { sentence: "Tu ___ été malade.",                 auxiliary: "avoir", answer: "as",           feedbackType: "trap-etre"   },
+      { sentence: "Ils ___ restés à la maison.",        auxiliary: "être",  answer: "sont"                                      },
+      { sentence: "Elle ___ blessée au genou.",         auxiliary: "être",  answer: "s'est",        feedbackType: "pronominal"  },
+      { sentence: "Vous ___ sortis sans manteau.",      auxiliary: "être",  answer: "êtes"                                      },
+      { sentence: "J'___ passé une bonne journée.",     auxiliary: "avoir", answer: "ai",           feedbackType: "trap-passer" },
+      { sentence: "Nous ___ rentrés à minuit.",         auxiliary: "être",  answer: "sommes"                                    }
+    ],
+
+    /* Niveau 3 — verbes à double auxiliaire selon le sens */
+    level3Bank: [
+      { sentence: "Elle ___ monté les valises.",      auxiliary: "avoir", answer: "a",      cod: "les valises" },
+      { sentence: "Elle ___ montée dans sa chambre.", auxiliary: "être",  answer: "est"                        },
+      { sentence: "Il ___ sorti le chien.",           auxiliary: "avoir", answer: "a",      cod: "le chien"    },
+      { sentence: "Il ___ sorti dans le jardin.",     auxiliary: "être",  answer: "est"                        },
+      { sentence: "Nous ___ descendu les cartons.",   auxiliary: "avoir", answer: "avons",  cod: "les cartons" },
+      { sentence: "Nous ___ descendus à la cave.",    auxiliary: "être",  answer: "sommes"                     },
+      { sentence: "Tu ___ rentré le vélo.",           auxiliary: "avoir", answer: "as",     cod: "le vélo"     },
+      { sentence: "Tu ___ rentré à la maison.",       auxiliary: "être",  answer: "es"                         },
+      { sentence: "Elle ___ retourné la crêpe.",      auxiliary: "avoir", answer: "a",      cod: "la crêpe"    },
+      { sentence: "Elle ___ retournée chez sa mère.", auxiliary: "être",  answer: "est"                        }
     ]
   }
 
