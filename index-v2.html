@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PROFICIAMUS — Du diagnostic au progrès</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red:    #E63946;
+      --green:  #2D9C3C;
+      --blue:   #1B4EBF;
+      --yellow: #F5A623;
+      --purple: #7B2D8B;
+      --text:   #1a1a1a;
+      --gray:   #6b7280;
+      --border: #e0e0e0;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #ffffff;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ─── WRAPPER ─── */
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ─── NAVBAR ─── */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: #fff;
+      border-bottom: 1px solid #e8e8e8;
+      height: auto;
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar__inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .navbar__brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .navbar__brand img {
+      height: 52px;
+      width: auto;
+    }
+
+    .navbar__brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .navbar__name {
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: 1px;
+    }
+
+    .navbar__tagline {
+      font-size: 12px;
+      font-style: italic;
+      font-weight: 700;
+      color: #102B6A;
+      margin-top: 2px;
+      letter-spacing: .01em;
+    }
+
+    .navbar__nav {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .navbar__nav a {
+      text-decoration: none;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      transition: color .2s;
+    }
+    .navbar__nav a:hover { color: var(--blue); }
+
+    .nav-lang {
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .navbar__nav .btn-login {
+      color: #fff !important;
+    }
+
+    .btn-login {
+      background: #102B6A;
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s;
+    }
+    .btn-login:hover { background: #0b1e4d; }
+
+    /* ─── MULTICOLOR NAME HELPER ─── */
+    .mc { font-weight: 800; }
+    .mc-r { color: var(--red); }
+    .mc-g { color: var(--green); }
+    .mc-b { color: var(--blue); }
+    .mc-y { color: var(--yellow); }
+
+    /* ─── HERO ─── */
+    .hero {
+      padding: 80px 20px 8px;
+      text-align: center;
+      position: relative;
+      background: linear-gradient(180deg, #e8f0fe 0%, #f5f8ff 55%, #ffffff 100%);
+    }
+
+    .hero__img {
+      width: 300px;
+      max-width: 80%;
+      margin: 0 auto 10px;
+      display: block;
+    }
+
+    .hero__cycle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #102B6A;
+      border-radius: 999px;
+      padding: 10px 26px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 20px;
+      letter-spacing: .04em;
+    }
+    .hero__cycle .pill-dot { color: #D62839; }
+
+    /* ─── 3 ESPACES ─── */
+    .section { margin-bottom: 48px; position: relative; z-index: 1; }
+    .section-title {
+      text-align: center;
+      font-size: clamp(18px, 2.5vw, 22px);
+      font-weight: 800;
+      margin-bottom: 32px;
+    }
+
+    .espaces-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 30px 24px;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card__icon {
+      width: 62px; height: 62px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto;
+    }
+
+    .card__title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: .5px;
+    }
+
+    .card__sub {
+      font-size: 13px;
+      color: var(--gray);
+      margin-top: -8px;
+    }
+
+    .card__sep {
+      height: 2px;
+      width: 40px;
+      margin: 0 auto;
+      border-radius: 2px;
+    }
+
+    .card__list {
+      list-style: none;
+      text-align: left;
+      font-size: 13.5px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .card__list li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ─── CARD HOVER INTERACTIF ─── */
+    .card[data-href] {
+      cursor: pointer;
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .card[data-href]:hover {
+      transform: translateY(-7px) scale(1.015);
+    }
+    .card[data-href]:active {
+      transform: translateY(-2px) scale(1.005);
+      transition-duration: .1s;
+    }
+    .card--eleve:hover  {
+      box-shadow: 0 12px 36px rgba(27,78,191,.22);
+      border-color: var(--blue);
+    }
+    .card--enseignant:hover {
+      box-shadow: 0 12px 36px rgba(230,57,70,.20);
+      border-color: var(--red);
+    }
+    /* Bouton intérieur : s'illumine aussi au hover de la carte */
+    .card--eleve:hover     .card__btn { opacity: .92; letter-spacing: .02em; }
+    .card--enseignant:hover .card__btn { opacity: .92; letter-spacing: .02em; }
+    .card__btn {
+      display: block;
+      padding: 11px 0;
+      border-radius: 8px;
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      transition: opacity .2s, letter-spacing .2s;
+      text-decoration: none;
+      text-align: center;
+      margin-top: 4px;
+      transition: opacity .2s;
+    }
+    .card__btn:hover { opacity: .88; }
+
+    /* ─── 4 ÉTAPES ─── */
+    .steps-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: nowrap;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 160px;
+      flex-shrink: 0;
+    }
+
+    .step__circle {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .step__num {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid currentColor;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step__label {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .step__desc {
+      font-size: 12px;
+      color: var(--gray);
+      line-height: 1.4;
+    }
+
+    .step-arrow {
+      font-size: 22px;
+      color: #ccc;
+      margin-top: 20px;
+      padding: 0 4px;
+      flex-shrink: 0;
+    }
+
+    /* ─── POUR CHAQUE DIFFICULTÉ ─── */
+    .diag-row {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      justify-content: center;
+    }
+
+    .diag-block {
+      flex: 1;
+      max-width: 300px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 18px;
+      font-size: 13px;
+    }
+
+    .diag-label {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      margin-bottom: 6px;
+    }
+
+    .diag-arrow {
+      font-size: 24px;
+      color: #ccc;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      flex-shrink: 0;
+    }
+
+    .diag-percent {
+      font-size: 38px;
+      font-weight: 800;
+      color: var(--red);
+      line-height: 1;
+      margin: 8px 0 4px;
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: #f0f0f0;
+      border-radius: 3px;
+      margin: 6px 0;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--red);
+      width: 45%;
+    }
+
+    .diag-small { font-size: 11.5px; color: var(--gray); }
+
+    .diag-illustration {
+      font-size: 32px;
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    .diag-resources { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-top: 8px; font-size: 12.5px; }
+    .diag-resources li::before { content: '✅ '; }
+
+    /* ─── RESSOURCES VARIÉES ─── */
+    .ressources-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .ressource-card {
+      width: 150px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 12px 18px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 1px 6px rgba(0,0,0,.05);
+    }
+
+    .ressource-icon {
+      font-size: 40px;
+    }
+
+    .ressource-label {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* ─── POUR QUI ─── */
+    .pourqui-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    .pourqui-col {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .pourqui-avatar {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+    }
+
+    .pourqui-title {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .pourqui-desc {
+      font-size: 14px;
+      color: var(--gray);
+      line-height: 1.6;
+      max-width: 240px;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #102B6A;
+      color: #fff;
+      padding: 10px 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer__inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer__links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer__links a {
+      color: #ffffffbb;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      transition: color .2s;
+    }
+    .footer__links a:hover { color: #fff; }
+
+    /* ─── SECTION BACKGROUNDS ─── */
+    .section--steps {
+      background: linear-gradient(135deg, #f0f5ff 0%, #f5fff8 100%);
+      padding: 40px 0;
+      margin-bottom: 0;
+    }
+    .section--diag {
+      background: #fafbfe;
+      padding: 40px 0;
+      margin-bottom: 0;
+    }
+    .section--ressources {
+      background: linear-gradient(135deg, #fff8f0 0%, #f5f0ff 100%);
+      padding: 40px 0;
+      margin-bottom: 0;
+    }
+    .section--pourqui {
+      background: linear-gradient(180deg, #f4f7ff 0%, #edf5ee 100%);
+      padding: 40px 0 48px;
+      margin-bottom: 0;
+    }
+
+    /* ─── UTILITY ─── */
+    .spacer { margin-top: 0; }
+
+    /* ══════════════════════════════════════
+       RESPONSIVE — TABLETTE  (≤ 768px)
+    ══════════════════════════════════════ */
+    @media (max-width: 768px) {
+
+      /* Navbar */
+      .navbar__brand img { height: 44px; }
+      .navbar__nav { gap: 12px; }
+      .navbar__nav a:not(.btn-login) { display: none; }
+      .nav-lang { display: none; }
+
+      /* Hero */
+      .hero { padding-top: 62px; padding-bottom: 12px; }
+      .hero__img { width: 220px; }
+      .hero__cycle {
+        font-size: 12.5px;
+        padding: 8px 16px;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+      }
+
+      /* 3 Espaces : 1 colonne */
+      .espaces-grid { grid-template-columns: 1fr; }
+
+      /* 4 Étapes : 2 par ligne, flèches masquées */
+      .steps-row { flex-wrap: wrap; gap: 24px; }
+      .step { width: calc(50% - 32px); min-width: 120px; }
+      .step-arrow { display: none; }
+
+      /* Diagnostic : colonne, flèches masquées */
+      .diag-row { flex-direction: column; align-items: stretch; gap: 16px; }
+      .diag-block { max-width: 100%; }
+      .diag-arrow { display: none; }
+
+      /* Ressources : 3 par ligne */
+      .ressource-card { width: calc(33.33% - 12px); }
+
+      /* Pour qui : 1 colonne */
+      .pourqui-row { grid-template-columns: 1fr; gap: 28px; }
+
+      /* Sections colorées */
+      .section--steps,
+      .section--diag,
+      .section--ressources,
+      .section--pourqui { padding: 28px 0; }
+
+      .section-title { margin-bottom: 20px; }
+    }
+
+    /* ══════════════════════════════════════
+       RESPONSIVE — MOBILE  (≤ 480px)
+    ══════════════════════════════════════ */
+    @media (max-width: 480px) {
+
+      /* Navbar */
+      .navbar__brand img { height: 38px; }
+      .btn-login { padding: 7px 13px; font-size: 13px; }
+
+      /* Hero */
+      .hero { padding-top: 56px; }
+      .hero__img { width: 180px; }
+      .hero__cycle { font-size: 11.5px; padding: 7px 12px; gap: 4px; }
+
+      /* 4 Étapes : 1 par ligne */
+      .step { width: 100%; }
+
+      /* Ressources : 2 par ligne */
+      .ressource-card { width: calc(50% - 8px); }
+
+      /* Cartes */
+      .card { padding: 22px 16px; }
+
+      /* Sections */
+      .section--steps,
+      .section--diag,
+      .section--ressources,
+      .section--pourqui { padding: 20px 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     1. NAVBAR
+═══════════════════════════════════ -->
+<nav class="navbar">
+  <div class="navbar__inner">
+    <a href="#" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=3" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="#">Accueil</a>
+      <a href="#">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════
+     2. HERO
+═══════════════════════════════════ -->
+<section class="hero">
+  <img src="assets/proficiamusgrand.png?v=4" alt="Proficiamus illustration" class="hero__img" />
+  <div class="hero__cycle" data-aos="fade-up">
+    Plateforme pour le Cycle&nbsp;3 :
+    <span class="pill-dot">•</span> CM1
+    <span class="pill-dot">•</span> CM2
+    <span class="pill-dot">•</span> 6ÈME
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     4. 3 ESPACES
+═══════════════════════════════════ -->
+<section class="section">
+  <div class="wrapper">
+    <div class="espaces-grid">
+
+      <!-- Élèves -->
+      <div class="card card--eleve" data-href="dashboard-eleve.html" data-aos="fade-up" data-aos-delay="0">
+        <div class="card__icon" style="background:var(--blue)">🧑‍🎓</div>
+        <div class="card__title" style="color:var(--blue)">ESPACE ÉLÈVES</div>
+        <div class="card__sub">S'entraîner et progresser</div>
+        <div class="card__sep" style="background:var(--red)"></div>
+        <ul class="card__list">
+          <li>🎮 Exercices interactifs</li>
+          <li>🧩 Jeux pédagogiques</li>
+          <li>💡 Conseils pour réussir</li>
+          <li>📊 Suivi des compétences</li>
+        </ul>
+        <a href="dashboard-eleve.html" class="card__btn" style="background:var(--blue)">→ Accéder à mon espace</a>
+      </div>
+
+      <!-- Enseignants -->
+      <div class="card card--enseignant" data-href="dashboard-enseignant.html" data-aos="fade-up" data-aos-delay="150">
+        <div class="card__icon" style="background:var(--red)">👩‍🏫</div>
+        <div class="card__title" style="color:var(--red)">ESPACE ENSEIGNANTS</div>
+        <div class="card__sub">Analyser et accompagner</div>
+        <div class="card__sep" style="background:var(--red)"></div>
+        <ul class="card__list">
+          <li>📊 Résultats détaillés</li>
+          <li>🔍 Diagnostic des besoins</li>
+          <li>🧰 Ressources de remédiation</li>
+          <li>👥 Suivi des élèves</li>
+        </ul>
+        <a href="dashboard-enseignant.html" class="card__btn" style="background:var(--red)">→ Accéder à mon espace</a>
+      </div>
+
+      <!-- Visiteur -->
+      <div class="card" data-aos="fade-up" data-aos-delay="300">
+        <div class="card__icon" style="background:var(--green)">👀</div>
+        <div class="card__title" style="color:var(--green)">ESPACE VISITEUR</div>
+        <div class="card__sub">Découvrir PROFICIAMUS</div>
+        <div class="card__sep" style="background:var(--green)"></div>
+        <ul class="card__list">
+          <li>🔓 Accès libre</li>
+          <li>🙋 Sans inscription</li>
+          <li>🎮 Accès aux exercices</li>
+          <li>🖥️ Découverte de la plateforme</li>
+        </ul>
+        <a href="#" class="card__btn" style="background:var(--green)">→ Découvrir sans inscription</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     5. 4 ÉTAPES
+═══════════════════════════════════ -->
+<section class="section section--steps">
+  <div class="wrapper">
+    <h2 class="section-title" style="color:var(--green)" data-aos="fade-up">Une démarche simple en 4 étapes</h2>
+    <div class="steps-row">
+
+      <div class="step" data-aos="zoom-in" data-aos-delay="0">
+        <div class="step__circle" style="background:var(--blue);color:var(--blue)">
+          <span style="font-size:26px">📊</span>
+          <span class="step__num" style="color:var(--blue)">1</span>
+        </div>
+        <div class="step__label">Évaluer</div>
+        <div class="step__desc">Des évaluations adaptées aux programmes.</div>
+      </div>
+      <div class="step-arrow">→</div>
+
+      <div class="step" data-aos="zoom-in" data-aos-delay="100">
+        <div class="step__circle" style="background:var(--green);color:var(--green)">
+          <span style="font-size:26px">🔍</span>
+          <span class="step__num" style="color:var(--green)">2</span>
+        </div>
+        <div class="step__label">Diagnostiquer</div>
+        <div class="step__desc">Identification précise des forces et des difficultés.</div>
+      </div>
+      <div class="step-arrow">→</div>
+
+      <div class="step" data-aos="zoom-in" data-aos-delay="200">
+        <div class="step__circle" style="background:var(--yellow);color:var(--yellow)">
+          <span style="font-size:26px">🔧</span>
+          <span class="step__num" style="color:var(--yellow)">3</span>
+        </div>
+        <div class="step__label">Remédier</div>
+        <div class="step__desc">Des ressources concrètes pour chaque besoin.</div>
+      </div>
+      <div class="step-arrow">→</div>
+
+      <div class="step" data-aos="zoom-in" data-aos-delay="300">
+        <div class="step__circle" style="background:var(--purple);color:var(--purple)">
+          <span style="font-size:26px">🚀</span>
+          <span class="step__num" style="color:var(--purple)">4</span>
+        </div>
+        <div class="step__label">Progresser</div>
+        <div class="step__desc">Suivi des progrès et consolidation des acquis.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     6. POUR CHAQUE DIFFICULTÉ
+═══════════════════════════════════ -->
+<section class="section section--diag">
+  <div class="wrapper">
+    <h2 class="section-title" style="color:var(--blue)" data-aos="fade-up">Pour chaque difficulté identifiée</h2>
+    <div class="diag-row">
+
+      <!-- Bloc 1 : résultats -->
+      <div class="diag-block" data-aos="fade-left" data-aos-delay="0">
+        <div class="diag-label" style="color:var(--blue)">1. Résultats de l'évaluation</div>
+        <div class="diag-small">Fractions : addition</div>
+        <div class="diag-percent">45%</div>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+        <div class="diag-small">Compétence à renforcer</div>
+      </div>
+
+      <div class="diag-arrow">→</div>
+
+      <!-- Bloc 2 : diagnostic -->
+      <div class="diag-block" data-aos="fade-left" data-aos-delay="150">
+        <div class="diag-label" style="color:var(--yellow)">2. Diagnostic automatique</div>
+        <div class="diag-illustration">🔍📈</div>
+        <div class="diag-small">Analyse des erreurs et identification des objectifs à travailler.</div>
+      </div>
+
+      <div class="diag-arrow">→</div>
+
+      <!-- Bloc 3 : ressources -->
+      <div class="diag-block" data-aos="fade-left" data-aos-delay="300">
+        <div class="diag-label" style="color:var(--green)">3. Ressources proposées</div>
+        <ul class="diag-resources">
+          <li>Jeux pédagogiques</li>
+          <li>Ateliers</li>
+          <li>Séquences</li>
+          <li>Fiches imprimables</li>
+          <li>Matériel à plastifier</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     7. RESSOURCES VARIÉES
+═══════════════════════════════════ -->
+<section class="section section--ressources">
+  <div class="wrapper">
+    <h2 class="section-title" style="color:var(--blue)" data-aos="fade-up">Des ressources variées</h2>
+    <div class="ressources-grid">
+
+      <div class="ressource-card" data-aos="zoom-in" data-aos-delay="0">
+        <div class="ressource-icon" style="color:var(--blue)">📖</div>
+        <div class="ressource-label" style="color:var(--blue)">Français</div>
+      </div>
+
+      <div class="ressource-card" data-aos="zoom-in" data-aos-delay="80">
+        <div class="ressource-icon" style="color:var(--green)">🧮</div>
+        <div class="ressource-label" style="color:var(--green)">Mathématiques</div>
+      </div>
+
+      <div class="ressource-card" data-aos="zoom-in" data-aos-delay="160">
+        <div class="ressource-icon" style="color:var(--purple)">🎲</div>
+        <div class="ressource-label" style="color:var(--purple)">Jeux pédagogiques</div>
+      </div>
+
+      <div class="ressource-card" data-aos="zoom-in" data-aos-delay="240">
+        <div class="ressource-icon" style="color:var(--yellow)">🖨️</div>
+        <div class="ressource-label" style="color:var(--yellow)">Ressources imprimables</div>
+      </div>
+
+      <div class="ressource-card" data-aos="zoom-in" data-aos-delay="320">
+        <div class="ressource-icon" style="color:#38b2f0">🧩</div>
+        <div class="ressource-label" style="color:#38b2f0">Ateliers de remédiation</div>
+      </div>
+
+      <div class="ressource-card" data-aos="zoom-in" data-aos-delay="400">
+        <div class="ressource-icon" style="color:var(--red)">📋</div>
+        <div class="ressource-label" style="color:var(--red)">Séquences pédagogiques</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     8. POUR QUI ?
+═══════════════════════════════════ -->
+<section class="section section--pourqui">
+  <div class="wrapper">
+    <h2 class="section-title" style="color:var(--gray)">
+      Pour qui ?&nbsp;<span style="color:var(--red)">Enseignants</span>,&nbsp;élèves,&nbsp;familles
+    </h2>
+    <div class="pourqui-row">
+
+      <div class="pourqui-col" data-aos="fade-up" data-aos-delay="0">
+        <div class="pourqui-avatar" style="background:#dbeafe">🧒</div>
+        <div class="pourqui-title" style="color:var(--blue)">Élèves</div>
+        <p class="pourqui-desc">S'entraîner à son rythme, comprendre et progresser en toute autonomie.</p>
+      </div>
+
+      <div class="pourqui-col" data-aos="fade-up" data-aos-delay="150">
+        <div class="pourqui-avatar" style="background:#fee2e2">👩‍🏫</div>
+        <div class="pourqui-title" style="color:var(--red)">Enseignants</div>
+        <p class="pourqui-desc">Analyser les résultats, accompagner chaque élève et gagner du temps au quotidien.</p>
+      </div>
+
+      <div class="pourqui-col" data-aos="fade-up" data-aos-delay="300">
+        <div class="pourqui-avatar" style="background:#dcfce7">🏡</div>
+        <div class="pourqui-title" style="color:var(--green)">Familles</div>
+        <p class="pourqui-desc">Accompagner les enfants et accéder librement aux exercices.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="spacer"></div>
+
+<!-- ═══════════════════════════════════
+     9. FOOTER
+═══════════════════════════════════ -->
+<footer>
+  <div class="footer__inner">
+    <div class="footer__links">
+      <a href="#">Mentions légales</a>
+      <a href="#">Politique de confidentialité</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/menu.js"></script>
+<script>
+  document.querySelectorAll('.card[data-href]').forEach(card => {
+    card.addEventListener('click', e => {
+      if (!e.target.closest('a')) {
+        window.location.href = card.dataset.href;
+      }
+    });
+  });
+</script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>AOS.init({ duration: 700, once: true, offset: 80 });</script>
+</body>
+</html>
