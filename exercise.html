@@ -2725,6 +2725,66 @@
       .ea-choice-btn { font-size: 13px; padding: 11px 14px; }
     }
 
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : pce-niveaux — Passé composé avec être (accord du participe)
+       ══════════════════════════════════════════════════════════════════════ */
+
+    .pce-clickable-sent {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 2.4;
+      padding: 18px 22px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .pce-word-btn {
+      display: inline-block;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      border-radius: 8px;
+      padding: 3px 8px;
+      margin: 0 2px;
+      transition: border-color 180ms, background 180ms;
+      font-family: inherit;
+      font-size: inherit;
+      font-weight: inherit;
+      color: inherit;
+      background: none;
+      line-height: inherit;
+    }
+
+    .pce-word-btn:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.06);
+    }
+
+    .pce-word-btn.pce-subject-found {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.10);
+      color: var(--blue);
+      font-weight: 700;
+    }
+
+    .pce-word-btn:disabled { cursor: default; }
+
+    .pce-blank-span {
+      display: inline-block;
+      border-bottom: 3px solid var(--blue);
+      padding: 0 14px 2px;
+      color: rgba(16,43,106,0.30);
+      font-style: italic;
+      min-width: 80px;
+      text-align: center;
+      margin: 0 4px;
+    }
+
+    .pce-shake { animation: pqpShake 400ms ease; }
+
   </style>
 </head>
 <body>
@@ -3209,6 +3269,9 @@
       } else if (currentType === "etre-ou-avoir-niveaux") {
         eoaInitSession();
         return;
+      } else if (currentType === "pce-niveaux") {
+        pceInitSession();
+        return;
       } else {
         bankSource = sessionData.bank;
       }
@@ -3351,6 +3414,8 @@
         /* session managed by pcaInitSession — no-op here */
       } else if (currentType === "etre-ou-avoir-niveaux") {
         /* session managed by eoaInitSession — no-op here */
+      } else if (currentType === "pce-niveaux") {
+        /* session managed by pceInitSession — no-op here */
       } else if (currentType === "accord-participe-cod") {
         renderAccordParticipeCod(card, q);
       }
@@ -14869,6 +14934,553 @@
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
         exerciseType: 'etre-ou-avoir-niveaux',
+        level:        'Niveau ' + lv,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       PASSÉ COMPOSÉ AVEC ÊTRE  —  type : pce-niveaux
+       Niveau 1 : 3 étapes guidées (clic sujet → genre/nombre → saisie)
+         Scoring : 3 pts tout premier coup ; 2 pts sujet+genre/nombre ok mais forme fausse ;
+                   1 pt deuxième essai réussi ; 0 sinon.
+       Niveau 2 : saisie directe — 2 pts 1er essai, 1 pt 2e essai, 0 sinon.
+       Seuil de déverrouillage : 80 %.
+    ══════════════════════════════════════════════════════════════════════════ */
+
+    const PCE_SEUIL    = 0.80;
+    const PCE_POSITIFS = ['Excellent ! 🎉', 'Bravo ! ⭐', 'Parfait ! 🌟', 'Super ! 👏', 'Très bien ! 👍'];
+
+    let pceState = null;
+
+    function pceSlugKey(suffix) {
+      const s = new URLSearchParams(window.location.search).get('slug') || 'pce';
+      return s + '_' + suffix;
+    }
+    function pceGetValidated() {
+      try { return JSON.parse(localStorage.getItem(pceSlugKey('validated')) || '[]'); }
+      catch { return []; }
+    }
+    function pceSetValidated(arr) {
+      localStorage.setItem(pceSlugKey('validated'), JSON.stringify(arr));
+    }
+    function pceNorm(str) {
+      return str.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[''`´'']/g, "'");
+    }
+    function pceShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    /* ── Init session ──────────────────────────────────────────────────────── */
+    function pceInitSession() {
+      pceState = null;
+      score = 0; currentIndex = 0;
+      sessionStartTime = Date.now();
+
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      pceRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Sélection de niveau ───────────────────────────────────────────────── */
+    function pceRenderLevelSelect(card) {
+      const validated = pceGetValidated();
+      const lvDefs = [
+        { lv: 1, desc: "Raisonnement guidé : identifier le sujet, son genre et son nombre, puis écrire la forme." },
+        { lv: 2, desc: "Écriture directe : écris l'auxiliaire conjugué + le participe passé accordé." }
+      ];
+      const badgeCls = ['badge-cm1', 'badge-cm2'];
+
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="pqp-rule-chip" style="display:flex;margin:0 auto 20px;max-width:520px">
+          📌 Avec <em>être</em>, le participe passé s'accorde avec le sujet.
+        </div>
+        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
+          ${lvDefs.map((d, i) => {
+            const unlocked = i === 0 || validated.includes(i - 1);
+            const done     = validated.includes(i);
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const disabled = !unlocked ? ' disabled' : '';
+            const desc     = !unlocked
+              ? 'Valide le Niveau 1 pour débloquer (80 % requis)'
+              : done ? d.desc + ' · <strong>Validé ✓</strong>' : d.desc;
+            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${disabled}>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${badgeCls[i]}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
+              </span>
+              <div>
+                <span class="ex-type-name">Niveau ${d.lv}</span>
+                <span class="ex-type-desc">${desc}</span>
+              </div>
+            </button>`;
+          }).join('')}
+        </div>
+      `;
+
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => pceStartLevel(parseInt(btn.dataset.level)))
+      );
+    }
+
+    /* ── Démarre un niveau ─────────────────────────────────────────────────── */
+    function pceStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const bank  = sessionData.bank || [];
+      const n     = sessionData.questionsPerSession || 10;
+      const items = pceShuffle([...bank]).slice(0, n);
+
+      pceState = { lv, items, idx: 0, rawScore: 0, rawMax: 0 };
+
+      document.getElementById('q-total').textContent = items.length;
+      pceRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Dispatch niveau ───────────────────────────────────────────────────── */
+    function pceRenderQuestion(card) {
+      const { lv, items, idx } = pceState;
+      const item  = items[idx];
+      const total = items.length;
+
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if (lv === 1) {
+        pceRenderLevel1(card, item, total);
+      } else {
+        pceRenderLevel2(card, item, total);
+      }
+    }
+
+    /* ── Avance à la question suivante ─────────────────────────────────────── */
+    function pceAdvance() {
+      pceState.idx++;
+      if (pceState.idx >= pceState.items.length) {
+        pceShowLevelResults();
+      } else {
+        pceRenderQuestion(document.getElementById('ex-card'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    /* ── Feedback d'erreur ciblé ───────────────────────────────────────────── */
+    function pceBuildErrorFeedback(userNorm, item) {
+      const cWords = pceNorm(item.answer).split(' ');
+      const uWords = userNorm.split(' ');
+
+      const cAux = cWords[0];
+      const cPP  = cWords[cWords.length - 1];
+      const uAux = uWords.length >= 2 ? uWords[0] : '';
+      const uPP  = uWords.length >= 2 ? uWords[uWords.length - 1] : uWords[0] || '';
+
+      if (!uAux || uAux !== cAux) {
+        return `Avec <em>être</em>, l'auxiliaire se conjugue : je <em>suis</em> / tu <em>es</em> / il <em>est</em> / nous <em>sommes</em> / vous <em>êtes</em> / ils <em>sont</em>.`;
+      }
+      if (uPP !== cPP) {
+        if (item.gender === 'f' && item.number === 'p') {
+          return `Le sujet est féminin pluriel : on ajoute <strong>-es</strong> au participe (→ <em>${cPP}</em>).`;
+        }
+        if (item.gender === 'f' && item.number === 's') {
+          return `Le sujet est féminin : on ajoute <strong>-e</strong> au participe (→ <em>${cPP}</em>).`;
+        }
+        if (item.gender === 'm' && item.number === 'p') {
+          return `Le sujet est pluriel : on ajoute <strong>-s</strong> au participe (→ <em>${cPP}</em>).`;
+        }
+        return `Avec <em>être</em>, le participe s'accorde avec le sujet : <strong>${item.answer}</strong>.`;
+      }
+      return `La forme attendue est <strong>${item.answer}</strong>.`;
+    }
+
+    /* ── Niveau 1 — raisonnement guidé en 3 étapes ─────────────────────────── */
+    function pceRenderLevel1(card, item, total) {
+      const { idx } = pceState;
+
+      /* Sentence without infinitive for step 1 */
+      const sentL1 = item.sentence.replace(/\s*\([^)]+\)/g, '').replace(/\s+/g, ' ').trim();
+      const tokens = sentL1.split(' ').filter(t => t.length > 0);
+
+      const wordsHtml = tokens.map(t => {
+        if (t === '___') return `<span class="pce-blank-span">___</span>`;
+        if (/[a-zA-ZÀ-ÿ0-9]/.test(t)) {
+          return `<button class="pce-word-btn" data-word="${t.replace(/"/g, '&quot;')}">${t}</button>`;
+        }
+        return `<span style="margin:0 1px">${t}</span>`;
+      }).join(' ');
+
+      card.innerHTML = `
+        <p class="ex-question-label">Conjugue au <strong>passé composé avec être</strong></p>
+        <div class="pqp-rule-chip">📌 Avec <em>être</em>, le participe passé s'accorde avec le sujet.</div>
+        <div class="pce-clickable-sent" id="pce-sent">${wordsHtml}</div>
+
+        <div id="pce-step1">
+          <div style="display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(16,43,106,0.08);border:2px solid rgba(16,43,106,0.22);border-radius:14px;padding:14px 22px;margin-bottom:16px">
+            <span style="font-size:24px;line-height:1">👆</span>
+            <span style="font-size:16px;font-weight:800;color:var(--blue);letter-spacing:0.01em">Clique sur le sujet dans la phrase</span>
+          </div>
+          <div class="ex-feedback-area" id="pce-fb1"></div>
+        </div>
+
+        <div id="pce-step2" class="ex-hidden">
+          <div class="ex-step2-divider"></div>
+          <p class="ex-question-label">Quel est le genre du sujet ?</p>
+          <div class="ex-group-row" id="pce-genre-row">
+            <button class="ex-group-btn" data-val="m">MASCULIN</button>
+            <button class="ex-group-btn" data-val="f">FÉMININ</button>
+          </div>
+          <div class="ex-feedback-area" id="pce-fb-genre"></div>
+          <div id="pce-nombre-wrap" class="ex-hidden" style="margin-top:8px">
+            <p class="ex-question-label">Quel est le nombre du sujet ?</p>
+            <div class="ex-group-row" id="pce-nombre-row">
+              <button class="ex-group-btn" data-val="s">SINGULIER</button>
+              <button class="ex-group-btn" data-val="p">PLURIEL</button>
+            </div>
+            <div class="ex-feedback-area" id="pce-fb-nombre"></div>
+          </div>
+        </div>
+
+        <div id="pce-step3" class="ex-hidden">
+          <div class="ex-step2-divider"></div>
+          <p class="ex-question-label">Écris l'auxiliaire <em>être</em> conjugué + le participe passé accordé.</p>
+          <div class="ex-input-row">
+            <input type="text" id="pce-input" class="ex-text-input"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                   placeholder="ex : est allée, sont partis…">
+            <button class="ex-validate-btn" id="pce-val-btn">Valider</button>
+          </div>
+          <div class="ex-feedback-area" id="pce-fb3"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      let step1FirstOk      = true;
+      let step2genreFirstOk = true;
+      let step2nombFirstOk  = true;
+      let step3Attempt      = 0;
+
+      /* ── Step 1 : clic sujet ─────────────────────────────────────────── */
+      card.querySelectorAll('.pce-word-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const raw  = btn.dataset.word;
+          const core = raw.replace(/^[,.:;!?«»"'()\[\]]+|[,.:;!?«»"'()\[\]]+$/g, '').toLowerCase();
+          const isSubject = item.subjectWords.some(sw =>
+            sw.toLowerCase() === core || sw.toLowerCase() === raw.toLowerCase()
+          );
+
+          if (isSubject) {
+            card.querySelectorAll('.pce-word-btn').forEach(b => {
+              const bc = b.dataset.word.replace(/^[,.:;!?«»"'()\[\]]+|[,.:;!?«»"'()\[\]]+$/g, '').toLowerCase();
+              if (item.subjectWords.some(sw => sw.toLowerCase() === bc || sw.toLowerCase() === b.dataset.word.toLowerCase())) {
+                b.classList.add('pce-subject-found');
+              }
+              b.disabled = true;
+            });
+            document.getElementById('pce-fb1').innerHTML =
+              `<div class="ex-feedback-correct">✅ Bien ! <strong>${item.subjectPhrase}</strong> est le sujet. Quel est son genre ?</div>`;
+            setTimeout(() => {
+              const step2 = document.getElementById('pce-step2');
+              if (step2) { step2.classList.remove('ex-hidden'); step2.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+            }, 420);
+          } else {
+            step1FirstOk = false;
+            btn.classList.add('pce-shake');
+            setTimeout(() => btn.classList.remove('pce-shake'), 450);
+            document.getElementById('pce-fb1').innerHTML =
+              `<div class="ex-feedback-wrong">❌ Ce mot n'est pas le sujet. Cherche qui fait l'action.</div>`;
+          }
+        });
+      });
+
+      /* ── Step 2a : genre ─────────────────────────────────────────────── */
+      card.querySelectorAll('#pce-genre-row .ex-group-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const isRight = btn.dataset.val === item.gender;
+          if (isRight) {
+            card.querySelectorAll('#pce-genre-row .ex-group-btn').forEach(b => {
+              b.disabled = true;
+              if (b.dataset.val === item.gender) b.classList.add('is-correct');
+            });
+            const gLabel = item.gender === 'f' ? 'Féminin' : 'Masculin';
+            document.getElementById('pce-fb-genre').innerHTML =
+              `<div class="ex-feedback-correct">✅ ${gLabel} — c'est exact !</div>`;
+            setTimeout(() => {
+              const wrap = document.getElementById('pce-nombre-wrap');
+              if (wrap) { wrap.classList.remove('ex-hidden'); wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+            }, 350);
+          } else {
+            step2genreFirstOk = false;
+            btn.classList.add('pce-shake');
+            setTimeout(() => btn.classList.remove('pce-shake'), 450);
+            const correct = item.gender === 'f' ? 'féminin' : 'masculin';
+            document.getElementById('pce-fb-genre').innerHTML =
+              `<div class="ex-feedback-wrong">❌ <strong>${item.subjectPhrase}</strong> est ${correct}.</div>`;
+          }
+        });
+      });
+
+      /* ── Step 2b : nombre ────────────────────────────────────────────── */
+      card.querySelectorAll('#pce-nombre-row .ex-group-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const isRight = btn.dataset.val === item.number;
+          if (isRight) {
+            card.querySelectorAll('#pce-nombre-row .ex-group-btn').forEach(b => {
+              b.disabled = true;
+              if (b.dataset.val === item.number) b.classList.add('is-correct');
+            });
+            const nLabel = item.number === 's' ? 'Singulier' : 'Pluriel';
+            document.getElementById('pce-fb-nombre').innerHTML =
+              `<div class="ex-feedback-correct">✅ ${nLabel} — parfait ! Maintenant écris la forme complète.</div>`;
+            setTimeout(() => {
+              const s3 = document.getElementById('pce-step3');
+              if (s3) {
+                s3.classList.remove('ex-hidden');
+                s3.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                setTimeout(() => document.getElementById('pce-input')?.focus(), 80);
+              }
+            }, 350);
+          } else {
+            step2nombFirstOk = false;
+            btn.classList.add('pce-shake');
+            setTimeout(() => btn.classList.remove('pce-shake'), 450);
+            const correct = item.number === 's' ? 'singulier' : 'pluriel';
+            document.getElementById('pce-fb-nombre').innerHTML =
+              `<div class="ex-feedback-wrong">❌ <strong>${item.subjectPhrase}</strong> est ${correct}.</div>`;
+          }
+        });
+      });
+
+      /* ── Step 3 : saisie de la forme ─────────────────────────────────── */
+      const doValidate3 = () => {
+        const input = document.getElementById('pce-input');
+        const vbtn  = document.getElementById('pce-val-btn');
+        if (!input || input.disabled || !input.value.trim()) return;
+
+        const userNorm    = pceNorm(input.value);
+        const correctNorm = pceNorm(item.answer);
+        const isRight     = userNorm === correctNorm;
+        step3Attempt++;
+
+        const reasoningOk = step1FirstOk && step2genreFirstOk && step2nombFirstOk;
+
+        if (isRight) {
+          input.disabled = true;
+          vbtn.disabled  = true;
+          input.classList.add('is-correct');
+          const pts = (step3Attempt === 1 && reasoningOk) ? 3 : 1;
+          pceState.rawScore += pts;
+          pceState.rawMax   += 3;
+          document.getElementById('pce-fb3').innerHTML =
+            `<div class="ex-feedback-correct">${PCE_POSITIFS[Math.floor(Math.random() * PCE_POSITIFS.length)]}</div>`;
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        } else {
+          input.classList.add('is-wrong');
+          const errHtml = pceBuildErrorFeedback(userNorm, item);
+
+          if (step3Attempt === 1 && reasoningOk) {
+            /* Raisonnement correct, forme fausse au 1er essai → 2 pts, avance auto */
+            pceState.rawScore += 2;
+            pceState.rawMax   += 3;
+            input.disabled = true;
+            vbtn.disabled  = true;
+            document.getElementById('pce-fb3').innerHTML =
+              `<div class="ex-feedback-wrong">❌ La forme correcte est <strong>${item.answer}</strong>. ${errHtml}</div>`;
+            setTimeout(() => pceAdvance(), 2500);
+          } else if (step3Attempt === 1) {
+            /* Raisonnement imparfait, 1er essai raté → 2e essai autorisé */
+            document.getElementById('pce-fb3').innerHTML =
+              `<div class="ex-feedback-wrong">❌ <strong>${item.answer}</strong>. ${errHtml} Essaie encore.</div>`;
+            setTimeout(() => {
+              input.classList.remove('is-wrong');
+              input.value = '';
+              input.focus();
+            }, 1600);
+          } else {
+            /* 2e essai raté → 0 pt, avance auto */
+            pceState.rawMax += 3;
+            input.disabled = true;
+            vbtn.disabled  = true;
+            document.getElementById('pce-fb3').innerHTML =
+              `<div class="ex-feedback-wrong">❌ La forme correcte est <strong>${item.answer}</strong>. ${errHtml}</div>`;
+            setTimeout(() => pceAdvance(), 2500);
+          }
+        }
+      };
+
+      document.getElementById('pce-val-btn')?.addEventListener('click', doValidate3);
+      document.getElementById('pce-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate3(); });
+      document.getElementById('next-btn')?.addEventListener('click', pceAdvance);
+    }
+
+    /* ── Niveau 2 — saisie directe ─────────────────────────────────────────── */
+    function pceRenderLevel2(card, item, total) {
+      const { idx } = pceState;
+
+      const sentDisplay = item.sentence
+        .replace('___', '<span class="pce-blank-span">___</span>')
+        .replace(/\(([^)]+)\)/g, (_, inf) => `<span class="pqp-infinitif-chip">${inf}</span>`);
+
+      card.innerHTML = `
+        <p class="ex-question-label">Conjugue au <strong>passé composé avec être</strong></p>
+        <div class="pqp-rule-chip">📌 Avec <em>être</em>, le participe passé s'accorde avec le sujet.</div>
+        <div class="pqp-sentence-display" style="text-align:center">${sentDisplay}</div>
+        <div class="ex-input-row">
+          <input type="text" id="pce-input" class="ex-text-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                 placeholder="Auxiliaire + participe accordé…">
+          <button class="ex-validate-btn" id="pce-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="pce-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      const input = document.getElementById('pce-input');
+      const vbtn  = document.getElementById('pce-val-btn');
+      let attempt = 0;
+      setTimeout(() => input.focus(), 60);
+
+      const doValidate = () => {
+        if (!input || input.disabled || !input.value.trim()) return;
+        const userNorm    = pceNorm(input.value);
+        const correctNorm = pceNorm(item.answer);
+        const isRight     = userNorm === correctNorm;
+        attempt++;
+
+        if (isRight) {
+          const pts = attempt === 1 ? 2 : 1;
+          pceState.rawScore += pts;
+          pceState.rawMax   += 2;
+          input.disabled = true;
+          vbtn.disabled  = true;
+          input.classList.add('is-correct');
+          document.getElementById('pce-fb').innerHTML =
+            `<div class="ex-feedback-correct">${PCE_POSITIFS[Math.floor(Math.random() * PCE_POSITIFS.length)]}</div>`;
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        } else {
+          const errHtml = pceBuildErrorFeedback(userNorm, item);
+          if (attempt === 1) {
+            input.classList.add('is-wrong');
+            document.getElementById('pce-fb').innerHTML =
+              `<div class="ex-feedback-wrong">❌ <strong>${item.answer}</strong>. ${errHtml} Essaie encore.</div>`;
+            setTimeout(() => {
+              input.classList.remove('is-wrong');
+              input.value = '';
+              input.focus();
+            }, 1600);
+          } else {
+            pceState.rawMax += 2;
+            input.disabled = true;
+            vbtn.disabled  = true;
+            input.classList.add('is-wrong');
+            document.getElementById('pce-fb').innerHTML =
+              `<div class="ex-feedback-wrong">❌ La forme correcte est <strong>${item.answer}</strong>. ${errHtml}</div>`;
+            setTimeout(() => pceAdvance(), 2500);
+          }
+        }
+      };
+
+      vbtn.addEventListener('click', doValidate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
+      document.getElementById('next-btn').addEventListener('click', pceAdvance);
+    }
+
+    /* ── Résultats d'un niveau ─────────────────────────────────────────────── */
+    function pceShowLevelResults() {
+      const { lv, rawScore, rawMax } = pceState;
+      const pct    = rawMax > 0 ? rawScore / rawMax : 0;
+      const passed = pct >= PCE_SEUIL;
+      const s20    = rawMax > 0 ? Math.round(pct * 20) : 0;
+      const pctPct = Math.round(pct * 100);
+
+      if (passed) {
+        const validated = pceGetValidated();
+        if (!validated.includes(lv - 1)) { validated.push(lv - 1); pceSetValidated(validated); }
+      }
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const stars     = s20 >= 19 ? '🌟🌟🌟' : s20 >= 16 ? '⭐⭐' : s20 >= 10 ? '⭐' : '';
+      const isLast    = lv >= 2;
+      const backHref  = sessionData.backLink?.href  || 'français-orthographe.html';
+      const backLabel = `← Retour à ${sessionData.backLink?.label || 'l\'Orthographe'}`;
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises le passé composé avec être aux deux niveaux !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="pce-restart-btn">Recommencer</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${lv} validé ! 🏆 Le Niveau 2 est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="pce-next-btn">Niveau 2 — Écriture directe →</button>
+          <button class="ex-btn-secondary" id="pce-retry-btn">Recommencer ce niveau</button>
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed   = Math.ceil(rawMax * PCE_SEUIL);
+        const neededS20 = Math.round(needed / rawMax * 20);
+        msg = `${stars || '💪'} Pas encore… il faut ${neededS20}/20 pour passer au niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="pce-retry-btn">Recommencer ce niveau</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('pce-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        pceStartLevel(pceState.lv);
+      });
+      document.getElementById('pce-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        pceStartLevel(2);
+      });
+      document.getElementById('pce-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        pceInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'pce-niveaux',
         level:        'Niveau ' + lv,
         score:        s20,
         total:        20,

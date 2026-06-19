@@ -7430,6 +7430,134 @@ const EXERCISE_DATA = {
       { sentence: "Elle ___ retourné la crêpe.",      auxiliary: "avoir", answer: "a",      cod: "la crêpe"    },
       { sentence: "Elle ___ retournée chez sa mère.", auxiliary: "être",  answer: "est"                        }
     ]
+  },
+
+  /* ══════════════════════════════════════════════════════════════════════
+     PASSÉ COMPOSÉ AVEC ÊTRE — accord du participe passé
+     Slug : ortho-accorder-participe-passe-etre
+     Type : pce-niveaux
+     Pool commun aux 2 niveaux (14 items, tirage de 10 par session).
+     Niveau 1 — raisonnement guidé en 3 temps (clic sujet → genre/nombre → saisie).
+     Niveau 2 — saisie directe (auxiliaire + participe accordé).
+  ══════════════════════════════════════════════════════════════════════ */
+
+  "ortho-accorder-participe-passe-etre": {
+    title:      "Le passé composé avec être",
+    domaine:    "Français",
+    competence: "Conjugaison — Passé composé avec être (accord du participe)",
+    type:       "pce-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    questionsPerSession: 10,
+    backLink: { href: "français-orthographe.html", label: "l'Orthographe" },
+
+    /* ── Banque commune (14 items) ──────────────────────────────────────
+       sentence      — phrase avec ___ et (infinitif) — utilisée au Niveau 2
+       subjectWords  — mots de la phrase appartenant au GN sujet (cliquables au N1)
+       subjectPhrase — sujet affiché dans les feedbacks
+       gender        — "m" | "f"
+       number        — "s" | "p"
+       answer        — forme attendue : auxiliaire être conjugué + participe accordé
+    ─────────────────────────────────────────────────────────────────── */
+    bank: [
+      {
+        sentence:      "Hier, elle ___ (aller) au parc.",
+        subjectWords:  ["elle"],
+        subjectPhrase: "elle",
+        gender: "f", number: "s",
+        answer: "est allée"
+      },
+      {
+        sentence:      "Ils ___ (partir) sans prévenir.",
+        subjectWords:  ["Ils"],
+        subjectPhrase: "ils",
+        gender: "m", number: "p",
+        answer: "sont partis"
+      },
+      {
+        sentence:      "Ma sœur ___ (naître) en décembre.",
+        subjectWords:  ["Ma", "sœur"],
+        subjectPhrase: "ma sœur",
+        gender: "f", number: "s",
+        answer: "est née"
+      },
+      {
+        sentence:      "Les voisines ___ (arriver) ensemble.",
+        subjectWords:  ["Les", "voisines"],
+        subjectPhrase: "les voisines",
+        gender: "f", number: "p",
+        answer: "sont arrivées"
+      },
+      {
+        sentence:      "Les filles ___ (rentrer) à midi.",
+        subjectWords:  ["Les", "filles"],
+        subjectPhrase: "les filles",
+        gender: "f", number: "p",
+        answer: "sont rentrées"
+      },
+      {
+        sentence:      "Il ___ (tomber) dans la cour.",
+        subjectWords:  ["Il"],
+        subjectPhrase: "il",
+        gender: "m", number: "s",
+        answer: "est tombé"
+      },
+      {
+        sentence:      "Elles ___ (venir) nous voir.",
+        subjectWords:  ["Elles"],
+        subjectPhrase: "elles",
+        gender: "f", number: "p",
+        answer: "sont venues"
+      },
+      {
+        sentence:      "La chatte ___ (rester) dehors.",
+        subjectWords:  ["La", "chatte"],
+        subjectPhrase: "la chatte",
+        gender: "f", number: "s",
+        answer: "est restée"
+      },
+      {
+        sentence:      "Mon frère ___ (revenir) de voyage.",
+        subjectWords:  ["Mon", "frère"],
+        subjectPhrase: "mon frère",
+        gender: "m", number: "s",
+        answer: "est revenu"
+      },
+      {
+        sentence:      "Les élèves ___ (sortir) en récréation.",
+        subjectWords:  ["Les", "élèves"],
+        subjectPhrase: "les élèves",
+        gender: "m", number: "p",
+        answer: "sont sortis"
+      },
+      {
+        sentence:      "La touriste ___ (descendre) à Paris.",
+        subjectWords:  ["La", "touriste"],
+        subjectPhrase: "la touriste",
+        gender: "f", number: "s",
+        answer: "est descendue"
+      },
+      {
+        sentence:      "Vous ___ (monter) trop vite.",
+        subjectWords:  ["Vous"],
+        subjectPhrase: "vous",
+        gender: "m", number: "p",
+        answer: "êtes montés"
+      },
+      {
+        sentence:      "La directrice ___ (entrer) dans la classe.",
+        subjectWords:  ["La", "directrice"],
+        subjectPhrase: "la directrice",
+        gender: "f", number: "s",
+        answer: "est entrée"
+      },
+      {
+        sentence:      "Mes parents ___ (partir) en vacances.",
+        subjectWords:  ["Mes", "parents"],
+        subjectPhrase: "mes parents",
+        gender: "m", number: "p",
+        answer: "sont partis"
+      }
+    ]
   }
 
 };
