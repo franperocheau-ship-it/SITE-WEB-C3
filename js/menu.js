@@ -187,19 +187,46 @@
 
   /* ── 2. Récupération de l'état d'authentification ─────────────────────────── */
   let profile = null;
-  try {
-    if (window.lfmDb) {
-      const { data: { session } } = await window.lfmDb.auth.getSession();
-      if (session) {
-        const { data } = await window.lfmDb
-          .from('profiles')
-          .select('id, role, display_name')
-          .eq('id', session.user.id)
-          .single();
-        profile = data;
-      }
+
+  function updateNavBtn(prof, userEmail) {
+    const btn = document.querySelector('.menu-btn');
+    if (!btn) return;
+    if (prof?.display_name) {
+      btn.textContent = '👤 ' + prof.display_name;
+    } else if (prof?.role) {
+      const ROLE_SHORT = { enseignant: 'Enseignant', eleve: 'Élève', admin: 'Admin' };
+      btn.textContent = '👤 ' + (ROLE_SHORT[prof.role] || prof.role);
+    } else if (userEmail) {
+      btn.textContent = '👤 ' + userEmail.split('@')[0];
     }
-  } catch (_) { /* silencieux — Supabase peut ne pas encore être configuré */ }
+  }
+
+  // Chemin 1 : lfmAuth disponible (pages avec auth.js chargé)
+  if (typeof lfmAuth !== 'undefined') {
+    try {
+      const session = await lfmAuth.getSession();
+      if (session?.user) {
+        const prof = await lfmAuth.getProfile();
+        profile = prof;
+        updateNavBtn(prof, session.user.email);
+      }
+    } catch (e) { console.warn('[menu] lfmAuth error:', e); }
+
+  // Chemin 2 : appel direct Supabase (pages sans auth.js)
+  } else if (window.lfmDb) {
+    try {
+      const { data: { user }, error } = await window.lfmDb.auth.getUser();
+      if (error) { console.warn('[menu] getUser error:', error); }
+      if (user) {
+        const { data: prof, error: pe } = await window.lfmDb
+          .from('profiles').select('id, role, display_name')
+          .eq('id', user.id).single();
+        if (pe) console.warn('[menu] profiles error:', pe);
+        profile = prof;
+        updateNavBtn(prof, user.email);
+      }
+    } catch (e) { console.warn('[menu] direct auth error:', e); }
+  }
 
   /* ── 3. Définition des espaces ────────────────────────────────────────────── */
   const ROLE_LABELS = { enseignant: 'Enseignant·e', eleve: 'Élève', admin: 'Administrateur' };

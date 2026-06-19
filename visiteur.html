@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Espace Visiteur — PROFICIAMUS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red:    #E63946;
+      --green:  #2D9C3C;
+      --blue:   #1B4EBF;
+      --yellow: #F5A623;
+      --purple: #7B2D8B;
+      --text:   #1a1a1a;
+      --gray:   #6b7280;
+      --border: #e0e0e0;
+      --navy:   #102B6A;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #ffffff;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ─── WRAPPER ─── */
+    .wrapper {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ─── NAVBAR ─── */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: #fff;
+      border-bottom: 1px solid #e8e8e8;
+      height: auto;
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .navbar__inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .navbar__brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .navbar__brand img { height: 34px; width: auto; }
+
+    .navbar__nav {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .navbar__nav a {
+      text-decoration: none;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      transition: color .2s;
+    }
+    .navbar__nav a:hover { color: var(--blue); }
+
+    .navbar__nav a.active {
+      color: var(--green);
+      border-bottom: 2px solid var(--green);
+      padding-bottom: 2px;
+    }
+
+    .nav-lang {
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .navbar__nav .btn-login { color: #fff !important; }
+
+    .btn-login {
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s;
+    }
+    .btn-login:hover { background: #0b1e4d; }
+
+    /* ─── HERO COMPACT ─── */
+    .hero {
+      padding: 76px 20px 32px;
+      text-align: center;
+      background: linear-gradient(180deg, #e8f4ec 0%, #f5fbf6 55%, #ffffff 100%);
+    }
+
+    .hero__title {
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 10px;
+      letter-spacing: -.3px;
+    }
+
+    .hero__sub {
+      font-size: 15px;
+      color: var(--gray);
+      max-width: 520px;
+      margin: 0 auto 20px;
+      line-height: 1.6;
+    }
+
+    .hero__cycle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--navy);
+      border-radius: 999px;
+      padding: 8px 22px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: .04em;
+    }
+    .hero__cycle .pill-dot { color: #D62839; }
+
+    /* ─── SECTION MATIERES ─── */
+    .section-matieres {
+      padding: 48px 0 56px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .matieres-grid {
+      display: flex;
+      gap: 28px;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    /* ─── MATIERE CARD ─── */
+    .mat-card {
+      flex: 1;
+      max-width: 440px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 0;
+      box-shadow: 0 2px 16px rgba(0,0,0,.07);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+    .mat-card:hover {
+      transform: translateY(-6px) scale(1.012);
+    }
+
+    .mat-card--fr:hover { box-shadow: 0 14px 40px rgba(230,57,70,.18); }
+    .mat-card--ma:hover { box-shadow: 0 14px 40px rgba(27,78,191,.18); }
+
+    .mat-card__top {
+      height: 6px;
+      width: 100%;
+    }
+    .mat-card--fr .mat-card__top { background: var(--red); }
+    .mat-card--ma .mat-card__top { background: var(--blue); }
+
+    .mat-card__body {
+      padding: 32px 28px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .mat-card__icon {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      font-size: 36px;
+    }
+    .mat-card--fr .mat-card__icon { background: #fde8ea; }
+    .mat-card--ma .mat-card__icon { background: #dce8fd; }
+
+    .mat-card__title {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: .3px;
+    }
+    .mat-card--fr .mat-card__title { color: var(--red); }
+    .mat-card--ma .mat-card__title { color: var(--blue); }
+
+    .mat-card__desc {
+      text-align: center;
+      font-size: 14px;
+      color: var(--gray);
+      line-height: 1.5;
+    }
+
+    .mat-card__sep {
+      height: 1px;
+      background: var(--border);
+      margin: 0 -4px;
+    }
+
+    .mat-card__themes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .theme-tag {
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 4px 12px;
+      letter-spacing: .02em;
+    }
+    .mat-card--fr .theme-tag { background: #fde8ea; color: #b02030; }
+    .mat-card--ma .theme-tag { background: #dce8fd; color: #1440a0; }
+
+    .mat-card__btn {
+      display: block;
+      padding: 13px 0;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      text-decoration: none;
+      text-align: center;
+      margin-top: auto;
+      transition: opacity .2s, letter-spacing .2s;
+    }
+    .mat-card--fr .mat-card__btn { background: var(--red); }
+    .mat-card--ma .mat-card__btn { background: var(--blue); }
+    .mat-card__btn:hover { opacity: .88; letter-spacing: .02em; }
+
+    /* ─── BANDEAU ACCÈS LIBRE ─── */
+    .acces-band {
+      margin: 0 auto 48px;
+      max-width: 620px;
+      padding: 0 20px;
+    }
+
+    .acces-band__inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #f0faf3;
+      border: 1.5px solid #a8ddb5;
+      border-radius: 12px;
+      padding: 14px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    .acces-band__icon { font-size: 20px; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--navy);
+      color: #fff;
+      padding: 10px 20px;
+    }
+
+    .footer__inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer__links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer__links a {
+      color: #ffffffbb;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      transition: color .2s;
+    }
+    .footer__links a:hover { color: #fff; }
+
+    /* ═══ RESPONSIVE ═══ */
+    @media (max-width: 768px) {
+      .navbar__brand img { height: 30px; }
+      .navbar__nav a:not(.btn-login) { display: none; }
+      .nav-lang { display: none; }
+
+      .hero { padding-top: 60px; }
+
+      .matieres-grid {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+      .mat-card { max-width: 100%; width: 100%; }
+    }
+
+    @media (max-width: 480px) {
+      .navbar__brand img { height: 26px; }
+      .btn-login { padding: 7px 12px; font-size: 13px; }
+      .mat-card__body { padding: 24px 20px 20px; }
+      .mat-card__title { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     NAVBAR
+═══════════════════════════════════ -->
+<nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index-v2.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=4" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index-v2.html">Accueil</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════
+     HERO COMPACT
+═══════════════════════════════════ -->
+<section class="hero">
+  <h1 class="hero__title" data-aos="fade-up">Choisissez un entraînement</h1>
+  <p class="hero__sub" data-aos="fade-up" data-aos-delay="80">
+    Exercices de français et de mathématiques pour les élèves de cycle 3
+  </p>
+  <div class="hero__cycle" data-aos="fade-up" data-aos-delay="160">
+    Plateforme pour le Cycle&nbsp;3 :
+    <span class="pill-dot">•</span> CM1
+    <span class="pill-dot">•</span> CM2
+    <span class="pill-dot">•</span> 6ÈME
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     2 GRANDES CARTES MATIÈRES
+═══════════════════════════════════ -->
+<section class="section-matieres">
+  <div class="wrapper">
+    <div class="matieres-grid">
+
+      <!-- FRANÇAIS -->
+      <div class="mat-card mat-card--fr" data-href="français.html" data-aos="fade-up" data-aos-delay="0">
+        <div class="mat-card__top"></div>
+        <div class="mat-card__body">
+          <div class="mat-card__icon">📖</div>
+          <div class="mat-card__title">Français</div>
+          <div class="mat-card__desc">Grammaire, conjugaison, orthographe et vocabulaire</div>
+          <div class="mat-card__sep"></div>
+          <div class="mat-card__themes">
+            <span class="theme-tag">Grammaire</span>
+            <span class="theme-tag">Conjugaison</span>
+            <span class="theme-tag">Orthographe</span>
+            <span class="theme-tag">Lexique</span>
+          </div>
+          <a href="français.html" class="mat-card__btn">S'entraîner en français →</a>
+        </div>
+      </div>
+
+      <!-- MATHÉMATIQUES -->
+      <div class="mat-card mat-card--ma" data-href="mathématiques.html" data-aos="fade-up" data-aos-delay="150">
+        <div class="mat-card__top"></div>
+        <div class="mat-card__body">
+          <div class="mat-card__icon">🧮</div>
+          <div class="mat-card__title">Mathématiques</div>
+          <div class="mat-card__desc">Nombres, calcul, géométrie et résolution de problèmes</div>
+          <div class="mat-card__sep"></div>
+          <div class="mat-card__themes">
+            <span class="theme-tag">Nombres entiers</span>
+            <span class="theme-tag">Fractions</span>
+            <span class="theme-tag">Algèbre</span>
+            <span class="theme-tag">Grandeurs</span>
+          </div>
+          <a href="mathématiques.html" class="mat-card__btn">S'entraîner en maths →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     BANDEAU ACCÈS LIBRE
+═══════════════════════════════════ -->
+<div class="acces-band" data-aos="fade-up">
+  <div class="acces-band__inner">
+    <span class="acces-band__icon">🔓</span>
+    Pas besoin de compte — accès libre pour tous les visiteurs
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     FOOTER
+═══════════════════════════════════ -->
+<footer>
+  <div class="footer__inner">
+    <div class="footer__links">
+      <a href="#">Mentions légales</a>
+      <a href="#">Politique de confidentialité</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/menu.js"></script>
+<script>
+  document.querySelectorAll('.mat-card[data-href]').forEach(card => {
+    card.addEventListener('click', e => {
+      if (!e.target.closest('a')) {
+        window.location.href = card.dataset.href;
+      }
+    });
+  });
+</script>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>AOS.init({ duration: 700, once: true, offset: 80 });</script>
+
+</body>
+</html>

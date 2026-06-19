@@ -69,7 +69,7 @@
     }
 
     .navbar__brand img {
-      height: 52px;
+      height: 34px;
       width: auto;
     }
 
@@ -264,6 +264,11 @@
       box-shadow: 0 12px 36px rgba(230,57,70,.20);
       border-color: var(--red);
     }
+    .card--visiteur:hover {
+      box-shadow: 0 12px 36px rgba(45,156,60,.20);
+      border-color: var(--green);
+    }
+    .card--visiteur:hover .card__btn { opacity: .92; letter-spacing: .02em; }
     /* Bouton intérieur : s'illumine aussi au hover de la carte */
     .card--eleve:hover     .card__btn { opacity: .92; letter-spacing: .02em; }
     .card--enseignant:hover .card__btn { opacity: .92; letter-spacing: .02em; }
@@ -630,7 +635,7 @@
 <nav class="navbar">
   <div class="navbar__inner">
     <a href="#" class="navbar__brand">
-      <img src="assets/proficiamuspetit.png?v=3" alt="Logo Proficiamus" />
+      <img src="assets/proficiamuspetit.png?v=4" alt="Logo Proficiamus" />
     </a>
     <div class="navbar__nav">
       <a href="#">Accueil</a>
@@ -645,7 +650,7 @@
      2. HERO
 ═══════════════════════════════════ -->
 <section class="hero">
-  <img src="assets/proficiamusgrand.png?v=4" alt="Proficiamus illustration" class="hero__img" />
+  <img src="assets/proficiamusgrand.png?v=5" alt="Proficiamus illustration" class="hero__img" />
   <div class="hero__cycle" data-aos="fade-up">
     Plateforme pour le Cycle&nbsp;3 :
     <span class="pill-dot">•</span> CM1
@@ -692,7 +697,7 @@
       </div>
 
       <!-- Visiteur -->
-      <div class="card" data-aos="fade-up" data-aos-delay="300">
+      <div class="card card--visiteur" data-href="visiteur.html" data-aos="fade-up" data-aos-delay="300">
         <div class="card__icon" style="background:var(--green)">👀</div>
         <div class="card__title" style="color:var(--green)">ESPACE VISITEUR</div>
         <div class="card__sub">Découvrir PROFICIAMUS</div>
@@ -703,7 +708,7 @@
           <li>🎮 Accès aux exercices</li>
           <li>🖥️ Découverte de la plateforme</li>
         </ul>
-        <a href="#" class="card__btn" style="background:var(--green)">→ Découvrir sans inscription</a>
+        <a href="visiteur.html" class="card__btn" style="background:var(--green)">→ Découvrir sans inscription</a>
       </div>
 
     </div>
@@ -887,9 +892,8 @@
 <footer>
   <div class="footer__inner">
     <div class="footer__links">
-      <a href="#">Mentions légales</a>
-      <a href="#">Politique de confidentialité</a>
-      <a href="#">Contact</a>
+      <a href="mentions-legales.html">Mentions légales</a>
+<a href="#">Contact</a>
     </div>
   </div>
 </footer>
