@@ -8566,6 +8566,63 @@ const EXERCISE_DATA = {
         }
       ]
     }
+  },
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     MATHÉMATIQUES — NOMBRES ENTIERS — Décomposer un nombre entier
+     Niveau 1 (CM1) : 4 champs numériques  mil / cen / diz / uni
+     Niveau 2 (CM2) : étiquettes positionnelles (clic pour placer)
+     Niveau 3 (6e)  : 3 champs texte  additive / produits / lettres
+  ═══════════════════════════════════════════════════════════════════════ */
+  "decomposer-nombre-entier": {
+    title:      "Décomposer un nombre entier",
+    domaine:    "Mathématiques",
+    competence: "Nombres entiers — Décomposition",
+    type:       "decomposer-nombre-entier-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
+
+    /* ── Niveau 1 — 4 champs numériques (milliers / centaines / dizaines / unités) ── */
+    lvl1: [
+      { display: "4 537", mil: 4, cen: 5, diz: 3, uni: 7 },
+      { display: "2 080", mil: 2, cen: 0, diz: 8, uni: 0 },
+      { display: "7 001", mil: 7, cen: 0, diz: 0, uni: 1 },
+      { display: "3 456", mil: 3, cen: 4, diz: 5, uni: 6 },
+      { display: "9 090", mil: 9, cen: 0, diz: 9, uni: 0 }
+    ],
+
+    /* ── Niveau 2 — étiquettes positionnelles à placer dans les slots ── */
+    lvl2: [
+      { display: "27 046",  parts: [20000, 7000, 40, 6] },
+      { display: "150 302", parts: [100000, 50000, 300, 2] },
+      { display: "83 500",  parts: [80000, 3000, 500] },
+      { display: "400 070", parts: [400000, 70] },
+      { display: "609 403", parts: [600000, 9000, 400, 3] }
+    ],
+
+    /* ── Niveau 3 — 3 champs texte : additive / somme de produits / lettres ── */
+    lvl3: [
+      { display: "306 050",
+        add: "300000+6000+50",
+        vp: ["3×100000","6×1000","5×10"],
+        lettres: "trois",  chiffre: "3" },
+      { display: "2 040 107",
+        add: "2000000+40000+100+7",
+        vp: ["2×1000000","4×10000","1×100","7×1"],
+        lettres: "vingt",  chiffre: "20" },
+      { display: "750 030",
+        add: "700000+50000+30",
+        vp: ["7×100000","5×10000","3×10"],
+        lettres: "sept",   chiffre: "7" },
+      { display: "1 800 605",
+        add: "1000000+800000+600+5",
+        vp: ["1×1000000","8×100000","6×100","5×1"],
+        lettres: "huit",   chiffre: "8" },
+      { display: "450 002",
+        add: "400000+50000+2",
+        vp: ["4×100000","5×10000","2×1"],
+        lettres: "quatre", chiffre: "4" }
+    ]
   }
 
 };

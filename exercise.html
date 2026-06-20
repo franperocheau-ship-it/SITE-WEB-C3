@@ -2787,6 +2787,220 @@
       text-align: center;
     }
 
+    /* ══════════════════════════════════════════════════════════════════
+       TYPE : decomposer-nombre-entier-niveaux
+    ══════════════════════════════════════════════════════════════════ */
+
+    .dni-tab-bar {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .dni-tab {
+      flex: 1;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      padding: 11px 8px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      text-align: center;
+      transition: color 150ms, border-color 150ms;
+    }
+    .dni-tab.is-active {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+    }
+    .dni-tab:hover:not(.is-active) { color: var(--text); }
+
+    /* Niveau 1 — champs numériques */
+    .dni-fields-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+    .dni-field-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+    .dni-field-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .dni-field-input {
+      width: 68px;
+      height: 62px;
+      border: 2px solid var(--blue);
+      border-radius: 12px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      font-family: inherit;
+      -moz-appearance: textfield;
+      transition: border-color 150ms, box-shadow 150ms;
+    }
+    .dni-field-input::-webkit-outer-spin-button,
+    .dni-field-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .dni-field-input:focus { box-shadow: 0 0 0 3px rgba(16,43,106,0.12); }
+    .dni-field-input.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.07);
+      color: #15803d;
+    }
+    .dni-field-input.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+    .dni-field-input:disabled { cursor: default; }
+    .dni-field-unit {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .dni-field-op {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--muted);
+      padding-bottom: 20px;
+      flex-shrink: 0;
+    }
+    .dni-preview {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--blue);
+      background: rgba(16,43,106,0.04);
+      border: 1.5px solid rgba(16,43,106,0.12);
+      border-radius: 10px;
+      padding: 11px 14px;
+      margin-bottom: 16px;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-style: italic;
+    }
+    @media (max-width: 600px) {
+      .dni-field-input { width: 52px; height: 52px; font-size: 22px; }
+      .dni-field-op    { font-size: 17px; padding-bottom: 16px; }
+    }
+
+    /* Niveau 2 — étiquettes */
+    .dni-slots-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 14px;
+      background: rgba(16,43,106,0.03);
+      border: 2px dashed rgba(16,43,106,0.18);
+      border-radius: 14px;
+      margin-bottom: 14px;
+      min-height: 58px;
+    }
+    .dni-slot {
+      min-width: 86px;
+      height: 46px;
+      border: 2px dashed rgba(16,43,106,0.28);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 150ms, background 150ms, color 150ms;
+      padding: 0 12px;
+      user-select: none;
+    }
+    .dni-slot.is-filled {
+      border-style: solid;
+      border-color: var(--blue);
+      color: var(--blue);
+      background: rgba(16,43,106,0.05);
+    }
+    .dni-slot.is-correct {
+      border-style: solid;
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.09);
+      color: #15803d;
+    }
+    .dni-slot.is-wrong {
+      border-style: solid;
+      border-color: var(--red);
+      background: rgba(214,40,57,0.07);
+      color: var(--red);
+    }
+    .dni-label-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+    .dni-label-btn {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 16px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 150ms, background 150ms, transform 150ms;
+    }
+    .dni-label-btn:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.04);
+      transform: translateY(-2px);
+    }
+    .dni-label-btn.is-selected {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.08);
+      color: var(--blue);
+    }
+    .dni-label-btn.ex-word-used { opacity: 0.32; }
+    .dni-label-btn:disabled { cursor: default; }
+
+    /* Niveau 3 — champs texte */
+    .dni-lvl3-fields { margin-bottom: 16px; }
+    .dni-lvl3-field-wrap { margin-bottom: 14px; }
+    .dni-lvl3-field-wrap label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    textarea.dni-textarea {
+      width: 100%;
+      resize: none;
+      line-height: 1.55;
+      font-size: 17px;
+      min-height: 80px;
+    }
+
   </style>
 </head>
 <body>
@@ -3268,6 +3482,9 @@
       } else if (currentType === "change-sujet-niveaux") {
         csjInitSession();
         return;
+      } else if (currentType === "decomposer-nombre-entier-niveaux") {
+        dniInitSession();
+        return;
       } else {
         bankSource = sessionData.bank;
       }
@@ -3414,6 +3631,8 @@
         /* session managed by pceInitSession — no-op here */
       } else if (currentType === "change-temps-niveaux") {
         /* session managed by ctInitSession — no-op here */
+      } else if (currentType === "decomposer-nombre-entier-niveaux") {
+        /* session managed by dniInitSession — no-op here */
       } else if (currentType === "accord-participe-cod") {
         renderAccordParticipeCod(card, q);
       }
@@ -16208,6 +16427,444 @@
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
         exerciseType: 'change-sujet-niveaux',
+        level,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : decomposer-nombre-entier-niveaux
+       Mathématiques — Décomposer un nombre entier, 3 niveaux
+       Niveau 1 (CM1) : 4 champs numériques  mil / cen / diz / uni
+       Niveau 2 (CM2) : étiquettes positionnelles  (clic pour placer)
+       Niveau 3 (6e)  : 3 champs texte  additive / produits / lettres
+    ══════════════════════════════════════════════════════════════════════ */
+
+    let dniState = null;
+
+    function dniInitSession() {
+      dniState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      dniStartLevel(1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function dniStartLevel(lv) {
+      const pool = lv === 1 ? [...sessionData.lvl1]
+                 : lv === 2 ? [...sessionData.lvl2]
+                 : [...sessionData.lvl3];
+      const qs = shuffle(pool);
+      dniState = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = qs.length;
+      dniRenderQuestion();
+    }
+
+    function dniRenderQuestion() {
+      const { level, questions, idx, total } = dniState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+      const card = document.getElementById('ex-card');
+      if (level === 1) dniRenderLvl1(card, q);
+      else if (level === 2) dniRenderLvl2(card, q);
+      else dniRenderLvl3(card, q);
+    }
+
+    /* ── Barre d'onglets ──────────────────────────────────────────────── */
+
+    function dniTabBar(activeLv) {
+      return [1,2,3].map(lv =>
+        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
+      ).join('');
+    }
+
+    function dniSetupTabs() {
+      document.querySelectorAll('.dni-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lv = parseInt(btn.dataset.lv, 10);
+          if (lv === dniState.level) return;
+          dniStartLevel(lv);
+        });
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       NIVEAU 1 — 4 champs numériques (milliers / centaines / dizaines / unités)
+    ══════════════════════════════════════════════════════════════════ */
+
+    function dniRenderLvl1(card, q) {
+      card.innerHTML = `
+        <div class="dni-tab-bar">${dniTabBar(1)}</div>
+        <p class="ex-question-label">Décompose ce nombre en milliers, centaines, dizaines et unités.</p>
+        <div class="vp-number-display">${q.display}</div>
+        <div class="dni-fields-row">
+          <div class="dni-field-wrap">
+            <span class="dni-field-label">Milliers</span>
+            <input type="number" class="dni-field-input" id="dni-mil" min="0" max="9999" placeholder="?" autocomplete="off">
+            <span class="dni-field-unit">× 1 000</span>
+          </div>
+          <span class="dni-field-op">+</span>
+          <div class="dni-field-wrap">
+            <span class="dni-field-label">Centaines</span>
+            <input type="number" class="dni-field-input" id="dni-cen" min="0" max="9" placeholder="?" autocomplete="off">
+            <span class="dni-field-unit">× 100</span>
+          </div>
+          <span class="dni-field-op">+</span>
+          <div class="dni-field-wrap">
+            <span class="dni-field-label">Dizaines</span>
+            <input type="number" class="dni-field-input" id="dni-diz" min="0" max="9" placeholder="?" autocomplete="off">
+            <span class="dni-field-unit">× 10</span>
+          </div>
+          <span class="dni-field-op">+</span>
+          <div class="dni-field-wrap">
+            <span class="dni-field-label">Unités</span>
+            <input type="number" class="dni-field-input" id="dni-uni" min="0" max="9" placeholder="?" autocomplete="off">
+            <span class="dni-field-unit">× 1</span>
+          </div>
+        </div>
+        <div class="dni-preview" id="dni-preview">Remplis les cases pour voir l'équation</div>
+        <div class="ex-feedback-area" id="dni-feedback"></div>
+        <button class="ex-validate-btn" id="dni-validate-btn" style="width:100%;margin-top:16px">Vérifier</button>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      dniSetupTabs();
+      ['dni-mil','dni-cen','dni-diz','dni-uni'].forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('input', dniUpdatePreview);
+        el.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('dni-validate-btn').click(); });
+      });
+      setTimeout(() => document.getElementById('dni-mil').focus(), 50);
+      document.getElementById('dni-validate-btn').addEventListener('click', () => dniValidateLvl1(q));
+      dniUpdatePreview();
+    }
+
+    function dniUpdatePreview() {
+      const vals  = ['dni-mil','dni-cen','dni-diz','dni-uni'].map(id => document.getElementById(id)?.value ?? '');
+      const units = ['1 000','100','10','1'];
+      const preview = document.getElementById('dni-preview');
+      if (!preview) return;
+      const parts = vals
+        .map((v, i) => (v !== '' && parseInt(v, 10) !== 0) ? `(${v} × ${units[i]})` : null)
+        .filter(Boolean);
+      preview.textContent = parts.length ? parts.join(' + ') : 'Remplis les cases pour voir l\'équation';
+    }
+
+    function dniValidateLvl1(q) {
+      const fields = { mil: document.getElementById('dni-mil'), cen: document.getElementById('dni-cen'), diz: document.getElementById('dni-diz'), uni: document.getElementById('dni-uni') };
+      if (Object.values(fields).some(el => el.value === '')) return;
+      Object.values(fields).forEach(el => el.disabled = true);
+      document.getElementById('dni-validate-btn').disabled = true;
+      const vals = { mil: parseInt(fields.mil.value,10), cen: parseInt(fields.cen.value,10), diz: parseInt(fields.diz.value,10), uni: parseInt(fields.uni.value,10) };
+      const isRight = vals.mil === q.mil && vals.cen === q.cen && vals.diz === q.diz && vals.uni === q.uni;
+      Object.keys(vals).forEach(k => fields[k].classList.add(vals[k] === q[k] ? 'is-correct' : 'is-wrong'));
+      const eqParts = [
+        [q.mil, '1 000'], [q.cen, '100'], [q.diz, '10'], [q.uni, '1']
+      ].filter(([v]) => v !== 0).map(([v, u]) => `(${v} × ${u})`);
+      const eq = eqParts.join(' + ');
+      if (isRight) {
+        dniState.score++;
+        document.getElementById('dni-feedback').innerHTML = `<div class="ex-feedback-correct">✅ Bravo ! ${q.display} = ${eq}</div>`;
+      } else {
+        document.getElementById('dni-feedback').innerHTML = `
+          <div class="ex-feedback-wrong">❌ Vérifie ta décomposition.<br>
+            <strong>${q.display} = ${eq}</strong>
+          </div>
+          <div class="ex-note">📌 Astuce : commence par les unités (à droite), puis les dizaines, centaines, milliers.</div>`;
+      }
+      dniAdvance();
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       NIVEAU 2 — Étiquettes positionnelles (clic pour placer)
+    ══════════════════════════════════════════════════════════════════ */
+
+    function dniFmtVal(n) {
+      return n.toLocaleString('fr-FR');
+    }
+
+    function dniRenderLvl2(card, q) {
+      const slotsHtml  = q.parts.map((_, i) =>
+        (i > 0 ? '<span class="dni-field-op" style="padding-bottom:0">+</span>' : '') +
+        `<div class="dni-slot" data-idx="${i}" data-val="">?</div>`
+      ).join('');
+      const labelsHtml = shuffle([...q.parts]).map(v => `<button class="dni-label-btn" data-val="${v}">${dniFmtVal(v)}</button>`).join('');
+      card.innerHTML = `
+        <div class="dni-tab-bar">${dniTabBar(2)}</div>
+        <p class="ex-question-label">Place les valeurs de position pour décomposer ce nombre.</p>
+        <div class="vp-number-display">${q.display}</div>
+        <div class="dni-slots-row" id="dni-slots">${slotsHtml}</div>
+        <div class="dni-label-bank" id="dni-label-bank">${labelsHtml}</div>
+        <div class="ex-feedback-area" id="dni-feedback"></div>
+        <button class="ex-validate-btn" id="dni-validate-btn" style="width:100%;margin-top:16px">Vérifier</button>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      dniSetupTabs();
+      dniSetupLvl2(q);
+    }
+
+    function dniSetupLvl2(q) {
+      let selectedLabel = null;
+      const slotsEl = document.getElementById('dni-slots');
+      const bankEl  = document.getElementById('dni-label-bank');
+
+      bankEl.querySelectorAll('.dni-label-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          if (selectedLabel?.btn === btn) {
+            btn.classList.remove('is-selected');
+            selectedLabel = null;
+            return;
+          }
+          if (selectedLabel) selectedLabel.btn.classList.remove('is-selected');
+          selectedLabel = { btn, val: parseInt(btn.dataset.val, 10) };
+          btn.classList.add('is-selected');
+        });
+      });
+
+      slotsEl.querySelectorAll('.dni-slot').forEach(slot => {
+        slot.addEventListener('click', () => {
+          const curVal = slot.dataset.val ? parseInt(slot.dataset.val, 10) : null;
+          if (selectedLabel) {
+            if (curVal !== null) {
+              const rb = bankEl.querySelector(`.dni-label-btn[data-val="${curVal}"]`);
+              if (rb) { rb.disabled = false; rb.classList.remove('ex-word-used'); }
+            }
+            slot.dataset.val = selectedLabel.val;
+            slot.textContent = dniFmtVal(selectedLabel.val);
+            slot.classList.add('is-filled');
+            selectedLabel.btn.disabled = true;
+            selectedLabel.btn.classList.add('ex-word-used');
+            selectedLabel.btn.classList.remove('is-selected');
+            selectedLabel = null;
+          } else if (curVal !== null) {
+            const rb = bankEl.querySelector(`.dni-label-btn[data-val="${curVal}"]`);
+            if (rb) { rb.disabled = false; rb.classList.remove('ex-word-used'); }
+            slot.dataset.val = '';
+            slot.textContent = '?';
+            slot.classList.remove('is-filled');
+          }
+        });
+      });
+
+      document.getElementById('dni-validate-btn').addEventListener('click', () => dniValidateLvl2(q));
+    }
+
+    function dniValidateLvl2(q) {
+      const slotsEl = document.getElementById('dni-slots');
+      const slots   = [...slotsEl.querySelectorAll('.dni-slot')];
+      if (slots.some(s => !s.dataset.val)) return;
+
+      slotsEl.querySelectorAll('.dni-slot').forEach(s => s.style.pointerEvents = 'none');
+      document.getElementById('dni-label-bank').querySelectorAll('.dni-label-btn').forEach(b => b.disabled = true);
+      document.getElementById('dni-validate-btn').disabled = true;
+
+      const placed   = slots.map(s => parseInt(s.dataset.val, 10));
+      const expected = [...q.parts].sort((a,b) => a - b);
+      const sorted   = [...placed].sort((a,b) => a - b);
+      const isRight  = expected.length === sorted.length && expected.every((v,i) => v === sorted[i]);
+
+      if (isRight) {
+        dniState.score++;
+        slots.forEach(s => s.classList.add('is-correct'));
+        document.getElementById('dni-feedback').innerHTML = `<div class="ex-feedback-correct">✅ Bravo ! ${q.display} = ${q.parts.map(dniFmtVal).join(' + ')}</div>`;
+      } else {
+        slots.forEach(s => {
+          const v = parseInt(s.dataset.val, 10);
+          s.classList.add(q.parts.includes(v) ? 'is-correct' : 'is-wrong');
+        });
+        document.getElementById('dni-feedback').innerHTML = `
+          <div class="ex-feedback-wrong">❌ La somme ne correspond pas à ${q.display}.<br>
+            Décomposition : <strong>${q.parts.map(dniFmtVal).join(' + ')}</strong>
+          </div>`;
+      }
+      dniAdvance();
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       NIVEAU 3 — 3 champs texte (additive / somme de produits / lettres)
+    ══════════════════════════════════════════════════════════════════ */
+
+    function dniNorm3(str) {
+      return str.trim().toLowerCase().replace(/[\s()]/g,'').replace(/×/g,'x');
+    }
+
+    function dniCheckAdd(userStr, storedStr) {
+      const parse = s => s.split('+').map(t => parseInt(dniNorm3(t), 10)).filter(n => !isNaN(n)).sort((a,b) => a-b);
+      const u = parse(userStr), expected = parse(storedStr);
+      return u.length === expected.length && u.every((v,i) => v === expected[i]);
+    }
+
+    function dniCheckVp(userStr, storedArr) {
+      const norm = s => dniNorm3(s).split('+').filter(Boolean).sort();
+      const u = norm(userStr), expected = storedArr.map(t => dniNorm3(t)).sort();
+      return u.length === expected.length && u.every((v,i) => v === expected[i]);
+    }
+
+    function dniRenderLvl3(card, q) {
+      card.innerHTML = `
+        <div class="dni-tab-bar">${dniTabBar(3)}</div>
+        <p class="ex-question-label">Décompose ce nombre de trois façons différentes.</p>
+        <div class="vp-number-display">${q.display}</div>
+        <div class="dni-lvl3-fields">
+          <div class="dni-lvl3-field-wrap">
+            <label for="dni-add">Décomposition additive</label>
+            <textarea class="ex-text-input dni-textarea" id="dni-add" rows="3"
+                      placeholder="ex : 300 000 + 6 000 + 50"
+                      autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+          </div>
+          <div class="dni-lvl3-field-wrap">
+            <label for="dni-vp">Somme de produits</label>
+            <textarea class="ex-text-input dni-textarea" id="dni-vp" rows="3"
+                      placeholder="ex : (3 × 100 000) + (6 × 1 000) + (5 × 10)"
+                      autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+          </div>
+          <div class="dni-lvl3-field-wrap">
+            <label for="dni-lettres">Chiffre des centaines de milliers en lettres</label>
+            <input type="text" class="ex-text-input" id="dni-lettres" placeholder="ex : trois"
+                   autocomplete="off" autocorrect="off" spellcheck="false">
+          </div>
+        </div>
+        <div class="ex-feedback-area" id="dni-feedback"></div>
+        <button class="ex-validate-btn" id="dni-validate-btn" style="width:100%;margin-top:16px">Vérifier</button>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      dniSetupTabs();
+      document.getElementById('dni-lettres').addEventListener('keydown', e => {
+        if (e.key === 'Enter') document.getElementById('dni-validate-btn').click();
+      });
+      setTimeout(() => document.getElementById('dni-add').focus(), 50);
+      document.getElementById('dni-validate-btn').addEventListener('click', () => dniValidateLvl3(q));
+    }
+
+    function dniValidateLvl3(q) {
+      const addEl     = document.getElementById('dni-add');
+      const vpEl      = document.getElementById('dni-vp');
+      const lettresEl = document.getElementById('dni-lettres');
+      if (!addEl.value.trim() || !vpEl.value.trim() || !lettresEl.value.trim()) return;
+      [addEl, vpEl, lettresEl].forEach(el => el.disabled = true);
+      document.getElementById('dni-validate-btn').disabled = true;
+
+      const okAdd     = dniCheckAdd(addEl.value, q.add);
+      const okVp      = dniCheckVp(vpEl.value, q.vp);
+      const normLettres = dniNorm3(lettresEl.value);
+      const okLettres = normLettres === dniNorm3(q.lettres) || normLettres === dniNorm3(q.chiffre);
+
+      addEl.classList.add(okAdd ? 'is-correct' : 'is-wrong');
+      vpEl.classList.add(okVp ? 'is-correct' : 'is-wrong');
+      lettresEl.classList.add(okLettres ? 'is-correct' : 'is-wrong');
+
+      const isRight = okAdd && okVp && okLettres;
+      if (isRight) {
+        dniState.score++;
+        document.getElementById('dni-feedback').innerHTML = `<div class="ex-feedback-correct">✅ Bravo ! Les trois formes sont correctes.</div>`;
+      } else {
+        const wrong = [];
+        if (!okAdd)     wrong.push('décomposition additive');
+        if (!okVp)      wrong.push('somme de produits');
+        if (!okLettres) wrong.push('écriture en lettres');
+        document.getElementById('dni-feedback').innerHTML = `
+          <div class="ex-feedback-wrong">
+            ❌ Champ(s) à revoir : <strong>${wrong.join(', ')}</strong><br>
+            Réponses attendues :<br>
+            • Additive : <strong>${q.add}</strong><br>
+            • Produits : <strong>${q.vp.join(' + ')}</strong><br>
+            • Lettres : <strong>${q.lettres}</strong>
+          </div>`;
+      }
+      dniAdvance();
+    }
+
+    /* ── Avancer ou terminer le niveau ──────────────────────────────── */
+
+    function dniAdvance() {
+      const { idx, total } = dniState;
+      const isLast = idx === total - 1;
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.textContent = isLast ? 'Voir mes résultats' : 'Question suivante →';
+      nextBtn.classList.remove('ex-hidden');
+      nextBtn.onclick = () => {
+        dniState.idx++;
+        if (dniState.idx >= total) {
+          dniShowLevelResults();
+        } else {
+          dniRenderQuestion();
+          document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+    }
+
+    /* ── Résultats de niveau ─────────────────────────────────────────── */
+
+    function dniShowLevelResults() {
+      const { level, score: lvScore, total } = dniState;
+      const pct    = lvScore / total;
+      const s20    = Math.round(pct * 20);
+      const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
+      const isLast = level === 3;
+      const nextLv = level + 1;
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   =
+        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') + ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+
+      const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      let msg, btnsHTML;
+
+      if (isLast) {
+        msg = `🎊 Bravo ! Tu maîtrises la décomposition des nombres entiers aux 3 niveaux !${stars}`;
+        btnsHTML = `
+          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="dni-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else {
+        msg = `Niveau ${level} terminé !${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="dni-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-secondary" id="dni-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('dni-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        dniStartLevel(level);
+      });
+      document.getElementById('dni-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        dniStartLevel(nextLv);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'decomposer-nombre-entier-niveaux',
         level,
         score:        s20,
         total:        20,
