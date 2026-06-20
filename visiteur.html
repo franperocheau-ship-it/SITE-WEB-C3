@@ -326,6 +326,24 @@
     }
     .footer__links a:hover { color: #fff; }
 
+    .footer__text {
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffffbb;
+      line-height: 1.6;
+      padding-bottom: 6px;
+    }
+    .footer__text .rouge { color: #E63946; }
+    .footer__credit {
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffff66;
+    }
+
     /* ═══ RESPONSIVE ═══ */
     @media (max-width: 768px) {
       .navbar__brand img { height: 30px; }
@@ -446,11 +464,15 @@
 ═══════════════════════════════════ -->
 <footer>
   <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
     <div class="footer__links">
-      <a href="#">Mentions légales</a>
-      <a href="#">Politique de confidentialité</a>
+      <a href="mentions-legales.html">Mentions légales</a>
       <a href="#">Contact</a>
     </div>
+    <p class="footer__credit">© 2026 François Perocheau — CC BY-NC-SA 4.0</p>
   </div>
 </footer>
 

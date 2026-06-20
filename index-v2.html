@@ -20,6 +20,13 @@
       --text:   #1a1a1a;
       --gray:   #6b7280;
       --border: #e0e0e0;
+
+      --color-brand-navy:  #1A2D6B;
+      --color-brand-blue:  #2563EB;
+      --color-niveau-cm1:  #1DBFA0;
+      --color-niveau-cm2:  #4A90D9;
+      --color-niveau-6e:   #F5A623;
+      --font-display:      'Nunito', sans-serif;
     }
 
     body {
@@ -151,7 +158,7 @@
     }
 
     .hero__img {
-      width: 300px;
+      width: 488px;
       max-width: 80%;
       margin: 0 auto 10px;
       display: block;
@@ -520,6 +527,24 @@
     }
     .footer__links a:hover { color: #fff; }
 
+    .footer__text {
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffffbb;
+      line-height: 1.6;
+      padding-bottom: 6px;
+    }
+    .footer__text .rouge { color: #E63946; }
+    .footer__credit {
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffff66;
+    }
+
     /* ─── SECTION BACKGROUNDS ─── */
     .section--steps {
       background: linear-gradient(135deg, #f0f5ff 0%, #f5fff8 100%);
@@ -542,6 +567,42 @@
       margin-bottom: 0;
     }
 
+    /* ─── CYCLE 3 BANNER ─── */
+    .cycle3-banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--color-brand-navy);
+      margin: 1rem 0;
+    }
+    .cycle3-icon { font-size: 1.3rem; }
+    .cycle3-label { color: var(--color-brand-navy); }
+    .cycle3-badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cycle3-dot {
+      color: var(--color-brand-navy);
+      font-weight: 900;
+    }
+    .badge-niveau {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 0.9rem;
+      padding: 5px 16px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+    .badge-cm1 { background: var(--color-niveau-cm1); color: #ffffff; }
+    .badge-cm2 { background: var(--color-brand-blue); color: #ffffff; }
+    .badge-6e  { background: var(--color-niveau-6e);  color: #ffffff; }
+
     /* ─── UTILITY ─── */
     .spacer { margin-top: 0; }
 
@@ -558,7 +619,7 @@
 
       /* Hero */
       .hero { padding-top: 62px; padding-bottom: 12px; }
-      .hero__img { width: 220px; }
+      .hero__img { width: 358px; }
       .hero__cycle {
         font-size: 12.5px;
         padding: 8px 16px;
@@ -607,7 +668,7 @@
 
       /* Hero */
       .hero { padding-top: 56px; }
-      .hero__img { width: 180px; }
+      .hero__img { width: 293px; }
       .hero__cycle { font-size: 11.5px; padding: 7px 12px; gap: 4px; }
 
       /* 4 Étapes : 1 par ligne */
@@ -651,11 +712,16 @@
 ═══════════════════════════════════ -->
 <section class="hero">
   <img src="assets/proficiamusgrand.png?v=5" alt="Proficiamus illustration" class="hero__img" />
-  <div class="hero__cycle" data-aos="fade-up">
-    Plateforme pour le Cycle&nbsp;3 :
-    <span class="pill-dot">•</span> CM1
-    <span class="pill-dot">•</span> CM2
-    <span class="pill-dot">•</span> 6ÈME
+  <div class="cycle3-banner" data-aos="fade-up">
+    <span class="cycle3-icon">📘</span>
+    <span class="cycle3-label">Plateforme dédiée au Cycle 3 :</span>
+    <span class="cycle3-badges">
+      <span class="badge-niveau badge-cm1">CM1</span>
+      <span class="cycle3-dot">•</span>
+      <span class="badge-niveau badge-cm2">CM2</span>
+      <span class="cycle3-dot">•</span>
+      <span class="badge-niveau badge-6e">6ème</span>
+    </span>
   </div>
 </section>
 
@@ -891,10 +957,15 @@
 ═══════════════════════════════════ -->
 <footer>
   <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
     <div class="footer__links">
       <a href="mentions-legales.html">Mentions légales</a>
-<a href="#">Contact</a>
+      <a href="#">Contact</a>
     </div>
+    <p class="footer__credit">© 2026 François Perocheau — CC BY-NC-SA 4.0</p>
   </div>
 </footer>
 

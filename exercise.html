@@ -4,40 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Exercice — Français — Lycée Français de Madrid</title>
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/results.js"></script>
   <script src="exercise-data.js?v=16"></script>
   <style>
-    /* ── Page layout ────────────────────────────────────────── */
-    .page-wrap {
-      background: var(--bg);
-      min-height: calc(100vh - 88px);
-      padding-bottom: 64px;
-    }
-
-    .page-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 64px;
-    }
-
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--blue);
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-      padding: 20px 0 0;
-      opacity: 0.75;
-      transition: opacity 180ms;
-    }
-    .back-link:hover { opacity: 1; }
-
     /* ── Exercise container (narrows content to readable width) ── */
     .ex-container {
       max-width: 720px;
@@ -56,35 +29,6 @@
       gap: 6px;
       flex-wrap: wrap;
       margin-bottom: 14px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
-      font-weight: 700;
-      font-size: 10px;
-      letter-spacing: 0.06em;
-      padding: 3px 8px;
-      flex-shrink: 0;
-      line-height: 1;
-    }
-
-    .badge-cm1 {
-      background: rgba(16,43,106,0.09);
-      color: var(--blue);
-      border: 1px solid rgba(16,43,106,0.18);
-    }
-
-    .badge-cm2 {
-      background: var(--blue);
-      color: #ffffff;
-    }
-
-    .badge-6e {
-      background: var(--red);
-      color: #ffffff;
     }
 
     .badge-ce1 {
@@ -140,13 +84,6 @@
       background: var(--border);
       border-radius: 100px;
       overflow: hidden;
-    }
-
-    .ex-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--blue) 0%, #1b4db0 100%);
-      border-radius: 100px;
-      transition: width 500ms cubic-bezier(.4,0,.2,1);
     }
 
     /* ── Question card ──────────────────────────────────────── */
@@ -359,37 +296,6 @@
     /* ── Feedback ───────────────────────────────────────────── */
     .ex-feedback-area { margin-top: 4px; }
 
-    .ex-feedback-correct {
-      background: rgba(22,163,74,0.08);
-      border: 1.5px solid rgba(22,163,74,0.25);
-      border-radius: 12px;
-      padding: 14px 18px;
-      font-size: 15px;
-      font-weight: 700;
-      color: #15803d;
-    }
-
-    .ex-feedback-wrong {
-      background: rgba(214,40,57,0.05);
-      border: 1.5px solid rgba(214,40,57,0.18);
-      border-radius: 12px;
-      padding: 14px 18px;
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.65;
-    }
-
-    .ex-note {
-      background: rgba(16,43,106,0.05);
-      border: 1.5px solid rgba(16,43,106,0.15);
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 13px;
-      color: var(--blue);
-      margin-top: 8px;
-      line-height: 1.6;
-    }
-
     /* ── Step 2 ─────────────────────────────────────────────── */
     .ex-step2-divider {
       height: 1px;
@@ -447,27 +353,6 @@
     @keyframes exFadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── Next button ────────────────────────────────────────── */
-    .ex-next-btn {
-      display: block;
-      margin: 28px auto 0;
-      background: var(--blue);
-      color: #fff;
-      border: none;
-      border-radius: 100px;
-      padding: 13px 44px;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 200ms, transform 200ms;
-    }
-
-    .ex-next-btn:hover {
-      background: #0d2255;
-      transform: translateY(-2px);
     }
 
     /* ── Results ────────────────────────────────────────────── */
@@ -2785,30 +2670,123 @@
 
     .pce-shake { animation: pqpShake 400ms ease; }
 
-  </style>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
-  <!-- NAVBAR-PROFICIAMUS-CSS -->
-  <style>
-  /* ─── Navbar Proficiamus (extrait d'index-v2.html) ─── */
-  body{padding-top:50px;}
-  .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
-  .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
-  .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
-  .navbar__brand img{height:34px;width:auto;}
-  .navbar__brand-text{display:flex;flex-direction:column;}
-  .navbar__name{font-size:18px;font-weight:800;line-height:1;letter-spacing:1px;}
-  .navbar__tagline{font-size:12px;font-style:italic;font-weight:700;color:#102B6A;margin-top:2px;}
-  .navbar__nav{display:flex;align-items:center;gap:24px;}
-  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;transition:color .2s;}
-  .navbar__nav a:hover{color:#1B4EBF;}
-  .navbar__nav a.active{color:#2D9C3C;border-bottom:2px solid #2D9C3C;padding-bottom:2px;}
-  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;font-family:'Nunito',sans-serif;}
-  .navbar__nav .btn-login{color:#fff!important;}
-  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
-  .btn-login:hover{background:#0b1e4d;}
-  @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : change-temps-niveaux — « Change de temps ! »
+       ══════════════════════════════════════════════════════════════════════ */
+
+    /* ── Badges de temps (phrase source) ─────────────────────────────── */
+    .ct-tense-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .ct-badge-present       { background: rgba(16,43,106,0.09);  color: var(--blue);  border: 1px solid rgba(16,43,106,0.20); }
+    .ct-badge-futur         { background: rgba(22,163,74,0.10);  color: #15803d;      border: 1px solid rgba(22,163,74,0.25); }
+    .ct-badge-imparfait     { background: rgba(217,119,6,0.10);  color: #92400e;      border: 1px solid rgba(217,119,6,0.25); }
+    .ct-badge-passe-compose { background: rgba(214,40,57,0.09);  color: var(--red);   border: 1px solid rgba(214,40,57,0.22); }
+    .ct-badge-passe-simple  { background: rgba(124,58,237,0.09); color: #5b21b6;      border: 1px solid rgba(124,58,237,0.22); }
+    .ct-badge-pqp           { background: rgba(190,18,60,0.09);  color: #9f1239;      border: 1px solid rgba(190,18,60,0.22); }
+    .ct-badge-conditionnel  { background: rgba(120,83,0,0.09);   color: #78350f;      border: 1px solid rgba(217,119,6,0.30); }
+
+    /* ── Bloc phrase source ─────────────────────────────────────────── */
+    .ct-phrase-block {
+      padding: 20px 24px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .ct-phrase-text {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      font-style: italic;
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+
+    /* ── Consigne ───────────────────────────────────────────────────── */
+    .ct-instruction {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    /* ── Champ texte pleine largeur ─────────────────────────────────── */
+    .ct-text-input {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+    .ct-text-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(16,43,106,0.10);
+    }
+    .ct-text-input.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.06); color: #15803d; }
+    .ct-text-input.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.05); }
+    .ct-text-input:disabled   { cursor: default; }
+
+    /* ── Bouton Valider pleine largeur ──────────────────────────────── */
+    .ct-val-btn {
+      display: block;
+      width: 100%;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 24px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: background 200ms, transform 200ms;
+    }
+    .ct-val-btn:hover:not(:disabled) { background: #0d2255; transform: translateY(-1px); }
+    .ct-val-btn:disabled { opacity: 0.5; cursor: default; }
+
+    /* ── Surlignage des mots fautifs dans la phrase de l'élève ──────── */
+    .ct-error-word {
+      background: rgba(214,40,57,0.12);
+      color: var(--red);
+      border-radius: 4px;
+      padding: 0 3px;
+      font-weight: 700;
+      font-style: normal;
+      text-decoration: none;
+    }
+
+    /* ── Phrase correcte affichée après 2 erreurs ───────────────────── */
+    .ct-correct-sentence {
+      background: rgba(22,163,74,0.07);
+      border: 1.5px solid rgba(22,163,74,0.25);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #15803d;
+      margin-top: 8px;
+      text-align: center;
+    }
+
   </style>
 </head>
 <body>
@@ -3289,6 +3267,12 @@
       } else if (currentType === "pce-niveaux") {
         pceInitSession();
         return;
+      } else if (currentType === "change-temps-niveaux") {
+        ctInitSession();
+        return;
+      } else if (currentType === "change-sujet-niveaux") {
+        csjInitSession();
+        return;
       } else {
         bankSource = sessionData.bank;
       }
@@ -3433,6 +3417,8 @@
         /* session managed by eoaInitSession — no-op here */
       } else if (currentType === "pce-niveaux") {
         /* session managed by pceInitSession — no-op here */
+      } else if (currentType === "change-temps-niveaux") {
+        /* session managed by ctInitSession — no-op here */
       } else if (currentType === "accord-participe-cod") {
         renderAccordParticipeCod(card, q);
       }
@@ -15499,6 +15485,735 @@
         exerciseSlug: slug, subject, category,
         exerciseType: 'pce-niveaux',
         level:        'Niveau ' + lv,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : change-temps-niveaux — « Change de temps ! »
+       5 niveaux déverrouillables à 80 %. 2 tentatives par item.
+       Score : 2 pts si correct du 1er coup, 1 pt au 2e, 0 sinon. Max 20 pts.
+       ════════════════════════════════════════════════════════════════════════ */
+
+    const CT_SEUIL = 0.80;
+
+    const CT_LV_DEFS = [
+      { lv: 1, badge: 'badge-cm1', desc: 'Présent ↔ Futur simple / Présent ↔ Imparfait' },
+      { lv: 2, badge: 'badge-cm1', desc: 'Présent → Passé composé' },
+      { lv: 3, badge: 'badge-cm2', desc: 'Présent → Passé simple' },
+      { lv: 4, badge: 'badge-cm2', desc: 'Passé composé → Plus-que-parfait' },
+      { lv: 5, badge: 'badge-6e',  desc: 'Présent → Conditionnel présent' }
+    ];
+
+    let ctState = null;
+
+    function ctSlugKey(suffix) {
+      const s = new URLSearchParams(window.location.search).get('slug') || 'ct';
+      return `ct_${s}_${suffix}`;
+    }
+    function ctGetValidated() {
+      try { return JSON.parse(localStorage.getItem(ctSlugKey('validated')) || '[]'); }
+      catch(e) { return []; }
+    }
+    function ctSetValidated(arr) {
+      localStorage.setItem(ctSlugKey('validated'), JSON.stringify(arr));
+    }
+
+    /* Normalisation : minuscules, espaces réduits, guillemets normalisés */
+    function ctNorm(str) {
+      return (str || '').toLowerCase().trim().replace(/\s+/g, ' ')
+        .replace(/['']/g, "'").replace(/[""«»]/g, '"');
+    }
+    /* Normalisation d'un mot seul : sans ponctuation finale */
+    function ctNormWord(w) {
+      return (w || '').toLowerCase().replace(/[.,;:!?«»"'"'"""]/g, '').trim();
+    }
+
+    function ctTenseClass(tense) {
+      const t = (tense || '').toLowerCase();
+      if (t.includes('futur'))           return 'ct-badge-futur';
+      if (t.includes('imparfait'))       return 'ct-badge-imparfait';
+      if (t.includes('passé composé') || t.includes('passe compose')) return 'ct-badge-passe-compose';
+      if (t.includes('passé simple')  || t.includes('passe simple'))  return 'ct-badge-passe-simple';
+      if (t.includes('plus-que'))        return 'ct-badge-pqp';
+      if (t.includes('conditionnel'))    return 'ct-badge-conditionnel';
+      return 'ct-badge-present';
+    }
+
+    function ctShuf(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    /* ── Init : réinitialise et affiche le sélecteur de niveau ──────────── */
+    function ctInitSession() {
+      ctState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      ctRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Sélecteur de niveau (5 boutons) ────────────────────────────────── */
+    function ctRenderLevelSelect(card) {
+      const validated = ctGetValidated();
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="pqp-rule-chip" style="display:flex;margin:0 auto 20px;max-width:520px">
+          📌 Réécris la phrase entière au temps demandé en effectuant tous les accords.
+        </div>
+        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
+          ${CT_LV_DEFS.map((d, i) => {
+            const unlocked = i === 0 || validated.includes(i - 1);
+            const done     = validated.includes(i);
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const disabled = !unlocked ? ' disabled' : '';
+            const descHtml = !unlocked
+              ? '🔒 Valide le niveau précédent pour débloquer (80 % requis)'
+              : done
+                ? d.desc + ' · <strong>Validé ✓</strong>'
+                : d.desc;
+            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${disabled}>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${d.badge}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
+              </span>
+              <div>
+                <span class="ex-type-name">Niveau ${d.lv}</span>
+                <span class="ex-type-desc">${descHtml}</span>
+              </div>
+            </button>`;
+          }).join('')}
+        </div>
+      `;
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => ctStartLevel(parseInt(btn.dataset.level)))
+      );
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function ctStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const pool  = (sessionData.bank || []).filter(item => item.level === lv);
+      const n     = sessionData.questionsPerSession || 10;
+      const items = ctShuf(pool).slice(0, n);
+
+      ctState = { lv, items, idx: 0, rawScore: 0, rawMax: 0, attempt: 0 };
+
+      document.getElementById('q-total').textContent = items.length;
+      ctRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Rendu d'une question ────────────────────────────────────────────── */
+    function ctRenderQuestion(card) {
+      const { items, idx } = ctState;
+      const item  = items[idx];
+      const total = items.length;
+
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      const srcCls = ctTenseClass(item.sourceTense);
+      const isLast = idx + 1 >= total;
+
+      card.innerHTML = `
+        <p class="ex-question-label">Change de temps !</p>
+        <div class="ct-phrase-block">
+          <span class="ct-tense-badge ${srcCls}">${item.sourceTense}</span>
+          <div class="ct-phrase-text">« ${item.sentence} »</div>
+        </div>
+        <p class="ct-instruction">➜ Réécris cette phrase au <strong>${item.targetTense}</strong> :</p>
+        <input type="text" id="ct-input" class="ct-text-input"
+               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+               placeholder="Écris la phrase entière…">
+        <button class="ct-val-btn" id="ct-val-btn">Valider</button>
+        <div class="ex-feedback-area" id="ct-feedback"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${isLast ? 'Voir les résultats →' : 'Phrase suivante →'}</button>
+      `;
+
+      ctState.attempt = 0;
+
+      const input   = document.getElementById('ct-input');
+      const valBtn  = document.getElementById('ct-val-btn');
+      const nextBtn = document.getElementById('next-btn');
+
+      valBtn.addEventListener('click', ctValidate);
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !valBtn.disabled) { e.preventDefault(); ctValidate(); }
+      });
+      nextBtn.addEventListener('click', () => {
+        ctState.idx++;
+        if (ctState.idx >= ctState.items.length) {
+          ctShowLevelResults();
+        } else {
+          ctRenderQuestion(document.getElementById('ex-card'));
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+
+      input.focus();
+    }
+
+    /* ── Vérifie si la réponse est correcte ─────────────────────────────── */
+    function ctCheckAnswer(userInput, item) {
+      const uNorm   = ctNorm(userInput);
+      const answers = item.answers || [item.answer];
+      // 1) Correspondance exacte normalisée
+      if (answers.some(a => ctNorm(a) === uNorm)) return true;
+      // 2) Correspondance souple : sujet présent + formes verbales correctes
+      const sourceNorm = ctNorm(item.sentence);
+      return answers.some(a => ctFlexibleMatch(uNorm, sourceNorm, ctNorm(a)));
+    }
+
+    /* ── Validation souple : sujet + verbe corrects, reste toléré ───────── */
+    function ctFlexibleMatch(userNorm, sourceNorm, answerNorm) {
+      const strip = s => s.replace(/[.,;:!?«»"'"'"]/g, '').trim();
+      const uWords = strip(userNorm).split(/\s+/);
+      const sWords = strip(sourceNorm).split(/\s+/);
+      const aWords = strip(answerNorm).split(/\s+/);
+
+      const sSet = new Set(sWords.map(ctNormWord));
+      const aSet = new Set(aWords.map(ctNormWord));
+      const uSet = new Set(uWords.map(ctNormWord));
+
+      // Refuser si l'élève a recopié la source sans modifier
+      if (strip(userNorm) === strip(sourceNorm)) return false;
+
+      // Mots-clés = nouvelles formes verbales absentes de la source
+      const keyWords    = aWords.filter(w => !sSet.has(ctNormWord(w)));
+      // Mots remplacés = mots de la source absents de la réponse correcte
+      const removedWords = sWords.filter(w => !aSet.has(ctNormWord(w)));
+
+      if (keyWords.length === 0 && removedWords.length === 0) return false;
+
+      // Toutes les nouvelles formes verbales doivent être présentes
+      const keyOk     = keyWords.every(w => uSet.has(ctNormWord(w)));
+      // Les anciennes formes ne doivent plus apparaître (pas de phrase hybride)
+      const removedOk = removedWords.every(w => !uSet.has(ctNormWord(w)));
+
+      return keyOk && removedOk;
+    }
+
+    /* ── Surligne les mots différents dans la phrase de l'élève ─────────── */
+    function ctHighlightDiff(userInput, correctAnswer) {
+      const uTokens = userInput.trim().split(/\s+/);
+      const cTokens = correctAnswer.trim().split(/\s+/);
+      return uTokens.map((u, i) => {
+        const c = cTokens[i] || '';
+        return ctNormWord(u) === ctNormWord(c)
+          ? u
+          : `<mark class="ct-error-word">${u}</mark>`;
+      }).join(' ');
+    }
+
+    /* ── Validation (2 tentatives) ───────────────────────────────────────── */
+    function ctValidate() {
+      const input   = document.getElementById('ct-input');
+      const valBtn  = document.getElementById('ct-val-btn');
+      const nextBtn = document.getElementById('next-btn');
+      const fb      = document.getElementById('ct-feedback');
+      const item    = ctState.items[ctState.idx];
+      const userVal = (input?.value || '').trim();
+
+      if (!userVal) { input?.focus(); return; }
+
+      const correct  = ctCheckAnswer(userVal, item);
+      const canon    = (item.answers || [item.answer])[0];
+
+      if (correct) {
+        const pts = ctState.attempt === 0 ? 2 : 1;
+        ctState.rawScore += pts;
+        ctState.rawMax   += 2;
+
+        input.disabled = true;
+        input.classList.add('is-correct');
+        valBtn.disabled = true;
+
+        const ptsLabel = pts === 2
+          ? '<strong>+2 points</strong>'
+          : '<strong>+1 point</strong> <span style="font-weight:500;font-size:13px">(2<sup>e</sup> tentative)</span>';
+        fb.innerHTML = `<div class="ex-feedback-correct">✓ Bravo ! ${ptsLabel}</div>`;
+        nextBtn.classList.remove('ex-hidden');
+
+      } else if (ctState.attempt === 0) {
+        /* 1re tentative fausse : surligner les erreurs, laisser corriger */
+        ctState.attempt = 1;
+        input.classList.add('is-wrong');
+
+        const highlighted = ctHighlightDiff(userVal, canon);
+        fb.innerHTML = `
+          <div class="ex-feedback-wrong">
+            <div style="margin-bottom:8px">❌ Ta phrase : ${highlighted}</div>
+            <div class="ex-note">📌 ${item.feedbackRule}</div>
+          </div>`;
+
+        setTimeout(() => {
+          input.classList.remove('is-wrong');
+          input.select();
+          input.focus();
+        }, 600);
+
+      } else {
+        /* 2e tentative fausse : afficher la correction complète */
+        ctState.rawMax += 2;
+
+        input.disabled = true;
+        valBtn.disabled = true;
+
+        fb.innerHTML = `
+          <div class="ex-feedback-wrong">
+            <div style="margin-bottom:8px">❌ La bonne réponse est :</div>
+            <div class="ct-correct-sentence">✓ ${canon}</div>
+            <div class="ex-note" style="margin-top:8px">📌 ${item.feedbackRule}</div>
+          </div>`;
+        nextBtn.classList.remove('ex-hidden');
+      }
+    }
+
+    /* ── Résultats de fin de niveau ──────────────────────────────────────── */
+    function ctShowLevelResults() {
+      const { lv, rawScore, rawMax } = ctState;
+      const pct    = rawMax > 0 ? rawScore / rawMax : 0;
+      const passed = pct >= CT_SEUIL;
+      const s20    = rawMax > 0 ? Math.round(pct * 20) : 0;
+      const pctPct = Math.round(pct * 100);
+
+      if (passed) {
+        const validated = ctGetValidated();
+        if (!validated.includes(lv - 1)) { validated.push(lv - 1); ctSetValidated(validated); }
+      }
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const stars  = s20 >= 18 ? '🌟🌟🌟' : s20 >= 14 ? '⭐⭐' : s20 >= 10 ? '⭐' : '';
+      const isLast = lv >= 5;
+      const backHref  = sessionData.backLink?.href  || 'français-orthographe.html';
+      const backLabel = `← Retour à ${sessionData.backLink?.label || 'l\'Orthographe'}`;
+      const nextDef   = CT_LV_DEFS[lv]; /* index lv = définition du niveau suivant (0-based) */
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises tous les changements de temps !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="ct-restart-btn">Recommencer</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${lv} validé ! 🏆 Le Niveau ${lv + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="ct-next-btn">Niveau ${lv + 1} →</button>
+          <button class="ex-btn-secondary" id="ct-retry-btn">Recommencer ce niveau</button>
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const neededS20 = Math.ceil(CT_SEUIL * 20);
+        msg = `${stars || '💪'} Pas encore… il faut ${neededS20}/20 pour débloquer le niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="ct-retry-btn">Recommencer ce niveau</button>
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('ct-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        ctStartLevel(ctState.lv);
+      });
+      document.getElementById('ct-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        ctStartLevel(lv + 1);
+      });
+      document.getElementById('ct-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        ctInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'change-temps-niveaux',
+        level:        'Niveau ' + lv,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : change-sujet-niveaux — « Change de sujet ! »
+       Niveau 1 : changement de nombre, présent, groupes 1 et 2
+       Niveau 2 : changement de genre + adjectif attribut, présent et imparfait
+       Niveau 3 : participe passé avec être et avoir (PC / PQP)
+       Niveau 4 : pronoms indéfinis, sujets coordonnés et inversés
+       10 questions tirées d'un pool, 2 tentatives, seuil 80 %, localStorage.
+       ════════════════════════════════════════════════════════════════════════ */
+
+    const CSJ_SEUIL      = 0.80;
+    const CSJ_LEVELS     = [1, 2, 3, 4];
+    const CSJ_LEVEL_DESCS = [
+      'Changement de nombre — présent, groupes 1 et 2',
+      'Changement de genre + adjectif attribut — présent et imparfait',
+      'Participe passé avec être et avoir — passé composé et plus-que-parfait',
+      'Pronoms indéfinis, sujets coordonnés et sujets inversés',
+    ];
+    const CSJ_BADGE_CLS = ['badge-cm1', 'badge-cm2', 'badge-6e', 'badge-ce1'];
+
+    let csjState = null;
+
+    function csjSlugKey(suffix) {
+      const s = new URLSearchParams(window.location.search).get('slug') || 'csj';
+      return s + '_' + suffix;
+    }
+    function csjGetValidated() {
+      try { return JSON.parse(localStorage.getItem(csjSlugKey('validated')) || '[]'); }
+      catch { return []; }
+    }
+    function csjSetValidated(arr) {
+      localStorage.setItem(csjSlugKey('validated'), JSON.stringify(arr));
+    }
+
+    function csjNorm(str) {
+      return str.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[''`´'']/g, "'");
+    }
+
+    function csjEsc(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    /* Retourne les tokens de la réponse qui diffèrent de la source (mots obligatoires) */
+    function csjKeyTokens(q) {
+      const strip    = s => s.replace(/[.,?!;:«»"""]/g, '');
+      const srcSet   = new Set(csjNorm(q.source).split(' ').map(strip).filter(Boolean));
+      const accepted = Array.isArray(q.answers) ? q.answers : [q.answer];
+      const ansToks  = csjNorm(accepted[0]).split(' ').map(strip).filter(Boolean);
+      return ansToks.filter(t => !srcSet.has(t));
+    }
+
+    /* Vérifie la réponse : exact d'abord, puis par tokens-clés */
+    function csjIsCorrect(raw, q) {
+      const accepted = Array.isArray(q.answers) ? q.answers : [q.answer];
+      if (accepted.some(a => csjNorm(raw) === csjNorm(a))) return true;
+      const strip    = s => s.replace(/[.,?!;:«»"""]/g, '');
+      const keyToks  = csjKeyTokens(q);
+      if (keyToks.length === 0) return false;
+      const stuSet   = new Set(csjNorm(raw).split(' ').map(strip).filter(Boolean));
+      return keyToks.every(t => stuSet.has(t));
+    }
+
+    /* Surligne mot à mot : vert si correct, rouge souligné si fautif */
+    function csjDiffHtml(student, correct) {
+      const sWords = student.trim().split(/\s+/);
+      const cNorm  = csjNorm(correct).split(' ');
+      return sWords.map((sw, i) => {
+        const expected = cNorm[i] || '';
+        if (csjNorm(sw) === expected) {
+          return `<span style="color:#15803d;font-weight:700">${csjEsc(sw)}</span>`;
+        }
+        return `<span style="color:var(--red);font-weight:700;text-decoration:underline wavy">${csjEsc(sw)}</span>`;
+      }).join(' ');
+    }
+
+    /* Met le sujet de départ en gras dans la phrase source */
+    function csjBoldSubject(source, subject) {
+      const idx = source.indexOf(subject);
+      if (idx === -1) return csjEsc(source);
+      return csjEsc(source.slice(0, idx))
+           + '<strong>' + csjEsc(subject) + '</strong>'
+           + csjEsc(source.slice(idx + subject.length));
+    }
+
+    function csjInitSession() {
+      csjState         = null;
+      score            = 0;
+      currentIndex     = 0;
+      sessionStartTime = Date.now();
+
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      csjRenderLevelSelect(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function csjRenderLevelSelect(card) {
+      const validated = csjGetValidated();
+      card.innerHTML = `
+        <p class="ex-type-select-label">Choisis ton niveau</p>
+        <div class="ex-type-grid">
+          ${CSJ_LEVELS.map((lv, i) => {
+            const prevLv   = i > 0 ? CSJ_LEVELS[i - 1] : null;
+            const unlocked = i === 0 || validated.includes(prevLv);
+            const done     = validated.includes(lv);
+            const cls      = !unlocked ? ' vb-locked-card' : '';
+            const dis      = !unlocked ? ' disabled' : '';
+            const desc     = !unlocked
+              ? 'Valide le niveau précédent pour débloquer'
+              : done ? CSJ_LEVEL_DESCS[i] + ' · Niveau validé !'
+              : CSJ_LEVEL_DESCS[i];
+            const bdgCls   = CSJ_BADGE_CLS[i] || 'badge-cm1';
+            return `<button class="ex-type-card${cls}" data-level="${lv}"${dis}>
+              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
+                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${i + 1}</span>
+              </span>
+              <div>
+                <span class="ex-type-name">Niveau ${i + 1}</span>
+                <span class="ex-type-desc">${desc}</span>
+              </div>
+            </button>`;
+          }).join('')}
+        </div>
+      `;
+      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
+        btn.addEventListener('click', () => csjStartLevel(parseInt(btn.dataset.level, 10)))
+      );
+    }
+
+    function csjStartLevel(lv) {
+      const pool = [...(sessionData.pools[lv] || [])];
+      const n    = sessionData.questionsPerSession || 10;
+      const qs   = shuffle(pool).slice(0, n);
+
+      csjState = { level: lv, questions: qs, idx: 0, score: 0, correctCount: 0, total: qs.length };
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      document.getElementById('q-total').textContent = qs.length;
+      csjRenderQuestion();
+    }
+
+    function csjRenderQuestion() {
+      const { questions, idx, total } = csjState;
+      const q = questions[idx];
+
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      const card = document.getElementById('ex-card');
+      card.innerHTML = `
+        <p class="ex-question-label">Réécris la phrase entière avec le nouveau sujet.</p>
+        <div class="ex-sentence-display" style="font-size:18px;line-height:1.6;text-align:left;padding:18px 24px">
+          ${csjBoldSubject(q.source, q.subject)}
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin:0 0 20px;flex-wrap:wrap">
+          <span style="font-size:15px;color:var(--muted);font-weight:600">➜ Nouveau sujet :</span>
+          <span style="background:var(--blue);color:#fff;border-radius:8px;padding:5px 16px;font-weight:800;font-size:15px;letter-spacing:0.02em">${csjEsc(q.newSubject)}</span>
+        </div>
+        <div class="ex-input-row" style="margin-bottom:16px">
+          <input type="text" class="ex-text-input" id="csj-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Réécris la phrase entière…">
+          <button class="ex-validate-btn" id="csj-validate-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="csj-feedback"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const input  = document.getElementById('csj-input');
+      const valBtn = document.getElementById('csj-validate-btn');
+
+      let potential = 1.0;
+      let attempt   = 0;
+
+      setTimeout(() => input.focus(), 50);
+
+      function csjValidate() {
+        const raw = input.value.trim();
+        if (!raw) return;
+        attempt++;
+
+        const isRight   = csjIsCorrect(raw, q);
+        const canonical = (Array.isArray(q.answers) ? q.answers : [q.answer])[0];
+
+        if (isRight) {
+          csjState.correctCount++;
+          csjState.score += potential;
+          input.disabled  = true;
+          valBtn.disabled = true;
+          input.classList.add('is-correct');
+          const msgs = ['✅ Bravo !', '✨ Très bien !', '🌟 Exact !', '👏 Parfait !'];
+          document.getElementById('csj-feedback').innerHTML =
+            `<div class="ex-feedback-correct">${msgs[Math.floor(Math.random() * msgs.length)]}</div>`;
+          csjShowNextBtn();
+
+        } else if (attempt === 1) {
+          potential = Math.max(0, potential - 0.5);
+          input.disabled  = true;
+          valBtn.disabled = true;
+          const diffHtml = csjDiffHtml(raw, canonical);
+          document.getElementById('csj-feedback').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ta réponse : ${diffHtml}<br>
+              Vérifie tous les accords et réessaie.
+            </div>
+          `;
+          setTimeout(() => {
+            input.classList.remove('is-wrong');
+            input.value     = '';
+            input.disabled  = false;
+            valBtn.disabled = false;
+            input.focus();
+          }, 1500);
+
+        } else {
+          input.disabled  = true;
+          valBtn.disabled = true;
+          input.classList.add('is-wrong');
+          const diffHtml = csjDiffHtml(raw, canonical);
+          document.getElementById('csj-feedback').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ta réponse : ${diffHtml}<br>
+              Forme correcte : <strong>${csjEsc(canonical)}</strong>
+            </div>
+            <div class="ex-note">📌 ${csjEsc(q.rule)}</div>
+          `;
+          csjShowNextBtn();
+        }
+      }
+
+      valBtn.addEventListener('click', csjValidate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') csjValidate(); });
+    }
+
+    function csjShowNextBtn() {
+      const nextBtn = document.getElementById('next-btn');
+      const isLast  = csjState.idx === csjState.total - 1;
+      nextBtn.textContent = isLast ? 'Voir mes résultats' : 'Suivant →';
+      nextBtn.classList.remove('ex-hidden');
+      nextBtn.onclick = () => {
+        csjState.idx++;
+        if (csjState.idx >= csjState.total) {
+          csjShowLevelResults();
+        } else {
+          csjRenderQuestion();
+          document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+    }
+
+    function csjShowLevelResults() {
+      const { level, score: rawScore, correctCount, total } = csjState;
+      const correctPct = correctCount / total;
+      const passed     = correctPct >= CSJ_SEUIL;
+
+      if (passed) {
+        const validated = csjGetValidated();
+        if (!validated.includes(level)) { validated.push(level); csjSetValidated(validated); }
+        faireShowConfetti();
+      }
+
+      const lvIdx  = CSJ_LEVELS.indexOf(level);
+      const isLast = lvIdx === CSJ_LEVELS.length - 1;
+      const nextLv = !isLast ? CSJ_LEVELS[lvIdx + 1] : null;
+      const allDone = csjGetValidated().length >= CSJ_LEVELS.length;
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      const s20   = Math.round(rawScore / total * 20);
+      const stars = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : s20 >= 1 ? ' ⭐' : '';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   =
+        correctCount + ' bonne' + (correctCount !== 1 ? 's' : '') +
+        ' réponse' + (correctCount !== 1 ? 's' : '') + ' sur ' + total;
+
+      const backHref = sessionData.backLink?.href || 'français-orthographe.html';
+      let msg, btnsHTML;
+
+      if (passed && allDone && isLast) {
+        msg = '🎊 Félicitations ! Tu maîtrises les accords avec changement de sujet aux quatre niveaux !' + stars;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="csj-reset-btn">Recommencer depuis le début</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else if (passed) {
+        const nextLabel = nextLv ? ` Le niveau ${nextLv} est débloqué ! 🔓` : '';
+        msg = `Niveau ${level} validé !${nextLabel}` + stars;
+        btnsHTML = nextLv ? `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="csj-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-secondary" id="csj-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>` : `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="csj-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else {
+        const needed = Math.ceil(CSJ_SEUIL * total);
+        msg = `Pas encore… ${correctCount}/${total} bonnes réponses. Il faut ${needed} réponses correctes (80 %) pour passer. On réessaie ?` + stars;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="csj-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('csj-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        csjStartLevel(csjState.level);
+      });
+      document.getElementById('csj-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        csjStartLevel(nextLv);
+      });
+      document.getElementById('csj-reset-btn')?.addEventListener('click', () => {
+        csjSetValidated([]);
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        csjInitSession();
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'change-sujet-niveaux',
+        level,
         score:        s20,
         total:        20,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null

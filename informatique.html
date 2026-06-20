@@ -4,45 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Informatique – Site Web C3</title>
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
   <style>
-
-    /* ══════════════════════════════════════════════════════════════
-       PAGE SHELL
-    ══════════════════════════════════════════════════════════════ */
-    .page-wrap {
-      background: var(--bg);
-      min-height: calc(100vh - 88px);
-      padding-bottom: 72px;
-    }
-
-    .page-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 64px;
-    }
-
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--blue);
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-      padding: 20px 0 0;
-      opacity: 0.75;
-      transition: opacity 180ms;
-    }
-    .back-link:hover { opacity: 1; }
-
-    /* ══════════════════════════════════════════════════════════════
-       PAGE HEADER
-    ══════════════════════════════════════════════════════════════ */
-    .page-header {
-      text-align: center;
-      padding: 32px 0 44px;
-    }
+    /* ── PAGE SHELL — overrides ──────────────────────────────────────────── */
+    .page-wrap    { padding-bottom: 72px; }
+    .page-content { max-width: 1200px; }
+    .page-header  { padding: 32px 0 44px; }
 
     .page-header-icon {
       font-size: 54px;
@@ -50,21 +17,7 @@
       margin-bottom: 16px;
     }
 
-    .page-title {
-      font-weight: 900;
-      font-size: 30px;
-      color: var(--blue);
-      letter-spacing: 0.04em;
-      margin-bottom: 10px;
-    }
-
-    .page-title-rule {
-      width: 44px;
-      height: 3px;
-      background: var(--red);
-      border-radius: 2px;
-      margin: 0 auto 16px;
-    }
+    .page-title { font-size: 30px; letter-spacing: 0.04em; margin-bottom: 10px; }
 
     .page-intro {
       font-size: 15px;
@@ -76,10 +29,7 @@
       line-height: 1.75;
     }
 
-    /* ══════════════════════════════════════════════════════════════
-       GRILLE DE RESSOURCES
-       — Flexbox centré : 3 cartes sur la ligne 1, 2 centrées en ligne 2
-    ══════════════════════════════════════════════════════════════ */
+    /* ── GRILLE DE RESSOURCES ────────────────────────────────────────────── */
     .info-grid {
       display: flex;
       flex-wrap: wrap;
@@ -89,11 +39,8 @@
       margin: 0 auto;
     }
 
-    /* ══════════════════════════════════════════════════════════════
-       CARTE RESSOURCE
-    ══════════════════════════════════════════════════════════════ */
+    /* ── CARTE RESSOURCE ─────────────────────────────────────────────────── */
     .info-card {
-      /* 3 par ligne : (100% − 2 × 28px) / 3  ≈  33.33% − 19px */
       flex: 0 0 calc(33.33% - 19px);
       min-width: 260px;
       background: var(--card-bg);
@@ -104,21 +51,10 @@
       flex-direction: column;
       transition: transform 250ms ease, box-shadow 250ms ease;
     }
+    .info-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
 
-    .info-card:hover {
-      transform: translateY(-6px);
-      box-shadow: var(--shadow-md);
-    }
+    .ic-img-wrap { display: block; text-decoration: none; overflow: hidden; flex-shrink: 0; }
 
-    /* ── Zone image cliquable ───────── */
-    .ic-img-wrap {
-      display: block;
-      text-decoration: none;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-
-    /* Visuel coloré (placeholder logo) : remplacer .ic-visual par <img> si disponible */
     .ic-visual {
       height: 164px;
       display: flex;
@@ -129,119 +65,60 @@
       transition: transform 320ms ease;
       position: relative;
     }
+    .ic-img-wrap:hover .ic-visual { transform: scale(1.07); }
 
-    .ic-img-wrap:hover .ic-visual {
-      transform: scale(1.07);
-    }
-
-    /* Couleurs de fond propres à chaque ressource
-       ─ modifier ici pour changer la couleur de la zone image ─ */
     .ic-pronote { background: linear-gradient(135deg, #1A4D96 0%, #2C7BE5 100%); }
     .ic-qwant   { background: linear-gradient(135deg, #CC0066 0%, #FF6699 100%); }
     .ic-castor  { background: linear-gradient(135deg, #9B4110 0%, #E8712A 100%); }
     .ic-blockly { background: linear-gradient(135deg, #1565C0 0%, #2E7D32 100%); }
     .ic-ia      { background: linear-gradient(135deg, #4A148C 0%, #1565C0 100%); }
 
-    /* ── Corps de la carte ──────────── */
-    .ic-body {
-      padding: 22px 22px 26px;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
+    .ic-body { padding: 22px 22px 26px; display: flex; flex-direction: column; flex: 1; }
 
     .ic-title {
+      font-family: var(--font-display);
       font-weight: 800;
       font-size: 15px;
-      color: var(--blue);
+      color: var(--color-brand-navy);
       letter-spacing: 0.02em;
       margin-bottom: 10px;
       line-height: 1.4;
     }
 
-    .ic-desc {
-      font-size: 13.5px;
-      color: var(--muted);
-      line-height: 1.72;
-      flex: 1;
-    }
+    .ic-desc { font-size: 13.5px; color: var(--muted); line-height: 1.72; flex: 1; }
 
-    /* ── Bouton « J'y vais ! » ──────── */
     .ic-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       margin-top: 20px;
       align-self: flex-start;
-      background: var(--blue);
+      background: var(--color-brand-navy);
       color: #fff;
       text-decoration: none;
-      border-radius: 100px;
+      border-radius: 22px;
       padding: 10px 26px;
+      font-family: var(--font-display);
       font-weight: 700;
       font-size: 13px;
       letter-spacing: 0.03em;
       transition: background 220ms ease;
     }
+    .ic-btn:hover { background: #0f1d45; }
 
-    .ic-btn:hover { background: var(--red); }
+    .ic-logo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
 
-    /* Image locale : remplace l'emoji placeholder */
-    .ic-logo {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-    }
-
-    /* ══════════════════════════════════════════════════════════════
-       RESPONSIVE
-    ══════════════════════════════════════════════════════════════ */
-    @media (max-width: 1024px) {
-      .page-content { padding: 0 40px; }
-    }
-
+    /* ── RESPONSIVE ──────────────────────────────────────────────────────── */
     @media (max-width: 768px) {
-      .page-content { padding: 0 24px; }
-      .info-grid    { gap: 20px; }
-      /* 2 cartes par ligne */
-      .info-card    { flex: 0 0 calc(50% - 10px); min-width: 220px; }
+      .info-grid { gap: 20px; }
+      .info-card { flex: 0 0 calc(50% - 10px); min-width: 220px; }
     }
-
     @media (max-width: 520px) {
       .page-content { padding: 0 16px; }
-      /* 1 carte par ligne */
       .info-card    { flex: 0 0 100%; min-width: 0; }
       .ic-visual    { height: 140px; }
       .page-title   { font-size: 24px; }
     }
-
-  </style>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
-  <!-- NAVBAR-PROFICIAMUS-CSS -->
-  <style>
-  /* ─── Navbar Proficiamus (extrait d'index-v2.html) ─── */
-  body{padding-top:50px;}
-  .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
-  .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
-  .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
-  .navbar__brand img{height:34px;width:auto;}
-  .navbar__brand-text{display:flex;flex-direction:column;}
-  .navbar__name{font-size:18px;font-weight:800;line-height:1;letter-spacing:1px;}
-  .navbar__tagline{font-size:12px;font-style:italic;font-weight:700;color:#102B6A;margin-top:2px;}
-  .navbar__nav{display:flex;align-items:center;gap:24px;}
-  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;transition:color .2s;}
-  .navbar__nav a:hover{color:#1B4EBF;}
-  .navbar__nav a.active{color:#2D9C3C;border-bottom:2px solid #2D9C3C;padding-bottom:2px;}
-  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;font-family:'Nunito',sans-serif;}
-  .navbar__nav .btn-login{color:#fff!important;}
-  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
-  .btn-login:hover{background:#0b1e4d;}
-  @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
   </style>
 </head>
 <body>

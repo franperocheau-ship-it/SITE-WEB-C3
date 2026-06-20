@@ -7558,6 +7558,1014 @@ const EXERCISE_DATA = {
         answer: "sont partis"
       }
     ]
+  },
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     CHANGE DE TEMPS !  —  type : change-temps-niveaux
+     5 niveaux déverrouillables à 80 %.  Pool de 14 items par niveau, tirage de 10.
+     Champ texte pleine largeur : l'élève réécrit la phrase entière au temps demandé.
+     ══════════════════════════════════════════════════════════════════════════ */
+  "ortho-modifier-temps-accords": {
+    title:      "Change de temps !",
+    domaine:    "Français",
+    competence: "Orthographe — Modifier le temps et effectuer les accords nécessaires",
+    levels:     ["CM1", "CM2", "6e"],
+    type:       "change-temps-niveaux",
+    questionsPerSession: 10,
+    backLink:   { href: "français-orthographe.html", label: "Orthographe" },
+
+    /* bank : chaque item porte un champ « level » 1-5.
+       startSessionWithType filtre par niveau avant de shuffler. */
+    bank: [
+
+      /* ── NIVEAU 1 : Présent ↔ Futur simple / Présent ↔ Imparfait ─────────── */
+      {
+        level: 1,
+        sentence:     "Les enfants jouent dans le jardin.",
+        sourceTense:  "Présent",
+        targetTense:  "futur simple",
+        answers:      ["Les enfants joueront dans le jardin."],
+        feedbackRule: "Au futur, les verbes du 1<sup>er</sup> groupe prennent : <em>-erai, -eras, -era, -erons, -erez, -eront</em>."
+      },
+      {
+        level: 1,
+        sentence:     "Elle chante sous la pluie.",
+        sourceTense:  "Présent",
+        targetTense:  "imparfait",
+        answers:      ["Elle chantait sous la pluie."],
+        feedbackRule: "À l'imparfait, les verbes du 1<sup>er</sup> groupe prennent : <em>-ais, -ais, -ait, -ions, -iez, -aient</em>."
+      },
+      {
+        level: 1,
+        sentence:     "Nous mangeons des crêpes.",
+        sourceTense:  "Présent",
+        targetTense:  "futur simple",
+        answers:      ["Nous mangerons des crêpes."],
+        feedbackRule: "Au futur, les verbes du 1<sup>er</sup> groupe prennent : <em>-erai, -eras, -era, -erons, -erez, -eront</em>."
+      },
+      {
+        level: 1,
+        sentence:     "Tu finis tes devoirs.",
+        sourceTense:  "Présent",
+        targetTense:  "imparfait",
+        answers:      ["Tu finissais tes devoirs."],
+        feedbackRule: "À l'imparfait, les verbes du 2<sup>e</sup> groupe prennent le suffixe <em>-iss-</em> : <em>je finissais, nous finissions</em>."
+      },
+      {
+        level: 1,
+        sentence:     "Il regarde la télévision.",
+        sourceTense:  "Présent",
+        targetTense:  "futur simple",
+        answers:      ["Il regardera la télévision."],
+        feedbackRule: "Au futur, les verbes du 1<sup>er</sup> groupe prennent : <em>-erai, -eras, -era, -erons, -erez, -eront</em>."
+      },
+      {
+        level: 1,
+        sentence:     "Vous choisissez un livre.",
+        sourceTense:  "Présent",
+        targetTense:  "imparfait",
+        answers:      ["Vous choisissiez un livre."],
+        feedbackRule: "À l'imparfait, les verbes du 2<sup>e</sup> groupe prennent le suffixe <em>-iss-</em> : <em>tu choisissais, nous choisissions</em>."
+      },
+      {
+        level: 1,
+        sentence:     "Les oiseaux chantent le matin.",
+        sourceTense:  "Présent",
+        targetTense:  "imparfait",
+        answers:      ["Les oiseaux chantaient le matin."],
+        feedbackRule: "À l'imparfait, les verbes du 1<sup>er</sup> groupe prennent : <em>-ais, -ais, -ait, -ions, -iez, -aient</em>."
+      },
+      {
+        level: 1,
+        sentence:     "Je dessine un château.",
+        sourceTense:  "Présent",
+        targetTense:  "futur simple",
+        answers:      ["Je dessinerai un château."],
+        feedbackRule: "Au futur, les verbes du 1<sup>er</sup> groupe prennent : <em>-erai, -eras, -era, -erons, -erez, -eront</em>."
+      },
+      {
+        level: 1,
+        sentence:     "Nous obéissons aux règles.",
+        sourceTense:  "Présent",
+        targetTense:  "imparfait",
+        answers:      ["Nous obéissions aux règles."],
+        feedbackRule: "À l'imparfait, les verbes du 2<sup>e</sup> groupe prennent le suffixe <em>-iss-</em> : <em>nous obéissions</em>."
+      },
+      {
+        level: 1,
+        sentence:     "Elle range sa chambre.",
+        sourceTense:  "Présent",
+        targetTense:  "futur simple",
+        answers:      ["Elle rangera sa chambre."],
+        feedbackRule: "Au futur, les verbes du 1<sup>er</sup> groupe prennent : <em>-erai, -eras, -era, -erons, -erez, -eront</em>."
+      },
+      {
+        level: 1,
+        sentence:     "Tu sautes par-dessus la barrière.",
+        sourceTense:  "Présent",
+        targetTense:  "imparfait",
+        answers:      ["Tu sautais par-dessus la barrière."],
+        feedbackRule: "À l'imparfait, les verbes du 1<sup>er</sup> groupe prennent : <em>-ais, -ais, -ait, -ions, -iez, -aient</em>."
+      },
+      {
+        level: 1,
+        sentence:     "Ils applaudissent les artistes.",
+        sourceTense:  "Présent",
+        targetTense:  "futur simple",
+        answers:      ["Ils applaudiront les artistes."],
+        feedbackRule: "Au futur, les verbes du 2<sup>e</sup> groupe prennent : <em>-irai, -iras, -ira, -irons, -irez, -iront</em>."
+      },
+      {
+        level: 1,
+        sentence:     "Je marche jusqu'à l'école.",
+        sourceTense:  "Présent",
+        targetTense:  "imparfait",
+        answers:      ["Je marchais jusqu'à l'école."],
+        feedbackRule: "À l'imparfait, les verbes du 1<sup>er</sup> groupe prennent : <em>-ais, -ais, -ait, -ions, -iez, -aient</em>."
+      },
+      {
+        level: 1,
+        sentence:     "Vous remplissez le formulaire.",
+        sourceTense:  "Présent",
+        targetTense:  "futur simple",
+        answers:      ["Vous remplirez le formulaire."],
+        feedbackRule: "Au futur, les verbes du 2<sup>e</sup> groupe prennent : <em>-irai, -iras, -ira, -irons, -irez, -iront</em>."
+      },
+
+      /* ── NIVEAU 2 : Présent → Passé composé ──────────────────────────────── */
+      {
+        level: 2,
+        sentence:     "Elle mange une pomme.",
+        sourceTense:  "Présent",
+        targetTense:  "passé composé",
+        answers:      ["Elle a mangé une pomme."],
+        feedbackRule: "<em>Manger</em> se conjugue avec <em>avoir</em> au passé composé. Participe <em>mangé</em> — invariable avec avoir."
+      },
+      {
+        level: 2,
+        sentence:     "Les filles partent en vacances.",
+        sourceTense:  "Présent",
+        targetTense:  "passé composé",
+        answers:      ["Les filles sont parties en vacances."],
+        feedbackRule: "<em>Partir</em> se conjugue avec <em>être</em>. Avec être, le participe s'accorde avec le sujet : <em>les filles</em> (fém. pluriel) → <strong>parties</strong>."
+      },
+      {
+        level: 2,
+        sentence:     "Tu écris une lettre.",
+        sourceTense:  "Présent",
+        targetTense:  "passé composé",
+        answers:      ["Tu as écrit une lettre."],
+        feedbackRule: "<em>Écrire</em> se conjugue avec <em>avoir</em>. Participe irrégulier : <strong>écrit</strong> (invariable)."
+      },
+      {
+        level: 2,
+        sentence:     "Il tombe dans l'escalier.",
+        sourceTense:  "Présent",
+        targetTense:  "passé composé",
+        answers:      ["Il est tombé dans l'escalier."],
+        feedbackRule: "<em>Tomber</em> se conjugue avec <em>être</em>. Le sujet <em>il</em> est masc. sing. : participe <strong>tombé</strong> (sans accord)."
+      },
+      {
+        level: 2,
+        sentence:     "Nous chantons une chanson.",
+        sourceTense:  "Présent",
+        targetTense:  "passé composé",
+        answers:      ["Nous avons chanté une chanson."],
+        feedbackRule: "<em>Chanter</em> se conjugue avec <em>avoir</em>. Participe <em>chanté</em> — invariable avec avoir."
+      },
+      {
+        level: 2,
+        sentence:     "Elles arrivent à l'heure.",
+        sourceTense:  "Présent",
+        targetTense:  "passé composé",
+        answers:      ["Elles sont arrivées à l'heure."],
+        feedbackRule: "<em>Arriver</em> se conjugue avec <em>être</em>. Le sujet <em>elles</em> est fém. pluriel : <strong>arrivées</strong>."
+      },
+      {
+        level: 2,
+        sentence:     "Je prends mon sac.",
+        sourceTense:  "Présent",
+        targetTense:  "passé composé",
+        answers:      ["J'ai pris mon sac.", "j'ai pris mon sac."],
+        feedbackRule: "<em>Prendre</em> se conjugue avec <em>avoir</em>. Participe irrégulier : <strong>pris</strong>. N'oublie pas l'élision : <em>J'ai</em>."
+      },
+      {
+        level: 2,
+        sentence:     "Ma sœur entre dans la classe.",
+        sourceTense:  "Présent",
+        targetTense:  "passé composé",
+        answers:      ["Ma sœur est entrée dans la classe."],
+        feedbackRule: "<em>Entrer</em> se conjugue avec <em>être</em>. <em>Ma sœur</em> est fém. sing. : <strong>entrée</strong>."
+      },
+      {
+        level: 2,
+        sentence:     "Vous finissez le travail.",
+        sourceTense:  "Présent",
+        targetTense:  "passé composé",
+        answers:      ["Vous avez fini le travail."],
+        feedbackRule: "<em>Finir</em> se conjugue avec <em>avoir</em>. Participe : <strong>fini</strong> (invariable)."
+      },
+      {
+        level: 2,
+        sentence:     "Ils viennent nous voir.",
+        sourceTense:  "Présent",
+        targetTense:  "passé composé",
+        answers:      ["Ils sont venus nous voir."],
+        feedbackRule: "<em>Venir</em> se conjugue avec <em>être</em>. Le sujet <em>ils</em> est masc. pluriel : <strong>venus</strong>."
+      },
+      {
+        level: 2,
+        sentence:     "Elle met son manteau.",
+        sourceTense:  "Présent",
+        targetTense:  "passé composé",
+        answers:      ["Elle a mis son manteau."],
+        feedbackRule: "<em>Mettre</em> se conjugue avec <em>avoir</em>. Participe irrégulier : <strong>mis</strong> (invariable)."
+      },
+      {
+        level: 2,
+        sentence:     "Les élèves sortent en récréation.",
+        sourceTense:  "Présent",
+        targetTense:  "passé composé",
+        answers:      ["Les élèves sont sortis en récréation."],
+        feedbackRule: "<em>Sortir</em> se conjugue avec <em>être</em>. <em>Les élèves</em> est masc. pluriel : <strong>sortis</strong>."
+      },
+      {
+        level: 2,
+        sentence:     "Tu reçois un colis.",
+        sourceTense:  "Présent",
+        targetTense:  "passé composé",
+        answers:      ["Tu as reçu un colis."],
+        feedbackRule: "<em>Recevoir</em> se conjugue avec <em>avoir</em>. Participe irrégulier : <strong>reçu</strong> (invariable)."
+      },
+      {
+        level: 2,
+        sentence:     "La directrice monte dans son bureau.",
+        sourceTense:  "Présent",
+        targetTense:  "passé composé",
+        answers:      ["La directrice est montée dans son bureau."],
+        feedbackRule: "<em>Monter</em> se conjugue avec <em>être</em>. <em>La directrice</em> est fém. sing. : <strong>montée</strong>."
+      },
+
+      /* ── NIVEAU 3 : Présent → Passé simple ───────────────────────────────── */
+      {
+        level: 3,
+        sentence:     "Le roi entre dans la salle.",
+        sourceTense:  "Présent",
+        targetTense:  "passé simple",
+        answers:      ["Le roi entra dans la salle."],
+        feedbackRule: "Au passé simple, les verbes du 1<sup>er</sup> groupe prennent : <em>-ai, -as, -a, -âmes, -âtes, -èrent</em>."
+      },
+      {
+        level: 3,
+        sentence:     "Les soldats marchent toute la nuit.",
+        sourceTense:  "Présent",
+        targetTense:  "passé simple",
+        answers:      ["Les soldats marchèrent toute la nuit."],
+        feedbackRule: "Au passé simple, les verbes du 1<sup>er</sup> groupe prennent : <em>-ai, -as, -a, -âmes, -âtes, -èrent</em>."
+      },
+      {
+        level: 3,
+        sentence:     "Elle prend la parole.",
+        sourceTense:  "Présent",
+        targetTense:  "passé simple",
+        answers:      ["Elle prit la parole."],
+        feedbackRule: "<em>Prendre</em> est irrégulier au passé simple : <em>je pris, tu pris, il/elle prit, nous prîmes, ils prirent</em>."
+      },
+      {
+        level: 3,
+        sentence:     "Il fait un geste de la main.",
+        sourceTense:  "Présent",
+        targetTense:  "passé simple",
+        answers:      ["Il fit un geste de la main."],
+        feedbackRule: "<em>Faire</em> est irrégulier au passé simple : <em>je fis, tu fis, il fit, nous fîmes, ils firent</em>."
+      },
+      {
+        level: 3,
+        sentence:     "Nous arrivons au village.",
+        sourceTense:  "Présent",
+        targetTense:  "passé simple",
+        answers:      ["Nous arrivâmes au village."],
+        feedbackRule: "Au passé simple, les verbes du 1<sup>er</sup> groupe prennent : <em>-âmes</em> pour nous. N'oublie pas l'accent circonflexe : <strong>arrivâmes</strong>."
+      },
+      {
+        level: 3,
+        sentence:     "Ils viennent en courant.",
+        sourceTense:  "Présent",
+        targetTense:  "passé simple",
+        answers:      ["Ils vinrent en courant."],
+        feedbackRule: "<em>Venir</em> est irrégulier au passé simple : <em>je vins, tu vins, il vint, nous vînmes, ils vinrent</em>."
+      },
+      {
+        level: 3,
+        sentence:     "Elle dit la vérité.",
+        sourceTense:  "Présent",
+        targetTense:  "passé simple",
+        answers:      ["Elle dit la vérité."],
+        feedbackRule: "Au passé simple, <em>dire</em> à la 3<sup>e</sup> personne du singulier donne <em>dit</em> — la forme est identique au présent !"
+      },
+      {
+        level: 3,
+        sentence:     "Tu trouves la solution.",
+        sourceTense:  "Présent",
+        targetTense:  "passé simple",
+        answers:      ["Tu trouvas la solution."],
+        feedbackRule: "Au passé simple, les verbes du 1<sup>er</sup> groupe prennent : <em>-ai, -as, -a, -âmes, -âtes, -èrent</em>."
+      },
+      {
+        level: 3,
+        sentence:     "Il a peur.",
+        sourceTense:  "Présent",
+        targetTense:  "passé simple",
+        answers:      ["Il eut peur."],
+        feedbackRule: "<em>Avoir</em> est irrégulier au passé simple : <em>j'eus, tu eus, il eut, nous eûmes, vous eûtes, ils eurent</em>."
+      },
+      {
+        level: 3,
+        sentence:     "Elles chantent devant la foule.",
+        sourceTense:  "Présent",
+        targetTense:  "passé simple",
+        answers:      ["Elles chantèrent devant la foule."],
+        feedbackRule: "Au passé simple, les verbes du 1<sup>er</sup> groupe prennent : <em>-ai, -as, -a, -âmes, -âtes, -èrent</em>."
+      },
+      {
+        level: 3,
+        sentence:     "Nous sommes fatigués.",
+        sourceTense:  "Présent",
+        targetTense:  "passé simple",
+        answers:      ["Nous fûmes fatigués."],
+        feedbackRule: "<em>Être</em> est irrégulier au passé simple : <em>je fus, tu fus, il fut, nous fûmes, vous fûtes, ils furent</em>."
+      },
+      {
+        level: 3,
+        sentence:     "Il prend son épée.",
+        sourceTense:  "Présent",
+        targetTense:  "passé simple",
+        answers:      ["Il prit son épée."],
+        feedbackRule: "<em>Prendre</em> est irrégulier au passé simple : <em>je pris, tu pris, il prit, nous prîmes, ils prirent</em>."
+      },
+      {
+        level: 3,
+        sentence:     "Les enfants jouent dans la rue.",
+        sourceTense:  "Présent",
+        targetTense:  "passé simple",
+        answers:      ["Les enfants jouèrent dans la rue."],
+        feedbackRule: "Au passé simple, les verbes du 1<sup>er</sup> groupe prennent : <em>-ai, -as, -a, -âmes, -âtes, -èrent</em>."
+      },
+      {
+        level: 3,
+        sentence:     "Elle vient à sa rencontre.",
+        sourceTense:  "Présent",
+        targetTense:  "passé simple",
+        answers:      ["Elle vint à sa rencontre."],
+        feedbackRule: "<em>Venir</em> est irrégulier au passé simple : <em>je vins, tu vins, il vint, nous vînmes, ils vinrent</em>."
+      },
+
+      /* ── NIVEAU 4 : Passé composé → Plus-que-parfait ─────────────────────── */
+      {
+        level: 4,
+        sentence:     "Elle a mangé avant de partir.",
+        sourceTense:  "Passé composé",
+        targetTense:  "plus-que-parfait",
+        answers:      ["Elle avait mangé avant de partir."],
+        feedbackRule: "Au plus-que-parfait, l'auxiliaire est à l'imparfait : <em>avais, avait, avions…</em> ou <em>étais, était, étions…</em>"
+      },
+      {
+        level: 4,
+        sentence:     "Les filles sont parties en vacances.",
+        sourceTense:  "Passé composé",
+        targetTense:  "plus-que-parfait",
+        answers:      ["Les filles étaient parties en vacances."],
+        feedbackRule: "Au plus-que-parfait, l'auxiliaire <em>être</em> passe à l'imparfait : <em>étaient</em>. L'accord du participe reste identique."
+      },
+      {
+        level: 4,
+        sentence:     "Tu as écrit une lettre.",
+        sourceTense:  "Passé composé",
+        targetTense:  "plus-que-parfait",
+        answers:      ["Tu avais écrit une lettre."],
+        feedbackRule: "Au plus-que-parfait, l'auxiliaire <em>avoir</em> passe à l'imparfait : <em>avais</em>."
+      },
+      {
+        level: 4,
+        sentence:     "Il est tombé dans l'escalier.",
+        sourceTense:  "Passé composé",
+        targetTense:  "plus-que-parfait",
+        answers:      ["Il était tombé dans l'escalier."],
+        feedbackRule: "Au plus-que-parfait, l'auxiliaire <em>être</em> passe à l'imparfait : <em>était</em>. L'accord du participe reste identique."
+      },
+      {
+        level: 4,
+        sentence:     "Nous avons chanté une chanson.",
+        sourceTense:  "Passé composé",
+        targetTense:  "plus-que-parfait",
+        answers:      ["Nous avions chanté une chanson."],
+        feedbackRule: "Au plus-que-parfait, l'auxiliaire <em>avoir</em> passe à l'imparfait : <em>avions</em>."
+      },
+      {
+        level: 4,
+        sentence:     "Elles sont arrivées à l'heure.",
+        sourceTense:  "Passé composé",
+        targetTense:  "plus-que-parfait",
+        answers:      ["Elles étaient arrivées à l'heure."],
+        feedbackRule: "Au plus-que-parfait, l'auxiliaire <em>être</em> passe à l'imparfait : <em>étaient</em>. L'accord du participe reste identique."
+      },
+      {
+        level: 4,
+        sentence:     "J'ai pris mon sac.",
+        sourceTense:  "Passé composé",
+        targetTense:  "plus-que-parfait",
+        answers:      ["J'avais pris mon sac.", "j'avais pris mon sac."],
+        feedbackRule: "Au plus-que-parfait, l'auxiliaire <em>avoir</em> passe à l'imparfait : <em>avais</em>."
+      },
+      {
+        level: 4,
+        sentence:     "Ma sœur est entrée dans la classe.",
+        sourceTense:  "Passé composé",
+        targetTense:  "plus-que-parfait",
+        answers:      ["Ma sœur était entrée dans la classe."],
+        feedbackRule: "Au plus-que-parfait, l'auxiliaire <em>être</em> passe à l'imparfait : <em>était</em>. L'accord du participe reste identique."
+      },
+      {
+        level: 4,
+        sentence:     "Vous avez fini le travail.",
+        sourceTense:  "Passé composé",
+        targetTense:  "plus-que-parfait",
+        answers:      ["Vous aviez fini le travail."],
+        feedbackRule: "Au plus-que-parfait, l'auxiliaire <em>avoir</em> passe à l'imparfait : <em>aviez</em>."
+      },
+      {
+        level: 4,
+        sentence:     "Ils sont venus nous voir.",
+        sourceTense:  "Passé composé",
+        targetTense:  "plus-que-parfait",
+        answers:      ["Ils étaient venus nous voir."],
+        feedbackRule: "Au plus-que-parfait, l'auxiliaire <em>être</em> passe à l'imparfait : <em>étaient</em>. L'accord du participe reste identique."
+      },
+      {
+        level: 4,
+        sentence:     "Elle a mis son manteau.",
+        sourceTense:  "Passé composé",
+        targetTense:  "plus-que-parfait",
+        answers:      ["Elle avait mis son manteau."],
+        feedbackRule: "Au plus-que-parfait, l'auxiliaire <em>avoir</em> passe à l'imparfait : <em>avait</em>."
+      },
+      {
+        level: 4,
+        sentence:     "Les élèves sont sortis en récréation.",
+        sourceTense:  "Passé composé",
+        targetTense:  "plus-que-parfait",
+        answers:      ["Les élèves étaient sortis en récréation."],
+        feedbackRule: "Au plus-que-parfait, l'auxiliaire <em>être</em> passe à l'imparfait : <em>étaient</em>. L'accord du participe reste identique."
+      },
+      {
+        level: 4,
+        sentence:     "Tu as reçu un colis.",
+        sourceTense:  "Passé composé",
+        targetTense:  "plus-que-parfait",
+        answers:      ["Tu avais reçu un colis."],
+        feedbackRule: "Au plus-que-parfait, l'auxiliaire <em>avoir</em> passe à l'imparfait : <em>avais</em>."
+      },
+      {
+        level: 4,
+        sentence:     "La directrice est montée dans son bureau.",
+        sourceTense:  "Passé composé",
+        targetTense:  "plus-que-parfait",
+        answers:      ["La directrice était montée dans son bureau."],
+        feedbackRule: "Au plus-que-parfait, l'auxiliaire <em>être</em> passe à l'imparfait : <em>était</em>. L'accord du participe reste identique."
+      },
+
+      /* ── NIVEAU 5 : Présent → Conditionnel présent ───────────────────────── */
+      {
+        level: 5,
+        sentence:     "Je mange une pizza.",
+        sourceTense:  "Présent",
+        targetTense:  "conditionnel présent",
+        answers:      ["Je mangerais une pizza."],
+        feedbackRule: "Au conditionnel, les terminaisons sont : <em>-rais, -rais, -rait, -rions, -riez, -raient</em>."
+      },
+      {
+        level: 5,
+        sentence:     "Elle part en voyage.",
+        sourceTense:  "Présent",
+        targetTense:  "conditionnel présent",
+        answers:      ["Elle partirait en voyage."],
+        feedbackRule: "Au conditionnel, les terminaisons sont : <em>-rais, -rais, -rait, -rions, -riez, -raient</em>. Radical de <em>partir</em> : <em>partir-</em> → <em>partirait</em>."
+      },
+      {
+        level: 5,
+        sentence:     "Nous faisons un gâteau.",
+        sourceTense:  "Présent",
+        targetTense:  "conditionnel présent",
+        answers:      ["Nous ferions un gâteau."],
+        feedbackRule: "<em>Faire</em> a un radical irrégulier au conditionnel : <em>fer-</em> → <em>ferions</em>."
+      },
+      {
+        level: 5,
+        sentence:     "Tu peux venir ce soir.",
+        sourceTense:  "Présent",
+        targetTense:  "conditionnel présent",
+        answers:      ["Tu pourrais venir ce soir."],
+        feedbackRule: "<em>Pouvoir</em> a un radical irrégulier au conditionnel : <em>pourr-</em> → <em>pourrais</em>."
+      },
+      {
+        level: 5,
+        sentence:     "Il va à l'école.",
+        sourceTense:  "Présent",
+        targetTense:  "conditionnel présent",
+        answers:      ["Il irait à l'école."],
+        feedbackRule: "<em>Aller</em> a un radical irrégulier au conditionnel : <em>ir-</em> → <em>irait</em>."
+      },
+      {
+        level: 5,
+        sentence:     "Vous voulez du café ?",
+        sourceTense:  "Présent",
+        targetTense:  "conditionnel présent",
+        answers:      ["Vous voudriez du café ?"],
+        feedbackRule: "<em>Vouloir</em> a un radical irrégulier au conditionnel : <em>voudr-</em> → <em>voudriez</em>."
+      },
+      {
+        level: 5,
+        sentence:     "Elles savent la réponse.",
+        sourceTense:  "Présent",
+        targetTense:  "conditionnel présent",
+        answers:      ["Elles sauraient la réponse."],
+        feedbackRule: "<em>Savoir</em> a un radical irrégulier au conditionnel : <em>saur-</em> → <em>sauraient</em>."
+      },
+      {
+        level: 5,
+        sentence:     "Je suis content.",
+        sourceTense:  "Présent",
+        targetTense:  "conditionnel présent",
+        answers:      ["Je serais content."],
+        feedbackRule: "<em>Être</em> a un radical irrégulier au conditionnel : <em>ser-</em> → <em>serais</em>."
+      },
+      {
+        level: 5,
+        sentence:     "Nous avons le temps.",
+        sourceTense:  "Présent",
+        targetTense:  "conditionnel présent",
+        answers:      ["Nous aurions le temps."],
+        feedbackRule: "<em>Avoir</em> a un radical irrégulier au conditionnel : <em>aur-</em> → <em>aurions</em>."
+      },
+      {
+        level: 5,
+        sentence:     "Tu viens avec nous ?",
+        sourceTense:  "Présent",
+        targetTense:  "conditionnel présent",
+        answers:      ["Tu viendrais avec nous ?"],
+        feedbackRule: "<em>Venir</em> a un radical irrégulier au conditionnel : <em>viendr-</em> → <em>viendrais</em>."
+      },
+      {
+        level: 5,
+        sentence:     "Il choisit le bon chemin.",
+        sourceTense:  "Présent",
+        targetTense:  "conditionnel présent",
+        answers:      ["Il choisirait le bon chemin."],
+        feedbackRule: "Au conditionnel, les verbes du 2<sup>e</sup> groupe conservent leur infinitif comme radical : <em>choisir-</em> → <em>choisirait</em>."
+      },
+      {
+        level: 5,
+        sentence:     "Elles finissent à midi.",
+        sourceTense:  "Présent",
+        targetTense:  "conditionnel présent",
+        answers:      ["Elles finiraient à midi."],
+        feedbackRule: "Au conditionnel, les verbes du 2<sup>e</sup> groupe conservent leur infinitif comme radical : <em>finir-</em> → <em>finiraient</em>."
+      },
+      {
+        level: 5,
+        sentence:     "Vous êtes prêts.",
+        sourceTense:  "Présent",
+        targetTense:  "conditionnel présent",
+        answers:      ["Vous seriez prêts."],
+        feedbackRule: "<em>Être</em> a un radical irrégulier au conditionnel : <em>ser-</em> → <em>seriez</em>."
+      },
+      {
+        level: 5,
+        sentence:     "Je prends le bus.",
+        sourceTense:  "Présent",
+        targetTense:  "conditionnel présent",
+        answers:      ["Je prendrais le bus."],
+        feedbackRule: "<em>Prendre</em> a un radical irrégulier au conditionnel : <em>prendr-</em> → <em>prendrais</em>."
+      }
+
+    ]
+  },
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     CHANGE DE SUJET !  —  type : change-sujet-niveaux
+     4 niveaux déverrouillables à 80 %.  Pool de 14 items niveaux 1-3, 12 items niveau 4.
+     Tirage de 10 par session. Champ texte pleine largeur : l'élève réécrit la phrase
+     entière avec le nouveau sujet en effectuant tous les accords nécessaires.
+     ══════════════════════════════════════════════════════════════════════════ */
+  "ortho-modifier-sujet-accords": {
+    title:       "Change de sujet !",
+    domaine:     "Français",
+    competence:  "Orthographe — Accord sujet-verbe, adjectif attribut et participe passé",
+    type:        "change-sujet-niveaux",
+    levels:      ["CM1", "CM2", "6e"],
+    backLink:    { href: "français-orthographe.html", label: "Orthographe" },
+    questionsPerSession: 10,
+
+    pools: {
+
+      /* ── Niveau 1 — Changement de nombre (singulier ↔ pluriel), présent, groupes 1 et 2 ── */
+      1: [
+        {
+          source:     "Le chat dort sur le canapé.",
+          subject:    "Le chat",
+          newSubject: "Les chats",
+          answer:     "Les chats dorment sur le canapé.",
+          rule:       "Le verbe s'accorde toujours avec son sujet en personne et en nombre."
+        },
+        {
+          source:     "Les élèves chantent ensemble.",
+          subject:    "Les élèves",
+          newSubject: "L'élève",
+          answer:     "L'élève chante ensemble.",
+          rule:       "Le verbe s'accorde toujours avec son sujet en personne et en nombre."
+        },
+        {
+          source:     "Tu ranges ta chambre.",
+          subject:    "Tu",
+          newSubject: "Vous",
+          answer:     "Vous rangez votre chambre.",
+          rule:       "Le verbe s'accorde avec son sujet. Le déterminant possessif change aussi : ta → votre."
+        },
+        {
+          source:     "Nous finissons le travail.",
+          subject:    "Nous",
+          newSubject: "Il",
+          answer:     "Il finit le travail.",
+          rule:       "Le verbe s'accorde toujours avec son sujet en personne et en nombre."
+        },
+        {
+          source:     "Elle dessine un château.",
+          subject:    "Elle",
+          newSubject: "Elles",
+          answer:     "Elles dessinent un château.",
+          rule:       "Le verbe s'accorde toujours avec son sujet en personne et en nombre."
+        },
+        {
+          source:     "Vous choisissez un livre.",
+          subject:    "Vous",
+          newSubject: "Tu",
+          answer:     "Tu choisis un livre.",
+          rule:       "Le verbe s'accorde toujours avec son sujet en personne et en nombre."
+        },
+        {
+          source:     "Les oiseaux volent vers le sud.",
+          subject:    "Les oiseaux",
+          newSubject: "L'oiseau",
+          answer:     "L'oiseau vole vers le sud.",
+          rule:       "Le verbe s'accorde toujours avec son sujet en personne et en nombre."
+        },
+        {
+          source:     "Je marche jusqu'à l'école.",
+          subject:    "Je",
+          newSubject: "Nous",
+          answer:     "Nous marchons jusqu'à l'école.",
+          rule:       "Le verbe s'accorde toujours avec son sujet en personne et en nombre."
+        },
+        {
+          source:     "Il obéit aux consignes.",
+          subject:    "Il",
+          newSubject: "Ils",
+          answer:     "Ils obéissent aux consignes.",
+          rule:       "Les verbes du 2ème groupe prennent -issent à la 3ème personne du pluriel : ils finissent, ils obéissent."
+        },
+        {
+          source:     "Les enfants jouent dans la cour.",
+          subject:    "Les enfants",
+          newSubject: "L'enfant",
+          answer:     "L'enfant joue dans la cour.",
+          rule:       "Le verbe s'accorde toujours avec son sujet en personne et en nombre."
+        },
+        {
+          source:     "Tu sautes par-dessus la barrière.",
+          subject:    "Tu",
+          newSubject: "Elle",
+          answer:     "Elle saute par-dessus la barrière.",
+          rule:       "Le verbe s'accorde toujours avec son sujet en personne et en nombre."
+        },
+        {
+          source:     "Nous regardons un film.",
+          subject:    "Nous",
+          newSubject: "Vous",
+          answer:     "Vous regardez un film.",
+          rule:       "Le verbe s'accorde toujours avec son sujet en personne et en nombre."
+        },
+        {
+          source:     "Elle remplit son verre.",
+          subject:    "Elle",
+          newSubject: "Ils",
+          answer:     "Ils remplissent leur verre.",
+          rule:       "Les verbes du 2ème groupe prennent -issent à la 3ème personne du pluriel. Le possessif change aussi : son → leur."
+        },
+        {
+          source:     "Le boulanger prépare le pain.",
+          subject:    "Le boulanger",
+          newSubject: "Les boulangers",
+          answer:     "Les boulangers préparent le pain.",
+          rule:       "Le verbe s'accorde toujours avec son sujet en personne et en nombre."
+        }
+      ],
+
+      /* ── Niveau 2 — Changement de genre + nombre, adjectif attribut, présent et imparfait ── */
+      2: [
+        {
+          source:     "Le directeur est sévère mais juste.",
+          subject:    "Le directeur",
+          newSubject: "La directrice",
+          answer:     "La directrice est sévère mais juste.",
+          rule:       "Les adjectifs sévère et juste sont invariables (même forme au masculin et au féminin). N'oublie pas d'accorder le verbe avec le nouveau sujet."
+        },
+        {
+          source:     "Paul est content de ses résultats.",
+          subject:    "Paul",
+          newSubject: "Léa",
+          answer:     "Léa est contente de ses résultats.",
+          rule:       "L'adjectif attribut s'accorde en genre et en nombre avec le sujet : content → contente au féminin."
+        },
+        {
+          source:     "Les garçons étaient fatigués après la course.",
+          subject:    "Les garçons",
+          newSubject: "Les filles",
+          answer:     "Les filles étaient fatiguées après la course.",
+          rule:       "L'adjectif attribut s'accorde en genre et en nombre avec le sujet : fatigués → fatiguées au féminin pluriel."
+        },
+        {
+          source:     "Mon frère est grand et sportif.",
+          subject:    "Mon frère",
+          newSubject: "Ma sœur",
+          answer:     "Ma sœur est grande et sportive.",
+          rule:       "L'adjectif attribut s'accorde avec le sujet : grand → grande, sportif → sportive au féminin."
+        },
+        {
+          source:     "Elle semblait heureuse.",
+          subject:    "Elle",
+          newSubject: "Il",
+          answer:     "Il semblait heureux.",
+          rule:       "L'adjectif attribut s'accorde avec le sujet : heureuse → heureux au masculin singulier."
+        },
+        {
+          source:     "Le chien paraît doux et calme.",
+          subject:    "Le chien",
+          newSubject: "Les chiens",
+          answer:     "Les chiens paraissent doux et calmes.",
+          rule:       "L'adjectif attribut s'accorde en nombre avec le sujet : calme → calmes. Doux est invariable au masculin pluriel."
+        },
+        {
+          source:     "Tu es prête pour le départ ?",
+          subject:    "Tu",
+          newSubject: "Vous",
+          answers:    ["Vous êtes prêtes pour le départ ?", "Vous êtes prêts pour le départ ?"],
+          answer:     "Vous êtes prêtes pour le départ ?",
+          rule:       "L'adjectif attribut s'accorde avec le sujet en genre et en nombre : prête → prêts (masc. plur.) ou prêtes (fém. plur.)."
+        },
+        {
+          source:     "Mes cousins étaient joyeux ce matin.",
+          subject:    "Mes cousins",
+          newSubject: "Mes cousines",
+          answer:     "Mes cousines étaient joyeuses ce matin.",
+          rule:       "L'adjectif attribut s'accorde avec le sujet : joyeux → joyeuses au féminin pluriel."
+        },
+        {
+          source:     "Il devenait impatient.",
+          subject:    "Il",
+          newSubject: "Elle",
+          answer:     "Elle devenait impatiente.",
+          rule:       "L'adjectif attribut s'accorde avec le sujet : impatient → impatiente au féminin."
+        },
+        {
+          source:     "Le vieux chat semblait fatigué.",
+          subject:    "Le vieux chat",
+          newSubject: "La vieille chatte",
+          answer:     "La vieille chatte semblait fatiguée.",
+          rule:       "L'adjectif attribut s'accorde avec le sujet : fatigué → fatiguée au féminin. Vieux → vieille devant un nom féminin."
+        },
+        {
+          source:     "Vous étiez prêts à partir.",
+          subject:    "Vous",
+          newSubject: "Tu",
+          answer:     "Tu étais prêt à partir.",
+          rule:       "L'adjectif attribut s'accorde avec le sujet : prêts → prêt au masculin singulier. L'auxiliaire change aussi : étiez → étais."
+        },
+        {
+          source:     "Les nouveaux élèves étaient timides.",
+          subject:    "Les nouveaux élèves",
+          newSubject: "Le nouvel élève",
+          answer:     "Le nouvel élève était timide.",
+          rule:       "Nouveau s'emploie nouvel devant un nom masculin commençant par une voyelle ou un h muet. Timide est invariable."
+        },
+        {
+          source:     "Mon voisin est toujours souriant.",
+          subject:    "Mon voisin",
+          newSubject: "Mes voisines",
+          answer:     "Mes voisines sont toujours souriantes.",
+          rule:       "L'adjectif attribut s'accorde avec le sujet : souriant → souriantes au féminin pluriel."
+        },
+        {
+          source:     "Les élèves sont attentifs.",
+          subject:    "Les élèves",
+          newSubject: "L'élève",
+          answers:    ["L'élève est attentif.", "L'élève est attentive."],
+          answer:     "L'élève est attentif.",
+          rule:       "L'adjectif attribut s'accorde avec le sujet en genre et en nombre : attentifs → attentif (masc.) ou attentive (fém.) au singulier."
+        }
+      ],
+
+      /* ── Niveau 3 — Participe passé avec être et avoir (passé composé, plus-que-parfait) ── */
+      3: [
+        {
+          source:     "Il est parti sans prévenir.",
+          subject:    "Il",
+          newSubject: "Elle",
+          answer:     "Elle est partie sans prévenir.",
+          rule:       "Avec être, le participe passé s'accorde avec le sujet : parti → partie au féminin singulier."
+        },
+        {
+          source:     "Les garçons sont arrivés en retard.",
+          subject:    "Les garçons",
+          newSubject: "Les filles",
+          answer:     "Les filles sont arrivées en retard.",
+          rule:       "Avec être, le participe passé s'accorde avec le sujet : arrivés → arrivées au féminin pluriel."
+        },
+        {
+          source:     "Elle avait mangé avant de partir.",
+          subject:    "Elle",
+          newSubject: "Ils",
+          answer:     "Ils avaient mangé avant de partir.",
+          rule:       "Avec avoir, le participe passé ne s'accorde pas avec le sujet : mangé reste invariable. L'auxiliaire change : avait → avaient."
+        },
+        {
+          source:     "Ma sœur est entrée dans la classe.",
+          subject:    "Ma sœur",
+          newSubject: "Mon frère",
+          answer:     "Mon frère est entré dans la classe.",
+          rule:       "Avec être, le participe passé s'accorde avec le sujet : entrée → entré au masculin singulier."
+        },
+        {
+          source:     "Elles étaient venues nous voir.",
+          subject:    "Elles",
+          newSubject: "Ils",
+          answer:     "Ils étaient venus nous voir.",
+          rule:       "Avec être, le participe passé s'accorde avec le sujet : venues → venus au masculin pluriel."
+        },
+        {
+          source:     "Tu es resté à la maison.",
+          subject:    "Tu",
+          newSubject: "Vous",
+          answers:    ["Vous êtes restés à la maison.", "Vous êtes restées à la maison."],
+          answer:     "Vous êtes restés à la maison.",
+          rule:       "Avec être, le participe passé s'accorde avec le sujet : resté → restés (masc. plur.) ou restées (fém. plur.) selon le groupe."
+        },
+        {
+          source:     "Nous avons fini le travail.",
+          subject:    "Nous",
+          newSubject: "Elle",
+          answer:     "Elle a fini le travail.",
+          rule:       "Avec avoir, le participe passé ne s'accorde pas avec le sujet : fini reste invariable. L'auxiliaire change : avons → a."
+        },
+        {
+          source:     "Les élèves sont sortis en récréation.",
+          subject:    "Les élèves",
+          newSubject: "L'élève",
+          answers:    ["L'élève est sortie en récréation.", "L'élève est sorti en récréation."],
+          answer:     "L'élève est sortie en récréation.",
+          rule:       "Avec être, le participe passé s'accorde avec le sujet. Selon le genre de l'élève : sorti (masc.) ou sortie (fém.)."
+        },
+        {
+          source:     "Il avait pris son sac.",
+          subject:    "Il",
+          newSubject: "Elles",
+          answer:     "Elles avaient pris leur sac.",
+          rule:       "Avec avoir, le participe passé ne s'accorde pas avec le sujet : pris reste invariable. Le possessif change : son → leur."
+        },
+        {
+          source:     "La directrice est montée dans son bureau.",
+          subject:    "La directrice",
+          newSubject: "Les directrices",
+          answer:     "Les directrices sont montées dans leur bureau.",
+          rule:       "Avec être, le participe passé s'accorde avec le sujet : montée → montées au pluriel. Le possessif change : son → leur."
+        },
+        {
+          source:     "Vous étiez partis tôt.",
+          subject:    "Vous",
+          newSubject: "Tu",
+          answer:     "Tu étais parti tôt.",
+          rule:       "Avec être, le participe passé s'accorde avec le sujet : partis → parti au masculin singulier. L'auxiliaire change : étiez → étais."
+        },
+        {
+          source:     "Mes parents sont revenus de voyage.",
+          subject:    "Mes parents",
+          newSubject: "Ma mère",
+          answer:     "Ma mère est revenue de voyage.",
+          rule:       "Avec être, le participe passé s'accorde avec le sujet : revenus → revenue au féminin singulier. L'auxiliaire change : sont → est."
+        },
+        {
+          source:     "Elle a écrit une lettre.",
+          subject:    "Elle",
+          newSubject: "Ils",
+          answer:     "Ils ont écrit une lettre.",
+          rule:       "Avec avoir, le participe passé ne s'accorde pas avec le sujet : écrit reste invariable. L'auxiliaire change : a → ont."
+        },
+        {
+          source:     "Les filles étaient tombées dans la cour.",
+          subject:    "Les filles",
+          newSubject: "Le garçon",
+          answer:     "Le garçon était tombé dans la cour.",
+          rule:       "Avec être, le participe passé s'accorde avec le sujet : tombées → tombé au masculin singulier. L'auxiliaire change : étaient → était."
+        }
+      ],
+
+      /* ── Niveau 4 — Pronoms indéfinis, sujets coordonnés, sujets inversés ── */
+      4: [
+        {
+          source:     "Paul et Léa sont arrivés ensemble.",
+          subject:    "Paul et Léa",
+          newSubject: "Personne",
+          answer:     "Personne n'est arrivé ensemble.",
+          rule:       "\"Personne\" est un pronom indéfini masculin singulier qui entraîne la négation avec \"ne\" : Personne n'est arrivé (masculin singulier, invariable)."
+        },
+        {
+          source:     "Chacun a fait son travail sérieusement.",
+          subject:    "Chacun",
+          newSubject: "Tous les élèves",
+          answer:     "Tous les élèves ont fait leur travail sérieusement.",
+          rule:       "\"Chacun\" est singulier ; \"tous les élèves\" est pluriel : a → ont. Le possessif change aussi : son → leur."
+        },
+        {
+          source:     "Dans la forêt vivait un vieux loup gris.",
+          subject:    "un vieux loup gris",
+          newSubject: "de vieux loups gris",
+          answer:     "Dans la forêt vivaient de vieux loups gris.",
+          rule:       "Dans une phrase à sujet inversé, le verbe s'accorde avec le sujet réel qui est après lui : vivait → vivaient au pluriel."
+        },
+        {
+          source:     "Ni Paul ni Léa n'était prêt.",
+          subject:    "Ni Paul ni Léa",
+          newSubject: "Paul et Léa",
+          answer:     "Paul et Léa n'étaient pas prêts.",
+          rule:       "Avec \"et\", le sujet est pluriel : n'était → n'étaient pas, prêt → prêts. La structure de la négation change."
+        },
+        {
+          source:     "Tout le monde était content.",
+          subject:    "Tout le monde",
+          newSubject: "Les enfants",
+          answer:     "Les enfants étaient contents.",
+          rule:       "\"Tout le monde\" est singulier ; \"les enfants\" est masculin pluriel : était → étaient, content → contents."
+        },
+        {
+          source:     "Mes amis et moi sommes partis tôt.",
+          subject:    "Mes amis et moi",
+          newSubject: "Mon amie et moi",
+          answer:     "Mon amie et moi sommes parties tôt.",
+          rule:       "Quand le sujet \"et moi\" ne contient que des féminins, on accorde au féminin pluriel : partis → parties."
+        },
+        {
+          source:     "Aucun élève n'a répondu correctement.",
+          subject:    "Aucun élève",
+          newSubject: "Tous les élèves",
+          answer:     "Tous les élèves ont répondu correctement.",
+          rule:       "\"Aucun\" est singulier et entraîne la négation ; \"tous les élèves\" est pluriel : n'a → ont. La négation disparaît."
+        },
+        {
+          source:     "La plupart des enfants étaient fatigués.",
+          subject:    "La plupart des enfants",
+          newSubject: "Chaque enfant",
+          answer:     "Chaque enfant était fatigué.",
+          rule:       "\"Chaque\" est toujours singulier et masculin ici : étaient → était, fatigués → fatigué."
+        },
+        {
+          source:     "Sur la table étaient posés des livres.",
+          subject:    "des livres",
+          newSubject: "un livre",
+          answer:     "Sur la table était posé un livre.",
+          rule:       "Dans une phrase à sujet inversé, le verbe s'accorde avec le sujet réel : étaient posés → était posé au masculin singulier."
+        },
+        {
+          source:     "Ni l'un ni l'autre n'avait compris.",
+          subject:    "Ni l'un ni l'autre",
+          newSubject: "Ils",
+          answer:     "Ils n'avaient pas compris.",
+          rule:       "\"Ils\" entraîne le pluriel et modifie la structure de la négation : n'avait → n'avaient pas."
+        },
+        {
+          source:     "Mes sœurs et moi avons chanté.",
+          subject:    "Mes sœurs et moi",
+          newSubject: "Mon frère et moi",
+          answer:     "Mon frère et moi avons chanté.",
+          rule:       "Avec avoir, le participe passé est invariable : chanté reste invariable. Mon frère + moi forme un groupe masculin pluriel."
+        },
+        {
+          source:     "Quelqu'un a frappé à la porte.",
+          subject:    "Quelqu'un",
+          newSubject: "Plusieurs personnes",
+          answer:     "Plusieurs personnes ont frappé à la porte.",
+          rule:       "\"Quelqu'un\" est singulier ; \"plusieurs personnes\" est pluriel féminin : a → ont. Frappé reste invariable (auxiliaire avoir)."
+        }
+      ]
+    }
   }
 
 };

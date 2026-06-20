@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600&display=swap');
 
 /* ─── TOKENS ──────────────────────────────────────────────────────────────── */
 
@@ -15,6 +15,16 @@
   --shadow-img:  0 24px 64px rgba(16,43,106,0.14);
   --radius-card: 20px;
   --radius-img:  32px;
+
+  /* ─── Proficiamus Brand Tokens ──────────────────────────── */
+  --color-brand-navy:  #1A2D6B;
+  --color-brand-gold:  #F5A623;
+  --color-brand-blue:  #2563EB;
+  --color-niveau-cm1:  #1DBFA0;
+  --color-niveau-cm2:  #4A90D9;
+  --color-niveau-6e:   #F5A623;
+  --font-display:      'Nunito', sans-serif;
+  --font-body:         'Nunito Sans', sans-serif;
 }
 
 /* ─── RESET ───────────────────────────────────────────────────────────────── */
@@ -26,7 +36,7 @@
 }
 
 body {
-  font-family: 'Inter', 'SF Pro Display', 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
@@ -34,6 +44,19 @@ body {
 
 ul { list-style: none; }
 button { font-family: inherit; cursor: pointer; }
+
+/* ─── TYPOGRAPHIE PROFICIAMUS ──────────────────────────────────────────────── */
+
+h1, h2, h3,
+.page-title, .ex-page-title, nav a {
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--color-brand-navy);
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; font-weight: 700; }
+h3 { font-size: 1.2rem; font-weight: 700; }
 
 /* ─── LAYOUT CONTAINER ────────────────────────────────────────────────────── */
 
@@ -50,9 +73,9 @@ button { font-family: inherit; cursor: pointer; }
   position: sticky;
   top: 0;
   z-index: 100;
-  background: #ffffff;
-  box-shadow: 0 4px 20px rgba(16,43,106,0.04);
-  border-bottom: 3px solid var(--red);
+  background: var(--color-brand-navy);
+  box-shadow: 0 4px 20px rgba(26,45,107,0.18);
+  border-bottom: none;
   height: 88px;
 }
 
@@ -88,19 +111,28 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .header-name {
+  font-family: var(--font-display);
   font-weight: 800;
   font-size: 16px;
-  color: var(--blue);
+  color: var(--color-brand-gold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   text-decoration: none;
 }
 
 .header-sub {
+  font-family: var(--font-display);
   font-size: 11px;
-  font-weight: 400;
-  color: var(--blue);
+  font-weight: 700;
+  color: rgba(255,255,255,0.75);
   letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.header-actions a {
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -143,6 +175,49 @@ button { font-family: inherit; cursor: pointer; }
 .mbar-mid  { background: var(--blue); }
 .mbar-mid2 { background: var(--blue); }
 .mbar-bot  { background: var(--red); }
+
+/* ─── CYCLE 3 BANNER ─────────────────────────────────────────────────────── */
+
+.cycle3-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-brand-navy);
+  margin: 1rem 0;
+}
+
+.cycle3-icon {
+  font-size: 1.3rem;
+}
+
+.cycle3-label {
+  color: var(--color-brand-navy);
+}
+
+.cycle3-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cycle3-dot {
+  color: var(--color-brand-navy);
+  font-weight: 900;
+}
+
+.badge-niveau {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.9rem;
+  padding: 5px 16px;
+  border-radius: 20px;
+  display: inline-block;
+}
 
 /* ─── HERO ────────────────────────────────────────────────────────────────── */
 
@@ -377,11 +452,12 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .card-title {
+  font-family: var(--font-display);
   font-weight: 800;
   font-size: 12px;
-  color: var(--blue);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  color: var(--color-brand-navy);
+  letter-spacing: 0.06em;
+  text-transform: none;
   margin-top: 8px;
 }
 
@@ -394,11 +470,12 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .card-btn {
-  background: var(--blue);
+  background: var(--color-brand-navy);
   color: #ffffff;
   border: none;
-  border-radius: 100px;
+  border-radius: 22px;
   padding: 9px 24px;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 13px;
   margin-top: 18px;
@@ -407,7 +484,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .card-btn:hover {
-  background: var(--red);
+  background: #0f1d45;
 }
 
 /* Stretched link : toute la carte est cliquable quand le bouton est un <a> */
@@ -651,6 +728,460 @@ button { font-family: inherit; cursor: pointer; }
     flex-direction: column;
     text-align: center;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PROFICIAMUS DESIGN SYSTEM
+   ─── Badges de niveau ────────────────────────────────────────────────────── */
+
+/* Base badge — taille compacte pour les fiches de compétences */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* ─── Bouton filtre de niveau ────────────────────────────────────────────── */
+
+.level-btn {
+  border: 1.5px solid var(--border);
+  border-radius: 22px;
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--muted);
+  background: var(--card-bg);
+  cursor: pointer;
+  transition: border-color 200ms, color 200ms, background 200ms;
+}
+
+.level-btn:hover {
+  border-color: var(--color-brand-navy);
+  color: var(--color-brand-navy);
+}
+
+.level-btn.active[data-level="all"] {
+  background: var(--color-brand-navy);
+  border-color: var(--color-brand-navy);
+  color: #fff;
+}
+
+.level-btn.active[data-level="CM1"] {
+  background: var(--color-niveau-cm1);
+  border-color: var(--color-niveau-cm1);
+  color: #054336;
+}
+
+.level-btn.active[data-level="CM2"] {
+  background: var(--color-niveau-cm2);
+  border-color: var(--color-niveau-cm2);
+  color: #0c2d5a;
+}
+
+.level-btn.active[data-level="6e"] {
+  background: var(--color-niveau-6e);
+  border-color: var(--color-niveau-6e);
+  color: #6b420a;
+}
+
+.badge-cm1 {
+  background: var(--color-niveau-cm1);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  border-radius: 20px;
+  padding: 4px 14px;
+  border: none;
+}
+
+.badge-cm2 {
+  background: var(--color-niveau-cm2);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  border-radius: 20px;
+  padding: 4px 14px;
+}
+
+.badge-6e {
+  background: var(--color-niveau-6e);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  border-radius: 20px;
+  padding: 4px 14px;
+}
+
+/* ─── Boutons ────────────────────────────────────────────────────────────── */
+
+/* Bouton CTA / niveau suivant */
+.btn-cta {
+  background: var(--color-brand-gold);
+  color: #6b420a;
+  border: none;
+  border-radius: 22px;
+  padding: 13px 36px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 200ms, transform 200ms;
+}
+.btn-cta:hover { background: #e8971a; transform: translateY(-2px); }
+
+/* Bouton secondaire (retour, annuler) */
+.btn-secondary {
+  background: transparent;
+  color: var(--color-brand-navy);
+  border: 2px solid var(--color-brand-navy);
+  border-radius: 22px;
+  padding: 13px 36px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: background 200ms, transform 200ms;
+}
+.btn-secondary:hover { background: rgba(26,45,107,0.06); transform: translateY(-2px); }
+
+/* ─── Feedback exercices ─────────────────────────────────────────────────── */
+
+.ex-feedback-correct {
+  background: #e1f5ee;
+  color: #054336;
+  border-left: 3px solid var(--color-niveau-cm1);
+  border-radius: 0 12px 12px 0;
+  padding: 14px 18px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ex-feedback-wrong {
+  background: #FAECE7;
+  color: #712B13;
+  border-left: 3px solid var(--color-brand-gold);
+  border-radius: 0 12px 12px 0;
+  padding: 14px 18px;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.ex-note {
+  background: #EFF3FB;
+  color: #0c447c;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-top: 8px;
+  line-height: 1.6;
+}
+
+/* ─── Barre de progression ───────────────────────────────────────────────── */
+
+.ex-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-niveau-cm1), var(--color-niveau-cm2));
+  border-radius: 99px;
+  transition: width 500ms cubic-bezier(.4,0,.2,1);
+}
+
+/* ─── Bouton suivant ─────────────────────────────────────────────────────── */
+
+.ex-next-btn {
+  display: block;
+  margin: 28px auto 0;
+  background: var(--color-brand-navy);
+  color: #fff;
+  border: none;
+  border-radius: 22px;
+  padding: 13px 44px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 200ms, transform 200ms;
+}
+
+.ex-next-btn:hover {
+  background: #0f1d45;
+  transform: translateY(-2px);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PAGES INTÉRIEURES — Shell commun · Hub · Navbar
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Compense la navbar fixe (position:fixed ne prend pas de place dans le flux) */
+body:has(.navbar) { padding-top: 50px; }
+
+/* ─── Shell de page ──────────────────────────────────────────────────────── */
+
+.page-wrap {
+  background: var(--bg);
+  min-height: calc(100vh - 50px);
+  padding-bottom: 64px;
+}
+
+.page-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 64px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-brand-navy);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 20px 0 0;
+  opacity: 0.75;
+  transition: opacity 180ms;
+}
+.back-link:hover { opacity: 1; }
+
+/* ─── En-tête de page ───────────────────────────────────────────────────── */
+
+.page-header {
+  text-align: center;
+  padding: 28px 0 40px;
+}
+
+.page-header-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.page-title {
+  font-size: 2rem;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  margin-bottom: 10px;
+}
+
+.page-title-rule {
+  width: 44px;
+  height: 3px;
+  background: var(--color-niveau-cm1);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/* ─── Hub de cartes (Français, Mathématiques…) ──────────────────────────── */
+
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.hub-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
+  padding: 32px 16px 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 200px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 250ms ease, box-shadow 250ms ease;
+}
+
+.hub-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
+}
+
+.hub-card-emoji {
+  font-size: 36px;
+  margin-bottom: 14px;
+  display: block;
+}
+
+.hub-card-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  color: var(--color-brand-navy);
+  letter-spacing: 0.06em;
+  text-transform: none;
+  margin-bottom: 6px;
+}
+
+.hub-card-rule {
+  width: 36px;
+  height: 3px;
+  background: var(--color-niveau-cm1);
+  border-radius: 2px;
+  margin: 0 auto;
+}
+
+.hub-card-btn {
+  background: var(--color-brand-navy);
+  color: #ffffff;
+  border-radius: 22px;
+  padding: 9px 24px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  margin-top: auto;
+  margin-bottom: 24px;
+  display: inline-block;
+  transition: background 200ms ease;
+}
+
+.hub-card:hover .hub-card-btn { background: #0f1d45; }
+
+.hub-card-accent {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%;
+  height: 4px;
+}
+
+/* ─── Navbar Proficiamus ────────────────────────────────────────────────── */
+
+.navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+  height: auto;
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+}
+
+.navbar__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.navbar__brand img { height: 34px; width: auto; }
+
+.navbar__brand-text { display: flex; flex-direction: column; }
+
+.navbar__name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 1px;
+  color: var(--color-brand-navy);
+}
+
+.navbar__tagline {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 700;
+  color: var(--color-brand-navy);
+  margin-top: 2px;
+}
+
+.navbar__nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.navbar__nav a {
+  text-decoration: none;
+  color: var(--color-brand-navy);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  transition: color 200ms;
+}
+
+.navbar__nav a:hover { color: var(--color-brand-blue); }
+
+.navbar__nav a.active {
+  color: var(--color-niveau-cm1);
+  border-bottom: 2px solid var(--color-niveau-cm1);
+  padding-bottom: 2px;
+}
+
+.nav-lang {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--color-brand-navy);
+}
+
+.navbar__nav .btn-login { color: #fff !important; }
+
+.btn-login {
+  background: var(--color-brand-navy);
+  color: #fff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 22px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 200ms;
+}
+.btn-login:hover { background: #0f1d45; }
+
+/* ─── Responsive — pages intérieures ─────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .page-content { padding: 0 24px; }
+  .hub-grid { grid-template-columns: repeat(2, 1fr); }
+  .navbar__brand img { height: 28px; }
+  .navbar__nav { gap: 12px; }
+  .navbar__nav a:not(.btn-login) { display: none; }
+  .nav-lang { display: none; }
+}
+
+@media (max-width: 480px) {
+  .hub-grid { grid-template-columns: 1fr; }
+  .btn-login { padding: 7px 13px; font-size: 13px; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Histoire EMILE — Lycée Français de Madrid</title>
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
   <style>
     /* ── TOKENS HISTOIRE ─────────────────────────────────────────────────── */
     :root {
@@ -15,67 +15,16 @@
       --tg: 14px;
     }
 
-    /* ── PAGE SHELL ──────────────────────────────────────────────────────── */
-    .page-wrap {
-      background: var(--bg);
-      min-height: calc(100vh - 88px);
-      padding-bottom: 72px;
-    }
-
-    .page-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 64px;
-    }
-
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--blue);
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-      padding: 20px 0 0;
-      opacity: 0.75;
-      transition: opacity 180ms;
-    }
-    .back-link:hover { opacity: 1; }
-
-    /* ── PAGE HEADER ─────────────────────────────────────────────────────── */
-    .page-header {
-      text-align: center;
-      padding: 32px 0 36px;
-    }
-
-    .page-header-icon {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-
-    .page-title {
-      font-weight: 900;
-      font-size: 36px;
-      color: var(--blue);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
+    /* ── OVERRIDES PAGE SHELL ────────────────────────────────────────────── */
+    .page-wrap   { padding-bottom: 72px; }
+    .page-header { padding: 32px 0 36px; }
+    .page-title  { font-size: 36px; margin-bottom: 6px; }
 
     .page-emile-line {
       font-size: 15px;
       font-weight: 700;
       letter-spacing: 0.07em;
       margin-bottom: 14px;
-    }
-
-    .page-title-rule {
-      width: 44px;
-      height: 3px;
-      background: var(--red);
-      border-radius: 2px;
-      margin: 0 auto 14px;
     }
 
     .page-intro {
@@ -357,9 +306,6 @@
     .hb-cm2 { background: var(--hist-cm2); }
 
     /* ── RESPONSIVE ──────────────────────────────────────────────────────── */
-    @media (max-width: 1024px) { .page-content { padding: 0 40px; } }
-    @media (max-width: 768px)  { .page-content { padding: 0 24px; } }
-
     @media (max-width: 640px) {
       .timeline-content { min-width: auto; }
       .era-row          { display: none; }
@@ -384,30 +330,6 @@
       .hist-btn     { padding: 7px 16px; font-size: 12px; }
       .page-content { padding: 0 16px; }
     }
-  </style>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
-  <!-- NAVBAR-PROFICIAMUS-CSS -->
-  <style>
-  /* ─── Navbar Proficiamus (extrait d'index-v2.html) ─── */
-  body{padding-top:50px;}
-  .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
-  .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
-  .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
-  .navbar__brand img{height:34px;width:auto;}
-  .navbar__brand-text{display:flex;flex-direction:column;}
-  .navbar__name{font-size:18px;font-weight:800;line-height:1;letter-spacing:1px;}
-  .navbar__tagline{font-size:12px;font-style:italic;font-weight:700;color:#102B6A;margin-top:2px;}
-  .navbar__nav{display:flex;align-items:center;gap:24px;}
-  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;transition:color .2s;}
-  .navbar__nav a:hover{color:#1B4EBF;}
-  .navbar__nav a.active{color:#2D9C3C;border-bottom:2px solid #2D9C3C;padding-bottom:2px;}
-  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;font-family:'Nunito',sans-serif;}
-  .navbar__nav .btn-login{color:#fff!important;}
-  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
-  .btn-login:hover{background:#0b1e4d;}
-  @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
   </style>
 </head>
 <body>
