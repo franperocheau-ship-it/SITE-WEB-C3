@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mentions légales — Lycée Français de Madrid</title>
-  <link rel="stylesheet" href="styles.css?v=8">
+  <link rel="stylesheet" href="styles.css?v=9">
   <style>
 
     .page-wrap {
@@ -297,11 +297,11 @@
   <nav class="navbar">
   <div class="navbar__inner">
     <a href="index-v2.html" class="navbar__brand">
-      <img src="assets/proficiamuspetit.png?v=4" alt="Logo Proficiamus" />
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
     </a>
     <div class="navbar__nav">
       <a href="index-v2.html">Accueil</a>
-      <a href="#">À propos</a>
+      <a href="apropos.html">À propos</a>
       <span class="nav-lang">🌐 FR ∨</span>
       <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
     </div>
@@ -360,7 +360,7 @@
             Éditeur du site
           </h2>
           <p>
-            <strong>François Perocheau</strong>, enseignant au Lycée Français de Madrid (LFM).
+            <strong>François Pérocheau</strong>, enseignant au Lycée Français de Madrid (LFM).
           </p>
           <p>
             Ce site est un outil pédagogique personnel destiné aux élèves du cycle 3 (CM1, CM2, 6e).
@@ -422,7 +422,7 @@
           </ul>
           <p>À condition de :</p>
           <ul>
-            <li>citer l'auteur : <em>François Perocheau – LFM</em> ;</li>
+            <li>citer l'auteur : <em>François Pérocheau – LFM</em> ;</li>
             <li>ne pas en faire un usage commercial sans autorisation préalable ;</li>
             <li>partager toute adaptation sous la même licence CC BY-NC-SA.</li>
           </ul>
@@ -571,7 +571,7 @@
             Crédits
           </h2>
           <p>
-            <strong>Conception, développement et contenus :</strong> François Perocheau<br>
+            <strong>Conception, développement et contenus :</strong> François Pérocheau<br>
             <strong>Établissement de rattachement :</strong> Lycée Français de Madrid (LFM)<br>
             <strong>Technologies utilisées :</strong> HTML, CSS, JavaScript, GitHub Pages, Supabase<br>
             <strong>Diffusion :</strong> sous licence Creative Commons BY-NC-SA 4.0
@@ -604,23 +604,27 @@
   <!-- ═══════════════════════════════════════════
        FOOTER
   ═══════════════════════════════════════════ -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-inner">
-        <div class="footer-rule"></div>
-        <div class="footer-body">
-          <p class="footer-text">
-            Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,<br>
-            dans le respect d'un <strong class="footer-em">usage mesuré</strong> des écrans.
-          </p>
-        </div>
-        <p class="footer-credit">© 2026 François Perocheau – LFM &nbsp;•&nbsp; CC BY-NC-SA 4.0 &nbsp;•&nbsp; <a href="mentions-legales.html">Mentions légales</a></p>
-      </div>
-    </div>
-  </footer>
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 · <a href="mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a></p>
+  </div>
+</footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/menu.js"></script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
 </body>
 </html>

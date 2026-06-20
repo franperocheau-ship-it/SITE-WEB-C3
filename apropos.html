@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>À propos — Proficiamus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red:    #E63946;
+      --green:  #2D9C3C;
+      --blue:   #1B4EBF;
+      --yellow: #F5A623;
+      --purple: #7B2D8B;
+      --text:   #1a1a1a;
+      --gray:   #6b7280;
+      --border: #e0e0e0;
+      --color-brand-navy:  #1A2D6B;
+      --color-brand-blue:  #2563EB;
+      --color-niveau-cm1:  #1DBFA0;
+      --color-niveau-cm2:  #4A90D9;
+      --color-niveau-6e:   #F5A623;
+      --font-display:      'Fredoka', sans-serif;
+    }
+
+    body {
+      font-family: 'Nunito Sans', sans-serif;
+      background: #ffffff;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ─── WRAPPER ─── */
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ─── NAVBAR ─── */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: #fff;
+      border-bottom: 1px solid #e8e8e8;
+      height: auto;
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+    }
+    .navbar__inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .navbar__brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .navbar__brand img {
+      height: 34px;
+      width: auto;
+    }
+    .navbar__nav {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .navbar__nav a {
+      text-decoration: none;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      transition: color .2s;
+    }
+    .navbar__nav a:hover { color: var(--blue); }
+    .navbar__nav a.nav--active { color: var(--blue); }
+    .nav-lang {
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text);
+    }
+    .navbar__nav .btn-login { color: #fff !important; }
+    .btn-login {
+      background: #102B6A;
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s;
+    }
+    .btn-login:hover { background: #0b1e4d; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #102B6A;
+      color: #fff;
+      padding: 10px 20px;
+    }
+    .footer__inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer__links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .footer__links a {
+      color: #ffffffbb;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      transition: color .2s;
+    }
+    .footer__links a:hover { color: #fff; }
+    .footer__text {
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffffbb;
+      line-height: 1.6;
+      padding-bottom: 6px;
+    }
+    .footer__text .rouge { color: #E63946; }
+    .footer__credit {
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffff66;
+    }
+
+    /* ─── PAGE HERO ─── */
+    .page-hero {
+      padding: 88px 20px 40px;
+      background: linear-gradient(180deg, #e8f0fe 0%, #f5f8ff 60%, #ffffff 100%);
+      text-align: center;
+    }
+    .page-hero__label {
+      display: inline-block;
+      background: var(--color-brand-navy);
+      color: #fff;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      padding: 6px 20px;
+      margin-bottom: 14px;
+    }
+    .page-hero__title {
+      font-family: var(--font-display);
+      font-size: clamp(30px, 5vw, 44px);
+      font-weight: 700;
+      color: var(--color-brand-navy);
+      line-height: 1.2;
+    }
+
+    /* ─── ABOUT CONTENT ─── */
+    .about-content {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 56px 20px 80px;
+    }
+
+    .about-section {
+      margin-bottom: 52px;
+    }
+
+    .about-section__title {
+      font-size: clamp(16px, 2.2vw, 19px);
+      font-weight: 800;
+      color: var(--color-brand-navy);
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #dde5f8;
+    }
+
+    .about-prose {
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+    .about-prose:last-child { margin-bottom: 0; }
+
+    /* Mise en valeur de la citation latine */
+    .about-callout {
+      background: #f0f4ff;
+      border-left: 4px solid var(--color-brand-navy);
+      border-radius: 0 10px 10px 0;
+      padding: 22px 26px;
+      margin: 8px 0 26px;
+    }
+    .about-callout__main {
+      font-style: italic;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--color-brand-navy);
+      line-height: 1.65;
+      margin-bottom: 12px;
+    }
+    .about-callout__emphasis {
+      font-style: normal;
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--blue);
+      letter-spacing: .01em;
+    }
+
+    /* Bloc parti pris enseignant */
+    .about-aside {
+      background: #f7f9fc;
+      border: 1px solid #dde5f8;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-top: 24px;
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--text);
+      font-style: italic;
+    }
+
+    .about-signature {
+      margin-top: 56px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray);
+      text-align: right;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .navbar__brand img { height: 44px; }
+      .navbar__nav { gap: 12px; }
+      .navbar__nav a:not(.btn-login) { display: none; }
+      .nav-lang { display: none; }
+      .about-content { padding: 40px 20px 60px; }
+      .about-callout__main { font-size: 16px; }
+    }
+    @media (max-width: 480px) {
+      .navbar__brand img { height: 38px; }
+      .btn-login { padding: 7px 13px; font-size: 13px; }
+      .about-prose { font-size: 15px; }
+      .about-section { margin-bottom: 36px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     NAVBAR
+═══════════════════════════════════ -->
+<nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index-v2.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index-v2.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════
+     PAGE HERO
+═══════════════════════════════════ -->
+<section class="page-hero">
+  <span class="page-hero__label">Proficiamus</span>
+  <h1 class="page-hero__title">À propos</h1>
+</section>
+
+<!-- ═══════════════════════════════════
+     CONTENU
+═══════════════════════════════════ -->
+<div class="about-content">
+
+  <!-- Un mot sur le nom -->
+  <section class="about-section">
+    <h2 class="about-section__title">Un mot sur le nom</h2>
+    <div class="about-callout">
+      <p class="about-callout__main">Proficiamus vient du latin <em>proficere</em> : avancer, progresser, faire des progrès.</p>
+      <p class="about-callout__emphasis">Pas la perfection. Pas la performance. La progression.</p>
+    </div>
+  </section>
+
+  <!-- Qui suis-je ? -->
+  <section class="about-section">
+    <h2 class="about-section__title">Qui suis-je ?</h2>
+    <p class="about-prose">Je m'appelle <a href="https://es.linkedin.com/in/francoisperocheau" target="_blank" rel="noopener noreferrer" style="color:var(--blue);font-weight:700;text-decoration:none;border-bottom:1px solid #c0d0f0;">François Pérocheau</a>. Professeur des écoles, j'ai exercé en France avant de rejoindre le réseau des lycées français à l'étranger. Depuis plusieurs années, j'enseigne au Lycée Français de Madrid (LFM), un établissement reconnu pour son engagement en faveur de l'accompagnement des besoins spécifiques de chaque élève. J'y exerce actuellement en classe de CM2.</p>
+    <p class="about-prose">Au fil des années, j'ai cherché des réponses concrètes pour les élèves qui décrochent, qui s'ennuient ou qui avancent à un rythme différent. Proficiamus est né de cette recherche.</p>
+  </section>
+
+  <!-- Pourquoi ce site ? -->
+  <section class="about-section">
+    <h2 class="about-section__title">Pourquoi ce site ?</h2>
+    <p class="about-prose">Ce site est avant tout pensé pour mes élèves de CM2. L'idée de départ est simple : offrir à chacun des ressources adaptées à son niveau, sans étiquettes.</p>
+    <p class="about-prose">Les élèves qui rencontrent des difficultés peuvent retravailler les compétences de CM1 à leur rythme, sans jugement. Les élèves en réussite peuvent explorer des compétences de 6e pour aller plus loin.</p>
+    <div class="about-callout">
+      <p class="about-callout__main">Mais Proficiamus repose sur une conviction essentielle : les apprentissages ne se construisent pas uniquement devant un écran.</p>
+    </div>
+    <p class="about-prose">Le numérique permet de s'entraîner, de s'évaluer et d'identifier rapidement les besoins de chacun. En revanche, lorsqu'une notion résiste, lorsqu'une compétence n'est pas encore consolidée, il faut souvent revenir à la manipulation, à l'échange, à l'écriture, au jeu et à l'action.</p>
+    <p class="about-prose">L'écran aide à repérer les difficultés. Le progrès, lui, se construit souvent ailleurs.</p>
+    <p class="about-prose">C'est pourquoi Proficiamus a vocation à associer systématiquement les exercices numériques à des ressources hors écran : matériel manipulable, jeux pédagogiques, activités à imprimer ou à plastifier. Le numérique n'est pas une finalité ; il est un outil au service d'apprentissages plus concrets.</p>
+  </section>
+
+  <!-- Un choix de sobriété -->
+  <section class="about-section">
+    <h2 class="about-section__title">Un choix de sobriété</h2>
+    <div class="about-callout">
+      <p class="about-callout__main">Ce site a été conçu par un enseignant, pas par un développeur.</p>
+    </div>
+    <p class="about-prose">Pas d'illustrations décoratives, pas d'animations inutiles, pas de mécanismes destinés à retenir l'attention artificiellement. Ce choix est volontaire : tout ce qui détourne l'élève de son objectif d'apprentissage est écarté.</p>
+    <p class="about-prose">L'attention est une ressource précieuse. Je préfère la consacrer aux savoirs plutôt qu'aux effets visuels.</p>
+  </section>
+
+  <!-- Ce que je souhaite pour les élèves et les enseignants -->
+  <section class="about-section">
+    <h2 class="about-section__title">Ce que je souhaite pour les élèves et les enseignants</h2>
+    <p class="about-prose">Je souhaite que les bilans soient simples à comprendre, aussi bien pour l'élève que pour l'enseignant. Chacun doit pouvoir identifier rapidement ses réussites, ses fragilités et ses priorités de travail.</p>
+    <p class="about-prose">L'objectif n'est pas de collectionner les scores, mais de mieux comprendre où l'on en est pour savoir comment progresser.</p>
+  </section>
+
+  <!-- Ce que ce site n'est pas (encore) -->
+  <section class="about-section">
+    <h2 class="about-section__title">Ce que ce site n'est pas (encore)</h2>
+    <p class="about-prose">Proficiamus se construit progressivement. J'enseigne en CM2, et mon premier engagement reste ma classe. Les ressources s'ajoutent au fil des semaines, en français comme en mathématiques, avec une priorité donnée aux compétences du cycle 3.</p>
+    <p class="about-prose">Ce site est entièrement gratuit. J'espère que les retours de ses utilisateurs permettront de le faire évoluer pour qu'il devienne un outil toujours plus utile au service des élèves et des enseignants.</p>
+    <p class="about-prose">Si vous repérez une erreur, souhaitez suggérer une amélioration ou partager une idée, n'hésitez pas à utiliser la page <a href="feedback.html" style="color:var(--blue);font-weight:700;">Suggestions, erreurs et améliorations</a>.</p>
+  </section>
+
+  <p class="about-signature"><a href="https://es.linkedin.com/in/francoisperocheau" target="_blank" rel="noopener noreferrer" style="color:var(--gray);text-decoration:none;border-bottom:1px solid var(--border);">François Pérocheau</a> — LFM 2026</p>
+
+</div>
+
+<!-- ═══════════════════════════════════
+     FOOTER
+═══════════════════════════════════ -->
+<footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 <a href="https://es.linkedin.com/in/francoisperocheau" target="_blank" rel="noopener noreferrer" style="color:#ffffff99;text-decoration:none;">François Pérocheau</a> — CC BY-NC-SA 4.0 · <a href="mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a></p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/menu.js"></script>
+
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

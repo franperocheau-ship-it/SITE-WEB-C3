@@ -4,33 +4,42 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lycée Français de Madrid — Espace d'apprentissage</title>
-  <link rel="stylesheet" href="styles.css?v=8">
+  <link rel="stylesheet" href="styles.css?v=9">
+<style>
+    /* ─── NAVBAR PROFICIAMUS ─── */
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+    .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+    .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+    .navbar__brand img{height:34px;width:auto;}
+    .navbar__nav{display:flex;align-items:center;gap:24px;}
+    .navbar__nav a{text-decoration:none;color:#1a1a1a;font-size:14px;font-weight:700;transition:color .2s;}
+    .navbar__nav a:hover{color:#1B4EBF;}
+    .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;}
+    .navbar__nav .btn-login{color:#fff!important;}
+    .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Fredoka',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+    .btn-login:hover{background:#0b1e4d;}
+    @media(max-width:768px){.navbar__brand img{height:44px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}}
+    @media(max-width:480px){.navbar__brand img{height:38px;}.btn-login{padding:7px 13px;font-size:13px;}}
+</style>
 </head>
 <body class="home-page">
 
   <!-- ═══════════════════════════════════════════
        HEADER
   ═══════════════════════════════════════════ -->
-  <header class="header">
-    <div class="header-inner">
-      <a href="index.html" class="header-brand">
-        <img src="assets/lfm-logo.svg" alt="Lycée Français de Madrid" class="header-logo">
-        <div class="header-text">
-          <span class="header-name">LYCÉE FRANÇAIS DE MADRID</span>
-          <span class="header-sub">Ressources numériques pour le cycle 3</span>
-        </div>
-      </a>
-      <div class="header-actions">
-        <span class="lang-badge">FR</span>
-        <button class="menu-btn" aria-label="Ouvrir le menu">
-          <span class="mbar mbar-top"></span>
-          <span class="mbar mbar-mid"></span>
-          <span class="mbar mbar-mid2"></span>
-          <span class="mbar mbar-bot"></span>
-        </button>
-      </div>
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index-v2.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index-v2.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
     </div>
-  </header>
+  </div>
+</nav>
 
   <!-- ═══════════════════════════════════════════
        HERO
@@ -80,7 +89,7 @@
           <!-- Students photo -->
           <div class="hero-img-frame">
             <img
-              src="assets/enfants-cm2.png?v=2"
+              src="assets/enfants-cm2.png?v=9"
               alt="Élèves du Lycée Français de Madrid"
               class="hero-img"
             >
@@ -191,23 +200,27 @@
   <!-- ═══════════════════════════════════════════
        FOOTER
   ═══════════════════════════════════════════ -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-inner">
-        <div class="footer-rule"></div>
-        <div class="footer-body">
-          <p class="footer-text">
-            Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,<br>
-            dans le respect d'un <strong class="footer-em">usage mesuré</strong> des écrans.
-          </p>
-        </div>
-        <p class="footer-credit">© 2026 François Perocheau – LFM<br>CC BY-NC-SA 4.0 &nbsp;•&nbsp; <a href="mentions-legales.html">Mentions légales</a></p>
-      </div>
-    </div>
-  </footer>
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 · <a href="mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a></p>
+  </div>
+</footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/menu.js"></script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
 </body>
 </html>

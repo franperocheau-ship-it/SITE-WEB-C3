@@ -21,6 +21,11 @@
       --gray:   #6b7280;
       --border: #e0e0e0;
       --navy:   #102B6A;
+      --color-brand-navy:  #1A2D6B;
+      --color-brand-blue:  #2563EB;
+      --color-niveau-cm1:  #1DBFA0;
+      --color-niveau-6e:   #F5A623;
+      --font-display:      'Fredoka', sans-serif;
     }
 
     body {
@@ -137,19 +142,41 @@
       line-height: 1.6;
     }
 
-    .hero__cycle {
-      display: inline-flex;
+    .cycle3-banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--color-brand-navy);
+      margin: 1rem 0;
+    }
+    .cycle3-icon { font-size: 1.3rem; }
+    .cycle3-label { color: var(--color-brand-navy); font-weight: 400; }
+    .cycle3-badges {
+      display: flex;
       align-items: center;
       gap: 8px;
-      background: var(--navy);
-      border-radius: 999px;
-      padding: 8px 22px;
-      font-size: 13px;
-      font-weight: 800;
-      color: #fff;
-      letter-spacing: .04em;
     }
-    .hero__cycle .pill-dot { color: #D62839; }
+    .cycle3-dot {
+      color: var(--color-brand-navy);
+      font-weight: 900;
+    }
+    .badge-niveau {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1rem;
+      padding: 6px 18px;
+      border-radius: 20px;
+      display: inline-block;
+      letter-spacing: .03em;
+    }
+    .badge-cm1 { background: var(--color-niveau-cm1); color: #ffffff; }
+    .badge-cm2 { background: var(--color-brand-blue); color: #ffffff; }
+    .badge-6e  { background: var(--color-niveau-6e);  color: #ffffff; }
 
     /* ─── SECTION MATIERES ─── */
     .section-matieres {
@@ -185,15 +212,15 @@
       transform: translateY(-6px) scale(1.012);
     }
 
-    .mat-card--fr:hover { box-shadow: 0 14px 40px rgba(230,57,70,.18); }
-    .mat-card--ma:hover { box-shadow: 0 14px 40px rgba(27,78,191,.18); }
+    .mat-card--fr:hover { box-shadow: 0 14px 40px rgba(37,99,235,.20); }
+    .mat-card--ma:hover { box-shadow: 0 14px 40px rgba(245,166,35,.25); }
 
     .mat-card__top {
       height: 6px;
       width: 100%;
     }
-    .mat-card--fr .mat-card__top { background: var(--red); }
-    .mat-card--ma .mat-card__top { background: var(--blue); }
+    .mat-card--fr .mat-card__top { background: #1A2D6B; }
+    .mat-card--ma .mat-card__top { background: #F5A623; }
 
     .mat-card__body {
       padding: 32px 28px 28px;
@@ -212,8 +239,8 @@
       margin: 0 auto;
       font-size: 36px;
     }
-    .mat-card--fr .mat-card__icon { background: #fde8ea; }
-    .mat-card--ma .mat-card__icon { background: #dce8fd; }
+    .mat-card--fr .mat-card__icon { background: #dce8fd; }
+    .mat-card--ma .mat-card__icon { background: #fef3d8; }
 
     .mat-card__title {
       text-align: center;
@@ -221,8 +248,8 @@
       font-weight: 800;
       letter-spacing: .3px;
     }
-    .mat-card--fr .mat-card__title { color: var(--red); }
-    .mat-card--ma .mat-card__title { color: var(--blue); }
+    .mat-card--fr .mat-card__title { color: #1A2D6B; }
+    .mat-card--ma .mat-card__title { color: #7a4f00; }
 
     .mat-card__desc {
       text-align: center;
@@ -251,24 +278,24 @@
       padding: 4px 12px;
       letter-spacing: .02em;
     }
-    .mat-card--fr .theme-tag { background: #fde8ea; color: #b02030; }
-    .mat-card--ma .theme-tag { background: #dce8fd; color: #1440a0; }
+    .mat-card--fr .theme-tag { background: #dce8fd; color: #1a3db5; }
+    .mat-card--ma .theme-tag { background: #fef3d8; color: #7a4f00; }
 
     .mat-card__btn {
       display: block;
       padding: 13px 0;
-      border-radius: 10px;
-      color: #fff;
-      font-family: 'Fredoka', sans-serif;
-      font-weight: 700;
+      border-radius: 22px;
+      border: none;
+      font-family: var(--font-display);
+      font-weight: 400;
       font-size: 15px;
       text-decoration: none;
       text-align: center;
       margin-top: auto;
       transition: opacity .2s, letter-spacing .2s;
     }
-    .mat-card--fr .mat-card__btn { background: var(--red); }
-    .mat-card--ma .mat-card__btn { background: var(--blue); }
+    .mat-card--fr .mat-card__btn { background: #1A2D6B; color: #ffffff; }
+    .mat-card--ma .mat-card__btn { background: #F5A623; color: #6b420a; }
     .mat-card__btn:hover { opacity: .88; letter-spacing: .02em; }
 
     /* ─── BANDEAU ACCÈS LIBRE ─── */
@@ -308,7 +335,7 @@
       align-items: center;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 6px;
     }
 
     .footer__links {
@@ -332,10 +359,10 @@
       font-size: 12px;
       font-weight: 600;
       color: #ffffffbb;
-      line-height: 1.6;
-      padding-bottom: 6px;
+      line-height: 1.4;
+      padding-bottom: 2px;
     }
-    .footer__text .rouge { color: #E63946; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
     .footer__credit {
       width: 100%;
       text-align: center;
@@ -376,10 +403,11 @@
 <nav class="navbar">
   <div class="navbar__inner">
     <a href="index-v2.html" class="navbar__brand">
-      <img src="assets/proficiamuspetit.png?v=4" alt="Logo Proficiamus" />
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
     </a>
     <div class="navbar__nav">
       <a href="index-v2.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
       <span class="nav-lang">🌐 FR ∨</span>
       <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
     </div>
@@ -394,11 +422,16 @@
   <p class="hero__sub" data-aos="fade-up" data-aos-delay="80">
     Exercices de français et de mathématiques pour les élèves de cycle 3
   </p>
-  <div class="hero__cycle" data-aos="fade-up" data-aos-delay="160">
-    Plateforme pour le Cycle&nbsp;3 :
-    <span class="pill-dot">•</span> CM1
-    <span class="pill-dot">•</span> CM2
-    <span class="pill-dot">•</span> 6ÈME
+  <div class="cycle3-banner" data-aos="fade-up" data-aos-delay="160">
+    <span class="cycle3-icon">📘</span>
+    <span class="cycle3-label">Plateforme dédiée au Cycle 3 :</span>
+    <span class="cycle3-badges">
+      <span class="badge-niveau badge-cm1">CM1</span>
+      <span class="cycle3-dot">•</span>
+      <span class="badge-niveau badge-cm2">CM2</span>
+      <span class="cycle3-dot">•</span>
+      <span class="badge-niveau badge-6e">6ème</span>
+    </span>
   </div>
 </section>
 
@@ -421,7 +454,7 @@
             <span class="theme-tag">Grammaire</span>
             <span class="theme-tag">Conjugaison</span>
             <span class="theme-tag">Orthographe</span>
-            <span class="theme-tag">Lexique</span>
+            <span class="theme-tag">Vocabulaire</span>
           </div>
           <a href="français.html" class="mat-card__btn">S'entraîner en français →</a>
         </div>
@@ -452,12 +485,6 @@
 <!-- ═══════════════════════════════════
      BANDEAU ACCÈS LIBRE
 ═══════════════════════════════════ -->
-<div class="acces-band" data-aos="fade-up">
-  <div class="acces-band__inner">
-    <span class="acces-band__icon">🔓</span>
-    Pas besoin de compte — accès libre pour tous les visiteurs
-  </div>
-</div>
 
 <!-- ═══════════════════════════════════
      FOOTER
@@ -468,11 +495,7 @@
       Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
       dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
     </p>
-    <div class="footer__links">
-      <a href="mentions-legales.html">Mentions légales</a>
-      <a href="#">Contact</a>
-    </div>
-    <p class="footer__credit">© 2026 François Perocheau — CC BY-NC-SA 4.0</p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 · <a href="mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a></p>
   </div>
 </footer>
 

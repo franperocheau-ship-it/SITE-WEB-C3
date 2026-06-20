@@ -151,7 +151,7 @@
 
     /* ─── HERO ─── */
     .hero {
-      padding: 80px 20px 8px;
+      padding: 52px 20px 8px;
       text-align: center;
       position: relative;
       background: linear-gradient(180deg, #e8f0fe 0%, #f5f8ff 55%, #ffffff 100%);
@@ -160,7 +160,7 @@
     .hero__img {
       width: 488px;
       max-width: 80%;
-      margin: 0 auto 10px;
+      margin: 0 auto 36px;
       display: block;
     }
 
@@ -218,7 +218,7 @@
 
     .card__title {
       font-size: 16px;
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing: .5px;
     }
 
@@ -285,7 +285,7 @@
       border-radius: 8px;
       color: #fff;
       font-family: 'Fredoka', sans-serif;
-      font-weight: 700;
+      font-weight: 500;
       font-size: 14px;
       transition: opacity .2s, letter-spacing .2s;
       text-decoration: none;
@@ -309,18 +309,18 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
-      width: 160px;
+      width: 188px;
       flex-shrink: 0;
     }
 
     .step__circle {
-      width: 64px; height: 64px;
+      width: 78px; height: 78px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 26px;
-      margin-bottom: 10px;
+      font-size: 32px;
+      margin-bottom: 12px;
       position: relative;
     }
 
@@ -328,11 +328,11 @@
       position: absolute;
       top: -6px;
       right: -6px;
-      width: 22px; height: 22px;
+      width: 24px; height: 24px;
       border-radius: 50%;
       background: #fff;
       border: 2px solid currentColor;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 800;
       display: flex;
       align-items: center;
@@ -340,21 +340,21 @@
     }
 
     .step__label {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 800;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .step__desc {
-      font-size: 12px;
+      font-size: 13.5px;
       color: var(--gray);
       line-height: 1.4;
     }
 
     .step-arrow {
-      font-size: 22px;
+      font-size: 24px;
       color: #ccc;
-      margin-top: 20px;
+      margin-top: 26px;
       padding: 0 4px;
       flex-shrink: 0;
     }
@@ -369,37 +369,37 @@
 
     .diag-block {
       flex: 1;
-      max-width: 300px;
+      max-width: 340px;
       background: #fff;
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px 18px;
-      font-size: 13px;
+      border-radius: 14px;
+      padding: 26px 24px;
+      font-size: 14.5px;
     }
 
     .diag-label {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: .4px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .diag-arrow {
-      font-size: 24px;
+      font-size: 28px;
       color: #ccc;
       display: flex;
       align-items: center;
-      padding: 0 8px;
+      padding: 0 10px;
       flex-shrink: 0;
     }
 
     .diag-percent {
-      font-size: 38px;
+      font-size: 44px;
       font-weight: 800;
       color: var(--red);
       line-height: 1;
-      margin: 8px 0 4px;
+      margin: 10px 0 6px;
     }
 
     .progress-bar {
@@ -415,83 +415,16 @@
       width: 45%;
     }
 
-    .diag-small { font-size: 11.5px; color: var(--gray); }
+    .diag-small { font-size: 13px; color: var(--gray); }
 
     .diag-illustration {
-      font-size: 32px;
+      font-size: 38px;
       text-align: center;
-      margin: 10px 0;
+      margin: 12px 0;
     }
 
-    .diag-resources { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-top: 8px; font-size: 12.5px; }
+    .diag-resources { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-top: 10px; font-size: 13.5px; }
     .diag-resources li::before { content: '✅ '; }
-
-    /* ─── RESSOURCES VARIÉES ─── */
-    .ressources-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      justify-content: center;
-    }
-
-    .ressource-card {
-      width: 150px;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 22px 12px 18px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 1px 6px rgba(0,0,0,.05);
-    }
-
-    .ressource-icon {
-      font-size: 40px;
-    }
-
-    .ressource-label {
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    /* ─── POUR QUI ─── */
-    .pourqui-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 28px;
-    }
-
-    .pourqui-col {
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .pourqui-avatar {
-      width: 110px; height: 110px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 64px;
-    }
-
-    .pourqui-title {
-      font-size: 18px;
-      font-weight: 800;
-    }
-
-    .pourqui-desc {
-      font-size: 14px;
-      color: var(--gray);
-      line-height: 1.6;
-      max-width: 240px;
-    }
 
     /* ─── FOOTER ─── */
     footer {
@@ -556,17 +489,6 @@
       padding: 40px 0;
       margin-bottom: 0;
     }
-    .section--ressources {
-      background: linear-gradient(135deg, #fff8f0 0%, #f5f0ff 100%);
-      padding: 40px 0;
-      margin-bottom: 0;
-    }
-    .section--pourqui {
-      background: linear-gradient(180deg, #f4f7ff 0%, #edf5ee 100%);
-      padding: 40px 0 48px;
-      margin-bottom: 0;
-    }
-
     /* ─── CYCLE 3 BANNER ─── */
     .cycle3-banner {
       display: flex;
@@ -581,7 +503,7 @@
       margin: 1rem 0;
     }
     .cycle3-icon { font-size: 1.3rem; }
-    .cycle3-label { color: var(--color-brand-navy); }
+    .cycle3-label { color: var(--color-brand-navy); font-weight: 400; }
     .cycle3-badges {
       display: flex;
       align-items: center;
@@ -593,11 +515,12 @@
     }
     .badge-niveau {
       font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 0.9rem;
-      padding: 5px 16px;
+      font-weight: 900;
+      font-size: 1rem;
+      padding: 6px 18px;
       border-radius: 20px;
       display: inline-block;
+      letter-spacing: .03em;
     }
     .badge-cm1 { background: var(--color-niveau-cm1); color: #ffffff; }
     .badge-cm2 { background: var(--color-brand-blue); color: #ffffff; }
@@ -642,17 +565,9 @@
       .diag-block { max-width: 100%; }
       .diag-arrow { display: none; }
 
-      /* Ressources : 3 par ligne */
-      .ressource-card { width: calc(33.33% - 12px); }
-
-      /* Pour qui : 1 colonne */
-      .pourqui-row { grid-template-columns: 1fr; gap: 28px; }
-
       /* Sections colorées */
       .section--steps,
-      .section--diag,
-      .section--ressources,
-      .section--pourqui { padding: 28px 0; }
+      .section--diag { padding: 28px 0; }
 
       .section-title { margin-bottom: 20px; }
     }
@@ -674,17 +589,12 @@
       /* 4 Étapes : 1 par ligne */
       .step { width: 100%; }
 
-      /* Ressources : 2 par ligne */
-      .ressource-card { width: calc(50% - 8px); }
-
       /* Cartes */
       .card { padding: 22px 16px; }
 
       /* Sections */
       .section--steps,
-      .section--diag,
-      .section--ressources,
-      .section--pourqui { padding: 20px 0; }
+      .section--diag { padding: 20px 0; }
     }
   </style>
 </head>
@@ -696,11 +606,11 @@
 <nav class="navbar">
   <div class="navbar__inner">
     <a href="#" class="navbar__brand">
-      <img src="assets/proficiamuspetit.png?v=4" alt="Logo Proficiamus" />
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
     </a>
     <div class="navbar__nav">
       <a href="#">Accueil</a>
-      <a href="#">À propos</a>
+      <a href="apropos.html">À propos</a>
       <span class="nav-lang">🌐 FR ∨</span>
       <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
     </div>
@@ -711,7 +621,7 @@
      2. HERO
 ═══════════════════════════════════ -->
 <section class="hero">
-  <img src="assets/proficiamusgrand.png?v=5" alt="Proficiamus illustration" class="hero__img" />
+  <img src="assets/proficiamusgrand.png?v=9" alt="Proficiamus illustration" class="hero__img" />
   <div class="cycle3-banner" data-aos="fade-up">
     <span class="cycle3-icon">📘</span>
     <span class="cycle3-label">Plateforme dédiée au Cycle 3 :</span>
@@ -794,8 +704,8 @@
           <span style="font-size:26px">📊</span>
           <span class="step__num" style="color:var(--blue)">1</span>
         </div>
-        <div class="step__label">Évaluer</div>
-        <div class="step__desc">Des évaluations adaptées aux programmes.</div>
+        <div class="step__label">S'entraîner</div>
+        <div class="step__desc">Sur les compétences des programmes 2025.</div>
       </div>
       <div class="step-arrow">→</div>
 
@@ -842,7 +752,7 @@
 
       <!-- Bloc 1 : résultats -->
       <div class="diag-block" data-aos="fade-left" data-aos-delay="0">
-        <div class="diag-label" style="color:var(--blue)">1. Résultats de l'évaluation</div>
+        <div class="diag-label" style="color:var(--blue)">1. Résultats aux exercices</div>
         <div class="diag-small">Fractions : addition</div>
         <div class="diag-percent">45%</div>
         <div class="progress-bar"><div class="progress-fill"></div></div>
@@ -876,80 +786,6 @@
   </div>
 </section>
 
-<!-- ═══════════════════════════════════
-     7. RESSOURCES VARIÉES
-═══════════════════════════════════ -->
-<section class="section section--ressources">
-  <div class="wrapper">
-    <h2 class="section-title" style="color:var(--blue)" data-aos="fade-up">Des ressources variées</h2>
-    <div class="ressources-grid">
-
-      <div class="ressource-card" data-aos="zoom-in" data-aos-delay="0">
-        <div class="ressource-icon" style="color:var(--blue)">📖</div>
-        <div class="ressource-label" style="color:var(--blue)">Français</div>
-      </div>
-
-      <div class="ressource-card" data-aos="zoom-in" data-aos-delay="80">
-        <div class="ressource-icon" style="color:var(--green)">🧮</div>
-        <div class="ressource-label" style="color:var(--green)">Mathématiques</div>
-      </div>
-
-      <div class="ressource-card" data-aos="zoom-in" data-aos-delay="160">
-        <div class="ressource-icon" style="color:var(--purple)">🎲</div>
-        <div class="ressource-label" style="color:var(--purple)">Jeux pédagogiques</div>
-      </div>
-
-      <div class="ressource-card" data-aos="zoom-in" data-aos-delay="240">
-        <div class="ressource-icon" style="color:var(--yellow)">🖨️</div>
-        <div class="ressource-label" style="color:var(--yellow)">Ressources imprimables</div>
-      </div>
-
-      <div class="ressource-card" data-aos="zoom-in" data-aos-delay="320">
-        <div class="ressource-icon" style="color:#38b2f0">🧩</div>
-        <div class="ressource-label" style="color:#38b2f0">Ateliers de remédiation</div>
-      </div>
-
-      <div class="ressource-card" data-aos="zoom-in" data-aos-delay="400">
-        <div class="ressource-icon" style="color:var(--red)">📋</div>
-        <div class="ressource-label" style="color:var(--red)">Séquences pédagogiques</div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════
-     8. POUR QUI ?
-═══════════════════════════════════ -->
-<section class="section section--pourqui">
-  <div class="wrapper">
-    <h2 class="section-title" style="color:var(--gray)">
-      Pour qui ?&nbsp;<span style="color:var(--red)">Enseignants</span>,&nbsp;élèves,&nbsp;familles
-    </h2>
-    <div class="pourqui-row">
-
-      <div class="pourqui-col" data-aos="fade-up" data-aos-delay="0">
-        <div class="pourqui-avatar" style="background:#dbeafe">🧒</div>
-        <div class="pourqui-title" style="color:var(--blue)">Élèves</div>
-        <p class="pourqui-desc">S'entraîner à son rythme, comprendre et progresser en toute autonomie.</p>
-      </div>
-
-      <div class="pourqui-col" data-aos="fade-up" data-aos-delay="150">
-        <div class="pourqui-avatar" style="background:#fee2e2">👩‍🏫</div>
-        <div class="pourqui-title" style="color:var(--red)">Enseignants</div>
-        <p class="pourqui-desc">Analyser les résultats, accompagner chaque élève et gagner du temps au quotidien.</p>
-      </div>
-
-      <div class="pourqui-col" data-aos="fade-up" data-aos-delay="300">
-        <div class="pourqui-avatar" style="background:#dcfce7">🏡</div>
-        <div class="pourqui-title" style="color:var(--green)">Familles</div>
-        <p class="pourqui-desc">Accompagner les enfants et accéder librement aux exercices.</p>
-      </div>
-
-    </div>
-  </div>
-</section>
-
 <div class="spacer"></div>
 
 <!-- ═══════════════════════════════════
@@ -961,11 +797,7 @@
       Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
       dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
     </p>
-    <div class="footer__links">
-      <a href="mentions-legales.html">Mentions légales</a>
-      <a href="#">Contact</a>
-    </div>
-    <p class="footer__credit">© 2026 François Perocheau — CC BY-NC-SA 4.0</p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 · <a href="mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a></p>
   </div>
 </footer>
 
@@ -983,5 +815,14 @@
 </script>
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>AOS.init({ duration: 700, once: true, offset: 80 });</script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
 </body>
 </html>
