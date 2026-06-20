@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito+Sans:wght@400;600&display=swap');
 
 /* ─── TOKENS ──────────────────────────────────────────────────────────────── */
 
@@ -23,7 +23,7 @@
   --color-niveau-cm1:  #1DBFA0;
   --color-niveau-cm2:  #4A90D9;
   --color-niveau-6e:   #F5A623;
-  --font-display:      'Nunito', sans-serif;
+  --font-display:      'Fredoka', sans-serif;
   --font-body:         'Nunito Sans', sans-serif;
 }
 
@@ -464,10 +464,12 @@ h3 { font-size: 1.2rem; font-weight: 700; }
 .card-rule {
   width: 36px;
   height: 3px;
-  background: var(--red);
   border-radius: 2px;
   margin: 6px auto 0;
 }
+
+.card:nth-child(odd) .card-rule  { background: #F5A623; }
+.card:nth-child(even) .card-rule { background: #1A2D6B; }
 
 .card-btn {
   background: var(--color-brand-navy);
@@ -1039,10 +1041,12 @@ body:has(.navbar) { padding-top: 50px; }
 .hub-card-rule {
   width: 36px;
   height: 3px;
-  background: var(--color-niveau-cm1);
   border-radius: 2px;
   margin: 0 auto;
 }
+
+.hub-card:nth-child(odd) .hub-card-rule  { background: #F5A623; }
+.hub-card:nth-child(even) .hub-card-rule { background: #1A2D6B; }
 
 .hub-card-btn {
   background: var(--color-brand-navy);
@@ -1061,11 +1065,11 @@ body:has(.navbar) { padding-top: 50px; }
 .hub-card:hover .hub-card-btn { background: #0f1d45; }
 
 .hub-card-accent {
-  position: absolute;
-  bottom: 0; left: 0;
-  width: 100%;
-  height: 4px;
+  display: none;
 }
+
+.hub-card:nth-child(odd)  { border-bottom: 4px solid #F5A623; }
+.hub-card:nth-child(even) { border-bottom: 4px solid #1A2D6B; }
 
 /* ─── Navbar Proficiamus ────────────────────────────────────────────────── */
 
