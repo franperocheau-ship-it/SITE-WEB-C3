@@ -9,7 +9,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/results.js"></script>
-  <script src="exercise-data.js?v=9"></script>
+  <script src="exercise-data.js?v=13"></script>
   <style>
     /* ── Exercise container (narrows content to readable width) ── */
     .ex-container {
@@ -3001,6 +3001,566 @@
       min-height: 80px;
     }
 
+    /* ══════════════════════════════════════════════════════════════════
+       TYPE : composer-nombre-entier-niveaux
+    ══════════════════════════════════════════════════════════════════ */
+
+    .cni-decomp-display {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      text-align: center;
+      padding: 22px 20px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 24px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .cni-input-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .cni-number-input {
+      width: 220px;
+      height: 72px;
+      border: 2px solid var(--blue);
+      border-radius: 14px;
+      text-align: center;
+      font-size: 34px;
+      font-weight: 900;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      font-family: inherit;
+      letter-spacing: 0.04em;
+      -moz-appearance: textfield;
+      transition: border-color 150ms, box-shadow 150ms;
+    }
+    .cni-number-input::-webkit-outer-spin-button,
+    .cni-number-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .cni-number-input:focus { box-shadow: 0 0 0 3px rgba(16,43,106,0.12); }
+    .cni-number-input.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.07);
+      color: #15803d;
+    }
+    .cni-number-input.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+    .cni-number-input:disabled { cursor: default; }
+    @media (max-width: 600px) {
+      .cni-decomp-display { font-size: 17px; padding: 16px 12px; }
+      .cni-number-input   { width: 160px; height: 58px; font-size: 26px; }
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       TYPE : comparer-nombres-entiers-niveaux
+    ══════════════════════════════════════════════════════════════════ */
+
+    .cne-numbers-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 24px 16px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .cne-number {
+      font-size: 38px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      min-width: 110px;
+      text-align: center;
+    }
+    .cne-sign-slot {
+      font-size: 48px;
+      font-weight: 900;
+      min-width: 56px;
+      text-align: center;
+      color: var(--muted);
+      transition: color 200ms;
+    }
+    .cne-sign-slot.is-correct { color: #16a34a; }
+    .cne-sign-slot.is-wrong   { color: var(--red); }
+    .cne-sign-btns {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .cne-sign-btn {
+      font-size: 36px;
+      font-weight: 900;
+      width: 80px;
+      height: 80px;
+      border-radius: 16px;
+      border: 2px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 200ms, background 200ms, transform 150ms;
+    }
+    .cne-sign-btn:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.06);
+      transform: translateY(-3px);
+    }
+    .cne-sign-btn:disabled { cursor: default; opacity: 0.55; }
+    .cne-sign-btn.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.09);
+      color: #15803d;
+      opacity: 1;
+    }
+    .cne-sign-btn.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.07);
+      color: var(--red);
+      opacity: 1;
+    }
+    .cne-score-bar {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+    .cne-streak-toast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-80px);
+      background: var(--blue);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 10px 22px;
+      border-radius: 100px;
+      box-shadow: 0 4px 16px rgba(16,43,106,0.30);
+      pointer-events: none;
+      z-index: 999;
+      transition: transform 300ms ease;
+    }
+    .cne-streak-toast.is-visible {
+      transform: translateX(-50%) translateY(0);
+    }
+    @media (max-width: 600px) {
+      .cne-number    { font-size: 26px; min-width: 80px; }
+      .cne-sign-slot { font-size: 34px; min-width: 38px; }
+      .cne-sign-btn  { font-size: 26px; width: 64px; height: 64px; }
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       TYPE : ranger-nombres-entiers-niveaux
+    ══════════════════════════════════════════════════════════════════ */
+
+    .rni-order-badge {
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--blue);
+      background: rgba(16,43,106,0.06);
+      border: 1.5px solid rgba(16,43,106,0.18);
+      border-radius: 10px;
+      padding: 9px 14px;
+      margin: 0 0 18px;
+    }
+    .rni-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 14px;
+      background: rgba(16,43,106,0.03);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      margin-bottom: 18px;
+      min-height: 56px;
+      justify-content: center;
+    }
+    .rni-slots-area { margin-bottom: 18px; }
+    .rni-slots-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .rni-slot-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+    .rni-slot-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+    }
+    .rni-slot {
+      min-width: 100px;
+      height: 46px;
+      border: 2px dashed rgba(16,43,106,0.28);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 150ms, background 150ms, color 150ms;
+      padding: 0 10px;
+      user-select: none;
+    }
+    .rni-slot:hover:not([data-locked]) { background: rgba(16,43,106,0.04); }
+    .rni-slot.is-filled {
+      border-style: solid;
+      border-color: var(--blue);
+      color: var(--blue);
+      background: rgba(16,43,106,0.05);
+    }
+    .rni-slot.is-correct {
+      border-style: solid;
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.09);
+      color: #15803d;
+    }
+    .rni-slot.is-wrong {
+      border-style: solid;
+      border-color: var(--red);
+      background: rgba(214,40,57,0.07);
+      color: var(--red);
+    }
+    .rni-arrow {
+      font-size: 20px;
+      font-weight: 700;
+      color: rgba(16,43,106,0.35);
+      padding-bottom: 10px;
+      flex-shrink: 0;
+      align-self: flex-end;
+    }
+    .rni-score-row {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .rni-streak-toast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-80px);
+      background: var(--blue);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 10px 22px;
+      border-radius: 100px;
+      box-shadow: 0 4px 16px rgba(16,43,106,0.30);
+      pointer-events: none;
+      z-index: 999;
+      transition: transform 300ms ease;
+    }
+    .rni-streak-toast.is-visible { transform: translateX(-50%) translateY(0); }
+    @media (max-width: 600px) {
+      .rni-slot  { min-width: 80px; font-size: 13px; padding: 0 7px; }
+      .rni-arrow { font-size: 16px; }
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       TYPE : encadrer-nombre-entier-niveaux
+    ══════════════════════════════════════════════════════════════════ */
+
+    .eni-bracket-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 20px 10px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .eni-bound-input {
+      width: 140px;
+      height: 64px;
+      border: 2px solid var(--blue);
+      border-radius: 12px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      font-family: inherit;
+      -moz-appearance: textfield;
+      transition: border-color 150ms, box-shadow 150ms;
+    }
+    .eni-bound-input::-webkit-outer-spin-button,
+    .eni-bound-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .eni-bound-input:focus { box-shadow: 0 0 0 3px rgba(16,43,106,0.12); }
+    .eni-bound-input.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.07);
+      color: #15803d;
+    }
+    .eni-bound-input.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+    .eni-bound-input:disabled { cursor: default; }
+    .eni-lt {
+      font-size: 30px;
+      font-weight: 900;
+      color: rgba(16,43,106,0.35);
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .eni-number-display {
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--blue);
+      letter-spacing: -0.01em;
+      text-align: center;
+      min-width: 80px;
+      flex-shrink: 0;
+    }
+    .eni-score-row {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .eni-streak-toast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-80px);
+      background: var(--blue);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 10px 22px;
+      border-radius: 100px;
+      box-shadow: 0 4px 16px rgba(16,43,106,0.30);
+      pointer-events: none;
+      z-index: 999;
+      transition: transform 300ms ease;
+    }
+    .eni-streak-toast.is-visible { transform: translateX(-50%) translateY(0); }
+    @media (max-width: 600px) {
+      .eni-number-display { font-size: 26px; min-width: 60px; }
+      .eni-bound-input    { width: 100px; height: 54px; font-size: 20px; }
+      .eni-lt             { font-size: 22px; }
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       TYPE : arrondir-nombre-entier-niveaux
+    ══════════════════════════════════════════════════════════════════ */
+
+    .ani-number-display {
+      font-size: 42px;
+      font-weight: 900;
+      color: var(--blue);
+      letter-spacing: -0.01em;
+      text-align: center;
+      padding: 24px 20px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 20px;
+      line-height: 1;
+    }
+    .ani-hl-digit {
+      color: var(--red);
+      text-decoration: underline;
+      text-decoration-thickness: 3px;
+      text-underline-offset: 6px;
+      font-weight: 900;
+    }
+    .ani-rule-box {
+      font-size: 13px;
+      color: var(--muted);
+      background: rgba(16,43,106,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      text-align: center;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+    .ani-input-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .ani-answer-input {
+      width: 180px;
+      height: 64px;
+      border: 2px solid var(--blue);
+      border-radius: 12px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      font-family: inherit;
+      -moz-appearance: textfield;
+      transition: border-color 150ms, box-shadow 150ms;
+    }
+    .ani-answer-input::-webkit-outer-spin-button,
+    .ani-answer-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .ani-answer-input:focus { box-shadow: 0 0 0 3px rgba(16,43,106,0.12); }
+    .ani-answer-input.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.07);
+      color: #15803d;
+    }
+    .ani-answer-input.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+    .ani-answer-input:disabled { cursor: default; }
+    .ani-score-row {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 600px) {
+      .ani-number-display { font-size: 30px; }
+      .ani-answer-input   { width: 140px; height: 54px; font-size: 20px; }
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       TYPE : droite-graduee-nombres-entiers-niveaux
+    ══════════════════════════════════════════════════════════════════ */
+
+    .dgn-svg-wrap {
+      overflow-x: auto;
+      padding: 8px 4px 28px;
+      margin-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .dgn-svg-placer { cursor: crosshair; }
+    .dgn-input {
+      width: 160px;
+      height: 56px;
+      border: 2px solid var(--blue);
+      border-radius: 12px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      font-family: inherit;
+      -moz-appearance: textfield;
+      transition: border-color 150ms, box-shadow 150ms;
+    }
+    .dgn-input::-webkit-outer-spin-button,
+    .dgn-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .dgn-input:focus { box-shadow: 0 0 0 3px rgba(16,43,106,0.12); }
+    .dgn-input.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.07);
+      color: #15803d;
+    }
+    .dgn-input.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+    .dgn-input:disabled { cursor: default; }
+    .dgn-status {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      margin: 6px 0 4px;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       TYPE : arrondi-adapte-niveaux
+       Choisir l'arrondi adapté à la situation — 3 niveaux progressifs
+    ══════════════════════════════════════════════════════════════════ */
+    .aa-enonce {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.65;
+      padding: 22px 26px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .aa-choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .aa-choice-btn {
+      flex: 1;
+      min-width: 140px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      line-height: 1.4;
+      transition: border-color 200ms, background 200ms, transform 200ms;
+    }
+    .aa-choice-btn:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.04);
+      transform: translateY(-2px);
+    }
+    .aa-choice-btn:disabled { cursor: default; }
+    .aa-choice-btn.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.09);
+      color: #15803d;
+    }
+    .aa-choice-btn.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+    @media (max-width: 600px) {
+      .aa-enonce      { font-size: 15px; padding: 16px 18px; }
+      .aa-choice-btn  { font-size: 14px; padding: 13px 14px; min-width: 110px; }
+    }
+
   </style>
 </head>
 <body>
@@ -3485,6 +4045,27 @@
       } else if (currentType === "decomposer-nombre-entier-niveaux") {
         dniInitSession();
         return;
+      } else if (currentType === "composer-nombre-entier-niveaux") {
+        cniInitSession();
+        return;
+      } else if (currentType === "comparer-nombres-entiers-niveaux") {
+        cneInitSession();
+        return;
+      } else if (currentType === "encadrer-nombre-entier-niveaux") {
+        eniInitSession();
+        return;
+      } else if (currentType === "ranger-nombres-entiers-niveaux") {
+        rniInitSession();
+        return;
+      } else if (currentType === "droite-graduee-nombres-entiers-niveaux") {
+        dgnInitSession();
+        return;
+      } else if (currentType === "arrondir-nombre-entier-niveaux") {
+        aniInitSession();
+        return;
+      } else if (currentType === "arrondi-adapte-niveaux") {
+        aaInitSession();
+        return;
       } else {
         bankSource = sessionData.bank;
       }
@@ -3633,6 +4214,20 @@
         /* session managed by ctInitSession — no-op here */
       } else if (currentType === "decomposer-nombre-entier-niveaux") {
         /* session managed by dniInitSession — no-op here */
+      } else if (currentType === "composer-nombre-entier-niveaux") {
+        /* session managed by cniInitSession — no-op here */
+      } else if (currentType === "comparer-nombres-entiers-niveaux") {
+        /* session managed by cneInitSession — no-op here */
+      } else if (currentType === "encadrer-nombre-entier-niveaux") {
+        /* session managed by eniInitSession — no-op here */
+      } else if (currentType === "ranger-nombres-entiers-niveaux") {
+        /* session managed by rniInitSession — no-op here */
+      } else if (currentType === "droite-graduee-nombres-entiers-niveaux") {
+        /* session managed by dgnInitSession — no-op here */
+      } else if (currentType === "arrondir-nombre-entier-niveaux") {
+        /* session managed by aniInitSession — no-op here */
+      } else if (currentType === "arrondi-adapte-niveaux") {
+        /* session managed by aaInitSession — no-op here */
       } else if (currentType === "accord-participe-cod") {
         renderAccordParticipeCod(card, q);
       }
@@ -16866,6 +17461,1952 @@
         exerciseSlug: slug, subject, category,
         exerciseType: 'decomposer-nombre-entier-niveaux',
         level,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : composer-nombre-entier-niveaux
+       Mathématiques — Composer un nombre à partir de sa décomposition, 3 niveaux
+       Niveau 1 (CM1) : décomposition canonique → 1 champ numérique
+       Niveau 2 (CM2) : somme de parties non canoniques → 1 champ numérique
+       Niveau 3 (6e)  : somme de produits avec grandes puissances → 1 champ numérique
+    ══════════════════════════════════════════════════════════════════════ */
+
+    let cniState = null;
+
+    function cniInitSession() {
+      cniState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      cniStartLevel(1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cniStartLevel(lv) {
+      const pool = lv === 1 ? [...sessionData.lvl1]
+                 : lv === 2 ? [...sessionData.lvl2]
+                 : [...sessionData.lvl3];
+      const qs = shuffle(pool);
+      cniState = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = qs.length;
+      cniRenderQuestion();
+    }
+
+    function cniRenderQuestion() {
+      const { level, questions, idx, total } = cniState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+      const card = document.getElementById('ex-card');
+      if (level === 1)      cniRenderLvl1(card, q);
+      else if (level === 2) cniRenderLvl2(card, q);
+      else                  cniRenderLvl3(card, q);
+    }
+
+    /* ── Barre d'onglets (réutilise le style .dni-tab) ─────────────── */
+
+    function cniTabBar(activeLv) {
+      return [1,2,3].map(lv =>
+        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
+      ).join('');
+    }
+
+    function cniSetupTabs() {
+      document.querySelectorAll('.dni-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lv = parseInt(btn.dataset.lv, 10);
+          if (lv === cniState.level) return;
+          cniStartLevel(lv);
+        });
+      });
+    }
+
+    /* ── Formatage nombre français (espace tous les 3 chiffres) ─────── */
+
+    function cniFmt(n) { return n.toLocaleString('fr-FR'); }
+
+    /* ══════════════════════════════════════════════════════════════════
+       NIVEAU 1 — décomposition canonique → trouver le nombre entier
+    ══════════════════════════════════════════════════════════════════ */
+
+    function cniRenderLvl1(card, q) {
+      card.innerHTML = `
+        <div class="dni-tab-bar">${cniTabBar(1)}</div>
+        <p class="ex-question-label">Quel est le nombre entier correspondant à cette décomposition ?</p>
+        <div class="cni-decomp-display">${q.display}</div>
+        <div class="cni-input-wrap">
+          <input type="number" class="cni-number-input" id="cni-answer"
+                 placeholder="?" autocomplete="off" min="0">
+        </div>
+        <div class="ex-feedback-area" id="cni-feedback"></div>
+        <button class="ex-validate-btn" id="cni-validate-btn" style="width:100%;margin-top:16px">Vérifier</button>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      cniSetupTabs();
+      const inp = document.getElementById('cni-answer');
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('cni-validate-btn').click(); });
+      setTimeout(() => inp.focus(), 50);
+      document.getElementById('cni-validate-btn').addEventListener('click', () => cniValidateLvl1(q));
+    }
+
+    function cniValidateLvl1(q) {
+      const inp = document.getElementById('cni-answer');
+      if (inp.value === '') return;
+      inp.disabled = true;
+      document.getElementById('cni-validate-btn').disabled = true;
+      const val     = parseInt(inp.value, 10);
+      const isRight = val === q.answer;
+      inp.classList.add(isRight ? 'is-correct' : 'is-wrong');
+      if (isRight) {
+        cniState.score++;
+        const displayParen = q.display.split(' + ').map(t => `(${t})`).join(' + ');
+        document.getElementById('cni-feedback').innerHTML =
+          `<div class="ex-feedback-correct">✅ Bravo ! ${displayParen} = ${cniFmt(q.answer)}</div>`;
+      } else {
+        const hint = [
+          q.mil ? `${q.mil} millier${q.mil > 1 ? 's' : ''} = ${cniFmt(q.mil * 1000)}` : null,
+          q.cen ? `${q.cen} centaine${q.cen > 1 ? 's' : ''} = ${cniFmt(q.cen * 100)}` : null,
+          q.diz ? `${q.diz} dizaine${q.diz > 1 ? 's' : ''} = ${cniFmt(q.diz * 10)}` : null,
+          q.uni ? `${q.uni} unité${q.uni > 1 ? 's' : ''} = ${q.uni}` : null
+        ].filter(Boolean).join(', ');
+        document.getElementById('cni-feedback').innerHTML =
+          `<div class="ex-feedback-wrong">❌ Recompte : ${hint}. Additionne !</div>`;
+      }
+      cniAdvance();
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       NIVEAU 2 — somme de parties non canoniques → trouver le nombre entier
+    ══════════════════════════════════════════════════════════════════ */
+
+    function cniRenderLvl2(card, q) {
+      card.innerHTML = `
+        <div class="dni-tab-bar">${cniTabBar(2)}</div>
+        <p class="ex-question-label">Calcule le nombre entier correspondant à cette somme.</p>
+        <div class="cni-decomp-display">${q.display}</div>
+        <div class="cni-input-wrap">
+          <input type="number" class="cni-number-input" id="cni-answer"
+                 placeholder="?" autocomplete="off" min="0">
+        </div>
+        <div class="ex-feedback-area" id="cni-feedback"></div>
+        <button class="ex-validate-btn" id="cni-validate-btn" style="width:100%;margin-top:16px">Vérifier</button>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      cniSetupTabs();
+      const inp = document.getElementById('cni-answer');
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('cni-validate-btn').click(); });
+      setTimeout(() => inp.focus(), 50);
+      document.getElementById('cni-validate-btn').addEventListener('click', () => cniValidateLvl2(q));
+    }
+
+    function cniValidateLvl2(q) {
+      const inp = document.getElementById('cni-answer');
+      if (inp.value === '') return;
+      inp.disabled = true;
+      document.getElementById('cni-validate-btn').disabled = true;
+      const val     = parseInt(inp.value, 10);
+      const isRight = val === q.answer;
+      inp.classList.add(isRight ? 'is-correct' : 'is-wrong');
+      if (isRight) {
+        cniState.score++;
+        const sorted = [...q.parts].sort((a, b) => b - a);
+        document.getElementById('cni-feedback').innerHTML =
+          `<div class="ex-feedback-correct">✅ Bravo ! ${sorted.map(cniFmt).join(' + ')} = ${cniFmt(q.answer)}</div>`;
+      } else {
+        document.getElementById('cni-feedback').innerHTML =
+          `<div class="ex-feedback-wrong">❌ La bonne réponse est <strong>${cniFmt(q.answer)}</strong>.<br>
+           Vérifie chaque terme : ${q.parts.map(cniFmt).join(' + ')} = ${cniFmt(q.answer)}</div>`;
+      }
+      cniAdvance();
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       NIVEAU 3 — somme de produits avec grandes puissances → trouver le nombre entier
+    ══════════════════════════════════════════════════════════════════ */
+
+    function cniRenderLvl3(card, q) {
+      card.innerHTML = `
+        <div class="dni-tab-bar">${cniTabBar(3)}</div>
+        <p class="ex-question-label">Compose le nombre entier à partir de cette expression.</p>
+        <div class="cni-decomp-display">${q.display}</div>
+        <div class="cni-input-wrap">
+          <input type="number" class="cni-number-input" id="cni-answer"
+                 placeholder="?" autocomplete="off" min="0">
+        </div>
+        <div class="ex-feedback-area" id="cni-feedback"></div>
+        <button class="ex-validate-btn" id="cni-validate-btn" style="width:100%;margin-top:16px">Vérifier</button>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      cniSetupTabs();
+      const inp = document.getElementById('cni-answer');
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('cni-validate-btn').click(); });
+      setTimeout(() => inp.focus(), 50);
+      document.getElementById('cni-validate-btn').addEventListener('click', () => cniValidateLvl3(q));
+    }
+
+    function cniValidateLvl3(q) {
+      const inp = document.getElementById('cni-answer');
+      if (inp.value === '') return;
+      inp.disabled = true;
+      document.getElementById('cni-validate-btn').disabled = true;
+      const val     = parseInt(inp.value, 10);
+      const isRight = val === q.answer;
+      inp.classList.add(isRight ? 'is-correct' : 'is-wrong');
+      if (isRight) {
+        cniState.score++;
+        document.getElementById('cni-feedback').innerHTML =
+          `<div class="ex-feedback-correct">✅ Bravo ! Le résultat est <strong>${cniFmt(q.answer)}</strong></div>`;
+      } else {
+        const nbChiffres = String(q.answer).length;
+        document.getElementById('cni-feedback').innerHTML =
+          `<div class="ex-feedback-wrong">❌ Pas tout à fait. Le résultat est un nombre à <strong>${nbChiffres} chiffre${nbChiffres > 1 ? 's' : ''}</strong>. Calcule chaque produit, puis additionne.</div>`;
+      }
+      cniAdvance();
+    }
+
+    /* ── Avancer ou terminer le niveau ──────────────────────────────── */
+
+    function cniAdvance() {
+      const { idx, total } = cniState;
+      const isLast = idx === total - 1;
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.textContent = isLast ? 'Voir mes résultats' : 'Question suivante →';
+      nextBtn.classList.remove('ex-hidden');
+      nextBtn.onclick = () => {
+        cniState.idx++;
+        if (cniState.idx >= total) {
+          cniShowLevelResults();
+        } else {
+          cniRenderQuestion();
+          document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+    }
+
+    /* ── Résultats de niveau ─────────────────────────────────────────── */
+
+    function cniShowLevelResults() {
+      const { level, score: lvScore, total } = cniState;
+      const pct   = lvScore / total;
+      const s20   = Math.round(pct * 20);
+      const stars = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
+      const isLast = level === 3;
+      const nextLv = level + 1;
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   =
+        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') + ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+
+      const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      let msg, btnsHTML;
+
+      if (isLast) {
+        msg = `🎊 Bravo ! Tu maîtrises la composition des nombres entiers aux 3 niveaux !${stars}`;
+        btnsHTML = `
+          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="cni-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else {
+        msg = `Niveau ${level} terminé !${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="cni-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-secondary" id="cni-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('cni-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cniStartLevel(level);
+      });
+      document.getElementById('cni-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cniStartLevel(nextLv);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'composer-nombre-entier-niveaux',
+        level,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : comparer-nombres-entiers-niveaux
+       Trois niveaux progressifs — boutons < et > — feedback immédiat
+       ════════════════════════════════════════════════════════════════════════ */
+
+    let cneState = null;
+
+    function cneInitSession() {
+      cneState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      if (!document.getElementById('cne-streak-toast')) {
+        const toast = document.createElement('div');
+        toast.id = 'cne-streak-toast';
+        toast.className = 'cne-streak-toast';
+        document.body.appendChild(toast);
+      }
+      cneStartLevel(1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cneStartLevel(lv) {
+      const pool = lv === 1 ? [...sessionData.lvl1]
+                 : lv === 2 ? [...sessionData.lvl2]
+                 : [...sessionData.lvl3];
+      const qs = shuffle(pool);
+      cneState = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length, streak: 0 };
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = qs.length;
+      cneRenderQuestion();
+    }
+
+    function cneRenderQuestion() {
+      const { level, questions, idx, total } = cneState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+      cneRenderCard(document.getElementById('ex-card'), q, level);
+    }
+
+    function cneTabBar(activeLv) {
+      return [1,2,3].map(lv =>
+        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
+      ).join('');
+    }
+
+    function cneSetupTabs() {
+      document.querySelectorAll('.dni-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lv = parseInt(btn.dataset.lv, 10);
+          if (lv === cneState.level) return;
+          cneStartLevel(lv);
+        });
+      });
+    }
+
+    function cneRenderCard(card, q, lv) {
+      const { score, idx } = cneState;
+      const attemptsLabel = idx === 0
+        ? 'Aucun essai pour l\'instant'
+        : `${score} bonne${score !== 1 ? 's' : ''} sur ${idx} essai${idx !== 1 ? 's' : ''}`;
+      card.innerHTML = `
+        <div class="dni-tab-bar">${cneTabBar(lv)}</div>
+        <p class="ex-question-label">Compare les deux nombres — choisis &lt; ou &gt;</p>
+        <div class="cne-numbers-row">
+          <div class="cne-number">${q.left}</div>
+          <div class="cne-sign-slot" id="cne-slot">?</div>
+          <div class="cne-number">${q.right}</div>
+        </div>
+        <div class="cne-sign-btns" id="cne-btns">
+          <button class="cne-sign-btn" data-sign="<">&lt;</button>
+          <button class="cne-sign-btn" data-sign=">">&gt;</button>
+        </div>
+        <div class="ex-feedback-area" id="cne-feedback"></div>
+        <div class="cne-score-bar" id="cne-score">${attemptsLabel}</div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      cneSetupTabs();
+      document.querySelectorAll('.cne-sign-btn').forEach(btn => {
+        btn.addEventListener('click', () => cneHandleAnswer(btn.dataset.sign, q));
+      });
+    }
+
+    function cneHandleAnswer(chosen, q) {
+      document.querySelectorAll('.cne-sign-btn').forEach(b => b.disabled = true);
+      const slot    = document.getElementById('cne-slot');
+      const isRight = chosen === q.answer;
+
+      slot.textContent = chosen;
+      slot.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+      document.querySelectorAll('.cne-sign-btn').forEach(b => {
+        if (b.dataset.sign === q.answer) b.classList.add('is-correct');
+      });
+      if (!isRight) {
+        document.querySelector(`.cne-sign-btn[data-sign="${chosen}"]`)?.classList.add('is-wrong');
+      }
+
+      if (isRight) {
+        cneState.score++;
+        cneState.streak++;
+        document.getElementById('cne-feedback').innerHTML =
+          `<div class="ex-feedback-correct">✅ Exact ! <em>${q.explication}</em></div>`;
+        if (cneState.streak === 3) cneShowStreak();
+      } else {
+        cneState.streak = 0;
+        document.getElementById('cne-feedback').innerHTML =
+          `<div class="ex-feedback-wrong">❌ Pas tout à fait.<br>${q.left} ${q.answer} ${q.right}<br><em>${q.explication}</em></div>`;
+      }
+
+      const attempts = cneState.idx + 1;
+      const sc = cneState.score;
+      document.getElementById('cne-score').textContent =
+        `${sc} bonne${sc !== 1 ? 's' : ''} sur ${attempts} essai${attempts !== 1 ? 's' : ''}`;
+
+      cneAdvance();
+    }
+
+    function cneShowStreak() {
+      const toast = document.getElementById('cne-streak-toast');
+      if (!toast) return;
+      toast.textContent = '🔥 3 de suite !';
+      toast.classList.add('is-visible');
+      setTimeout(() => toast.classList.remove('is-visible'), 2000);
+    }
+
+    function cneAdvance() {
+      const { idx, total } = cneState;
+      const isLast = idx === total - 1;
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.textContent = isLast ? 'Voir mes résultats' : 'Question suivante →';
+      nextBtn.classList.remove('ex-hidden');
+      nextBtn.onclick = () => {
+        cneState.idx++;
+        if (cneState.idx >= total) {
+          cneShowLevelResults();
+        } else {
+          cneRenderQuestion();
+          document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+    }
+
+    function cneShowLevelResults() {
+      const { level, score: lvScore, total } = cneState;
+      const s20   = Math.round(lvScore / total * 20);
+      const stars = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
+      const isLast = level === 3;
+      const nextLv = level + 1;
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent =
+        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') +
+        ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+
+      const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      let msg, btnsHTML;
+
+      if (isLast) {
+        msg = `🎊 Bravo ! Tu maîtrises la comparaison des nombres entiers aux 3 niveaux !${stars}`;
+        btnsHTML = `
+          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="cne-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else {
+        msg = `Niveau ${level} terminé !${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="cne-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-secondary" id="cne-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('cne-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cneStartLevel(level);
+      });
+      document.getElementById('cne-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cneStartLevel(nextLv);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'comparer-nombres-entiers-niveaux',
+        level:        'Niveau ' + level,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : ranger-nombres-entiers-niveaux
+       Mathématiques — Ranger des nombres entiers, 3 niveaux progressifs
+       Niveau 1 (CM1) : 4 nombres à 4 chiffres
+       Niveau 2 (CM2) : 4 nombres à 5–6 chiffres
+       Niveau 3 (6e)  : 5 nombres jusqu'au million et au-delà
+    ══════════════════════════════════════════════════════════════════════ */
+
+    let rniState = null;
+
+    function rniFmt(n) {
+      return n.toLocaleString('fr-FR');
+    }
+
+    function rniOrdinal(i) {
+      return i === 0 ? '1<sup>er</sup>' : `${i + 1}<sup>e</sup>`;
+    }
+
+    function rniTabBar(activeLv) {
+      return [1,2,3].map(lv =>
+        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
+      ).join('');
+    }
+
+    function rniSetupTabs() {
+      document.querySelectorAll('.dni-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lv = parseInt(btn.dataset.lv, 10);
+          if (lv === rniState.level) return;
+          rniStartLevel(lv);
+        });
+      });
+    }
+
+    function rniInitSession() {
+      rniState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      if (!document.getElementById('rni-streak-toast')) {
+        const toast = document.createElement('div');
+        toast.id = 'rni-streak-toast';
+        toast.className = 'rni-streak-toast';
+        document.body.appendChild(toast);
+      }
+      rniStartLevel(1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function rniStartLevel(lv) {
+      const pool = lv === 1 ? [...sessionData.lvl1]
+                 : lv === 2 ? [...sessionData.lvl2]
+                 : [...sessionData.lvl3];
+      const qs = shuffle(pool);
+      rniState = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length, streak: 0 };
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = qs.length;
+      rniRenderQuestion();
+    }
+
+    function rniRenderQuestion() {
+      const { level, questions, idx, total } = rniState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+      rniRenderCard(document.getElementById('ex-card'), q, level);
+    }
+
+    function rniRenderCard(card, q, lv) {
+      const { score, idx } = rniState;
+      const arrow = q.order === 'croissant' ? '&lt;' : '&gt;';
+      const orderLabel = q.order === 'croissant'
+        ? '⬆ Ordre croissant — du plus petit au plus grand'
+        : '⬇ Ordre décroissant — du plus grand au plus petit';
+      const attemptsLabel = idx === 0
+        ? 'Aucun essai pour l\'instant'
+        : `${score} bonne${score !== 1 ? 's' : ''} sur ${idx} essai${idx !== 1 ? 's' : ''}`;
+
+      const shuffled = shuffle([...q.numbers]);
+
+      const bankHtml = shuffled.map(n =>
+        `<button class="ex-word-btn" data-val="${n}">${rniFmt(n)}</button>`
+      ).join('');
+
+      const slotsHtml = q.answer.map((_, i) =>
+        (i > 0 ? `<span class="rni-arrow">${arrow}</span>` : '') +
+        `<div class="rni-slot-wrap">
+          <div class="rni-slot-label">${rniOrdinal(i)}</div>
+          <div class="rni-slot" data-idx="${i}" data-val="">&nbsp;</div>
+        </div>`
+      ).join('');
+
+      card.innerHTML = `
+        <div class="dni-tab-bar">${rniTabBar(lv)}</div>
+        <p class="ex-question-label">Range ces nombres dans l'ordre ${q.order}.</p>
+        <div class="rni-order-badge">${orderLabel}</div>
+        <div class="ex-bank-label">Nombres à placer :</div>
+        <div class="rni-bank" id="rni-bank">${bankHtml}</div>
+        <div class="rni-slots-area">
+          <div class="rni-slots-row" id="rni-slots">${slotsHtml}</div>
+        </div>
+        <div class="ex-feedback-area" id="rni-feedback"></div>
+        <div class="rni-score-row" id="rni-score">${attemptsLabel}</div>
+        <button class="ex-validate-btn" id="rni-validate-btn" style="width:100%;margin-top:12px" disabled>Vérifier</button>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      rniSetupTabs();
+      rniSetupInteraction(q, lv);
+    }
+
+    function rniSetupInteraction(q, lv) {
+      let selectedTile = null;
+      const bankEl  = document.getElementById('rni-bank');
+      const slotsEl = document.getElementById('rni-slots');
+
+      function checkFilled() {
+        const allFilled = [...slotsEl.querySelectorAll('.rni-slot')].every(s => s.dataset.val !== '');
+        document.getElementById('rni-validate-btn').disabled = !allFilled;
+      }
+
+      bankEl.querySelectorAll('.ex-word-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          if (selectedTile?.btn === btn) {
+            btn.classList.remove('is-selected');
+            selectedTile = null;
+            return;
+          }
+          if (selectedTile) selectedTile.btn.classList.remove('is-selected');
+          selectedTile = { btn, val: parseInt(btn.dataset.val, 10) };
+          btn.classList.add('is-selected');
+        });
+      });
+
+      slotsEl.querySelectorAll('.rni-slot').forEach(slot => {
+        slot.addEventListener('click', () => {
+          if (slot.dataset.locked) return;
+          const curVal = slot.dataset.val ? parseInt(slot.dataset.val, 10) : null;
+          if (selectedTile) {
+            if (curVal !== null) {
+              const rb = bankEl.querySelector(`.ex-word-btn[data-val="${curVal}"]`);
+              if (rb) { rb.disabled = false; rb.classList.remove('ex-word-used'); }
+            }
+            slot.dataset.val = selectedTile.val;
+            slot.textContent = rniFmt(selectedTile.val);
+            slot.classList.add('is-filled');
+            selectedTile.btn.disabled = true;
+            selectedTile.btn.classList.add('ex-word-used');
+            selectedTile.btn.classList.remove('is-selected');
+            selectedTile = null;
+          } else if (curVal !== null) {
+            const rb = bankEl.querySelector(`.ex-word-btn[data-val="${curVal}"]`);
+            if (rb) { rb.disabled = false; rb.classList.remove('ex-word-used'); }
+            slot.dataset.val = '';
+            slot.innerHTML = '&nbsp;';
+            slot.classList.remove('is-filled');
+          }
+          checkFilled();
+        });
+      });
+
+      document.getElementById('rni-validate-btn').addEventListener('click', () => rniValidate(q, lv));
+    }
+
+    function rniValidate(q, lv) {
+      const slotsEl = document.getElementById('rni-slots');
+      const slots   = [...slotsEl.querySelectorAll('.rni-slot')];
+
+      slots.forEach(s => { s.dataset.locked = '1'; });
+      document.getElementById('rni-bank').querySelectorAll('.ex-word-btn').forEach(b => b.disabled = true);
+      document.getElementById('rni-validate-btn').disabled = true;
+
+      const placed  = slots.map(s => parseInt(s.dataset.val, 10));
+      const isRight = placed.every((v, i) => v === q.answer[i]);
+      const sep     = q.order === 'croissant' ? ' < ' : ' > ';
+      const answerStr = q.answer.map(rniFmt).join(sep);
+
+      const tips = {
+        1: 'On compare les chiffres des milliers en premier. S\'ils sont égaux, on passe aux centaines, puis aux dizaines, puis aux unités.',
+        2: 'Le nombre qui a le plus de chiffres est le plus grand. S\'ils ont le même nombre de chiffres, on compare rang par rang de gauche à droite.',
+        3: 'Même règle pour de grands nombres : on compare rang par rang de gauche à droite. Le premier chiffre qui diffère l\'emporte.'
+      };
+
+      const feedbackEl = document.getElementById('rni-feedback');
+      if (isRight) {
+        rniState.score++;
+        rniState.streak++;
+        slots.forEach(s => { s.classList.remove('is-filled'); s.classList.add('is-correct'); });
+        feedbackEl.innerHTML = `
+          <div class="ex-feedback-correct">✅ Bravo ! ${answerStr}</div>
+          <div class="ex-note">📌 ${tips[lv]}</div>`;
+        if (rniState.streak > 0 && rniState.streak % 3 === 0) rniShowStreak(rniState.streak);
+      } else {
+        rniState.streak = 0;
+        let correctCount = 0;
+        slots.forEach((s, i) => {
+          if (placed[i] === q.answer[i]) {
+            correctCount++;
+            /* correct position stays neutral (is-filled) per spec */
+          } else {
+            s.classList.remove('is-filled');
+            s.classList.add('is-wrong');
+          }
+        });
+        feedbackEl.innerHTML = `
+          <div class="ex-feedback-wrong">
+            ❌ ${correctCount} bonne${correctCount !== 1 ? 's' : ''} position${correctCount !== 1 ? 's' : ''} sur ${q.answer.length}.<br>
+            Ordre correct : <strong>${answerStr}</strong>
+          </div>
+          <div class="ex-note">📌 ${tips[lv]}</div>`;
+      }
+
+      const sc = rniState.score;
+      const att = rniState.idx + 1;
+      const scoreEl = document.getElementById('rni-score');
+      if (scoreEl) scoreEl.textContent = `${sc} bonne${sc !== 1 ? 's' : ''} sur ${att} essai${att !== 1 ? 's' : ''}`;
+
+      rniAdvance();
+    }
+
+    function rniShowStreak(n) {
+      const toast = document.getElementById('rni-streak-toast');
+      if (!toast) return;
+      toast.textContent = `🔥 ${n} de suite !`;
+      toast.classList.add('is-visible');
+      setTimeout(() => toast.classList.remove('is-visible'), 2000);
+    }
+
+    function rniAdvance() {
+      const { idx, total } = rniState;
+      const isLast = idx === total - 1;
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.textContent = isLast ? 'Voir mes résultats' : 'Question suivante →';
+      nextBtn.classList.remove('ex-hidden');
+      nextBtn.onclick = () => {
+        rniState.idx++;
+        if (rniState.idx >= total) {
+          rniShowLevelResults();
+        } else {
+          rniRenderQuestion();
+          document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+    }
+
+    function rniShowLevelResults() {
+      const { level, score: lvScore, total } = rniState;
+      const s20    = Math.round(lvScore / total * 20);
+      const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
+      const isLast = level === 3;
+      const nextLv = level + 1;
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent =
+        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') +
+        ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+
+      const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      let msg, btnsHTML;
+
+      if (isLast) {
+        msg = `🎊 Bravo ! Tu sais ranger des nombres entiers aux 3 niveaux !${stars}`;
+        btnsHTML = `
+          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="rni-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else {
+        msg = `Niveau ${level} terminé !${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="rni-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-secondary" id="rni-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('rni-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        rniStartLevel(level);
+      });
+      document.getElementById('rni-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        rniStartLevel(nextLv);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'ranger-nombres-entiers-niveaux',
+        level:        'Niveau ' + level,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : encadrer-nombre-entier-niveaux
+       Mathématiques — Encadrer un nombre entier, 3 niveaux progressifs
+       Niveau 1 (CM1) : dizaine / centaine, nombres à 3–4 chiffres
+       Niveau 2 (CM2) : millier / dizaine de milliers, 5–6 chiffres
+       Niveau 3 (6e)  : centaine de milliers / million, jusqu'à 8 chiffres
+    ══════════════════════════════════════════════════════════════════════ */
+
+    let eniState = null;
+
+    const ENI_RANG_ARTICLE = {
+      'dizaine':              'à la dizaine près',
+      'centaine':             'à la centaine près',
+      'millier':              'au millier près',
+      'dizaine de milliers':  'à la dizaine de milliers près',
+      'centaine de milliers': 'à la centaine de milliers près',
+      'million':              'au million près',
+    };
+
+    const ENI_RANG_TIP = {
+      'dizaine':              'Pour encadrer à la dizaine près, on cherche la dizaine juste en dessous et la dizaine juste au-dessus.',
+      'centaine':             'Pour encadrer à la centaine près, on cherche la centaine juste en dessous et la centaine juste au-dessus.',
+      'millier':              'Pour encadrer au millier près, on identifie le chiffre des milliers et on encadre entre X 000 et (X+1) 000.',
+      'dizaine de milliers':  'Pour encadrer à la dizaine de milliers près, on identifie le chiffre des dizaines de milliers et on encadre entre X0 000 et (X+1)0 000.',
+      'centaine de milliers': 'Pour encadrer à la centaine de milliers près, on identifie le chiffre des centaines de milliers et on encadre entre X00 000 et (X+1)00 000.',
+      'million':              'Pour encadrer au million près, on identifie le chiffre des millions et on encadre entre X 000 000 et (X+1) 000 000.',
+    };
+
+    const ENI_RANG_LABEL_LOWER = {
+      'dizaine':              'dizaine la plus proche en dessous',
+      'centaine':             'centaine la plus proche en dessous',
+      'millier':              'millier le plus proche en dessous',
+      'dizaine de milliers':  'dizaine de milliers la plus proche en dessous',
+      'centaine de milliers': 'centaine de milliers la plus proche en dessous',
+      'million':              'million le plus proche en dessous',
+    };
+
+    const ENI_RANG_LABEL_UPPER = {
+      'dizaine':              'dizaine la plus proche au-dessus',
+      'centaine':             'centaine la plus proche au-dessus',
+      'millier':              'millier le plus proche au-dessus',
+      'dizaine de milliers':  'dizaine de milliers la plus proche au-dessus',
+      'centaine de milliers': 'centaine de milliers la plus proche au-dessus',
+      'million':              'million le plus proche au-dessus',
+    };
+
+    function eniFmt(n) {
+      return n.toLocaleString('fr-FR');
+    }
+
+    function eniTabBar(activeLv) {
+      return [1, 2, 3].map(lv =>
+        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
+      ).join('');
+    }
+
+    function eniSetupTabs() {
+      document.querySelectorAll('.dni-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lv = parseInt(btn.dataset.lv, 10);
+          if (lv === eniState.level) return;
+          eniStartLevel(lv);
+        });
+      });
+    }
+
+    function eniInitSession() {
+      eniState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      if (!document.getElementById('eni-streak-toast')) {
+        const toast = document.createElement('div');
+        toast.id = 'eni-streak-toast';
+        toast.className = 'eni-streak-toast';
+        document.body.appendChild(toast);
+      }
+      eniStartLevel(1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function eniStartLevel(lv) {
+      const pool = lv === 1 ? [...sessionData.lvl1]
+                 : lv === 2 ? [...sessionData.lvl2]
+                 : [...sessionData.lvl3];
+      const qs = shuffle(pool);
+      eniState = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length, streak: 0 };
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = qs.length;
+      eniRenderQuestion();
+    }
+
+    function eniRenderQuestion() {
+      const { level, questions, idx, total } = eniState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+      eniRenderCard(document.getElementById('ex-card'), q, level);
+    }
+
+    function eniRenderCard(card, q, lv) {
+      const { score, idx } = eniState;
+      const attemptsLabel = idx === 0
+        ? 'Aucun essai pour l\'instant'
+        : `${score} bonne${score !== 1 ? 's' : ''} sur ${idx} essai${idx !== 1 ? 's' : ''}`;
+      const article = ENI_RANG_ARTICLE[q.rang] || q.rang;
+      card.innerHTML = `
+        <div class="dni-tab-bar">${eniTabBar(lv)}</div>
+        <p class="ex-question-label">Encadre ${q.display} ${article}</p>
+        <div class="eni-bracket-row">
+          <input type="number" class="eni-bound-input" id="eni-lower" placeholder="?" min="0" autocomplete="off" inputmode="numeric" />
+          <span class="eni-lt">&lt;</span>
+          <div class="eni-number-display">${q.display}</div>
+          <span class="eni-lt">&lt;</span>
+          <input type="number" class="eni-bound-input" id="eni-upper" placeholder="?" min="0" autocomplete="off" inputmode="numeric" />
+        </div>
+        <div class="ex-feedback-area" id="eni-feedback"></div>
+        <div class="eni-score-row" id="eni-score">${attemptsLabel}</div>
+        <button class="ex-validate-btn" id="eni-validate-btn" style="width:100%;margin-top:12px" disabled>Vérifier</button>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      eniSetupTabs();
+
+      const lowerInput  = document.getElementById('eni-lower');
+      const upperInput  = document.getElementById('eni-upper');
+      const validateBtn = document.getElementById('eni-validate-btn');
+
+      function checkReady() {
+        validateBtn.disabled = !(lowerInput.value !== '' && upperInput.value !== '');
+      }
+      lowerInput.addEventListener('input', checkReady);
+      upperInput.addEventListener('input', checkReady);
+
+      function onEnter(e) {
+        if (e.key === 'Enter' && !validateBtn.disabled) eniValidate(q, lv);
+      }
+      lowerInput.addEventListener('keydown', onEnter);
+      upperInput.addEventListener('keydown', onEnter);
+
+      validateBtn.addEventListener('click', () => eniValidate(q, lv));
+      lowerInput.focus();
+    }
+
+    function eniValidate(q, lv) {
+      const lowerInput  = document.getElementById('eni-lower');
+      const upperInput  = document.getElementById('eni-upper');
+      const validateBtn = document.getElementById('eni-validate-btn');
+
+      lowerInput.disabled  = true;
+      upperInput.disabled  = true;
+      validateBtn.disabled = true;
+
+      const enteredLower = parseInt(lowerInput.value, 10);
+      const enteredUpper = parseInt(upperInput.value, 10);
+      const lowerOk = enteredLower === q.lower;
+      const upperOk = enteredUpper === q.upper;
+      const isRight = lowerOk && upperOk;
+
+      const lFmt       = eniFmt(q.lower);
+      const uFmt       = eniFmt(q.upper);
+      const tip        = ENI_RANG_TIP[q.rang]         || '';
+      const lLabel     = ENI_RANG_LABEL_LOWER[q.rang] || 'borne inférieure';
+      const uLabel     = ENI_RANG_LABEL_UPPER[q.rang] || 'borne supérieure';
+      const feedbackEl = document.getElementById('eni-feedback');
+
+      if (isRight) {
+        eniState.score++;
+        eniState.streak++;
+        lowerInput.classList.add('is-correct');
+        upperInput.classList.add('is-correct');
+        feedbackEl.innerHTML = `
+          <div class="ex-feedback-correct">✅ Bravo ! ${lFmt} &lt; ${q.display} &lt; ${uFmt}</div>
+          <div class="ex-note">📌 ${lLabel} : ${lFmt} — ${uLabel} : ${uFmt}<br>${tip}</div>`;
+        if (eniState.streak > 0 && eniState.streak % 3 === 0) eniShowStreak(eniState.streak);
+      } else {
+        eniState.streak = 0;
+        lowerInput.classList.add(lowerOk ? 'is-correct' : 'is-wrong');
+        upperInput.classList.add(upperOk ? 'is-correct' : 'is-wrong');
+
+        let wrongMsg;
+        if (!lowerOk && !upperOk) {
+          wrongMsg = 'Les deux bornes ne sont pas correctes.';
+        } else if (!lowerOk) {
+          wrongMsg = 'La borne inférieure (à gauche) n\'est pas correcte.';
+        } else {
+          wrongMsg = 'La borne supérieure (à droite) n\'est pas correcte.';
+        }
+        feedbackEl.innerHTML = `
+          <div class="ex-feedback-wrong">❌ ${wrongMsg}</div>
+          <div class="ex-note">📌 ${tip}</div>`;
+      }
+
+      const sc  = eniState.score;
+      const att = eniState.idx + 1;
+      const scoreEl = document.getElementById('eni-score');
+      if (scoreEl) scoreEl.textContent = `${sc} bonne${sc !== 1 ? 's' : ''} sur ${att} essai${att !== 1 ? 's' : ''}`;
+
+      eniAdvance();
+    }
+
+    function eniShowStreak(n) {
+      const toast = document.getElementById('eni-streak-toast');
+      if (!toast) return;
+      toast.textContent = `🔥 ${n} de suite !`;
+      toast.classList.add('is-visible');
+      setTimeout(() => toast.classList.remove('is-visible'), 2000);
+    }
+
+    function eniAdvance() {
+      const { idx, total } = eniState;
+      const isLast  = idx === total - 1;
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.textContent = isLast ? 'Voir mes résultats' : 'Question suivante →';
+      nextBtn.classList.remove('ex-hidden');
+      nextBtn.onclick = () => {
+        eniState.idx++;
+        if (eniState.idx >= total) {
+          eniShowLevelResults();
+        } else {
+          eniRenderQuestion();
+          document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+    }
+
+    function eniShowLevelResults() {
+      const { level, score: lvScore, total } = eniState;
+      const s20    = Math.round(lvScore / total * 20);
+      const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
+      const isLast = level === 3;
+      const nextLv = level + 1;
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent =
+        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') +
+        ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+
+      const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      let msg, btnsHTML;
+
+      if (isLast) {
+        msg = `🎊 Bravo ! Tu sais encadrer des nombres entiers aux 3 niveaux !${stars}`;
+        btnsHTML = `
+          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="eni-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else {
+        msg = `Niveau ${level} terminé !${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="eni-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-secondary" id="eni-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('eni-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        eniStartLevel(level);
+      });
+      document.getElementById('eni-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        eniStartLevel(nextLv);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'encadrer-nombre-entier-niveaux',
+        level:        'Niveau ' + level,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       DROITE GRADUÉE — NOMBRES ENTIERS
+       type : droite-graduee-nombres-entiers-niveaux
+       Niveau 1 : nombres à 3–4 chiffres, 2/4/5/6/10 intervalles
+       Niveau 2 : nombres à 5–6 chiffres, 4/5/6/10 intervalles
+       Niveau 3 : jusqu'au million et au-delà, 2/4/5/10 intervalles
+    ═══════════════════════════════════════════════════════════════════════ */
+
+    let dgnState = null;
+
+    function dgnFmt(n) {
+      if (n < 1000) return String(n);
+      return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+
+    function dgnBuildSvg(q, liveRaw, answered, isRight) {
+      const { min, max, intervalles, pas, arrow, answer } = q;
+      const W = 660, PAD_L = 60, LINE_W = 540, LINE_Y = 90, H = 120;
+      const BOX_H = 26, BOX_TOP = 10, BOX_BOT = BOX_TOP + BOX_H;
+      const BOX_CY = BOX_TOP + BOX_H / 2;
+      const tickSpacing = LINE_W / intervalles;
+      const arrowIdx = Math.round((arrow - min) / pas);
+      const arrowX = PAD_L + arrowIdx * tickSpacing;
+      const bw = n => Math.max(44, dgnFmt(n).length * 7 + 18);
+
+      let s = '';
+
+      /* Axe */
+      s += `<line x1="${PAD_L}" y1="${LINE_Y}" x2="${PAD_L + LINE_W + 10}" y2="${LINE_Y}" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>`;
+      s += `<polygon points="${PAD_L+LINE_W+18},${LINE_Y} ${PAD_L+LINE_W+8},${LINE_Y-5} ${PAD_L+LINE_W+8},${LINE_Y+5}" fill="#94a3b8"/>`;
+
+      /* Graduations — aucune étiquette sur les graduations intermédiaires */
+      for (let i = 0; i <= intervalles; i++) {
+        const x = PAD_L + i * tickSpacing;
+        const isEndpoint = i === 0 || i === intervalles;
+        const isTarget   = i === arrowIdx;
+        const tickH      = isEndpoint ? 22 : 14;
+        const color = (answered && isTarget)
+          ? (isRight ? '#16a34a' : '#dc2626')
+          : (isEndpoint ? '#102b6a' : '#64748b');
+        s += `<line x1="${x}" y1="${LINE_Y - tickH / 2}" x2="${x}" y2="${LINE_Y + tickH / 2}" stroke="${color}" stroke-width="${isEndpoint ? 2.5 : 1.5}"/>`;
+      }
+
+      /* Encadré borne gauche + connecteur pointillé */
+      const minW = bw(min), minX = PAD_L;
+      s += `<rect x="${minX - minW/2}" y="${BOX_TOP}" width="${minW}" height="${BOX_H}" rx="4" fill="white" stroke="#102b6a" stroke-width="1.5"/>`;
+      s += `<text x="${minX}" y="${BOX_CY}" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#102b6a">${dgnFmt(min)}</text>`;
+      s += `<line x1="${minX}" y1="${BOX_BOT}" x2="${minX}" y2="${LINE_Y - 12}" stroke="#102b6a" stroke-width="1" stroke-dasharray="3,2"/>`;
+
+      /* Encadré borne droite + connecteur pointillé */
+      const maxW = bw(max), maxX = PAD_L + LINE_W;
+      s += `<rect x="${maxX - maxW/2}" y="${BOX_TOP}" width="${maxW}" height="${BOX_H}" rx="4" fill="white" stroke="#102b6a" stroke-width="1.5"/>`;
+      s += `<text x="${maxX}" y="${BOX_CY}" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#102b6a">${dgnFmt(max)}</text>`;
+      s += `<line x1="${maxX}" y1="${BOX_BOT}" x2="${maxX}" y2="${LINE_Y - 12}" stroke="#102b6a" stroke-width="1" stroke-dasharray="3,2"/>`;
+
+      /* Encadré réponse + flèche vers la graduation cible */
+      const ansW = bw(answer);
+      let boxStroke, boxFill, textFill, displayVal;
+      if (!answered) {
+        const hasVal  = liveRaw !== null && liveRaw !== '';
+        boxStroke  = hasVal ? '#2563eb' : '#94a3b8';
+        boxFill    = hasVal ? 'rgba(37,99,235,0.05)' : 'white';
+        textFill   = hasVal ? '#1d4ed8' : '#9ca3af';
+        displayVal = hasVal ? liveRaw : '?';
+      } else if (isRight) {
+        boxStroke  = '#16a34a';
+        boxFill    = 'rgba(22,163,74,0.09)';
+        textFill   = '#15803d';
+        displayVal = dgnFmt(answer);
+      } else {
+        boxStroke  = '#dc2626';
+        boxFill    = 'rgba(220,38,38,0.06)';
+        textFill   = '#dc2626';
+        const p = parseInt(liveRaw, 10);
+        displayVal = isNaN(p) ? (liveRaw || '?') : dgnFmt(p);
+      }
+      s += `<rect x="${arrowX - ansW/2}" y="${BOX_TOP}" width="${ansW}" height="${BOX_H}" rx="4" fill="${boxFill}" stroke="${boxStroke}" stroke-width="2.2"/>`;
+      s += `<text x="${arrowX}" y="${BOX_CY}" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="${textFill}">${displayVal}</text>`;
+      /* Tige de la flèche */
+      s += `<line x1="${arrowX}" y1="${BOX_BOT}" x2="${arrowX}" y2="${LINE_Y - 12}" stroke="${boxStroke}" stroke-width="2"/>`;
+      /* Pointe de la flèche (triangle vers le bas, tip à LINE_Y) */
+      s += `<polygon points="${arrowX},${LINE_Y} ${arrowX - 7},${LINE_Y - 12} ${arrowX + 7},${LINE_Y - 12}" fill="${boxStroke}"/>`;
+
+      return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block;max-width:100%;overflow:visible">${s}</svg>`;
+    }
+
+    function dgnTabBar(activeLv) {
+      return [1, 2, 3].map(lv =>
+        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
+      ).join('');
+    }
+
+    function dgnSetupTabs() {
+      document.querySelectorAll('.dni-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lv = parseInt(btn.dataset.lv, 10);
+          if (lv === dgnState.level) return;
+          dgnStartLevel(lv);
+        });
+      });
+    }
+
+    function dgnRenderCard(card, q, lv) {
+      const { score, idx } = dgnState;
+      const attemptsLabel = idx === 0
+        ? 'Aucun essai pour l\'instant'
+        : `${score} bonne${score !== 1 ? 's' : ''} sur ${idx} essai${idx !== 1 ? 's' : ''}`;
+
+      card.innerHTML = `
+        <div class="dni-tab-bar">${dgnTabBar(lv)}</div>
+        <p class="ex-question-label">Quelle est la valeur indiquée par la flèche ?</p>
+        <div class="dgn-svg-wrap" id="dgn-svg-wrap">${dgnBuildSvg(q, null, false, false)}</div>
+        <div style="text-align:center;margin-top:18px">
+          <input type="number" id="dgn-answer" class="dgn-input"
+                 placeholder="?" inputmode="numeric" autocomplete="off" min="0"/>
+        </div>
+        <div class="ex-feedback-area" id="dgn-feedback"></div>
+        <div class="eni-score-row" id="dgn-score">${attemptsLabel}</div>
+        <button class="ex-validate-btn" id="dgn-validate-btn" style="width:100%;margin-top:12px" disabled>Vérifier</button>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      dgnSetupTabs();
+
+      const svgWrap = document.getElementById('dgn-svg-wrap');
+      const input   = document.getElementById('dgn-answer');
+      const vBtn    = document.getElementById('dgn-validate-btn');
+      let answered  = false;
+
+      input.addEventListener('input', () => {
+        const raw = input.value.trim();
+        svgWrap.innerHTML = dgnBuildSvg(q, raw || null, false, false);
+        vBtn.disabled = raw === '';
+      });
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !vBtn.disabled && !answered) {
+          answered = true;
+          dgnValidate(q, lv);
+        }
+      });
+      vBtn.addEventListener('click', () => {
+        if (answered) return;
+        answered = true;
+        dgnValidate(q, lv);
+      });
+      setTimeout(() => input.focus(), 0);
+    }
+
+    function dgnValidate(q, lv) {
+      const svgWrap    = document.getElementById('dgn-svg-wrap');
+      const input      = document.getElementById('dgn-answer');
+      const vBtn       = document.getElementById('dgn-validate-btn');
+      const feedbackEl = document.getElementById('dgn-feedback');
+
+      input.disabled = true;
+      vBtn.disabled  = true;
+
+      const entered = parseInt(input.value, 10);
+      const isRight = entered === q.answer;
+      svgWrap.innerHTML = dgnBuildSvg(q, input.value, true, isRight);
+
+      if (isRight) {
+        input.classList.add('is-correct');
+        feedbackEl.innerHTML = `
+          <div class="ex-feedback-correct">
+            ✅ Bravo ! La flèche pointe sur <strong>${dgnFmt(q.answer)}</strong>.
+            Le pas est de <strong>${dgnFmt(q.pas)}</strong> : il y a
+            <strong>${q.intervalles} intervalle${q.intervalles > 1 ? 's' : ''}</strong>
+            entre <strong>${dgnFmt(q.min)}</strong> et <strong>${dgnFmt(q.max)}</strong>.
+          </div>`;
+      } else {
+        input.classList.add('is-wrong');
+        feedbackEl.innerHTML = `
+          <div class="ex-feedback-wrong">
+            ❌ La bonne réponse est <strong>${dgnFmt(q.answer)}</strong>.
+            Méthode : il y a <strong>${q.intervalles} intervalle${q.intervalles > 1 ? 's' : ''}</strong>
+            entre <strong>${dgnFmt(q.min)}</strong> et <strong>${dgnFmt(q.max)}</strong>,
+            donc le pas vaut (<strong>${dgnFmt(q.max)}</strong> − <strong>${dgnFmt(q.min)}</strong>)
+            ÷ <strong>${q.intervalles}</strong> = <strong>${dgnFmt(q.pas)}</strong>.
+          </div>`;
+      }
+
+      if (isRight) {
+        dgnState.score++;
+        dgnState.streak++;
+        if (dgnState.streak % 3 === 0) dgnShowStreak(dgnState.streak);
+      } else {
+        dgnState.streak = 0;
+      }
+
+      const sc  = dgnState.score;
+      const att = dgnState.idx + 1;
+      const scoreEl = document.getElementById('dgn-score');
+      if (scoreEl) scoreEl.textContent =
+        `${sc} bonne${sc !== 1 ? 's' : ''} sur ${att} essai${att !== 1 ? 's' : ''}`;
+
+      dgnAdvance();
+    }
+
+    function dgnAdvance() {
+      const { idx, total } = dgnState;
+      const isLast  = idx === total - 1;
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.textContent = isLast ? 'Voir mes résultats' : 'Question suivante →';
+      nextBtn.classList.remove('ex-hidden');
+      nextBtn.onclick = () => {
+        dgnState.idx++;
+        if (dgnState.idx >= total) {
+          dgnShowLevelResults();
+        } else {
+          dgnRenderQuestion();
+          document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+    }
+
+    function dgnShowStreak(n) {
+      const toast = document.getElementById('dgn-streak-toast');
+      if (!toast) return;
+      toast.textContent = `🔥 ${n} de suite !`;
+      toast.classList.add('is-visible');
+      setTimeout(() => toast.classList.remove('is-visible'), 2000);
+    }
+
+    function dgnRenderQuestion() {
+      const { level, questions, idx, total } = dgnState;
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+      dgnRenderCard(document.getElementById('ex-card'), questions[idx], level);
+    }
+
+    function dgnStartLevel(lv) {
+      const pool = lv === 1 ? [...sessionData.lvl1]
+                 : lv === 2 ? [...sessionData.lvl2]
+                 :             [...sessionData.lvl3];
+      dgnState = { level: lv, questions: pool, idx: 0, score: 0, total: pool.length, streak: 0 };
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent     = pool.length;
+      document.getElementById('ex-bar-fill').style.width = '0%';
+      dgnRenderQuestion();
+    }
+
+    function dgnInitSession() {
+      dgnState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      if (!document.getElementById('dgn-streak-toast')) {
+        const toast = document.createElement('div');
+        toast.id        = 'dgn-streak-toast';
+        toast.className = 'eni-streak-toast';
+        document.body.appendChild(toast);
+      }
+      dgnStartLevel(1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function dgnShowLevelResults() {
+      const { level, score: lvScore, total } = dgnState;
+      const s20    = Math.round(lvScore / total * 20);
+      const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
+      const isLast = level === 3;
+      const nextLv = level + 1;
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   =
+        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') +
+        ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+
+      const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      let msg, btnsHTML;
+
+      if (isLast) {
+        msg = `🎊 Bravo ! Tu sais lire des nombres sur une droite graduée aux 3 niveaux !${stars}`;
+        btnsHTML = `
+          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="dgn-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else {
+        msg = `Niveau ${level} terminé !${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="dgn-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-secondary" id="dgn-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('dgn-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        dgnStartLevel(level);
+      });
+      document.getElementById('dgn-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        dgnStartLevel(nextLv);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'droite-graduee-nombres-entiers-niveaux',
+        level:        'Niveau ' + level,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : arrondir-nombre-entier-niveaux
+       Mathématiques — Arrondir un nombre entier, 3 niveaux progressifs
+       Niveau 1 : à la dizaine près  (chiffre décisif = unités)
+       Niveau 2 : à la centaine près (chiffre décisif = dizaines)
+       Niveau 3 : au millier près    (chiffre décisif = centaines)
+    ══════════════════════════════════════════════════════════════════════ */
+
+    let aniState = null;
+
+    const ANI_RANG = {
+      1: { rang: 'dizaine',  rangInf: 'unités',    article: 'à la dizaine près',  rankFromRight: 0 },
+      2: { rang: 'centaine', rangInf: 'dizaines',   article: 'à la centaine près', rankFromRight: 1 },
+      3: { rang: 'millier',  rangInf: 'centaines',  article: 'au millier près',    rankFromRight: 2 },
+    };
+
+    function aniFmt(n) { return n.toLocaleString('fr-FR'); }
+
+    function aniHighlightDisplay(displayStr, rankFromRight) {
+      const digits = displayStr.replace(/[\s ]/g, '');
+      const hlIdx  = digits.length - 1 - rankFromRight;
+      let result = '';
+      let dc = 0;
+      for (let i = 0; i < displayStr.length; i++) {
+        const ch = displayStr[i];
+        if (ch === ' ' || ch === ' ') {
+          result += ch;
+        } else {
+          result += dc === hlIdx
+            ? `<span class="ani-hl-digit">${ch}</span>`
+            : ch;
+          dc++;
+        }
+      }
+      return result;
+    }
+
+    function aniTabBar(activeLv) {
+      return [1, 2, 3].map(lv =>
+        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
+      ).join('');
+    }
+
+    function aniSetupTabs() {
+      document.querySelectorAll('.dni-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lv = parseInt(btn.dataset.lv, 10);
+          if (lv === aniState.level) return;
+          aniStartLevel(lv);
+        });
+      });
+    }
+
+    function aniInitSession() {
+      aniState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      if (!document.getElementById('ani-streak-toast')) {
+        const toast = document.createElement('div');
+        toast.id        = 'ani-streak-toast';
+        toast.className = 'eni-streak-toast';
+        document.body.appendChild(toast);
+      }
+      aniStartLevel(1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function aniStartLevel(lv) {
+      const pool = lv === 1 ? [...sessionData.lvl1]
+                 : lv === 2 ? [...sessionData.lvl2]
+                 :              [...sessionData.lvl3];
+      aniState = { level: lv, questions: pool, idx: 0, score: 0, total: pool.length, streak: 0 };
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent     = pool.length;
+      document.getElementById('ex-bar-fill').style.width = '0%';
+      aniRenderQuestion();
+    }
+
+    function aniRenderQuestion() {
+      const { level, questions, idx, total } = aniState;
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+      aniRenderCard(document.getElementById('ex-card'), questions[idx], level);
+    }
+
+    function aniRenderCard(card, q, lv) {
+      const { score, idx } = aniState;
+      const r = ANI_RANG[lv];
+      const attemptsLabel = idx === 0
+        ? 'Aucun essai pour l\'instant'
+        : `${score} bonne${score !== 1 ? 's' : ''} sur ${idx} essai${idx !== 1 ? 's' : ''}`;
+      const hlDisplay = aniHighlightDisplay(q.display, r.rankFromRight);
+
+      card.innerHTML = `
+        <div class="dni-tab-bar">${aniTabBar(lv)}</div>
+        <p class="ex-question-label">Arrondis ce nombre ${r.article}</p>
+        <div class="ani-number-display">${hlDisplay}</div>
+        <div class="ani-rule-box">
+          Si le chiffre des <strong>${r.rangInf}</strong> est ≥ 5, on arrondit au-dessus.<br>
+          S'il est &lt; 5, on arrondit en dessous.
+        </div>
+        <div class="ani-input-row">
+          <input type="number" class="ani-answer-input" id="ani-input"
+                 placeholder="?" min="0" autocomplete="off" inputmode="numeric" />
+          <button class="ex-validate-btn" id="ani-validate-btn" disabled>Vérifier</button>
+        </div>
+        <div class="ex-feedback-area" id="ani-feedback"></div>
+        <div class="ani-score-row" id="ani-score">${attemptsLabel}</div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      aniSetupTabs();
+
+      const input       = document.getElementById('ani-input');
+      const validateBtn = document.getElementById('ani-validate-btn');
+
+      input.addEventListener('input', () => {
+        validateBtn.disabled = input.value === '';
+      });
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !validateBtn.disabled) aniValidate(q, lv);
+      });
+      validateBtn.addEventListener('click', () => aniValidate(q, lv));
+      setTimeout(() => input.focus(), 50);
+    }
+
+    function aniValidate(q, lv) {
+      const input       = document.getElementById('ani-input');
+      const validateBtn = document.getElementById('ani-validate-btn');
+      const feedbackEl  = document.getElementById('ani-feedback');
+
+      input.disabled       = true;
+      validateBtn.disabled = true;
+
+      const entered   = parseInt(input.value.replace(/[\s ]/g, ''), 10);
+      const isRight   = entered === q.answer;
+      const r         = ANI_RANG[lv];
+      const c         = q.decisive;
+      const answerFmt = aniFmt(q.answer);
+
+      input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+      let feedbackHtml;
+      if (isRight) {
+        aniState.score++;
+        aniState.streak++;
+        const direction = c >= 5 ? 'au-dessus' : 'en dessous';
+        const special   = c === 5
+          ? ' Le chiffre est exactement 5 : par convention, on arrondit au-dessus.'
+          : '';
+        feedbackHtml = `
+          <div class="ex-feedback-correct">
+            ✅ Bravo ! ${q.display} arrondi ${r.article} = <strong>${answerFmt}</strong>.<br>
+            Le chiffre des ${r.rangInf} était <strong>${c}</strong>,
+            donc on arrondit <strong>${direction}</strong>.${special}
+          </div>`;
+        if (aniState.streak > 0 && aniState.streak % 3 === 0) aniShowStreak(aniState.streak);
+      } else {
+        aniState.streak = 0;
+        let reason;
+        if (c === 5) {
+          reason = `Il est exactement 5 : par convention, on arrondit au-dessus → on ajoute 1 à la ${r.rang} et on met 0 à droite.`;
+        } else if (c > 5) {
+          reason = `Il est ≥ 5, donc on ajoute 1 à la ${r.rang} et on met 0 à droite.`;
+        } else {
+          reason = `Il est < 5, donc on garde la ${r.rang} et on met 0 à droite.`;
+        }
+        feedbackHtml = `
+          <div class="ex-feedback-wrong">
+            ❌ Le chiffre des ${r.rangInf} de ${q.display} est <strong>${c}</strong>.<br>
+            ${reason}<br>
+            La bonne réponse était : <strong>${answerFmt}</strong>.
+          </div>`;
+      }
+
+      feedbackEl.innerHTML = feedbackHtml;
+
+      const sc  = aniState.score;
+      const att = aniState.idx + 1;
+      const scoreEl = document.getElementById('ani-score');
+      if (scoreEl) scoreEl.textContent =
+        `${sc} bonne${sc !== 1 ? 's' : ''} sur ${att} essai${att !== 1 ? 's' : ''}`;
+
+      aniAdvance();
+    }
+
+    function aniShowStreak(n) {
+      const toast = document.getElementById('ani-streak-toast');
+      if (!toast) return;
+      toast.textContent = `${n} de suite !`;
+      toast.classList.add('is-visible');
+      setTimeout(() => toast.classList.remove('is-visible'), 2000);
+    }
+
+    function aniAdvance() {
+      const { idx, total } = aniState;
+      const isLast  = idx === total - 1;
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.textContent = isLast ? 'Voir mes résultats' : 'Question suivante →';
+      nextBtn.classList.remove('ex-hidden');
+      nextBtn.onclick = () => {
+        aniState.idx++;
+        if (aniState.idx >= total) {
+          aniShowLevelResults();
+        } else {
+          aniRenderQuestion();
+          document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+    }
+
+    function aniShowLevelResults() {
+      const { level, score: lvScore, total } = aniState;
+      const s20    = Math.round(lvScore / total * 20);
+      const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
+      const isLast = level === 3;
+      const nextLv = level + 1;
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent =
+        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') +
+        ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+
+      const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      let msg, btnsHTML;
+
+      if (isLast) {
+        msg = `🎊 Bravo ! Tu sais arrondir des nombres entiers aux 3 niveaux !${stars}`;
+        btnsHTML = `
+          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="ani-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else {
+        msg = `Niveau ${level} terminé !${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="ani-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-secondary" id="ani-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('ani-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        aniStartLevel(level);
+      });
+      document.getElementById('ani-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        aniStartLevel(nextLv);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'arrondir-nombre-entier-niveaux',
+        level:        'Niveau ' + level,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : arrondi-adapte-niveaux
+       Mathématiques — Choisir l'arrondi adapté à la situation
+       Niveau 1 : 2 choix — excès ou défaut, 2 valeurs proches
+       Niveau 2 : 3 choix — choisir le rang d'arrondi adapté au contexte
+       Niveau 3 : 2–3 choix — raisonnement sur excès / défaut + rang
+    ══════════════════════════════════════════════════════════════════════ */
+
+    let aaState = null;
+
+    function aaTabBar(activeLv) {
+      return [1,2,3].map(lv =>
+        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
+      ).join('');
+    }
+
+    function aaSetupTabs() {
+      document.querySelectorAll('.dni-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lv = parseInt(btn.dataset.lv, 10);
+          if (lv === aaState.level) return;
+          aaStartLevel(lv);
+        });
+      });
+    }
+
+    function aaInitSession() {
+      aaState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      if (!document.getElementById('aa-streak-toast')) {
+        const toast = document.createElement('div');
+        toast.id        = 'aa-streak-toast';
+        toast.className = 'cne-streak-toast';
+        document.body.appendChild(toast);
+      }
+      aaStartLevel(1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function aaStartLevel(lv) {
+      const pool = lv === 1 ? [...sessionData.lvl1]
+                 : lv === 2 ? [...sessionData.lvl2]
+                 :             [...sessionData.lvl3];
+      /* Questions dans l'ordre défini — pas de mélange aléatoire */
+      aaState = { level: lv, questions: pool, idx: 0, score: 0, total: pool.length, streak: 0 };
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent     = pool.length;
+      document.getElementById('ex-bar-fill').style.width = '0%';
+      aaRenderQuestion();
+    }
+
+    function aaRenderQuestion() {
+      const { level, questions, idx, total } = aaState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+      aaRenderCard(document.getElementById('ex-card'), q, level);
+    }
+
+    function aaRenderCard(card, q, lv) {
+      const { score, idx } = aaState;
+      const attemptsLabel = idx === 0
+        ? 'Aucun essai pour l\'instant'
+        : `${score} bonne${score !== 1 ? 's' : ''} sur ${idx} essai${idx !== 1 ? 's' : ''}`;
+
+      const choicesHtml = q.choices.map((c, i) =>
+        `<button class="aa-choice-btn" data-idx="${i}">${c}</button>`
+      ).join('');
+
+      card.innerHTML = `
+        <div class="dni-tab-bar">${aaTabBar(lv)}</div>
+        <p class="ex-question-label">Lis le problème et choisis l'arrondi le plus adapté à la situation.</p>
+        <div class="aa-enonce">${q.enonce}</div>
+        <div class="aa-choices" id="aa-choices">${choicesHtml}</div>
+        <div class="ex-feedback-area" id="aa-feedback"></div>
+        <div class="cne-score-bar" id="aa-score">${attemptsLabel}</div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      aaSetupTabs();
+      document.querySelectorAll('.aa-choice-btn').forEach(btn => {
+        btn.addEventListener('click', () => aaHandleAnswer(btn, q));
+      });
+    }
+
+    function aaHandleAnswer(chosenBtn, q) {
+      document.querySelectorAll('.aa-choice-btn').forEach(b => b.disabled = true);
+      const chosenIdx  = parseInt(chosenBtn.dataset.idx, 10);
+      const correctIdx = q.choices.indexOf(q.answer);
+      const isRight    = chosenIdx === correctIdx;
+
+      document.querySelectorAll('.aa-choice-btn').forEach(b => {
+        if (parseInt(b.dataset.idx, 10) === correctIdx) b.classList.add('is-correct');
+      });
+      if (!isRight) chosenBtn.classList.add('is-wrong');
+
+      const feedback = document.getElementById('aa-feedback');
+      if (isRight) {
+        aaState.score++;
+        aaState.streak++;
+        feedback.innerHTML =
+          `<div class="ex-feedback-correct">✅ Bravo ! ${q.explication}</div>`;
+        if (aaState.streak > 0 && aaState.streak % 3 === 0) aaShowStreak(aaState.streak);
+      } else {
+        aaState.streak = 0;
+        feedback.innerHTML =
+          `<div class="ex-feedback-wrong">❌ Pas tout à fait. ${q.explication}</div>`;
+      }
+
+      const attempts = aaState.idx + 1;
+      const sc       = aaState.score;
+      document.getElementById('aa-score').textContent =
+        `${sc} bonne${sc !== 1 ? 's' : ''} sur ${attempts} essai${attempts !== 1 ? 's' : ''}`;
+
+      aaAdvance();
+    }
+
+    function aaShowStreak(n) {
+      const toast = document.getElementById('aa-streak-toast');
+      if (!toast) return;
+      toast.textContent = n === 3 ? '🔥 3 de suite !' : `🔥 ${n} de suite !`;
+      toast.classList.add('is-visible');
+      setTimeout(() => toast.classList.remove('is-visible'), 2000);
+    }
+
+    function aaAdvance() {
+      const { idx, total } = aaState;
+      const isLast = idx === total - 1;
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.textContent = isLast ? 'Voir mes résultats' : 'Question suivante →';
+      nextBtn.classList.remove('ex-hidden');
+      nextBtn.onclick = () => {
+        aaState.idx++;
+        if (aaState.idx >= total) {
+          aaShowLevelResults();
+        } else {
+          aaRenderQuestion();
+          document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+    }
+
+    function aaShowLevelResults() {
+      const { level, score: lvScore, total } = aaState;
+      const s20    = Math.round(lvScore / total * 20);
+      const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
+      const isLast = level === 3;
+      const nextLv = level + 1;
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   =
+        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') +
+        ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+
+      const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      let msg, btnsHTML;
+
+      if (isLast) {
+        msg = `🎊 Bravo ! Tu sais choisir le bon arrondi selon la situation aux 3 niveaux !${stars}`;
+        btnsHTML = `
+          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="aa-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else {
+        msg = `Niveau ${level} terminé !${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="aa-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-secondary" id="aa-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('aa-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        aaStartLevel(level);
+      });
+      document.getElementById('aa-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        aaStartLevel(nextLv);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'arrondi-adapte-niveaux',
+        level:        'Niveau ' + level,
         score:        s20,
         total:        20,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
