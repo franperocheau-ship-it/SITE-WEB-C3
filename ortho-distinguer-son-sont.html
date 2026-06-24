@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distinguer son et sont — Orthographe — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=9">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/results.js"></script>
+  <style>
+    /* ── Tabs ─────────────────────────────────────────────────── */
+    .dss-tab-bar {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .dss-tab {
+      flex: 1;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      padding: 11px 8px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      text-align: center;
+      transition: color 150ms, border-color 150ms;
+    }
+    .dss-tab.is-active { color: var(--blue); border-bottom-color: var(--blue); }
+    .dss-tab:hover:not(.is-active) { color: var(--text); }
+
+    /* ── Panel ───────────────────────────────────────────────── */
+    .dss-hidden { display: none !important; }
+
+    /* ── Rule ────────────────────────────────────────────────── */
+    .dss-rule-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16,43,106,0.05);
+      border: 1px solid rgba(16,43,106,0.15);
+      border-radius: 100px;
+      padding: 7px 16px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--blue);
+      cursor: pointer;
+      margin-bottom: 16px;
+      transition: background 150ms;
+    }
+    .dss-rule-btn:hover { background: rgba(16,43,106,0.09); }
+    .dss-rule-panel {
+      background: rgba(16,43,106,0.04);
+      border: 1.5px solid rgba(16,43,106,0.16);
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.85;
+      color: var(--text);
+    }
+    .dss-rule-panel strong { color: var(--blue); }
+    .dss-rule-close {
+      display: inline-block;
+      margin-top: 10px;
+      background: none;
+      border: 1px solid rgba(16,43,106,0.22);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--blue);
+      cursor: pointer;
+    }
+    .dss-rule-close:hover { background: rgba(16,43,106,0.06); }
+
+    /* ── Progress ────────────────────────────────────────────── */
+    .dss-progress { margin-bottom: 24px; }
+    .dss-progress-top { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .dss-progress-label { font-weight: 700; font-size: 13px; color: var(--blue); }
+    .dss-bar-bg { height: 8px; background: var(--border); border-radius: 100px; overflow: hidden; }
+    .dss-bar-fill { height: 100%; background: var(--blue); border-radius: 100px; transition: width 350ms ease; }
+
+    /* ── Card ────────────────────────────────────────────────── */
+    .dss-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-md);
+      padding: 32px 36px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 600px) { .dss-card { padding: 22px 18px; } }
+
+    /* ── Score bar ───────────────────────────────────────────── */
+    .dss-score-bar {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Phrase display ──────────────────────────────────────── */
+    .dss-phrase {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.7;
+      text-align: center;
+      padding: 20px 22px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 22px;
+    }
+    .dss-blank {
+      display: inline-block;
+      border-bottom: 3px solid var(--blue);
+      min-width: 52px;
+      text-align: center;
+      padding: 0 6px 2px;
+      margin: 0 2px;
+      color: rgba(16,43,106,0.35);
+      font-style: italic;
+      vertical-align: text-bottom;
+    }
+    .dss-blank.is-filled  { font-style: normal; color: var(--blue); }
+    .dss-blank.is-correct { border-bottom-color: #16a34a; color: #15803d; font-style: normal; }
+    .dss-blank.is-wrong   { border-bottom-color: var(--red); color: var(--red); font-style: normal; }
+
+    /* ── Choice buttons (Level 1) ────────────────────────────── */
+    .dss-choices {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .dss-choice {
+      min-width: 96px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 28px;
+      font-family: inherit;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 170ms, background 170ms, transform 170ms;
+    }
+    .dss-choice:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.04);
+      transform: translateY(-2px);
+    }
+    .dss-choice:disabled { cursor: default; }
+    .dss-choice.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.09); color: #15803d; }
+    .dss-choice.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.06); color: var(--red); }
+
+    /* ── Feedback ────────────────────────────────────────────── */
+    .dss-feedback { margin: 14px 0 6px; min-height: 22px; }
+
+    /* ── Next button ─────────────────────────────────────────── */
+    .dss-next-btn {
+      display: block;
+      width: 100%;
+      margin-top: 14px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 22px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 170ms, transform 170ms;
+    }
+    .dss-next-btn:hover { background: #0d2255; transform: translateY(-1px); }
+
+    /* ── Validate button (shared) ────────────────────────────── */
+    .dss-validate-btn {
+      display: block;
+      width: 100%;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 6px;
+      transition: background 170ms;
+    }
+    .dss-validate-btn:hover:not(:disabled) { background: #0d2255; }
+    .dss-validate-btn:disabled { opacity: 0.38; cursor: default; }
+
+    /* ── Mots-cliquables (Level 2A) ──────────────────────────── */
+    .dss-sentence-wrap {
+      font-size: 19px;
+      font-weight: 600;
+      line-height: 2.3;
+      text-align: center;
+      padding: 16px 20px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .dss-h-word {
+      display: inline-block;
+      border: 2px solid rgba(16,43,106,0.22);
+      background: rgba(16,43,106,0.05);
+      border-radius: 8px;
+      padding: 1px 9px;
+      margin: 0 2px;
+      cursor: pointer;
+      font-weight: 800;
+      color: var(--blue);
+      font-family: inherit;
+      font-size: inherit;
+      transition: border-color 130ms, background 130ms;
+    }
+    .dss-h-word:hover:not(:disabled) { border-color: var(--blue); background: rgba(16,43,106,0.10); }
+    .dss-h-word.is-selected { border-color: var(--blue); background: rgba(16,43,106,0.15); }
+    .dss-h-word:disabled { cursor: default; }
+    .dss-h-word.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.10); color: #15803d; }
+    .dss-h-word.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.08); color: var(--red); }
+    .dss-h-word.is-missed  { border: 2px dashed #16a34a; color: #16a34a; background: rgba(22,163,74,0.05); }
+
+    .dss-mc-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .dss-correct-btn {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 18px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 130ms, background 130ms;
+      flex-shrink: 0;
+    }
+    .dss-correct-btn:hover:not(:disabled) { border-color: var(--blue); background: rgba(16,43,106,0.04); }
+    .dss-correct-btn.is-selected { border-color: var(--blue); background: rgba(16,43,106,0.08); color: var(--blue); }
+    .dss-correct-btn:disabled { cursor: default; }
+
+    /* ── Classification (Level 2B) ───────────────────────────── */
+    .dss-cl-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px;
+      background: rgba(16,43,106,0.03);
+      border: 2px dashed rgba(16,43,106,0.18);
+      border-radius: 14px;
+      margin-bottom: 14px;
+      min-height: 56px;
+    }
+    .dss-cl-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 480px) { .dss-cl-cols { grid-template-columns: 1fr; } }
+    .dss-cl-col {
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      min-height: 110px;
+      cursor: pointer;
+      transition: border-color 140ms, background 140ms;
+    }
+    .dss-cl-col:hover { border-color: rgba(16,43,106,0.28); background: rgba(16,43,106,0.02); }
+    .dss-cl-col-hdr {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--blue);
+      text-align: center;
+      margin-bottom: 8px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dss-cl-cards-wrap { display: flex; flex-direction: column; gap: 5px; }
+    .dss-cl-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+      text-align: center;
+      transition: border-color 130ms, background 130ms, transform 130ms;
+    }
+    .dss-cl-card:hover:not(.is-correct):not(.is-wrong) { border-color: rgba(16,43,106,0.28); transform: translateY(-1px); }
+    .dss-cl-card.is-selected { border-color: var(--blue); background: rgba(16,43,106,0.08); color: var(--blue); }
+    .dss-cl-card.is-correct  { border-color: #16a34a; background: rgba(22,163,74,0.09); color: #15803d; cursor: default; }
+    .dss-cl-card.is-wrong    { border-color: var(--red); background: rgba(214,40,57,0.07); color: var(--red); cursor: default; }
+
+    /* ── Fill-in (Level 3A) ──────────────────────────────────── */
+    .dss-fill-sentence {
+      font-size: 19px;
+      font-weight: 600;
+      line-height: 2.8;
+      text-align: center;
+      padding: 16px 20px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 18px;
+    }
+    .dss-fill-inp {
+      display: inline-block;
+      width: 70px;
+      border: 2px solid var(--blue);
+      border-radius: 8px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 800;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--card-bg);
+      padding: 2px 4px;
+      outline: none;
+      vertical-align: middle;
+      margin: 0 4px;
+      transition: border-color 140ms, box-shadow 140ms;
+    }
+    .dss-fill-inp:focus { box-shadow: 0 0 0 3px rgba(16,43,106,0.12); }
+    .dss-fill-inp.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.07); color: #15803d; }
+    .dss-fill-inp.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.06); color: var(--red); }
+    .dss-fill-inp:disabled { cursor: default; }
+
+    /* ── Production libre (Level 3B) ─────────────────────────── */
+    .dss-prompt-box {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.55;
+      padding: 16px 20px;
+      background: var(--bg);
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .dss-textarea {
+      width: 100%;
+      min-height: 96px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 16px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      resize: vertical;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+      transition: border-color 190ms, box-shadow 190ms;
+    }
+    .dss-textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(16,43,106,0.10); }
+
+    /* ── Streak toast ────────────────────────────────────────── */
+    .dss-streak-toast {
+      position: fixed;
+      top: 76px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-16px);
+      background: var(--blue);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      padding: 10px 24px;
+      border-radius: 100px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 280ms, transform 280ms;
+      z-index: 9999;
+    }
+    .dss-streak-toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Results ─────────────────────────────────────────────── */
+    .dss-results { text-align: center; padding: 8px 0 4px; }
+    .dss-results-score { font-size: 42px; font-weight: 900; color: var(--blue); line-height: 1; margin-bottom: 4px; }
+    .dss-results-pct   { font-size: 20px; font-weight: 700; color: var(--muted); margin-bottom: 14px; }
+    .dss-results-msg   { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 24px; }
+    .dss-results-btns  { display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto; }
+    .dss-btn-primary {
+      background: var(--blue); color: #fff; border: none; border-radius: 12px;
+      padding: 13px 22px; font-family: inherit; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: background 170ms;
+    }
+    .dss-btn-primary:hover { background: #0d2255; }
+    .dss-btn-secondary {
+      background: none; border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 12px 22px; font-family: inherit; font-size: 14px; font-weight: 600;
+      color: var(--text); cursor: pointer; text-decoration: none; display: block;
+      transition: border-color 170ms;
+    }
+    .dss-btn-secondary:hover { border-color: rgba(16,43,106,0.25); }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index-v2.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index-v2.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="page-wrap">
+  <div class="page-content">
+
+    <a href="français-orthographe.html" class="back-link">← Orthographe</a>
+
+    <div class="ex-container">
+
+      <!-- Page header -->
+      <div class="ex-page-header">
+        <div class="ex-page-badges">
+          <span class="badge badge-cm1">CM1</span>
+          <span class="badge badge-cm2">CM2</span>
+          <span class="badge badge-6e">6e</span>
+        </div>
+        <h1 class="ex-page-title">Distinguer <em>son</em> et <em>sont</em></h1>
+        <div class="ex-page-rule"></div>
+        <p class="ex-page-subtitle" style="font-size:14px;color:var(--muted);margin-top:8px">Homophones grammaticaux</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="dss-tab-bar">
+        <button class="dss-tab is-active" data-lv="1">Niveau 1</button>
+        <button class="dss-tab" data-lv="2">Niveau 2</button>
+        <button class="dss-tab" data-lv="3">Niveau 3</button>
+      </div>
+
+      <!-- ── Panel 1 ─────────────────────────────────────────── -->
+      <div id="dss-panel-1">
+        <button class="dss-rule-btn" onclick="toggleRule(1)">❓ Revoir la règle</button>
+        <div class="dss-rule-panel dss-hidden" id="dss-rule-1">
+          <p><strong>sont</strong> = verbe être → remplaçable par « étaient »<br>
+             <strong>son</strong> = déterminant possessif → remplaçable par « mon » ou « ton »</p>
+          <p><em>Astuce : si tu peux remplacer par « étaient », écris <strong>sont</strong>.</em></p>
+          <button class="dss-rule-close" onclick="toggleRule(1)">Fermer</button>
+        </div>
+        <div class="dss-progress">
+          <div class="dss-progress-top">
+            <span class="dss-progress-label">Question <span id="dss-qn-1">1</span> sur <span id="dss-qt-1">12</span></span>
+          </div>
+          <div class="dss-bar-bg"><div class="dss-bar-fill" id="dss-bar-1" style="width:0%"></div></div>
+        </div>
+        <div class="dss-card" id="dss-area-1"></div>
+        <div class="dss-score-bar" id="dss-score-1">Aucun essai pour l'instant</div>
+      </div>
+
+      <!-- ── Panel 2 ─────────────────────────────────────────── -->
+      <div id="dss-panel-2" class="dss-hidden">
+        <button class="dss-rule-btn" onclick="toggleRule(2)">❓ Revoir la règle</button>
+        <div class="dss-rule-panel dss-hidden" id="dss-rule-2">
+          <p><strong>sont</strong> = verbe être → remplaçable par « étaient »<br>
+             <strong>son</strong> = déterminant possessif → remplaçable par « mon » ou « ton »</p>
+          <p><em>Astuce : si tu peux remplacer par « étaient », écris <strong>sont</strong>.</em></p>
+          <button class="dss-rule-close" onclick="toggleRule(2)">Fermer</button>
+        </div>
+        <div class="dss-progress">
+          <div class="dss-progress-top">
+            <span class="dss-progress-label">Question <span id="dss-qn-2">1</span> sur <span id="dss-qt-2">12</span></span>
+          </div>
+          <div class="dss-bar-bg"><div class="dss-bar-fill" id="dss-bar-2" style="width:0%"></div></div>
+        </div>
+        <div class="dss-card" id="dss-area-2"></div>
+        <div class="dss-score-bar" id="dss-score-2">Aucun essai pour l'instant</div>
+      </div>
+
+      <!-- ── Panel 3 ─────────────────────────────────────────── -->
+      <div id="dss-panel-3" class="dss-hidden">
+        <button class="dss-rule-btn" onclick="toggleRule(3)">❓ Revoir la règle</button>
+        <div class="dss-rule-panel dss-hidden" id="dss-rule-3">
+          <p><strong>sont</strong> = verbe être → remplaçable par « étaient »<br>
+             <strong>son</strong> = déterminant possessif → remplaçable par « mon » ou « ton »</p>
+          <p><em>Astuce : si tu peux remplacer par « étaient », écris <strong>sont</strong>.</em></p>
+          <button class="dss-rule-close" onclick="toggleRule(3)">Fermer</button>
+        </div>
+        <div class="dss-progress">
+          <div class="dss-progress-top">
+            <span class="dss-progress-label">Question <span id="dss-qn-3">1</span> sur <span id="dss-qt-3">16</span></span>
+          </div>
+          <div class="dss-bar-bg"><div class="dss-bar-fill" id="dss-bar-3" style="width:0%"></div></div>
+        </div>
+        <div class="dss-card" id="dss-area-3"></div>
+        <div class="dss-score-bar" id="dss-score-3">Aucun essai pour l'instant</div>
+      </div>
+
+    </div><!-- /.ex-container -->
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 · <a href="mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a></p>
+  </div>
+</footer>
+
+<!-- Streak toast -->
+<div class="dss-streak-toast" id="dss-streak-toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════════════════════ */
+
+/* Niveau 1 — choix-etiquette (12 questions, ordre fixe)
+   testOk:true  → "étaient" fonctionne → réponse : "sont"
+   testOk:false → "étaient" échoue, testPhrase = test avec "mon" → réponse : "son" */
+const N1 = [
+  { phrase:"Les enfants ___ fatigués après la récréation.", answer:"sont", testPhrase:"étaient fatigués",   testOk:true  },
+  { phrase:"Il a oublié ___ cartable à la maison.",          answer:"son",  testPhrase:"mon cartable",       testOk:false },
+  { phrase:"Les fleurs ___ écloses ce matin.",               answer:"sont", testPhrase:"étaient écloses",    testOk:true  },
+  { phrase:"Elle range ___ manteau dans l'armoire.",         answer:"son",  testPhrase:"mon manteau",        testOk:false },
+  { phrase:"Les élèves ___ attentifs en classe.",            answer:"sont", testPhrase:"étaient attentifs",  testOk:true  },
+  { phrase:"Le chien a retrouvé ___ os.",                    answer:"son",  testPhrase:"mon os",             testOk:false },
+  { phrase:"Les nuages ___ très sombres ce soir.",           answer:"sont", testPhrase:"étaient sombres",    testOk:true  },
+  { phrase:"Il prête ___ vélo à un ami.",                    answer:"son",  testPhrase:"mon vélo",           testOk:false },
+  { phrase:"Les résultats ___ excellents cette année.",      answer:"sont", testPhrase:"étaient excellents", testOk:true  },
+  { phrase:"Elle a perdu ___ écharpe rouge.",                answer:"son",  testPhrase:"mon écharpe",        testOk:false },
+  { phrase:"Les portes ___ fermées à clé.",                  answer:"sont", testPhrase:"étaient fermées",    testOk:true  },
+  { phrase:"Le chat lèche ___ pelage.",                      answer:"son",  testPhrase:"mon pelage",         testOk:false },
+];
+
+/* Niveau 2A — mots-cliquables
+   "son" et "sont" (insensible à la casse) sont mis en évidence.
+   wordIdx : index 0-based dans raw.split(' ')
+   errors = [] → phrase sans erreur */
+const N2_MC = [
+  { raw:"Les oiseaux son partis vers le sud.",
+    errors:[{ wordIdx:2, wrongForm:"son",  correctForm:"sont", testPhrase:"étaient partis",     testOk:true  }] },
+  { raw:"Il a rangé sont livre sur l'étagère.",
+    errors:[{ wordIdx:3, wrongForm:"sont", correctForm:"son",  testPhrase:"mon livre",          testOk:false }] },
+  { raw:"Les routes son glissantes ce matin.",
+    errors:[{ wordIdx:2, wrongForm:"son",  correctForm:"sont", testPhrase:"étaient glissantes", testOk:true  }] },
+  { raw:"Elle a donné sont avis sur la question.",
+    errors:[{ wordIdx:3, wrongForm:"sont", correctForm:"son",  testPhrase:"mon avis",           testOk:false }] },
+  { raw:"Les résultats son meilleurs qu'avant.",
+    errors:[{ wordIdx:2, wrongForm:"son",  correctForm:"sont", testPhrase:"étaient meilleurs",  testOk:true  }] },
+  { raw:"Le professeur a corrigé sont erreur.",
+    errors:[{ wordIdx:4, wrongForm:"sont", correctForm:"son",  testPhrase:"mon erreur",         testOk:false }] },
+  { raw:"Les enfants sont rentrés et leur père attend son tour.",     errors:[] },
+  { raw:"Il a pris son manteau car les températures sont basses.",    errors:[] },
+  { raw:"Les joueurs sont prêts et leur entraîneur garde son calme.", errors:[] },
+  { raw:"Son chien est malade et les vétérinaires sont occupés.",     errors:[] },
+];
+
+/* Niveau 2B — classification (2 séries de 6 items) */
+const N2_CL = [
+  { items:[
+    { phrase:"Ils sont là.",           col:"sont" },
+    { phrase:"Son ami arrive.",        col:"son"  },
+    { phrase:"Les chats sont dehors.", col:"sont" },
+    { phrase:"Son cartable est lourd.",col:"son"  },
+    { phrase:"Les notes sont bonnes.", col:"sont" },
+    { phrase:"Son vélo est neuf.",     col:"son"  },
+  ]},
+  { items:[
+    { phrase:"Les portes sont ouvertes.", col:"sont" },
+    { phrase:"Son manteau est rouge.",    col:"son"  },
+    { phrase:"Les élèves sont prêts.",    col:"sont" },
+    { phrase:"Son idée est bonne.",       col:"son"  },
+    { phrase:"Les résultats sont là.",    col:"sont" },
+    { phrase:"Son frère est grand.",      col:"son"  },
+  ]},
+];
+
+/* Niveau 3A — fill-in (6 phrases à 1 blanc + 6 à 2 blancs, ordre fixe)
+   testOk:true  → testPhrase = test "étaient …" → sont
+   testOk:false → testPhrase = test "mon …"     → son */
+const N3_FI = [
+  { sentence:"Les scientifiques ___ convaincus par les résultats.",
+    answers:["sont"], blanks:[{ testPhrase:"étaient convaincus",  testOk:true  }] },
+  { sentence:"Le directeur a exprimé ___ mécontentement.",
+    answers:["son"],  blanks:[{ testPhrase:"mon mécontentement",  testOk:false }] },
+  { sentence:"Les températures ___ en baisse depuis une semaine.",
+    answers:["sont"], blanks:[{ testPhrase:"étaient en baisse",   testOk:true  }] },
+  { sentence:"L'artiste a exposé ___ dernier tableau.",
+    answers:["son"],  blanks:[{ testPhrase:"mon dernier tableau", testOk:false }] },
+  { sentence:"Les décisions ___ prises à l'unanimité.",
+    answers:["sont"], blanks:[{ testPhrase:"étaient prises",      testOk:true  }] },
+  { sentence:"Le médecin a donné ___ accord pour l'opération.",
+    answers:["son"],  blanks:[{ testPhrase:"mon accord",          testOk:false }] },
+  { sentence:"Les élèves ___ studieux et leur professeur est fier de ___ travail.",
+    answers:["sont","son"],
+    blanks:[{ testPhrase:"étaient studieux", testOk:true  },
+            { testPhrase:"mon travail",      testOk:false }] },
+  { sentence:"___ discours était long et les spectateurs ___ partis avant la fin.",
+    answers:["son","sont"],
+    blanks:[{ testPhrase:"mon discours",    testOk:false },
+            { testPhrase:"étaient partis",  testOk:true  }] },
+  { sentence:"Les résultats ___ bons et le directeur garde ___ calme.",
+    answers:["sont","son"],
+    blanks:[{ testPhrase:"étaient bons",   testOk:true  },
+            { testPhrase:"mon calme",       testOk:false }] },
+  { sentence:"Il a perdu ___ chemin et ses amis ___ inquiets.",
+    answers:["son","sont"],
+    blanks:[{ testPhrase:"mon chemin",       testOk:false },
+            { testPhrase:"étaient inquiets", testOk:true  }] },
+  { sentence:"Les arbres ___ hauts et ___ ombre est bienfaisante.",
+    answers:["sont","son"],
+    blanks:[{ testPhrase:"étaient hauts", testOk:true  },
+            { testPhrase:"mon ombre",      testOk:false }] },
+  { sentence:"___ équipe a gagné et les supporters ___ en fête.",
+    answers:["son","sont"],
+    blanks:[{ testPhrase:"mon équipe",      testOk:false },
+            { testPhrase:"étaient en fête", testOk:true  }] },
+];
+
+/* Niveau 3B — production libre */
+const N3_PL = [
+  { consigne:"Écris une phrase sur un <strong>sportif</strong> qui contient à la fois <em>son</em> et <em>sont</em>." },
+  { consigne:"Écris une phrase sur <strong>l'école</strong> qui contient à la fois <em>son</em> et <em>sont</em>." },
+  { consigne:"Écris une phrase sur un <strong>animal</strong> qui contient à la fois <em>son</em> et <em>sont</em>." },
+  { consigne:"Écris une phrase sur la <strong>famille</strong> qui contient à la fois <em>son</em> et <em>sont</em>." },
+];
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════════ */
+
+function mkState() {
+  return { idx:0, score:0, attempts:0, streak:0, questions:[], started:false };
+}
+const ST = { 1: mkState(), 2: mkState(), 3: mkState() };
+let activeLevel = 1;
+const sessionStart = Date.now();
+
+/* ═══════════════════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════════════════ */
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* Mark "son" and "sont" (case-insensitive) as homophones */
+function tokenize(raw) {
+  return raw.split(' ').map((token, idx) => {
+    const clean = token.replace(/^[«"''""]/,'').replace(/[.,!?;:»"''"""]+$/,'');
+    const lower = clean.toLowerCase();
+    const isH   = lower === 'son' || lower === 'sont';
+    return { raw: token, clean, isH, idx };
+  });
+}
+
+function fbOk(html)  { return `<div class="ex-feedback-correct">${html}</div>`; }
+function fbErr(html) { return `<div class="ex-feedback-wrong">${html}</div>`;   }
+
+/* Explanation for the replacement test, used in error feedback */
+function testExpl(testPhrase, testOk) {
+  if (testOk) {
+    return `Essaie « étaient » : <em>« ${testPhrase} »</em> → ça fonctionne → on écrit <strong>sont</strong>.`;
+  } else {
+    return `Essaie « étaient » → ne fonctionne pas → essaie « mon » / « ton » : <em>« ${testPhrase} »</em> → ça fonctionne → on écrit <strong>son</strong>.`;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TABS & RULE
+═══════════════════════════════════════════════════════════════════ */
+
+function setLevel(lv) {
+  activeLevel = lv;
+  [1,2,3].forEach(i => {
+    document.getElementById(`dss-panel-${i}`).classList.toggle('dss-hidden', i !== lv);
+    document.querySelector(`.dss-tab[data-lv="${i}"]`).classList.toggle('is-active', i === lv);
+  });
+  if (!ST[lv].started) {
+    initLevel(lv);
+    ST[lv].started = true;
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleRule(lv) {
+  document.getElementById(`dss-rule-${lv}`).classList.toggle('dss-hidden');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LEVEL INIT
+═══════════════════════════════════════════════════════════════════ */
+
+function initLevel(lv) {
+  const st = ST[lv];
+  st.idx = 0; st.score = 0; st.attempts = 0; st.streak = 0;
+
+  if (lv === 1) {
+    st.questions = N1.map(q => ({ type:'choix', data: q }));
+    document.getElementById('dss-qt-1').textContent = st.questions.length;
+
+  } else if (lv === 2) {
+    const mcItems = N2_MC.map(q => ({ type:'mc', data: q }));
+    const clItems = N2_CL.map(s => ({ type:'cl', data: s }));
+    st.questions  = shuffle([...mcItems, ...clItems]);
+    document.getElementById('dss-qt-2').textContent = st.questions.length;
+
+  } else {
+    const fiItems = N3_FI.map(q => ({ type:'fi', data: q }));
+    const plItems = N3_PL.map(q => ({ type:'pl', data: q }));
+    st.questions  = [...fiItems, ...plItems];
+    document.getElementById('dss-qt-3').textContent = st.questions.length;
+  }
+
+  updateScore(lv);
+  showQuestion(lv);
+}
+
+function retryLevel(lv) {
+  ST[lv].started = true;
+  initLevel(lv);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PROGRESS & SCORE
+═══════════════════════════════════════════════════════════════════ */
+
+function updateProgress(lv) {
+  const st = ST[lv];
+  document.getElementById(`dss-qn-${lv}`).textContent  = st.idx + 1;
+  document.getElementById(`dss-bar-${lv}`).style.width = (st.idx / st.questions.length * 100) + '%';
+}
+
+function updateScore(lv) {
+  const { score:s, attempts:t } = ST[lv];
+  document.getElementById(`dss-score-${lv}`).textContent =
+    t === 0 ? "Aucun essai pour l'instant"
+             : `${s} bonne${s !== 1 ? 's' : ''} réponse${s !== 1 ? 's' : ''} sur ${t} essai${t !== 1 ? 's' : ''}`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   STREAK
+═══════════════════════════════════════════════════════════════════ */
+
+function checkStreak(lv) {
+  const { streak } = ST[lv];
+  if (streak > 0 && streak % 3 === 0) {
+    const toast = document.getElementById('dss-streak-toast');
+    toast.textContent = `🔥 ${streak} de suite !`;
+    toast.classList.add('is-visible');
+    setTimeout(() => toast.classList.remove('is-visible'), 2000);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NEXT BUTTON
+═══════════════════════════════════════════════════════════════════ */
+
+function addNextBtn(area, lv) {
+  const st  = ST[lv];
+  const btn = document.createElement('button');
+  btn.className   = 'dss-next-btn';
+  btn.textContent = (st.idx === st.questions.length - 1) ? 'Voir mes résultats' : 'Question suivante →';
+  btn.addEventListener('click', () => {
+    st.idx++;
+    if (st.idx >= st.questions.length) {
+      showResults(lv);
+    } else {
+      showQuestion(lv);
+      document.getElementById(`dss-area-${lv}`).scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+  });
+  area.appendChild(btn);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SHOW QUESTION dispatcher
+═══════════════════════════════════════════════════════════════════ */
+
+function showQuestion(lv) {
+  const st   = ST[lv];
+  const area = document.getElementById(`dss-area-${lv}`);
+  updateProgress(lv);
+  const item = st.questions[st.idx];
+  switch (item.type) {
+    case 'choix': renderChoix(area, item.data, lv); break;
+    case 'mc':    renderMC(area, item.data, lv);    break;
+    case 'cl':    renderCL(area, item.data, lv);    break;
+    case 'fi':    renderFI(area, item.data, lv);    break;
+    case 'pl':    renderPL(area, item.data, lv);    break;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NIVEAU 1 : CHOIX-ÉTIQUETTE
+═══════════════════════════════════════════════════════════════════ */
+
+function renderChoix(area, q, lv) {
+  const phraseHtml = q.phrase.replace('___', '<span class="dss-blank" id="dss-bl">___</span>');
+
+  area.innerHTML = `
+    <p class="ex-question-label">Quel mot complète la phrase : <strong>son</strong> ou <strong>sont</strong> ?</p>
+    <div class="dss-phrase">${phraseHtml}</div>
+    <div class="dss-choices" id="dss-choices"></div>
+    <div class="dss-feedback" id="dss-fb"></div>
+  `;
+
+  const grid = area.querySelector('#dss-choices');
+  ['son', 'sont'].forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className   = 'dss-choice';
+    btn.textContent = choice;
+    btn.addEventListener('click', () => {
+      grid.querySelectorAll('.dss-choice').forEach(b => b.disabled = true);
+      const correct = choice === q.answer;
+
+      grid.querySelectorAll('.dss-choice').forEach(b => {
+        if (b.textContent === q.answer) b.classList.add('is-correct');
+      });
+      if (!correct) btn.classList.add('is-wrong');
+
+      const blank = area.querySelector('#dss-bl');
+      if (blank) {
+        blank.textContent = q.answer;
+        blank.classList.add('is-filled', correct ? 'is-correct' : 'is-wrong');
+      }
+
+      const st = ST[lv];
+      st.attempts++;
+      if (correct) {
+        st.score++;
+        st.streak++;
+        const test = q.testOk
+          ? '« étaient » fonctionne → <strong>sont</strong>'
+          : `« ${q.testPhrase} » fonctionne → <strong>son</strong>`;
+        area.querySelector('#dss-fb').innerHTML = fbOk(
+          `✅ Bravo ! <strong>« ${q.answer} »</strong> est correct ici : ${test}.`
+        );
+      } else {
+        st.streak = 0;
+        area.querySelector('#dss-fb').innerHTML = fbErr(
+          `❌ ${testExpl(q.testPhrase, q.testOk)}`
+        );
+      }
+      checkStreak(lv);
+      updateScore(lv);
+      addNextBtn(area, lv);
+    });
+    grid.appendChild(btn);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NIVEAU 2A : MOTS-CLIQUABLES
+═══════════════════════════════════════════════════════════════════ */
+
+function renderMC(area, q, lv) {
+  const tokens      = tokenize(q.raw);
+  const errorIdxSet = new Set(q.errors.map(e => e.wordIdx));
+  const hasErrors   = q.errors.length > 0;
+
+  const sentHtml = tokens.map(tok =>
+    tok.isH ? `<button class="dss-h-word" data-ti="${tok.idx}">${tok.raw}</button>` : tok.raw
+  ).join(' ');
+
+  area.innerHTML = `
+    <p class="ex-question-label">Clique sur le ou les mots mal orthographiés, puis valide.<br>
+    S'il n'y a pas d'erreur, clique sur « Phrase correcte ».</p>
+    <div class="dss-sentence-wrap">${sentHtml}</div>
+    <div class="dss-mc-row">
+      <button class="dss-correct-btn" id="dss-ok-btn">✓ Phrase correcte</button>
+      <button class="dss-validate-btn" id="dss-val-btn" style="flex:1">Valider</button>
+    </div>
+    <div class="dss-feedback" id="dss-fb"></div>
+  `;
+
+  const selected        = new Set();
+  let   correctSelected = false;
+  let   answered        = false;
+
+  area.querySelectorAll('.dss-h-word').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (answered) return;
+      const ti = parseInt(btn.dataset.ti);
+      if (selected.has(ti)) {
+        selected.delete(ti);
+        btn.classList.remove('is-selected');
+      } else {
+        selected.add(ti);
+        btn.classList.add('is-selected');
+        if (correctSelected) {
+          correctSelected = false;
+          area.querySelector('#dss-ok-btn').classList.remove('is-selected');
+        }
+      }
+    });
+  });
+
+  area.querySelector('#dss-ok-btn').addEventListener('click', () => {
+    if (answered) return;
+    correctSelected = !correctSelected;
+    area.querySelector('#dss-ok-btn').classList.toggle('is-selected', correctSelected);
+    if (correctSelected) {
+      selected.clear();
+      area.querySelectorAll('.dss-h-word.is-selected').forEach(b => b.classList.remove('is-selected'));
+    }
+  });
+
+  area.querySelector('#dss-val-btn').addEventListener('click', () => {
+    if (answered) return;
+    answered = true;
+    area.querySelectorAll('.dss-h-word').forEach(b => b.disabled = true);
+    area.querySelector('#dss-ok-btn').disabled  = true;
+    area.querySelector('#dss-val-btn').disabled = true;
+
+    const st = ST[lv];
+    const correct = correctSelected
+      ? !hasErrors
+      : selected.size === errorIdxSet.size && [...selected].every(ti => errorIdxSet.has(ti));
+
+    st.attempts++;
+    if (correct) { st.score++; st.streak++; } else { st.streak = 0; }
+
+    area.querySelectorAll('.dss-h-word').forEach(btn => {
+      const ti    = parseInt(btn.dataset.ti);
+      const isErr = errorIdxSet.has(ti);
+      const wasSel= selected.has(ti);
+      if      (isErr && wasSel)  btn.classList.add('is-correct');
+      else if (isErr && !wasSel) btn.classList.add('is-missed');
+      else if (!isErr && wasSel) btn.classList.add('is-wrong');
+    });
+
+    const fb   = area.querySelector('#dss-fb');
+    const expl = q.errors.map(e =>
+      `<br>• <strong>« ${e.wrongForm} »</strong> → <strong>« ${e.correctForm} »</strong> : ${testExpl(e.testPhrase, e.testOk)}`
+    ).join('');
+
+    if (correct) {
+      fb.innerHTML = hasErrors
+        ? fbOk(`✅ Bravo ! Tu as trouvé ${q.errors.length > 1 ? 'les erreurs' : "l'erreur"}.${expl}`)
+        : fbOk(`✅ Bravo ! Cette phrase ne contient aucune erreur.`);
+    } else {
+      fb.innerHTML = (correctSelected && hasErrors)
+        ? fbErr(`❌ Il y avait ${q.errors.length > 1 ? 'des erreurs' : 'une erreur'} dans cette phrase.${expl}`)
+        : fbErr(`❌ Pas tout à fait.${expl || " Cette phrase ne contenait pas d'erreur."}`);
+    }
+
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NIVEAU 2B : CLASSIFICATION
+═══════════════════════════════════════════════════════════════════ */
+
+function renderCL(area, serie, lv) {
+  const items       = shuffle([...serie.items]);
+  const placedInCol = {};
+  let   selCard     = null;
+  let   answered    = false;
+
+  area.innerHTML = `
+    <p class="ex-question-label">Classe chaque phrase dans la bonne colonne. Clique une carte pour la sélectionner, puis clique la colonne.</p>
+    <div class="dss-cl-bank" id="dss-bank"></div>
+    <div class="dss-cl-cols">
+      <div class="dss-cl-col" id="dss-col-sont">
+        <div class="dss-cl-col-hdr"><em>sont</em> — verbe être</div>
+        <div class="dss-cl-cards-wrap" id="dss-wrap-sont"></div>
+      </div>
+      <div class="dss-cl-col" id="dss-col-son">
+        <div class="dss-cl-col-hdr"><em>son</em> — déterminant possessif</div>
+        <div class="dss-cl-cards-wrap" id="dss-wrap-son"></div>
+      </div>
+    </div>
+    <button class="dss-validate-btn" id="dss-val-btn" disabled>
+      Valider (place toutes les phrases d'abord)
+    </button>
+    <div class="dss-feedback" id="dss-fb"></div>
+  `;
+
+  function checkAllPlaced() {
+    const n      = Object.keys(placedInCol).length;
+    const valBtn = area.querySelector('#dss-val-btn');
+    valBtn.disabled    = n < items.length;
+    valBtn.textContent = n < items.length ? `Valider (${n}/${items.length} placées)` : 'Valider';
+  }
+
+  function makeCard(item, idx) {
+    const el     = document.createElement('div');
+    el.className = 'dss-cl-card';
+    el.textContent = item.phrase;
+    el.dataset.idx = idx;
+
+    el.addEventListener('click', e => {
+      if (answered) return;
+
+      if (placedInCol[idx] !== undefined) {
+        e.stopPropagation();
+        el.remove();
+        delete placedInCol[idx];
+        el.classList.remove('is-selected');
+        area.querySelector('#dss-bank').appendChild(el);
+        if (selCard && selCard.idx === idx) selCard = null;
+        checkAllPlaced();
+        return;
+      }
+
+      if (selCard && selCard.idx === idx) {
+        selCard = null;
+        el.classList.remove('is-selected');
+      } else {
+        if (selCard) selCard.el.classList.remove('is-selected');
+        selCard = { idx, el };
+        el.classList.add('is-selected');
+      }
+    });
+    return el;
+  }
+
+  const bank = area.querySelector('#dss-bank');
+  items.forEach((item, idx) => bank.appendChild(makeCard(item, idx)));
+
+  ['sont', 'son'].forEach(col => {
+    const colEl  = area.querySelector(`#dss-col-${col}`);
+    const wrapEl = area.querySelector(`#dss-wrap-${col}`);
+    colEl.addEventListener('click', () => {
+      if (answered || !selCard) return;
+      const { idx, el } = selCard;
+      el.remove();
+      el.classList.remove('is-selected');
+      selCard          = null;
+      placedInCol[idx] = col;
+      wrapEl.appendChild(el);
+      checkAllPlaced();
+    });
+  });
+
+  area.querySelector('#dss-val-btn').addEventListener('click', () => {
+    if (answered) return;
+    answered = true;
+    area.querySelector('#dss-val-btn').disabled = true;
+
+    const st = ST[lv];
+    st.attempts++;
+    let allOk = true;
+
+    items.forEach((item, idx) => {
+      const card = area.querySelector(`.dss-cl-card[data-idx="${idx}"]`);
+      if (placedInCol[idx] === item.col) {
+        card.classList.add('is-correct');
+      } else {
+        card.classList.add('is-wrong');
+        allOk = false;
+      }
+    });
+
+    if (allOk) { st.score++; st.streak++; } else { st.streak = 0; }
+
+    const fb = area.querySelector('#dss-fb');
+    fb.innerHTML = allOk
+      ? fbOk(`✅ Bravo ! Toutes les phrases sont bien classées.`)
+      : fbErr(`❌ Certaines phrases sont mal classées. Les cartes vertes sont correctes ; les rouges sont à revoir.`);
+
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NIVEAU 3A : FILL-IN
+═══════════════════════════════════════════════════════════════════ */
+
+function renderFI(area, q, lv) {
+  let blankIdx = 0;
+  const sentHtml = q.sentence.replace(/___/g, () => {
+    const i = blankIdx++;
+    return `<input class="dss-fill-inp" id="dss-inp-${i}" data-idx="${i}"
+                   type="text" maxlength="4"
+                   autocomplete="off" autocorrect="off" spellcheck="false"
+                   placeholder="?" aria-label="réponse ${i+1}">`;
+  });
+
+  area.innerHTML = `
+    <p class="ex-question-label">Complète avec <strong>son</strong> ou <strong>sont</strong>.</p>
+    <div class="dss-fill-sentence">${sentHtml}</div>
+    <button class="dss-validate-btn" id="dss-val-btn">Valider</button>
+    <div class="dss-feedback" id="dss-fb"></div>
+  `;
+
+  setTimeout(() => area.querySelector('#dss-inp-0')?.focus(), 60);
+
+  area.querySelectorAll('.dss-fill-inp').forEach(inp => {
+    inp.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      const next = area.querySelector(`#dss-inp-${parseInt(inp.dataset.idx) + 1}`);
+      if (next) next.focus(); else doValidate();
+    });
+  });
+
+  area.querySelector('#dss-val-btn').addEventListener('click', doValidate);
+
+  function doValidate() {
+    const inputs = [...area.querySelectorAll('.dss-fill-inp')];
+    if (inputs.some(i => !i.value.trim())) return;
+
+    inputs.forEach(i => i.disabled = true);
+    area.querySelector('#dss-val-btn').disabled = true;
+
+    const st = ST[lv];
+    st.attempts++;
+
+    let allOk = true;
+    const parts = [];
+
+    inputs.forEach((inp, i) => {
+      const val    = inp.value.trim().toLowerCase();
+      const expect = q.answers[i];
+      const blank  = q.blanks[i];
+      const ok     = val === expect;
+      inp.classList.add(ok ? 'is-correct' : 'is-wrong');
+      if (!ok) allOk = false;
+      parts.push({ ok, expect, blank });
+    });
+
+    if (allOk) { st.score++; st.streak++; } else { st.streak = 0; }
+
+    const fb = area.querySelector('#dss-fb');
+    if (allOk) {
+      const details = parts.map(p => {
+        const test = p.blank.testOk
+          ? `« ${p.blank.testPhrase} » → fonctionne → <strong>sont</strong>`
+          : `« ${p.blank.testPhrase} » → fonctionne → <strong>son</strong>`;
+        return `<strong>« ${p.expect} »</strong> : ${test}.`;
+      }).join(' ');
+      fb.innerHTML = fbOk(`✅ Bravo ! ${details}`);
+    } else {
+      const details = parts.map(p => testExpl(p.blank.testPhrase, p.blank.testOk)).join('<br>');
+      fb.innerHTML  = fbErr(`❌ ${details}`);
+    }
+
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NIVEAU 3B : PRODUCTION LIBRE
+═══════════════════════════════════════════════════════════════════ */
+
+function renderPL(area, q, lv) {
+  area.innerHTML = `
+    <p class="ex-question-label">Écris ta propre phrase.</p>
+    <div class="dss-prompt-box">${q.consigne}</div>
+    <textarea class="dss-textarea" id="dss-ta" placeholder="Écris ta phrase ici…"></textarea>
+    <button class="dss-validate-btn" id="dss-val-btn">Valider</button>
+    <div class="dss-feedback" id="dss-fb"></div>
+  `;
+
+  area.querySelector('#dss-val-btn').addEventListener('click', () => {
+    const text = area.querySelector('#dss-ta').value.trim();
+    if (!text) return;
+
+    area.querySelector('#dss-ta').disabled      = true;
+    area.querySelector('#dss-val-btn').disabled = true;
+
+    const st = ST[lv];
+    st.attempts++;
+
+    const hasSon  = /\bson\b/i.test(text);
+    const hasSont = /\bsont\b/i.test(text);
+
+    const fb = area.querySelector('#dss-fb');
+    if (hasSon && hasSont) {
+      st.score++; st.streak++;
+      fb.innerHTML = fbOk(
+        `✅ Bravo ! Ta phrase contient bien <strong>son</strong> et <strong>sont</strong>. Relis-la pour vérifier que tout est correct.`
+      );
+    } else if (!hasSon && !hasSont) {
+      st.streak = 0;
+      fb.innerHTML = fbErr(
+        `❌ Ta phrase ne contient ni <strong>son</strong> ni <strong>sont</strong>. Essaie d'inclure les deux !`
+      );
+    } else if (!hasSont) {
+      st.streak = 0;
+      fb.innerHTML = fbErr(
+        `❌ Ta phrase contient <strong>son</strong> mais pas <strong>sont</strong>. Essaie d'y inclure les deux !`
+      );
+    } else {
+      st.streak = 0;
+      fb.innerHTML = fbErr(
+        `❌ Ta phrase contient <strong>sont</strong> mais pas <strong>son</strong>. Essaie d'y inclure les deux !`
+      );
+    }
+
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESULTS
+═══════════════════════════════════════════════════════════════════ */
+
+function showResults(lv) {
+  const { score: s, attempts: t } = ST[lv];
+  const pct   = t > 0 ? Math.round(100 * s / t) : 0;
+  const stars = pct === 100 ? ' 🌟🌟🌟' : pct >= 80 ? ' ⭐⭐' : ' ⭐';
+  const msg   = pct === 100 ? '🏆 Parfait ! Tu maîtrises cette règle !'
+              : pct >= 80   ? '🌟 Très bien !'
+              : pct >= 60   ? '👍 Continue comme ça !'
+              : '💪 Encore un petit effort !';
+
+  document.getElementById(`dss-bar-${lv}`).style.width = '100%';
+
+  const nextBtn = lv < 3
+    ? `<button class="dss-btn-primary" onclick="setLevel(${lv+1})">Niveau ${lv+1} →</button>`
+    : '';
+  const congratsEl = lv === 3
+    ? `<p style="color:var(--blue);font-weight:700;margin-bottom:14px">🎉 Tu as terminé les 3 niveaux !</p>`
+    : '';
+
+  document.getElementById(`dss-area-${lv}`).innerHTML = `
+    <div class="dss-results">
+      ${congratsEl}
+      <div class="dss-results-score">${s} / ${t}</div>
+      <div class="dss-results-pct">${pct} %${stars}</div>
+      <div class="dss-results-msg">${msg}</div>
+      <div class="dss-results-btns">
+        ${nextBtn}
+        <button class="dss-btn-${lv < 3 ? 'secondary' : 'primary'}" onclick="retryLevel(${lv})">
+          Recommencer ce niveau
+        </button>
+        <a href="français-orthographe.html" class="dss-btn-secondary">← Retour aux notions</a>
+      </div>
+    </div>
+  `;
+
+  updateScore(lv);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  saveExerciseResult({
+    exerciseSlug: 'ortho-distinguer-son-sont',
+    subject:      'français',
+    category:     'Orthographe',
+    exerciseType: 'son-sont-niveaux',
+    level:        'Niveau ' + lv,
+    score:        s,
+    total:        t,
+    durationSecs: Math.round((Date.now() - sessionStart) / 1000)
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BOOTSTRAP
+═══════════════════════════════════════════════════════════════════ */
+
+document.querySelectorAll('.dss-tab').forEach(btn =>
+  btn.addEventListener('click', () => setLevel(parseInt(btn.dataset.lv)))
+);
+
+ST[1].started = true;
+initLevel(1);
+</script>
+
+<script src="js/menu.js"></script>
+<style>
+  footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+  .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+  .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+  .footer__text .rouge { color: #F5A623; font-weight: 700; }
+  .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+  .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

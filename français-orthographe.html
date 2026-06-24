@@ -230,6 +230,12 @@
 
       .level-filters { flex-wrap: wrap; justify-content: center; }
     }
+
+    .badge-niveau {
+      background: rgba(16,43,106,0.07);
+      color: #102B6A;
+      border: 1px solid rgba(16,43,106,0.20);
+    }
   </style>
 </head>
 <body>
@@ -364,10 +370,10 @@
               { title: "Distinguer son / sont",                                                slug: "ortho-distinguer-son-sont",               levels: ["CM1","CM2","6e"] },
               { title: "Distinguer on / ont",                                                  slug: "ortho-distinguer-on-ont",                 levels: ["CM1","CM2","6e"] },
               { title: "Distinguer ce / se",                                                   slug: "ortho-distinguer-ce-se",                  levels: ["CM1","CM2","6e"] },
-              { title: "Distinguer ces / ses",                                                 slug: "ortho-distinguer-ces-ses",                levels: ["CM1","CM2","6e"] },
+              { title: "ces / ses / c'est / s'est / sait / sais",                             slug: "ortho-distinguer-ces-ses-cest-sest",      levels: ["CM1","CM2","6e"] },
               { title: "Distinguer ou / où",                                                   slug: "ortho-distinguer-ou-ou",                  levels: ["CM1","CM2","6e"] },
               { title: "Distinguer leur / leurs",                                              slug: "ortho-distinguer-leur-leurs",             levels: ["CM1","CM2","6e"] },
-              { title: "Distinguer tout / tous / toute / toutes",                              slug: "ortho-distinguer-tout",                   levels: ["CM1","CM2","6e"] },
+              { title: "tout, tous, toute, toutes",                                             slug: "ortho-distinguer-tout",                   levels: ["CM1","CM2","6e"] },
               { title: "Distinguer quel(s), quelle(s), qu'elle(s)",                           slug: "ortho-distinguer-quel",                   levels: ["CM1","CM2","6e"] },
             ]
           }
@@ -385,15 +391,32 @@
       "ortho-transformer-gn-feminin",
       "ortho-identifier-donneur-accord",
       "ortho-modifier-temps-accords",
-      "ortho-modifier-sujet-accords"
+      "ortho-modifier-sujet-accords",
+      "ortho-distinguer-a-a",
+      "ortho-distinguer-et-est",
+      "ortho-distinguer-on-ont"
     ]);
 
-    const CUSTOM_HREFS = {};
+    const CUSTOM_HREFS = {
+      "ortho-distinguer-a-a":               "ortho-distinguer-a-a.html",
+      "ortho-distinguer-et-est":            "ortho-distinguer-et-est.html",
+      "ortho-distinguer-son-sont":          "ortho-distinguer-son-sont.html",
+      "ortho-distinguer-on-ont":            "ortho-distinguer-on-ont.html",
+      "ortho-distinguer-ce-se":             "ortho-distinguer-ce-se.html",
+      "ortho-distinguer-ces-ses-cest-sest": "ortho-distinguer-ces-ses-cest-sest.html",
+      "ortho-distinguer-leur-leurs":        "ortho-distinguer-leur-leurs.html",
+      "ortho-distinguer-tout":              "ortho-distinguer-tout-tous-toute-toutes.html",
+      "ortho-distinguer-ou-ou":            "ortho-distinguer-ou-ou.html",
+      "ortho-distinguer-quel":             "ortho-distinguer-quel-quelle-quels-quelles.html"
+    };
 
     /* ── Badge rendering ───────────────────────────────────────────────────── */
     function renderBadges(levels) {
       return levels.map(level => {
-        const cls = level === "CM1" ? "badge-cm1" : level === "CM2" ? "badge-cm2" : "badge-6e";
+        const cls = level === "CM1" ? "badge-cm1"
+                  : level === "CM2" ? "badge-cm2"
+                  : level === "6e"  ? "badge-6e"
+                  : "badge-niveau";
         return `<span class="badge ${cls}">${level}</span>`;
       }).join("");
     }

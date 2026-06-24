@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>quel, quelle, quels, quelles, qu'elle, qu'elles — Orthographe — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=9">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/results.js"></script>
+  <style>
+    .dss-tab-bar {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .dss-tab {
+      flex: 1;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      padding: 11px 8px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      text-align: center;
+      transition: color 150ms, border-color 150ms;
+    }
+    .dss-tab.is-active { color: var(--blue); border-bottom-color: var(--blue); }
+    .dss-tab:hover:not(.is-active) { color: var(--text); }
+
+    .dss-hidden { display: none !important; }
+
+    .dss-rule-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16,43,106,0.05);
+      border: 1px solid rgba(16,43,106,0.15);
+      border-radius: 100px;
+      padding: 7px 16px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--blue);
+      cursor: pointer;
+      margin-bottom: 16px;
+      transition: background 150ms;
+    }
+    .dss-rule-btn:hover { background: rgba(16,43,106,0.09); }
+    .dss-rule-panel {
+      background: rgba(16,43,106,0.04);
+      border: 1.5px solid rgba(16,43,106,0.16);
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.85;
+      color: var(--text);
+    }
+    .dss-rule-panel strong { color: var(--blue); }
+    .dss-rule-close {
+      display: inline-block;
+      margin-top: 10px;
+      background: none;
+      border: 1px solid rgba(16,43,106,0.22);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--blue);
+      cursor: pointer;
+    }
+    .dss-rule-close:hover { background: rgba(16,43,106,0.06); }
+
+    .dss-progress { margin-bottom: 24px; }
+    .dss-progress-top { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .dss-progress-label { font-weight: 700; font-size: 13px; color: var(--blue); }
+    .dss-bar-bg { height: 8px; background: var(--border); border-radius: 100px; overflow: hidden; }
+    .dss-bar-fill { height: 100%; background: var(--blue); border-radius: 100px; transition: width 350ms ease; }
+
+    .dss-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-md);
+      padding: 32px 36px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 600px) { .dss-card { padding: 22px 18px; } }
+
+    .dss-score-bar {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .dss-phrase {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.7;
+      text-align: center;
+      padding: 20px 22px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 22px;
+    }
+    .dss-blank {
+      display: inline-block;
+      border-bottom: 3px solid var(--blue);
+      min-width: 72px;
+      text-align: center;
+      padding: 0 6px 2px;
+      margin: 0 2px;
+      color: rgba(16,43,106,0.35);
+      font-style: italic;
+      vertical-align: text-bottom;
+    }
+    .dss-blank.is-filled  { font-style: normal; color: var(--blue); }
+    .dss-blank.is-correct { border-bottom-color: #16a34a; color: #15803d; font-style: normal; }
+    .dss-blank.is-wrong   { border-bottom-color: var(--red); color: var(--red); font-style: normal; }
+
+    .dss-choices {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .dss-choices-4 { gap: 10px; }
+
+    .dss-choice {
+      min-width: 96px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 24px;
+      font-family: inherit;
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 170ms, background 170ms, transform 170ms;
+    }
+    .dss-choice-4 {
+      min-width: 76px;
+      padding: 12px 14px;
+      font-size: 17px;
+    }
+    .dss-choice:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.04);
+      transform: translateY(-2px);
+    }
+    .dss-choice:disabled { cursor: default; }
+    .dss-choice.is-selected { border-color: var(--blue); background: rgba(16,43,106,0.08); color: var(--blue); }
+    .dss-choice.is-correct  { border-color: #16a34a; background: rgba(22,163,74,0.09); color: #15803d; }
+    .dss-choice.is-wrong    { border-color: var(--red); background: rgba(214,40,57,0.06); color: var(--red); }
+
+    .dss-db-section { margin-bottom: 14px; }
+    .dss-db-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 8px;
+    }
+
+    .dss-feedback { margin: 14px 0 6px; min-height: 22px; }
+
+    .dss-validate-btn {
+      display: block;
+      width: 100%;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 6px;
+      transition: background 170ms;
+    }
+    .dss-validate-btn:hover:not(:disabled) { background: #0d2255; }
+    .dss-validate-btn:disabled { opacity: 0.38; cursor: default; }
+
+    .dss-next-btn {
+      display: block;
+      width: 100%;
+      margin-top: 14px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 22px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 170ms, transform 170ms;
+    }
+    .dss-next-btn:hover { background: #0d2255; transform: translateY(-1px); }
+
+    .dss-streak-toast {
+      position: fixed;
+      top: 76px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-16px);
+      background: var(--blue);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      padding: 10px 24px;
+      border-radius: 100px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 280ms, transform 280ms;
+      z-index: 9999;
+    }
+    .dss-streak-toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .dss-results { text-align: center; padding: 8px 0 4px; }
+    .dss-results-score { font-size: 42px; font-weight: 900; color: var(--blue); line-height: 1; margin-bottom: 4px; }
+    .dss-results-pct   { font-size: 20px; font-weight: 700; color: var(--muted); margin-bottom: 14px; }
+    .dss-results-msg   { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 24px; }
+    .dss-results-btns  { display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto; }
+    .dss-btn-primary {
+      background: var(--blue); color: #fff; border: none; border-radius: 12px;
+      padding: 13px 22px; font-family: inherit; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: background 170ms;
+    }
+    .dss-btn-primary:hover { background: #0d2255; }
+    .dss-btn-secondary {
+      background: none; border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 12px 22px; font-family: inherit; font-size: 14px; font-weight: 600;
+      color: var(--text); cursor: pointer; text-decoration: none; display: block;
+      transition: border-color 170ms;
+    }
+    .dss-btn-secondary:hover { border-color: rgba(16,43,106,0.25); }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index-v2.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index-v2.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="page-wrap">
+  <div class="page-content">
+
+    <a href="français-orthographe.html" class="back-link">← Orthographe</a>
+
+    <div class="ex-container">
+
+      <div class="ex-page-header">
+        <div class="ex-page-badges">
+          <span class="badge badge-cm1">CM1</span>
+          <span class="badge badge-cm2">CM2</span>
+          <span class="badge badge-6e">6e</span>
+        </div>
+        <h1 class="ex-page-title">Distinguer <em>quel</em>, <em>quelle</em>, <em>quels</em>, <em>quelles</em>, <em>qu'elle</em>, <em>qu'elles</em></h1>
+        <div class="ex-page-rule"></div>
+        <p class="ex-page-subtitle" style="font-size:14px;color:var(--muted);margin-top:8px">Homophones grammaticaux</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="dss-tab-bar">
+        <button class="dss-tab is-active" data-lv="1">Niveau 1</button>
+        <button class="dss-tab" data-lv="2">Niveau 2</button>
+        <button class="dss-tab" data-lv="3">Niveau 3</button>
+      </div>
+
+      <!-- ── Panel 1 ── -->
+      <div id="dss-panel-1">
+        <button class="dss-rule-btn" onclick="toggleRule(1)">❓ Revoir la règle</button>
+        <div class="dss-rule-panel dss-hidden" id="dss-rule-1">
+          <p>
+            <strong>quel</strong> = masculin singulier → <em>Quel livre ?</em><br>
+            <strong>quelle</strong> = féminin singulier → <em>Quelle heure ?</em><br>
+            <strong>quels</strong> = masculin pluriel → <em>Quels livres ?</em><br>
+            <strong>quelles</strong> = féminin pluriel → <em>Quelles heures ?</em>
+          </p>
+          <p><em>Astuce : regarde le nom qui suit ou auquel il se rapporte.<br>
+          Accorde en genre et en nombre comme un adjectif.</em></p>
+          <button class="dss-rule-close" onclick="toggleRule(1)">Fermer</button>
+        </div>
+        <div class="dss-progress">
+          <div class="dss-progress-top">
+            <span class="dss-progress-label">Question <span id="dss-qn-1">1</span> sur <span id="dss-qt-1">12</span></span>
+          </div>
+          <div class="dss-bar-bg"><div class="dss-bar-fill" id="dss-bar-1" style="width:0%"></div></div>
+        </div>
+        <div class="dss-card" id="dss-area-1"></div>
+        <div class="dss-score-bar" id="dss-score-1">Aucun essai pour l'instant</div>
+      </div>
+
+      <!-- ── Panel 2 ── -->
+      <div id="dss-panel-2" class="dss-hidden">
+        <button class="dss-rule-btn" onclick="toggleRule(2)">❓ Revoir la règle</button>
+        <div class="dss-rule-panel dss-hidden" id="dss-rule-2">
+          <p>
+            <strong>quelle(s)</strong> = déterminant ou attribut → remplaçable par <em>quel</em> au masculin<br>
+            &nbsp;&nbsp;&nbsp;→ <em>Quelle chance !</em> → <em>Quel chance ?</em> non → tester : peut-on mettre un nom masculin à la place ?<br><br>
+            <strong>qu'elle(s)</strong> = <em>que</em> + <em>elle(s)</em> → remplaçable par <em>qu'il(s)</em>
+          </p>
+          <p><em>Astuce : si tu peux remplacer par « qu'il » ou « qu'ils », écris<br>
+          <strong>qu'elle</strong> ou <strong>qu'elles</strong> (en deux mots avec apostrophe).</em></p>
+          <button class="dss-rule-close" onclick="toggleRule(2)">Fermer</button>
+        </div>
+        <div class="dss-progress">
+          <div class="dss-progress-top">
+            <span class="dss-progress-label">Question <span id="dss-qn-2">1</span> sur <span id="dss-qt-2">12</span></span>
+          </div>
+          <div class="dss-bar-bg"><div class="dss-bar-fill" id="dss-bar-2" style="width:0%"></div></div>
+        </div>
+        <div class="dss-card" id="dss-area-2"></div>
+        <div class="dss-score-bar" id="dss-score-2">Aucun essai pour l'instant</div>
+      </div>
+
+      <!-- ── Panel 3 ── -->
+      <div id="dss-panel-3" class="dss-hidden">
+        <button class="dss-rule-btn" onclick="toggleRule(3)">❓ Revoir la règle</button>
+        <div class="dss-rule-panel dss-hidden" id="dss-rule-3">
+          <p>
+            <strong>quel</strong> → masculin singulier (déterminant ou attribut)<br>
+            <strong>quelle</strong> → féminin singulier (déterminant ou attribut)<br>
+            <strong>quels</strong> → masculin pluriel<br>
+            <strong>quelles</strong> → féminin pluriel<br>
+            <strong>qu'elle</strong> → <em>que</em> + <em>elle</em> → remplaçable par « qu'il »<br>
+            <strong>qu'elles</strong> → <em>que</em> + <em>elles</em> → remplaçable par « qu'ils »
+          </p>
+          <p>
+            <strong>Piège :</strong> « quelle » et « qu'elle » se prononcent pareil.<br>
+            <em>Test : remplace par « qu'il » → si ça marche → <strong>qu'elle</strong>. Sinon → <strong>quelle</strong>.</em>
+          </p>
+          <button class="dss-rule-close" onclick="toggleRule(3)">Fermer</button>
+        </div>
+        <div class="dss-progress">
+          <div class="dss-progress-top">
+            <span class="dss-progress-label">Question <span id="dss-qn-3">1</span> sur <span id="dss-qt-3">18</span></span>
+          </div>
+          <div class="dss-bar-bg"><div class="dss-bar-fill" id="dss-bar-3" style="width:0%"></div></div>
+        </div>
+        <div class="dss-card" id="dss-area-3"></div>
+        <div class="dss-score-bar" id="dss-score-3">Aucun essai pour l'instant</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 · <a href="mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a></p>
+  </div>
+</footer>
+
+<div class="dss-streak-toast" id="dss-streak-toast"></div>
+
+<script>
+window.EXERCISE_DATA = window.EXERCISE_DATA || {};
+window.EXERCISE_DATA['ortho-distinguer-quel'] = { title: "quel, quelle, quels, quelles, qu'elle, qu'elles" };
+
+/* ═══════════════════════════════════════════════════════════════
+   DATA — NIVEAU 1 : quel / quelle / quels / quelles (ordre fixe)
+═══════════════════════════════════════════════════════════════ */
+const N1 = [
+  { phrase:"___ livre as-tu choisi ?",          answer:"quel",    nom:"livre",    genre:"masculin", nombre:"singulier" },
+  { phrase:"___ heure est-il ?",                 answer:"quelle",  nom:"heure",    genre:"féminin",  nombre:"singulier" },
+  { phrase:"___ beaux paysages !",               answer:"quels",   nom:"paysages", genre:"masculin", nombre:"pluriel"   },
+  { phrase:"___ belles fleurs !",                answer:"quelles", nom:"fleurs",   genre:"féminin",  nombre:"pluriel"   },
+  { phrase:"Je ne sais pas ___ chemin prendre.", answer:"quel",    nom:"chemin",   genre:"masculin", nombre:"singulier" },
+  { phrase:"___ chance tu as !",                 answer:"quelle",  nom:"chance",   genre:"féminin",  nombre:"singulier" },
+  { phrase:"___ sont tes sports préférés ?",     answer:"quels",   nom:"sports",   genre:"masculin", nombre:"pluriel"   },
+  { phrase:"___ sont tes matières préférées ?",  answer:"quelles", nom:"matières", genre:"féminin",  nombre:"pluriel"   },
+  { phrase:"___ temps fait-il dehors ?",         answer:"quel",    nom:"temps",    genre:"masculin", nombre:"singulier" },
+  { phrase:"___ surprise !",                      answer:"quelle",  nom:"surprise", genre:"féminin",  nombre:"singulier" },
+  { phrase:"Dis-moi ___ films tu aimes.",         answer:"quels",   nom:"films",    genre:"masculin", nombre:"pluriel"   },
+  { phrase:"Dis-moi ___ chansons tu écoutes.",    answer:"quelles", nom:"chansons", genre:"féminin",  nombre:"pluriel"   },
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   DATA — NIVEAU 2 : quelle(s) vs qu'elle(s) (ordre fixe)
+   choices = 2 étiquettes pertinentes par question
+═══════════════════════════════════════════════════════════════ */
+const N2 = [
+  /* groupe quelle / qu'elle */
+  { phrase:"Je sais ___ a raison.",                  answer:"qu'elle", choices:["quelle","qu'elle"] },
+  { phrase:"___ belle journée !",                     answer:"quelle",  choices:["quelle","qu'elle"], nom:"journée", genre:"féminin", nombre:"singulier" },
+  { phrase:"Il pense ___ viendra demain.",            answer:"qu'elle", choices:["quelle","qu'elle"] },
+  { phrase:"Je ne sais pas ___ heure il est.",        answer:"quelle",  choices:["quelle","qu'elle"], nom:"heure",   genre:"féminin", nombre:"singulier" },
+  { phrase:"Il espère ___ réussira.",                 answer:"qu'elle", choices:["quelle","qu'elle"] },
+  { phrase:"___ surprise de la voir ici !",           answer:"quelle",  choices:["quelle","qu'elle"], nom:"surprise",genre:"féminin", nombre:"singulier" },
+  { phrase:"Il dit ___ est malade.",                  answer:"qu'elle", choices:["quelle","qu'elle"] },
+  { phrase:"___ est cette odeur ?",                   answer:"quelle",  choices:["quelle","qu'elle"], nom:"odeur",   genre:"féminin", nombre:"singulier" },
+  /* groupe quelles / qu'elles */
+  { phrase:"Je crois ___ sont parties.",              answer:"qu'elles",choices:["quelles","qu'elles"] },
+  { phrase:"___ sont tes couleurs préférées ?",       answer:"quelles", choices:["quelles","qu'elles"], nom:"couleurs",genre:"féminin", nombre:"pluriel" },
+  { phrase:"Il pense ___ ont raison.",                answer:"qu'elles",choices:["quelles","qu'elles"] },
+  { phrase:"___ belles photos elles ont prises !",    answer:"quelles", choices:["quelles","qu'elles"], nom:"photos",  genre:"féminin", nombre:"pluriel" },
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   DATA — NIVEAU 3 : les six formes mélangées (ordre aléatoire)
+   type:'single' = 1 blanc   type:'double' = 2 blancs
+═══════════════════════════════════════════════════════════════ */
+const N3 = [
+  /* ── Single-blank ──────────────────────────────────────── */
+  { type:"single", phrase:"___ film regardes-tu ?",
+    answer:"quel",    choices:["quel","quelle"],      nom:"film",    genre:"masculin", nombre:"singulier" },
+  { type:"single", phrase:"Je crois ___ a compris la leçon.",
+    answer:"qu'elle", choices:["quelle","qu'elle"] },
+  { type:"single", phrase:"___ jolies fleurs tu as cueillies !",
+    answer:"quelles", choices:["quelles","qu'elles"], nom:"fleurs",  genre:"féminin",  nombre:"pluriel"   },
+  { type:"single", phrase:"Il pense ___ sont en retard.",
+    answer:"qu'elles",choices:["quelles","qu'elles"] },
+  { type:"single", phrase:"___ sport pratiques-tu ?",
+    answer:"quel",    choices:["quel","quels"],        nom:"sport",   genre:"masculin", nombre:"singulier" },
+  { type:"single", phrase:"___ chance incroyable !",
+    answer:"quelle",  choices:["quelle","qu'elle"],    nom:"chance",  genre:"féminin",  nombre:"singulier" },
+  { type:"single", phrase:"Dis-moi ___ livres tu préfères.",
+    answer:"quels",   choices:["quel","quels"],         nom:"livres",  genre:"masculin", nombre:"pluriel"   },
+  { type:"single", phrase:"Il espère ___ sera là.",
+    answer:"qu'elle", choices:["quelle","qu'elle"] },
+  { type:"single", phrase:"___ sont les règles du jeu ?",
+    answer:"quelles", choices:["quelles","qu'elles"],  nom:"règles",  genre:"féminin",  nombre:"pluriel"   },
+  { type:"single", phrase:"Je sais ___ ont tout préparé.",
+    answer:"qu'elles",choices:["quelles","qu'elles"] },
+  { type:"single", phrase:"___ beau tableau !",
+    answer:"quel",    choices:["quel","quelle"],        nom:"tableau", genre:"masculin", nombre:"singulier" },
+  { type:"single", phrase:"___ est ton adresse ?",
+    answer:"quelle",  choices:["quelle","qu'elle"],     nom:"adresse", genre:"féminin",  nombre:"singulier" },
+  /* ── Double-blank ──────────────────────────────────────── */
+  { type:"double",
+    phrase:"Je sais ___ film elle préfère et ___ elle viendra.",
+    answers:["quel","qu'elle"],
+    blanks:[
+      { choices:["quel","quelle"],    nom:"film",    genre:"masculin", nombre:"singulier" },
+      { choices:["quelle","qu'elle"] }
+    ]
+  },
+  { type:"double",
+    phrase:"___ chance ___ a eue !",
+    answers:["quelle","qu'elle"],
+    blanks:[
+      { choices:["quelle","qu'elle"], nom:"chance",  genre:"féminin",  nombre:"singulier" },
+      { choices:["quelle","qu'elle"] }
+    ]
+  },
+  { type:"double",
+    phrase:"Dis-moi ___ matières tu aimes et ___ tu réussis le mieux.",
+    answers:["quelles","qu'elles"],
+    blanks:[
+      { choices:["quelles","qu'elles"], nom:"matières", genre:"féminin", nombre:"pluriel" },
+      { choices:["quelles","qu'elles"] }
+    ]
+  },
+  { type:"double",
+    phrase:"___ sont les équipes et ___ ont gagné ?",
+    answers:["quelles","qu'elles"],
+    blanks:[
+      { choices:["quelles","qu'elles"], nom:"équipes", genre:"féminin", nombre:"pluriel" },
+      { choices:["quelles","qu'elles"] }
+    ]
+  },
+  { type:"double",
+    phrase:"Je ne sais pas ___ chemin prendre ni ___ est sûre.",
+    answers:["quel","qu'elle"],
+    blanks:[
+      { choices:["quel","quelle"],    nom:"chemin",  genre:"masculin", nombre:"singulier" },
+      { choices:["quelle","qu'elle"] }
+    ]
+  },
+  { type:"double",
+    phrase:"___ belles photos ! Je crois ___ les a prises elle-même.",
+    answers:["quelles","qu'elle"],
+    blanks:[
+      { choices:["quelles","qu'elles"], nom:"photos", genre:"féminin", nombre:"pluriel" },
+      { choices:["qu'elle","qu'elles"] }
+    ]
+  },
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════ */
+function mkState() {
+  return { idx:0, score:0, attempts:0, streak:0, questions:[], started:false };
+}
+const ST = { 1: mkState(), 2: mkState(), 3: mkState() };
+let activeLevel = 1;
+const sessionStart = Date.now();
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════════════ */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function fbOk(html)  { return `<div class="ex-feedback-correct">${html}</div>`; }
+function fbErr(html) { return `<div class="ex-feedback-wrong">${html}</div>`;   }
+
+function choiceLabel(choices) {
+  if (choices.length === 2) {
+    return `<strong>${choices[0]}</strong> ou <strong>${choices[1]}</strong>`;
+  }
+  const last = choices[choices.length - 1];
+  const rest  = choices.slice(0, -1).map(c => `<strong>${c}</strong>`).join(', ');
+  return `${rest} ou <strong>${last}</strong>`;
+}
+
+function successMsg(answer, info) {
+  if (answer === "qu'elle" || answer === "qu'elles") {
+    const ils = answer === "qu'elle" ? "qu'il" : "qu'ils";
+    return `C'est <em>que</em> + <em>${answer.slice(3)}</em>. Test : remplace par « ${ils} » → ça fonctionne → on écrit <strong>${answer}</strong> (deux mots avec apostrophe) ✓`;
+  }
+  if (info && info.nom) {
+    return `C'est un déterminant ou attribut. Il s'accorde avec <em>${info.nom}</em> : ${info.genre} ${info.nombre} → <strong>${answer}</strong> ✓`;
+  }
+  return `<strong>${answer}</strong> ✓`;
+}
+
+function errorMsg(answer, info) {
+  if (answer === "qu'elle" || answer === "qu'elles") {
+    const ils = answer === "qu'elle" ? "qu'il" : "qu'ils";
+    return `Essaie de remplacer par « ${ils} » → ça fonctionne ici → on écrit <strong>${answer}</strong> (deux mots avec apostrophe).`;
+  }
+  if (info && info.nom) {
+    return `La substitution par « qu'il » ne fonctionne pas → c'est un déterminant. Regarde le nom : <em>${info.nom}</em> — ${info.genre} ${info.nombre} → <strong>${answer}</strong>.`;
+  }
+  return `La bonne réponse est <strong>${answer}</strong>.`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TABS & RULE
+═══════════════════════════════════════════════════════════════ */
+function setLevel(lv) {
+  activeLevel = lv;
+  [1,2,3].forEach(i => {
+    document.getElementById(`dss-panel-${i}`).classList.toggle('dss-hidden', i !== lv);
+    document.querySelector(`.dss-tab[data-lv="${i}"]`).classList.toggle('is-active', i === lv);
+  });
+  if (!ST[lv].started) {
+    initLevel(lv);
+    ST[lv].started = true;
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleRule(lv) {
+  document.getElementById(`dss-rule-${lv}`).classList.toggle('dss-hidden');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LEVEL INIT
+═══════════════════════════════════════════════════════════════ */
+function initLevel(lv) {
+  const st = ST[lv];
+  st.idx = 0; st.score = 0; st.attempts = 0; st.streak = 0;
+
+  if (lv === 1) {
+    st.questions = N1.map(q => ({ type:'simple', data: q }));
+  } else if (lv === 2) {
+    st.questions = N2.map(q => ({ type:'simple', data: q }));
+  } else {
+    st.questions = shuffle(N3.map(q => ({ type: q.type, data: q })));
+  }
+
+  document.getElementById(`dss-qt-${lv}`).textContent = st.questions.length;
+  updateScore(lv);
+  showQuestion(lv);
+}
+
+function retryLevel(lv) {
+  ST[lv].started = true;
+  initLevel(lv);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PROGRESS & SCORE
+═══════════════════════════════════════════════════════════════ */
+function updateProgress(lv) {
+  const st = ST[lv];
+  document.getElementById(`dss-qn-${lv}`).textContent  = st.idx + 1;
+  document.getElementById(`dss-bar-${lv}`).style.width = (st.idx / st.questions.length * 100) + '%';
+}
+
+function updateScore(lv) {
+  const { score:s, attempts:t } = ST[lv];
+  document.getElementById(`dss-score-${lv}`).textContent =
+    t === 0 ? "Aucun essai pour l'instant"
+             : `${s} bonne${s !== 1 ? 's' : ''} réponse${s !== 1 ? 's' : ''} sur ${t} essai${t !== 1 ? 's' : ''}`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STREAK
+═══════════════════════════════════════════════════════════════ */
+function checkStreak(lv) {
+  const { streak } = ST[lv];
+  if (streak > 0 && streak % 3 === 0) {
+    const toast = document.getElementById('dss-streak-toast');
+    toast.textContent = `🔥 ${streak} de suite !`;
+    toast.classList.add('is-visible');
+    setTimeout(() => toast.classList.remove('is-visible'), 2000);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NEXT BUTTON
+═══════════════════════════════════════════════════════════════ */
+function addNextBtn(area, lv) {
+  const st  = ST[lv];
+  const btn = document.createElement('button');
+  btn.className   = 'dss-next-btn';
+  btn.textContent = (st.idx === st.questions.length - 1) ? 'Voir mes résultats' : 'Question suivante →';
+  btn.addEventListener('click', () => {
+    st.idx++;
+    if (st.idx >= st.questions.length) {
+      showResults(lv);
+    } else {
+      showQuestion(lv);
+      document.getElementById(`dss-area-${lv}`).scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+  });
+  area.appendChild(btn);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SHOW QUESTION dispatcher
+═══════════════════════════════════════════════════════════════ */
+function showQuestion(lv) {
+  const st   = ST[lv];
+  const area = document.getElementById(`dss-area-${lv}`);
+  updateProgress(lv);
+  const item = st.questions[st.idx];
+
+  if (item.type !== 'double') {
+    const choices = lv === 1
+      ? ['quel', 'quelle', 'quels', 'quelles']
+      : item.data.choices;
+    renderChoixSimple(area, item.data, lv, choices);
+  } else {
+    renderChoixDouble(area, item.data, lv);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER : choix simple (1 blanc)
+═══════════════════════════════════════════════════════════════ */
+function renderChoixSimple(area, q, lv, choices) {
+  const fourChoices = choices.length >= 4;
+  const phraseHtml  = q.phrase.replace('___', '<span class="dss-blank" id="dss-bl">___</span>');
+  const label = `Quel mot complète la phrase : ${choiceLabel(choices)} ?`;
+
+  area.innerHTML = `
+    <p class="ex-question-label">${label}</p>
+    <div class="dss-phrase">${phraseHtml}</div>
+    <div class="dss-choices${fourChoices ? ' dss-choices-4' : ''}" id="dss-choices"></div>
+    <div class="dss-feedback" id="dss-fb"></div>
+  `;
+
+  const grid = area.querySelector('#dss-choices');
+  choices.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className = 'dss-choice' + (fourChoices ? ' dss-choice-4' : '');
+    btn.textContent = choice;
+    btn.addEventListener('click', () => {
+      grid.querySelectorAll('.dss-choice').forEach(b => b.disabled = true);
+      const correct = choice === q.answer;
+
+      grid.querySelectorAll('.dss-choice').forEach(b => {
+        if (b.textContent === q.answer) b.classList.add('is-correct');
+      });
+      if (!correct) btn.classList.add('is-wrong');
+
+      const blank = area.querySelector('#dss-bl');
+      if (blank) {
+        blank.textContent = q.answer;
+        blank.classList.add('is-filled', correct ? 'is-correct' : 'is-wrong');
+      }
+
+      const st = ST[lv];
+      st.attempts++;
+      if (correct) {
+        st.score++;
+        st.streak++;
+        area.querySelector('#dss-fb').innerHTML = fbOk(
+          `✅ Bravo ! ${successMsg(q.answer, q)}`
+        );
+      } else {
+        st.streak = 0;
+        area.querySelector('#dss-fb').innerHTML = fbErr(
+          `❌ <strong>${choice}</strong> n'est pas correct ici. ${errorMsg(q.answer, q)}`
+        );
+      }
+      checkStreak(lv);
+      updateScore(lv);
+      addNextBtn(area, lv);
+    });
+    grid.appendChild(btn);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER : choix double (2 blancs indépendants + bouton Vérifier)
+═══════════════════════════════════════════════════════════════ */
+function renderChoixDouble(area, q, lv) {
+  let blankIdx = 0;
+  const phraseHtml = q.phrase.replace(/___/g, () => {
+    const i = blankIdx++;
+    return `<span class="dss-blank" id="dss-bl-${i}">___</span>`;
+  });
+
+  area.innerHTML = `
+    <p class="ex-question-label">Quelle est la bonne forme pour chaque blanc ?</p>
+    <div class="dss-phrase">${phraseHtml}</div>
+    <div class="dss-db-section">
+      <div class="dss-db-label">Blanc 1</div>
+      <div class="dss-choices" id="dss-choices-0"></div>
+    </div>
+    <div class="dss-db-section">
+      <div class="dss-db-label">Blanc 2</div>
+      <div class="dss-choices" id="dss-choices-1"></div>
+    </div>
+    <button class="dss-validate-btn" id="dss-val-btn" disabled>Vérifier</button>
+    <div class="dss-feedback" id="dss-fb"></div>
+  `;
+
+  const sel      = [null, null];
+  let   answered = false;
+
+  [0, 1].forEach(bi => {
+    const grid        = area.querySelector(`#dss-choices-${bi}`);
+    const blkChoices  = q.blanks[bi].choices;
+    blkChoices.forEach(choice => {
+      const btn = document.createElement('button');
+      btn.className = 'dss-choice';
+      btn.textContent = choice;
+      btn.addEventListener('click', () => {
+        if (answered) return;
+        grid.querySelectorAll('.dss-choice').forEach(b => b.classList.remove('is-selected'));
+        btn.classList.add('is-selected');
+        sel[bi] = choice;
+        const blank = area.querySelector(`#dss-bl-${bi}`);
+        blank.textContent = choice;
+        blank.classList.add('is-filled');
+        if (sel[0] !== null && sel[1] !== null) {
+          area.querySelector('#dss-val-btn').disabled = false;
+        }
+      });
+      grid.appendChild(btn);
+    });
+  });
+
+  area.querySelector('#dss-val-btn').addEventListener('click', () => {
+    if (answered || sel[0] === null || sel[1] === null) return;
+    answered = true;
+    area.querySelectorAll('.dss-choice').forEach(b => b.disabled = true);
+    area.querySelector('#dss-val-btn').disabled = true;
+
+    const st = ST[lv];
+    st.attempts++;
+
+    const results = q.answers.map((ans, i) => ({
+      correct:  sel[i] === ans,
+      selected: sel[i],
+      answer:   ans,
+      info:     q.blanks[i]
+    }));
+    const allOk = results.every(r => r.correct);
+
+    results.forEach((r, i) => {
+      const blank = area.querySelector(`#dss-bl-${i}`);
+      blank.textContent = r.answer;
+      blank.classList.remove('is-filled');
+      blank.classList.add(r.correct ? 'is-correct' : 'is-wrong');
+
+      const grid = area.querySelector(`#dss-choices-${i}`);
+      grid.querySelectorAll('.dss-choice').forEach(b => {
+        b.classList.remove('is-selected');
+        if (b.textContent === r.answer)                        b.classList.add('is-correct');
+        else if (b.textContent === r.selected && !r.correct)  b.classList.add('is-wrong');
+      });
+    });
+
+    if (allOk) { st.score++; st.streak++; } else { st.streak = 0; }
+
+    const fbLines = results.map((r, i) => {
+      const n = i + 1;
+      return r.correct
+        ? `Blanc ${n} ✓ — ${successMsg(r.answer, r.info)}`
+        : `Blanc ${n} ✗ — ${errorMsg(r.answer, r.info)}`;
+    });
+
+    const fb = area.querySelector('#dss-fb');
+    fb.innerHTML = allOk
+      ? fbOk(`✅ Bravo !<br>${fbLines.join('<br>')}`)
+      : fbErr(`❌<br>${fbLines.join('<br>')}`);
+
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESULTS
+═══════════════════════════════════════════════════════════════ */
+function showResults(lv) {
+  const { score: s, attempts: t } = ST[lv];
+  const pct   = t > 0 ? Math.round(100 * s / t) : 0;
+  const stars = pct === 100 ? ' 🌟🌟🌟' : pct >= 80 ? ' ⭐⭐' : ' ⭐';
+  const msg   = pct === 100 ? '🏆 Parfait ! Tu maîtrises cette règle !'
+              : pct >= 80   ? '🌟 Très bien !'
+              : pct >= 60   ? '👍 Continue comme ça !'
+              : '💪 Encore un petit effort !';
+
+  document.getElementById(`dss-bar-${lv}`).style.width = '100%';
+
+  const nextBtn = lv < 3
+    ? `<button class="dss-btn-primary" onclick="setLevel(${lv + 1})">Niveau ${lv + 1} →</button>`
+    : '';
+  const congratsEl = lv === 3
+    ? `<p style="color:var(--blue);font-weight:700;margin-bottom:14px">🎉 Tu as terminé les 3 niveaux !</p>`
+    : '';
+
+  document.getElementById(`dss-area-${lv}`).innerHTML = `
+    <div class="dss-results">
+      ${congratsEl}
+      <div class="dss-results-score">${s} / ${t}</div>
+      <div class="dss-results-pct">${pct} %${stars}</div>
+      <div class="dss-results-msg">${msg}</div>
+      <div class="dss-results-btns">
+        ${nextBtn}
+        <button class="dss-btn-${lv < 3 ? 'secondary' : 'primary'}" onclick="retryLevel(${lv})">
+          Recommencer ce niveau
+        </button>
+        <a href="français-orthographe.html" class="dss-btn-secondary">← Retour aux notions</a>
+      </div>
+    </div>
+  `;
+
+  updateScore(lv);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  saveExerciseResult({
+    exerciseSlug: 'ortho-distinguer-quel',
+    subject:      'français',
+    category:     'Orthographe — Homophones grammaticaux',
+    exerciseType: 'quel-quelle-quels-quelles-niveaux',
+    level:        'Niveau ' + lv,
+    score:        s,
+    total:        t,
+    durationSecs: Math.round((Date.now() - sessionStart) / 1000)
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BOOTSTRAP
+═══════════════════════════════════════════════════════════════ */
+document.querySelectorAll('.dss-tab').forEach(btn =>
+  btn.addEventListener('click', () => setLevel(parseInt(btn.dataset.lv)))
+);
+
+ST[1].started = true;
+initLevel(1);
+</script>
+
+<script src="js/menu.js"></script>
+<style>
+  footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+  .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+  .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+  .footer__text .rouge { color: #F5A623; font-weight: 700; }
+  .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+  .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

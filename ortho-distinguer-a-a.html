@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distinguer a et à — Orthographe — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=9">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/results.js"></script>
+  <style>
+    /* ── Tabs ─────────────────────────────────────────────────── */
+    .daa-tab-bar {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .daa-tab {
+      flex: 1;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      padding: 11px 8px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      text-align: center;
+      transition: color 150ms, border-color 150ms;
+    }
+    .daa-tab.is-active { color: var(--blue); border-bottom-color: var(--blue); }
+    .daa-tab:hover:not(.is-active) { color: var(--text); }
+
+    /* ── Panel ───────────────────────────────────────────────── */
+    .daa-hidden { display: none !important; }
+
+    /* ── Rule ────────────────────────────────────────────────── */
+    .daa-rule-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16,43,106,0.05);
+      border: 1px solid rgba(16,43,106,0.15);
+      border-radius: 100px;
+      padding: 7px 16px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--blue);
+      cursor: pointer;
+      margin-bottom: 16px;
+      transition: background 150ms;
+    }
+    .daa-rule-btn:hover { background: rgba(16,43,106,0.09); }
+    .daa-rule-panel {
+      background: rgba(16,43,106,0.04);
+      border: 1.5px solid rgba(16,43,106,0.16);
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.85;
+      color: var(--text);
+    }
+    .daa-rule-panel strong { color: var(--blue); }
+    .daa-rule-close {
+      display: inline-block;
+      margin-top: 10px;
+      background: none;
+      border: 1px solid rgba(16,43,106,0.22);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--blue);
+      cursor: pointer;
+    }
+    .daa-rule-close:hover { background: rgba(16,43,106,0.06); }
+
+    /* ── Progress ────────────────────────────────────────────── */
+    .daa-progress { margin-bottom: 24px; }
+    .daa-progress-top {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .daa-progress-label { font-weight: 700; font-size: 13px; color: var(--blue); }
+    .daa-bar-bg { height: 8px; background: var(--border); border-radius: 100px; overflow: hidden; }
+    .daa-bar-fill { height: 100%; background: var(--blue); border-radius: 100px; transition: width 350ms ease; }
+
+    /* ── Card ────────────────────────────────────────────────── */
+    .daa-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-md);
+      padding: 32px 36px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 600px) { .daa-card { padding: 22px 18px; } }
+
+    /* ── Score bar ───────────────────────────────────────────── */
+    .daa-score-bar {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Phrase display (Level 1 & 3) ───────────────────────── */
+    .daa-phrase {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.7;
+      text-align: center;
+      padding: 20px 22px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 22px;
+    }
+    .daa-blank {
+      display: inline-block;
+      border-bottom: 3px solid var(--blue);
+      min-width: 44px;
+      text-align: center;
+      padding: 0 6px 2px;
+      margin: 0 2px;
+      color: rgba(16,43,106,0.35);
+      font-style: italic;
+      vertical-align: text-bottom;
+    }
+    .daa-blank.is-filled  { font-style: normal; color: var(--blue); }
+    .daa-blank.is-correct { border-bottom-color: #16a34a; color: #15803d; font-style: normal; }
+    .daa-blank.is-wrong   { border-bottom-color: var(--red); color: var(--red); font-style: normal; }
+
+    /* ── Level-1 choice buttons ──────────────────────────────── */
+    .daa-choices {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .daa-choice {
+      min-width: 96px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 28px;
+      font-family: inherit;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 170ms, background 170ms, transform 170ms;
+    }
+    .daa-choice:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.04);
+      transform: translateY(-2px);
+    }
+    .daa-choice:disabled { cursor: default; }
+    .daa-choice.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.09); color: #15803d; }
+    .daa-choice.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.06); color: var(--red); }
+
+    /* ── Feedback ────────────────────────────────────────────── */
+    .daa-feedback { margin: 14px 0 6px; min-height: 22px; }
+
+    /* ── Next button ─────────────────────────────────────────── */
+    .daa-next-btn {
+      display: block;
+      width: 100%;
+      margin-top: 14px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 22px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 170ms, transform 170ms;
+    }
+    .daa-next-btn:hover { background: #0d2255; transform: translateY(-1px); }
+
+    /* ── Validate button (shared) ────────────────────────────── */
+    .daa-validate-btn {
+      display: block;
+      width: 100%;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 6px;
+      transition: background 170ms;
+    }
+    .daa-validate-btn:hover:not(:disabled) { background: #0d2255; }
+    .daa-validate-btn:disabled { opacity: 0.38; cursor: default; }
+
+    /* ── Mots-cliquables (Level 2A) ──────────────────────────── */
+    .daa-sentence-wrap {
+      font-size: 19px;
+      font-weight: 600;
+      line-height: 2.3;
+      text-align: center;
+      padding: 16px 20px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .daa-h-word {
+      display: inline-block;
+      border: 2px solid rgba(16,43,106,0.22);
+      background: rgba(16,43,106,0.05);
+      border-radius: 8px;
+      padding: 1px 9px;
+      margin: 0 2px;
+      cursor: pointer;
+      font-weight: 800;
+      color: var(--blue);
+      font-family: inherit;
+      font-size: inherit;
+      transition: border-color 130ms, background 130ms;
+    }
+    .daa-h-word:hover:not(:disabled) { border-color: var(--blue); background: rgba(16,43,106,0.10); }
+    .daa-h-word.is-selected  { border-color: var(--blue); background: rgba(16,43,106,0.15); }
+    .daa-h-word:disabled { cursor: default; }
+    .daa-h-word.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.10); color: #15803d; }
+    .daa-h-word.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.08); color: var(--red); }
+    .daa-h-word.is-missed  { border: 2px dashed #16a34a; color: #16a34a; background: rgba(22,163,74,0.05); }
+
+    .daa-mc-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .daa-correct-btn {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 18px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 130ms, background 130ms;
+      flex-shrink: 0;
+    }
+    .daa-correct-btn:hover:not(:disabled) { border-color: var(--blue); background: rgba(16,43,106,0.04); }
+    .daa-correct-btn.is-selected { border-color: var(--blue); background: rgba(16,43,106,0.08); color: var(--blue); }
+    .daa-correct-btn:disabled { cursor: default; }
+
+    /* ── Classification (Level 2B) ───────────────────────────── */
+    .daa-cl-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px;
+      background: rgba(16,43,106,0.03);
+      border: 2px dashed rgba(16,43,106,0.18);
+      border-radius: 14px;
+      margin-bottom: 14px;
+      min-height: 56px;
+    }
+    .daa-cl-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 480px) { .daa-cl-cols { grid-template-columns: 1fr; } }
+    .daa-cl-col {
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      min-height: 110px;
+      cursor: pointer;
+      transition: border-color 140ms, background 140ms;
+    }
+    .daa-cl-col:hover { border-color: rgba(16,43,106,0.28); background: rgba(16,43,106,0.02); }
+    .daa-cl-col-hdr {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--blue);
+      text-align: center;
+      margin-bottom: 8px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid var(--border);
+    }
+    .daa-cl-cards-wrap { display: flex; flex-direction: column; gap: 5px; }
+    .daa-cl-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+      text-align: center;
+      transition: border-color 130ms, background 130ms, transform 130ms;
+    }
+    .daa-cl-card:hover:not(.is-correct):not(.is-wrong) { border-color: rgba(16,43,106,0.28); transform: translateY(-1px); }
+    .daa-cl-card.is-selected { border-color: var(--blue); background: rgba(16,43,106,0.08); color: var(--blue); }
+    .daa-cl-card.is-correct  { border-color: #16a34a; background: rgba(22,163,74,0.09); color: #15803d; cursor: default; }
+    .daa-cl-card.is-wrong    { border-color: var(--red); background: rgba(214,40,57,0.07); color: var(--red); cursor: default; }
+
+    /* ── Fill-in (Level 3A) ──────────────────────────────────── */
+    .daa-fill-sentence {
+      font-size: 19px;
+      font-weight: 600;
+      line-height: 2.8;
+      text-align: center;
+      padding: 16px 20px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 18px;
+    }
+    .daa-fill-inp {
+      display: inline-block;
+      width: 60px;
+      border: 2px solid var(--blue);
+      border-radius: 8px;
+      text-align: center;
+      font-size: 19px;
+      font-weight: 800;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--card-bg);
+      padding: 2px 4px;
+      outline: none;
+      vertical-align: middle;
+      margin: 0 4px;
+      transition: border-color 140ms, box-shadow 140ms;
+    }
+    .daa-fill-inp:focus { box-shadow: 0 0 0 3px rgba(16,43,106,0.12); }
+    .daa-fill-inp.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.07); color: #15803d; }
+    .daa-fill-inp.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.06); color: var(--red); }
+    .daa-fill-inp:disabled { cursor: default; }
+
+    /* ── Production libre (Level 3B) ─────────────────────────── */
+    .daa-prompt-box {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.55;
+      padding: 16px 20px;
+      background: var(--bg);
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .daa-textarea {
+      width: 100%;
+      min-height: 96px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 16px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      resize: vertical;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+      transition: border-color 190ms, box-shadow 190ms;
+    }
+    .daa-textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(16,43,106,0.10); }
+
+    /* ── Streak toast ────────────────────────────────────────── */
+    .daa-streak-toast {
+      position: fixed;
+      top: 76px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-16px);
+      background: var(--blue);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      padding: 10px 24px;
+      border-radius: 100px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 280ms, transform 280ms;
+      z-index: 9999;
+    }
+    .daa-streak-toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Results ─────────────────────────────────────────────── */
+    .daa-results {
+      text-align: center;
+      padding: 8px 0 4px;
+    }
+    .daa-results-score { font-size: 42px; font-weight: 900; color: var(--blue); line-height: 1; margin-bottom: 4px; }
+    .daa-results-pct   { font-size: 20px; font-weight: 700; color: var(--muted); margin-bottom: 14px; }
+    .daa-results-msg   { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 24px; }
+    .daa-results-btns  { display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto; }
+    .daa-btn-primary {
+      background: var(--blue); color: #fff; border: none; border-radius: 12px;
+      padding: 13px 22px; font-family: inherit; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: background 170ms;
+    }
+    .daa-btn-primary:hover { background: #0d2255; }
+    .daa-btn-secondary {
+      background: none; border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 12px 22px; font-family: inherit; font-size: 14px; font-weight: 600;
+      color: var(--text); cursor: pointer; text-decoration: none; display: block;
+      transition: border-color 170ms;
+    }
+    .daa-btn-secondary:hover { border-color: rgba(16,43,106,0.25); }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index-v2.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index-v2.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="page-wrap">
+  <div class="page-content">
+
+    <a href="français-orthographe.html" class="back-link">← Orthographe</a>
+
+    <div class="ex-container">
+
+      <!-- Page header -->
+      <div class="ex-page-header">
+        <div class="ex-page-badges">
+          <span class="badge badge-cm1">CM1</span>
+          <span class="badge badge-cm2">CM2</span>
+          <span class="badge badge-6e">6e</span>
+        </div>
+        <h1 class="ex-page-title">Distinguer <em>a</em> et <em>à</em></h1>
+        <div class="ex-page-rule"></div>
+        <p class="ex-page-subtitle" style="font-size:14px;color:var(--muted);margin-top:8px">Homophones grammaticaux</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="daa-tab-bar">
+        <button class="daa-tab is-active" data-lv="1">Niveau 1</button>
+        <button class="daa-tab" data-lv="2">Niveau 2</button>
+        <button class="daa-tab" data-lv="3">Niveau 3</button>
+      </div>
+
+      <!-- ── Panel 1 ─────────────────────────────────────────── -->
+      <div id="daa-panel-1">
+        <button class="daa-rule-btn" onclick="toggleRule(1)">❓ Revoir la règle</button>
+        <div class="daa-rule-panel daa-hidden" id="daa-rule-1">
+          <p><strong>a</strong> = verbe avoir → remplaçable par « avait »<br>
+             <strong>à</strong> = préposition → non remplaçable par « avait »</p>
+          <p><em>Astuce : si tu peux remplacer par « avait », écris <strong>a</strong> sans accent.</em></p>
+          <button class="daa-rule-close" onclick="toggleRule(1)">Fermer</button>
+        </div>
+        <div class="daa-progress">
+          <div class="daa-progress-top">
+            <span class="daa-progress-label">Question <span id="daa-qn-1">1</span> sur <span id="daa-qt-1">12</span></span>
+          </div>
+          <div class="daa-bar-bg"><div class="daa-bar-fill" id="daa-bar-1" style="width:0%"></div></div>
+        </div>
+        <div class="daa-card" id="daa-area-1"></div>
+        <div class="daa-score-bar" id="daa-score-1">Aucun essai pour l'instant</div>
+      </div>
+
+      <!-- ── Panel 2 ─────────────────────────────────────────── -->
+      <div id="daa-panel-2" class="daa-hidden">
+        <button class="daa-rule-btn" onclick="toggleRule(2)">❓ Revoir la règle</button>
+        <div class="daa-rule-panel daa-hidden" id="daa-rule-2">
+          <p><strong>a</strong> = verbe avoir → remplaçable par « avait »<br>
+             <strong>à</strong> = préposition → non remplaçable par « avait »</p>
+          <p><em>Astuce : si tu peux remplacer par « avait », écris <strong>a</strong> sans accent.</em></p>
+          <button class="daa-rule-close" onclick="toggleRule(2)">Fermer</button>
+        </div>
+        <div class="daa-progress">
+          <div class="daa-progress-top">
+            <span class="daa-progress-label">Question <span id="daa-qn-2">1</span> sur <span id="daa-qt-2">12</span></span>
+          </div>
+          <div class="daa-bar-bg"><div class="daa-bar-fill" id="daa-bar-2" style="width:0%"></div></div>
+        </div>
+        <div class="daa-card" id="daa-area-2"></div>
+        <div class="daa-score-bar" id="daa-score-2">Aucun essai pour l'instant</div>
+      </div>
+
+      <!-- ── Panel 3 ─────────────────────────────────────────── -->
+      <div id="daa-panel-3" class="daa-hidden">
+        <button class="daa-rule-btn" onclick="toggleRule(3)">❓ Revoir la règle</button>
+        <div class="daa-rule-panel daa-hidden" id="daa-rule-3">
+          <p><strong>a</strong> = verbe avoir → remplaçable par « avait »<br>
+             <strong>à</strong> = préposition → non remplaçable par « avait »</p>
+          <p><em>Astuce : si tu peux remplacer par « avait », écris <strong>a</strong> sans accent.</em></p>
+          <button class="daa-rule-close" onclick="toggleRule(3)">Fermer</button>
+        </div>
+        <div class="daa-progress">
+          <div class="daa-progress-top">
+            <span class="daa-progress-label">Question <span id="daa-qn-3">1</span> sur <span id="daa-qt-3">16</span></span>
+          </div>
+          <div class="daa-bar-bg"><div class="daa-bar-fill" id="daa-bar-3" style="width:0%"></div></div>
+        </div>
+        <div class="daa-card" id="daa-area-3"></div>
+        <div class="daa-score-bar" id="daa-score-3">Aucun essai pour l'instant</div>
+      </div>
+
+    </div><!-- /.ex-container -->
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 · <a href="mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a></p>
+  </div>
+</footer>
+
+<!-- Streak toast -->
+<div class="daa-streak-toast" id="daa-streak-toast"></div>
+
+<script>
+/* Provides exerciseTitle to saveExerciseResult() via results.js */
+const EXERCISE_DATA = { 'ortho-distinguer-a-a': { title: "Distinguer a et à" } };
+
+/* ═══════════════════════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════════════════════ */
+
+/* Niveau 1 — choix-etiquette (12 questions, ordre fixe) */
+const N1 = [
+  { phrase:"Il ___ mangé toute la tarte.",       answer:"a",  testPhrase:"avait mangé",        testOk:true  },
+  { phrase:"Elle pense ___ ses amis.",            answer:"à",  testPhrase:"avait ses amis",      testOk:false },
+  { phrase:"Le chat ___ renversé son bol.",       answer:"a",  testPhrase:"avait renversé",      testOk:true  },
+  { phrase:"Nous allons ___ la piscine.",         answer:"à",  testPhrase:"avait la piscine",    testOk:false },
+  { phrase:"Papa ___ appelé le médecin.",         answer:"a",  testPhrase:"avait appelé",        testOk:true  },
+  { phrase:"Il tient ___ son jouet.",             answer:"à",  testPhrase:"avait son jouet",     testOk:false },
+  { phrase:"Elle ___ oublié son cartable.",       answer:"a",  testPhrase:"avait oublié",        testOk:true  },
+  { phrase:"Le train part ___ midi.",             answer:"à",  testPhrase:"avait midi",          testOk:false },
+  { phrase:"Mon frère ___ couru très vite.",      answer:"a",  testPhrase:"avait couru",         testOk:true  },
+  { phrase:"Ce livre appartient ___ Léa.",        answer:"à",  testPhrase:"avait Léa",           testOk:false },
+  { phrase:"Il ___ neigé cette nuit.",            answer:"a",  testPhrase:"avait neigé",         testOk:true  },
+  { phrase:"Je pense ___ toi.",                   answer:"à",  testPhrase:"avait toi",           testOk:false },
+];
+
+/* Niveau 2A — mots-cliquables
+   wordIdx : index du token (0-based) dans raw.split(' ')
+   errors = [] → phrase sans erreur */
+const N2_MC = [
+  { raw:"Il à gagné le match.",
+    errors:[{ wordIdx:1, wrongForm:"à", correctForm:"a", testPhrase:"avait gagné",    testOk:true  }] },
+  { raw:"Elle a peur a l'orage.",
+    errors:[{ wordIdx:3, wrongForm:"a", correctForm:"à", testPhrase:"avait l'orage",  testOk:false }] },
+  { raw:"Le chien à aboyé toute la nuit.",
+    errors:[{ wordIdx:2, wrongForm:"à", correctForm:"a", testPhrase:"avait aboyé",    testOk:true  }] },
+  { raw:"Nous allons a Paris demain.",
+    errors:[{ wordIdx:2, wrongForm:"a", correctForm:"à", testPhrase:"avait Paris",    testOk:false }] },
+  { raw:"Il à offert des fleurs à sa mère.",
+    errors:[{ wordIdx:1, wrongForm:"à", correctForm:"a", testPhrase:"avait offert",   testOk:true  }] },
+  { raw:"Elle à pensé a tout.",
+    errors:[
+      { wordIdx:1, wrongForm:"à", correctForm:"a", testPhrase:"avait pensé", testOk:true  },
+      { wordIdx:3, wrongForm:"a", correctForm:"à", testPhrase:"avait tout",  testOk:false },
+    ] },
+  { raw:"Il a donné son livre à son ami.",        errors:[] },
+  { raw:"Elle a couru jusqu'à la maison.",        errors:[] },
+  { raw:"Le boulanger a livré le pain à l'école.", errors:[] },
+  { raw:"Papa a téléphoné à mamie ce matin.",     errors:[] },
+];
+
+/* Niveau 2B — classification (2 séries de 6 items) */
+const N2_CL = [
+  { items:[
+    { phrase:"Il a dormi.",         col:"a" },
+    { phrase:"Elle va à l'école.",  col:"à" },
+    { phrase:"Il a crié.",          col:"a" },
+    { phrase:"Je pense à toi.",     col:"à" },
+    { phrase:"Le chien a mordu.",   col:"a" },
+    { phrase:"Elle répond à Paul.", col:"à" },
+  ]},
+  { items:[
+    { phrase:"Maman a cuisiné.",       col:"a" },
+    { phrase:"Il joue à la balle.",    col:"à" },
+    { phrase:"Il a souri.",            col:"a" },
+    { phrase:"Elle tient à ce livre.", col:"à" },
+    { phrase:"Le vent a soufflé.",     col:"a" },
+    { phrase:"Il habite à Lyon.",      col:"à" },
+  ]},
+];
+
+/* Niveau 3A — fill-in (ordre fixe) */
+const N3_FI = [
+  { sentence:"Le médecin ___ soigné le blessé.",
+    answers:["a"],    blanks:[{ testPhrase:"avait soigné",             testOk:true  }] },
+  { sentence:"Elle habite ___ Bordeaux depuis deux ans.",
+    answers:["à"],    blanks:[{ testPhrase:"avait Bordeaux",            testOk:false }] },
+  { sentence:"Le professeur ___ expliqué la leçon.",
+    answers:["a"],    blanks:[{ testPhrase:"avait expliqué",            testOk:true  }] },
+  { sentence:"Il tient ___ terminer son travail.",
+    answers:["à"],    blanks:[{ testPhrase:"avait terminer",            testOk:false }] },
+  { sentence:"La tempête ___ abîmé les toitures.",
+    answers:["a"],    blanks:[{ testPhrase:"avait abîmé",               testOk:true  }] },
+  { sentence:"Nous pensons ___ partir demain.",
+    answers:["à"],    blanks:[{ testPhrase:"avait partir",              testOk:false }] },
+  { sentence:"Il ___ écrit une lettre ___ sa grand-mère.",
+    answers:["a","à"], blanks:[{ testPhrase:"avait écrit",    testOk:true  },
+                               { testPhrase:"avait sa grand-mère",      testOk:false }] },
+  { sentence:"Elle ___ couru ___ toute vitesse.",
+    answers:["a","à"], blanks:[{ testPhrase:"avait couru",    testOk:true  },
+                               { testPhrase:"avait toute vitesse",      testOk:false }] },
+  { sentence:"Le chien ___ obéi ___ son maître.",
+    answers:["a","à"], blanks:[{ testPhrase:"avait obéi",     testOk:true  },
+                               { testPhrase:"avait son maître",         testOk:false }] },
+  { sentence:"Papa ___ téléphoné ___ son ami.",
+    answers:["a","à"], blanks:[{ testPhrase:"avait téléphoné",testOk:true  },
+                               { testPhrase:"avait son ami",            testOk:false }] },
+  { sentence:"La maîtresse ___ lu l'histoire ___ voix haute.",
+    answers:["a","à"], blanks:[{ testPhrase:"avait lu",       testOk:true  },
+                               { testPhrase:"avait voix haute",         testOk:false }] },
+  { sentence:"Il ___ répondu ___ toutes les questions.",
+    answers:["a","à"], blanks:[{ testPhrase:"avait répondu",  testOk:true  },
+                               { testPhrase:"avait toutes les questions",testOk:false }] },
+];
+
+/* Niveau 3B — production libre */
+const N3_PL = [
+  { consigne:"Écris une phrase avec le verbe <strong>partir</strong> qui contient à la fois <em>a</em> et <em>à</em>." },
+  { consigne:"Écris une phrase avec <strong>l'école</strong> qui contient à la fois <em>a</em> et <em>à</em>." },
+  { consigne:"Écris une phrase avec le verbe <strong>manger</strong> qui contient à la fois <em>a</em> et <em>à</em>." },
+  { consigne:"Écris une phrase avec le verbe <strong>téléphoner</strong> qui contient à la fois <em>a</em> et <em>à</em>." },
+];
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════════ */
+
+function mkState() {
+  return { idx:0, score:0, attempts:0, streak:0, questions:[], started:false };
+}
+const ST = { 1: mkState(), 2: mkState(), 3: mkState() };
+let activeLevel = 1;
+const sessionStart = Date.now();
+
+/* ═══════════════════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════════════════ */
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* Split sentence into tokens; mark standalone a/à as homophones */
+function tokenize(raw) {
+  return raw.split(' ').map((token, idx) => {
+    const clean = token.replace(/^[«"''""]/,'').replace(/[.,!?;:»"''"""]+$/,'');
+    const isH   = clean === 'a' || clean === 'à';
+    return { raw: token, clean, isH, idx };
+  });
+}
+
+function fbOk(html)  { return `<div class="ex-feedback-correct">${html}</div>`; }
+function fbErr(html) { return `<div class="ex-feedback-wrong">${html}</div>`;  }
+
+/* Build the "avait test" explanation string */
+function avaitExpl(testPhrase, testOk, correctForm) {
+  const verdict = testOk ? 'fonctionne' : 'ne fonctionne pas';
+  const donc    = correctForm === 'a'
+    ? 'on écrit <strong>a</strong> (sans accent)'
+    : 'on écrit <strong>à</strong> (avec accent)';
+  return `Tester : « ${testPhrase} » → <em>${verdict}</em> → ${donc}.`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TABS & RULE
+═══════════════════════════════════════════════════════════════════ */
+
+function setLevel(lv) {
+  activeLevel = lv;
+  [1,2,3].forEach(i => {
+    document.getElementById(`daa-panel-${i}`).classList.toggle('daa-hidden', i !== lv);
+    document.querySelector(`.daa-tab[data-lv="${i}"]`).classList.toggle('is-active', i === lv);
+  });
+  if (!ST[lv].started) {
+    initLevel(lv);
+    ST[lv].started = true;
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleRule(lv) {
+  document.getElementById(`daa-rule-${lv}`).classList.toggle('daa-hidden');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LEVEL INIT
+═══════════════════════════════════════════════════════════════════ */
+
+function initLevel(lv) {
+  const st = ST[lv];
+  st.idx = 0; st.score = 0; st.attempts = 0; st.streak = 0;
+
+  if (lv === 1) {
+    st.questions = N1.map(q => ({ type:'choix', data: q }));
+    document.getElementById('daa-qt-1').textContent = st.questions.length;
+
+  } else if (lv === 2) {
+    const mcItems = N2_MC.map(q => ({ type:'mc',  data: q }));
+    const clItems = N2_CL.map(s => ({ type:'cl',  data: s }));
+    st.questions  = shuffle([...mcItems, ...clItems]);
+    document.getElementById('daa-qt-2').textContent = st.questions.length;
+
+  } else {
+    const fiItems = N3_FI.map(q => ({ type:'fi', data: q }));
+    const plItems = N3_PL.map(q => ({ type:'pl', data: q }));
+    st.questions  = [...fiItems, ...plItems];
+    document.getElementById('daa-qt-3').textContent = st.questions.length;
+  }
+
+  updateScore(lv);
+  showQuestion(lv);
+}
+
+function retryLevel(lv) {
+  ST[lv].started = true;
+  initLevel(lv);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PROGRESS & SCORE
+═══════════════════════════════════════════════════════════════════ */
+
+function updateProgress(lv) {
+  const st = ST[lv];
+  document.getElementById(`daa-qn-${lv}`).textContent  = st.idx + 1;
+  document.getElementById(`daa-bar-${lv}`).style.width = (st.idx / st.questions.length * 100) + '%';
+}
+
+function updateScore(lv) {
+  const { score:s, attempts:t } = ST[lv];
+  document.getElementById(`daa-score-${lv}`).textContent =
+    t === 0 ? "Aucun essai pour l'instant"
+             : `${s} bonne${s !== 1 ? 's' : ''} réponse${s !== 1 ? 's' : ''} sur ${t} essai${t !== 1 ? 's' : ''}`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   STREAK
+═══════════════════════════════════════════════════════════════════ */
+
+function checkStreak(lv) {
+  const { streak } = ST[lv];
+  if (streak > 0 && streak % 3 === 0) {
+    const toast = document.getElementById('daa-streak-toast');
+    toast.textContent = `🔥 ${streak} de suite !`;
+    toast.classList.add('is-visible');
+    setTimeout(() => toast.classList.remove('is-visible'), 2000);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NEXT BUTTON
+═══════════════════════════════════════════════════════════════════ */
+
+function addNextBtn(area, lv) {
+  const st  = ST[lv];
+  const btn = document.createElement('button');
+  btn.className   = 'daa-next-btn';
+  btn.textContent = (st.idx === st.questions.length - 1) ? 'Voir mes résultats' : 'Question suivante →';
+  btn.addEventListener('click', () => {
+    st.idx++;
+    if (st.idx >= st.questions.length) {
+      showResults(lv);
+    } else {
+      showQuestion(lv);
+      document.getElementById(`daa-area-${lv}`).scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+  });
+  area.appendChild(btn);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SHOW QUESTION dispatcher
+═══════════════════════════════════════════════════════════════════ */
+
+function showQuestion(lv) {
+  const st   = ST[lv];
+  const area = document.getElementById(`daa-area-${lv}`);
+  updateProgress(lv);
+  const item = st.questions[st.idx];
+
+  switch (item.type) {
+    case 'choix': renderChoix(area, item.data, lv);  break;
+    case 'mc':    renderMC(area, item.data, lv);     break;
+    case 'cl':    renderCL(area, item.data, lv);     break;
+    case 'fi':    renderFI(area, item.data, lv);     break;
+    case 'pl':    renderPL(area, item.data, lv);     break;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NIVEAU 1 : CHOIX-ÉTIQUETTE
+═══════════════════════════════════════════════════════════════════ */
+
+function renderChoix(area, q, lv) {
+  const phraseHtml = q.phrase.replace('___',
+    '<span class="daa-blank" id="daa-bl">___</span>');
+
+  area.innerHTML = `
+    <p class="ex-question-label">Quel mot complète la phrase : <strong>a</strong> ou <strong>à</strong> ?</p>
+    <div class="daa-phrase">${phraseHtml}</div>
+    <div class="daa-choices" id="daa-choices"></div>
+    <div class="daa-feedback" id="daa-fb"></div>
+  `;
+
+  const grid = area.querySelector('#daa-choices');
+  ['a', 'à'].forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className   = 'daa-choice';
+    btn.textContent = choice;
+    btn.addEventListener('click', () => {
+      grid.querySelectorAll('.daa-choice').forEach(b => b.disabled = true);
+      const correct = choice === q.answer;
+
+      grid.querySelectorAll('.daa-choice').forEach(b => {
+        if (b.textContent === q.answer) b.classList.add('is-correct');
+      });
+      if (!correct) btn.classList.add('is-wrong');
+
+      const blank = area.querySelector('#daa-bl');
+      if (blank) {
+        blank.textContent = q.answer;
+        blank.classList.add('is-filled', correct ? 'is-correct' : 'is-wrong');
+      }
+
+      const st = ST[lv];
+      st.attempts++;
+      if (correct) {
+        st.score++;
+        st.streak++;
+        const test = q.testOk ? '« avait » fonctionne' : '« avait » ne fonctionne pas';
+        area.querySelector('#daa-fb').innerHTML = fbOk(
+          `✅ Bravo ! <strong>« ${q.answer} »</strong> est correct ici : ${test}.`
+        );
+      } else {
+        st.streak = 0;
+        area.querySelector('#daa-fb').innerHTML = fbErr(
+          `❌ Essaie de remplacer par « avait » : ${avaitExpl(q.testPhrase, q.testOk, q.answer)}`
+        );
+      }
+      checkStreak(lv);
+      updateScore(lv);
+      addNextBtn(area, lv);
+    });
+    grid.appendChild(btn);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NIVEAU 2A : MOTS-CLIQUABLES
+═══════════════════════════════════════════════════════════════════ */
+
+function renderMC(area, q, lv) {
+  const tokens      = tokenize(q.raw);
+  const errorIdxSet = new Set(q.errors.map(e => e.wordIdx));
+  const hasErrors   = q.errors.length > 0;
+
+  /* Build sentence HTML: homophones become buttons, rest plain text */
+  const sentParts = tokens.map(tok => {
+    if (tok.isH) return `<button class="daa-h-word" data-ti="${tok.idx}">${tok.raw}</button>`;
+    return tok.raw;
+  });
+  const sentHtml = sentParts.join(' ');
+
+  area.innerHTML = `
+    <p class="ex-question-label">Clique sur le ou les mots mal orthographiés, puis valide.<br>
+    S'il n'y a pas d'erreur, clique sur « Phrase correcte ».</p>
+    <div class="daa-sentence-wrap">${sentHtml}</div>
+    <div class="daa-mc-row">
+      <button class="daa-correct-btn" id="daa-ok-btn">✓ Phrase correcte</button>
+      <button class="daa-validate-btn" id="daa-val-btn" style="flex:1">Valider</button>
+    </div>
+    <div class="daa-feedback" id="daa-fb"></div>
+  `;
+
+  const selected        = new Set();
+  let   correctSelected = false;
+  let   answered        = false;
+
+  area.querySelectorAll('.daa-h-word').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (answered) return;
+      const ti = parseInt(btn.dataset.ti);
+      if (selected.has(ti)) {
+        selected.delete(ti);
+        btn.classList.remove('is-selected');
+      } else {
+        selected.add(ti);
+        btn.classList.add('is-selected');
+        if (correctSelected) {
+          correctSelected = false;
+          area.querySelector('#daa-ok-btn').classList.remove('is-selected');
+        }
+      }
+    });
+  });
+
+  area.querySelector('#daa-ok-btn').addEventListener('click', () => {
+    if (answered) return;
+    correctSelected = !correctSelected;
+    area.querySelector('#daa-ok-btn').classList.toggle('is-selected', correctSelected);
+    if (correctSelected) {
+      selected.clear();
+      area.querySelectorAll('.daa-h-word.is-selected').forEach(b => b.classList.remove('is-selected'));
+    }
+  });
+
+  area.querySelector('#daa-val-btn').addEventListener('click', () => {
+    if (answered) return;
+    answered = true;
+    area.querySelectorAll('.daa-h-word').forEach(b => b.disabled = true);
+    area.querySelector('#daa-ok-btn').disabled = true;
+    area.querySelector('#daa-val-btn').disabled = true;
+
+    const st      = ST[lv];
+    let   correct;
+
+    if (correctSelected) {
+      correct = !hasErrors;
+    } else {
+      correct = selected.size === errorIdxSet.size &&
+                [...selected].every(ti => errorIdxSet.has(ti));
+    }
+
+    st.attempts++;
+    if (correct) { st.score++; st.streak++; } else { st.streak = 0; }
+
+    /* Colour homophone buttons */
+    area.querySelectorAll('.daa-h-word').forEach(btn => {
+      const ti         = parseInt(btn.dataset.ti);
+      const isErr      = errorIdxSet.has(ti);
+      const wasSel     = selected.has(ti);
+      if      (isErr && wasSel)  btn.classList.add('is-correct');
+      else if (isErr && !wasSel) btn.classList.add('is-missed');
+      else if (!isErr && wasSel) btn.classList.add('is-wrong');
+    });
+
+    const fb    = area.querySelector('#daa-fb');
+    const expl  = q.errors.map(e =>
+      `<br>• <strong>« ${e.wrongForm} »</strong> → <strong>« ${e.correctForm} »</strong> : ${avaitExpl(e.testPhrase, e.testOk, e.correctForm)}`
+    ).join('');
+
+    if (correct) {
+      fb.innerHTML = hasErrors
+        ? fbOk(`✅ Bravo ! Tu as trouvé ${q.errors.length > 1 ? 'les erreurs' : 'l\'erreur'}.${expl}`)
+        : fbOk(`✅ Bravo ! Cette phrase ne contient aucune erreur.`);
+    } else {
+      fb.innerHTML = (correctSelected && hasErrors)
+        ? fbErr(`❌ Il y avait ${q.errors.length > 1 ? 'des erreurs' : 'une erreur'} dans cette phrase.${expl}`)
+        : fbErr(`❌ Pas tout à fait.${expl || ' Cette phrase ne contenait pas d\'erreur.'}`);
+    }
+
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NIVEAU 2B : CLASSIFICATION
+═══════════════════════════════════════════════════════════════════ */
+
+function renderCL(area, serie, lv) {
+  const items       = shuffle([...serie.items]);
+  const placedInCol = {}; /* itemIdx → col string */
+  let   selCard     = null; /* { idx, el } */
+  let   answered    = false;
+
+  area.innerHTML = `
+    <p class="ex-question-label">Classe chaque phrase dans la bonne colonne. Clique une carte pour la sélectionner, puis clique la colonne.</p>
+    <div class="daa-cl-bank" id="daa-bank"></div>
+    <div class="daa-cl-cols">
+      <div class="daa-cl-col" id="daa-col-a">
+        <div class="daa-cl-col-hdr"><em>a</em> — verbe avoir</div>
+        <div class="daa-cl-cards-wrap" id="daa-wrap-a"></div>
+      </div>
+      <div class="daa-cl-col" id="daa-col-aa">
+        <div class="daa-cl-col-hdr"><em>à</em> — préposition</div>
+        <div class="daa-cl-cards-wrap" id="daa-wrap-aa"></div>
+      </div>
+    </div>
+    <button class="daa-validate-btn" id="daa-val-btn" disabled>
+      Valider (place toutes les phrases d'abord)
+    </button>
+    <div class="daa-feedback" id="daa-fb"></div>
+  `;
+
+  function checkAllPlaced() {
+    const n      = Object.keys(placedInCol).length;
+    const valBtn = area.querySelector('#daa-val-btn');
+    valBtn.disabled    = n < items.length;
+    valBtn.textContent = n < items.length
+      ? `Valider (${n}/${items.length} placées)`
+      : 'Valider';
+  }
+
+  function makeCard(item, idx) {
+    const el      = document.createElement('div');
+    el.className  = 'daa-cl-card';
+    el.textContent = item.phrase;
+    el.dataset.idx = idx;
+
+    el.addEventListener('click', e => {
+      if (answered) return;
+
+      if (placedInCol[idx] !== undefined) {
+        /* Card in column → return to bank */
+        e.stopPropagation();
+        el.remove();
+        delete placedInCol[idx];
+        el.classList.remove('is-selected');
+        area.querySelector('#daa-bank').appendChild(el);
+        if (selCard && selCard.idx === idx) selCard = null;
+        checkAllPlaced();
+        return;
+      }
+
+      /* Card in bank → toggle selection */
+      if (selCard && selCard.idx === idx) {
+        selCard = null;
+        el.classList.remove('is-selected');
+      } else {
+        if (selCard) selCard.el.classList.remove('is-selected');
+        selCard = { idx, el };
+        el.classList.add('is-selected');
+      }
+    });
+    return el;
+  }
+
+  const bank = area.querySelector('#daa-bank');
+  items.forEach((item, idx) => bank.appendChild(makeCard(item, idx)));
+
+  /* Column click handler */
+  ['a', 'à'].forEach(col => {
+    const colEl   = area.querySelector(col === 'a' ? '#daa-col-a'  : '#daa-col-aa');
+    const wrapEl  = area.querySelector(col === 'a' ? '#daa-wrap-a' : '#daa-wrap-aa');
+    colEl.addEventListener('click', () => {
+      if (answered || !selCard) return;
+      const { idx, el } = selCard;
+      el.remove();
+      el.classList.remove('is-selected');
+      selCard         = null;
+      placedInCol[idx] = col;
+      wrapEl.appendChild(el);
+      checkAllPlaced();
+    });
+  });
+
+  /* Validate */
+  area.querySelector('#daa-val-btn').addEventListener('click', () => {
+    if (answered) return;
+    answered = true;
+    area.querySelector('#daa-val-btn').disabled = true;
+
+    const st = ST[lv];
+    st.attempts++;
+    let allOk = true;
+
+    items.forEach((item, idx) => {
+      const card = area.querySelector(`.daa-cl-card[data-idx="${idx}"]`);
+      if (placedInCol[idx] === item.col) {
+        card.classList.add('is-correct');
+      } else {
+        card.classList.add('is-wrong');
+        allOk = false;
+      }
+    });
+
+    if (allOk) { st.score++; st.streak++; } else { st.streak = 0; }
+
+    const fb = area.querySelector('#daa-fb');
+    fb.innerHTML = allOk
+      ? fbOk(`✅ Bravo ! Toutes les phrases sont bien classées.`)
+      : fbErr(`❌ Certaines phrases sont mal classées. Les cartes vertes sont correctes ; les rouges sont à revoir.`);
+
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NIVEAU 3A : FILL-IN
+═══════════════════════════════════════════════════════════════════ */
+
+function renderFI(area, q, lv) {
+  let blankIdx = 0;
+  const sentHtml = q.sentence.replace(/___/g, () => {
+    const i = blankIdx++;
+    return `<input class="daa-fill-inp" id="daa-inp-${i}" data-idx="${i}"
+                   type="text" maxlength="2"
+                   autocomplete="off" autocorrect="off" spellcheck="false"
+                   placeholder="?" aria-label="réponse ${i+1}">`;
+  });
+
+  area.innerHTML = `
+    <p class="ex-question-label">Complète avec <strong>a</strong> ou <strong>à</strong>.</p>
+    <div class="daa-fill-sentence">${sentHtml}</div>
+    <button class="daa-validate-btn" id="daa-val-btn">Valider</button>
+    <div class="daa-feedback" id="daa-fb"></div>
+  `;
+
+  setTimeout(() => area.querySelector('#daa-inp-0')?.focus(), 60);
+
+  area.querySelectorAll('.daa-fill-inp').forEach(inp => {
+    inp.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      const next = area.querySelector(`#daa-inp-${parseInt(inp.dataset.idx) + 1}`);
+      if (next) next.focus(); else doValidate();
+    });
+  });
+
+  area.querySelector('#daa-val-btn').addEventListener('click', doValidate);
+
+  function doValidate() {
+    const inputs   = [...area.querySelectorAll('.daa-fill-inp')];
+    if (inputs.some(i => !i.value.trim())) return;
+
+    inputs.forEach(i => i.disabled = true);
+    area.querySelector('#daa-val-btn').disabled = true;
+
+    const st = ST[lv];
+    st.attempts++;
+
+    let allOk = true;
+    const parts = [];
+
+    inputs.forEach((inp, i) => {
+      const val    = inp.value.trim().toLowerCase();
+      const expect = q.answers[i];
+      const blank  = q.blanks[i];
+      const ok     = val === expect;
+      inp.classList.add(ok ? 'is-correct' : 'is-wrong');
+      if (!ok) allOk = false;
+      parts.push({ ok, expect, blank });
+    });
+
+    if (allOk) { st.score++; st.streak++; } else { st.streak = 0; }
+
+    const fb = area.querySelector('#daa-fb');
+    if (allOk) {
+      const details = parts.map(p => {
+        const test = p.blank.testOk ? '« avait » fonctionne' : '« avait » ne fonctionne pas';
+        return `<strong>« ${p.expect} »</strong> : ${test}.`;
+      }).join(' ');
+      fb.innerHTML = fbOk(`✅ Bravo ! ${details}`);
+    } else {
+      const details = parts.map(p => avaitExpl(p.blank.testPhrase, p.blank.testOk, p.expect)).join('<br>');
+      fb.innerHTML  = fbErr(`❌ ${details}`);
+    }
+
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NIVEAU 3B : PRODUCTION LIBRE
+═══════════════════════════════════════════════════════════════════ */
+
+function renderPL(area, q, lv) {
+  area.innerHTML = `
+    <p class="ex-question-label">Écris ta propre phrase.</p>
+    <div class="daa-prompt-box">${q.consigne}</div>
+    <textarea class="daa-textarea" id="daa-ta" placeholder="Écris ta phrase ici…"></textarea>
+    <button class="daa-validate-btn" id="daa-val-btn">Valider</button>
+    <div class="daa-feedback" id="daa-fb"></div>
+  `;
+
+  area.querySelector('#daa-val-btn').addEventListener('click', () => {
+    const text = area.querySelector('#daa-ta').value.trim();
+    if (!text) return;
+
+    area.querySelector('#daa-ta').disabled    = true;
+    area.querySelector('#daa-val-btn').disabled = true;
+
+    const st = ST[lv];
+    st.attempts++;
+
+    /* Detect standalone "a" (no accent) and "à" (with accent) */
+    const hasA  = /(?:^|[\s«"''(])a(?=[\s.,!?;:»"'')"']|$)/u.test(text);
+    const hasAa = /(?:^|[\s«"''(])à(?=[\s.,!?;:»"'')"']|$)/u.test(text);
+
+    const fb = area.querySelector('#daa-fb');
+    if (hasA && hasAa) {
+      st.score++; st.streak++;
+      fb.innerHTML = fbOk(
+        `✅ Bravo ! Ta phrase contient bien <strong>a</strong> et <strong>à</strong>. Relis-la pour vérifier que tout est correct.`
+      );
+    } else if (!hasA && !hasAa) {
+      st.streak = 0;
+      fb.innerHTML = fbErr(
+        `❌ Ta phrase ne contient ni <strong>a</strong> ni <strong>à</strong>. Essaie d'inclure les deux !`
+      );
+    } else if (!hasA) {
+      st.streak = 0;
+      fb.innerHTML = fbErr(
+        `❌ Ta phrase contient <strong>à</strong> mais pas <strong>a</strong>. Essaie d'y inclure les deux !`
+      );
+    } else {
+      st.streak = 0;
+      fb.innerHTML = fbErr(
+        `❌ Ta phrase contient <strong>a</strong> mais pas <strong>à</strong>. Essaie d'y inclure les deux !`
+      );
+    }
+
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESULTS
+═══════════════════════════════════════════════════════════════════ */
+
+function showResults(lv) {
+  const { score: s, attempts: t } = ST[lv];
+  const pct   = t > 0 ? Math.round(100 * s / t) : 0;
+  const stars = pct === 100 ? ' 🌟🌟🌟' : pct >= 80 ? ' ⭐⭐' : ' ⭐';
+  const msg   = pct === 100 ? '🏆 Parfait ! Tu maîtrises cette règle !'
+              : pct >= 80   ? '🌟 Très bien !'
+              : pct >= 60   ? '👍 Continue comme ça !'
+              : '💪 Encore un petit effort !';
+
+  document.getElementById(`daa-bar-${lv}`).style.width = '100%';
+
+  const nextBtn    = lv < 3
+    ? `<button class="daa-btn-primary" onclick="setLevel(${lv+1})">Niveau ${lv+1} →</button>`
+    : '';
+  const congratsEl = lv === 3
+    ? `<p style="color:var(--blue);font-weight:700;margin-bottom:14px">🎉 Tu as terminé les 3 niveaux !</p>`
+    : '';
+
+  document.getElementById(`daa-area-${lv}`).innerHTML = `
+    <div class="daa-results">
+      ${congratsEl}
+      <div class="daa-results-score">${s} / ${t}</div>
+      <div class="daa-results-pct">${pct} %${stars}</div>
+      <div class="daa-results-msg">${msg}</div>
+      <div class="daa-results-btns">
+        ${nextBtn}
+        <button class="daa-btn-${lv < 3 ? 'secondary' : 'primary'}" onclick="retryLevel(${lv})">
+          Recommencer ce niveau
+        </button>
+        <a href="français-orthographe.html" class="daa-btn-secondary">← Retour aux notions</a>
+      </div>
+    </div>
+  `;
+
+  updateScore(lv);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  saveExerciseResult({
+    exerciseSlug: 'ortho-distinguer-a-a',
+    subject:      'français',
+    category:     'Orthographe',
+    exerciseType: 'a-a-niveaux',
+    level:        'Niveau ' + lv,
+    score:        s,
+    total:        t,
+    durationSecs: Math.round((Date.now() - sessionStart) / 1000)
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BOOTSTRAP
+═══════════════════════════════════════════════════════════════════ */
+
+document.querySelectorAll('.daa-tab').forEach(btn =>
+  btn.addEventListener('click', () => setLevel(parseInt(btn.dataset.lv)))
+);
+
+/* Start level 1 immediately */
+ST[1].started = true;
+initLevel(1);
+</script>
+
+<script src="js/menu.js"></script>
+<style>
+  footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+  .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+  .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+  .footer__text .rouge { color: #F5A623; font-weight: 700; }
+  .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+  .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

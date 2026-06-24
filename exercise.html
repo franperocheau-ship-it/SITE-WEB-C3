@@ -3561,6 +3561,138 @@
       .aa-choice-btn  { font-size: 14px; padding: 13px 14px; min-width: 110px; }
     }
 
+    /* ── Type : fraction-decimale-grille-droite-niveaux ─────────────────── */
+    .fdgd-step-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #1DBFA0;
+      background: rgba(29,191,160,0.10);
+      border: 1px solid rgba(29,191,160,0.25);
+      border-radius: 6px;
+      padding: 3px 10px;
+      margin-bottom: 10px;
+    }
+    /* Bande 10 cases (/10) */
+    .fdgd-grid-10 {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+      margin-bottom: 10px;
+      flex-wrap: nowrap;
+    }
+    /* Grille 10×10 (/100) */
+    .fdgd-grid-100 {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .fdgd-row { display: flex; gap: 3px; }
+    /* Cellule commune */
+    .fdgd-cell {
+      border: 2px solid #93c5fd;
+      background: #eff6ff;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 100ms, border-color 100ms;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .fdgd-cell-10  { width: 44px; height: 44px; }
+    .fdgd-cell-100 { width: 24px; height: 24px; border-radius: 3px; }
+    .fdgd-cell:hover:not(:disabled) { border-color: #3b82f6; background: #bfdbfe; }
+    .fdgd-cell.is-colored { background: #1DBFA0; border-color: #0d9488; }
+    .fdgd-cell:disabled   { cursor: default; }
+    .fdgd-counter {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1DBFA0;
+      margin-bottom: 14px;
+      min-height: 20px;
+    }
+    @media (max-width: 480px) {
+      .fdgd-cell-10  { width: 30px; height: 30px; }
+      .fdgd-cell-100 { width: 20px; height: 20px; }
+    }
+
+    /* ── Type : fraction-decimale-tableau-niveaux ───────────────────────── */
+    .fdtn-table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 8px;
+    }
+    .fdtn-table {
+      border-collapse: collapse;
+      margin: 0 auto;
+    }
+    .fdtn-th {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+      padding: 6px 8px 8px;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+      min-width: 64px;
+    }
+    .fdtn-th-inactive { color: rgba(100,116,139,0.35); }
+    .fdtn-comma-th {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--blue);
+      padding: 6px 4px 8px;
+      border-bottom: 2px solid var(--border);
+      min-width: 28px;
+    }
+    .fdtn-td {
+      text-align: center;
+      padding: 10px 8px;
+      border: 1px solid var(--border);
+    }
+    .fdtn-comma-td {
+      padding: 10px 2px;
+      border: none;
+      vertical-align: middle;
+    }
+    .fdtn-comma-sym {
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--blue);
+      display: block;
+      line-height: 1;
+    }
+    .fdtn-input {
+      width: 52px;
+      height: 52px;
+      border: 2px solid var(--blue);
+      border-radius: 10px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      font-family: inherit;
+      transition: border-color 150ms, box-shadow 150ms;
+    }
+    .fdtn-input:focus { box-shadow: 0 0 0 3px rgba(16,43,106,0.12); }
+    .fdtn-input.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.07); color: #15803d; }
+    .fdtn-input.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.06); color: var(--red); }
+    .fdtn-input:disabled   { cursor: default; }
+    .fdtn-inactive-td      { background: rgba(100,116,139,0.05); min-width: 64px; }
+    @media (max-width: 480px) {
+      .fdtn-input  { width: 42px; height: 42px; font-size: 20px; }
+      .fdtn-th     { min-width: 52px; font-size: 10px; }
+      .fdtn-td     { padding: 8px 4px; }
+    }
+
   </style>
 </head>
 <body>
@@ -3734,6 +3866,8 @@
     let sessionLevelLoader = null; /* fn(valeurNiveau) → charge les questions de ce niveau */
     let vpState      = null;     /* valeur-position  : état de session     */
     let vpTableSt    = null;     /* valeur-position  : état tableau étape 2 */
+    let fdgdState    = null;     /* fraction-decimale-grille-droite-niveaux */
+    let fdtnState    = null;     /* fraction-decimale-tableau-niveaux       */
 
     const LEVEL_LABELS = { "CM1": "Niveau 1", "CM2": "Niveau 2", "6e": "Niveau 3" };
 
@@ -4066,6 +4200,12 @@
       } else if (currentType === "arrondi-adapte-niveaux") {
         aaInitSession();
         return;
+      } else if (currentType === "fraction-decimale-grille-droite-niveaux") {
+        fdgdInitSession();
+        return;
+      } else if (currentType === "fraction-decimale-tableau-niveaux") {
+        fdtnInitSession();
+        return;
       } else {
         bankSource = sessionData.bank;
       }
@@ -4228,6 +4368,10 @@
         /* session managed by aniInitSession — no-op here */
       } else if (currentType === "arrondi-adapte-niveaux") {
         /* session managed by aaInitSession — no-op here */
+      } else if (currentType === "fraction-decimale-grille-droite-niveaux") {
+        /* session managed by fdgdInitSession — no-op here */
+      } else if (currentType === "fraction-decimale-tableau-niveaux") {
+        /* session managed by fdtnInitSession — no-op here */
       } else if (currentType === "accord-participe-cod") {
         renderAccordParticipeCod(card, q);
       }
@@ -19406,6 +19550,640 @@
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
         exerciseType: 'arrondi-adapte-niveaux',
+        level:        'Niveau ' + level,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : fraction-decimale-grille-droite-niveaux
+       Mathématiques — Associer une fraction décimale à un nombre décimal
+       Niveau 1 (/10)  : grille 10 cases + droite 10 graduations + saisie
+       Niveau 2 (/100) : grille 10×10  + droite 100 graduations + saisie
+       Niveau 3 (/1000): droite 20 graduations (pas 50/1000) + saisie
+    ══════════════════════════════════════════════════════════════════════ */
+
+    function fdgdInitSession() {
+      fdgdState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      fdgdStartLevel(1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function fdgdStartLevel(lv) {
+      const pool = lv === 1 ? [...sessionData.lvl1] : lv === 2 ? [...sessionData.lvl2] : [...sessionData.lvl3];
+      const qs   = shuffle(pool);
+      fdgdState  = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length, coloredSet: new Set(), droiteIdx: null };
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = qs.length;
+      fdgdRenderQuestion();
+    }
+
+    function fdgdRenderQuestion() {
+      const { level, questions, idx, total } = fdgdState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+      fdgdState.coloredSet = new Set();
+      fdgdState.droiteIdx  = null;
+      const card = document.getElementById('ex-card');
+      if (level === 3) {
+        fdgdRenderDroite(card, q); /* pas de grille pour /1000 */
+      } else {
+        fdgdRenderGrille(card, q);
+      }
+    }
+
+    /* ── Onglets de niveau ─────────────────────────────────────────────── */
+    function fdgdTabBar(activeLv) {
+      return '<div class="dni-tab-bar">' +
+        [1, 2, 3].map(lv =>
+          `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-fdgd-lv="${lv}">Niveau ${lv}</button>`
+        ).join('') +
+        '</div>';
+    }
+
+    function fdgdSetupTabs() {
+      document.querySelectorAll('[data-fdgd-lv]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lv = parseInt(btn.dataset.fdgdLv, 10);
+          if (lv === fdgdState.level) return;
+          fdgdStartLevel(lv);
+        });
+      });
+    }
+
+    /* ── Étape 1 — Grille de coloriage ─────────────────────────────────── */
+    function fdgdRenderGrille(card, q) {
+      const { num, den } = q;
+      let gridHtml;
+      if (den === 10) {
+        const cells = Array.from({ length: 10 }, (_, i) =>
+          `<button class="fdgd-cell fdgd-cell-10" data-idx="${i}" aria-label="Case ${i + 1}"></button>`
+        ).join('');
+        gridHtml = `<div class="fdgd-grid-10" id="fdgd-grid">${cells}</div>`;
+      } else {
+        let rows = '';
+        for (let r = 0; r < 10; r++) {
+          let rowCells = '';
+          for (let c = 0; c < 10; c++) {
+            rowCells += `<button class="fdgd-cell fdgd-cell-100" data-idx="${r * 10 + c}"></button>`;
+          }
+          rows += `<div class="fdgd-row">${rowCells}</div>`;
+        }
+        gridHtml = `<div class="fdgd-grid-100" id="fdgd-grid">${rows}</div>`;
+      }
+
+      card.innerHTML = `
+        ${fdgdTabBar(fdgdState.level)}
+        <div class="fdgd-step-tag">Étape 1 — Coloriage</div>
+        <p class="ex-question-label">Colorie ${num} case${num > 1 ? 's' : ''} pour représenter la fraction.</p>
+        <div class="nline-question-area" style="margin-bottom:16px">${_rfracHtml(num, den)}</div>
+        ${gridHtml}
+        <div class="fdgd-counter" id="fdgd-counter">0 case coloriée / ${den}</div>
+        <button class="ex-validate-btn" id="fdgd-next-step-btn" style="width:100%;margin-top:4px">Étape suivante →</button>
+      `;
+
+      fdgdSetupTabs();
+
+      const coloredSet = fdgdState.coloredSet;
+      const counter    = document.getElementById('fdgd-counter');
+      document.getElementById('fdgd-grid').querySelectorAll('.fdgd-cell').forEach(cell => {
+        cell.addEventListener('click', () => {
+          const idx = parseInt(cell.dataset.idx, 10);
+          if (coloredSet.has(idx)) {
+            coloredSet.delete(idx);
+            cell.classList.remove('is-colored');
+          } else {
+            coloredSet.add(idx);
+            cell.classList.add('is-colored');
+          }
+          const n = coloredSet.size;
+          counter.textContent = `${n} case${n !== 1 ? 's' : ''} coloriée${n !== 1 ? 's' : ''} / ${den}`;
+        });
+      });
+
+      document.getElementById('fdgd-next-step-btn').addEventListener('click', () => {
+        fdgdRenderDroite(card, q);
+      });
+    }
+
+    /* ── Étape 2 (ou 1 pour niv.3) — Droite graduée ───────────────────── */
+    function fdgdRenderDroite(card, q) {
+      const { num, den, droiteTicks, majorStep, tickIdx } = q;
+      const isLv3   = fdgdState.level === 3;
+      const stepNum = isLv3 ? 1 : 2;
+
+      /* Espacement adaptatif */
+      const spacing   = den === 100
+        ? Math.max(22, Math.min(36, Math.floor(620 / droiteTicks)))
+        : Math.max(38, Math.min(60, Math.floor(580 / droiteTicks)));
+      const padL = 50, padR = 56;
+      const lineW = droiteTicks * spacing;
+      const W     = lineW + padL + padR;
+      const H     = 96;
+      const lineY = 48;
+
+      let selIdx = null;
+
+      function buildSvg() {
+        let s = '';
+        /* Ligne + flèche */
+        s += `<line x1="${padL}" y1="${lineY}" x2="${padL + lineW + 8}" y2="${lineY}" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>`;
+        s += `<polygon points="${padL + lineW + 16},${lineY} ${padL + lineW + 6},${lineY - 5} ${padL + lineW + 6},${lineY + 5}" fill="#94a3b8"/>`;
+        /* Encadré "0" à gauche */
+        s += `<rect x="${padL - 28}" y="${lineY - 15}" width="26" height="22" rx="5" fill="rgba(16,43,106,0.08)" stroke="rgba(16,43,106,0.22)" stroke-width="1.5"/>`;
+        s += `<text x="${padL - 15}" y="${lineY + 5}" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#102b6a">0</text>`;
+        /* Encadré "1" à droite */
+        s += `<rect x="${padL + lineW + 22}" y="${lineY - 15}" width="26" height="22" rx="5" fill="rgba(16,43,106,0.08)" stroke="rgba(16,43,106,0.22)" stroke-width="1.5"/>`;
+        s += `<text x="${padL + lineW + 35}" y="${lineY + 5}" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#102b6a">1</text>`;
+        /* Graduations */
+        for (let i = 0; i <= droiteTicks; i++) {
+          const x       = padL + i * spacing;
+          const isMaj   = (i % majorStep === 0);
+          const tH      = isMaj ? 20 : 10;
+          const color   = isMaj ? '#102b6a' : '#94a3b8';
+          const sw      = isMaj ? 2 : 1.5;
+          s += `<line x1="${x}" y1="${lineY - tH / 2}" x2="${x}" y2="${lineY + tH / 2}" stroke="${color}" stroke-width="${sw}"/>`;
+          /* Zone cliquable pour les graduations intermédiaires */
+          if (i > 0 && i < droiteTicks) {
+            s += `<rect x="${x - 12}" y="4" width="24" height="${H - 8}" fill="transparent" class="fdgd-hit" data-tick="${i}" style="cursor:pointer"/>`;
+          }
+        }
+        /* Marqueur de sélection */
+        if (selIdx !== null) {
+          const dx = padL + selIdx * spacing;
+          s += `<circle cx="${dx}" cy="${lineY}" r="9" fill="#1DBFA0" stroke="#0d9488" stroke-width="2.5" pointer-events="none"/>`;
+        }
+        return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block;max-width:100%;overflow:visible">${s}</svg>`;
+      }
+
+      card.innerHTML = `
+        ${fdgdTabBar(fdgdState.level)}
+        <div class="fdgd-step-tag">Étape ${stepNum} — Droite graduée</div>
+        <p class="ex-question-label">Place cette fraction sur la droite.</p>
+        <div class="nline-question-area" style="margin-bottom:16px">${_rfracHtml(num, den)}</div>
+        <div class="nline-scroll-wrap" id="fdgd-droite-wrap">${buildSvg()}</div>
+        <p class="nline-status" id="fdgd-droite-status">Clique sur une graduation pour la sélectionner.</p>
+        <button class="ex-validate-btn" id="fdgd-droite-next-btn" disabled style="width:100%;margin-top:4px">Étape suivante →</button>
+      `;
+
+      fdgdSetupTabs();
+
+      const wrap      = document.getElementById('fdgd-droite-wrap');
+      const statusEl  = document.getElementById('fdgd-droite-status');
+      const nextBtn   = document.getElementById('fdgd-droite-next-btn');
+
+      function bindHits() {
+        wrap.querySelectorAll('.fdgd-hit').forEach(rect => {
+          rect.addEventListener('click', () => {
+            selIdx = parseInt(rect.dataset.tick, 10);
+            wrap.innerHTML = buildSvg();
+            bindHits();
+            statusEl.textContent = 'Graduation sélectionnée. Clique sur « Étape suivante » pour continuer.';
+            nextBtn.disabled = false;
+          });
+        });
+      }
+      bindHits();
+
+      nextBtn.addEventListener('click', () => {
+        fdgdState.droiteIdx = selIdx;
+        fdgdRenderSaisie(card, q);
+      });
+    }
+
+    /* ── Étape 3 (ou 2 pour niv.3) — Saisie décimale ──────────────────── */
+    function fdgdRenderSaisie(card, q) {
+      const { num, den, decimal, decimalStr } = q;
+      const isLv3   = fdgdState.level === 3;
+      const stepNum = isLv3 ? 2 : 3;
+
+      card.innerHTML = `
+        ${fdgdTabBar(fdgdState.level)}
+        <div class="fdgd-step-tag">Étape ${stepNum} — Écriture décimale</div>
+        <p class="ex-question-label">Écris le nombre décimal correspondant à cette fraction.</p>
+        <div class="nline-question-area" style="margin-bottom:16px">${_rfracHtml(num, den)}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="fdgd-dec-input" placeholder="0,…" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false">
+          <button class="ex-validate-btn" id="fdgd-dec-validate">Vérifier</button>
+        </div>
+        <div class="ex-feedback-area" id="fdgd-feedback"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      fdgdSetupTabs();
+
+      const inp = document.getElementById('fdgd-dec-input');
+      const btn = document.getElementById('fdgd-dec-validate');
+
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') btn.click(); });
+      setTimeout(() => inp.focus(), 50);
+
+      btn.addEventListener('click', () => {
+        const raw    = inp.value.trim();
+        if (!raw) return;
+        const parsed = parseFloat(raw.replace(',', '.'));
+        const isRight = !isNaN(parsed) && Math.abs(parsed - decimal) < 1e-9;
+
+        inp.disabled = true;
+        btn.disabled = true;
+
+        /* Info grille */
+        const gridOk  = fdgdState.coloredSet.size === num;
+        const gridInfo = (fdgdState.level < 3 && fdgdState.coloredSet.size > 0)
+          ? (gridOk
+              ? `✅ Grille : ${fdgdState.coloredSet.size} case${fdgdState.coloredSet.size > 1 ? 's' : ''} coloriée${fdgdState.coloredSet.size > 1 ? 's' : ''} — correct !`
+              : `💡 Grille : tu as colorié ${fdgdState.coloredSet.size} case${fdgdState.coloredSet.size > 1 ? 's' : ''} (il en fallait ${num}).`)
+          : '';
+
+        /* Info droite */
+        const droiteOk = fdgdState.droiteIdx === q.tickIdx;
+        const droiteInfo = fdgdState.droiteIdx !== null
+          ? (droiteOk
+              ? `✅ Droite : bonne graduation !`
+              : `💡 Droite : la bonne graduation est la ${q.tickIdx}ᵉ depuis 0.`)
+          : '';
+
+        const noteHtml = [gridInfo, droiteInfo].filter(Boolean)
+          .map(t => `<div class="ex-note" style="margin-top:6px">${t}</div>`).join('');
+
+        if (isRight) {
+          fdgdState.score++;
+          inp.classList.add('is-correct');
+          document.getElementById('fdgd-feedback').innerHTML =
+            `<div class="ex-feedback-correct">✅ Bravo ! ${_rfracHtml(num, den)} s'écrit <strong>${decimalStr}</strong>.</div>${noteHtml}`;
+        } else {
+          inp.classList.add('is-wrong');
+          document.getElementById('fdgd-feedback').innerHTML =
+            `<div class="ex-feedback-wrong">❌ Pas tout à fait. ${_rfracHtml(num, den)} s'écrit <strong>${decimalStr}</strong> en écriture décimale.</div>${noteHtml}`;
+        }
+
+        fdgdAdvance();
+      });
+    }
+
+    /* ── Avancement ────────────────────────────────────────────────────── */
+    function fdgdAdvance() {
+      const { idx, total } = fdgdState;
+      const isLast = idx === total - 1;
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.textContent = isLast ? 'Voir mes résultats' : 'Question suivante →';
+      nextBtn.classList.remove('ex-hidden');
+      nextBtn.onclick = () => {
+        fdgdState.idx++;
+        if (fdgdState.idx >= total) {
+          fdgdShowResults();
+        } else {
+          fdgdRenderQuestion();
+          document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+    }
+
+    /* ── Résultats de niveau ────────────────────────────────────────────── */
+    function fdgdShowResults() {
+      const { level, score: lvScore, total } = fdgdState;
+      const s20   = Math.round(lvScore / total * 20);
+      const stars = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
+      const isLast = level === 3;
+      const nextLv = level + 1;
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   =
+        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') + ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+
+      const backHref = sessionData.backLink?.href || 'mathématiques-fractions.html';
+      let msg, btnsHTML;
+      if (isLast) {
+        msg = `🎊 Bravo ! Tu maîtrises les fractions décimales aux 3 niveaux !${stars}`;
+        btnsHTML = `
+          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="fdgd-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else {
+        msg = `Niveau ${level} terminé !${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="fdgd-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-secondary" id="fdgd-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('fdgd-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        fdgdStartLevel(level);
+      });
+      document.getElementById('fdgd-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        fdgdStartLevel(nextLv);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'fraction-decimale-grille-droite-niveaux',
+        level:        'Niveau ' + level,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : fraction-decimale-tableau-niveaux
+       Mathématiques — Associer une fraction décimale à un nombre décimal
+       Tableau de numération + saisie du nombre décimal complet
+       Niveau 1 (/10)  : colonnes U + Di
+       Niveau 2 (/100) : colonnes U + Di + Ce
+       Niveau 3 (/1000): colonnes U + Di + Ce + Mi
+    ══════════════════════════════════════════════════════════════════════ */
+
+    function fdtnInitSession() {
+      fdtnState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      fdtnStartLevel(1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function fdtnStartLevel(lv) {
+      const pool = lv === 1 ? [...sessionData.lvl1] : lv === 2 ? [...sessionData.lvl2] : [...sessionData.lvl3];
+      const qs   = shuffle(pool);
+      fdtnState  = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = qs.length;
+      fdtnRenderQuestion();
+    }
+
+    function fdtnRenderQuestion() {
+      const { level, questions, idx, total } = fdtnState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+      const card = document.getElementById('ex-card');
+      fdtnRenderTableau(card, q);
+    }
+
+    /* ── Onglets de niveau ─────────────────────────────────────────────── */
+    function fdtnTabBar(activeLv) {
+      return '<div class="dni-tab-bar">' +
+        [1, 2, 3].map(lv =>
+          `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-fdtn-lv="${lv}">Niveau ${lv}</button>`
+        ).join('') +
+        '</div>';
+    }
+
+    function fdtnSetupTabs() {
+      document.querySelectorAll('[data-fdtn-lv]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lv = parseInt(btn.dataset.fdtnLv, 10);
+          if (lv === fdtnState.level) return;
+          fdtnStartLevel(lv);
+        });
+      });
+    }
+
+    /* ── Colonnes actives selon le niveau ──────────────────────────────── */
+    const FDTN_COL_DEFS = [
+      { id: 'u',  label: 'Unités',    isComma: false },
+      { id: '_',  label: ',',         isComma: true  },
+      { id: 'di', label: 'Dixièmes',  isComma: false },
+      { id: 'ce', label: 'Centièmes', isComma: false },
+      { id: 'mi', label: 'Millièmes', isComma: false }
+    ];
+
+    function fdtnActiveCols(level) {
+      if (level === 1) return ['u', 'di'];
+      if (level === 2) return ['u', 'di', 'ce'];
+      return ['u', 'di', 'ce', 'mi'];
+    }
+
+    /* ── Rendu du tableau + saisie décimale ────────────────────────────── */
+    function fdtnRenderTableau(card, q) {
+      const { num, den, decimal, decimalStr, tab } = q;
+      const activeCols = fdtnActiveCols(fdtnState.level);
+
+      const visibleDefs = FDTN_COL_DEFS.filter(col => {
+        if (col.isComma) return true;
+        return activeCols.includes(col.id);
+      });
+
+      const headerCells = visibleDefs.map(col => {
+        if (col.isComma) return `<th class="fdtn-comma-th">,</th>`;
+        return `<th class="fdtn-th">${col.label}</th>`;
+      }).join('');
+
+      const inputCells = visibleDefs.map(col => {
+        if (col.isComma) return `<td class="fdtn-comma-td"><span class="fdtn-comma-sym">,</span></td>`;
+        return `<td class="fdtn-td"><input type="tel" maxlength="1" class="fdtn-input" data-col="${col.id}" autocomplete="off" pattern="[0-9]" inputmode="numeric"></td>`;
+      }).join('');
+
+      card.innerHTML = `
+        ${fdtnTabBar(fdtnState.level)}
+        <p class="ex-question-label">Place les chiffres de cette fraction dans le tableau de numération.</p>
+        <div class="nline-question-area" style="margin-bottom:16px">${_rfracHtml(num, den)}</div>
+        <div class="fdtn-table-wrap">
+          <table class="fdtn-table">
+            <thead><tr>${headerCells}</tr></thead>
+            <tbody><tr>${inputCells}</tr></tbody>
+          </table>
+        </div>
+        <div class="ex-feedback-area" id="fdtn-tab-feedback"></div>
+        <button class="ex-validate-btn" id="fdtn-check-btn" style="width:100%;margin-top:16px">Vérifier le tableau</button>
+
+        <div id="fdtn-step2" class="ex-hidden" style="margin-top:24px;border-top:1.5px solid var(--border);padding-top:24px">
+          <p class="ex-question-label">Maintenant, écris le nombre décimal complet.</p>
+          <div class="ex-input-row">
+            <input type="text" class="ex-text-input" id="fdtn-dec-input" placeholder="0,…" inputmode="decimal" autocomplete="off" autocorrect="off" spellcheck="false">
+            <button class="ex-validate-btn" id="fdtn-dec-validate">Valider</button>
+          </div>
+          <div class="ex-feedback-area" id="fdtn-dec-feedback"></div>
+          <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+        </div>
+      `;
+
+      fdtnSetupTabs();
+
+      const inputs = [...card.querySelectorAll('.fdtn-input')];
+
+      /* Navigation automatique entre cases */
+      inputs.forEach((inp, i) => {
+        inp.addEventListener('input', () => {
+          if (inp.value.length >= 1 && i < inputs.length - 1) inputs[i + 1].focus();
+        });
+        inp.addEventListener('keydown', e => {
+          if (e.key === 'Enter') document.getElementById('fdtn-check-btn').click();
+          if (e.key === 'Backspace' && inp.value === '' && i > 0) inputs[i - 1].focus();
+        });
+      });
+      if (inputs.length > 0) setTimeout(() => inputs[0].focus(), 50);
+
+      document.getElementById('fdtn-check-btn').addEventListener('click', () => {
+        fdtnCheckTableau(q, activeCols, inputs);
+      });
+    }
+
+    /* ── Validation du tableau ─────────────────────────────────────────── */
+    function fdtnCheckTableau(q, activeCols, inputs) {
+      let allCorrect = true;
+      inputs.forEach(inp => {
+        const col      = inp.dataset.col;
+        const expected = String(q.tab[col]);
+        const isRight  = inp.value === expected;
+        inp.disabled   = true;
+        inp.classList.add(isRight ? 'is-correct' : 'is-wrong');
+        if (!isRight) allCorrect = false;
+      });
+      document.getElementById('fdtn-check-btn').disabled = true;
+
+      const labelMap = { u: 'Unités', di: 'Dixièmes', ce: 'Centièmes', mi: 'Millièmes' };
+      const corrigé  = activeCols.map(id => `${labelMap[id]} : <strong>${q.tab[id]}</strong>`).join(' &nbsp;|&nbsp; ');
+
+      document.getElementById('fdtn-tab-feedback').innerHTML = allCorrect
+        ? `<div class="ex-feedback-correct" style="margin-bottom:0">✅ Tableau correct !</div>`
+        : `<div class="ex-feedback-wrong" style="margin-bottom:0">❌ Vérifie tes réponses.<br><span style="font-size:13px">${corrigé}</span></div>`;
+
+      /* Révéler la saisie du nombre décimal */
+      const step2 = document.getElementById('fdtn-step2');
+      step2.classList.remove('ex-hidden');
+
+      const decInp = document.getElementById('fdtn-dec-input');
+      const decBtn = document.getElementById('fdtn-dec-validate');
+
+      setTimeout(() => decInp.focus(), 120);
+      decInp.addEventListener('keydown', e => { if (e.key === 'Enter') decBtn.click(); });
+
+      decBtn.addEventListener('click', () => {
+        const raw     = decInp.value.trim();
+        if (!raw) return;
+        const parsed  = parseFloat(raw.replace(',', '.'));
+        const isRight = !isNaN(parsed) && Math.abs(parsed - q.decimal) < 1e-9;
+
+        decInp.disabled = true;
+        decBtn.disabled  = true;
+
+        if (isRight) {
+          fdtnState.score++;
+          decInp.classList.add('is-correct');
+          document.getElementById('fdtn-dec-feedback').innerHTML =
+            `<div class="ex-feedback-correct">✅ Bravo ! ${_rfracHtml(q.num, q.den)} = <strong>${q.decimalStr}</strong>.</div>`;
+        } else {
+          decInp.classList.add('is-wrong');
+          document.getElementById('fdtn-dec-feedback').innerHTML =
+            `<div class="ex-feedback-wrong">❌ Pas tout à fait. ${_rfracHtml(q.num, q.den)} s'écrit <strong>${q.decimalStr}</strong>.</div>`;
+        }
+        fdtnAdvance();
+      });
+    }
+
+    /* ── Avancement ────────────────────────────────────────────────────── */
+    function fdtnAdvance() {
+      const { idx, total } = fdtnState;
+      const isLast  = idx === total - 1;
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.textContent = isLast ? 'Voir mes résultats' : 'Question suivante →';
+      nextBtn.classList.remove('ex-hidden');
+      nextBtn.onclick = () => {
+        fdtnState.idx++;
+        if (fdtnState.idx >= total) {
+          fdtnShowResults();
+        } else {
+          fdtnRenderQuestion();
+          document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+    }
+
+    /* ── Résultats de niveau ────────────────────────────────────────────── */
+    function fdtnShowResults() {
+      const { level, score: lvScore, total } = fdtnState;
+      const s20    = Math.round(lvScore / total * 20);
+      const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
+      const isLast = level === 3;
+      const nextLv = level + 1;
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-pct').textContent   =
+        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') + ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+
+      const backHref = sessionData.backLink?.href || 'mathématiques-fractions.html';
+      let msg, btnsHTML;
+      if (isLast) {
+        msg = `🎊 Bravo ! Tu maîtrises le tableau de numération aux 3 niveaux !${stars}`;
+        btnsHTML = `
+          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="fdtn-retry-btn">Recommencer ce niveau</button>
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else {
+        msg = `Niveau ${level} terminé !${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="fdtn-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-secondary" id="fdtn-retry-btn">Recommencer ce niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('fdtn-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        fdtnStartLevel(level);
+      });
+      document.getElementById('fdtn-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        fdtnStartLevel(nextLv);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'fraction-decimale-tableau-niveaux',
         level:        'Niveau ' + level,
         score:        s20,
         total:        20,

@@ -9161,6 +9161,112 @@ const EXERCISE_DATA = {
         explication: "Pour l'aide humanitaire, on arrondit toujours par excès. 2 340 000 ÷ 100 000 = 23,4 → il faut 24 lots pour que toutes les 2 340 000 personnes reçoivent une ration."
       }
     ]
+  },
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     MATHÉMATIQUES — FRACTIONS DÉCIMALES
+     Type A : Grille de coloriage + droite graduée + saisie décimale
+     Niveau 1 : fractions /10  — bande 10 cases, droite 10 graduations
+     Niveau 2 : fractions /100 — grille 10×10, droite 100 graduations
+     Niveau 3 : fractions /1000 — droite 20 graduations (pas = 50/1000)
+  ═══════════════════════════════════════════════════════════════════════ */
+  "fraction-decimale-grille-droite": {
+    title:      "Fraction décimale — Grille, droite et écriture décimale",
+    domaine:    "Mathématiques",
+    competence: "Associer une fraction décimale à un nombre décimal",
+    type:       "fraction-decimale-grille-droite-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    backLink:   { href: "mathématiques-fractions.html", label: "Fractions" },
+
+    /* ── Niveau 1 — /10 ── */
+    lvl1: [
+      { num: 3, den: 10, decimal: 0.3,  decimalStr: "0,3",  droiteTicks: 10, majorStep: 10, tickIdx: 3  },
+      { num: 7, den: 10, decimal: 0.7,  decimalStr: "0,7",  droiteTicks: 10, majorStep: 10, tickIdx: 7  },
+      { num: 1, den: 10, decimal: 0.1,  decimalStr: "0,1",  droiteTicks: 10, majorStep: 10, tickIdx: 1  },
+      { num: 9, den: 10, decimal: 0.9,  decimalStr: "0,9",  droiteTicks: 10, majorStep: 10, tickIdx: 9  },
+      { num: 5, den: 10, decimal: 0.5,  decimalStr: "0,5",  droiteTicks: 10, majorStep: 10, tickIdx: 5  },
+      { num: 4, den: 10, decimal: 0.4,  decimalStr: "0,4",  droiteTicks: 10, majorStep: 10, tickIdx: 4  },
+      { num: 6, den: 10, decimal: 0.6,  decimalStr: "0,6",  droiteTicks: 10, majorStep: 10, tickIdx: 6  },
+      { num: 2, den: 10, decimal: 0.2,  decimalStr: "0,2",  droiteTicks: 10, majorStep: 10, tickIdx: 2  }
+    ],
+
+    /* ── Niveau 2 — /100 ── */
+    lvl2: [
+      { num: 23, den: 100, decimal: 0.23, decimalStr: "0,23", droiteTicks: 100, majorStep: 10, tickIdx: 23 },
+      { num: 75, den: 100, decimal: 0.75, decimalStr: "0,75", droiteTicks: 100, majorStep: 10, tickIdx: 75 },
+      { num: 40, den: 100, decimal: 0.4,  decimalStr: "0,40", droiteTicks: 100, majorStep: 10, tickIdx: 40 },
+      { num: 8,  den: 100, decimal: 0.08, decimalStr: "0,08", droiteTicks: 100, majorStep: 10, tickIdx: 8  },
+      { num: 60, den: 100, decimal: 0.6,  decimalStr: "0,60", droiteTicks: 100, majorStep: 10, tickIdx: 60 },
+      { num: 17, den: 100, decimal: 0.17, decimalStr: "0,17", droiteTicks: 100, majorStep: 10, tickIdx: 17 },
+      { num: 50, den: 100, decimal: 0.5,  decimalStr: "0,50", droiteTicks: 100, majorStep: 10, tickIdx: 50 },
+      { num: 91, den: 100, decimal: 0.91, decimalStr: "0,91", droiteTicks: 100, majorStep: 10, tickIdx: 91 }
+    ],
+
+    /* ── Niveau 3 — /1000 (pas droite = 50/1000, 20 graduations) ── */
+    lvl3: [
+      { num:  50, den: 1000, decimal: 0.05,  decimalStr: "0,050", droiteTicks: 20, majorStep: 5, tickIdx:  1 },
+      { num: 150, den: 1000, decimal: 0.15,  decimalStr: "0,150", droiteTicks: 20, majorStep: 5, tickIdx:  3 },
+      { num: 250, den: 1000, decimal: 0.25,  decimalStr: "0,250", droiteTicks: 20, majorStep: 5, tickIdx:  5 },
+      { num: 350, den: 1000, decimal: 0.35,  decimalStr: "0,350", droiteTicks: 20, majorStep: 5, tickIdx:  7 },
+      { num: 450, den: 1000, decimal: 0.45,  decimalStr: "0,450", droiteTicks: 20, majorStep: 5, tickIdx:  9 },
+      { num: 650, den: 1000, decimal: 0.65,  decimalStr: "0,650", droiteTicks: 20, majorStep: 5, tickIdx: 13 },
+      { num: 750, den: 1000, decimal: 0.75,  decimalStr: "0,750", droiteTicks: 20, majorStep: 5, tickIdx: 15 },
+      { num: 900, den: 1000, decimal: 0.9,   decimalStr: "0,900", droiteTicks: 20, majorStep: 5, tickIdx: 18 }
+    ]
+  },
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     MATHÉMATIQUES — FRACTIONS DÉCIMALES
+     Type B : Tableau de numération + saisie décimale
+     Niveau 1 : /10  — colonnes U et Di actives
+     Niveau 2 : /100 — colonnes U, Di, Ce actives
+     Niveau 3 : /1000 — colonnes U, Di, Ce, Mi actives (certaines > 1)
+  ═══════════════════════════════════════════════════════════════════════ */
+  "fraction-decimale-tableau-numeration": {
+    title:      "Fraction décimale — Tableau de numération",
+    domaine:    "Mathématiques",
+    competence: "Associer une fraction décimale à un nombre décimal",
+    type:       "fraction-decimale-tableau-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    backLink:   { href: "mathématiques-fractions.html", label: "Fractions" },
+
+    /* tab : { u, di, ce, mi } — null = colonne non active */
+
+    /* ── Niveau 1 — /10 ── */
+    lvl1: [
+      { num: 7, den: 10, decimal: 0.7, decimalStr: "0,7", tab: { u: 0, di: 7, ce: null, mi: null } },
+      { num: 3, den: 10, decimal: 0.3, decimalStr: "0,3", tab: { u: 0, di: 3, ce: null, mi: null } },
+      { num: 9, den: 10, decimal: 0.9, decimalStr: "0,9", tab: { u: 0, di: 9, ce: null, mi: null } },
+      { num: 1, den: 10, decimal: 0.1, decimalStr: "0,1", tab: { u: 0, di: 1, ce: null, mi: null } },
+      { num: 5, den: 10, decimal: 0.5, decimalStr: "0,5", tab: { u: 0, di: 5, ce: null, mi: null } },
+      { num: 4, den: 10, decimal: 0.4, decimalStr: "0,4", tab: { u: 0, di: 4, ce: null, mi: null } },
+      { num: 6, den: 10, decimal: 0.6, decimalStr: "0,6", tab: { u: 0, di: 6, ce: null, mi: null } },
+      { num: 2, den: 10, decimal: 0.2, decimalStr: "0,2", tab: { u: 0, di: 2, ce: null, mi: null } }
+    ],
+
+    /* ── Niveau 2 — /100 ── */
+    lvl2: [
+      { num: 37, den: 100, decimal: 0.37, decimalStr: "0,37", tab: { u: 0, di: 3, ce: 7, mi: null } },
+      { num: 75, den: 100, decimal: 0.75, decimalStr: "0,75", tab: { u: 0, di: 7, ce: 5, mi: null } },
+      { num: 40, den: 100, decimal: 0.4,  decimalStr: "0,40", tab: { u: 0, di: 4, ce: 0, mi: null } },
+      { num:  8, den: 100, decimal: 0.08, decimalStr: "0,08", tab: { u: 0, di: 0, ce: 8, mi: null } },
+      { num: 60, den: 100, decimal: 0.6,  decimalStr: "0,60", tab: { u: 0, di: 6, ce: 0, mi: null } },
+      { num: 17, den: 100, decimal: 0.17, decimalStr: "0,17", tab: { u: 0, di: 1, ce: 7, mi: null } },
+      { num: 50, den: 100, decimal: 0.5,  decimalStr: "0,50", tab: { u: 0, di: 5, ce: 0, mi: null } },
+      { num: 91, den: 100, decimal: 0.91, decimalStr: "0,91", tab: { u: 0, di: 9, ce: 1, mi: null } }
+    ],
+
+    /* ── Niveau 3 — /1000 ── */
+    lvl3: [
+      { num:  125, den: 1000, decimal: 0.125, decimalStr: "0,125", tab: { u: 0, di: 1, ce: 2, mi: 5 } },
+      { num:  450, den: 1000, decimal: 0.45,  decimalStr: "0,450", tab: { u: 0, di: 4, ce: 5, mi: 0 } },
+      { num:  875, den: 1000, decimal: 0.875, decimalStr: "0,875", tab: { u: 0, di: 8, ce: 7, mi: 5 } },
+      { num: 1234, den: 1000, decimal: 1.234, decimalStr: "1,234", tab: { u: 1, di: 2, ce: 3, mi: 4 } },
+      { num:  500, den: 1000, decimal: 0.5,   decimalStr: "0,500", tab: { u: 0, di: 5, ce: 0, mi: 0 } },
+      { num:  750, den: 1000, decimal: 0.75,  decimalStr: "0,750", tab: { u: 0, di: 7, ce: 5, mi: 0 } },
+      { num: 2345, den: 1000, decimal: 2.345, decimalStr: "2,345", tab: { u: 2, di: 3, ce: 4, mi: 5 } },
+      { num:   30, den: 1000, decimal: 0.03,  decimalStr: "0,030", tab: { u: 0, di: 0, ce: 3, mi: 0 } }
+    ]
   }
 
 };

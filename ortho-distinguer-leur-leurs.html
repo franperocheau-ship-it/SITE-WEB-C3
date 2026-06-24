@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distinguer leur et leurs — Orthographe — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=9">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/results.js"></script>
+  <style>
+    /* ── Tabs ─────────────────────────────────────────────────── */
+    .dll-tab-bar { display:flex; border-bottom:2px solid var(--border); margin-bottom:24px; }
+    .dll-tab { flex:1; background:none; border:none; border-bottom:3px solid transparent; margin-bottom:-2px; padding:11px 8px; font-family:inherit; font-size:14px; font-weight:700; color:var(--muted); cursor:pointer; text-align:center; transition:color 150ms,border-color 150ms; }
+    .dll-tab.is-active { color:var(--blue); border-bottom-color:var(--blue); }
+    .dll-tab:hover:not(.is-active) { color:var(--text); }
+
+    /* ── Panel ───────────────────────────────────────────────── */
+    .dll-hidden { display:none !important; }
+
+    /* ── Rule ────────────────────────────────────────────────── */
+    .dll-rule-btn { display:inline-flex; align-items:center; gap:6px; background:rgba(16,43,106,0.05); border:1px solid rgba(16,43,106,0.15); border-radius:100px; padding:7px 16px; font-family:inherit; font-size:13px; font-weight:600; color:var(--blue); cursor:pointer; margin-bottom:16px; transition:background 150ms; }
+    .dll-rule-btn:hover { background:rgba(16,43,106,0.09); }
+    .dll-rule-panel { background:rgba(16,43,106,0.04); border:1.5px solid rgba(16,43,106,0.16); border-radius:14px; padding:18px 22px; margin-bottom:20px; font-size:14px; line-height:1.85; color:var(--text); }
+    .dll-rule-panel strong { color:var(--blue); }
+    .dll-rule-close { display:inline-block; margin-top:10px; background:none; border:1px solid rgba(16,43,106,0.22); border-radius:100px; padding:5px 14px; font-family:inherit; font-size:12px; font-weight:600; color:var(--blue); cursor:pointer; }
+    .dll-rule-close:hover { background:rgba(16,43,106,0.06); }
+
+    /* ── Progress ────────────────────────────────────────────── */
+    .dll-progress { margin-bottom:24px; }
+    .dll-progress-top { display:flex; justify-content:space-between; margin-bottom:10px; }
+    .dll-progress-label { font-weight:700; font-size:13px; color:var(--blue); }
+    .dll-bar-bg { height:8px; background:var(--border); border-radius:100px; overflow:hidden; }
+    .dll-bar-fill { height:100%; background:var(--blue); border-radius:100px; transition:width 350ms ease; }
+
+    /* ── Card ────────────────────────────────────────────────── */
+    .dll-card { background:var(--card-bg); border-radius:var(--radius-card); box-shadow:var(--shadow-md); padding:32px 36px; margin-bottom:12px; }
+    @media (max-width:600px) { .dll-card { padding:22px 18px; } }
+
+    /* ── Score bar ───────────────────────────────────────────── */
+    .dll-score-bar { text-align:center; font-size:13px; font-weight:700; color:var(--muted); padding:10px; border-top:1px solid var(--border); }
+
+    /* ── Phrase ──────────────────────────────────────────────── */
+    .dll-phrase { font-size:20px; font-weight:700; color:var(--text); line-height:1.8; text-align:center; padding:20px 22px; background:var(--bg); border-radius:14px; border:1.5px solid var(--border); margin-bottom:22px; }
+    .dll-blank { display:inline-block; border-bottom:3px solid var(--blue); min-width:48px; text-align:center; padding:0 6px 2px; margin:0 2px; color:rgba(16,43,106,0.35); font-style:italic; vertical-align:text-bottom; }
+    .dll-blank.is-filled  { font-style:normal; color:var(--blue); }
+    .dll-blank.is-correct { border-bottom-color:#16a34a; color:#15803d; font-style:normal; }
+    .dll-blank.is-wrong   { border-bottom-color:var(--red); color:var(--red); font-style:normal; }
+
+    /* ── Choice buttons (étiquette) ──────────────────────────── */
+    .dll-choices { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+    .dll-choice { min-width:80px; background:var(--bg); border:2px solid var(--border); border-radius:14px; padding:13px 22px; font-family:inherit; font-size:20px; font-weight:900; color:var(--text); cursor:pointer; text-align:center; transition:border-color 170ms,background 170ms,transform 170ms; }
+    .dll-choice:hover:not(:disabled) { border-color:var(--blue); background:rgba(16,43,106,0.04); transform:translateY(-2px); }
+    .dll-choice:disabled { cursor:default; }
+    .dll-choice.is-correct  { border-color:#16a34a; background:rgba(22,163,74,0.09); color:#15803d; }
+    .dll-choice.is-wrong    { border-color:var(--red); background:rgba(214,40,57,0.06); color:var(--red); }
+    .dll-choice.is-selected { border-color:var(--blue); background:rgba(16,43,106,0.08); color:var(--blue); }
+
+    /* ── Clickable words (mots-cliquables) ───────────────────── */
+    .dll-clickword { display:inline-block; background:rgba(16,43,106,0.07); border:2px solid rgba(16,43,106,0.18); border-radius:8px; padding:1px 8px; cursor:pointer; font-weight:900; transition:background 170ms,border-color 170ms; }
+    .dll-clickword:hover:not(.is-locked) { background:rgba(16,43,106,0.13); border-color:rgba(16,43,106,0.35); }
+    .dll-clickword.is-selected { background:rgba(16,43,106,0.15); border-color:var(--blue); color:var(--blue); outline:2px solid var(--blue); outline-offset:1px; }
+    .dll-clickword.is-correct  { background:rgba(22,163,74,0.09); border-color:#16a34a; color:#15803d; }
+    .dll-clickword.is-wrong    { background:rgba(214,40,57,0.06); border-color:var(--red); color:var(--red); }
+    .dll-clickword.is-locked   { cursor:default; }
+    .dll-cliq-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:14px 0; }
+    .dll-phrase-ok-btn { background:rgba(22,163,74,0.07); border:2px solid rgba(22,163,74,0.3); border-radius:12px; padding:10px 20px; font-family:inherit; font-size:14px; font-weight:700; color:#15803d; cursor:pointer; transition:background 170ms,border-color 170ms; }
+    .dll-phrase-ok-btn:hover:not(:disabled) { background:rgba(22,163,74,0.13); border-color:#16a34a; }
+    .dll-phrase-ok-btn.is-selected { background:rgba(22,163,74,0.15); border-color:#16a34a; outline:2px solid #16a34a; outline-offset:1px; }
+    .dll-phrase-ok-btn:disabled { cursor:default; opacity:0.7; }
+
+    /* ── Validate / Next buttons ─────────────────────────────── */
+    .dll-validate-btn { display:block; width:100%; background:var(--blue); color:#fff; border:none; border-radius:12px; padding:12px 20px; font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:6px; transition:background 170ms; }
+    .dll-validate-btn:hover:not(:disabled) { background:#0d2255; }
+    .dll-validate-btn:disabled { opacity:0.38; cursor:default; }
+    .dll-next-btn { display:block; width:100%; margin-top:14px; background:var(--blue); color:#fff; border:none; border-radius:12px; padding:13px 22px; font-family:inherit; font-size:15px; font-weight:700; cursor:pointer; transition:background 170ms,transform 170ms; }
+    .dll-next-btn:hover { background:#0d2255; transform:translateY(-1px); }
+
+    /* ── Fill-in inputs ──────────────────────────────────────── */
+    .dll-fill-phrase { font-size:18px; font-weight:700; color:var(--text); line-height:2.4; text-align:center; padding:20px 22px; background:var(--bg); border-radius:14px; border:1.5px solid var(--border); margin-bottom:22px; }
+    .dll-fill-input { display:inline-block; border:none; border-bottom:3px solid var(--blue); background:transparent; font-family:inherit; font-size:18px; font-weight:900; color:var(--blue); text-align:center; width:72px; outline:none; padding:0 4px 2px; vertical-align:text-bottom; }
+    .dll-fill-input:focus { border-bottom-color:#0d2255; }
+    .dll-fill-input.is-correct { border-bottom-color:#16a34a; color:#15803d; }
+    .dll-fill-input.is-wrong   { border-bottom-color:var(--red); color:var(--red); }
+
+    /* ── Classification ──────────────────────────────────────── */
+    .dll-classif-wrap { display:flex; flex-direction:column; gap:16px; }
+    .dll-classif-bank-label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
+    .dll-classif-bank { display:flex; flex-wrap:wrap; gap:8px; min-height:52px; padding:12px; background:var(--bg); border:1.5px dashed var(--border); border-radius:14px; align-items:flex-start; }
+    .dll-classif-bank.is-over { border-color:var(--blue); background:rgba(16,43,106,0.03); }
+    .dll-classif-cols { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media (max-width:500px) { .dll-classif-cols { grid-template-columns:1fr; } }
+    .dll-classif-col { border:2px solid var(--border); border-radius:14px; overflow:hidden; transition:border-color 170ms,background 170ms; }
+    .dll-classif-col.is-over { border-color:var(--blue); background:rgba(16,43,106,0.03); cursor:pointer; }
+    .dll-classif-col-header { padding:10px 14px; background:rgba(16,43,106,0.05); font-size:13px; font-weight:800; color:var(--blue); text-align:center; border-bottom:1px solid var(--border); }
+    .dll-classif-col-body { min-height:56px; padding:10px; display:flex; flex-direction:column; gap:8px; }
+    .dll-classif-card { background:var(--card-bg); border:2px solid var(--border); border-radius:10px; padding:9px 14px; font-size:14px; font-weight:600; color:var(--text); cursor:pointer; transition:border-color 170ms,background 170ms,transform 170ms; user-select:none; }
+    .dll-classif-card:hover:not(.is-locked) { border-color:rgba(16,43,106,0.3); transform:translateY(-1px); }
+    .dll-classif-card.is-selected { border-color:var(--blue); background:rgba(16,43,106,0.07); color:var(--blue); }
+    .dll-classif-card.is-correct  { border-color:#16a34a; background:rgba(22,163,74,0.08); color:#15803d; cursor:default; }
+    .dll-classif-card.is-wrong    { border-color:var(--red); background:rgba(214,40,57,0.06); color:var(--red); cursor:default; }
+    .dll-classif-card.is-locked   { cursor:default; }
+    .dll-classif-hint { font-size:11px; font-weight:600; opacity:0.8; margin-top:2px; }
+
+    /* ── Production libre ────────────────────────────────────── */
+    .dll-prompt { font-size:16px; font-weight:700; color:var(--text); line-height:1.6; padding:16px 20px; background:var(--bg); border:1.5px solid var(--border); border-radius:14px; margin-bottom:16px; }
+    .dll-textarea { width:100%; box-sizing:border-box; border:1.5px solid var(--border); border-radius:12px; padding:14px 16px; font-family:inherit; font-size:15px; color:var(--text); background:var(--bg); outline:none; resize:vertical; min-height:90px; transition:border-color 200ms; margin-bottom:10px; }
+    .dll-textarea:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(16,43,106,0.08); }
+    .dll-textarea:disabled { opacity:0.7; background:var(--card-bg); }
+
+    /* ── Feedback ────────────────────────────────────────────── */
+    .dll-feedback { margin:14px 0 6px; min-height:22px; }
+
+    /* ── Streak toast ────────────────────────────────────────── */
+    .dll-streak-toast { position:fixed; top:76px; left:50%; transform:translateX(-50%) translateY(-16px); background:var(--blue); color:#fff; font-size:15px; font-weight:800; padding:10px 24px; border-radius:100px; box-shadow:0 4px 20px rgba(0,0,0,0.18); opacity:0; pointer-events:none; transition:opacity 280ms,transform 280ms; z-index:9999; }
+    .dll-streak-toast.is-visible { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* ── Results ─────────────────────────────────────────────── */
+    .dll-results { text-align:center; padding:8px 0 4px; }
+    .dll-results-score { font-size:42px; font-weight:900; color:var(--blue); line-height:1; margin-bottom:4px; }
+    .dll-results-pct   { font-size:20px; font-weight:700; color:var(--muted); margin-bottom:14px; }
+    .dll-results-msg   { font-size:15px; font-weight:600; color:var(--text); margin-bottom:24px; }
+    .dll-results-btns  { display:flex; flex-direction:column; gap:10px; max-width:320px; margin:0 auto; }
+    .dll-btn-primary { background:var(--blue); color:#fff; border:none; border-radius:12px; padding:13px 22px; font-family:inherit; font-size:15px; font-weight:700; cursor:pointer; transition:background 170ms; }
+    .dll-btn-primary:hover { background:#0d2255; }
+    .dll-btn-secondary { background:none; border:1.5px solid var(--border); border-radius:12px; padding:12px 22px; font-family:inherit; font-size:14px; font-weight:600; color:var(--text); cursor:pointer; text-decoration:none; display:block; transition:border-color 170ms; }
+    .dll-btn-secondary:hover { border-color:rgba(16,43,106,0.25); }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index-v2.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index-v2.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="page-wrap">
+  <div class="page-content">
+
+    <a href="français-orthographe.html" class="back-link">← Orthographe</a>
+
+    <div class="ex-container">
+
+      <!-- Page header -->
+      <div class="ex-page-header">
+        <div class="ex-page-badges">
+          <span class="badge badge-cm1">CM1</span>
+          <span class="badge badge-cm2">CM2</span>
+          <span class="badge badge-6e">6e</span>
+        </div>
+        <h1 class="ex-page-title">Distinguer <em>leur</em> et <em>leurs</em></h1>
+        <div class="ex-page-rule"></div>
+        <p class="ex-page-subtitle" style="font-size:14px;color:var(--muted);margin-top:8px">Homophones grammaticaux</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="dll-tab-bar">
+        <button class="dll-tab is-active" data-lv="1">Niveau 1</button>
+        <button class="dll-tab" data-lv="2">Niveau 2</button>
+        <button class="dll-tab" data-lv="3">Niveau 3</button>
+      </div>
+
+      <!-- ── Panel 1 ─────────────────────────────────────────── -->
+      <div id="dll-panel-1">
+        <button class="dll-rule-btn" onclick="toggleRule(1)">❓ Revoir la règle</button>
+        <div class="dll-rule-panel dll-hidden" id="dll-rule-1">
+          <p>
+            <strong>leur</strong> (sans s) = déterminant singulier → remplaçable par « son » ou « sa »<br>
+            &emsp;<em>leur maison → sa maison ✓</em><br>
+            <strong>leur</strong> (sans s) = pronom → remplaçable par « lui »<br>
+            &emsp;<em>je leur parle → je lui parle ✓</em><br>
+            <strong>leurs</strong> (avec s) = déterminant pluriel → remplaçable par « ses »<br>
+            &emsp;<em>leurs maisons → ses maisons ✓</em>
+          </p>
+          <p><em>Astuce : mets le nom qui suit au singulier. S'il prend un s au pluriel, <strong>leurs</strong> en prend un aussi. Sinon, écris <strong>leur</strong> sans s.</em></p>
+          <button class="dll-rule-close" onclick="toggleRule(1)">Fermer</button>
+        </div>
+        <div class="dll-progress">
+          <div class="dll-progress-top">
+            <span class="dll-progress-label">Question <span id="dll-qn-1">1</span> sur <span id="dll-qt-1">12</span></span>
+          </div>
+          <div class="dll-bar-bg"><div class="dll-bar-fill" id="dll-bar-1" style="width:0%"></div></div>
+        </div>
+        <div class="dll-card" id="dll-area-1"></div>
+        <div class="dll-score-bar" id="dll-score-1">Aucun essai pour l'instant</div>
+      </div>
+
+      <!-- ── Panel 2 ─────────────────────────────────────────── -->
+      <div id="dll-panel-2" class="dll-hidden">
+        <button class="dll-rule-btn" onclick="toggleRule(2)">❓ Revoir la règle</button>
+        <div class="dll-rule-panel dll-hidden" id="dll-rule-2">
+          <p>
+            <strong>leur</strong> (sans s) = déterminant singulier → « son »/« sa »<br>
+            <strong>leur</strong> (sans s) = pronom → « lui » — jamais de s !<br>
+            <strong>leurs</strong> (avec s) = déterminant pluriel → « ses »
+          </p>
+          <p><em>Astuce : mets le nom qui suit au singulier. S'il prend un s au pluriel, <strong>leurs</strong> en prend un aussi. Pour le pronom, remplace par « lui » → jamais de s.</em></p>
+          <button class="dll-rule-close" onclick="toggleRule(2)">Fermer</button>
+        </div>
+        <div class="dll-progress">
+          <div class="dll-progress-top">
+            <span class="dll-progress-label">Question <span id="dll-qn-2">1</span> sur <span id="dll-qt-2">10</span></span>
+          </div>
+          <div class="dll-bar-bg"><div class="dll-bar-fill" id="dll-bar-2" style="width:0%"></div></div>
+        </div>
+        <div class="dll-card" id="dll-area-2"></div>
+        <div class="dll-score-bar" id="dll-score-2">Aucun essai pour l'instant</div>
+      </div>
+
+      <!-- ── Panel 3 ─────────────────────────────────────────── -->
+      <div id="dll-panel-3" class="dll-hidden">
+        <button class="dll-rule-btn" onclick="toggleRule(3)">❓ Revoir la règle</button>
+        <div class="dll-rule-panel dll-hidden" id="dll-rule-3">
+          <p>
+            <strong>leur</strong> (sans s) = déterminant singulier → « son »/« sa »<br>
+            <strong>leur</strong> (sans s) = pronom → « lui » — jamais de s !<br>
+            <strong>leurs</strong> (avec s) = déterminant pluriel → « ses »
+          </p>
+          <p><em>Astuce : mets le nom qui suit au singulier. S'il prend un s au pluriel, <strong>leurs</strong> en prend un aussi. Sinon, écris <strong>leur</strong> sans s.</em></p>
+          <button class="dll-rule-close" onclick="toggleRule(3)">Fermer</button>
+        </div>
+        <div class="dll-progress">
+          <div class="dll-progress-top">
+            <span class="dll-progress-label">Question <span id="dll-qn-3">1</span> sur <span id="dll-qt-3">16</span></span>
+          </div>
+          <div class="dll-bar-bg"><div class="dll-bar-fill" id="dll-bar-3" style="width:0%"></div></div>
+        </div>
+        <div class="dll-card" id="dll-area-3"></div>
+        <div class="dll-score-bar" id="dll-score-3">Aucun essai pour l'instant</div>
+      </div>
+
+    </div><!-- /.ex-container -->
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 · <a href="mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a></p>
+  </div>
+</footer>
+
+<!-- Streak toast -->
+<div class="dll-streak-toast" id="dll-streak-toast"></div>
+
+<script>
+window.EXERCISE_DATA = window.EXERCISE_DATA || {};
+window.EXERCISE_DATA['ortho-distinguer-leur-leurs'] = { title: 'Distinguer leur et leurs' };
+
+/* ═══════════════════════════════════════════════════════════════
+   DONNÉES — NIVEAU 1 : choix-étiquette (ordre fixe)
+═══════════════════════════════════════════════════════════════ */
+const N1 = [
+  { phrase:"Les enfants rangent ___ affaires.",    answer:"leurs", wtype:"det-plur", hint:"ses affaires → pluriel"  },
+  { phrase:"Les élèves ont rendu ___ copie.",      answer:"leur",  wtype:"det-sing", hint:"sa copie → singulier"    },
+  { phrase:"Les chats lèchent ___ pelage.",        answer:"leur",  wtype:"det-sing", hint:"son pelage → singulier"  },
+  { phrase:"Les joueurs enfilent ___ maillots.",   answer:"leurs", wtype:"det-plur", hint:"ses maillots → pluriel"  },
+  { phrase:"Les parents attendent ___ enfants.",   answer:"leurs", wtype:"det-plur", hint:"ses enfants → pluriel"   },
+  { phrase:"Les oiseaux regagnent ___ nid.",       answer:"leur",  wtype:"det-sing", hint:"son nid → singulier"     },
+  { phrase:"Les élèves ouvrent ___ cahiers.",      answer:"leurs", wtype:"det-plur", hint:"ses cahiers → pluriel"   },
+  { phrase:"Les pompiers font ___ travail.",       answer:"leur",  wtype:"det-sing", hint:"son travail → singulier" },
+  { phrase:"Les enfants lavent ___ mains.",        answer:"leurs", wtype:"det-plur", hint:"ses mains → pluriel"     },
+  { phrase:"Les coureurs reprennent ___ souffle.", answer:"leur",  wtype:"det-sing", hint:"son souffle → singulier" },
+  { phrase:"Les touristes prennent ___ photos.",   answer:"leurs", wtype:"det-plur", hint:"ses photos → pluriel"    },
+  { phrase:"Les acteurs apprennent ___ rôle.",     answer:"leur",  wtype:"det-sing", hint:"son rôle → singulier"    },
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   DONNÉES — NIVEAU 2A : mots-cliquables
+   template : ___ marque chaque leur/leurs cliquable
+   words    : [{display, isError, correction, wtype, hint}]
+   isCorrect: indique si la phrase est déjà correcte
+═══════════════════════════════════════════════════════════════ */
+const N2_CLIQ = [
+  {
+    template: "Les enfants ont perdu ___ manteau.",
+    words: [{ display:"leurs", isError:true,  correction:"leur",  wtype:"det-sing", hint:"son manteau → singulier" }],
+    isCorrect: false
+  },
+  {
+    template: "Je ___ ai dit la vérité.",
+    words: [{ display:"leur",  isError:false, wtype:"pron" }],
+    isCorrect: true
+  },
+  {
+    template: "Les élèves ont fini ___ devoirs.",
+    words: [{ display:"leur",  isError:true,  correction:"leurs", wtype:"det-plur", hint:"ses devoirs → pluriel" }],
+    isCorrect: false
+  },
+  {
+    template: "Elle ___ a expliqué la règle.",
+    words: [{ display:"leur",  isError:false, wtype:"pron" }],
+    isCorrect: true
+  },
+  {
+    template: "Les sportifs préparent ___ équipement.",
+    words: [{ display:"leurs", isError:true,  correction:"leur",  wtype:"det-sing", hint:"son équipement → singulier" }],
+    isCorrect: false
+  },
+  {
+    template: "Il ___ a offert des fleurs.",
+    words: [{ display:"leurs", isError:true,  correction:"leur",  wtype:"pron",     hint:"pronom invariable → jamais de s" }],
+    isCorrect: false
+  },
+  {
+    template: "Les oiseaux construisent ___ nids.",
+    words: [{ display:"leur",  isError:true,  correction:"leurs", wtype:"det-plur", hint:"ses nids → pluriel" }],
+    isCorrect: false
+  },
+  {
+    template: "Nous ___ avons rendu ___ livres.",
+    words: [
+      { display:"leur",  isError:false, wtype:"pron"     },
+      { display:"leurs", isError:false, wtype:"det-plur" }
+    ],
+    isCorrect: true
+  },
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   DONNÉES — NIVEAU 2B : classification en deux colonnes
+═══════════════════════════════════════════════════════════════ */
+const N2_CLASSIF = [
+  {
+    serie: 1,
+    items: [
+      { phrase:"Leur maison est grande.",   col:"leur",  hint:"sa maison → singulier"  },
+      { phrase:"Leurs enfants jouent.",     col:"leurs", hint:"ses enfants → pluriel"   },
+      { phrase:"Je leur parle.",            col:"leur",  hint:"pronom → lui"            },
+      { phrase:"Leurs idées sont bonnes.",  col:"leurs", hint:"ses idées → pluriel"     },
+      { phrase:"Leur avis compte.",         col:"leur",  hint:"son avis → singulier"    },
+      { phrase:"Leurs amis arrivent.",      col:"leurs", hint:"ses amis → pluriel"      },
+    ]
+  },
+  {
+    serie: 2,
+    items: [
+      { phrase:"Leur chien aboie.",          col:"leur",  hint:"son chien → singulier"   },
+      { phrase:"Leurs bagages sont lourds.", col:"leurs", hint:"ses bagages → pluriel"   },
+      { phrase:"Il leur répond.",            col:"leur",  hint:"pronom → lui"            },
+      { phrase:"Leurs résultats sont bons.", col:"leurs", hint:"ses résultats → pluriel" },
+      { phrase:"Leur projet avance.",        col:"leur",  hint:"son projet → singulier"  },
+      { phrase:"Leurs parents attendent.",   col:"leurs", hint:"ses parents → pluriel"   },
+    ]
+  },
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   DONNÉES — NIVEAU 3A : fill-in guidé (ordre fixe)
+═══════════════════════════════════════════════════════════════ */
+const N3_FILL = [
+  /* ─ 1 blanc ─────────────────────────────────────────────── */
+  { type:"single", phrase:"Les médecins ont donné ___ avis sur la question.",
+    answer:"leur",  wtype:"det-sing", hint:"son avis → singulier"     },
+  { type:"single", phrase:"Les chercheurs ont publié ___ résultats.",
+    answer:"leurs", wtype:"det-plur", hint:"ses résultats → pluriel"  },
+  { type:"single", phrase:"Le professeur ___ a expliqué la leçon.",
+    answer:"leur",  wtype:"pron",     hint:"pronom → lui"             },
+  { type:"single", phrase:"Les athlètes ont battu ___ record.",
+    answer:"leur",  wtype:"det-sing", hint:"son record → singulier"   },
+  { type:"single", phrase:"Les élèves ont rendu ___ travaux.",
+    answer:"leurs", wtype:"det-plur", hint:"ses travaux → pluriel"    },
+  { type:"single", phrase:"On ___ a annoncé la nouvelle ce matin.",
+    answer:"leur",  wtype:"pron",     hint:"pronom → lui"             },
+  /* ─ 2 blancs ────────────────────────────────────────────── */
+  { type:"double",
+    phrase:"Les parents lisent une histoire à ___ enfants avant ___ coucher.",
+    answers:["leurs","leur"],
+    wtypes: ["det-plur","det-sing"],
+    hints:  ["ses enfants → pluriel","son coucher → singulier"] },
+  { type:"double",
+    phrase:"Les enseignants corrigent ___ copies et rendent ___ avis.",
+    answers:["leurs","leur"],
+    wtypes: ["det-plur","det-sing"],
+    hints:  ["ses copies → pluriel","son avis → singulier"] },
+  { type:"double",
+    phrase:"Les joueurs reprennent ___ entraînements et ___ coach les encourage.",
+    answers:["leurs","leur"],
+    wtypes: ["det-plur","det-sing"],
+    hints:  ["ses entraînements → pluriel","son coach → singulier"] },
+  { type:"double",
+    phrase:"Je ___ ai expliqué ___ erreurs.",
+    answers:["leur","leurs"],
+    wtypes: ["pron","det-plur"],
+    hints:  ["pronom → lui","ses erreurs → pluriel"] },
+  { type:"double",
+    phrase:"Les scientifiques partagent ___ découvertes avec ___ équipe.",
+    answers:["leurs","leur"],
+    wtypes: ["det-plur","det-sing"],
+    hints:  ["ses découvertes → pluriel","son équipe → singulier"] },
+  { type:"double",
+    phrase:"On ___ a remis ___ diplômes lors de la cérémonie.",
+    answers:["leur","leurs"],
+    wtypes: ["pron","det-plur"],
+    hints:  ["pronom → lui","ses diplômes → pluriel"] },
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   DONNÉES — NIVEAU 3B : production libre (ordre fixe)
+═══════════════════════════════════════════════════════════════ */
+const N3_LIBRE = [
+  "Écris une phrase sur des <strong>enfants</strong> qui contient à la fois <strong>leur</strong> et <strong>leurs</strong>.",
+  "Écris une phrase sur des <strong>sportifs</strong> qui contient à la fois <strong>leur</strong> et <strong>leurs</strong>.",
+  "Écris une phrase sur des <strong>élèves</strong> qui contient à la fois <strong>leur</strong> et <strong>leurs</strong>.",
+  "Écris une phrase sur des <strong>animaux</strong> qui contient à la fois <strong>leur</strong> et <strong>leurs</strong>.",
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════ */
+function mkState() {
+  return { idx:0, score:0, attempts:0, streak:0, questions:[], started:false };
+}
+const ST = { 1:mkState(), 2:mkState(), 3:mkState() };
+let activeLevel = 1;
+const sessionStart = Date.now();
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════════════ */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function fbOk(html) { return `<div class="ex-feedback-correct">${html}</div>`; }
+function fbErr(html) { return `<div class="ex-feedback-wrong">${html}</div>`; }
+
+function explainOk(answer, wtype, hint) {
+  if (wtype === 'det-sing') return `« ${hint} » → singulier → <strong>leur</strong> sans s ✓`;
+  if (wtype === 'det-plur') return `« ${hint} » → pluriel → <strong>leurs</strong> avec s ✓`;
+  if (wtype === 'pron')     return `pronom : remplace par « lui » → <strong>leur</strong> invariable ✓`;
+  return `<strong>« ${answer} »</strong> ✓`;
+}
+function explainErr(answer, wtype, hint) {
+  if (wtype === 'det-sing') return `« ${hint} » → au singulier → écris <strong>leur</strong> (sans s).`;
+  if (wtype === 'det-plur') return `« ${hint} » → au pluriel → écris <strong>leurs</strong> (avec s).`;
+  if (wtype === 'pron')     return `C'est un pronom : remplace par « lui » → écris <strong>leur</strong> (sans s, toujours).`;
+  return `La bonne réponse est <strong>${answer}</strong>.`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TABS & RÈGLE
+═══════════════════════════════════════════════════════════════ */
+function setLevel(lv) {
+  activeLevel = lv;
+  [1,2,3].forEach(i => {
+    document.getElementById(`dll-panel-${i}`).classList.toggle('dll-hidden', i !== lv);
+    document.querySelector(`.dll-tab[data-lv="${i}"]`).classList.toggle('is-active', i === lv);
+  });
+  if (!ST[lv].started) { initLevel(lv); ST[lv].started = true; }
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+function toggleRule(lv) {
+  document.getElementById(`dll-rule-${lv}`).classList.toggle('dll-hidden');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INITIALISATION DES NIVEAUX
+═══════════════════════════════════════════════════════════════ */
+function initLevel(lv) {
+  const st = ST[lv];
+  st.idx = 0; st.score = 0; st.attempts = 0; st.streak = 0;
+
+  if (lv === 1) {
+    st.questions = N1.map(q => ({ type:'etiquette', data:q }));
+  } else if (lv === 2) {
+    const cliq    = N2_CLIQ.map(q => ({ type:'cliquable', data:q }));
+    const classif = N2_CLASSIF.map(q => ({ type:'classif',   data:q }));
+    st.questions = shuffle([...cliq, ...classif]);
+  } else {
+    const fill  = N3_FILL.map(q => ({ type: q.type === 'single' ? 'fill-single' : 'fill-double', data:q }));
+    const libre = N3_LIBRE.map(p => ({ type:'libre', data:p }));
+    st.questions = [...fill, ...libre];
+  }
+
+  document.getElementById(`dll-qt-${lv}`).textContent = st.questions.length;
+  updateScore(lv);
+  showQuestion(lv);
+}
+function retryLevel(lv) { ST[lv].started = true; initLevel(lv); }
+
+/* ═══════════════════════════════════════════════════════════════
+   PROGRESSION & SCORE
+═══════════════════════════════════════════════════════════════ */
+function updateProgress(lv) {
+  const st = ST[lv];
+  document.getElementById(`dll-qn-${lv}`).textContent  = st.idx + 1;
+  document.getElementById(`dll-bar-${lv}`).style.width = (st.idx / st.questions.length * 100) + '%';
+}
+function updateScore(lv) {
+  const { score:s, attempts:t } = ST[lv];
+  document.getElementById(`dll-score-${lv}`).textContent =
+    t === 0 ? "Aucun essai pour l'instant"
+            : `${s} bonne${s!==1?'s':''} réponse${s!==1?'s':''} sur ${t} essai${t!==1?'s':''}`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STREAK
+═══════════════════════════════════════════════════════════════ */
+function checkStreak(lv) {
+  const { streak } = ST[lv];
+  if (streak > 0 && streak % 3 === 0) {
+    const toast = document.getElementById('dll-streak-toast');
+    toast.textContent = `🔥 ${streak} de suite !`;
+    toast.classList.add('is-visible');
+    setTimeout(() => toast.classList.remove('is-visible'), 2000);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BOUTON SUIVANT
+═══════════════════════════════════════════════════════════════ */
+function addNextBtn(area, lv) {
+  const st  = ST[lv];
+  const btn = document.createElement('button');
+  btn.className   = 'dll-next-btn';
+  btn.textContent = (st.idx === st.questions.length - 1) ? 'Voir mes résultats' : 'Question suivante →';
+  btn.addEventListener('click', () => {
+    st.idx++;
+    if (st.idx >= st.questions.length) {
+      showResults(lv);
+    } else {
+      showQuestion(lv);
+      document.getElementById(`dll-area-${lv}`).scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+  });
+  area.appendChild(btn);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DISPATCH
+═══════════════════════════════════════════════════════════════ */
+function showQuestion(lv) {
+  const st   = ST[lv];
+  const area = document.getElementById(`dll-area-${lv}`);
+  updateProgress(lv);
+  const item = st.questions[st.idx];
+
+  if      (item.type === 'etiquette')   renderEtiquette(area, item.data, lv);
+  else if (item.type === 'cliquable')   renderCliquable(area, item.data, lv);
+  else if (item.type === 'classif')     renderClassif(area, item.data, lv);
+  else if (item.type === 'fill-single') renderFillSingle(area, item.data, lv);
+  else if (item.type === 'fill-double') renderFillDouble(area, item.data, lv);
+  else if (item.type === 'libre')       renderLibre(area, item.data, lv);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER : Étiquette — Niveau 1
+═══════════════════════════════════════════════════════════════ */
+function renderEtiquette(area, q, lv) {
+  const phraseHtml = q.phrase.replace('___', '<span class="dll-blank" id="dll-bl">___</span>');
+  area.innerHTML = `
+    <p class="ex-question-label">Quel mot complète la phrase : <strong>leur</strong> ou <strong>leurs</strong> ?</p>
+    <div class="dll-phrase">${phraseHtml}</div>
+    <div class="dll-choices" id="dll-choices"></div>
+    <div class="dll-feedback" id="dll-fb"></div>
+  `;
+  const grid = area.querySelector('#dll-choices');
+  ['leur','leurs'].forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className   = 'dll-choice';
+    btn.textContent = choice;
+    btn.addEventListener('click', () => {
+      grid.querySelectorAll('.dll-choice').forEach(b => b.disabled = true);
+      const correct = choice === q.answer;
+      grid.querySelectorAll('.dll-choice').forEach(b => {
+        if (b.textContent === q.answer) b.classList.add('is-correct');
+      });
+      if (!correct) btn.classList.add('is-wrong');
+      const blank = area.querySelector('#dll-bl');
+      blank.textContent = q.answer;
+      blank.classList.add('is-filled', correct ? 'is-correct' : 'is-wrong');
+      const st = ST[lv];
+      st.attempts++;
+      if (correct) {
+        st.score++; st.streak++;
+        area.querySelector('#dll-fb').innerHTML = fbOk(
+          `✅ Bravo ! <strong>« ${q.answer} »</strong> — ${explainOk(q.answer, q.wtype, q.hint)}`
+        );
+      } else {
+        st.streak = 0;
+        area.querySelector('#dll-fb').innerHTML = fbErr(
+          `❌ ${explainErr(q.answer, q.wtype, q.hint)}`
+        );
+      }
+      checkStreak(lv);
+      updateScore(lv);
+      addNextBtn(area, lv);
+    });
+    grid.appendChild(btn);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER : Mots cliquables — Niveau 2
+═══════════════════════════════════════════════════════════════ */
+function renderCliquable(area, q, lv) {
+  let wi = 0;
+  const phraseHtml = q.template.replace(/___/g, () => {
+    const w = q.words[wi++];
+    return `<span class="dll-clickword" data-wi="${wi-1}">${w.display}</span>`;
+  });
+
+  area.innerHTML = `
+    <p class="ex-question-label">Clique sur le mot <strong>incorrect</strong>, ou indique si la phrase est correcte.</p>
+    <div class="dll-phrase">${phraseHtml}</div>
+    <div class="dll-cliq-actions">
+      <button class="dll-phrase-ok-btn" id="dll-ok-btn">✅ Phrase correcte</button>
+    </div>
+    <button class="dll-validate-btn" id="dll-val-btn" disabled>Valider</button>
+    <div class="dll-feedback" id="dll-fb"></div>
+  `;
+
+  let selectedWi = null;
+  let selectedOk = false;
+  const valBtn = area.querySelector('#dll-val-btn');
+  const okBtn  = area.querySelector('#dll-ok-btn');
+
+  area.querySelectorAll('.dll-clickword').forEach(span => {
+    span.addEventListener('click', () => {
+      if (span.classList.contains('is-locked')) return;
+      const idx = parseInt(span.dataset.wi);
+      area.querySelectorAll('.dll-clickword').forEach(s => s.classList.remove('is-selected'));
+      okBtn.classList.remove('is-selected');
+      if (selectedWi === idx && !selectedOk) {
+        selectedWi = null;
+        valBtn.disabled = true;
+      } else {
+        selectedWi = idx;
+        selectedOk = false;
+        span.classList.add('is-selected');
+        valBtn.disabled = false;
+      }
+    });
+  });
+
+  okBtn.addEventListener('click', () => {
+    area.querySelectorAll('.dll-clickword').forEach(s => s.classList.remove('is-selected'));
+    if (selectedOk) {
+      selectedOk = false;
+      selectedWi = null;
+      okBtn.classList.remove('is-selected');
+      valBtn.disabled = true;
+    } else {
+      selectedOk = true;
+      selectedWi = null;
+      okBtn.classList.add('is-selected');
+      valBtn.disabled = false;
+    }
+  });
+
+  valBtn.addEventListener('click', () => {
+    valBtn.disabled = true;
+    okBtn.disabled  = true;
+    area.querySelectorAll('.dll-clickword').forEach(s => {
+      s.classList.add('is-locked');
+      s.classList.remove('is-selected');
+    });
+
+    const st = ST[lv];
+    st.attempts++;
+    let correct = false;
+    const fb = area.querySelector('#dll-fb');
+
+    if (selectedOk) {
+      correct = q.isCorrect;
+      if (correct) {
+        area.querySelectorAll('.dll-clickword').forEach(s => s.classList.add('is-correct'));
+        st.score++; st.streak++;
+        fb.innerHTML = fbOk(`✅ Bravo ! Cette phrase est bien correcte — aucun mot à corriger.`);
+      } else {
+        const errWord = q.words.find(w => w.isError);
+        area.querySelectorAll('.dll-clickword').forEach((s, i) => {
+          s.classList.add(q.words[i].isError ? 'is-wrong' : 'is-correct');
+        });
+        st.streak = 0;
+        fb.innerHTML = fbErr(
+          `❌ Cette phrase contient une erreur ! « ${errWord.display} » → <strong>« ${errWord.correction} »</strong>. ${explainErr(errWord.correction, errWord.wtype, errWord.hint || '')}`
+        );
+      }
+    } else {
+      const word = q.words[selectedWi];
+      correct = word.isError;
+      if (correct) {
+        area.querySelectorAll('.dll-clickword').forEach((s, i) => {
+          s.classList.add(q.words[i].isError ? 'is-correct' : 'is-correct');
+        });
+        area.querySelectorAll('.dll-clickword')[selectedWi].textContent = word.correction;
+        st.score++; st.streak++;
+        let expl = '';
+        if (word.wtype === 'det-sing') expl = `« ${word.hint} » → singulier → <strong>leur</strong> sans s ✓`;
+        else if (word.wtype === 'det-plur') expl = `« ${word.hint} » → pluriel → <strong>leurs</strong> avec s ✓`;
+        else expl = `pronom : remplace par « lui » → <strong>leur</strong> sans s ✓`;
+        fb.innerHTML = fbOk(
+          `✅ Bravo ! « ${word.display} » était incorrect → <strong>« ${word.correction} »</strong>. ${expl}`
+        );
+      } else {
+        area.querySelectorAll('.dll-clickword').forEach((s, i) => {
+          s.classList.add(q.words[i].isError ? 'is-wrong' : 'is-correct');
+        });
+        st.streak = 0;
+        if (q.isCorrect) {
+          fb.innerHTML = fbErr(`❌ Cette phrase est correcte ! Aucun mot n'est fautif.`);
+        } else {
+          const errWord = q.words.find(w => w.isError);
+          fb.innerHTML = fbErr(
+            `❌ Ce n'est pas ce mot. L'erreur était « ${errWord.display} » → <strong>« ${errWord.correction} »</strong>. ${explainErr(errWord.correction, errWord.wtype, errWord.hint || '')}`
+          );
+        }
+      }
+    }
+
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER : Classification — Niveau 2
+   Clic pour sélectionner, clic sur colonne pour placer,
+   clic sur carte placée pour la renvoyer dans la banque.
+═══════════════════════════════════════════════════════════════ */
+function renderClassif(area, q, lv) {
+  const placement    = new Array(q.items.length).fill(null);
+  let   selectedCard = null;
+
+  function rebuild() {
+    const allPlaced = placement.every(p => p !== null);
+
+    const bankCards   = q.items
+      .map((item, i) => ({ item, i }))
+      .filter(({ i }) => placement[i] === null);
+    const leurCards   = q.items
+      .map((item, i) => ({ item, i }))
+      .filter(({ i }) => placement[i] === 'leur');
+    const leursCards  = q.items
+      .map((item, i) => ({ item, i }))
+      .filter(({ i }) => placement[i] === 'leurs');
+
+    const bankHtml = bankCards.length
+      ? bankCards.map(({ item, i }) =>
+          `<div class="dll-classif-card${selectedCard===i?' is-selected':''}" data-ci="${i}" data-zone="bank">${item.phrase}</div>`
+        ).join('')
+      : `<span style="color:var(--muted);font-size:13px;padding:6px 0;display:block">✓ toutes classées</span>`;
+
+    const leurHtml  = leurCards.map(({ item, i }) =>
+      `<div class="dll-classif-card" data-ci="${i}" data-zone="col">${item.phrase}</div>`
+    ).join('');
+    const leursHtml = leursCards.map(({ item, i }) =>
+      `<div class="dll-classif-card" data-ci="${i}" data-zone="col">${item.phrase}</div>`
+    ).join('');
+
+    const colLeurClass  = (selectedCard !== null) ? ' is-over' : '';
+    const colLeursClass = (selectedCard !== null) ? ' is-over' : '';
+
+    area.innerHTML = `
+      <p class="ex-question-label">Classe chaque phrase dans la bonne colonne. Clique une carte pour la sélectionner, puis clique la colonne cible. Clique une carte déjà classée pour la remettre dans la banque.</p>
+      <div class="dll-classif-wrap">
+        <div>
+          <div class="dll-classif-bank-label">Phrases à classer</div>
+          <div class="dll-classif-bank${selectedCard!==null?' is-over':''}" id="dll-bank">${bankHtml}</div>
+        </div>
+        <div class="dll-classif-cols">
+          <div class="dll-classif-col${colLeurClass}" id="dll-col-leur" data-col="leur">
+            <div class="dll-classif-col-header">leur<br><small style="font-weight:600;font-size:10px">(singulier ou pronom)</small></div>
+            <div class="dll-classif-col-body" id="dll-col-leur-body">${leurHtml}</div>
+          </div>
+          <div class="dll-classif-col${colLeursClass}" id="dll-col-leurs" data-col="leurs">
+            <div class="dll-classif-col-header">leurs<br><small style="font-weight:600;font-size:10px">(pluriel)</small></div>
+            <div class="dll-classif-col-body" id="dll-col-leurs-body">${leursHtml}</div>
+          </div>
+        </div>
+        ${allPlaced ? `<button class="dll-validate-btn" id="dll-val-btn">Vérifier le classement</button>` : ''}
+        <div class="dll-feedback" id="dll-fb"></div>
+      </div>
+    `;
+
+    /* Cards in bank: clic = sélectionner/désélectionner */
+    area.querySelectorAll('.dll-classif-card[data-zone="bank"]').forEach(card => {
+      card.addEventListener('click', () => {
+        const ci = parseInt(card.dataset.ci);
+        selectedCard = (selectedCard === ci) ? null : ci;
+        rebuild();
+      });
+    });
+
+    /* Cards in columns: clic = renvoyer dans la banque */
+    area.querySelectorAll('.dll-classif-card[data-zone="col"]').forEach(card => {
+      card.addEventListener('click', () => {
+        placement[parseInt(card.dataset.ci)] = null;
+        selectedCard = null;
+        rebuild();
+      });
+    });
+
+    /* Colonnes: clic = placer la carte sélectionnée */
+    if (selectedCard !== null) {
+      ['leur','leurs'].forEach(col => {
+        const colEl = area.querySelector(`#dll-col-${col}`);
+        if (colEl) {
+          colEl.addEventListener('click', e => {
+            /* ignorer si on a cliqué sur une carte déjà placée */
+            if (e.target.closest('.dll-classif-card')) return;
+            placement[selectedCard] = col;
+            selectedCard = null;
+            rebuild();
+          });
+        }
+      });
+      /* Banque: recliquer quand une carte est sélectionnée = désélectionner */
+      const bank = area.querySelector('#dll-bank');
+      if (bank) {
+        bank.addEventListener('click', e => {
+          if (!e.target.closest('.dll-classif-card')) {
+            selectedCard = null;
+            rebuild();
+          }
+        });
+      }
+    }
+
+    /* Validation */
+    const valBtn = area.querySelector('#dll-val-btn');
+    if (valBtn) {
+      valBtn.addEventListener('click', () => {
+        const st = ST[lv];
+        st.attempts++;
+        const allOk = q.items.every((item, i) => placement[i] === item.col);
+        if (allOk) { st.score++; st.streak++; } else { st.streak = 0; }
+
+        const mkCard = (item, i) => {
+          const ok   = placement[i] === item.col;
+          const hint = !ok ? `<div class="dll-classif-hint">→ ${item.hint}</div>` : '';
+          return `<div class="dll-classif-card is-locked ${ok?'is-correct':'is-wrong'}">${item.phrase}${hint}</div>`;
+        };
+
+        area.innerHTML = `
+          <p class="ex-question-label">Classement vérifié :</p>
+          <div class="dll-classif-cols">
+            <div class="dll-classif-col">
+              <div class="dll-classif-col-header">leur<br><small style="font-weight:600;font-size:10px">(singulier ou pronom)</small></div>
+              <div class="dll-classif-col-body">
+                ${q.items.map((item,i) => placement[i]==='leur' ? mkCard(item,i) : '').join('')}
+              </div>
+            </div>
+            <div class="dll-classif-col">
+              <div class="dll-classif-col-header">leurs<br><small style="font-weight:600;font-size:10px">(pluriel)</small></div>
+              <div class="dll-classif-col-body">
+                ${q.items.map((item,i) => placement[i]==='leurs' ? mkCard(item,i) : '').join('')}
+              </div>
+            </div>
+          </div>
+          <div class="dll-feedback" id="dll-fb"></div>
+        `;
+
+        const fb = area.querySelector('#dll-fb');
+        if (allOk) {
+          fb.innerHTML = fbOk(`✅ Bravo ! Toutes les phrases sont bien classées.`);
+        } else {
+          const wrongs = q.items.filter((item, i) => placement[i] !== item.col);
+          const details = wrongs.map(item =>
+            `« ${item.phrase} » → colonne <strong>${item.col}</strong> (${item.hint})`
+          ).join('<br>');
+          fb.innerHTML = fbErr(
+            `❌ ${wrongs.length} erreur${wrongs.length>1?'s':''}.<br>${details}`
+          );
+        }
+
+        checkStreak(lv);
+        updateScore(lv);
+        addNextBtn(area, lv);
+      });
+    }
+  }
+
+  rebuild();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER : Fill-in 1 blanc — Niveau 3
+═══════════════════════════════════════════════════════════════ */
+function renderFillSingle(area, q, lv) {
+  const phraseHtml = q.phrase.replace('___',
+    `<input type="text" class="dll-fill-input" id="dll-inp" maxlength="5" autocomplete="off" spellcheck="false" placeholder="…">`);
+  area.innerHTML = `
+    <p class="ex-question-label">Écris <strong>leur</strong> ou <strong>leurs</strong> dans le blanc.</p>
+    <div class="dll-fill-phrase">${phraseHtml}</div>
+    <button class="dll-validate-btn" id="dll-val-btn" disabled>Vérifier</button>
+    <div class="dll-feedback" id="dll-fb"></div>
+  `;
+
+  const inp    = area.querySelector('#dll-inp');
+  const valBtn = area.querySelector('#dll-val-btn');
+  inp.addEventListener('input', () => { valBtn.disabled = inp.value.trim().length === 0; });
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !valBtn.disabled) valBtn.click(); });
+  inp.focus();
+
+  valBtn.addEventListener('click', () => {
+    const raw = inp.value.trim().toLowerCase();
+    inp.disabled    = true;
+    valBtn.disabled = true;
+    const correct = raw === q.answer;
+    inp.classList.add(correct ? 'is-correct' : 'is-wrong');
+    if (!correct) { inp.value = q.answer; }
+
+    const st = ST[lv];
+    st.attempts++;
+    if (correct) {
+      st.score++; st.streak++;
+      area.querySelector('#dll-fb').innerHTML = fbOk(
+        `✅ Bravo ! <strong>« ${q.answer} »</strong> — ${explainOk(q.answer, q.wtype, q.hint)}`
+      );
+    } else {
+      st.streak = 0;
+      area.querySelector('#dll-fb').innerHTML = fbErr(
+        `❌ Tu as écrit « ${raw} ». ${explainErr(q.answer, q.wtype, q.hint)}`
+      );
+    }
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER : Fill-in 2 blancs — Niveau 3
+═══════════════════════════════════════════════════════════════ */
+function renderFillDouble(area, q, lv) {
+  let bi = 0;
+  const phraseHtml = q.phrase.replace(/___/g, () => {
+    const i = bi++;
+    return `<input type="text" class="dll-fill-input" id="dll-inp-${i}" maxlength="5" autocomplete="off" spellcheck="false" placeholder="…">`;
+  });
+  area.innerHTML = `
+    <p class="ex-question-label">Écris <strong>leur</strong> ou <strong>leurs</strong> dans chaque blanc.</p>
+    <div class="dll-fill-phrase">${phraseHtml}</div>
+    <button class="dll-validate-btn" id="dll-val-btn" disabled>Vérifier</button>
+    <div class="dll-feedback" id="dll-fb"></div>
+  `;
+
+  const inps   = [area.querySelector('#dll-inp-0'), area.querySelector('#dll-inp-1')];
+  const valBtn = area.querySelector('#dll-val-btn');
+
+  const checkReady = () => { valBtn.disabled = inps.some(i => i.value.trim().length === 0); };
+  inps.forEach(inp => {
+    inp.addEventListener('input', checkReady);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !valBtn.disabled) valBtn.click(); });
+  });
+  inps[0].focus();
+
+  valBtn.addEventListener('click', () => {
+    inps.forEach(i => i.disabled = true);
+    valBtn.disabled = true;
+    const st = ST[lv];
+    st.attempts++;
+
+    const results = q.answers.map((ans, i) => ({
+      ans,
+      given:   inps[i].value.trim().toLowerCase(),
+      correct: inps[i].value.trim().toLowerCase() === ans,
+      wtype:   q.wtypes[i],
+      hint:    q.hints[i]
+    }));
+    const allOk = results.every(r => r.correct);
+
+    results.forEach((r, i) => {
+      inps[i].classList.add(r.correct ? 'is-correct' : 'is-wrong');
+      if (!r.correct) inps[i].value = r.ans;
+    });
+
+    if (allOk) { st.score++; st.streak++; } else { st.streak = 0; }
+
+    const fb = area.querySelector('#dll-fb');
+    if (allOk) {
+      const lines = results.map(r =>
+        `<strong>« ${r.ans} »</strong> — ${explainOk(r.ans, r.wtype, r.hint)}`
+      ).join('<br>');
+      fb.innerHTML = fbOk(`✅ Bravo !<br>${lines}`);
+    } else {
+      const lines = results.map((r, i) =>
+        r.correct
+          ? `Blanc ${i+1} ✓ — <strong>« ${r.ans} »</strong> : ${explainOk(r.ans, r.wtype, r.hint)}`
+          : `Blanc ${i+1} ✗ — Tu as écrit « ${r.given} ». ${explainErr(r.ans, r.wtype, r.hint)}`
+      ).join('<br>');
+      fb.innerHTML = fbErr(`❌<br>${lines}`);
+    }
+
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER : Production libre — Niveau 3
+═══════════════════════════════════════════════════════════════ */
+function renderLibre(area, prompt, lv) {
+  area.innerHTML = `
+    <p class="ex-question-label">À toi d'écrire !</p>
+    <div class="dll-prompt">${prompt}</div>
+    <textarea class="dll-textarea" id="dll-libre-ta" placeholder="Écris ta phrase ici…"></textarea>
+    <button class="dll-validate-btn" id="dll-val-btn" disabled>Vérifier</button>
+    <div class="dll-feedback" id="dll-fb"></div>
+  `;
+
+  const ta     = area.querySelector('#dll-libre-ta');
+  const valBtn = area.querySelector('#dll-val-btn');
+  ta.addEventListener('input', () => { valBtn.disabled = ta.value.trim().length === 0; });
+
+  valBtn.addEventListener('click', () => {
+    ta.disabled     = true;
+    valBtn.disabled = true;
+    const text     = ta.value.toLowerCase();
+    const hasLeur  = /\bleur\b/.test(text);
+    const hasLeurs = /\bleurs\b/.test(text);
+    const st       = ST[lv];
+    st.attempts++;
+    const fb = area.querySelector('#dll-fb');
+
+    if (hasLeur && hasLeurs) {
+      st.score++; st.streak++;
+      checkStreak(lv);
+      fb.innerHTML = fbOk(
+        `✅ Bravo ! Ta phrase contient bien <strong>leur</strong> et <strong>leurs</strong>. Relis-la pour vérifier que chaque forme est bien utilisée.`
+      );
+    } else {
+      st.streak = 0;
+      checkStreak(lv);
+      const missing = !hasLeur ? '<strong>leur</strong>' : '<strong>leurs</strong>';
+      const present = hasLeur  ? '<strong>leur</strong>' : '<strong>leurs</strong>';
+      fb.innerHTML = fbErr(
+        `❌ Ta phrase contient ${present} mais pas ${missing}. Essaie d'y inclure les deux !`
+      );
+    }
+
+    updateScore(lv);
+    addNextBtn(area, lv);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RÉSULTATS
+═══════════════════════════════════════════════════════════════ */
+function showResults(lv) {
+  const { score:s, attempts:t } = ST[lv];
+  const pct   = t > 0 ? Math.round(100 * s / t) : 0;
+  const stars = pct === 100 ? ' 🌟🌟🌟' : pct >= 80 ? ' ⭐⭐' : ' ⭐';
+  const msg   = pct === 100 ? '🏆 Parfait ! Tu maîtrises cette règle !'
+              : pct >= 80   ? '🌟 Très bien !'
+              : pct >= 60   ? '👍 Continue comme ça !'
+              : '💪 Encore un petit effort !';
+
+  document.getElementById(`dll-bar-${lv}`).style.width = '100%';
+
+  const nextBtn = lv < 3
+    ? `<button class="dll-btn-primary" onclick="setLevel(${lv+1})">Niveau ${lv+1} →</button>`
+    : '';
+  const congratsEl = lv === 3
+    ? `<p style="color:var(--blue);font-weight:700;margin-bottom:14px">🎉 Tu as terminé les 3 niveaux !</p>`
+    : '';
+
+  document.getElementById(`dll-area-${lv}`).innerHTML = `
+    <div class="dll-results">
+      ${congratsEl}
+      <div class="dll-results-score">${s} / ${t}</div>
+      <div class="dll-results-pct">${pct} %${stars}</div>
+      <div class="dll-results-msg">${msg}</div>
+      <div class="dll-results-btns">
+        ${nextBtn}
+        <button class="dll-btn-${lv<3?'secondary':'primary'}" onclick="retryLevel(${lv})">
+          Recommencer ce niveau
+        </button>
+        <a href="français-orthographe.html" class="dll-btn-secondary">← Retour aux notions</a>
+      </div>
+    </div>
+  `;
+
+  updateScore(lv);
+  window.scrollTo({ top:0, behavior:'smooth' });
+
+  saveExerciseResult({
+    exerciseSlug: 'ortho-distinguer-leur-leurs',
+    subject:      'français',
+    category:     'Orthographe — Homophones grammaticaux',
+    exerciseType: 'leur-leurs-niveaux',
+    level:        'Niveau ' + lv,
+    score:        s,
+    total:        t,
+    durationSecs: Math.round((Date.now() - sessionStart) / 1000)
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DÉMARRAGE
+═══════════════════════════════════════════════════════════════ */
+document.querySelectorAll('.dll-tab').forEach(btn =>
+  btn.addEventListener('click', () => setLevel(parseInt(btn.dataset.lv)))
+);
+
+ST[1].started = true;
+initLevel(1);
+</script>
+
+<script src="js/menu.js"></script>
+<style>
+  footer { background:#102B6A !important; color:#fff !important; padding:10px 20px !important; }
+  .footer__inner { max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:6px; }
+  .footer__text { width:100%; text-align:center; font-size:12px; font-weight:600; color:#ffffffbb; line-height:1.4; padding-bottom:2px; }
+  .footer__text .rouge { color:#F5A623; font-weight:700; }
+  .footer__credit { width:100%; text-align:center; font-size:12px; font-weight:600; color:#ffffff66; }
+  .footer__credit a { color:#ffffff99; text-decoration:none; }
+</style>
+</body>
+</html>

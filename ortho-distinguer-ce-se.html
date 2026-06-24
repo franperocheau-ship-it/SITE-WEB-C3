@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distinguer ce et se — Orthographe — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=9">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/results.js"></script>
+  <style>
+    /* ── Tabs ─────────────────────────────────────────────────── */
+    .dcs-tab-bar {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .dcs-tab {
+      flex: 1;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      padding: 11px 8px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      text-align: center;
+      transition: color 150ms, border-color 150ms;
+    }
+    .dcs-tab.is-active { color: var(--blue); border-bottom-color: var(--blue); }
+    .dcs-tab:hover:not(.is-active) { color: var(--text); }
+
+    /* ── Panel ───────────────────────────────────────────────── */
+    .dcs-hidden { display: none !important; }
+
+    /* ── Rule ────────────────────────────────────────────────── */
+    .dcs-rule-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16,43,106,0.05);
+      border: 1px solid rgba(16,43,106,0.15);
+      border-radius: 100px;
+      padding: 7px 16px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--blue);
+      cursor: pointer;
+      margin-bottom: 16px;
+      transition: background 150ms;
+    }
+    .dcs-rule-btn:hover { background: rgba(16,43,106,0.09); }
+    .dcs-rule-panel {
+      background: rgba(16,43,106,0.04);
+      border: 1.5px solid rgba(16,43,106,0.16);
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.85;
+      color: var(--text);
+    }
+    .dcs-rule-panel strong { color: var(--blue); }
+    .dcs-rule-close {
+      display: inline-block;
+      margin-top: 10px;
+      background: none;
+      border: 1px solid rgba(16,43,106,0.22);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--blue);
+      cursor: pointer;
+    }
+    .dcs-rule-close:hover { background: rgba(16,43,106,0.06); }
+
+    /* ── Progress ────────────────────────────────────────────── */
+    .dcs-progress { margin-bottom: 24px; }
+    .dcs-progress-top { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .dcs-progress-label { font-weight: 700; font-size: 13px; color: var(--blue); }
+    .dcs-bar-bg { height: 8px; background: var(--border); border-radius: 100px; overflow: hidden; }
+    .dcs-bar-fill { height: 100%; background: var(--blue); border-radius: 100px; transition: width 350ms ease; }
+
+    /* ── Card ────────────────────────────────────────────────── */
+    .dcs-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-md);
+      padding: 32px 36px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 600px) { .dcs-card { padding: 22px 18px; } }
+
+    /* ── Score bar ───────────────────────────────────────────── */
+    .dcs-score-bar {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Phrase display ──────────────────────────────────────── */
+    .dcs-phrase {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.7;
+      text-align: center;
+      padding: 20px 22px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 22px;
+    }
+    .dcs-blank {
+      display: inline-block;
+      border-bottom: 3px solid var(--blue);
+      min-width: 44px;
+      text-align: center;
+      padding: 0 6px 2px;
+      margin: 0 2px;
+      color: rgba(16,43,106,0.35);
+      font-style: italic;
+      vertical-align: text-bottom;
+    }
+    .dcs-blank.is-filled  { font-style: normal; color: var(--blue); }
+    .dcs-blank.is-correct { border-bottom-color: #16a34a; color: #15803d; font-style: normal; }
+    .dcs-blank.is-wrong   { border-bottom-color: var(--red); color: var(--red); font-style: normal; }
+
+    /* ── Choice buttons (Level 1) ────────────────────────────── */
+    .dcs-choices {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .dcs-choice {
+      min-width: 96px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 28px;
+      font-family: inherit;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 170ms, background 170ms, transform 170ms;
+    }
+    .dcs-choice:hover:not(:disabled) {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.04);
+      transform: translateY(-2px);
+    }
+    .dcs-choice:disabled { cursor: default; }
+    .dcs-choice.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.09); color: #15803d; }
+    .dcs-choice.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.06); color: var(--red); }
+
+    /* ── Feedback ────────────────────────────────────────────── */
+    .dcs-feedback { margin: 14px 0 6px; min-height: 22px; }
+
+    /* ── Next button ─────────────────────────────────────────── */
+    .dcs-next-btn {
+      display: block;
+      width: 100%;
+      margin-top: 14px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 22px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 170ms, transform 170ms;
+    }
+    .dcs-next-btn:hover { background: #0d2255; transform: translateY(-1px); }
+
+    /* ── Validate button ─────────────────────────────────────── */
+    .dcs-validate-btn {
+      display: block;
+      width: 100%;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 6px;
+      transition: background 170ms;
+    }
+    .dcs-validate-btn:hover:not(:disabled) { background: #0d2255; }
+    .dcs-validate-btn:disabled { opacity: 0.38; cursor: default; }
+
+    /* ── Mots-cliquables (Level 2A) ──────────────────────────── */
+    .dcs-sentence-wrap {
+      font-size: 19px;
+      font-weight: 600;
+      line-height: 2.3;
+      text-align: center;
+      padding: 16px 20px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .dcs-h-word {
+      display: inline-block;
+      border: 2px solid rgba(16,43,106,0.22);
+      background: rgba(16,43,106,0.05);
+      border-radius: 8px;
+      padding: 1px 9px;
+      margin: 0 2px;
+      cursor: pointer;
+      font-weight: 800;
+      color: var(--blue);
+      font-family: inherit;
+      font-size: inherit;
+      transition: border-color 130ms, background 130ms;
+    }
+    .dcs-h-word:hover:not(:disabled) { border-color: var(--blue); background: rgba(16,43,106,0.10); }
+    .dcs-h-word.is-selected { border-color: var(--blue); background: rgba(16,43,106,0.15); }
+    .dcs-h-word:disabled { cursor: default; }
+    .dcs-h-word.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.10); color: #15803d; }
+    .dcs-h-word.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.08); color: var(--red); }
+    .dcs-h-word.is-missed  { border: 2px dashed #16a34a; color: #16a34a; background: rgba(22,163,74,0.05); }
+
+    .dcs-mc-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .dcs-correct-btn {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 18px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 130ms, background 130ms;
+      flex-shrink: 0;
+    }
+    .dcs-correct-btn:hover:not(:disabled) { border-color: var(--blue); background: rgba(16,43,106,0.04); }
+    .dcs-correct-btn.is-selected { border-color: var(--blue); background: rgba(16,43,106,0.08); color: var(--blue); }
+    .dcs-correct-btn:disabled { cursor: default; }
+
+    /* ── Classification (Level 2B) ───────────────────────────── */
+    .dcs-cl-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px;
+      background: rgba(16,43,106,0.03);
+      border: 2px dashed rgba(16,43,106,0.18);
+      border-radius: 14px;
+      margin-bottom: 14px;
+      min-height: 56px;
+    }
+    .dcs-cl-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 480px) { .dcs-cl-cols { grid-template-columns: 1fr; } }
+    .dcs-cl-col {
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      min-height: 110px;
+      cursor: pointer;
+      transition: border-color 140ms, background 140ms;
+    }
+    .dcs-cl-col:hover { border-color: rgba(16,43,106,0.28); background: rgba(16,43,106,0.02); }
+    .dcs-cl-col-hdr {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--blue);
+      text-align: center;
+      margin-bottom: 8px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dcs-cl-cards-wrap { display: flex; flex-direction: column; gap: 5px; }
+    .dcs-cl-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+      text-align: center;
+      transition: border-color 130ms, background 130ms, transform 130ms;
+    }
+    .dcs-cl-card:hover:not(.is-correct):not(.is-wrong) { border-color: rgba(16,43,106,0.28); transform: translateY(-1px); }
+    .dcs-cl-card.is-selected { border-color: var(--blue); background: rgba(16,43,106,0.08); color: var(--blue); }
+    .dcs-cl-card.is-correct  { border-color: #16a34a; background: rgba(22,163,74,0.09); color: #15803d; cursor: default; }
+    .dcs-cl-card.is-wrong    { border-color: var(--red); background: rgba(214,40,57,0.07); color: var(--red); cursor: default; }
+
+    /* ── Fill-in (Level 3A) ──────────────────────────────────── */
+    .dcs-fill-sentence {
+      font-size: 19px;
+      font-weight: 600;
+      line-height: 2.8;
+      text-align: center;
+      padding: 16px 20px;
+      background: var(--bg);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 18px;
+    }
+    .dcs-fill-inp {
+      display: inline-block;
+      width: 54px;
+      border: 2px solid var(--blue);
+      border-radius: 8px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 800;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--card-bg);
+      padding: 2px 4px;
+      outline: none;
+      vertical-align: middle;
+      margin: 0 4px;
+      transition: border-color 140ms, box-shadow 140ms;
+    }
+    .dcs-fill-inp:focus { box-shadow: 0 0 0 3px rgba(16,43,106,0.12); }
+    .dcs-fill-inp.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.07); color: #15803d; }
+    .dcs-fill-inp.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.06); color: var(--red); }
+    .dcs-fill-inp:disabled { cursor: default; }
+
+    /* ── Production libre (Level 3B) ─────────────────────────── */
+    .dcs-prompt-box {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.55;
+      padding: 16px 20px;
+      background: var(--bg);
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .dcs-textarea {
+      width: 100%;
+      min-height: 96px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 16px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      resize: vertical;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+      transition: border-color 190ms, box-shadow 190ms;
+    }
+    .dcs-textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(16,43,106,0.10); }
+
+    /* ── Streak toast ────────────────────────────────────────── */
+    .dcs-streak-toast {
+      position: fixed;
+      top: 76px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-16px);
+      background: var(--blue);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      padding: 10px 24px;
+      border-radius: 100px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 280ms, transform 280ms;
+      z-index: 9999;
+    }
+    .dcs-streak-toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Results ─────────────────────────────────────────────── */
+    .dcs-results { text-align: center; padding: 8px 0 4px; }
+    .dcs-results-score { font-size: 42px; font-weight: 900; color: var(--blue); line-height: 1; margin-bottom: 4px; }
+    .dcs-results-pct   { font-size: 20px; font-weight: 700; color: var(--muted); margin-bottom: 14px; }
+    .dcs-results-msg   { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 24px; }
+    .dcs-results-btns  { display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto; }
+    .dcs-btn-primary {
+      background: var(--blue); color: #fff; border: none; border-radius: 12px;
+      padding: 13px 22px; font-family: inherit; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: background 170ms;
+    }
+    .dcs-btn-primary:hover { background: #0d2255; }
+    .dcs-btn-secondary {
+      background: none; border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 12px 22px; font-family: inherit; font-size: 14px; font-weight: 600;
+      color: var(--text); cursor: pointer; text-decoration: none; display: block;
+      transition: border-color 170ms;
+    }
+    .dcs-btn-secondary:hover { border-color: rgba(16,43,106,0.25); }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index-v2.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index-v2.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="page-wrap">
+  <div class="page-content">
+
+    <a href="français-orthographe.html" class="back-link">← Orthographe</a>
+
+    <div class="ex-container">
+
+      <!-- Page header -->
+      <div class="ex-page-header">
+        <div class="ex-page-badges">
+          <span class="badge badge-cm1">CM1</span>
+          <span class="badge badge-cm2">CM2</span>
+          <span class="badge badge-6e">6e</span>
+        </div>
+        <h1 class="ex-page-title">Distinguer <em>ce</em> et <em>se</em></h1>
+        <div class="ex-page-rule"></div>
+        <p class="ex-page-subtitle" style="font-size:14px;color:var(--muted);margin-top:8px">Homophones grammaticaux</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="dcs-tab-bar">
+        <button class="dcs-tab is-active" data-lv="1">Niveau 1</button>
+        <button class="dcs-tab" data-lv="2">Niveau 2</button>
+        <button class="dcs-tab" data-lv="3">Niveau 3</button>
+      </div>
+
+      <!-- ── Panel 1 ─────────────────────────────────────────── -->
+      <div id="dcs-panel-1">
+        <button class="dcs-rule-btn" onclick="toggleRule(1)">❓ Revoir la règle</button>
+        <div class="dcs-rule-panel dcs-hidden" id="dcs-rule-1">
+          <p><strong>se</strong> = pronom réfléchi → remplaçable par « me » ou « te »<br>
+             <strong>ce</strong> = déterminant ou pronom démonstratif → remplaçable par « cela »<br>
+             devant un verbe, ou détermine un nom (<em>ce livre, ce soir…</em>)</p>
+          <p><em>Astuce : si tu peux remplacer par « me » ou « te », écris se.</em></p>
+          <button class="dcs-rule-close" onclick="toggleRule(1)">Fermer</button>
+        </div>
+        <div class="dcs-progress">
+          <div class="dcs-progress-top">
+            <span class="dcs-progress-label">Question <span id="dcs-qn-1">1</span> sur <span id="dcs-qt-1">12</span></span>
+          </div>
+          <div class="dcs-bar-bg"><div class="dcs-bar-fill" id="dcs-bar-1" style="width:0%"></div></div>
+        </div>
+        <div class="dcs-card" id="dcs-area-1"></div>
+        <div class="dcs-score-bar" id="dcs-score-1">Aucun essai pour l'instant</div>
+      </div>
+
+      <!-- ── Panel 2 ─────────────────────────────────────────── -->
+      <div id="dcs-panel-2" class="dcs-hidden">
+        <button class="dcs-rule-btn" onclick="toggleRule(2)">❓ Revoir la règle</button>
+        <div class="dcs-rule-panel dcs-hidden" id="dcs-rule-2">
+          <p><strong>se</strong> = pronom réfléchi → remplaçable par « me » ou « te »<br>
+             <strong>ce</strong> = déterminant ou pronom démonstratif → remplaçable par « cela »<br>
+             devant un verbe, ou détermine un nom (<em>ce livre, ce soir…</em>)</p>
+          <p><em>Astuce : si tu peux remplacer par « me » ou « te », écris se.</em></p>
+          <button class="dcs-rule-close" onclick="toggleRule(2)">Fermer</button>
+        </div>
+        <div class="dcs-progress">
+          <div class="dcs-progress-top">
+            <span class="dcs-progress-label">Question <span id="dcs-qn-2">1</span> sur <span id="dcs-qt-2">12</span></span>
+          </div>
+          <div class="dcs-bar-bg"><div class="dcs-bar-fill" id="dcs-bar-2" style="width:0%"></div></div>
+        </div>
+        <div class="dcs-card" id="dcs-area-2"></div>
+        <div class="dcs-score-bar" id="dcs-score-2">Aucun essai pour l'instant</div>
+      </div>
+
+      <!-- ── Panel 3 ─────────────────────────────────────────── -->
+      <div id="dcs-panel-3" class="dcs-hidden">
+        <button class="dcs-rule-btn" onclick="toggleRule(3)">❓ Revoir la règle</button>
+        <div class="dcs-rule-panel dcs-hidden" id="dcs-rule-3">
+          <p><strong>se</strong> = pronom réfléchi → remplaçable par « me » ou « te »<br>
+             <strong>ce</strong> = déterminant ou pronom démonstratif → remplaçable par « cela »<br>
+             devant un verbe, ou détermine un nom (<em>ce livre, ce soir…</em>)</p>
+          <p><em>Astuce : si tu peux remplacer par « me » ou « te », écris se.</em></p>
+          <button class="dcs-rule-close" onclick="toggleRule(3)">Fermer</button>
+        </div>
+        <div class="dcs-progress">
+          <div class="dcs-progress-top">
+            <span class="dcs-progress-label">Question <span id="dcs-qn-3">1</span> sur <span id="dcs-qt-3">16</span></span>
+          </div>
+          <div class="dcs-bar-bg"><div class="dcs-bar-fill" id="dcs-bar-3" style="width:0%"></div></div>
+        </div>
+        <div class="dcs-card" id="dcs-area-3"></div>
+        <div class="dcs-score-bar" id="dcs-score-3">Aucun essai pour l'instant</div>
+      </div>
+
+    </div><!-- /.ex-container -->
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 · <a href="mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a></p>
+  </div>
+</footer>
+
+<!-- Streak toast -->
+<div class="dcs-streak-toast" id="dcs-streak-toast"></div>
+
+<script>
+const EXERCISE_DATA = { 'ortho-distinguer-ce-se': { title: "Distinguer ce et se" } };
+
+/* ═══════════════════════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════════════════════ */
+
+/* Niveau 1 — choix-etiquette (12 questions, ordre fixe)
+   testOk: true  → "me/te" fonctionne → réponse correcte : "se"
+   testOk: false → "me/te" ne fonctionne pas → réponse correcte : "ce" */
+const N1 = [
+  { phrase:"Il ___ lave les mains avant de manger.",          answer:"se", testPhrase:"me lave",               testOk:true  },
+  { phrase:"___ film est très drôle.",                        answer:"ce", testPhrase:"me film",               testOk:false },
+  { phrase:"Elle ___ dépêche pour ne pas être en retard.",    answer:"se", testPhrase:"me dépêche",            testOk:true  },
+  { phrase:"Il aime ___ quartier depuis toujours.",           answer:"ce", testPhrase:"me quartier",           testOk:false },
+  { phrase:"Le chat ___ cache sous le canapé.",               answer:"se", testPhrase:"me cache",              testOk:true  },
+  { phrase:"___ que tu dis est intéressant.",                 answer:"ce", testPhrase:"me que tu dis",         testOk:false },
+  { phrase:"Il ___ souvient de ses vacances.",                answer:"se", testPhrase:"me souvient",           testOk:true  },
+  { phrase:"Regarde ___ beau coucher de soleil.",             answer:"ce", testPhrase:"me beau coucher",       testOk:false },
+  { phrase:"Elle ___ repose après le sport.",                 answer:"se", testPhrase:"me repose",             testOk:true  },
+  { phrase:"___ soir, on mange ensemble.",                    answer:"ce", testPhrase:"me soir",               testOk:false },
+  { phrase:"Le bébé ___ réveille souvent la nuit.",           answer:"se", testPhrase:"me réveille",           testOk:true  },
+  { phrase:"Il ne comprend pas ___ qui s'est passé.",         answer:"ce", testPhrase:"me qui s'est passé",    testOk:false },
+];
+
+/* Niveau 2A — mots-cliquables (10 phrases)
+   wordIdx : index 0-based dans raw.split(' ')
+   errors  = [] → phrase sans erreur */
+const N2_MC = [
+  { raw:"Il ce lève tôt chaque matin.",
+    errors:[{ wordIdx:1, wrongForm:"ce", correctForm:"se", testPhrase:"me lève",    testOk:true  }] },
+  { raw:"Se livre est passionnant.",
+    errors:[{ wordIdx:0, wrongForm:"Se", correctForm:"ce", testPhrase:"me livre",   testOk:false }] },
+  { raw:"Elle ce demande ce qu'elle va faire.",
+    errors:[{ wordIdx:1, wrongForm:"ce", correctForm:"se", testPhrase:"me demande", testOk:true  }] },
+  { raw:"Il aime se quartier calme.",
+    errors:[{ wordIdx:2, wrongForm:"se", correctForm:"ce", testPhrase:"me quartier",testOk:false }] },
+  { raw:"Le chien ce couche devant la cheminée.",
+    errors:[{ wordIdx:2, wrongForm:"ce", correctForm:"se", testPhrase:"me couche",  testOk:true  }] },
+  { raw:"Ce qu'il dit ce comprend facilement.",
+    errors:[{ wordIdx:3, wrongForm:"ce", correctForm:"se", testPhrase:"me comprend",testOk:true  }] },
+  { raw:"Ce matin, il se lève plus tôt que d'habitude.", errors:[] },
+  { raw:"Elle ne sait pas ce qui se passe.",             errors:[] },
+  { raw:"Ce livre se lit très facilement.",              errors:[] },
+  { raw:"Il se souvient de ce jour-là.",                 errors:[] },
+];
+
+/* Niveau 2B — classification (2 séries de 6 items) */
+const N2_CL = [
+  { items:[
+    { phrase:"Ce chat est mignon.",  col:"ce" },
+    { phrase:"Il se lève.",          col:"se" },
+    { phrase:"Ce soir il fait froid.",col:"ce" },
+    { phrase:"Elle se coiffe.",      col:"se" },
+    { phrase:"Ce que tu veux.",      col:"ce" },
+    { phrase:"Il se cache.",         col:"se" },
+  ]},
+  { items:[
+    { phrase:"Ce livre est lourd.",  col:"ce" },
+    { phrase:"Elle se dépêche.",     col:"se" },
+    { phrase:"Ce n'est pas vrai.",   col:"ce" },
+    { phrase:"Il se repose.",        col:"se" },
+    { phrase:"Ce moment était beau.",col:"ce" },
+    { phrase:"Elle se souvient.",    col:"se" },
+  ]},
+];
+
+/* Niveau 3A — fill-in (6 phrases à 1 blanc + 6 à 2 blancs = 12 questions) */
+const N3_FI = [
+  { sentence:"Les athlètes ___ préparent pour la compétition.",
+    answers:["se"],
+    blanks:[{ testPhrase:"me préparent",   testOk:true  }] },
+  { sentence:"___ résultat est inattendu.",
+    answers:["ce"],
+    blanks:[{ testPhrase:"me résultat",    testOk:false }] },
+  { sentence:"Le public ___ lève pour applaudir.",
+    answers:["se"],
+    blanks:[{ testPhrase:"me lève",        testOk:true  }] },
+  { sentence:"Il ne comprend pas ___ qu'on lui explique.",
+    answers:["ce"],
+    blanks:[{ testPhrase:"me qu'on lui explique", testOk:false }] },
+  { sentence:"La situation ___ complique de jour en jour.",
+    answers:["se"],
+    blanks:[{ testPhrase:"me complique",   testOk:true  }] },
+  { sentence:"___ projet demande beaucoup de travail.",
+    answers:["ce"],
+    blanks:[{ testPhrase:"me projet",      testOk:false }] },
+  { sentence:"Il ___ souvient de ___ voyage inoubliable.",
+    answers:["se","ce"],
+    blanks:[
+      { testPhrase:"me souvient",  testOk:true  },
+      { testPhrase:"me voyage",    testOk:false }
+    ] },
+  { sentence:"___ problème ___ règle facilement.",
+    answers:["ce","se"],
+    blanks:[
+      { testPhrase:"me problème",  testOk:false },
+      { testPhrase:"me règle",     testOk:true  }
+    ] },
+  { sentence:"Elle ___ demande si ___ qu'on lui dit est vrai.",
+    answers:["se","ce"],
+    blanks:[
+      { testPhrase:"me demande",           testOk:true  },
+      { testPhrase:"me qu'on lui dit",     testOk:false }
+    ] },
+  { sentence:"___ matin, il ___ lève plus tôt que d'habitude.",
+    answers:["ce","se"],
+    blanks:[
+      { testPhrase:"me matin",     testOk:false },
+      { testPhrase:"me lève",      testOk:true  }
+    ] },
+  { sentence:"Il ___ concentre sur ___ qu'il doit faire.",
+    answers:["se","ce"],
+    blanks:[
+      { testPhrase:"me concentre",         testOk:true  },
+      { testPhrase:"me qu'il doit faire",  testOk:false }
+    ] },
+  { sentence:"___ que je vois ___ passe sous mes yeux.",
+    answers:["ce","se"],
+    blanks:[
+      { testPhrase:"me que je vois", testOk:false },
+      { testPhrase:"me passe",       testOk:true  }
+    ] },
+];
+
+/* Niveau 3B — production libre (4 consignes) */
+const N3_PL = [
+  { consigne:"Écris une phrase sur <strong>le matin</strong> qui contient à la fois <em>ce</em> et <em>se</em>." },
+  { consigne:"Écris une phrase sur <strong>un animal</strong> qui contient à la fois <em>ce</em> et <em>se</em>." },
+  { consigne:"Écris une phrase sur <strong>l'école</strong> qui contient à la fois <em>ce</em> et <em>se</em>." },
+  { consigne:"Écris une phrase sur <strong>un souvenir</strong> qui contient à la fois <em>ce</em> et <em>se</em>." },
+];
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════════ */
+
+function mkState() {
+  return { idx:0, score:0, attempts:0, streak:0, questions:[], started:false };
+}
+const ST = { 1: mkState(), 2: mkState(), 3: mkState() };
+let activeLevel = 1;
+const sessionStart = Date.now();
+
+/* ═══════════════════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════════════════ */
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function tokenize(raw) {
+  return raw.split(' ').map((token, idx) => {
+    const clean      = token.replace(/^[«"''""]/,'').replace(/[.,!?;:»"''"""]+$/,'');
+    const cleanLower = clean.toLowerCase();
+    const isH        = cleanLower === 'ce' || cleanLower === 'se';
+    return { raw: token, clean, isH, idx };
+  });
+}
+
+function fbOk(html)  { return `<div class="ex-feedback-correct">${html}</div>`; }
+function fbErr(html) { return `<div class="ex-feedback-wrong">${html}</div>`;   }
+
+function ceseExpl(testPhrase, testOk, correctForm) {
+  if (testOk) {
+    return `Essaie « ${testPhrase} » → <em>fonctionne</em> → on écrit <strong>se</strong>.`;
+  } else {
+    return `Essaie « ${testPhrase} » → <em>ne fonctionne pas</em> → « cela » fonctionne ou c'est un déterminant devant un nom → on écrit <strong>ce</strong>.`;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TABS & RULE
+═══════════════════════════════════════════════════════════════════ */
+
+function setLevel(lv) {
+  activeLevel = lv;
+  [1,2,3].forEach(i => {
+    document.getElementById(`dcs-panel-${i}`).classList.toggle('dcs-hidden', i !== lv);
+    document.querySelector(`.dcs-tab[data-lv="${i}"]`).classList.toggle('is-active', i === lv);
+  });
+  if (!ST[lv].started) {
+    initLevel(lv);
+    ST[lv].started = true;
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleRule(lv) {
+  document.getElementById(`dcs-rule-${lv}`).classList.toggle('dcs-hidden');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LEVEL INIT
+═══════════════════════════════════════════════════════════════════ */
+
+function initLevel(lv) {
+  const st = ST[lv];
+  st.idx = 0; st.score = 0; st.attempts = 0; st.streak = 0;
+
+  if (lv === 1) {
+    st.questions = N1.map(q => ({ type:'choix', data: q }));
+    document.getElementById('dcs-qt-1').textContent = st.questions.length;
+
+  } else if (lv === 2) {
+    const mcItems = N2_MC.map(q => ({ type:'mc', data: q }));
+    const clItems = N2_CL.map(s => ({ type:'cl', data: s }));
+    st.questions  = shuffle([...mcItems, ...clItems]);
+    document.getElementById('dcs-qt-2').textContent = st.questions.length;
+
+  } else {
+    const fiItems = N3_FI.map(q => ({ type:'fi', data: q }));
+    const plItems = N3_PL.map(q => ({ type:'pl', data: q }));
+    st.questions  = [...fiItems, ...plItems];
+    document.getElementById('dcs-qt-3').textContent = st.questions.length;
+  }
+
+  updateScore(lv);
+  showQuestion(lv);
+}
+
+function retryLevel(lv) {
+  ST[lv].started = true;
+  initLevel(lv);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PROGRESS & SCORE
+═══════════════════════════════════════════════════════════════════ */
+
+function updateProgress(lv) {
+  const st = ST[lv];
+  document.getElementById(`dcs-qn-${lv}`).textContent  = st.idx + 1;
+  document.getElementById(`dcs-bar-${lv}`).style.width = (st.idx / st.questions.length * 100) + '%';
+}
+
+function updateScore(lv) {
+  const { score:s, attempts:t } = ST[lv];
+  document.getElementById(`dcs-score-${lv}`).textContent =
+    t === 0 ? "Aucun essai pour l'instant"
+             : `${s} bonne${s !== 1 ? 's' : ''} réponse${s !== 1 ? 's' : ''} sur ${t} essai${t !== 1 ? 's' : ''}`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   STREAK
+═══════════════════════════════════════════════════════════════════ */
+
+function checkStreak(lv) {
+  const { streak } = ST[lv];
+  if (streak > 0 && streak % 3 === 0) {
+    const toast = document.getElementById('dcs-streak-toast');
+    toast.textContent = `🔥 ${streak} de suite !`;
+    toast.classList.add('is-visible');
+    setTimeout(() => toast.classList.remove('is-visible'), 2000);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NEXT BUTTON
+═══════════════════════════════════════════════════════════════════ */
+
+function addNextBtn(area, lv) {
+  const st  = ST[lv];
+  const btn = document.createElement('button');
+  btn.className   = 'dcs-next-btn';
+  btn.textContent = (st.idx === st.questions.length - 1) ? 'Voir mes résultats' : 'Question suivante →';
+  btn.addEventListener('click', () => {
+    st.idx++;
+    if (st.idx >= st.questions.length) {
+      showResults(lv);
+    } else {
+      showQuestion(lv);
+      document.getElementById(`dcs-area-${lv}`).scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+  });
+  area.appendChild(btn);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SHOW QUESTION dispatcher
+═══════════════════════════════════════════════════════════════════ */
+
+function showQuestion(lv) {
+  const st   = ST[lv];
+  const area = document.getElementById(`dcs-area-${lv}`);
+  updateProgress(lv);
+  const item = st.questions[st.idx];
+
+  switch (item.type) {
+    case 'choix': renderChoix(area, item.data, lv); break;
+    case 'mc':    renderMC(area, item.data, lv);    break;
+    case 'cl':    renderCL(area, item.data, lv);    break;
+    case 'fi':    renderFI(area, item.data, lv);    break;
+    case 'pl':    renderPL(area, item.data, lv);    break;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NIVEAU 1 : CHOIX-ÉTIQUETTE
+═══════════════════════════════════════════════════════════════════ */
+
+function renderChoix(area, q, lv) {
+  const phraseHtml = q.phrase.replace('___',
+    '<span class="dcs-blank" id="dcs-bl">___</span>');
+
+  area.innerHTML = `
+    <p class="ex-question-label">Quel mot complète la phrase : <strong>ce</strong> ou <strong>se</strong> ?</p>
+    <div class="dcs-phrase">${phraseHtml}</div>
+    <div class="dcs-choices" id="dcs-choices"></div>
+    <div class="dcs-feedback" id="dcs-fb"></div>
+  `;
+
+  const grid = area.querySelector('#dcs-choices');
+  ['ce', 'se'].forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className   = 'dcs-choice';
+    btn.textContent = choice;
+    btn.addEventListener('click', () => {
+      grid.querySelectorAll('.dcs-choice').forEach(b => b.disabled = true);
+      const correct = choice === q.answer;
+
+      grid.querySelectorAll('.dcs-choice').forEach(b => {
+        if (b.textContent === q.answer) b.classList.add('is-correct');
+      });
+      if (!correct) btn.classList.add('is-wrong');
+
+      const blank = area.querySelector('#dcs-bl');
+      if (blank) {
+        blank.textContent = q.answer;
+        blank.classList.add('is-filled', correct ? 'is-correct' : 'is-wrong');
+      }
+
+      const st = ST[lv];
+      st.attempts++;
+      if (correct) {
+        st.score++;
+        st.streak++;
+        area.querySelector('#dcs-fb').innerHTML = fbOk(
+          `✅ Bravo ! <strong>« ${q.answer} »</strong> est correct ici : ${ceseExpl(q.testPhrase, q.testOk, q.answer)}`
+        );
+      } else {
+        st.streak = 0;
+        area.querySelector('#dcs-fb').innerHTML = fbErr(
+          `❌ ${ceseExpl(q.testPhrase, q.testOk, q.answer)}`
+        );
+      }
+      checkStreak(lv);
+      updateScore(lv);
+      addNextBtn(area, lv);
+    });
+    grid.appendChild(btn);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NIVEAU 2A : MOTS-CLIQUABLES
+═══════════════════════════════════════════════════════════════════ */
+
+function renderMC(area, q, lv) {
+  const tokens      = tokenize(q.raw);
+  const errorIdxSet = new Set(q.errors.map(e => e.wordIdx));
+  const hasErrors   = q.errors.length > 0;
+
+  const sentParts = tokens.map(tok => {
+    if (tok.isH) return `<button class="dcs-h-word" data-ti="${tok.idx}">${tok.raw}</button>`;
+    return tok.raw;
+  });
+  const sentHtml = sentParts.join(' ');
+
+  area.innerHTML = `
+    <p class="ex-question-label">Clique sur le ou les mots mal orthographiés, puis valide.<br>
+    S'il n'y a pas d'erreur, clique sur « Phrase correcte ».</p>
+    <div class="dcs-sentence-wrap">${sentHtml}</div>
+    <div class="dcs-mc-row">
+      <button class="dcs-correct-btn" id="dcs-ok-btn">✓ Phrase correcte</button>
+      <button class="dcs-validate-btn" id="dcs-val-btn" style="flex:1">Valider</button>
+    </div>
+    <div class="dcs-feedback" id="dcs-fb"></div>
+  `;
+
+  const selected        = new Set();
+  let   correctSelected = false;
+  let   answered        = false;
+
+  area.querySelectorAll('.dcs-h-word').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (answered) return;
+      const ti = parseInt(btn.dataset.ti);
+      if (selected.has(ti)) {
+        selected.delete(ti);
+        btn.classList.remove('is-selected');
+      } else {
+        selected.add(ti);
+        btn.classList.add('is-selected');
+        if (correctSelected) {
+          correctSelected = false;
+          area.querySelector('#dcs-ok-btn').classList.remove('is-selected');
+        }
+      }
+    });
+  });
+
+  area.querySelector('#dcs-ok-btn').addEventListener('click', () => {
+    if (answered) return;
+    correctSelected = !correctSelected;
+    area.querySelector('#dcs-ok-btn').classList.toggle('is-selected', correctSelected);
+    if (correctSelected) {
+      selected.clear();
+      area.querySelectorAll('.dcs-h-word.is-selected').forEach(b => b.classList.remove('is-selected'));
+    }
+  });
+
+  area.querySelector('#dcs-val-btn').addEventListener('click', () => {
+    if (answered) return;
+    answered = true;
+    area.querySelectorAll('.dcs-h-word').forEach(b => b.disabled = true);
+    area.querySelector('#dcs-ok-btn').disabled = true;
+    area.querySelector('#dcs-val-btn').disabled = true;
+
+    const st = ST[lv];
+    let correct;
+
+    if (correctSelected) {
+      correct = !hasErrors;
+    } else {
+      correct = selected.size === errorIdxSet.size &&
+                [...selected].every(ti => errorIdxSet.has(ti));
+    }
+
+    st.attempts++;
+    if (correct) { st.score++; st.streak++; } else { st.streak = 0; }
+
+    area.querySelectorAll('.dcs-h-word').forEach(btn => {
+      const ti     = parseInt(btn.dataset.ti);
+      const isErr  = errorIdxSet.has(ti);
+      const wasSel = selected.has(ti);
+      if      (isErr && wasSel)  btn.classList.add('is-correct');
+      else if (isErr && !wasSel) btn.classList.add('is-missed');
+      else if (!isErr && wasSel) btn.classList.add('is-wrong');
+    });
+
+    const fb   = area.querySelector('#dcs-fb');
+    const expl = q.errors.map(e =>
+      `<br>• <strong>« ${e.wrongForm} »</strong> → <strong>« ${e.correctForm} »</strong> : ${ceseExpl(e.testPhrase, e.testOk, e.correctForm)}`
+    ).join('');
+
+    if (correct) {
+      fb.innerHTML = hasErrors
+        ? fbOk(`✅ Bravo ! Tu as trouvé ${q.errors.length > 1 ? 'les erreurs' : "l'erreur"}.${expl}`)
+        : fbOk(`✅ Bravo ! Cette phrase ne contient aucune erreur.`);
+    } else {
+      fb.innerHTML = (correctSelected && hasErrors)
+        ? fbErr(`❌ Il y avait ${q.errors.length > 1 ? 'des erreurs' : 'une erreur'} dans cette phrase.${expl}`)
+        : fbErr(`❌ Pas tout à fait.${expl || " Cette phrase ne contenait pas d'erreur."}`);
+    }
+
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NIVEAU 2B : CLASSIFICATION
+═══════════════════════════════════════════════════════════════════ */
+
+function renderCL(area, serie, lv) {
+  const items       = shuffle([...serie.items]);
+  const placedInCol = {};
+  let   selCard     = null;
+  let   answered    = false;
+
+  area.innerHTML = `
+    <p class="ex-question-label">Classe chaque phrase dans la bonne colonne. Clique une carte pour la sélectionner, puis clique la colonne.</p>
+    <div class="dcs-cl-bank" id="dcs-bank"></div>
+    <div class="dcs-cl-cols">
+      <div class="dcs-cl-col" id="dcs-col-ce">
+        <div class="dcs-cl-col-hdr"><em>ce</em> — déterminant / pronom</div>
+        <div class="dcs-cl-cards-wrap" id="dcs-wrap-ce"></div>
+      </div>
+      <div class="dcs-cl-col" id="dcs-col-se">
+        <div class="dcs-cl-col-hdr"><em>se</em> — pronom réfléchi</div>
+        <div class="dcs-cl-cards-wrap" id="dcs-wrap-se"></div>
+      </div>
+    </div>
+    <button class="dcs-validate-btn" id="dcs-val-btn" disabled>
+      Valider (place toutes les phrases d'abord)
+    </button>
+    <div class="dcs-feedback" id="dcs-fb"></div>
+  `;
+
+  function checkAllPlaced() {
+    const n      = Object.keys(placedInCol).length;
+    const valBtn = area.querySelector('#dcs-val-btn');
+    valBtn.disabled    = n < items.length;
+    valBtn.textContent = n < items.length
+      ? `Valider (${n}/${items.length} placées)`
+      : 'Valider';
+  }
+
+  function makeCard(item, idx) {
+    const el       = document.createElement('div');
+    el.className   = 'dcs-cl-card';
+    el.textContent = item.phrase;
+    el.dataset.idx = idx;
+
+    el.addEventListener('click', e => {
+      if (answered) return;
+
+      if (placedInCol[idx] !== undefined) {
+        e.stopPropagation();
+        el.remove();
+        delete placedInCol[idx];
+        el.classList.remove('is-selected');
+        area.querySelector('#dcs-bank').appendChild(el);
+        if (selCard && selCard.idx === idx) selCard = null;
+        checkAllPlaced();
+        return;
+      }
+
+      if (selCard && selCard.idx === idx) {
+        selCard = null;
+        el.classList.remove('is-selected');
+      } else {
+        if (selCard) selCard.el.classList.remove('is-selected');
+        selCard = { idx, el };
+        el.classList.add('is-selected');
+      }
+    });
+    return el;
+  }
+
+  const bank = area.querySelector('#dcs-bank');
+  items.forEach((item, idx) => bank.appendChild(makeCard(item, idx)));
+
+  ['ce', 'se'].forEach(col => {
+    const colEl  = area.querySelector(`#dcs-col-${col}`);
+    const wrapEl = area.querySelector(`#dcs-wrap-${col}`);
+    colEl.addEventListener('click', () => {
+      if (answered || !selCard) return;
+      const { idx, el } = selCard;
+      el.remove();
+      el.classList.remove('is-selected');
+      selCard           = null;
+      placedInCol[idx]  = col;
+      wrapEl.appendChild(el);
+      checkAllPlaced();
+    });
+  });
+
+  area.querySelector('#dcs-val-btn').addEventListener('click', () => {
+    if (answered) return;
+    answered = true;
+    area.querySelector('#dcs-val-btn').disabled = true;
+
+    const st = ST[lv];
+    st.attempts++;
+    let allOk = true;
+
+    items.forEach((item, idx) => {
+      const card = area.querySelector(`.dcs-cl-card[data-idx="${idx}"]`);
+      if (placedInCol[idx] === item.col) {
+        card.classList.add('is-correct');
+      } else {
+        card.classList.add('is-wrong');
+        allOk = false;
+      }
+    });
+
+    if (allOk) { st.score++; st.streak++; } else { st.streak = 0; }
+
+    const fb = area.querySelector('#dcs-fb');
+    fb.innerHTML = allOk
+      ? fbOk(`✅ Bravo ! Toutes les phrases sont bien classées.`)
+      : fbErr(`❌ Certaines phrases sont mal classées. Les cartes vertes sont correctes ; les rouges sont à revoir.`);
+
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NIVEAU 3A : FILL-IN
+═══════════════════════════════════════════════════════════════════ */
+
+function renderFI(area, q, lv) {
+  let blankIdx = 0;
+  const sentHtml = q.sentence.replace(/___/g, () => {
+    const i = blankIdx++;
+    return `<input class="dcs-fill-inp" id="dcs-inp-${i}" data-idx="${i}"
+                   type="text" maxlength="2"
+                   autocomplete="off" autocorrect="off" spellcheck="false"
+                   placeholder="?" aria-label="réponse ${i+1}">`;
+  });
+
+  area.innerHTML = `
+    <p class="ex-question-label">Complète avec <strong>ce</strong> ou <strong>se</strong>.</p>
+    <div class="dcs-fill-sentence">${sentHtml}</div>
+    <button class="dcs-validate-btn" id="dcs-val-btn">Valider</button>
+    <div class="dcs-feedback" id="dcs-fb"></div>
+  `;
+
+  setTimeout(() => area.querySelector('#dcs-inp-0')?.focus(), 60);
+
+  area.querySelectorAll('.dcs-fill-inp').forEach(inp => {
+    inp.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      const next = area.querySelector(`#dcs-inp-${parseInt(inp.dataset.idx) + 1}`);
+      if (next) next.focus(); else doValidate();
+    });
+  });
+
+  area.querySelector('#dcs-val-btn').addEventListener('click', doValidate);
+
+  function doValidate() {
+    const inputs = [...area.querySelectorAll('.dcs-fill-inp')];
+    if (inputs.some(i => !i.value.trim())) return;
+
+    inputs.forEach(i => i.disabled = true);
+    area.querySelector('#dcs-val-btn').disabled = true;
+
+    const st = ST[lv];
+    st.attempts++;
+
+    let allOk = true;
+    const parts = [];
+
+    inputs.forEach((inp, i) => {
+      const val    = inp.value.trim().toLowerCase();
+      const expect = q.answers[i];
+      const blank  = q.blanks[i];
+      const ok     = val === expect;
+      inp.classList.add(ok ? 'is-correct' : 'is-wrong');
+      if (!ok) allOk = false;
+      parts.push({ ok, expect, blank });
+    });
+
+    if (allOk) { st.score++; st.streak++; } else { st.streak = 0; }
+
+    const fb = area.querySelector('#dcs-fb');
+    if (allOk) {
+      const details = parts.map(p => {
+        const test = p.blank.testOk
+          ? `« ${p.blank.testPhrase} » fonctionne → se`
+          : `« ${p.blank.testPhrase} » ne fonctionne pas → ce`;
+        return `<strong>« ${p.expect} »</strong> : ${test}.`;
+      }).join(' ');
+      fb.innerHTML = fbOk(`✅ Bravo ! ${details}`);
+    } else {
+      const details = parts.map(p => ceseExpl(p.blank.testPhrase, p.blank.testOk, p.expect)).join('<br>');
+      fb.innerHTML  = fbErr(`❌ ${details}`);
+    }
+
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   NIVEAU 3B : PRODUCTION LIBRE
+═══════════════════════════════════════════════════════════════════ */
+
+function renderPL(area, q, lv) {
+  area.innerHTML = `
+    <p class="ex-question-label">Écris ta propre phrase.</p>
+    <div class="dcs-prompt-box">${q.consigne}</div>
+    <textarea class="dcs-textarea" id="dcs-ta" placeholder="Écris ta phrase ici…"></textarea>
+    <button class="dcs-validate-btn" id="dcs-val-btn">Valider</button>
+    <div class="dcs-feedback" id="dcs-fb"></div>
+  `;
+
+  area.querySelector('#dcs-val-btn').addEventListener('click', () => {
+    const text = area.querySelector('#dcs-ta').value.trim();
+    if (!text) return;
+
+    area.querySelector('#dcs-ta').disabled     = true;
+    area.querySelector('#dcs-val-btn').disabled = true;
+
+    const st = ST[lv];
+    st.attempts++;
+
+    const hasCe = /\bce\b/i.test(text);
+    const hasSe = /\bse\b/i.test(text);
+
+    const fb = area.querySelector('#dcs-fb');
+    if (hasCe && hasSe) {
+      st.score++; st.streak++;
+      fb.innerHTML = fbOk(
+        `✅ Bravo ! Ta phrase contient bien <strong>ce</strong> et <strong>se</strong>. Relis-la pour vérifier que tout est correct.`
+      );
+    } else if (!hasCe && !hasSe) {
+      st.streak = 0;
+      fb.innerHTML = fbErr(
+        `❌ Ta phrase ne contient ni <strong>ce</strong> ni <strong>se</strong>. Essaie d'inclure les deux !`
+      );
+    } else if (!hasCe) {
+      st.streak = 0;
+      fb.innerHTML = fbErr(
+        `❌ Ta phrase contient <strong>se</strong> mais pas <strong>ce</strong>. Essaie d'y inclure les deux !`
+      );
+    } else {
+      st.streak = 0;
+      fb.innerHTML = fbErr(
+        `❌ Ta phrase contient <strong>ce</strong> mais pas <strong>se</strong>. Essaie d'y inclure les deux !`
+      );
+    }
+
+    checkStreak(lv);
+    updateScore(lv);
+    addNextBtn(area, lv);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESULTS
+═══════════════════════════════════════════════════════════════════ */
+
+function showResults(lv) {
+  const { score: s, attempts: t } = ST[lv];
+  const pct   = t > 0 ? Math.round(100 * s / t) : 0;
+  const stars = pct === 100 ? ' 🌟🌟🌟' : pct >= 80 ? ' ⭐⭐' : ' ⭐';
+  const msg   = pct === 100 ? '🏆 Parfait ! Tu maîtrises cette règle !'
+              : pct >= 80   ? '🌟 Très bien !'
+              : pct >= 60   ? '👍 Continue comme ça !'
+              : '💪 Encore un petit effort !';
+
+  document.getElementById(`dcs-bar-${lv}`).style.width = '100%';
+
+  const nextBtn = lv < 3
+    ? `<button class="dcs-btn-primary" onclick="setLevel(${lv+1})">Niveau ${lv+1} →</button>`
+    : '';
+  const congratsEl = lv === 3
+    ? `<p style="color:var(--blue);font-weight:700;margin-bottom:14px">🎉 Tu as terminé les 3 niveaux !</p>`
+    : '';
+
+  document.getElementById(`dcs-area-${lv}`).innerHTML = `
+    <div class="dcs-results">
+      ${congratsEl}
+      <div class="dcs-results-score">${s} / ${t}</div>
+      <div class="dcs-results-pct">${pct} %${stars}</div>
+      <div class="dcs-results-msg">${msg}</div>
+      <div class="dcs-results-btns">
+        ${nextBtn}
+        <button class="dcs-btn-${lv < 3 ? 'secondary' : 'primary'}" onclick="retryLevel(${lv})">
+          Recommencer ce niveau
+        </button>
+        <a href="français-orthographe.html" class="dcs-btn-secondary">← Retour aux notions</a>
+      </div>
+    </div>
+  `;
+
+  updateScore(lv);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  saveExerciseResult({
+    exerciseSlug: 'ortho-distinguer-ce-se',
+    subject:      'français',
+    category:     'Orthographe',
+    exerciseType: 'ce-se-niveaux',
+    level:        'Niveau ' + lv,
+    score:        s,
+    total:        t,
+    durationSecs: Math.round((Date.now() - sessionStart) / 1000)
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BOOTSTRAP
+═══════════════════════════════════════════════════════════════════ */
+
+document.querySelectorAll('.dcs-tab').forEach(btn =>
+  btn.addEventListener('click', () => setLevel(parseInt(btn.dataset.lv)))
+);
+
+ST[1].started = true;
+initLevel(1);
+</script>
+
+<script src="js/menu.js"></script>
+<style>
+  footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+  .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+  .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+  .footer__text .rouge { color: #F5A623; font-weight: 700; }
+  .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+  .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>
