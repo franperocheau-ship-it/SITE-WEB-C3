@@ -333,9 +333,113 @@
       text-decoration: none;
     }
 
+    /* ── Tab bar ── */
+    .dash-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 8px;
+      margin-bottom: 24px;
+    }
+
+    .dash-tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      background: none;
+      color: var(--muted);
+      transition: background 180ms, color 180ms;
+    }
+
+    .dash-tab:hover { background: var(--bg); color: var(--text); }
+
+    .dash-tab--active { background: var(--blue); color: #fff; }
+
+    .dash-tab--active:hover { background: #0d2255; }
+
+    /* ── Subject cards (Tab 1 : Faire des exercices) ── */
+    .subject-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .subject-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 32px 24px 24px;
+      text-decoration: none;
+      border-top: 4px solid transparent;
+      transition: transform 200ms, box-shadow 200ms;
+    }
+
+    .subject-card:hover { transform: translateY(-4px); }
+
+    .subject-card--fr { border-top-color: var(--blue); }
+    .subject-card--fr:hover { box-shadow: 0 8px 32px rgba(16,43,106,0.15); }
+
+    .subject-card--ma { border-top-color: #F5A623; }
+    .subject-card--ma:hover { box-shadow: 0 8px 32px rgba(245,166,35,0.20); }
+
+    .subject-card__icon {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .subject-card--fr .subject-card__icon { background: rgba(16,43,106,0.08); }
+    .subject-card--ma .subject-card__icon { background: rgba(245,166,35,0.12); }
+
+    .subject-card__icon img { width: 52px; height: 52px; object-fit: contain; }
+
+    .subject-card__title {
+      font-size: 20px;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .subject-card--fr .subject-card__title { color: var(--blue); }
+    .subject-card--ma .subject-card__title { color: #7a4f00; }
+
+    .subject-card__desc {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .subject-card__cta {
+      margin-top: auto;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 24px;
+      border-radius: 100px;
+    }
+
+    .subject-card--fr .subject-card__cta { background: var(--blue); color: #fff; }
+    .subject-card--ma .subject-card__cta { background: #F5A623; color: #6b420a; }
+
     @media (max-width: 600px) {
       .dash-header  { padding: 20px; }
       .dash-section { padding: 20px; }
+      .subject-cards-grid { grid-template-columns: 1fr; }
+      .dash-tab { font-size: 13px; padding: 10px 12px; }
     }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -394,6 +498,40 @@
         </div>
       </div>
 
+      <!-- ── Tab bar ── -->
+      <div class="dash-tabs">
+        <button class="dash-tab dash-tab--active" data-tab="exercices">🎯 Faire des exercices</button>
+        <button class="dash-tab" data-tab="resultats">📊 Mes résultats</button>
+      </div>
+
+      <!-- ── Tab 1 : Faire des exercices ── -->
+      <div id="tab-exercices" class="dash-tab-pane">
+        <div class="subject-cards-grid">
+
+          <a href="français.html" class="subject-card subject-card--fr">
+            <div class="subject-card__icon">
+              <img src="assets/iconefrancais.png?v=2" alt="Français">
+            </div>
+            <div class="subject-card__title">Français</div>
+            <div class="subject-card__desc">Grammaire, conjugaison, orthographe, vocabulaire</div>
+            <div class="subject-card__cta">Choisir un exercice →</div>
+          </a>
+
+          <a href="mathématiques.html" class="subject-card subject-card--ma">
+            <div class="subject-card__icon">
+              <img src="assets/iconemaths.png?v=2" alt="Mathématiques">
+            </div>
+            <div class="subject-card__title">Mathématiques</div>
+            <div class="subject-card__desc">Nombres, calcul, géométrie, mesures</div>
+            <div class="subject-card__cta">Choisir un exercice →</div>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- ── Tab 2 : Mes résultats ── -->
+      <div id="tab-resultats" class="dash-tab-pane" style="display:none">
+
       <!-- Statistiques globales -->
       <div class="dash-stats" id="dash-stats" style="display:none">
         <div class="dash-stat">
@@ -439,6 +577,8 @@
         <a href="visiteur.html" class="dash-cta">Continuer à m'entraîner →</a>
       </div>
 
+      </div><!-- /tab-resultats -->
+
       <!-- Actions -->
       <div class="dash-actions">
         <a href="index-v2.html" class="dash-back-link">← Retour aux exercices</a>
@@ -461,6 +601,25 @@
 
   <script src="js/menu.js"></script>
   <script>
+    /* ── Tabs ─────────────────────────────────────────────────────────────── */
+    const TAB_KEY = 'dash-active-tab';
+
+    function activateTab(tabName) {
+      document.querySelectorAll('.dash-tab').forEach(btn => {
+        btn.classList.toggle('dash-tab--active', btn.dataset.tab === tabName);
+      });
+      document.querySelectorAll('.dash-tab-pane').forEach(pane => {
+        pane.style.display = (pane.id === 'tab-' + tabName) ? '' : 'none';
+      });
+      sessionStorage.setItem(TAB_KEY, tabName);
+    }
+
+    document.querySelectorAll('.dash-tab').forEach(btn => {
+      btn.addEventListener('click', () => activateTab(btn.dataset.tab));
+    });
+
+    activateTab(sessionStorage.getItem(TAB_KEY) || 'exercices');
+
     /* ── Formatage de date ─────────────────────────────────────────────────── */
     function formatDate(iso) {
       const d = new Date(iso);
@@ -598,7 +757,10 @@
       if (!profile) return;
 
       /* Déconnexion */
-      document.getElementById('dash-logout-btn').addEventListener('click', () => lfmAuth.signOut());
+      document.getElementById('dash-logout-btn').addEventListener('click', () => {
+        sessionStorage.removeItem(TAB_KEY);
+        lfmAuth.signOut();
+      });
 
       /* Info de classe (optionnel, peut être absent) */
       let classMeta = null;

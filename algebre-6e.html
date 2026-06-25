@@ -79,7 +79,6 @@
     .answer-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(16,43,106,0.08); }
     .answer-input.correct { border-color: #2EA05A; background: rgba(46,160,90,0.10); }
     .answer-input.wrong   { border-color: var(--red); background: rgba(214,40,57,0.08); }
-    .answer-input.revealed { border-color: var(--border); background: rgba(16,43,106,0.04); color: var(--muted); }
     .answer-input:disabled { cursor: not-allowed; }
 
     .answer-fb { font-size: 16px; height: 18px; line-height: 1; }
@@ -196,8 +195,6 @@
     };
 
     const opSymbol = { add: "+", sub: "−", mul: "×", div: "÷" };
-    const revealed = new Set();
-
     function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
     function round1(n) { return Math.round(n * 10) / 10; }
 
@@ -281,7 +278,6 @@
 
           <div class="level-actions">
             <button class="btn btn-primary" onclick="checkLevel()">Vérifier</button>
-            <button class="btn btn-secondary" onclick="hintLevel()">Indice</button>
             <button class="btn btn-ghost" onclick="newGame()">Nouvelle partie</button>
             <span class="level-result" id="result"></span>
           </div>
@@ -297,8 +293,6 @@
       values.forEach((val, i) => {
         const input = document.getElementById(`input-${i}`);
         const fb = document.getElementById(`fb-${i}`);
-        if (revealed.has(i)) return;
-
         const raw = input.value.trim();
         if (raw === "") { allCorrect = false; fb.textContent = ""; input.classList.remove("correct", "wrong"); return; }
 
@@ -313,8 +307,7 @@
       });
 
       const result = document.getElementById("result");
-      const scoredCount = values.length - revealed.size;
-      if (allCorrect && answeredCount === scoredCount) {
+      if (allCorrect && answeredCount === values.length) {
         result.textContent = "🎉 Bravo, tout est juste !";
         result.classList.add("win");
       } else {
@@ -323,25 +316,7 @@
       }
     }
 
-    function hintLevel() {
-      const values = level.puzzle.values;
-      const remaining = values.map((_, i) => i).filter(i => !revealed.has(i));
-      if (remaining.length === 0) return;
-
-      const idx = remaining[0];
-      revealed.add(idx);
-
-      const input = document.getElementById(`input-${idx}`);
-      const fb = document.getElementById(`fb-${idx}`);
-      input.value = values[idx];
-      input.disabled = true;
-      input.classList.remove("correct", "wrong");
-      input.classList.add("revealed");
-      fb.textContent = "💡";
-    }
-
     function newGame() {
-      revealed.clear();
       renderGame();
     }
 
