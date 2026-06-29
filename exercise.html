@@ -3619,6 +3619,49 @@
       .fdgd-cell-10  { width: 30px; height: 30px; }
       .fdgd-cell-100 { width: 20px; height: 20px; }
     }
+    /* Grille : saisie numérique + coloriage automatique */
+    .fdgd-input-wrap {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .fdgd-input-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--blue);
+      margin-bottom: 8px;
+    }
+    .fdgd-count-input {
+      width: 80px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--blue);
+      border: 2px solid #93c5fd;
+      border-radius: 10px;
+      padding: 8px 12px;
+      background: #eff6ff;
+      outline: none;
+      transition: border-color 160ms, background 160ms;
+      -moz-appearance: textfield;
+    }
+    .fdgd-count-input::-webkit-outer-spin-button,
+    .fdgd-count-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .fdgd-count-input:focus { border-color: #3b82f6; }
+    .fdgd-count-input.is-error { border-color: #ef4444; background: #fef2f2; color: #ef4444; }
+    .fdgd-input-error {
+      font-size: 12px;
+      font-weight: 600;
+      color: #ef4444;
+      min-height: 18px;
+      margin-top: 4px;
+    }
+    /* Droite graduée responsive */
+    .fdgd-droite-container {
+      width: 100%;
+      margin-bottom: 4px;
+      overflow: visible;
+    }
 
     /* ── Type : fraction-decimale-tableau-niveaux ───────────────────────── */
     .fdtn-table-wrap {
@@ -4003,19 +4046,29 @@
       };
       const badgeCls = { "CM1": "badge-cm1", "CM2": "badge-cm2", "6e": "badge-6e" };
 
+      const pfiValidated = pfiGetValidated();
       const grid = document.getElementById("ex-level-grid");
-      grid.innerHTML = levels.map(l => `
-        <button class="ex-type-card" data-level="${l}">
+      grid.innerHTML = levels.map((l, i) => {
+        const prevLv   = i > 0 ? levels[i - 1] : null;
+        const unlocked = i === 0 || pfiValidated.includes(prevLv);
+        const done     = pfiValidated.includes(l);
+        const cls      = !unlocked ? ' vb-locked-card' : '';
+        const disabled = !unlocked ? ' disabled' : '';
+        const descText = !unlocked
+          ? 'Valide le niveau précédent pour débloquer'
+          : done ? (descs[l] || '') + ' ✓' : (descs[l] || '');
+        return `<button class="ex-type-card${cls}" data-level="${l}"${disabled}>
           <span class="ex-type-icon" style="width:auto">
             <span class="badge ${badgeCls[l] || 'badge-cm1'}" style="font-size:13px;padding:4px 12px">${LEVEL_LABELS[l] ?? l}</span>
           </span>
           <div>
             <span class="ex-type-name">${LEVEL_LABELS[l] ?? l}</span>
-            <span class="ex-type-desc">${descs[l] || ''}</span>
+            <span class="ex-type-desc">${descText}</span>
           </div>
-        </button>`).join('');
+        </button>`;
+      }).join('');
 
-      grid.querySelectorAll(".ex-type-card").forEach(btn =>
+      grid.querySelectorAll(".ex-type-card:not([disabled])").forEach(btn =>
         btn.addEventListener("click", () => {
           pfiSelectedLevel   = btn.dataset.level;
           sessionLevelList   = [...levels];
@@ -4055,19 +4108,29 @@
       const badgeCls = { "CM1": "badge-cm1", "CM2": "badge-cm2", "6e": "badge-6e" };
       const diffMap  = { "CM1": 1, "CM2": 2, "6e": 3 };
 
+      const accordValidated = accordGetValidated();
       const grid = document.getElementById("ex-level-grid");
-      grid.innerHTML = levels.map(l => `
-        <button class="ex-type-card" data-level="${l}">
+      grid.innerHTML = levels.map((l, i) => {
+        const prevLv   = i > 0 ? levels[i - 1] : null;
+        const unlocked = i === 0 || accordValidated.includes(prevLv);
+        const done     = accordValidated.includes(l);
+        const cls      = !unlocked ? ' vb-locked-card' : '';
+        const disabled = !unlocked ? ' disabled' : '';
+        const descText = !unlocked
+          ? 'Valide le niveau précédent pour débloquer'
+          : done ? (descs[l] || '') + ' ✓' : (descs[l] || '');
+        return `<button class="ex-type-card${cls}" data-level="${l}"${disabled}>
           <span class="ex-type-icon" style="width:auto">
             <span class="badge ${badgeCls[l] || 'badge-cm1'}" style="font-size:13px;padding:4px 12px">${LEVEL_LABELS[l] ?? l}</span>
           </span>
           <div>
             <span class="ex-type-name">${LEVEL_LABELS[l] ?? l}</span>
-            <span class="ex-type-desc">${descs[l] || ''}</span>
+            <span class="ex-type-desc">${descText}</span>
           </div>
-        </button>`).join('');
+        </button>`;
+      }).join('');
 
-      grid.querySelectorAll(".ex-type-card").forEach(btn =>
+      grid.querySelectorAll(".ex-type-card:not([disabled])").forEach(btn =>
         btn.addEventListener("click", () => {
           accordLevel = btn.dataset.level;
           const diff  = diffMap[accordLevel];
@@ -4841,15 +4904,17 @@
     /* ── Results ──────────────────────────────────────────────────────────── */
 
     /* Configure les boutons de l'écran de résultats selon qu'il reste un niveau suivant ou non. */
-    function _setupResultsScreen() {
+    function _setupResultsScreen(pct = 100) {
       const backHref  = sessionData?.backLink?.href  || '#';
       const backLabel = sessionData?.backLink?.label || 'Retour';
       const wrap      = document.getElementById('ex-results-btns-wrap');
 
-      const hasMulti  = sessionLevelIdx >= 0 && sessionLevelList.length > 1;
-      const isLast    = sessionLevelIdx >= sessionLevelList.length - 1;
+      const hasMulti   = sessionLevelIdx >= 0 && sessionLevelList.length > 1;
+      const isLast     = sessionLevelIdx >= sessionLevelList.length - 1;
+      const lockedType = currentType === 'produire-3-formes' || currentType === 'accord-ecrit';
+      const canProgress = !lockedType || pct >= 80;
 
-      if (hasMulti && !isLast) {
+      if (hasMulti && !isLast && canProgress) {
         /* Pas dernier niveau : bouton principal "Niveau suivant" */
         const nextLabel = sessionLevelLabels[sessionLevelIdx + 1];
         wrap.innerHTML = `
@@ -4873,6 +4938,29 @@
           sessionStartTime = Date.now();
           sessionLevelLoader(sessionLevelList[sessionLevelIdx]);
           window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+      } else if (hasMulti && !isLast && !canProgress) {
+        /* Score insuffisant sur type verrouillé : recommencer ou choisir un niveau */
+        wrap.innerHTML = `
+          <p style="color:#F5A623;font-weight:700;margin:0 0 12px">🔒 Atteins 80 % pour débloquer le niveau suivant !</p>
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="restart-btn">Recommencer ce niveau</button>
+            <button class="ex-btn-secondary" id="choose-level-btn">← Choisir un niveau</button>
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>
+        `;
+        document.getElementById('restart-btn').addEventListener('click', () => {
+          document.getElementById('results-screen').classList.add('ex-hidden');
+          document.getElementById('exercise-screen').classList.remove('ex-hidden');
+          sessionStartTime = Date.now();
+          sessionLevelLoader(sessionLevelList[sessionLevelIdx]);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        document.getElementById('choose-level-btn').addEventListener('click', () => {
+          document.getElementById('results-screen').classList.add('ex-hidden');
+          if (currentType === 'produire-3-formes') showLevelSelect();
+          else if (currentType === 'accord-ecrit') showAccordLevelSelect();
         });
 
       } else if (hasMulti && isLast) {
@@ -4931,7 +5019,17 @@
       else                  msg = "💪 Encore un petit effort !";
 
       document.getElementById("score-msg").textContent = msg;
-      _setupResultsScreen();
+
+      if (pct >= 80 && currentType === 'produire-3-formes' && pfiSelectedLevel) {
+        const _v = pfiGetValidated();
+        if (!_v.includes(pfiSelectedLevel)) { _v.push(pfiSelectedLevel); pfiSetValidated(_v); }
+      }
+      if (pct >= 80 && currentType === 'accord-ecrit' && accordLevel) {
+        const _v = accordGetValidated();
+        if (!_v.includes(accordLevel)) { _v.push(accordLevel); accordSetValidated(_v); }
+      }
+
+      _setupResultsScreen(pct);
       window.scrollTo({ top: 0, behavior: "smooth" });
 
       /* Enregistrement du résultat pour les élèves connectés */
@@ -14066,6 +14164,23 @@
       localStorage.setItem(key, JSON.stringify(arr));
     }
 
+    function pfiGetValidated() {
+      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_pfi_valides';
+      try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+    }
+    function pfiSetValidated(arr) {
+      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_pfi_valides';
+      localStorage.setItem(key, JSON.stringify(arr));
+    }
+    function accordGetValidated() {
+      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_accord_valides';
+      try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+    }
+    function accordSetValidated(arr) {
+      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_accord_valides';
+      localStorage.setItem(key, JSON.stringify(arr));
+    }
+
     function gnpNorm(str) {
       return str.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[''`´'']/g, '');
     }
@@ -19621,54 +19736,94 @@
       });
     }
 
-    /* ── Étape 1 — Grille de coloriage ─────────────────────────────────── */
+    /* ── Étape 1 — Grille de coloriage (saisie → coloriage automatique) ── */
     function fdgdRenderGrille(card, q) {
       const { num, den } = q;
-      let gridHtml;
-      if (den === 10) {
-        const cells = Array.from({ length: 10 }, (_, i) =>
-          `<button class="fdgd-cell fdgd-cell-10" data-idx="${i}" aria-label="Case ${i + 1}"></button>`
-        ).join('');
-        gridHtml = `<div class="fdgd-grid-10" id="fdgd-grid">${cells}</div>`;
-      } else {
-        let rows = '';
-        for (let r = 0; r < 10; r++) {
-          let rowCells = '';
-          for (let c = 0; c < 10; c++) {
-            rowCells += `<button class="fdgd-cell fdgd-cell-100" data-idx="${r * 10 + c}"></button>`;
+
+      function buildGrid(val) {
+        const n = Math.max(0, Math.min(isNaN(val) ? 0 : Math.round(val), den));
+        if (den === 10) {
+          const cW = 40, cH = 40, gap = 4;
+          const W  = 10 * cW + 9 * gap;
+          let rects = '';
+          for (let i = 0; i < 10; i++) {
+            const x = i * (cW + gap);
+            const fill   = i < n ? '#1DBFA0' : 'white';
+            const stroke = i < n ? '#0d9488' : '#ccc';
+            rects += `<rect x="${x}" y="0" width="${cW}" height="${cH}" rx="4"
+              fill="${fill}" stroke="${stroke}" stroke-width="1"/>`;
           }
-          rows += `<div class="fdgd-row">${rowCells}</div>`;
+          return `<svg viewBox="0 0 ${W} ${cH}" width="${W}" height="${cH}"
+            style="display:block;max-width:100%;overflow:visible;margin:0 auto">${rects}</svg>`;
+        } else {
+          /* /100 — colorie de bas en haut, de gauche à droite */
+          const cW = 28, cH = 28, gap = 3;
+          const W = 10 * cW + 9 * gap;
+          const H = 10 * cH + 9 * gap;
+          let rects = '';
+          for (let row = 0; row < 10; row++) {   /* row 0 = bas */
+            for (let col = 0; col < 10; col++) {
+              const idx       = row * 10 + col;   /* 0 = bas-gauche */
+              const visualRow = 9 - row;           /* 0 = haut dans SVG */
+              const x = col * (cW + gap);
+              const y = visualRow * (cH + gap);
+              const fill   = idx < n ? '#1DBFA0' : 'white';
+              const stroke = idx < n ? '#0d9488' : '#ccc';
+              rects += `<rect x="${x}" y="${y}" width="${cW}" height="${cH}" rx="3"
+                fill="${fill}" stroke="${stroke}" stroke-width="1"/>`;
+            }
+          }
+          return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"
+            style="display:block;max-width:100%;overflow:visible;margin:0 auto">${rects}</svg>`;
         }
-        gridHtml = `<div class="fdgd-grid-100" id="fdgd-grid">${rows}</div>`;
       }
 
       card.innerHTML = `
         ${fdgdTabBar(fdgdState.level)}
         <div class="fdgd-step-tag">Étape 1 — Coloriage</div>
-        <p class="ex-question-label">Colorie ${num} case${num > 1 ? 's' : ''} pour représenter la fraction.</p>
-        <div class="nline-question-area" style="margin-bottom:16px">${_rfracHtml(num, den)}</div>
-        ${gridHtml}
+        <div class="nline-question-area" style="margin-bottom:12px">${_rfracHtml(num, den)}</div>
+        <div class="fdgd-input-wrap">
+          <label class="fdgd-input-label" for="fdgd-count-input">Combien de cases veux-tu colorier ?</label>
+          <input type="number" id="fdgd-count-input" class="fdgd-count-input"
+            min="0" max="${den}" placeholder="0" inputmode="numeric" autocomplete="off">
+          <div class="fdgd-input-error" id="fdgd-input-error"></div>
+        </div>
+        <div id="fdgd-grid-wrap" style="margin-bottom:8px">${buildGrid(0)}</div>
         <div class="fdgd-counter" id="fdgd-counter">0 case coloriée / ${den}</div>
         <button class="ex-validate-btn" id="fdgd-next-step-btn" style="width:100%;margin-top:4px">Étape suivante →</button>
       `;
 
       fdgdSetupTabs();
 
-      const coloredSet = fdgdState.coloredSet;
-      const counter    = document.getElementById('fdgd-counter');
-      document.getElementById('fdgd-grid').querySelectorAll('.fdgd-cell').forEach(cell => {
-        cell.addEventListener('click', () => {
-          const idx = parseInt(cell.dataset.idx, 10);
-          if (coloredSet.has(idx)) {
-            coloredSet.delete(idx);
-            cell.classList.remove('is-colored');
-          } else {
-            coloredSet.add(idx);
-            cell.classList.add('is-colored');
-          }
-          const n = coloredSet.size;
-          counter.textContent = `${n} case${n !== 1 ? 's' : ''} coloriée${n !== 1 ? 's' : ''} / ${den}`;
-        });
+      const inp      = document.getElementById('fdgd-count-input');
+      const errEl    = document.getElementById('fdgd-input-error');
+      const counter  = document.getElementById('fdgd-counter');
+      const gridWrap = document.getElementById('fdgd-grid-wrap');
+
+      function refresh(rawVal) {
+        const n = Math.max(0, Math.min(isNaN(rawVal) ? 0 : Math.round(rawVal), den));
+        gridWrap.innerHTML = buildGrid(n);
+        fdgdState.coloredSet = new Set(Array.from({ length: n }, (_, i) => i));
+        counter.textContent = `${n} case${n !== 1 ? 's' : ''} coloriée${n !== 1 ? 's' : ''} / ${den}`;
+      }
+
+      inp.addEventListener('input', () => {
+        const raw = parseFloat(inp.value);
+        if (inp.value === '' || isNaN(raw)) {
+          errEl.textContent = '';
+          inp.classList.remove('is-error');
+          refresh(0);
+          return;
+        }
+        if (raw > den) {
+          errEl.textContent = `Maximum : ${den} cases`;
+          inp.classList.add('is-error');
+          refresh(den);
+        } else {
+          errEl.textContent = '';
+          inp.classList.remove('is-error');
+          refresh(raw);
+        }
       });
 
       document.getElementById('fdgd-next-step-btn').addEventListener('click', () => {
@@ -19676,89 +19831,118 @@
       });
     }
 
-    /* ── Étape 2 (ou 1 pour niv.3) — Droite graduée ───────────────────── */
+    /* ── Étape 2 (ou 1 pour niv.3) — Droite graduée zoomée (10 subdivisions) */
     function fdgdRenderDroite(card, q) {
-      const { num, den, droiteTicks, majorStep, tickIdx } = q;
+      const { num, den } = q;
       const isLv3   = fdgdState.level === 3;
       const stepNum = isLv3 ? 1 : 2;
 
-      /* Espacement adaptatif */
-      const spacing   = den === 100
-        ? Math.max(22, Math.min(36, Math.floor(620 / droiteTicks)))
-        : Math.max(38, Math.min(60, Math.floor(580 / droiteTicks)));
-      const padL = 50, padR = 56;
-      const lineW = droiteTicks * spacing;
-      const W     = lineW + padL + padR;
-      const H     = 96;
-      const lineY = 48;
+      /* Zoom sur [leftBound, leftBound+1], 10 subdivisions (dixièmes) */
+      const leftBound  = Math.floor(q.decimal);
+      const rightBound = leftBound + 1;
+      const rawTick    = Math.round((q.decimal - leftBound) * 10);
+      const targetTick = Math.max(1, Math.min(9, rawTick));
 
-      let selIdx = null;
+      let selIdx     = null;
+      let selCorrect = null;
 
       function buildSvg() {
+        const VW = 500, VH = 90;
+        const padL = 50, padR = 50;
+        const lineW = VW - padL - padR;
+        const lineY = 44;
+        const nTicks = 10;
+        const tickStep = lineW / nTicks;
+
         let s = '';
-        /* Ligne + flèche */
-        s += `<line x1="${padL}" y1="${lineY}" x2="${padL + lineW + 8}" y2="${lineY}" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>`;
-        s += `<polygon points="${padL + lineW + 16},${lineY} ${padL + lineW + 6},${lineY - 5} ${padL + lineW + 6},${lineY + 5}" fill="#94a3b8"/>`;
-        /* Encadré "0" à gauche */
-        s += `<rect x="${padL - 28}" y="${lineY - 15}" width="26" height="22" rx="5" fill="rgba(16,43,106,0.08)" stroke="rgba(16,43,106,0.22)" stroke-width="1.5"/>`;
-        s += `<text x="${padL - 15}" y="${lineY + 5}" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#102b6a">0</text>`;
-        /* Encadré "1" à droite */
-        s += `<rect x="${padL + lineW + 22}" y="${lineY - 15}" width="26" height="22" rx="5" fill="rgba(16,43,106,0.08)" stroke="rgba(16,43,106,0.22)" stroke-width="1.5"/>`;
-        s += `<text x="${padL + lineW + 35}" y="${lineY + 5}" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="700" fill="#102b6a">1</text>`;
-        /* Graduations */
-        for (let i = 0; i <= droiteTicks; i++) {
-          const x       = padL + i * spacing;
-          const isMaj   = (i % majorStep === 0);
-          const tH      = isMaj ? 20 : 10;
-          const color   = isMaj ? '#102b6a' : '#94a3b8';
-          const sw      = isMaj ? 2 : 1.5;
-          s += `<line x1="${x}" y1="${lineY - tH / 2}" x2="${x}" y2="${lineY + tH / 2}" stroke="${color}" stroke-width="${sw}"/>`;
-          /* Zone cliquable pour les graduations intermédiaires */
-          if (i > 0 && i < droiteTicks) {
-            s += `<rect x="${x - 12}" y="4" width="24" height="${H - 8}" fill="transparent" class="fdgd-hit" data-tick="${i}" style="cursor:pointer"/>`;
+
+        /* Ligne principale */
+        s += `<line x1="${padL}" y1="${lineY}" x2="${padL + lineW}" y2="${lineY}"
+          stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>`;
+
+        /* Tick + encadré borne gauche */
+        s += `<line x1="${padL}" y1="${lineY - 14}" x2="${padL}" y2="${lineY + 14}"
+          stroke="#102b6a" stroke-width="2"/>`;
+        s += `<rect x="${padL - 26}" y="${lineY - 24}" width="24" height="20" rx="5"
+          fill="rgba(16,43,106,0.08)" stroke="rgba(16,43,106,0.22)" stroke-width="1.5"/>`;
+        s += `<text x="${padL - 14}" y="${lineY - 9}" text-anchor="middle"
+          font-family="sans-serif" font-size="13" font-weight="700" fill="#102b6a">${leftBound}</text>`;
+
+        /* Tick + encadré borne droite */
+        s += `<line x1="${padL + lineW}" y1="${lineY - 14}" x2="${padL + lineW}" y2="${lineY + 14}"
+          stroke="#102b6a" stroke-width="2"/>`;
+        s += `<rect x="${padL + lineW + 2}" y="${lineY - 24}" width="24" height="20" rx="5"
+          fill="rgba(16,43,106,0.08)" stroke="rgba(16,43,106,0.22)" stroke-width="1.5"/>`;
+        s += `<text x="${padL + lineW + 14}" y="${lineY - 9}" text-anchor="middle"
+          font-family="sans-serif" font-size="13" font-weight="700" fill="#102b6a">${rightBound}</text>`;
+
+        /* Graduations intérieures (dixièmes 1 à 9) */
+        for (let i = 1; i < nTicks; i++) {
+          const x   = padL + i * tickStep;
+          const tv  = leftBound + i / nTicks;
+          const lbl = tv.toFixed(1).replace('.', ',');
+          const isSel = selIdx === i;
+          const dotFill   = isSel ? (selCorrect ? '#1DBFA0' : '#ef4444') : null;
+          const dotStroke = isSel ? (selCorrect ? '#0d9488' : '#b91c1c') : null;
+
+          s += `<line x1="${x}" y1="${lineY - 10}" x2="${x}" y2="${lineY + 10}"
+            stroke="#94a3b8" stroke-width="1.5"/>`;
+          s += `<text x="${x}" y="${lineY + 26}" text-anchor="middle"
+            font-family="sans-serif" font-size="10" fill="#64748b">${lbl}</text>`;
+          s += `<rect x="${x - 15}" y="2" width="30" height="${lineY + 16}"
+            fill="transparent" class="fdgd-hit" data-tick="${i}" style="cursor:pointer"/>`;
+
+          if (dotFill) {
+            s += `<circle cx="${x}" cy="${lineY}" r="9"
+              fill="${dotFill}" stroke="${dotStroke}" stroke-width="2.5" pointer-events="none"/>`;
+            s += `<text x="${x}" y="${lineY + 4}" text-anchor="middle"
+              font-family="sans-serif" font-size="9" font-weight="700"
+              fill="white" pointer-events="none">${lbl}</text>`;
           }
         }
-        /* Marqueur de sélection */
-        if (selIdx !== null) {
-          const dx = padL + selIdx * spacing;
-          s += `<circle cx="${dx}" cy="${lineY}" r="9" fill="#1DBFA0" stroke="#0d9488" stroke-width="2.5" pointer-events="none"/>`;
-        }
-        return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block;max-width:100%;overflow:visible">${s}</svg>`;
+
+        return `<svg viewBox="0 0 ${VW} ${VH}" width="100%"
+          style="display:block;overflow:visible">${s}</svg>`;
       }
 
       card.innerHTML = `
         ${fdgdTabBar(fdgdState.level)}
         <div class="fdgd-step-tag">Étape ${stepNum} — Droite graduée</div>
-        <p class="ex-question-label">Place cette fraction sur la droite.</p>
+        <p class="ex-question-label">Place cette fraction sur la droite graduée.</p>
         <div class="nline-question-area" style="margin-bottom:16px">${_rfracHtml(num, den)}</div>
-        <div class="nline-scroll-wrap" id="fdgd-droite-wrap">${buildSvg()}</div>
+        <div class="fdgd-droite-container" id="fdgd-droite-wrap"></div>
         <p class="nline-status" id="fdgd-droite-status">Clique sur une graduation pour la sélectionner.</p>
         <button class="ex-validate-btn" id="fdgd-droite-next-btn" disabled style="width:100%;margin-top:4px">Étape suivante →</button>
       `;
 
       fdgdSetupTabs();
 
-      const wrap      = document.getElementById('fdgd-droite-wrap');
-      const statusEl  = document.getElementById('fdgd-droite-status');
-      const nextBtn   = document.getElementById('fdgd-droite-next-btn');
+      const wrap    = document.getElementById('fdgd-droite-wrap');
+      const statEl  = document.getElementById('fdgd-droite-status');
+      const nextBtn = document.getElementById('fdgd-droite-next-btn');
 
-      function bindHits() {
+      function render() {
+        wrap.innerHTML = buildSvg();
         wrap.querySelectorAll('.fdgd-hit').forEach(rect => {
           rect.addEventListener('click', () => {
-            selIdx = parseInt(rect.dataset.tick, 10);
-            wrap.innerHTML = buildSvg();
-            bindHits();
-            statusEl.textContent = 'Graduation sélectionnée. Clique sur « Étape suivante » pour continuer.';
+            selIdx     = parseInt(rect.dataset.tick, 10);
+            selCorrect = (selIdx === targetTick);
+            fdgdState.droiteIdx = selIdx;
+            render();
+            if (selCorrect) {
+              statEl.textContent = '✅ Bonne graduation ! Clique sur « Étape suivante » pour continuer.';
+              statEl.style.color = '#059669';
+            } else {
+              statEl.textContent = '❌ Essaie encore !';
+              statEl.style.color = '#ef4444';
+            }
             nextBtn.disabled = false;
           });
         });
       }
-      bindHits();
+      render();
 
-      nextBtn.addEventListener('click', () => {
-        fdgdState.droiteIdx = selIdx;
-        fdgdRenderSaisie(card, q);
-      });
+      nextBtn.addEventListener('click', () => fdgdRenderSaisie(card, q));
     }
 
     /* ── Étape 3 (ou 2 pour niv.3) — Saisie décimale ──────────────────── */
@@ -19805,12 +19989,15 @@
               : `💡 Grille : tu as colorié ${fdgdState.coloredSet.size} case${fdgdState.coloredSet.size > 1 ? 's' : ''} (il en fallait ${num}).`)
           : '';
 
-        /* Info droite */
-        const droiteOk = fdgdState.droiteIdx === q.tickIdx;
+        /* Info droite — targetTick recalculé depuis la fraction */
+        const _lb        = Math.floor(q.decimal);
+        const _target    = Math.max(1, Math.min(9, Math.round((q.decimal - _lb) * 10)));
+        const droiteOk   = fdgdState.droiteIdx === _target;
+        const droiteVal  = (_lb + _target / 10).toFixed(1).replace('.', ',');
         const droiteInfo = fdgdState.droiteIdx !== null
           ? (droiteOk
               ? `✅ Droite : bonne graduation !`
-              : `💡 Droite : la bonne graduation est la ${q.tickIdx}ᵉ depuis 0.`)
+              : `💡 Droite : la bonne graduation était ${droiteVal}.`)
           : '';
 
         const noteHtml = [gridInfo, droiteInfo].filter(Boolean)

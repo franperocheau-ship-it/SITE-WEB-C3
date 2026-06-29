@@ -9267,6 +9267,19 @@ const EXERCISE_DATA = {
       { num: 2345, den: 1000, decimal: 2.345, decimalStr: "2,345", tab: { u: 2, di: 3, ce: 4, mi: 5 } },
       { num:   30, den: 1000, decimal: 0.03,  decimalStr: "0,030", tab: { u: 0, di: 0, ce: 3, mi: 0 } }
     ]
+  },
+
+
+  /* ── Fraction décimale — Association (page autonome) ───────────────────── */
+  "fraction-decimale-association": {
+    title:      "Fraction décimale — Association",
+    domaine:    "Mathématiques",
+    competence: "Associer une fraction décimale à un nombre décimal",
+    subject:    "mathématiques",
+    domain:     "Nombres décimaux",
+    levels:     ["CM1", "CM2", "6e"],
+    type:       "custom",
+    backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" }
   }
 
 };

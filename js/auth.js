@@ -37,7 +37,7 @@ const lfmAuth = (() => {
   /* Déconnexion ────────────────────────────────────────────────────────────── */
   async function signOut() {
     await db.auth.signOut();
-    window.location.href = 'index.html';
+    window.location.href = 'index-v2.html';
   }
 
   /* Session courante ───────────────────────────────────────────────────────── */

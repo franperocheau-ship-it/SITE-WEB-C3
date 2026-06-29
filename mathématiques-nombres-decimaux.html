@@ -348,12 +348,12 @@
   .navbar__name{font-size:18px;font-weight:800;line-height:1;letter-spacing:1px;}
   .navbar__tagline{font-size:12px;font-style:italic;font-weight:700;color:#102B6A;margin-top:2px;}
   .navbar__nav{display:flex;align-items:center;gap:24px;}
-  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;transition:color .2s;}
+  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-size:14px;font-weight:700;transition:color .2s;}
   .navbar__nav a:hover{color:#1B4EBF;}
   .navbar__nav a.active{color:#2D9C3C;border-bottom:2px solid #2D9C3C;padding-bottom:2px;}
-  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;font-family:'Nunito',sans-serif;}
+  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;}
   .navbar__nav .btn-login{color:#fff!important;}
-  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
   .btn-login:hover{background:#0b1e4d;}
   @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
   </style>
@@ -456,9 +456,9 @@
           {
             label: null,
             skills: [
-              { title: "Associer une fraction décimale à un nombre décimal",              slug: "associer-fraction-decimale",                   levels: ["CM2","6e"] },
-              { title: "Écrire une fraction décimale sous forme décimale",                slug: "ecrire-fraction-sous-forme-decimale",          levels: ["CM2","6e"] },
-              { title: "Écrire un décimal sous forme de fraction décimale",               slug: "ecrire-decimal-sous-forme-fraction",           levels: ["6e"] },
+              { title: "Associer une fraction décimale à un nombre décimal",              slug: "associer-fraction-decimale",                   levels: ["CM1","CM2","6e"] },
+              { title: "Écrire une fraction décimale sous forme décimale",                slug: "ecrire-fraction-sous-forme-decimale",          levels: ["CM1","CM2","6e"] },
+              { title: "Écrire un décimal sous forme de fraction décimale",               slug: "ecrire-decimal-sous-forme-fraction",           levels: ["CM1","CM2","6e"] },
             ]
           }
         ]
@@ -471,13 +471,8 @@
           {
             label: null,
             skills: [
-              { title: "Lire un nombre décimal",                                          slug: "lire-nombre-decimal",                          levels: ["CM1","CM2","6e"] },
-              { title: "Écrire un nombre décimal",                                        slug: "ecrire-nombre-decimal",                        levels: ["CM1","CM2","6e"] },
-              { title: "Identifier les dixièmes",                                         slug: "identifier-dixiemes",                          levels: ["CM1","CM2","6e"] },
-              { title: "Identifier les centièmes",                                        slug: "identifier-centiemes",                         levels: ["CM2","6e"] },
-              { title: "Identifier les millièmes",                                        slug: "identifier-milliemes",                         levels: ["CM2","6e"] },
               { title: "Décomposer un nombre décimal",                                    slug: "decomposer-nombre-decimal",                    levels: ["CM1","CM2","6e"] },
-              { title: "Composer un nombre décimal à partir d'une décomposition",         slug: "composer-nombre-decimal-decomposition",        levels: ["CM2","6e"] },
+              { title: "Composer un nombre décimal à partir d'une décomposition",         slug: "composer-nombre-decimal-decomposition",        levels: ["CM1","CM2","6e"] },
             ]
           }
         ]
@@ -493,8 +488,8 @@
               { title: "Comparer deux nombres décimaux",                                  slug: "comparer-deux-nombres-decimaux",               levels: ["CM1","CM2","6e"] },
               { title: "Utiliser les symboles <, > et =",                                 slug: "utiliser-symboles-comparaison",                levels: ["CM1","CM2","6e"] },
               { title: "Ranger des nombres décimaux",                                     slug: "ranger-nombres-decimaux",                      levels: ["CM1","CM2","6e"] },
-              { title: "Encadrer un nombre décimal",                                      slug: "encadrer-nombre-decimal",                      levels: ["CM2","6e"] },
-              { title: "Intercaler un décimal entre deux nombres",                        slug: "intercaler-decimal",                           levels: ["CM2","6e"] },
+              { title: "Encadrer un nombre décimal",                                      slug: "encadrer-nombre-decimal",                      levels: ["CM1","CM2","6e"] },
+              { title: "Intercaler un décimal entre deux nombres",                        slug: "intercaler-decimal",                           levels: ["CM1","CM2","6e"] },
             ]
           }
         ]
@@ -507,9 +502,9 @@
           {
             label: null,
             skills: [
-              { title: "Placer un décimal sur une droite graduée",                        slug: "placer-decimal-droite-graduee",                levels: ["CM2","6e"] },
-              { title: "Compléter une droite graduée",                                    slug: "completer-droite-graduee",                     levels: ["CM2","6e"] },
-              { title: "Retrouver un décimal à partir de sa position",                   slug: "retrouver-decimal-position",                   levels: ["6e"] },
+              { title: "Placer un décimal sur une droite graduée",                        slug: "placer-decimal-droite-graduee",                levels: ["CM1","CM2","6e"] },
+              { title: "Compléter une droite graduée",                                    slug: "completer-droite-graduee",                     levels: ["CM1","CM2","6e"] },
+              { title: "Retrouver un décimal à partir de sa position",                   slug: "retrouver-decimal-position",                   levels: ["CM1","CM2","6e"] },
             ]
           }
         ]
@@ -524,7 +519,7 @@
             skills: [
               { title: "Arrondir au dixième",                                             slug: "arrondir-dixieme",                             levels: ["CM2","6e"] },
               { title: "Arrondir au centième",                                            slug: "arrondir-centieme",                            levels: ["6e"] },
-              { title: "Trouver l'entier le plus proche",                                 slug: "trouver-entier-proche",                        levels: ["CM2","6e"] },
+              { title: "Trouver l'entier le plus proche",                                 slug: "trouver-entier-proche",                        levels: ["CM1","CM2","6e"] },
               { title: "Utiliser un arrondi dans une situation concrète",                 slug: "utiliser-arrondi-situation",                   levels: ["6e"] },
             ]
           }
@@ -540,16 +535,28 @@
       }).join("");
     }
 
+    /* ── Custom exercise pages (slug → file) ─────────────────────────────── */
+    const CUSTOM_PAGES = new Map([
+      ["associer-fraction-decimale",              "fraction-decimale-association.html"],
+      ["ecrire-fraction-sous-forme-decimale",     "ecrire-fraction-decimale.html"],
+      ["ecrire-decimal-sous-forme-fraction",      "ecrire-decimal-fraction.html"],
+      ["decomposer-nombre-decimal",               "maths/decomposer-decimaux/index.html"],
+      ["composer-nombre-decimal-decomposition",   "maths/composer-decimaux/index.html"],
+    ]);
+
     /* ── Skill card rendering ──────────────────────────────────────────────── */
     function renderSkillCard(skill, sectionId) {
+      const customUrl = CUSTOM_PAGES.get(skill.slug);
+      const href      = customUrl ? customUrl : "#";
+      const onclick   = customUrl ? "" : `onclick="return false;"`;
       return `
         <a class="skill-card"
-           href="#"
+           href="${href}"
            data-slug="${skill.slug}"
            data-levels="${skill.levels.join(",")}"
            data-title="${skill.title.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}"
            data-section="${sectionId}"
-           onclick="return false;">
+           ${onclick}>
           <div class="skill-badges">${renderBadges(skill.levels)}</div>
           <div class="skill-title">${skill.title}</div>
         </a>

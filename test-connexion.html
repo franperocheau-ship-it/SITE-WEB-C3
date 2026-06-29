@@ -30,8 +30,11 @@
     button:hover { background: #0d2255; }
   </style>
 
-  <!-- ─── NAVBAR PROFICIAMUS ─── -->
-<style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+  /* ─── Navbar Proficiamus ─── */
   body{padding-top:50px;}
   .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
   .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
@@ -40,30 +43,6 @@
   .navbar__nav{display:flex;align-items:center;gap:24px;}
   .navbar__nav a{text-decoration:none;color:#1a1a1a;font-family:'Fredoka',sans-serif;font-size:14px;font-weight:700;transition:color .2s;}
   .navbar__nav a:hover{color:#1B4EBF;}
-  .navbar__nav a.active{color:#2D9C3C;border-bottom:2px solid #2D9C3C;padding-bottom:2px;}
-  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;font-family:'Fredoka',sans-serif;}
-  .navbar__nav .btn-login{color:#fff !important;}
-  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Fredoka',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
-  .btn-login:hover{background:#0b1e4d;}
-  @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
-  </style>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet" />
-  <!-- NAVBAR-PROFICIAMUS-CSS -->
-  <style>
-  /* ─── Navbar Proficiamus (extrait d'index-v2.html) ─── */
-  .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
-  .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
-  .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
-  .navbar__brand img{height:34px;width:auto;}
-  .navbar__brand-text{display:flex;flex-direction:column;}
-  .navbar__name{font-size:18px;font-weight:800;line-height:1;letter-spacing:1px;}
-  .navbar__tagline{font-size:12px;font-style:italic;font-weight:700;color:#102B6A;margin-top:2px;}
-  .navbar__nav{display:flex;align-items:center;gap:24px;}
-  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-family:'Fredoka',sans-serif;font-size:14px;font-weight:700;transition:color .2s;}
-  .navbar__nav a:hover{color:#1B4EBF;}
-  .navbar__nav a.active{color:#2D9C3C;border-bottom:2px solid #2D9C3C;padding-bottom:2px;}
   .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;font-family:'Fredoka',sans-serif;}
   .navbar__nav .btn-login{color:#fff!important;}
   .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Fredoka',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
@@ -72,6 +51,20 @@
   </style>
 </head>
 <body>
+
+<nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index-v2.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index-v2.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
 
 <h1>🔌 Test de connexion Supabase</h1>
 
@@ -150,5 +143,25 @@
 
   runTests();
 </script>
+
+<footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 · <a href="mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a></p>
+  </div>
+</footer>
+
+<script src="js/menu.js"></script>
+<style>
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
 </body>
 </html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Écrire un décimal sous forme de fraction — Mathématiques — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css?v=9">
+  <style>
+    /* ── Layout ─────────────────────────────────────────────────── */
+    .page-wrap    { background: var(--bg); min-height: calc(100vh - 88px); padding-bottom: 64px; }
+    .page-content { max-width: 1400px; margin: 0 auto; padding: 0 64px; }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--blue); font-size: 13px; font-weight: 600;
+      text-decoration: none; padding: 20px 0 0; opacity: 0.75; transition: opacity 180ms;
+    }
+    .back-link:hover { opacity: 1; }
+    .ex-container { max-width: 680px; margin: 0 auto; }
+
+    /* ── Page header ─────────────────────────────────────────────── */
+    .ex-page-header   { text-align: center; padding: 28px 0 32px; }
+    .ex-page-badges   { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 6px; font-weight: 700; font-size: 10px;
+      letter-spacing: 0.06em; padding: 3px 8px; flex-shrink: 0; line-height: 1;
+    }
+    .ex-page-title    { font-weight: 800; font-size: 21px; color: var(--blue); line-height: 1.35; max-width: 540px; margin: 0 auto 10px; }
+    .ex-page-rule     { width: 44px; height: 3px; background: var(--red); border-radius: 2px; margin: 0 auto 12px; }
+    .ex-page-subtitle { font-size: 13px; color: var(--muted); }
+
+    /* ── Level stack ─────────────────────────────────────────────── */
+    .levels-stack { display: flex; flex-direction: column; gap: 20px; }
+
+    /* ── Level card ──────────────────────────────────────────────── */
+    .level-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      transition: opacity 450ms ease, filter 450ms ease;
+    }
+    .level-card.locked { opacity: 0.42; pointer-events: none; filter: grayscale(0.25); }
+
+    .lc-header {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 14px; padding: 20px 28px; border-bottom: 1.5px solid var(--border);
+      background: rgba(16,43,106,0.025);
+    }
+    .lc-header-left { display: flex; align-items: center; gap: 14px; }
+    .lc-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--blue); color: #fff;
+      font-size: 17px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .locked .lc-num { background: var(--muted); }
+    .lc-title { font-weight: 800; font-size: 14px; color: var(--blue); }
+    .lc-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .lc-status {
+      font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 100px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .lc-status.locked { background: rgba(100,116,139,0.10); color: var(--muted); }
+    .lc-status.done   { background: rgba(22,163,74,0.12);   color: #15803d; }
+    .lc-status.active { background: rgba(245,166,35,0.15);  color: #92400e; }
+
+    /* ── Level body ──────────────────────────────────────────────── */
+    .lc-body { padding: 28px 28px 24px; }
+
+    /* ── Progress dots ───────────────────────────────────────────── */
+    .q-progress       { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .q-progress-label { font-size: 12px; font-weight: 700; color: var(--blue); letter-spacing: 0.05em; }
+    .q-progress-dots  { display: flex; gap: 6px; }
+    .q-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--border); border: 1.5px solid transparent;
+      transition: background 300ms;
+    }
+    .q-dot.done    { background: #16a34a; border-color: #16a34a; }
+    .q-dot.current { background: var(--blue); border-color: var(--blue); }
+
+    /* ── Decimal display ─────────────────────────────────────────── */
+    .display-box {
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 16px; padding: 28px 24px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px;
+    }
+    .decimal-display { font-size: 56px; font-weight: 800; color: var(--blue); letter-spacing: -0.01em; }
+
+    /* ── Sub-label ───────────────────────────────────────────────── */
+    .sub-label {
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin: 0 0 12px;
+    }
+
+    /* ── Fraction input area ─────────────────────────────────────── */
+    .frac-input-area {
+      display: flex; flex-direction: column; align-items: center;
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 16px; padding: 22px 24px 18px;
+    }
+    .frac-input-display { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .frac-inp {
+      width: 110px; height: 60px;
+      border: 2px solid var(--blue); border-radius: 12px;
+      text-align: center; font-family: inherit; font-size: 28px;
+      font-weight: 800; color: var(--text); background: var(--card-bg);
+      outline: none; transition: border-color 150ms, box-shadow 150ms;
+      -moz-appearance: textfield;
+    }
+    .frac-inp::-webkit-outer-spin-button,
+    .frac-inp::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .frac-inp:focus  { box-shadow: 0 0 0 3px rgba(16,43,106,0.10); }
+    .frac-inp.correct { border-color: #16a34a; background: rgba(22,163,74,0.06); color: #15803d; }
+    .frac-inp.wrong   { border-color: var(--red); background: rgba(214,40,57,0.06); color: var(--red); }
+    .frac-inp-bar { width: 120px; height: 3.5px; background: var(--blue); border-radius: 2px; margin: 8px 0; }
+    .frac-input-hint { font-size: 12px; color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.4; }
+
+    /* ── Explanation (visible after wrong) ───────────────────────── */
+    .expl-box {
+      font-size: 13px; font-weight: 600; color: var(--muted);
+      background: rgba(16,43,106,0.05); border-radius: 10px;
+      padding: 11px 14px; margin-top: 12px; line-height: 1.55;
+      display: none;
+    }
+    .expl-box.visible { display: block; }
+    .expl-box strong  { color: var(--blue); }
+
+    /* ── Feedback ────────────────────────────────────────────────── */
+    .q-feedback {
+      font-size: 14px; font-weight: 700; padding: 12px 16px;
+      border-radius: 10px; margin-top: 14px; display: none; line-height: 1.5;
+    }
+    .q-feedback.correct { display: block; background: rgba(22,163,74,0.09); color: #15803d; }
+    .q-feedback.wrong   { display: block; background: rgba(214,40,57,0.06); color: var(--red); }
+
+    /* ── Buttons ─────────────────────────────────────────────────── */
+    .btn-validate {
+      width: 100%; background: var(--blue); color: #fff;
+      border: none; border-radius: 12px; padding: 15px 24px;
+      font-family: inherit; font-size: 15px; font-weight: 700;
+      cursor: pointer; margin-top: 16px;
+      transition: background 200ms, transform 150ms;
+    }
+    .btn-validate:hover:not(:disabled) { background: #0d2255; transform: translateY(-2px); }
+    .btn-validate:disabled { opacity: 0.45; cursor: default; transform: none; }
+    .btn-next {
+      width: 100%; background: #16a34a; color: #fff;
+      border: none; border-radius: 12px; padding: 15px 24px;
+      font-family: inherit; font-size: 15px; font-weight: 700;
+      cursor: pointer; margin-top: 10px;
+      transition: background 200ms, transform 150ms;
+      display: none;
+    }
+    .btn-next:hover { background: #15803d; transform: translateY(-2px); }
+
+    /* ── Level complete ──────────────────────────────────────────── */
+    .level-complete { text-align: center; padding: 28px 16px; background: rgba(22,163,74,0.06); border-radius: 14px; }
+    .level-complete-icon  { font-size: 42px; margin-bottom: 8px; }
+    .level-complete-title { font-size: 17px; font-weight: 800; color: #15803d; margin-bottom: 4px; }
+    .level-complete-score { font-size: 14px; color: var(--muted); font-weight: 600; }
+
+    /* ── Responsive ──────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .page-content { padding: 0 24px; }
+      .lc-body    { padding: 20px 18px 18px; }
+      .lc-header  { padding: 16px 18px; }
+      .decimal-display { font-size: 44px; }
+      .frac-inp   { width: 90px; height: 52px; font-size: 24px; }
+      .frac-inp-bar { width: 100px; }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+  /* ─── Navbar ─── */
+  body{padding-top:50px;}
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+  .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+  .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+  .navbar__brand img{height:34px;width:auto;}
+  .navbar__nav{display:flex;align-items:center;gap:24px;}
+  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-size:14px;font-weight:700;transition:color .2s;}
+  .navbar__nav a:hover{color:#1B4EBF;}
+  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;}
+  .navbar__nav .btn-login{color:#fff!important;}
+  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+  .btn-login:hover{background:#0b1e4d;}
+  @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar__inner">
+      <a href="index-v2.html" class="navbar__brand">
+        <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+      </a>
+      <div class="navbar__nav">
+        <a href="index-v2.html">Accueil</a>
+        <a href="apropos.html">À propos</a>
+        <span class="nav-lang">🌐 FR ∨</span>
+        <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="page-wrap">
+    <div class="page-content">
+      <a href="mathématiques-nombres-decimaux.html" class="back-link">← Nombres décimaux</a>
+
+      <div class="ex-container">
+
+        <!-- Page header -->
+        <div class="ex-page-header">
+          <div class="ex-page-badges">
+            <span class="badge badge-cm1">CM1</span>
+            <span class="badge badge-cm2">CM2</span>
+            <span class="badge badge-6e">6e</span>
+          </div>
+          <h1 class="ex-page-title">Écrire un nombre décimal sous forme de fraction décimale</h1>
+          <div class="ex-page-rule"></div>
+          <p class="ex-page-subtitle">Lis le nombre décimal et écris la fraction décimale correspondante — 3 niveaux progressifs.</p>
+        </div>
+
+        <!-- Level cards -->
+        <div class="levels-stack">
+
+          <!-- Niveau 1 -->
+          <div class="level-card" id="lc-0">
+            <div class="lc-header">
+              <div class="lc-header-left">
+                <div class="lc-num">1</div>
+                <div>
+                  <div class="lc-title">Dixièmes et centièmes</div>
+                  <div class="lc-sub">Fractions avec dénominateur 10 ou 100.</div>
+                </div>
+              </div>
+              <span class="lc-status active" id="lc-badge-0">En cours</span>
+            </div>
+            <div class="lc-body" id="lb-0"></div>
+          </div>
+
+          <!-- Niveau 2 -->
+          <div class="level-card locked" id="lc-1">
+            <div class="lc-header">
+              <div class="lc-header-left">
+                <div class="lc-num">2</div>
+                <div>
+                  <div class="lc-title">Centièmes, millièmes et nombres > 1</div>
+                  <div class="lc-sub">Décimaux avec dénominateur 100 ou 1 000, dont certains supérieurs à 1.</div>
+                </div>
+              </div>
+              <span class="lc-status locked" id="lc-badge-1">Verrouillé</span>
+            </div>
+            <div class="lc-body" id="lb-1"></div>
+          </div>
+
+          <!-- Niveau 3 -->
+          <div class="level-card locked" id="lc-2">
+            <div class="lc-header">
+              <div class="lc-header-left">
+                <div class="lc-num">3</div>
+                <div>
+                  <div class="lc-title">Millièmes et décimaux avancés</div>
+                  <div class="lc-sub">Millièmes et grands décimaux, mélange de fractions < 1 et > 1.</div>
+                </div>
+              </div>
+              <span class="lc-status locked" id="lc-badge-2">Verrouillé</span>
+            </div>
+            <div class="lc-body" id="lb-2"></div>
+          </div>
+
+        </div><!-- /.levels-stack -->
+      </div><!-- /.ex-container -->
+    </div><!-- /.page-content -->
+  </div><!-- /.page-wrap -->
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer__inner">
+      <p class="footer__text">
+        Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+        dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+      </p>
+      <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 · <a href="mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a></p>
+    </div>
+  </footer>
+
+  <style>
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/results.js"></script>
+
+  <script>
+  /* ════════════════════════════════════════════════════════════════════
+     QUESTION DATA
+     answer   : valeur numérique du décimal
+     str      : affichage du décimal (virgule française)
+     canonical: fraction la plus naturelle (numérateur, dénominateur)
+     expl     : explication affichée après erreur
+  ════════════════════════════════════════════════════════════════════ */
+  const LEVELS = [
+    /* ── Niveau 1 : Dixièmes et centièmes ──────────────────────────── */
+    {
+      questions: [
+        { str: '0,3',  answer: 0.3,  canonical: { num: 3,  den: 10  }, expl: '0,3 a <strong>1 chiffre</strong> après la virgule → dénominateur <strong>10</strong> → <strong>3/10</strong>' },
+        { str: '0,7',  answer: 0.7,  canonical: { num: 7,  den: 10  }, expl: '0,7 a <strong>1 chiffre</strong> après la virgule → dénominateur <strong>10</strong> → <strong>7/10</strong>' },
+        { str: '0,25', answer: 0.25, canonical: { num: 25, den: 100 }, expl: '0,25 a <strong>2 chiffres</strong> après la virgule → dénominateur <strong>100</strong> → <strong>25/100</strong>' },
+        { str: '0,08', answer: 0.08, canonical: { num: 8,  den: 100 }, expl: '0,08 a <strong>2 chiffres</strong> après la virgule → dénominateur <strong>100</strong> → on retire la virgule : <strong>8/100</strong>' },
+        { str: '0,5',  answer: 0.5,  canonical: { num: 5,  den: 10  }, expl: '0,5 a <strong>1 chiffre</strong> après la virgule → dénominateur <strong>10</strong> → <strong>5/10</strong> (on accepte aussi 50/100)' },
+      ]
+    },
+    /* ── Niveau 2 : Centièmes, millièmes et nombres > 1 ───────────── */
+    {
+      questions: [
+        { str: '0,17',  answer: 0.17,  canonical: { num: 17,  den: 100  }, expl: '0,17 a <strong>2 chiffres</strong> après la virgule → dénominateur <strong>100</strong> → <strong>17/100</strong>' },
+        { str: '1,5',   answer: 1.5,   canonical: { num: 15,  den: 10   }, expl: '1,5 a <strong>1 chiffre</strong> après la virgule → dénominateur <strong>10</strong> → on retire la virgule : <strong>15/10</strong>' },
+        { str: '0,63',  answer: 0.63,  canonical: { num: 63,  den: 100  }, expl: '0,63 a <strong>2 chiffres</strong> après la virgule → dénominateur <strong>100</strong> → <strong>63/100</strong>' },
+        { str: '1,25',  answer: 1.25,  canonical: { num: 125, den: 100  }, expl: '1,25 a <strong>2 chiffres</strong> après la virgule → dénominateur <strong>100</strong> → on retire la virgule : <strong>125/100</strong>' },
+        { str: '0,048', answer: 0.048, canonical: { num: 48,  den: 1000 }, expl: '0,048 a <strong>3 chiffres</strong> après la virgule → dénominateur <strong>1 000</strong> → on retire la virgule : <strong>48/1000</strong>' },
+      ]
+    },
+    /* ── Niveau 3 : Millièmes et décimaux avancés ──────────────────── */
+    {
+      questions: [
+        { str: '0,007', answer: 0.007, canonical: { num: 7,   den: 1000 }, expl: '0,007 a <strong>3 chiffres</strong> après la virgule → dénominateur <strong>1 000</strong> → on retire la virgule : <strong>7/1000</strong>' },
+        { str: '3,7',   answer: 3.7,   canonical: { num: 37,  den: 10   }, expl: '3,7 a <strong>1 chiffre</strong> après la virgule → dénominateur <strong>10</strong> → on retire la virgule : <strong>37/10</strong>' },
+        { str: '0,375', answer: 0.375, canonical: { num: 375, den: 1000 }, expl: '0,375 a <strong>3 chiffres</strong> après la virgule → dénominateur <strong>1 000</strong> → <strong>375/1000</strong>' },
+        { str: '0,143', answer: 0.143, canonical: { num: 143, den: 1000 }, expl: '0,143 a <strong>3 chiffres</strong> après la virgule → dénominateur <strong>1 000</strong> → <strong>143/1000</strong>' },
+        { str: '1,75',  answer: 1.75,  canonical: { num: 175, den: 100  }, expl: '1,75 a <strong>2 chiffres</strong> après la virgule → dénominateur <strong>100</strong> → on retire la virgule : <strong>175/100</strong>' },
+      ]
+    }
+  ];
+
+  const N_Q        = 5;
+  const VALID_DENS = new Set([10, 100, 1000]);
+
+  /* ════════════════════════════════════════════════════════════════════
+     STATE
+  ════════════════════════════════════════════════════════════════════ */
+  const state = [0, 1, 2].map(() => ({
+    qIdx:         0,
+    score:        0,
+    firstAttempt: true,
+    done:         false,
+    questionDone: new Array(N_Q).fill(false),
+  }));
+
+  /* ════════════════════════════════════════════════════════════════════
+     HELPERS
+  ════════════════════════════════════════════════════════════════════ */
+  function progressDotsHtml(lvlIdx) {
+    const st = state[lvlIdx];
+    return Array.from({ length: N_Q }, (_, i) => {
+      let cls = 'q-dot';
+      if (st.questionDone[i]) cls += ' done';
+      else if (i === st.qIdx)  cls += ' current';
+      return `<span class="${cls}"></span>`;
+    }).join('');
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     RENDER
+  ════════════════════════════════════════════════════════════════════ */
+  function render(lvlIdx) {
+    const st = state[lvlIdx];
+    const q  = LEVELS[lvlIdx].questions[st.qIdx];
+
+    document.getElementById(`lb-${lvlIdx}`).innerHTML = `
+      <div class="q-progress">
+        <span class="q-progress-label">Question ${st.qIdx + 1} / ${N_Q}</span>
+        <div class="q-progress-dots">${progressDotsHtml(lvlIdx)}</div>
+      </div>
+
+      <div class="display-box">
+        <span class="decimal-display">${q.str}</span>
+      </div>
+
+      <div class="sub-label">Écris sous forme de fraction décimale</div>
+      <div class="frac-input-area">
+        <div class="frac-input-display">
+          <input class="frac-inp" id="frac-num-l${lvlIdx}" type="number"
+            min="0" placeholder="?" inputmode="numeric" aria-label="Numérateur">
+          <div class="frac-inp-bar"></div>
+          <input class="frac-inp" id="frac-den-l${lvlIdx}" type="number"
+            min="1" placeholder="10, 100…" inputmode="numeric" aria-label="Dénominateur">
+        </div>
+        <div class="frac-input-hint">
+          Numérateur (en haut) · Dénominateur : 10, 100 ou 1 000 (en bas)
+        </div>
+      </div>
+
+      <div class="expl-box" id="expl-l${lvlIdx}"></div>
+      <div class="q-feedback" id="fb-l${lvlIdx}"></div>
+
+      <button class="btn-validate" id="val-btn-l${lvlIdx}">Vérifier</button>
+      <button class="btn-next"     id="next-btn-l${lvlIdx}">Question suivante →</button>
+    `;
+
+    const numInp = document.getElementById(`frac-num-l${lvlIdx}`);
+    const denInp = document.getElementById(`frac-den-l${lvlIdx}`);
+
+    [numInp, denInp].forEach(inp => {
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter') document.getElementById(`val-btn-l${lvlIdx}`).click();
+      });
+    });
+
+    document.getElementById(`val-btn-l${lvlIdx}`).addEventListener('click',  () => validate(lvlIdx));
+    document.getElementById(`next-btn-l${lvlIdx}`).addEventListener('click', () => nextQ(lvlIdx));
+
+    numInp.focus();
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     VALIDATE
+  ════════════════════════════════════════════════════════════════════ */
+  function validate(lvlIdx) {
+    const st     = state[lvlIdx];
+    const q      = LEVELS[lvlIdx].questions[st.qIdx];
+    const numInp = document.getElementById(`frac-num-l${lvlIdx}`);
+    const denInp = document.getElementById(`frac-den-l${lvlIdx}`);
+    const fb     = document.getElementById(`fb-l${lvlIdx}`);
+    const expl   = document.getElementById(`expl-l${lvlIdx}`);
+
+    const entN = parseInt(numInp.value, 10);
+    const entD = parseInt(denInp.value, 10);
+
+    /* Incomplete input */
+    if (isNaN(entN) || isNaN(entD) || entD <= 0) {
+      fb.textContent = '✗ Saisis le numérateur et le dénominateur.';
+      fb.className   = 'q-feedback wrong';
+      return;
+    }
+
+    /* Denominator must be 10, 100 or 1000 */
+    if (!VALID_DENS.has(entD)) {
+      numInp.classList.add('wrong');
+      denInp.classList.add('wrong');
+      fb.textContent = '✗ Le dénominateur doit être 10, 100 ou 1 000 (fraction décimale).';
+      fb.className   = 'q-feedback wrong';
+      expl.innerHTML = q.expl;
+      expl.classList.add('visible');
+      st.firstAttempt = false;
+      return;
+    }
+
+    const ok = Math.abs(entN / entD - q.answer) < 0.0001;
+
+    if (ok) {
+      numInp.classList.add('correct'); numInp.classList.remove('wrong');
+      denInp.classList.add('correct'); denInp.classList.remove('wrong');
+      numInp.readOnly = true;
+      denInp.readOnly = true;
+
+      fb.textContent = `✓ Parfait ! ${q.str} = ${entN}/${entD}`;
+      fb.className   = 'q-feedback correct';
+      expl.classList.remove('visible');
+
+      if (st.firstAttempt) st.score++;
+      st.questionDone[st.qIdx] = true;
+
+      document.getElementById(`val-btn-l${lvlIdx}`).style.display  = 'none';
+      document.getElementById(`next-btn-l${lvlIdx}`).style.display = 'block';
+
+    } else {
+      numInp.classList.add('wrong'); numInp.classList.remove('correct');
+      denInp.classList.add('wrong'); denInp.classList.remove('correct');
+      fb.textContent  = '✗ Ce n\'est pas correct. Relis l\'explication et réessaie.';
+      fb.className    = 'q-feedback wrong';
+      st.firstAttempt = false;
+
+      expl.innerHTML = q.expl;
+      expl.classList.add('visible');
+    }
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     NAVIGATION
+  ════════════════════════════════════════════════════════════════════ */
+  function nextQ(lvlIdx) {
+    const st = state[lvlIdx];
+    st.qIdx++;
+    st.firstAttempt = true;
+
+    if (st.qIdx >= N_Q) {
+      completeLevel(lvlIdx);
+    } else {
+      render(lvlIdx);
+      document.getElementById(`lc-${lvlIdx}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function completeLevel(lvlIdx) {
+    const st    = state[lvlIdx];
+    st.done     = true;
+    const badge = document.getElementById(`lc-badge-${lvlIdx}`);
+
+    document.getElementById(`lb-${lvlIdx}`).innerHTML = `
+      <div class="level-complete">
+        <div class="level-complete-icon">🎉</div>
+        <div class="level-complete-title">Niveau ${lvlIdx + 1} terminé !</div>
+        <div class="level-complete-score">Score : ${st.score} / ${N_Q} bonne${st.score > 1 ? 's' : ''} réponse${st.score > 1 ? 's' : ''} du premier coup</div>
+      </div>
+    `;
+    badge.textContent = 'Terminé ✓';
+    badge.className   = 'lc-status done';
+
+    if (typeof saveExerciseResult === 'function') {
+      saveExerciseResult({
+        exerciseSlug: 'ecrire-decimal-sous-forme-fraction',
+        subject:      'mathématiques',
+        category:     'Nombres décimaux',
+        exerciseType: 'custom',
+        level:        lvlIdx + 1,
+        score:        st.score,
+        total:        N_Q,
+      });
+    }
+
+    if (lvlIdx < 2) setTimeout(() => unlock(lvlIdx + 1), 500);
+  }
+
+  function unlock(lvlIdx) {
+    const card  = document.getElementById(`lc-${lvlIdx}`);
+    const badge = document.getElementById(`lc-badge-${lvlIdx}`);
+    card.classList.remove('locked');
+    badge.textContent = 'En cours';
+    badge.className   = 'lc-status active';
+    render(lvlIdx);
+    setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     INIT
+  ════════════════════════════════════════════════════════════════════ */
+  render(0);
+  </script>
+
+  <script src="js/menu.js"></script>
+</body>
+</html>

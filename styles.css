@@ -48,7 +48,7 @@ button { font-family: inherit; cursor: pointer; }
 /* ─── TYPOGRAPHIE PROFICIAMUS ──────────────────────────────────────────────── */
 
 h1, h2, h3,
-.page-title, .ex-page-title, nav a {
+.page-title, .ex-page-title {
   font-family: var(--font-display);
   font-weight: 800;
   color: var(--color-brand-navy);
@@ -1132,8 +1132,8 @@ body:has(.navbar) { padding-top: 50px; }
 
 .navbar__nav a {
   text-decoration: none;
-  color: var(--color-brand-navy);
-  font-family: var(--font-display);
+  color: #1a1a1a;
+  font-family: var(--font-body);
   font-size: 14px;
   font-weight: 700;
   transition: color 200ms;
@@ -1148,7 +1148,7 @@ body:has(.navbar) { padding-top: 50px; }
 }
 
 .nav-lang {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -1158,19 +1158,19 @@ body:has(.navbar) { padding-top: 50px; }
 .navbar__nav .btn-login { color: #fff !important; }
 
 .btn-login {
-  background: var(--color-brand-navy);
+  background: #102B6A;
   color: #fff;
   border: none;
   padding: 9px 18px;
-  border-radius: 22px;
-  font-family: var(--font-display);
+  border-radius: 8px;
+  font-family: 'Fredoka', sans-serif;
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
   text-decoration: none;
-  transition: background 200ms;
+  transition: background .2s;
 }
-.btn-login:hover { background: #0f1d45; }
+.btn-login:hover { background: #0b1e4d; }
 
 /* ─── Responsive — pages intérieures ─────────────────────────────────────── */
 

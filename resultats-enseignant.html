@@ -330,12 +330,12 @@
   .navbar__name{font-size:18px;font-weight:800;line-height:1;letter-spacing:1px;}
   .navbar__tagline{font-size:12px;font-style:italic;font-weight:700;color:#102B6A;margin-top:2px;}
   .navbar__nav{display:flex;align-items:center;gap:24px;}
-  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;transition:color .2s;}
+  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-size:14px;font-weight:700;transition:color .2s;}
   .navbar__nav a:hover{color:#1B4EBF;}
   .navbar__nav a.active{color:#2D9C3C;border-bottom:2px solid #2D9C3C;padding-bottom:2px;}
-  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;font-family:'Nunito',sans-serif;}
+  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;}
   .navbar__nav .btn-login{color:#fff!important;}
-  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
   .btn-login:hover{background:#0b1e4d;}
   @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
   </style>
@@ -425,6 +425,10 @@
             <div style="font-weight:800;font-size:20px;color:var(--blue)" id="print-title">Résultats — LFM</div>
             <div style="font-size:13px;color:var(--muted);margin-top:4px" id="print-date"></div>
             <hr style="margin:16px 0;border:none;border-top:2px solid var(--border)">
+          </div>
+          <div class="view-tabs" id="bilan-subject-tabs" style="display:none;margin-bottom:16px">
+            <button class="tab-btn active" id="bilan-tab-fr" onclick="filterBilanByDomaine('Français')">📖 Français</button>
+            <button class="tab-btn" id="bilan-tab-math" onclick="filterBilanByDomaine('Mathématiques')">🔢 Mathématiques</button>
           </div>
           <div id="bilan-content">
             <div class="view-loading">Chargement du bilan…</div>
@@ -690,7 +694,7 @@
             m + Object.values(lvls).reduce((k, arr) => k + arr.length, 0), 0), 0);
         const icon = DOMAIN_ICONS[domaine] || '📖';
 
-        html += `<div class="bilan-domaine">
+        html += `<div class="bilan-domaine" data-domaine="${escHtml(domaine)}">
           <div class="bilan-domaine-header" onclick="toggleDomaine(this)">
             <span class="bilan-domaine-title">${icon} ${escHtml(domaine)}</span>
             <span class="bilan-domaine-count">${totalRows} résultat${totalRows > 1 ? 's' : ''}</span>
@@ -758,6 +762,9 @@
 
       container.innerHTML = html;
       _bilanLoaded = true;
+      document.getElementById('bilan-subject-tabs').style.display = '';
+      const savedDomaine = sessionStorage.getItem('bilan-domaine-filter') || 'Français';
+      filterBilanByDomaine(savedDomaine);
 
     } catch (e) {
       container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Erreur lors du chargement du bilan.</div></div>';
@@ -769,12 +776,23 @@
     header.closest('.bilan-domaine').classList.toggle('closed');
   }
 
+  function filterBilanByDomaine(domaine) {
+    sessionStorage.setItem('bilan-domaine-filter', domaine);
+    document.getElementById('bilan-tab-fr').classList.toggle('active',   domaine === 'Français');
+    document.getElementById('bilan-tab-math').classList.toggle('active', domaine === 'Mathématiques');
+    document.querySelectorAll('#bilan-content .bilan-domaine').forEach(el => {
+      el.style.display = el.dataset.domaine === domaine ? '' : 'none';
+    });
+  }
+
   /* ═══════════════════════════════════════════════════════════════════════════
      IMPRESSION PDF
   ═══════════════════════════════════════════════════════════════════════════ */
   function printBilan() {
     /* Ouvrir tous les accordéons fermés */
     document.querySelectorAll('.bilan-domaine.closed').forEach(d => d.classList.remove('closed'));
+    /* Afficher tous les domaines (filtre désactivé pour impression) */
+    document.querySelectorAll('#bilan-content .bilan-domaine').forEach(d => d.style.display = '');
     /* Remplir l'en-tête */
     const p     = new URLSearchParams(window.location.search);
     const cname = decodeURIComponent(p.get('cname') || (_currentClass?.name || 'Classe'));
@@ -783,6 +801,9 @@
     document.getElementById('print-date').textContent =
       `Imprimé le ${new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}`;
     window.print();
+    /* Restaurer le filtre actif après impression */
+    const saved = sessionStorage.getItem('bilan-domaine-filter') || 'Français';
+    filterBilanByDomaine(saved);
   }
 
   /* ── PDF par compétence ────────────────────────────────────────────────── */
@@ -993,6 +1014,7 @@
     document.getElementById('panel-eleves').style.display  = '';
     document.getElementById('panel-bilan').style.display   = 'none';
     document.getElementById('print-bilan-btn').style.display = 'none';
+    document.getElementById('bilan-subject-tabs').style.display = 'none';
     document.getElementById('bilan-content').innerHTML =
       '<div class="view-loading">Chargement du bilan…</div>';
 

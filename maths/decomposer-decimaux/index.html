@@ -1,0 +1,1681 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Décomposer un nombre décimal — Mathématiques — LFM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../js/supabase-client.js" onerror="void 0"></script>
+  <script src="../../js/auth.js" onerror="void 0"></script>
+  <script src="../../js/results.js" onerror="void 0"></script>
+  <style>
+    /* ── Tokens ── */
+    :root {
+      --navy:    #1A2D6B;
+      --gold:    #F5A623;
+      --gold-bg: #FFF3D0;
+      --teal:    #1DBFA0;
+      --err:     #E05252;
+      --bg:      #F8FAFC;
+      --white:   #ffffff;
+      --border:  #E8EDF3;
+      --text:    #1E2532;
+      --muted:   #5F6368;
+      --green:   #16a34a;
+      --green-bg:#dcfce7;
+      --shadow:  0 10px 30px rgba(26,45,107,0.10);
+      --radius:  20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Fredoka', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      padding-top: 50px;
+    }
+
+    /* ── Navbar Proficiamus ── */
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+    .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+    .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+    .navbar__brand img{height:34px;width:auto;}
+    .navbar__nav{display:flex;align-items:center;gap:24px;}
+    .navbar__nav a{text-decoration:none;color:#1a1a1a;font-family:'Fredoka',sans-serif;font-size:14px;font-weight:700;transition:color .2s;}
+    .navbar__nav a:hover{color:#1B4EBF;}
+    .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;font-family:'Fredoka',sans-serif;}
+    .navbar__nav .btn-login{color:#fff!important;}
+    .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Fredoka',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+    .btn-login:hover{background:#0b1e4d;}
+    @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+
+    /* ── Main layout ── */
+    .main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    /* ── Page title ── */
+    .page-title {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .page-title h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.25;
+    }
+    .page-title .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .page-rule {
+      width: 44px;
+      height: 3px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin: 10px auto 0;
+    }
+
+    /* ── Level tabs ── */
+    .level-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .level-tab {
+      border: 2px solid var(--border);
+      border-radius: 100px;
+      padding: 9px 22px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      background: var(--white);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 200ms;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .level-tab.active {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #fff;
+    }
+    .level-tab.unlocked:hover:not(.active) {
+      border-color: var(--navy);
+      color: var(--navy);
+    }
+    .level-tab.locked {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .level-tab .lock-icon { font-size: 13px; }
+
+    /* ── Numeration table ── */
+    .num-table-wrapper {
+      overflow-x: auto;
+      margin-bottom: 24px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+    .num-table {
+      width: 100%;
+      min-width: 500px;
+      border-collapse: collapse;
+      background: var(--white);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .num-table thead th {
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-align: center;
+      background: var(--navy);
+      color: #fff;
+      white-space: nowrap;
+    }
+    .num-table thead th.col-entier { background: rgba(26,45,107,0.85); }
+    .num-table thead th.col-dec    { background: rgba(26,45,107,0.70); }
+    .num-table thead th.col-sep    {
+      background: var(--navy);
+      color: var(--gold);
+      font-size: 20px;
+      padding: 0 4px;
+      width: 18px;
+    }
+    .num-table tbody td {
+      padding: 14px 10px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      border-top: 2px solid var(--border);
+      min-width: 68px;
+      transition: background 300ms, color 300ms, box-shadow 300ms;
+    }
+    .num-table tbody td.col-entier {
+      background: rgba(26,45,107,0.06);
+      color: var(--navy);
+    }
+    .num-table tbody td.col-dec {
+      background: var(--gold-bg);
+      color: #92400e;
+    }
+    .num-table tbody td.col-sep {
+      background: var(--white);
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--navy);
+      border-left: 3px solid var(--navy);
+      border-right: 3px solid var(--navy);
+      min-width: 18px;
+      padding: 0 2px;
+    }
+    .num-table tbody td.hl {
+      background: var(--gold) !important;
+      color: var(--navy) !important;
+      box-shadow: inset 0 0 0 3px rgba(26,45,107,0.2);
+    }
+    .num-table tbody td.hl-err {
+      background: var(--err) !important;
+      color: #fff !important;
+      animation: shake 300ms ease;
+    }
+    .num-table tbody td.hl-blink {
+      animation: blink 700ms ease infinite;
+    }
+    @keyframes blink {
+      0%,100% { background: var(--gold); }
+      50%      { background: var(--gold-bg); }
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%      { transform: translateX(-4px); }
+      75%      { transform: translateX(4px); }
+    }
+    @keyframes fill-in {
+      0%   { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1);   opacity: 1; }
+    }
+    .num-table tbody td.reveal {
+      animation: fill-in 400ms ease forwards;
+    }
+
+    /* ── Progress ── */
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .progress-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .progress-score {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .progress-bar-bg {
+      height: 7px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--teal);
+      border-radius: 100px;
+      transition: width 400ms ease;
+    }
+
+    /* ── Question card ── */
+    .q-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px 36px;
+      animation: fadeUp 320ms ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .q-type-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 12px;
+    }
+    .q-prompt {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.4;
+      margin-bottom: 24px;
+    }
+    .q-prompt .num {
+      color: var(--gold);
+      font-size: 24px;
+    }
+
+    /* ── Fill-decomp inputs ── */
+    .decomp-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .decomp-row .frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 16px;
+      line-height: 1;
+      gap: 2px;
+    }
+    .decomp-row .frac hr {
+      width: 100%;
+      border: 1.5px solid var(--navy);
+      margin: 2px 0;
+    }
+    .d-input {
+      width: 64px;
+      height: 52px;
+      border: 2.5px solid var(--border);
+      border-radius: 12px;
+      text-align: center;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+      background: var(--bg);
+      outline: none;
+      -moz-appearance: textfield;
+      appearance: textfield;
+      transition: border-color 200ms, box-shadow 200ms, background 200ms;
+    }
+    .d-input::-webkit-outer-spin-button,
+    .d-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .d-input:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(26,45,107,0.12);
+      background: var(--white);
+    }
+    .d-input.ok  { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+    .d-input.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── Free-text single input ── */
+    .free-input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .free-input {
+      flex: 1;
+      height: 56px;
+      border: 2.5px solid var(--border);
+      border-radius: 14px;
+      padding: 0 18px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--navy);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+    .free-input:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(26,45,107,0.12);
+      background: var(--white);
+    }
+    .free-input.ok  { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+    .free-input.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── QCM choices ── */
+    .choices-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .choice-btn {
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 200ms, background 200ms, transform 200ms;
+      line-height: 1.35;
+    }
+    .choice-btn:hover:not(:disabled):not(.ok):not(.err) {
+      border-color: var(--navy);
+      background: rgba(26,45,107,0.04);
+      transform: translateY(-2px);
+    }
+    .choice-btn:disabled { cursor: default; }
+    .choice-btn.ok  { border-color: var(--green); background: var(--green-bg); color: #15803d; }
+    .choice-btn.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── Checkboxes (Type D) ── */
+    .checks-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: border-color 200ms, background 200ms;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .check-item:hover:not(.disabled) { border-color: var(--navy); }
+    .check-item.selected { border-color: var(--navy); background: rgba(26,45,107,0.05); }
+    .check-item.ok-item  { border-color: var(--green); background: var(--green-bg); color: #15803d; }
+    .check-item.err-item { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+    .check-item.disabled { cursor: default; }
+    .check-box {
+      width: 22px;
+      height: 22px;
+      border: 2.5px solid var(--border);
+      border-radius: 6px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 200ms;
+    }
+    .check-item.selected .check-box {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #fff;
+    }
+
+    /* ── Vrai / Faux ── */
+    .vf-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .vf-btn {
+      flex: 1;
+      padding: 16px;
+      border: 2.5px solid var(--border);
+      border-radius: 16px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--bg);
+      color: var(--text);
+      transition: all 200ms;
+    }
+    .vf-btn:hover:not(:disabled):not(.ok):not(.err) {
+      transform: translateY(-2px);
+      border-color: var(--navy);
+      background: rgba(26,45,107,0.04);
+    }
+    .vf-btn:disabled { cursor: default; }
+    .vf-btn.ok  { border-color: var(--green); background: var(--green-bg); color: #15803d; }
+    .vf-btn.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── Follow-up (L3 Type C) ── */
+    .followup {
+      margin-top: 16px;
+      padding: 16px 20px;
+      background: rgba(26,45,107,0.04);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      display: none;
+    }
+    .followup.visible { display: block; animation: fadeUp 300ms ease; }
+    .followup-text {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .followup-text .d-input { width: 52px; height: 44px; font-size: 18px; }
+
+    /* ── Validate button ── */
+    .validate-btn {
+      width: 100%;
+      padding: 15px;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 200ms, transform 200ms, opacity 200ms;
+    }
+    .validate-btn:hover:not(:disabled) {
+      background: #142358;
+      transform: translateY(-2px);
+    }
+    .validate-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── Feedback ── */
+    .feedback {
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.5;
+      display: none;
+      animation: fadeUp 250ms ease;
+    }
+    .feedback.visible { display: block; }
+    .feedback.ok-fb  { background: var(--green-bg); color: #15803d; border: 1.5px solid #86efac; }
+    .feedback.err-fb { background: #fef2f2;         color: #b91c1c; border: 1.5px solid #fca5a5; }
+
+    /* ── Next button ── */
+    .next-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      display: none;
+      transition: background 200ms, transform 200ms;
+      animation: fadeUp 250ms ease;
+    }
+    .next-btn.visible { display: block; }
+    .next-btn:hover { background: #17a88d; transform: translateY(-2px); }
+
+    /* ── Level result screen ── */
+    .result-screen {
+      display: none;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 48px 36px;
+      text-align: center;
+      animation: fadeUp 350ms ease;
+    }
+    .result-screen.visible { display: block; }
+    .result-emoji { font-size: 56px; margin-bottom: 12px; }
+    .result-title { font-size: 26px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+    .result-score { font-size: 48px; font-weight: 700; color: var(--gold); margin: 12px 0; }
+    .result-msg   { font-size: 16px; color: var(--muted); margin-bottom: 28px; line-height: 1.5; }
+    .result-btns  { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      padding: 13px 32px;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 200ms, transform 200ms;
+    }
+    .btn-primary:hover { background: #142358; transform: translateY(-2px); }
+    .btn-secondary {
+      padding: 13px 32px;
+      background: transparent;
+      color: var(--navy);
+      border: 2px solid var(--border);
+      border-radius: 100px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 200ms;
+    }
+    .btn-secondary:hover { border-color: var(--navy); transform: translateY(-2px); }
+
+    /* ── Confetti ── */
+    .confetti-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 999;
+    }
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      top: -10px;
+      border-radius: 2px;
+      animation: confettiFall linear forwards;
+    }
+    @keyframes confettiFall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 540px) {
+      .main { padding: 20px 12px 48px; }
+      .q-card { padding: 24px 20px; }
+      .choices-grid { grid-template-columns: 1fr; }
+      .q-prompt { font-size: 17px; }
+      .decomp-row { font-size: 18px; }
+      .d-input { width: 52px; height: 46px; font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar__inner">
+    <a href="../../index-v2.html" class="navbar__brand">
+      <img src="../../assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="../../index-v2.html">Accueil</a>
+      <a href="../../apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+
+  <div class="page-title">
+    <h1>Décomposer un nombre décimal</h1>
+    <p class="subtitle">Cycle 3 — Nombres et calculs — Nombres décimaux</p>
+    <div class="page-rule"></div>
+  </div>
+
+  <!-- Level tabs -->
+  <div class="level-tabs" id="levelTabs">
+    <button class="level-tab active unlocked" data-level="1" onclick="selectLevel(1)">Niveau 1</button>
+    <button class="level-tab locked"          data-level="2" onclick="selectLevel(2)"><span class="lock-icon" id="lock2">🔒</span> Niveau 2</button>
+    <button class="level-tab locked"          data-level="3" onclick="selectLevel(3)"><span class="lock-icon" id="lock3">🔒</span> Niveau 3</button>
+  </div>
+
+  <!-- Numeration table -->
+  <div class="num-table-wrapper">
+    <table class="num-table" id="numTable">
+      <thead>
+        <tr>
+          <th class="col-entier">Centaines</th>
+          <th class="col-entier">Dizaines</th>
+          <th class="col-entier">Unités</th>
+          <th class="col-sep">║</th>
+          <th class="col-dec">Dixièmes</th>
+          <th class="col-dec">Centièmes</th>
+          <th class="col-dec">Millièmes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="col-entier" id="td-ce">&nbsp;</td>
+          <td class="col-entier" id="td-di">&nbsp;</td>
+          <td class="col-entier" id="td-u">&nbsp;</td>
+          <td class="col-sep">,</td>
+          <td class="col-dec"   id="td-d">&nbsp;</td>
+          <td class="col-dec"   id="td-c">&nbsp;</td>
+          <td class="col-dec"   id="td-m">&nbsp;</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Progress -->
+  <div id="progressArea">
+    <div class="progress-row">
+      <span class="progress-label" id="progressLabel">Question 1/5</span>
+      <span class="progress-score" id="progressScore">Score : 0</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Question card -->
+  <div class="q-card" id="qCard">
+    <div class="q-type-badge" id="qTypeBadge"></div>
+    <div class="q-prompt"     id="qPrompt"></div>
+    <div id="qBody"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Question suivante →</button>
+  </div>
+
+  <!-- Result screen -->
+  <div class="result-screen" id="resultScreen">
+    <div class="result-emoji" id="resultEmoji"></div>
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-score" id="resultScore"></div>
+    <div class="result-msg"   id="resultMsg"></div>
+    <div class="result-btns">
+      <button class="btn-primary"   id="nextLevelBtn"  onclick="goNextLevel()"  style="display:none">Niveau suivant 🔓</button>
+      <button class="btn-secondary" onclick="retryLevel()">Réessayer</button>
+      <a class="btn-secondary" href="../../mathématiques-nombres-decimaux.html" style="display:inline-flex;align-items:center;text-decoration:none">← Retour</a>
+    </div>
+  </div>
+
+</main>
+
+<!-- Confetti container -->
+<div class="confetti-container" id="confettiContainer"></div>
+
+<script>
+/* ─── Data ─── */
+
+const BANKS = {
+  1: [
+    { decimal: "2,3",  entier: 2, d: 3 },
+    { decimal: "0,7",  entier: 0, d: 7 },
+    { decimal: "5,4",  entier: 5, d: 4 },
+    { decimal: "1,9",  entier: 1, d: 9 },
+    { decimal: "4,0",  entier: 4, d: 0 },
+    { decimal: "0,1",  entier: 0, d: 1 },
+    { decimal: "3,6",  entier: 3, d: 6 },
+    { decimal: "7,5",  entier: 7, d: 5 }
+  ],
+  2: [
+    { decimal: "3,47",  entier: 3,  d: 4, c: 7 },
+    { decimal: "0,08",  entier: 0,  d: 0, c: 8,  piege: true },
+    { decimal: "12,50", entier: 12, d: 5, c: 0,  piege: true },
+    { decimal: "0,25",  entier: 0,  d: 2, c: 5 },
+    { decimal: "6,30",  entier: 6,  d: 3, c: 0,  piege: true },
+    { decimal: "1,04",  entier: 1,  d: 0, c: 4,  piege: true },
+    { decimal: "9,99",  entier: 9,  d: 9, c: 9 },
+    { decimal: "0,60",  entier: 0,  d: 6, c: 0,  piege: true }
+  ],
+  3: [
+    { decimal: "1,375", entier: 1, d: 3, c: 7, m: 5 },
+    { decimal: "0,040", entier: 0, d: 0, c: 4, m: 0, piege: true },
+    { decimal: "2,008", entier: 2, d: 0, c: 0, m: 8, piege: true },
+    { decimal: "0,500", entier: 0, d: 5, c: 0, m: 0, equivalent: true },
+    { decimal: "3,060", entier: 3, d: 0, c: 6, m: 0, piege: true },
+    { decimal: "0,100", entier: 0, d: 1, c: 0, m: 0, equivalent: true },
+    { decimal: "4,251", entier: 4, d: 2, c: 5, m: 1 },
+    { decimal: "0,009", entier: 0, d: 0, c: 0, m: 9, piege: true }
+  ]
+};
+
+const CONFIG = {
+  1: { perSession: 5, threshold: 4 },
+  2: { perSession: 6, threshold: 5 },
+  3: { perSession: 6, threshold: 5 }
+};
+
+/* ─── State ─── */
+
+let currentLevel    = 1;
+let session         = [];
+let sessionIdx      = 0;
+let score           = 0;
+let attempts        = 0; // attempts on current question
+let levelsDone      = JSON.parse(sessionStorage.getItem('ddLevelsDone') || '{}');
+let answered        = false;
+let followupActive  = false;
+let followupDone    = false;
+
+/* ─── Numeration table helpers ─── */
+
+function parseNumber(decStr) {
+  const parts  = decStr.split(',');
+  const intStr = parts[0] || '0';
+  const decPart = parts[1] || '';
+  const len = intStr.length;
+  return {
+    ce: len >= 3 ? intStr[len - 3] : '',
+    di: len >= 2 ? intStr[len - 2] : '',
+    u:  intStr[len - 1],
+    d:  decPart.length >= 1 ? decPart[0] : '',
+    c:  decPart.length >= 2 ? decPart[1] : '',
+    m:  decPart.length >= 3 ? decPart[2] : ''
+  };
+}
+
+const COL_IDS = { ce: 'td-ce', di: 'td-di', u: 'td-u', d: 'td-d', c: 'td-c', m: 'td-m' };
+
+function updateTable(decStr, highlightCol, errorCols) {
+  const p = parseNumber(decStr);
+  for (const [key, id] of Object.entries(COL_IDS)) {
+    const td = document.getElementById(id);
+    td.textContent = (p[key] !== '') ? p[key] : ' ';
+    td.classList.remove('hl', 'hl-err', 'hl-blink', 'reveal');
+    if (errorCols && errorCols.includes(key))        td.classList.add('hl-err');
+    else if (highlightCol === key)                   td.classList.add('hl');
+  }
+}
+
+function blinkTableCol(col) {
+  const td = document.getElementById(COL_IDS[col]);
+  if (td) { td.classList.remove('hl-err'); td.classList.add('hl-blink'); }
+}
+
+function revealTable(decStr) {
+  const p = parseNumber(decStr);
+  for (const [key, id] of Object.entries(COL_IDS)) {
+    const td = document.getElementById(id);
+    td.textContent = (p[key] !== '') ? p[key] : ' ';
+    td.classList.remove('hl', 'hl-err', 'hl-blink');
+    td.classList.add('reveal');
+  }
+}
+
+/* ─── Question generation ─── */
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const TYPES_L1 = ['fill', 'qcm-digit', 'reconstitute'];
+const TYPES_L2 = ['fill', 'qcm-digit', 'multi-choice'];
+const TYPES_L3 = ['fill', 'qcm-pos', 'vrai-faux', 'recompose'];
+
+function buildQuestions(level) {
+  const bank    = shuffle(BANKS[level]).slice(0, CONFIG[level].perSession);
+  const typeArr = level === 1 ? TYPES_L1 : level === 2 ? TYPES_L2 : TYPES_L3;
+  return bank.map((entry, i) => ({
+    entry,
+    type: typeArr[i % typeArr.length],
+    level
+  }));
+}
+
+/* ─── Level management ─── */
+
+function initLevelTabs() {
+  for (const lv of [1, 2, 3]) {
+    const btn  = document.querySelector(`.level-tab[data-level="${lv}"]`);
+    const lock = document.getElementById(`lock${lv}`);
+    if (levelsDone[lv - 1] || lv === 1) {
+      btn.classList.remove('locked');
+      btn.classList.add('unlocked');
+      if (lock) lock.textContent = '🔓';
+    }
+  }
+}
+
+function selectLevel(lv) {
+  if (lv > 1 && !levelsDone[lv - 1]) return;
+  currentLevel = lv;
+  document.querySelectorAll('.level-tab').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.level-tab[data-level="${lv}"]`).classList.add('active');
+  startLevel();
+}
+
+function startLevel() {
+  session    = buildQuestions(currentLevel);
+  sessionIdx = 0;
+  score      = 0;
+  document.getElementById('resultScreen').classList.remove('visible');
+  document.getElementById('qCard').style.display = '';
+  document.getElementById('progressArea').style.display = '';
+  renderQuestion();
+}
+
+/* ─── Rendering ─── */
+
+function renderQuestion() {
+  const q = session[sessionIdx];
+  attempts      = 0;
+  answered      = false;
+  followupActive= false;
+  followupDone  = false;
+
+  updateProgress();
+  updateTable(q.entry.decimal, null, null);
+
+  const typeBadge = document.getElementById('qTypeBadge');
+  const prompt    = document.getElementById('qPrompt');
+  const body      = document.getElementById('qBody');
+  const fb        = document.getElementById('feedback');
+  const nextBtn   = document.getElementById('nextBtn');
+
+  fb.className    = 'feedback';
+  fb.textContent  = '';
+  nextBtn.className = 'next-btn';
+
+  switch (q.type) {
+    case 'fill':        renderFill(q, typeBadge, prompt, body); break;
+    case 'qcm-digit':   renderQcmDigit(q, typeBadge, prompt, body); break;
+    case 'reconstitute':renderReconstitute(q, typeBadge, prompt, body); break;
+    case 'multi-choice':renderMultiChoice(q, typeBadge, prompt, body); break;
+    case 'qcm-pos':     renderQcmPos(q, typeBadge, prompt, body); break;
+    case 'vrai-faux':   renderVraiFaux(q, typeBadge, prompt, body); break;
+    case 'recompose':   renderRecompose(q, typeBadge, prompt, body); break;
+  }
+}
+
+/* ── Type: fill decomposition ── */
+function renderFill(q, badge, prompt, body) {
+  const lv = q.level;
+  const e  = q.entry;
+  badge.textContent = 'Complète la décomposition';
+
+  const fields = lv === 1 ? ['entier', 'd']
+               : lv === 2 ? ['entier', 'd', 'c']
+               :             ['entier', 'd', 'c', 'm'];
+
+  const denom  = lv === 1 ? [1, 10]
+               : lv === 2 ? [1, 10, 100]
+               :             [1, 10, 100, 1000];
+
+  prompt.innerHTML = `Complète la décomposition de <span class="num">${e.decimal}</span> :`;
+
+  const parts = [];
+  for (let i = 0; i < fields.length; i++) {
+    if (i > 0) parts.push('<span>+</span>');
+    if (denom[i] === 1) {
+      parts.push(`<input class="d-input" id="finput-${i}" type="number" min="0" placeholder="?">`);
+    } else {
+      parts.push(`
+        <span class="frac">
+          <input class="d-input" id="finput-${i}" type="number" min="0" placeholder="?">
+          <hr>
+          <span>${denom[i]}</span>
+        </span>`);
+    }
+  }
+
+  body.innerHTML = `
+    <div class="decomp-row">${parts.join('')}</div>
+    <button class="validate-btn" id="validateBtn" onclick="validateFill()" disabled>Valider</button>
+  `;
+
+  // Wire up inputs → enable button only when all filled
+  for (let i = 0; i < fields.length; i++) {
+    const inp = document.getElementById(`finput-${i}`);
+    inp.addEventListener('input', checkFillReady);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') validateFill(); });
+  }
+
+  // Store answers on q
+  q._fields  = fields;
+  q._denom   = denom;
+  q._answers = fields.map(f => e[f]);
+  q._cols    = lv === 1 ? ['u', 'd']
+             : lv === 2 ? ['u', 'd', 'c']
+             :             ['u', 'd', 'c', 'm'];
+
+  updateTable(e.decimal, null, null);
+  document.getElementById(`finput-0`).focus();
+}
+
+function checkFillReady() {
+  const q = session[sessionIdx];
+  const n = q._fields ? q._fields.length : 0;
+  let allFilled = true;
+  for (let i = 0; i < n; i++) {
+    const v = document.getElementById(`finput-${i}`)?.value?.trim();
+    if (v === '' || v === null) { allFilled = false; break; }
+  }
+  const btn = document.getElementById('validateBtn');
+  if (btn) btn.disabled = !allFilled;
+}
+
+function validateFill() {
+  if (answered) return;
+  const q = session[sessionIdx];
+  let allCorrect = true;
+  const wrongCols = [];
+
+  for (let i = 0; i < q._fields.length; i++) {
+    const inp = document.getElementById(`finput-${i}`);
+    const val = parseInt(inp.value, 10);
+    const exp = q._answers[i];
+    inp.disabled = true;
+    if (val === exp) {
+      inp.classList.add('ok');
+    } else {
+      inp.classList.add('err');
+      allCorrect = false;
+      wrongCols.push(q._cols[i]);
+    }
+  }
+
+  if (allCorrect) {
+    handleCorrect(q);
+  } else {
+    handleWrong(q, wrongCols);
+  }
+}
+
+/* ── Type: QCM digit value ── */
+function renderQcmDigit(q, badge, prompt, body) {
+  const e = q.entry;
+  badge.textContent = 'Valeur d\'un chiffre';
+
+  // For L1: ask about the decimal digit; for L2+: pick randomly
+  let digit, colName, colKey, wrongOptions;
+
+  if (q.level === 1) {
+    digit   = e.d;
+    colName = 'dixièmes';
+    colKey  = 'd';
+    wrongOptions = [
+      `${digit} unité${digit > 1 ? 's' : ''}`,
+      `${digit} centièmes`,
+      `${digit * 10} dixièmes`
+    ];
+  } else {
+    // Pick a random non-empty column
+    const candidates = [
+      { digit: e.entier, col: 'u', name: 'unités' },
+      { digit: e.d,      col: 'd', name: 'dixièmes' },
+      { digit: e.c,      col: 'c', name: 'centièmes' }
+    ].filter(x => x.digit !== undefined);
+    const pick = candidates[Math.floor(Math.random() * candidates.length)];
+    digit   = pick.digit;
+    colName = pick.name;
+    colKey  = pick.col;
+    const allNames = ['unités','dixièmes','centièmes'];
+    wrongOptions = allNames
+      .filter(n => n !== colName)
+      .map(n => `${digit} ${n}`)
+      .concat([`${digit * 10} ${colName}`])
+      .slice(0, 3);
+  }
+
+  const correct = `${digit} ${colName}`;
+  q._correctChoice = correct;
+  q._hlCol         = colKey;
+
+  const choices = shuffle([correct, ...wrongOptions]).slice(0, 4);
+  q._choices = choices;
+
+  prompt.innerHTML = `Dans <span class="num">${e.decimal}</span>, que représente le chiffre <span class="num">${digit}</span> ?`;
+
+  body.innerHTML = `
+    <div class="choices-grid" id="choicesGrid">
+      ${choices.map((c, i) => `<button class="choice-btn" id="ch-${i}" onclick="validateQcm(${i})">${c}</button>`).join('')}
+    </div>
+  `;
+
+  updateTable(e.decimal, colKey, null);
+}
+
+function validateQcm(idx) {
+  if (answered) return;
+  const q = session[sessionIdx];
+  const chosen  = q._choices[idx];
+  const correct = q._correctChoice;
+  const btn     = document.getElementById(`ch-${idx}`);
+
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+
+  if (chosen === correct) {
+    btn.classList.add('ok');
+    handleCorrect(q);
+  } else {
+    btn.classList.add('err');
+    // Highlight correct
+    q._choices.forEach((c, i) => {
+      if (c === correct) document.getElementById(`ch-${i}`).classList.add('ok');
+    });
+    handleWrong(q, [q._hlCol]);
+  }
+}
+
+/* ── Type: reconstitute (L1 Type C) ── */
+function renderReconstitute(q, badge, prompt, body) {
+  const e = q.entry;
+  badge.textContent = 'Reconstitue le nombre';
+
+  prompt.innerHTML = `<span class="num">${e.entier}</span> unité${e.entier > 1 ? 's' : ''} + <span class="num">${e.d}</span> dixième${e.d > 1 ? 's' : ''} = ?`;
+
+  q._freeAnswer = e.decimal.replace(',', ',');
+
+  body.innerHTML = `
+    <div class="free-input-row">
+      <input class="free-input" id="freeInput" type="text" inputmode="decimal" placeholder="ex : 2,3" autocomplete="off">
+    </div>
+    <button class="validate-btn" id="validateBtn" onclick="validateFree()" disabled>Valider</button>
+  `;
+
+  const inp = document.getElementById('freeInput');
+  inp.addEventListener('input', () => {
+    document.getElementById('validateBtn').disabled = inp.value.trim() === '';
+  });
+  inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') validateFree(); });
+  inp.focus();
+  updateTable(e.decimal, null, null);
+}
+
+function validateFree() {
+  if (answered) return;
+  const q    = session[sessionIdx];
+  const inp  = document.getElementById('freeInput');
+  const raw  = inp.value.trim().replace('.', ',');
+  const exp  = q._freeAnswer;
+
+  // Accept both "4,0" and "4" as well as with dot
+  const normalize = s => s.replace(',', '.').replace(/\.?0+$/, '');
+  const correct   = normalize(raw) === normalize(exp.replace(',', '.'));
+
+  inp.disabled = true;
+  if (correct) {
+    inp.classList.add('ok');
+    handleCorrect(q);
+  } else {
+    inp.classList.add('err');
+    handleWrong(q, null);
+  }
+}
+
+/* ── Type: multi-choice (L2 Type D) ── */
+function renderMultiChoice(q, badge, prompt, body) {
+  const e = q.entry;
+  badge.textContent = 'Coche toutes les bonnes réponses';
+
+  prompt.innerHTML = `Coche <strong>toutes</strong> les décompositions correctes de <span class="num">${e.decimal}</span> :`;
+
+  // Build options (hardcoded per spec for 0,25; derived for others)
+  const opts = buildMultiOptions(e);
+  q._multiOpts = opts;
+
+  body.innerHTML = `
+    <div class="checks-list" id="checksList">
+      ${opts.map((o, i) => `
+        <div class="check-item" id="chk-${i}" onclick="toggleCheck(${i})">
+          <span class="check-box" id="chkbox-${i}"></span>
+          <span>${o.label}</span>
+        </div>`).join('')}
+    </div>
+    <button class="validate-btn" id="validateBtn" onclick="validateMulti()">Valider</button>
+  `;
+
+  updateTable(e.decimal, null, null);
+}
+
+function buildMultiOptions(e) {
+  // Returns [{label, correct}]
+  const d = e.decimal;
+  if (d === '0,25') {
+    return [
+      { label: '2/10 + 5/100',                         correct: true  },
+      { label: '25/100',                                correct: true  },
+      { label: '0 unité + 2 dixièmes + 5 centièmes',   correct: true  },
+      { label: '2,5/10',                                correct: false }
+    ];
+  }
+  // Generic options
+  const u  = e.entier, dv = e.d, cv = e.c;
+  return shuffle([
+    { label: `${u} + ${dv}/10 + ${cv}/100`,                          correct: true  },
+    { label: `${u * 100 + dv * 10 + cv}/100`,                        correct: true  },
+    { label: `${u} unité${u>1?'s':''} + ${dv} dixième${dv>1?'s':''} + ${cv} centième${cv>1?'s':''}`, correct: true },
+    { label: `${dv}/100 + ${cv}/10`,                                  correct: false }
+  ]);
+}
+
+const selectedChecks = new Set();
+
+function toggleCheck(i) {
+  const item = document.getElementById(`chk-${i}`);
+  const box  = document.getElementById(`chkbox-${i}`);
+  if (item.classList.contains('disabled')) return;
+  if (selectedChecks.has(i)) {
+    selectedChecks.delete(i);
+    item.classList.remove('selected');
+    box.textContent = '';
+  } else {
+    selectedChecks.add(i);
+    item.classList.add('selected');
+    box.textContent = '✓';
+  }
+}
+
+function validateMulti() {
+  if (answered) return;
+  const q    = session[sessionIdx];
+  const opts = q._multiOpts;
+
+  let allRight = true;
+  opts.forEach((o, i) => {
+    const item     = document.getElementById(`chk-${i}`);
+    const checked  = selectedChecks.has(i);
+    item.classList.add('disabled');
+    if (o.correct && checked)  item.classList.add('ok-item');
+    else if (o.correct && !checked) { item.classList.add('err-item'); allRight = false; }
+    else if (!o.correct && checked) { item.classList.add('err-item'); allRight = false; }
+  });
+
+  document.getElementById('validateBtn').disabled = true;
+  selectedChecks.clear();
+
+  if (allRight) handleCorrect(q);
+  else          handleWrong(q, null);
+}
+
+/* ── Type: QCM positional (L3 Type B) ── */
+function renderQcmPos(q, badge, prompt, body) {
+  const e = q.entry;
+  badge.textContent = 'Position d\'un chiffre';
+
+  // Ask what digit is at a random decimal position
+  const cols = [
+    { key: 'd', name: 'dixièmes',   val: e.d },
+    { key: 'c', name: 'centièmes',  val: e.c },
+    { key: 'm', name: 'millièmes',  val: e.m }
+  ];
+  const target = cols[Math.floor(Math.random() * cols.length)];
+  q._freeAnswer = String(target.val);
+  q._hlCol      = target.key;
+
+  prompt.innerHTML = `Dans <span class="num">${e.decimal}</span>, quel chiffre est aux <strong>${target.name}</strong> ?`;
+
+  body.innerHTML = `
+    <div class="free-input-row">
+      <input class="free-input" id="freeInput" type="number" min="0" max="9" placeholder="0–9">
+    </div>
+    <button class="validate-btn" id="validateBtn" onclick="validateFreePos()" disabled>Valider</button>
+  `;
+
+  const inp = document.getElementById('freeInput');
+  inp.addEventListener('input', () => {
+    document.getElementById('validateBtn').disabled = inp.value.trim() === '';
+  });
+  inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') validateFreePos(); });
+  inp.focus();
+  updateTable(e.decimal, target.key, null);
+}
+
+function validateFreePos() {
+  if (answered) return;
+  const q    = session[sessionIdx];
+  const inp  = document.getElementById('freeInput');
+  const val  = inp.value.trim();
+  inp.disabled = true;
+
+  if (val === q._freeAnswer) {
+    inp.classList.add('ok');
+    handleCorrect(q);
+  } else {
+    inp.classList.add('err');
+    handleWrong(q, [q._hlCol]);
+  }
+}
+
+/* ── Type: Vrai/Faux (L3 Type C) ── */
+function renderVraiFaux(q, badge, prompt, body) {
+  const e = q.entry;
+  badge.textContent = 'Vrai ou Faux ?';
+
+  // Build a statement; for equivalent entries, state is TRUE; for others build a false one
+  let statement, isTrue, followup;
+
+  if (e.equivalent) {
+    // e.g. 0,500 = 5/10  (true)
+    // or   0,100 = 1/10  (true)
+    const numVal  = e.d;
+    const denom   = 10;
+    statement = `<span class="num">${e.decimal}</span> peut aussi s'écrire <span class="num">${numVal}/${denom}</span>`;
+    isTrue    = true;
+    const steps = e.decimal === '0,500'
+      ? ['500/1000', '50/100', '5/10']
+      : ['100/1000', '10/100',  '1/10'];
+    followup  = { steps };
+  } else {
+    // e.g. 1,375 → false statement: "1,375 s'écrit 13/100"
+    statement = `<span class="num">${e.decimal}</span> peut s'écrire <span class="num">${e.d}/10 + ${e.m}/100</span>`;
+    isTrue    = false;
+    followup  = null;
+  }
+
+  q._vfAnswer  = isTrue;
+  q._vfFollowup = followup;
+  q._vfEntry   = e;
+
+  prompt.innerHTML = `Vrai ou Faux ? ${statement}`;
+
+  body.innerHTML = `
+    <div class="vf-row">
+      <button class="vf-btn" id="vf-true"  onclick="validateVF(true)">✓ Vrai</button>
+      <button class="vf-btn" id="vf-false" onclick="validateVF(false)">✗ Faux</button>
+    </div>
+    <div class="followup" id="followup"></div>
+  `;
+
+  updateTable(e.decimal, null, null);
+}
+
+function validateVF(chosen) {
+  if (answered) return;
+  const q   = session[sessionIdx];
+  const trueBtn  = document.getElementById('vf-true');
+  const falseBtn = document.getElementById('vf-false');
+  trueBtn.disabled  = true;
+  falseBtn.disabled = true;
+
+  const correct = chosen === q._vfAnswer;
+  (chosen ? trueBtn : falseBtn).classList.add(correct ? 'ok' : 'err');
+  if (!correct) (chosen ? falseBtn : trueBtn).classList.add('ok');
+
+  if (correct && q._vfFollowup) {
+    // Show follow-up
+    followupActive = true;
+    const fu = document.getElementById('followup');
+    const steps = q._vfFollowup.steps;
+    fu.innerHTML = `
+      <div class="followup-text">
+        Car ${steps[0]} =
+        <input class="d-input" id="fu0" type="number" min="0" placeholder="?">
+        /100 =
+        <input class="d-input" id="fu1" type="number" min="0" placeholder="?">
+        /10
+      </div>
+      <button class="validate-btn" id="fuBtn" onclick="validateFollowup()" style="margin-top:8px" disabled>Valider la suite</button>
+    `;
+    fu.classList.add('visible');
+
+    const fuAnswers = [parseInt(steps[1].split('/')[0]), parseInt(steps[2].split('/')[0])];
+    q._fuAnswers = fuAnswers;
+
+    const fu0 = document.getElementById('fu0');
+    const fu1 = document.getElementById('fu1');
+    const fuBtn = document.getElementById('fuBtn');
+    [fu0, fu1].forEach(inp => {
+      inp.addEventListener('input', () => {
+        fuBtn.disabled = fu0.value.trim() === '' || fu1.value.trim() === '';
+      });
+    });
+    fu0.focus();
+    // Don't advance yet — wait for followup validation
+    showFeedback(true, 'Exact ! Maintenant complète l\'équivalence :');
+  } else if (correct) {
+    handleCorrect(q);
+  } else {
+    handleWrong(q, null);
+  }
+}
+
+function validateFollowup() {
+  if (followupDone) return;
+  const q   = session[sessionIdx];
+  const fu0 = document.getElementById('fu0');
+  const fu1 = document.getElementById('fu1');
+  const fuBtn = document.getElementById('fuBtn');
+
+  const v0 = parseInt(fu0.value, 10);
+  const v1 = parseInt(fu1.value, 10);
+  const [e0, e1] = q._fuAnswers;
+
+  fuBtn.disabled = true;
+  fu0.disabled   = true;
+  fu1.disabled   = true;
+
+  if (v0 === e0 && v1 === e1) {
+    fu0.classList.add('ok');
+    fu1.classList.add('ok');
+    followupDone = true;
+    handleCorrect(q);
+  } else {
+    if (v0 !== e0) fu0.classList.add('err');
+    if (v1 !== e1) fu1.classList.add('err');
+    handleWrong(q, null);
+  }
+}
+
+/* ── Type: Recompose (L3 Type D) ── */
+function renderRecompose(q, badge, prompt, body) {
+  const e = q.entry;
+  badge.textContent = 'Recompose le nombre';
+
+  prompt.innerHTML = `
+    Recompose le nombre :<br>
+    <span class="num">${e.entier} + ${e.d}/10 + ${e.c}/100 + ${e.m}/1000 = ?</span>
+  `;
+
+  // Accept both canonical and simplified forms
+  const parts   = e.decimal.split(',');
+  const decPart = parts[1] || '';
+  const simplified = e.entier + ',' + decPart.replace(/0+$/, '') || '0';
+  q._freeAnswer    = e.decimal;
+  q._altAnswer     = simplified === e.decimal ? null : simplified;
+
+  body.innerHTML = `
+    <div class="free-input-row">
+      <input class="free-input" id="freeInput" type="text" inputmode="decimal" placeholder="ex : 0,040">
+    </div>
+    <button class="validate-btn" id="validateBtn" onclick="validateRecompose()" disabled>Valider</button>
+  `;
+
+  const inp = document.getElementById('freeInput');
+  inp.addEventListener('input', () => {
+    document.getElementById('validateBtn').disabled = inp.value.trim() === '';
+  });
+  inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') validateRecompose(); });
+  inp.focus();
+  updateTable(e.decimal, null, null);
+}
+
+function validateRecompose() {
+  if (answered) return;
+  const q   = session[sessionIdx];
+  const inp = document.getElementById('freeInput');
+  const raw = inp.value.trim().replace('.', ',');
+
+  inp.disabled = true;
+  const ok = raw === q._freeAnswer || (q._altAnswer && raw === q._altAnswer);
+  if (ok) {
+    inp.classList.add('ok');
+    handleCorrect(q);
+  } else {
+    inp.classList.add('err');
+    handleWrong(q, null);
+  }
+}
+
+/* ─── Correct / Wrong handlers ─── */
+
+function handleCorrect(q) {
+  answered = true;
+  score++;
+  showFeedback(true, getFeedbackOk(q));
+  showNext();
+  if (q._hlCol) updateTable(q.entry.decimal, q._hlCol, null);
+  updateProgress();
+}
+
+function handleWrong(q, wrongCols) {
+  attempts++;
+
+  if (wrongCols) {
+    updateTable(q.entry.decimal, null, wrongCols);
+  }
+
+  if (attempts >= 2) {
+    // Show full answer
+    answered = true;
+    revealTable(q.entry.decimal);
+    showFeedback(false, getCorrection(q));
+    disableAllInputs();
+    showNext();
+  } else {
+    // Hint after 1st fail
+    const msg = getFeedbackErr1(q, wrongCols);
+    showFeedback(false, msg);
+    if (wrongCols && wrongCols.length > 0) {
+      setTimeout(() => blinkTableCol(wrongCols[0]), 800);
+    }
+    // Re-enable validate button for another try
+    const btn = document.getElementById('validateBtn') || document.getElementById('fuBtn');
+    if (btn && !btn.classList.contains('validate-btn') && document.getElementById('validateBtn')) {
+      document.getElementById('validateBtn').disabled = false;
+    }
+    // Reset input state
+    resetInputsForRetry(q);
+  }
+}
+
+function resetInputsForRetry(q) {
+  // Re-enable inputs and remove err class for fill type
+  const inputs = document.querySelectorAll('.d-input, .free-input');
+  inputs.forEach(inp => {
+    if (inp.classList.contains('err')) {
+      inp.classList.remove('err');
+      inp.disabled   = false;
+      inp.value      = '';
+    }
+  });
+  // Re-enable validate button
+  const vBtn = document.getElementById('validateBtn');
+  if (vBtn) vBtn.disabled = true;
+  checkFillReady();
+}
+
+function disableAllInputs() {
+  document.querySelectorAll('.d-input, .free-input, .choice-btn, .vf-btn, .check-item').forEach(el => {
+    el.disabled = true;
+    el.classList.add('disabled');
+  });
+  const vBtn = document.getElementById('validateBtn');
+  if (vBtn) vBtn.disabled = true;
+}
+
+/* ─── Feedback messages ─── */
+
+const COL_NAMES = { u: 'unités', d: 'dixièmes', c: 'centièmes', m: 'millièmes' };
+
+function getFeedbackOk(q) {
+  const msgs = [
+    'Parfait ! 🎉',
+    'Très bien ! ✓',
+    'Excellent ! 🌟',
+    'Bravo, c\'est juste !',
+    'Correct ! 👍'
+  ];
+  return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
+function getFeedbackErr1(q, wrongCols) {
+  const e = q.entry;
+  if (wrongCols && wrongCols.includes('d') && e.d === 0)
+    return `Attention ! Dans <strong>${e.decimal}</strong>, il y a bien un <strong>0</strong> aux dixièmes. Ne l'oublie pas !`;
+  if (wrongCols && wrongCols.includes('c') && e.c === 0)
+    return `Attention ! Dans <strong>${e.decimal}</strong>, il y a bien un <strong>0</strong> aux centièmes. Regarde la colonne dans le tableau.`;
+  if (wrongCols && wrongCols.includes('m') && e.m === 0)
+    return `Attention ! Le chiffre aux millièmes est <strong>0</strong> — la case clignotante t'indique la bonne colonne.`;
+  if (wrongCols)
+    return `Pas tout à fait. Regarde la colonne <strong>${COL_NAMES[wrongCols[0]] || wrongCols[0]}</strong> dans le tableau de numération.`;
+  return `Pas tout à fait. Vérifie ta réponse en regardant le tableau de numération.`;
+}
+
+function getCorrection(q) {
+  const e   = q.entry;
+  const lv  = q.level;
+  if (lv === 1) return `La bonne réponse est <strong>${e.decimal} = ${e.entier} + ${e.d}/10</strong>. Le tableau montre chaque chiffre dans sa colonne.`;
+  if (lv === 2) return `La bonne réponse est <strong>${e.decimal} = ${e.entier} + ${e.d}/10 + ${e.c}/100</strong>. ${e.piege ? 'Attention aux zéros intercalés !' : ''}`;
+  if (lv === 3) return `La bonne réponse est <strong>${e.decimal} = ${e.entier} + ${e.d}/10 + ${e.c}/100 + ${e.m}/1000</strong>. ${e.piege ? 'Les zéros aux dixièmes ou centièmes doivent quand même figurer !' : ''}`;
+  return 'Voici la correction dans le tableau de numération.';
+}
+
+/* ─── UI helpers ─── */
+
+function showFeedback(ok, msg) {
+  const fb = document.getElementById('feedback');
+  fb.className = `feedback visible ${ok ? 'ok-fb' : 'err-fb'}`;
+  fb.innerHTML = msg;
+}
+
+function showNext() {
+  const btn = document.getElementById('nextBtn');
+  const isLast = sessionIdx === session.length - 1;
+  btn.textContent = isLast ? 'Voir les résultats →' : 'Question suivante →';
+  btn.classList.add('visible');
+}
+
+function nextQuestion() {
+  sessionIdx++;
+  if (sessionIdx >= session.length) {
+    showResults();
+  } else {
+    document.getElementById('qCard').style.animation = 'none';
+    requestAnimationFrame(() => {
+      document.getElementById('qCard').style.animation = '';
+      renderQuestion();
+    });
+  }
+}
+
+function updateProgress() {
+  const total = session.length;
+  const done  = sessionIdx;
+  document.getElementById('progressLabel').textContent = `Question ${Math.min(done + 1, total)}/${total}`;
+  document.getElementById('progressScore').textContent = `Score : ${score}`;
+  document.getElementById('progressFill').style.width = `${(done / total) * 100}%`;
+}
+
+/* ─── Results ─── */
+
+function showResults() {
+  const lv        = currentLevel;
+  const total     = session.length;
+  const threshold = CONFIG[lv].threshold;
+  const passed    = score >= threshold;
+
+  document.getElementById('qCard').style.display        = 'none';
+  document.getElementById('progressArea').style.display = 'none';
+  document.getElementById('progressFill').style.width   = '100%';
+
+  const rs = document.getElementById('resultScreen');
+  document.getElementById('resultEmoji').textContent = passed ? '🏆' : '💪';
+  document.getElementById('resultTitle').textContent = passed ? 'Niveau réussi !' : 'Courage !';
+  document.getElementById('resultScore').textContent = `${score}/${total}`;
+
+  const nextLevelBtn = document.getElementById('nextLevelBtn');
+  if (passed) {
+    levelsDone[lv] = true;
+    sessionStorage.setItem('ddLevelsDone', JSON.stringify(levelsDone));
+    initLevelTabs();
+    document.getElementById('resultMsg').textContent =
+      `Bravo ! Tu as obtenu ${score} sur ${total} (seuil : ${threshold}/${total}). Tu peux passer au niveau suivant !`;
+    if (lv < 3) {
+      nextLevelBtn.style.display = 'inline-flex';
+      nextLevelBtn.style.alignItems = 'center';
+    }
+    launchConfetti();
+    logResult(lv, score, total);
+  } else {
+    document.getElementById('resultMsg').textContent =
+      `Tu as obtenu ${score} sur ${total}. Il faut ${threshold}/${total} pour passer au niveau suivant. Réessaie !`;
+    nextLevelBtn.style.display = 'none';
+  }
+
+  rs.classList.add('visible');
+}
+
+function goNextLevel() {
+  selectLevel(currentLevel + 1);
+}
+
+function retryLevel() {
+  document.getElementById('resultScreen').classList.remove('visible');
+  document.getElementById('qCard').style.display        = '';
+  document.getElementById('progressArea').style.display = '';
+  startLevel();
+}
+
+/* ─── Supabase logging ─── */
+
+function logResult(level, sc, total) {
+  // TODO: Supabase logging
+  if (typeof saveExerciseResult === 'function') {
+    saveExerciseResult({
+      exerciseSlug: 'decomposer-decimaux',
+      subject:      'mathématiques',
+      category:     'nombres-decimaux',
+      exerciseType: 'decomposition',
+      level:        `Niveau ${level}`,
+      score:         sc,
+      total:         total
+    });
+  }
+}
+
+/* ─── Confetti ─── */
+
+function launchConfetti() {
+  const colors  = ['#F5A623', '#1DBFA0', '#1A2D6B', '#E05252', '#ffffff'];
+  const container = document.getElementById('confettiContainer');
+  container.innerHTML = '';
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `
+      left: ${Math.random() * 100}%;
+      background: ${colors[Math.floor(Math.random() * colors.length)]};
+      width: ${6 + Math.random() * 8}px;
+      height: ${6 + Math.random() * 8}px;
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+      animation-duration: ${1.5 + Math.random() * 1.5}s;
+      animation-delay: ${Math.random() * 0.6}s;
+    `;
+    container.appendChild(p);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 3200);
+}
+
+/* ─── Init ─── */
+
+initLevelTabs();
+startLevel();
+</script>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 · <a href="../../mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="../../js/menu.js"></script>
+<style>
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

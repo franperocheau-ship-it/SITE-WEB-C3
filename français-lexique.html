@@ -389,6 +389,422 @@
       .ex-type-btn { padding: 8px 14px; }
     }
 
+    /* ════════════════════════════════════════════════════════════════════════
+       NOUVEAU SYSTÈME — Niveaux & exercices interactifs
+    ════════════════════════════════════════════════════════════════════════ */
+
+    .ex-panel-body { padding: 24px; }
+
+    /* ── Sélecteur de niveau ─────────────────────────────────────────────── */
+    .lv-intro {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .lv-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .lv-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+      border-radius: 14px;
+      border: 2px solid var(--border);
+      background: var(--card-bg);
+      cursor: pointer;
+      transition: border-color 200ms, box-shadow 200ms, background 200ms;
+      text-align: left;
+      font-family: inherit;
+      width: 100%;
+    }
+    .lv-card:not(.lv-locked):hover {
+      border-color: var(--color-brand-navy);
+      box-shadow: 0 4px 16px rgba(26,45,107,.12);
+    }
+    .lv-card.lv-locked {
+      opacity: .55;
+      cursor: not-allowed;
+      background: var(--bg);
+    }
+
+    .lv-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .lv-badge-1 { background: var(--color-niveau-cm1); }
+    .lv-badge-2 { background: var(--color-brand-navy); }
+    .lv-badge-3 { background: var(--color-brand-gold); }
+
+    .lv-info { flex: 1; }
+    .lv-num {
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .lv-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+    .lv-lock {
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    .lv-star {
+      font-size: 18px;
+    }
+
+    /* ── Écran question ─────────────────────────────────────────────────── */
+    .qz-progress-wrap { margin-bottom: 20px; }
+    .qz-progress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .qz-bar-bg {
+      height: 6px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .qz-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: var(--color-brand-navy);
+      transition: width 400ms ease;
+    }
+
+    .qz-instruction {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    /* MCQ ------------------------------------------------------------------ */
+    .qz-choices { display: flex; flex-direction: column; gap: 8px; }
+    .qz-choice {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 16px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      text-align: left;
+      transition: border-color 180ms, background 180ms;
+    }
+    .qz-choice:hover:not([disabled]):not(.qz-selected) {
+      border-color: var(--color-brand-navy);
+      background: rgba(26,45,107,.04);
+    }
+    /* état sélectionné (avant validation) */
+    .qz-choice.qz-selected {
+      border-color: #4B8DEE;
+      background: rgba(75,141,238,.11);
+    }
+    .qz-choice[disabled] { cursor: default; }
+    .qz-choice.qz-correct  { border-color:#16a34a; background:rgba(22,163,74,.08); }
+    .qz-choice.qz-wrong    { border-color:var(--red); background:rgba(214,40,57,.07); }
+    .qz-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      transition: all 180ms;
+    }
+    .qz-choice:hover:not([disabled]):not(.qz-selected) .qz-dot { border-color: var(--blue); }
+    .qz-choice.qz-selected .qz-dot { background: #4B8DEE; border-color: #4B8DEE; }
+    .qz-choice.qz-correct .qz-dot { background:#16a34a; border-color:#16a34a; }
+    .qz-choice.qz-wrong   .qz-dot { background:var(--red); border-color:var(--red); }
+
+    /* Click-sort ----------------------------------------------------------- */
+    .cs-bank-label, .cs-slots-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .cs-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 44px;
+      padding: 10px;
+      background: var(--bg);
+      border-radius: 10px;
+      border: 1.5px dashed var(--border);
+      margin-bottom: 16px;
+    }
+    .cs-chip {
+      padding: 7px 14px;
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 160ms;
+      user-select: none;
+    }
+    .cs-chip:hover:not(.cs-placed):not(.cs-done) {
+      border-color: #4B8DEE;
+      background: rgba(75,141,238,.09);
+    }
+    .cs-chip.cs-placed { opacity: .35; cursor: default; }
+    .cs-chip.cs-done.cs-ok  { background:rgba(22,163,74,.12); border-color:#16a34a; color:#15803d; }
+    .cs-chip.cs-done.cs-err { background:rgba(214,40,57,.09); border-color:var(--red); color:var(--red); }
+
+    .cs-slots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .cs-slot {
+      min-width: 80px;
+      padding: 7px 14px;
+      border-radius: 100px;
+      border: 1.5px dashed var(--border);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      background: var(--bg);
+      text-align: center;
+      cursor: pointer;
+      transition: all 160ms;
+    }
+    .cs-slot.cs-filled {
+      border-style: solid;
+      border-color: var(--color-brand-navy);
+      color: var(--text);
+      background: var(--card-bg);
+    }
+    .cs-slot.cs-filled:hover { border-color: var(--red); }
+    .cs-slot.cs-ok-slot  { border-color:#16a34a; color:#15803d; background:rgba(22,163,74,.08); }
+    .cs-slot.cs-err-slot { border-color:var(--red); color:var(--red); background:rgba(214,40,57,.07); }
+
+    .cs-reset-btn {
+      margin-top: 10px;
+      padding: 6px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      background: transparent;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .cs-reset-btn:hover { border-color: var(--red); color: var(--red); }
+
+    /* Match (pair clicking) ------------------------------------------------ */
+    .match-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .match-col { display: flex; flex-direction: column; gap: 8px; }
+    .match-chip {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      transition: all 180ms;
+      user-select: none;
+    }
+    .match-chip:hover:not([data-paired]):not([disabled]) {
+      border-color: var(--color-brand-navy);
+      background: rgba(26,45,107,.05);
+    }
+    .match-chip.match-selected {
+      border-color: #4B8DEE;
+      background: rgba(75,141,238,.12);
+      color: #1a4db8;
+      box-shadow: 0 0 0 3px rgba(75,141,238,.20);
+    }
+    .match-chip.match-ok  { border-color:#16a34a; background:rgba(22,163,74,.1); color:#15803d; cursor:default; }
+    .match-chip.match-err { border-color:var(--red); background:rgba(214,40,57,.08); color:var(--red); }
+
+    /* Column sort (propre / figuré, etc.) ---------------------------------- */
+    .col-sort-items { display: flex; flex-direction: column; gap: 10px; }
+    .col-sort-item {
+      padding: 12px 14px;
+      background: var(--bg);
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+    }
+    .col-sort-text {
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    .col-sort-btns { display: flex; gap: 8px; }
+    .col-sort-btn {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 160ms;
+    }
+    .col-sort-btn:hover:not([disabled]) { opacity: .8; }
+    .col-sort-btn.col-btn-a { color: var(--color-niveau-cm1); border-color: var(--color-niveau-cm1); }
+    .col-sort-btn.col-btn-b { color: var(--color-brand-gold); border-color: var(--color-brand-gold); }
+    .col-sort-btn.col-btn-a:hover:not([disabled]) { background: rgba(29,191,160,.1); }
+    .col-sort-btn.col-btn-b:hover:not([disabled]) { background: rgba(245,166,35,.1); }
+    .col-sort-btn.col-ok-a  { background:rgba(22,163,74,.12); border-color:#16a34a; color:#15803d; }
+    .col-sort-btn.col-ok-b  { background:rgba(22,163,74,.12); border-color:#16a34a; color:#15803d; }
+    .col-sort-btn.col-wrong { background:rgba(214,40,57,.08); border-color:var(--red); color:var(--red); }
+
+    /* Dictionary entry ----------------------------------------------------- */
+    .dict-entry {
+      background: var(--bg);
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      padding: 16px 18px;
+      margin-bottom: 16px;
+    }
+    .dict-headword {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-brand-navy);
+      margin-bottom: 2px;
+    }
+    .dict-class {
+      font-size: 12px;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+    .dict-defs { list-style: none; padding: 0; margin: 0 0 10px; }
+    .dict-defs li {
+      font-size: 13px;
+      color: var(--text);
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.5;
+    }
+    .dict-defs li:last-child { border-bottom: none; }
+    .dict-def-num { font-weight: 700; color: var(--color-brand-navy); margin-right: 4px; }
+    .dict-example {
+      font-size: 12px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* Feedback banner ------------------------------------------------------ */
+    .qz-feedback {
+      margin-top: 14px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      display: none;
+    }
+    .qz-feedback.fb-ok  { background:rgba(22,163,74,.10); color:#15803d; border:1px solid rgba(22,163,74,.25); }
+    .qz-feedback.fb-err { background:rgba(214,40,57,.08); color:#b91c1c; border:1px solid rgba(214,40,57,.20); }
+    .qz-feedback.visible { display: block; }
+
+    /* Next / Validate buttons ---------------------------------------------- */
+    .qz-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .qz-btn {
+      padding: 11px 24px;
+      border-radius: 100px;
+      border: none;
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 200ms;
+    }
+    .qz-btn-primary {
+      background: var(--color-brand-navy);
+      color: #fff;
+    }
+    .qz-btn-primary:hover { opacity: .88; }
+    .qz-btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+    .qz-btn-secondary {
+      background: var(--bg);
+      color: var(--muted);
+      border: 1.5px solid var(--border);
+    }
+    .qz-btn-secondary:hover { border-color: var(--color-brand-navy); color: var(--color-brand-navy); }
+
+    /* Result screen -------------------------------------------------------- */
+    .qz-result {
+      text-align: center;
+      padding: 8px 0 24px;
+    }
+    .qz-result-emoji { font-size: 52px; margin-bottom: 12px; }
+    .qz-result-score {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--color-brand-navy);
+      margin-bottom: 6px;
+    }
+    .qz-result-msg {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .qz-result-unlock {
+      display: inline-block;
+      padding: 10px 20px;
+      background: rgba(29,191,160,.12);
+      border: 1px solid rgba(29,191,160,.35);
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #0d7a67;
+      margin-bottom: 24px;
+    }
+
   </style>
 </head>
 <body>
@@ -466,7 +882,7 @@
         <div class="category-header" role="button" tabindex="0" aria-expanded="true">
           <span class="category-emoji">📚</span>
           <h2 class="category-title">Comprendre les mots</h2>
-          <span class="category-count" id="count-comprendre-mots">7 notions</span>
+          <span class="category-count" id="count-comprendre-mots">6 notions</span>
           <span class="category-toggle">▾</span>
         </div>
         <div class="category-divider"></div>
@@ -478,18 +894,8 @@
               <span class="badge badge-cm2">CM2</span>
               <span class="badge badge-6e">6e</span>
             </div>
-            <div class="skill-card-title">Utiliser l'ordre alphabétique</div>
-            <div class="skill-card-accent" style="background:var(--blue)"></div>
-          </a>
-
-          <a class="skill-card" href="#utiliser-dictionnaire" data-levels="CM1,CM2,6e" data-slug="utiliser-dictionnaire">
-            <div class="skill-card-badges">
-              <span class="badge badge-cm1">CM1</span>
-              <span class="badge badge-cm2">CM2</span>
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Utiliser le dictionnaire</div>
-            <div class="skill-card-accent" style="background:var(--blue)"></div>
+            <div class="skill-card-title">Ranger dans l'ordre alphabétique</div>
+            <div class="skill-card-accent" style="background:var(--color-brand-navy)"></div>
           </a>
 
           <a class="skill-card" href="#trouver-synonyme" data-levels="CM1,CM2,6e" data-slug="trouver-synonyme">
@@ -565,8 +971,9 @@
             <div class="skill-card-accent" style="background:var(--blue)"></div>
           </a>
 
-          <a class="skill-card" href="#identifier-radical" data-levels="CM2,6e" data-slug="identifier-radical">
+          <a class="skill-card" href="#identifier-radical" data-levels="CM1,CM2,6e" data-slug="identifier-radical">
             <div class="skill-card-badges">
+              <span class="badge badge-cm1">CM1</span>
               <span class="badge badge-cm2">CM2</span>
               <span class="badge badge-6e">6e</span>
             </div>
@@ -574,8 +981,9 @@
             <div class="skill-card-accent" style="background:var(--blue)"></div>
           </a>
 
-          <a class="skill-card" href="#identifier-prefixe" data-levels="CM2,6e" data-slug="identifier-prefixe">
+          <a class="skill-card" href="#identifier-prefixe" data-levels="CM1,CM2,6e" data-slug="identifier-prefixe">
             <div class="skill-card-badges">
+              <span class="badge badge-cm1">CM1</span>
               <span class="badge badge-cm2">CM2</span>
               <span class="badge badge-6e">6e</span>
             </div>
@@ -583,8 +991,9 @@
             <div class="skill-card-accent" style="background:var(--blue)"></div>
           </a>
 
-          <a class="skill-card" href="#identifier-suffixe" data-levels="CM2,6e" data-slug="identifier-suffixe">
+          <a class="skill-card" href="#identifier-suffixe" data-levels="CM1,CM2,6e" data-slug="identifier-suffixe">
             <div class="skill-card-badges">
+              <span class="badge badge-cm1">CM1</span>
               <span class="badge badge-cm2">CM2</span>
               <span class="badge badge-6e">6e</span>
             </div>
@@ -698,14 +1107,17 @@
         </div>
       </div>
 
-      <div class="ex-type-toggle-wrap">
+      <!-- Filled dynamically: level-select OR question OR result screen -->
+      <div id="exercisePanelBody" class="ex-panel-body"></div>
+
+      <!-- Legacy toggle (only shown for old-format skills) -->
+      <div class="ex-type-toggle-wrap" id="legacyToggleWrap" style="display:none">
         <div class="ex-type-toggle" role="group" aria-label="Type d'exercice">
           <button class="ex-type-btn active" data-type="fillBlank">Texte à trous</button>
           <button class="ex-type-btn" data-type="mcq">QCM</button>
         </div>
       </div>
-
-      <div class="ex-list" id="exerciseList"></div>
+      <div class="ex-list" id="exerciseList" style="display:none"></div>
 
     </div>
   </div>
@@ -713,305 +1125,9 @@
   <script>
     /* ════════════════════════════════════════════════════════════════════════
        SKILL DATA  —  single source of truth
-       Each skill contains title, slug, levels, category, and exercises.
-       The exercises object is consumed by ExercisePanel and is fully reusable
-       across Grammaire, Orthographe, Conjugaison, Mathématiques.
+       Toutes les compétences sont dans js/lex-comprendre.js, js/lex-construire.js et js/lex-relations.js
     ════════════════════════════════════════════════════════════════════════ */
-    const SKILLS = [
-
-      /* ── Comprendre les mots ─────────────────────────────────────────────── */
-      {
-        title: "Utiliser l'ordre alphabétique", slug: "ordre-alphabetique",
-        levels: ["CM1","CM2","6e"], category: "comprendre-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "Dans un dictionnaire, les mots sont rangés dans l'ordre ____.", answer: "alphabétique", hint: "Indice : de A à Z" },
-            { sentence: "La lettre B vient ____ la lettre D dans l'alphabet.", answer: "avant", hint: "Indice : B est en 2e position, D en 4e" },
-            { sentence: "Pour trouver 'zèbre', on se rend vers la ____ du dictionnaire.", answer: "fin", hint: "Indice : Z est la dernière lettre de l'alphabet" }
-          ],
-          mcq: [
-            { question: "Quel groupe de mots est classé dans l'ordre alphabétique ?", choices: ["lune, arbre, mer, vent", "arbre, lune, mer, vent", "mer, arbre, vent, lune", "vent, lune, arbre, mer"], answer: "arbre, lune, mer, vent" },
-            { question: "Quel mot vient en premier dans le dictionnaire ?", choices: ["tigre", "renard", "aigle", "zèbre"], answer: "aigle" },
-            { question: "Pour classer 'chat' et 'chien', quelle lettre compare-t-on en premier ?", choices: ["la 1re lettre", "la 2e lettre", "la 3e lettre", "la 4e lettre"], answer: "la 3e lettre" }
-          ]
-        }
-      },
-
-      {
-        title: "Utiliser le dictionnaire", slug: "utiliser-dictionnaire",
-        levels: ["CM1","CM2","6e"], category: "comprendre-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "Le dictionnaire donne la ____ des mots.", answer: "définition", hint: "Indice : ce que le mot signifie" },
-            { sentence: "On cherche un verbe dans le dictionnaire à son ____.", answer: "infinitif", hint: "Indice : la forme de base du verbe" },
-            { sentence: "Les mots repères en haut des pages permettent de se ____ dans le dictionnaire.", answer: "repérer", hint: "Indice : savoir où on en est" }
-          ],
-          mcq: [
-            { question: "À quoi sert un dictionnaire ?", choices: ["Faire des calculs", "Connaître la définition d'un mot", "Apprendre l'histoire", "Conjuguer uniquement"], answer: "Connaître la définition d'un mot" },
-            { question: "Sous quelle forme cherche-t-on un verbe dans le dictionnaire ?", choices: ["Au présent", "Au passé composé", "À l'infinitif", "Au futur"], answer: "À l'infinitif" },
-            { question: "Que trouve-t-on souvent après la définition dans le dictionnaire ?", choices: ["Un dessin obligatoire", "Tous les synonymes possibles", "Un exemple d'utilisation", "La traduction en anglais"], answer: "Un exemple d'utilisation" }
-          ]
-        }
-      },
-
-      {
-        title: "Trouver un synonyme", slug: "trouver-synonyme",
-        levels: ["CM1","CM2","6e"], category: "comprendre-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "Le chevalier est très ____.", answer: "courageux", hint: "Indice : synonyme de 'brave'" },
-            { sentence: "Cette histoire est vraiment ____.", answer: "amusante", hint: "Indice : synonyme de 'drôle'" },
-            { sentence: "Le désert est une région très ____.", answer: "aride", hint: "Indice : synonyme de 'sec'" }
-          ],
-          mcq: [
-            { question: "Quel est le synonyme de 'rapide' ?", choices: ["lent", "vif", "calme", "faible"], answer: "vif" },
-            { question: "Quel est le synonyme de 'content' ?", choices: ["triste", "heureux", "fâché", "inquiet"], answer: "heureux" },
-            { question: "Quel est le synonyme de 'débuter' ?", choices: ["terminer", "arrêter", "commencer", "casser"], answer: "commencer" }
-          ]
-        }
-      },
-
-      {
-        title: "Trouver un antonyme", slug: "trouver-antonyme",
-        levels: ["CM1","CM2","6e"], category: "comprendre-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "L'antonyme de 'jour' est ____.", answer: "nuit", hint: "Indice : le contraire de jour" },
-            { sentence: "L'antonyme de 'chaud' est ____.", answer: "froid", hint: "Indice : ce qu'on ressent en hiver" },
-            { sentence: "L'antonyme de 'monter' est ____.", answer: "descendre", hint: "Indice : aller vers le bas" }
-          ],
-          mcq: [
-            { question: "Quel est l'antonyme de 'grand' ?", choices: ["gros", "fort", "petit", "haut"], answer: "petit" },
-            { question: "Quel est l'antonyme de 'gentil' ?", choices: ["sage", "méchant", "poli", "calme"], answer: "méchant" },
-            { question: "Quel est l'antonyme de 'commencer' ?", choices: ["débuter", "continuer", "terminer", "avancer"], answer: "terminer" }
-          ]
-        }
-      },
-
-      {
-        title: "Identifier un homonyme", slug: "identifier-homonyme",
-        levels: ["CM2","6e"], category: "comprendre-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "'Vert' (couleur) et 'verre' (pour boire) sont des ____.", answer: "homonymes", hint: "Indice : ils se prononcent de la même façon" },
-            { sentence: "Les homonymes se prononcent de façon ____ mais ont des sens différents.", answer: "identique", hint: "Indice : pareil, semblable" },
-            { sentence: "Le mot '____ ' peut désigner un métal précieux ou marquer une opposition.", answer: "or", hint: "Indice : métal jaune précieux, et aussi un mot de liaison" }
-          ],
-          mcq: [
-            { question: "Lesquels sont des homonymes ?", choices: ["soleil / lune", "mère / mer", "maison / jardin", "chat / chien"], answer: "mère / mer" },
-            { question: "Que partagent deux homonymes ?", choices: ["La même écriture", "La même prononciation", "Le même sens", "La même longueur"], answer: "La même prononciation" },
-            { question: "Quel mot est un homonyme de 'sot' (stupide) ?", choices: ["sort", "seau", "sol", "sous"], answer: "seau" }
-          ]
-        }
-      },
-
-      {
-        title: "Comprendre la polysémie d'un mot", slug: "polysemie",
-        levels: ["CM2","6e"], category: "comprendre-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "Un mot qui a plusieurs sens différents est un mot ____.", answer: "polysémique", hint: "Indice : du grec 'poly' (plusieurs) et 'sema' (signe)" },
-            { sentence: "Le mot 'voler' peut signifier se déplacer dans les airs ou ____ un objet.", answer: "dérober", hint: "Indice : prendre ce qui ne nous appartient pas" },
-            { sentence: "Pour trouver le bon sens d'un mot polysémique, on s'aide du ____.", answer: "contexte", hint: "Indice : les mots qui entourent le mot" }
-          ],
-          mcq: [
-            { question: "Quel est un exemple de mot polysémique ?", choices: ["stylo (un seul sens)", "voler (se déplacer ou dérober)", "rouge (une couleur)", "arbre (un seul sens)"], answer: "voler (se déplacer ou dérober)" },
-            { question: "Que signifie 'polysémique' ?", choices: ["Qui a un seul sens", "Qui a plusieurs sens", "Qui vient du grec", "Qui est rare"], answer: "Qui a plusieurs sens" },
-            { question: "Dans 'Le feu est rouge', que signifie 'feu' ?", choices: ["Un incendie", "Un signal de circulation", "De la chaleur", "Une bougie"], answer: "Un signal de circulation" }
-          ]
-        }
-      },
-
-      {
-        title: "Identifier le sens propre et le sens figuré", slug: "sens-propre-figure",
-        levels: ["CM2","6e"], category: "comprendre-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "Quand on dit 'Le chat monte dans l'arbre', 'monter' est au sens ____.", answer: "propre", hint: "Indice : le sens concret et littéral" },
-            { sentence: "'Avoir le cafard' signifie être triste : c'est le sens ____.", answer: "figuré", hint: "Indice : le sens imagé, non littéral" },
-            { sentence: "Le sens ____ d'un mot est son sens courant et le plus concret.", answer: "propre", hint: "Indice : direct, non imagé" }
-          ],
-          mcq: [
-            { question: "Dans 'Il a un coeur de pierre', le mot 'pierre' est au :", choices: ["sens propre", "sens figuré", "sens alphabétique", "sens contraire"], answer: "sens figuré" },
-            { question: "Dans 'La rivière coule vite', 'couler' est au :", choices: ["sens figuré", "sens contraire", "sens propre", "sens polysémique"], answer: "sens propre" },
-            { question: "Quelle phrase utilise 'lourd' au sens figuré ?", choices: ["Ce sac est très lourd.", "La pierre est lourde.", "Cette nouvelle est lourde à porter.", "Le cartable est lourd."], answer: "Cette nouvelle est lourde à porter." }
-          ]
-        }
-      },
-
-      /* ── Construire les mots ──────────────────────────────────────────────── */
-      {
-        title: "Identifier une famille de mots", slug: "famille-de-mots",
-        levels: ["CM1","CM2","6e"], category: "construire-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "'Jardiner', 'jardinier' et 'jardinage' forment une ____ de mots.", answer: "famille", hint: "Indice : ils partagent la même racine" },
-            { sentence: "Les mots d'une même famille ont tous le même ____.", answer: "radical", hint: "Indice : la partie commune à tous ces mots" },
-            { sentence: "'Chanter', 'chanteur' et 'chanson' forment une ____ de mots.", answer: "famille", hint: "Indice : ils partagent le radical 'chant'" }
-          ],
-          mcq: [
-            { question: "Quel mot n'appartient pas à la famille de 'fleur' ?", choices: ["fleurir", "fleuriste", "fleuve", "floraison"], answer: "fleuve" },
-            { question: "Quel groupe forme une famille de mots ?", choices: ["maison / mais / mason", "pêche / pêcheur / pêcher", "livre / libre / livrer", "terre / terreur / tierce"], answer: "pêche / pêcheur / pêcher" },
-            { question: "Quel est le radical commun à 'porter', 'porteur' et 'portable' ?", choices: ["port", "por", "portabl", "porte"], answer: "port" }
-          ]
-        }
-      },
-
-      {
-        title: "Identifier le radical d'un mot", slug: "identifier-radical",
-        levels: ["CM2","6e"], category: "construire-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "Dans le mot 'chanteur', le radical est ____.", answer: "chant", hint: "Indice : la partie qui porte le sens principal" },
-            { sentence: "Le radical du mot 'jardinage' est ____.", answer: "jardin", hint: "Indice : sans le suffixe -age" },
-            { sentence: "Dans 'pêcheur' et 'pêche', le radical commun est ____.", answer: "pêch", hint: "Indice : la partie partagée par les deux mots" }
-          ],
-          mcq: [
-            { question: "Quel est le radical du mot 'chanteur' ?", choices: ["chant", "-eur", "chan", "chante"], answer: "chant" },
-            { question: "Quel est le radical commun à 'marcher', 'marcheur' et 'marche' ?", choices: ["march", "marche", "mar", "marcher"], answer: "march" },
-            { question: "Quel est le radical du mot 'danseur' ?", choices: ["dans", "-eur", "danse", "danser"], answer: "dans" }
-          ]
-        }
-      },
-
-      {
-        title: "Identifier un préfixe", slug: "identifier-prefixe",
-        levels: ["CM2","6e"], category: "construire-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "Dans le mot 'déplacer', 'dé-' est un ____.", answer: "préfixe", hint: "Indice : il se place avant le radical" },
-            { sentence: "Le préfixe 'im-' dans 'impossible' signifie ____.", answer: "non", hint: "Indice : il exprime le contraire" },
-            { sentence: "Dans 'revenir', le préfixe 're-' indique qu'on fait l'action ____.", answer: "à nouveau", hint: "Indice : une deuxième fois" }
-          ],
-          mcq: [
-            { question: "Quel est le préfixe dans 'antiviolence' ?", choices: ["anti-", "viol", "violence", "-ence"], answer: "anti-" },
-            { question: "Que signifie le préfixe 'pré-' dans 'prévoir' ?", choices: ["après", "avant", "contre", "sans"], answer: "avant" },
-            { question: "Quel mot contient un préfixe ?", choices: ["maison", "soleil", "désordre", "jardin"], answer: "désordre" }
-          ]
-        }
-      },
-
-      {
-        title: "Identifier un suffixe", slug: "identifier-suffixe",
-        levels: ["CM2","6e"], category: "construire-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "Dans le mot 'chanteur', '-eur' est le ____.", answer: "suffixe", hint: "Indice : il se place après le radical" },
-            { sentence: "Le suffixe '-ette' dans 'maisonnette' indique que la maison est ____.", answer: "petite", hint: "Indice : -ette marque la petite taille" },
-            { sentence: "Dans 'rapidement', le suffixe '-ment' transforme l'adjectif en ____.", answer: "adverbe", hint: "Indice : il précise comment se déroule l'action" }
-          ],
-          mcq: [
-            { question: "Quel est le suffixe dans 'jardinage' ?", choices: ["jardin-", "-age", "-inage", "jar-"], answer: "-age" },
-            { question: "Que signifie le suffixe '-eur' dans 'plongeur' ?", choices: ["Celui qui fait l'action", "Avant", "Encore", "Sans"], answer: "Celui qui fait l'action" },
-            { question: "Quel mot contient un suffixe signifiant 'petite taille' ?", choices: ["maison", "jardin", "maisonnette", "soleil"], answer: "maisonnette" }
-          ]
-        }
-      },
-
-      {
-        title: "Former un mot dérivé", slug: "mot-derive",
-        levels: ["CM2","6e"], category: "construire-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "En ajoutant le suffixe '-eur' à 'chanter', on forme le mot ____.", answer: "chanteur", hint: "Indice : celui qui chante" },
-            { sentence: "Le mot 'impoli' est formé en ajoutant le préfixe 'im-' au mot ____.", answer: "poli", hint: "Indice : le mot de base, sans le préfixe" },
-            { sentence: "Un mot formé à partir d'un radical auquel on ajoute des affixes est un mot ____.", answer: "dérivé", hint: "Indice : il dérive du mot d'origine" }
-          ],
-          mcq: [
-            { question: "Quel mot est dérivé de 'fleur' ?", choices: ["fleuve", "flûte", "fleurir", "flour"], answer: "fleurir" },
-            { question: "Comment est formé le mot 'malheureux' ?", choices: ["préfixe mal- + heureux", "heureux + suffixe -mal", "radical mal + eux", "sans dérivation"], answer: "préfixe mal- + heureux" },
-            { question: "Quel mot est dérivé de 'pêche' avec un suffixe ?", choices: ["repêcher", "dépêcher", "empêcher", "pêcheur"], answer: "pêcheur" }
-          ]
-        }
-      },
-
-      {
-        title: "Comprendre l'origine de certains mots (latin, grec)", slug: "origine-mots",
-        levels: ["6e"], category: "construire-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "Le mot 'aquarium' vient du latin '____ ' qui signifie 'eau'.", answer: "aqua", hint: "Indice : on retrouve cette racine dans 'aquatique'" },
-            { sentence: "La racine grecque 'tele-' signifie 'loin' et se retrouve dans le mot ____.", answer: "téléphone", hint: "Indice : appareil pour communiquer à distance" },
-            { sentence: "Le mot 'bibliothèque' vient du grec '____ ' (livre) et 'theke' (rangement).", answer: "biblio", hint: "Indice : on la retrouve dans 'bibliographie'" }
-          ],
-          mcq: [
-            { question: "Que signifie la racine latine 'terra' ?", choices: ["eau", "feu", "terre", "air"], answer: "terre" },
-            { question: "Quelle racine grecque signifie 'vie' ?", choices: ["geo", "bio", "photo", "logo"], answer: "bio" },
-            { question: "Le mot 'philosophie' vient du grec 'philos' (ami) et 'sophia' qui signifie :", choices: ["vie", "sagesse", "lumière", "nature"], answer: "sagesse" }
-          ]
-        }
-      },
-
-      /* ── Relations entre les mots ─────────────────────────────────────────── */
-      {
-        title: "Regrouper des mots par thème", slug: "regrouper-par-theme",
-        levels: ["CM1","CM2","6e"], category: "relations-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "Les mots 'chien', 'chat', 'lapin' appartiennent au thème des animaux de ____.", answer: "compagnie", hint: "Indice : on les garde chez soi" },
-            { sentence: "Pour regrouper des mots par thème, on cherche ce qu'ils ont en ____.", answer: "commun", hint: "Indice : ce qui les réunit tous" },
-            { sentence: "Les mots 'couteau', 'fourchette' et 'cuillère' appartiennent au thème des ____.", answer: "couverts", hint: "Indice : on les utilise pour manger" }
-          ],
-          mcq: [
-            { question: "Quel mot n'appartient pas au thème de la nature ?", choices: ["forêt", "rivière", "calculatrice", "montagne"], answer: "calculatrice" },
-            { question: "Quel groupe appartient au thème des sports ?", choices: ["marteau, scie, clou", "natation, tennis, football", "cahier, stylo, règle", "four, casserole, assiette"], answer: "natation, tennis, football" },
-            { question: "Quel thème réunit 'robe', 'pantalon', 'manteau' et 'chapeau' ?", choices: ["La maison", "Les vêtements", "Les aliments", "Les couleurs"], answer: "Les vêtements" }
-          ]
-        }
-      },
-
-      {
-        title: "Identifier un champ lexical", slug: "champ-lexical",
-        levels: ["CM2","6e"], category: "relations-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "L'ensemble des mots liés à un même thème forme un ____ lexical.", answer: "champ", hint: "Indice : on parle du champ lexical de la mer, de la peur…" },
-            { sentence: "'Houle', 'vague', 'marée' et 'écume' appartiennent au champ lexical de la ____.", answer: "mer", hint: "Indice : grande étendue d'eau salée" },
-            { sentence: "Le champ lexical de la peur comprend des mots comme 'effroi', 'terreur' et ____.", answer: "angoisse", hint: "Indice : un autre mot pour désigner la peur intense" }
-          ],
-          mcq: [
-            { question: "Quel mot appartient au champ lexical de la guerre ?", choices: ["fleur", "bataille", "cuisine", "musique"], answer: "bataille" },
-            { question: "Quel groupe forme un champ lexical de l'école ?", choices: ["stylo, cahier, tableau, maître", "four, casserole, couteau, plat", "ballon, piscine, stade, arbitre", "montagne, forêt, rivière, prairie"], answer: "stylo, cahier, tableau, maître" },
-            { question: "À quel champ lexical appartient le mot 'diagnostic' ?", choices: ["L'architecture", "La médecine", "L'agriculture", "La musique"], answer: "La médecine" }
-          ]
-        }
-      },
-
-      {
-        title: "Choisir le mot adapté au contexte", slug: "mot-adapte-contexte",
-        levels: ["CM2","6e"], category: "relations-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "Choisir le bon mot selon la situation, c'est choisir le mot ____ au contexte.", answer: "adapté", hint: "Indice : le mot qui convient le mieux" },
-            { sentence: "Dans un texte scientifique, on préférera le mot 'substance' plutôt que le mot ____.", answer: "truc", hint: "Indice : un mot familier et imprécis" },
-            { sentence: "Pour bien choisir un mot, on tient compte du ____ de la phrase.", answer: "contexte", hint: "Indice : les mots et phrases qui entourent" }
-          ],
-          mcq: [
-            { question: "Quelle phrase utilise le mot le plus adapté pour parler d'un bébé ?", choices: ["Le bébé brailla toute la nuit.", "Le bébé vociféra toute la nuit.", "Le bébé pleura toute la nuit.", "Le bébé tempêta toute la nuit."], answer: "Le bébé pleura toute la nuit." },
-            { question: "Quel mot est le plus adapté pour décrire la démarche d'un éléphant ?", choices: ["sautiller", "danser", "voltiger", "avancer lourdement"], answer: "avancer lourdement" },
-            { question: "Dans un texte scientifique, quel mot choisiriez-vous ?", choices: ["truc", "machin", "substance", "bidule"], answer: "substance" }
-          ]
-        }
-      },
-
-      {
-        title: "Distinguer les niveaux de langue", slug: "niveaux-de-langue",
-        levels: ["6e"], category: "relations-mots",
-        exercises: {
-          fillBlank: [
-            { sentence: "Il existe trois niveaux de langue : soutenu, courant et ____.", answer: "familier", hint: "Indice : le niveau utilisé avec ses amis proches" },
-            { sentence: "Dire 'Je n'ai pas vu ce film' correspond au niveau de langue ____.", answer: "courant", hint: "Indice : le niveau standard de la vie quotidienne" },
-            { sentence: "Dans une lettre officielle, on utilise le niveau de langue ____.", answer: "soutenu", hint: "Indice : le niveau le plus formel" }
-          ],
-          mcq: [
-            { question: "Quelle phrase est au niveau de langue soutenu ?", choices: ["J'ai pas faim.", "Je n'ai pas faim.", "Je ne suis point affamé.", "J'ai zéro faim."], answer: "Je ne suis point affamé." },
-            { question: "À quel niveau de langue appartient 'C'est un bouquin super' ?", choices: ["Soutenu", "Courant", "Familier", "Scientifique"], answer: "Familier" },
-            { question: "Avec quel niveau de langue parle-t-on à un directeur d'école ?", choices: ["Familier", "Courant ou soutenu", "Argotique", "Populaire"], answer: "Courant ou soutenu" }
-          ]
-        }
-      }
-
-    ]; // end SKILLS
+    const SKILLS = []; // toutes les compétences sont désormais dans LEX_COMPRENDRE, LEX_CONSTRUIRE et LEX_RELATIONS
 
     /* ════════════════════════════════════════════════════════════════════════
        UTILITIES
@@ -1042,37 +1158,45 @@
     }
 
     /* ════════════════════════════════════════════════════════════════════════
-       EXERCISE PANEL
-       Generic and reusable — only the SKILLS data changes per subject.
+       PANEL PRINCIPAL — gère les deux formats (niveaux + legacy)
     ════════════════════════════════════════════════════════════════════════ */
     const ExercisePanel = {
       overlay: null,
       panel:   null,
+      body:    null,
       currentSkill: null,
       currentType:  'fillBlank',
+      /* état quiz interactif */
+      _skill:    null,
+      _niveauIdx: 0,
+      _questions: [],
+      _qIdx:      0,
+      _score:     0,
+      _answered:  false,
+      _unlocks:   {},   /* slug → {n1: bool, n2: bool, n3: bool} */
 
       init() {
         this.overlay = document.getElementById('exerciseOverlay');
         this.panel   = document.getElementById('exercisePanel');
+        this.body    = document.getElementById('exercisePanelBody');
 
         document.getElementById('exerciseCloseBtn')
           .addEventListener('click', () => this.close());
-
         this.overlay.addEventListener('click', e => {
           if (e.target === this.overlay) this.close();
         });
-
         document.addEventListener('keydown', e => {
           if (e.key === 'Escape' && this.overlay.classList.contains('is-open')) this.close();
         });
 
+        /* Legacy toggle */
         document.querySelectorAll('.ex-type-btn').forEach(btn => {
           btn.addEventListener('click', () => {
             document.querySelectorAll('.ex-type-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             this.currentType = btn.dataset.type;
             this.panel.scrollTop = 0;
-            this.renderExercises();
+            this._renderLegacy();
           });
         });
 
@@ -1085,20 +1209,38 @@
       },
 
       open(slug) {
+        /* ── Nouveau système (LEX_COMPRENDRE + LEX_CONSTRUIRE + LEX_RELATIONS) ── */
+        const _allLex = [...(window.LEX_COMPRENDRE||[]), ...(window.LEX_CONSTRUIRE||[]), ...(window.LEX_RELATIONS||[])];
+        if (_allLex.length) {
+          const skill = _allLex.find(s => s.slug === slug);
+          if (skill) {
+            this._skill = skill;
+            document.getElementById('exerciseSkillBadges').innerHTML = badgesHTML(skill.levels);
+            document.getElementById('exerciseSkillTitle').textContent = skill.title;
+            document.getElementById('legacyToggleWrap').style.display = 'none';
+            document.getElementById('exerciseList').style.display = 'none';
+            this.body.style.display = '';
+            this._openPanel();
+            this._loadUnlocks(slug).then(() => this._showLevelSelect());
+            return;
+          }
+        }
+        /* ── Format legacy ── */
         this.currentSkill = SKILLS.find(s => s.slug === slug);
-        if (!this.currentSkill || !this.currentSkill.exercises) return;
-
-        /* Reset to fill-blank */
+        if (!this.currentSkill?.exercises) return;
+        this.body.style.display = 'none';
+        document.getElementById('legacyToggleWrap').style.display = '';
+        document.getElementById('exerciseList').style.display = '';
         this.currentType = 'fillBlank';
         document.querySelectorAll('.ex-type-btn').forEach(b => b.classList.remove('active'));
         document.querySelector('[data-type="fillBlank"]').classList.add('active');
-
-        document.getElementById('exerciseSkillBadges').innerHTML =
-          badgesHTML(this.currentSkill.levels);
+        document.getElementById('exerciseSkillBadges').innerHTML = badgesHTML(this.currentSkill.levels);
         document.getElementById('exerciseSkillTitle').textContent = this.currentSkill.title;
+        this._renderLegacy();
+        this._openPanel();
+      },
 
-        this.renderExercises();
-
+      _openPanel() {
         document.body.style.overflow = 'hidden';
         this.overlay.setAttribute('aria-hidden', 'false');
         requestAnimationFrame(() => this.overlay.classList.add('is-open'));
@@ -1112,53 +1254,534 @@
         setTimeout(() => { this.panel.scrollTop = 0; }, 300);
       },
 
-      renderExercises() {
-        const exList    = document.getElementById('exerciseList');
-        const exercises = this.currentSkill.exercises[this.currentType];
+      /* ── Unlock check via Supabase ─────────────────────────────────────── */
+      async _loadUnlocks(slug) {
+        const key = `lex-${slug}`;
+        this._unlocks[slug] = { n1: false, n2: false, n3: false };
+        try {
+          if (!window.lfmDb || typeof lfmAuth === 'undefined') return;
+          const session = await lfmAuth.getSession();
+          if (!session) return;
+          const { data } = await window.lfmDb
+            .from('exercise_results')
+            .select('exercise_slug, score, total')
+            .eq('student_id', session.user.id)
+            .like('exercise_slug', `${key}-%`);
+          if (!data) return;
+          const passed = (s) => s && s.total > 0 && (s.score / s.total) >= 0.8;
+          const best = { n1: null, n2: null, n3: null };
+          data.forEach(r => {
+            const m = r.exercise_slug.match(/-n([123])$/);
+            if (!m) return;
+            const k = `n${m[1]}`;
+            if (!best[k] || r.score > best[k].score) best[k] = r;
+          });
+          this._unlocks[slug].n1 = passed(best.n1);
+          this._unlocks[slug].n2 = passed(best.n2);
+          this._unlocks[slug].n3 = passed(best.n3);
+        } catch(e) { /* silencieux */ }
+      },
 
-        if (this.currentType === 'fillBlank') {
-          exList.innerHTML = exercises.map((ex, i) => this.fillBlankItem(ex, i)).join('');
-        } else {
-          exList.innerHTML = exercises.map((ex, i) => this.mcqItem(ex, i)).join('');
-          this.bindChoices();
+      /* ── Écran sélection de niveau ─────────────────────────────────────── */
+      _showLevelSelect() {
+        const slug = this._skill.slug;
+        const u = this._unlocks[slug] || {};
+        const stars = ['🌟', '⭐⭐', '🏆'];
+        const descs = this._skill.niveaux.map(n => n.desc);
+        const locked = [false, !u.n1, !u.n2];
+        const passed = [u.n1, u.n2, u.n3];
+
+        this.body.innerHTML = `
+          <p class="lv-intro">Choisis un niveau. Réussis le Niveau 1 pour débloquer le Niveau 2, etc.<br>
+          <strong>Réussite</strong> = 4 bonnes réponses sur 5.</p>
+          <div class="lv-grid">
+            ${[0,1,2].map(i => `
+              <button class="lv-card ${locked[i] ? 'lv-locked' : ''}"
+                      data-num="${i+1}" ${locked[i] ? 'disabled' : ''}>
+                <div class="lv-badge lv-badge-${i+1}">${i+1}</div>
+                <div class="lv-info">
+                  <div class="lv-num">Niveau ${i+1}</div>
+                  <div class="lv-desc">${descs[i]}</div>
+                </div>
+                ${locked[i]
+                  ? `<span class="lv-lock">🔒</span>`
+                  : passed[i]
+                    ? `<span class="lv-star">${stars[i]}</span>`
+                    : ''}
+              </button>`).join('')}
+          </div>`;
+
+        this.body.querySelectorAll('.lv-card:not(.lv-locked)').forEach(btn => {
+          btn.addEventListener('click', () => this._startLevel(+btn.dataset.num));
+        });
+        this.panel.scrollTop = 0;
+      },
+
+      /* ── Démarrer un niveau ────────────────────────────────────────────── */
+      _startLevel(num) {
+        this._niveauIdx = num - 1;
+        this._questions = this._skill.niveaux[this._niveauIdx].questions;
+        this._qIdx  = 0;
+        this._score = 0;
+        this._renderQuestion();
+      },
+
+      /* ── Rendu d'une question ──────────────────────────────────────────── */
+      _renderQuestion() {
+        const q     = this._questions[this._qIdx];
+        const total = this._questions.length;
+        const pct   = Math.round((this._qIdx / total) * 100);
+        this._answered = false;
+
+        let questionHTML = '';
+        switch(q.type) {
+          case 'mcq':      questionHTML = this._renderMCQ(q);      break;
+          case 'dict-mcq': questionHTML = this._renderDictMCQ(q);  break;
+          case 'click-sort': questionHTML = this._renderClickSort(q); break;
+          case 'match':    questionHTML = this._renderMatch(q);    break;
+          case 'col-sort': questionHTML = this._renderColSort(q);  break;
+          default:         questionHTML = `<p>Type inconnu : ${q.type}</p>`;
+        }
+
+        this.body.innerHTML = `
+          <div class="qz-progress-wrap">
+            <div class="qz-progress-top">
+              <span>Niveau ${this._niveauIdx + 1} — Question ${this._qIdx + 1}/${total}</span>
+              <span>${this._score}/${this._qIdx} ✓</span>
+            </div>
+            <div class="qz-bar-bg"><div class="qz-bar-fill" style="width:${pct}%"></div></div>
+          </div>
+          ${questionHTML}
+          <div class="qz-feedback" id="qzFeedback"></div>
+          <div class="qz-actions">
+            <button class="qz-btn qz-btn-primary" id="qzValidate" disabled>Valider</button>
+            <button class="qz-btn qz-btn-secondary" id="qzBack">← Niveaux</button>
+          </div>`;
+
+        this.panel.scrollTop = 0;
+        this._bindQuestionEvents(q);
+
+        document.getElementById('qzBack').addEventListener('click', () => this._showLevelSelect());
+        document.getElementById('qzValidate').addEventListener('click', () => this._validate(q));
+      },
+
+      _bindQuestionEvents(q) {
+        const validateBtn = () => document.getElementById('qzValidate');
+        if (q.type === 'mcq' || q.type === 'dict-mcq') {
+          document.querySelectorAll('.qz-choice').forEach(btn => {
+            btn.addEventListener('click', () => {
+              if (this._answered) return;
+              document.querySelectorAll('.qz-choice').forEach(b => b.classList.remove('qz-selected'));
+              btn.classList.add('qz-selected');
+              validateBtn().disabled = false;
+            });
+          });
+        }
+        if (q.type === 'click-sort') {
+          this._bindClickSort(q, validateBtn);
+        }
+        if (q.type === 'match') {
+          this._bindMatch(q, validateBtn);
+        }
+        if (q.type === 'col-sort') {
+          this._bindColSort(q, validateBtn);
         }
       },
 
-      fillBlankItem(ex, i) {
+      /* ── RENDU MCQ ─────────────────────────────────────────────────────── */
+      _renderMCQ(q) {
+        const shuffled = shuffle(q.choices);
+        return `
+          <div class="qz-instruction">${htmlEsc(q.instruction)}</div>
+          <div class="qz-choices">
+            ${shuffled.map(c => `
+              <button class="qz-choice" data-value="${htmlEsc(c)}">
+                <span class="qz-dot"></span>
+                <span>${htmlEsc(c)}</span>
+              </button>`).join('')}
+          </div>`;
+      },
+
+      /* ── RENDU DICT-MCQ ────────────────────────────────────────────────── */
+      _renderDictMCQ(q) {
+        const e = q.entry;
+        const defsHTML = e.defs.map(d => `<li><span class="dict-def-num"></span>${htmlEsc(d)}</li>`).join('');
+        const shuffled = shuffle(q.choices);
+        return `
+          <div class="dict-entry">
+            <div class="dict-headword">${htmlEsc(e.mot)}</div>
+            <div class="dict-class">${htmlEsc(e.classe)}</div>
+            <ul class="dict-defs">${defsHTML}</ul>
+            ${e.exemple ? `<div class="dict-example">${htmlEsc(e.exemple)}</div>` : ''}
+          </div>
+          <div class="qz-instruction">${htmlEsc(q.question)}</div>
+          <div class="qz-choices">
+            ${shuffled.map(c => `
+              <button class="qz-choice" data-value="${htmlEsc(c)}">
+                <span class="qz-dot"></span>
+                <span>${htmlEsc(c)}</span>
+              </button>`).join('')}
+          </div>`;
+      },
+
+      /* ── RENDU CLICK-SORT ──────────────────────────────────────────────── */
+      _renderClickSort(q) {
+        const scrambled = shuffle([...q.words]);
+        return `
+          <div class="qz-instruction">${htmlEsc(q.instruction)}</div>
+          <div class="cs-bank-label">Mots à classer :</div>
+          <div class="cs-bank" id="csBank">
+            ${scrambled.map((w,i) => `<button class="cs-chip" data-word="${htmlEsc(w)}" data-idx="${i}">${htmlEsc(w)}</button>`).join('')}
+          </div>
+          <div class="cs-slots-label">Ton classement (clique les mots dans l'ordre) :</div>
+          <div class="cs-slots" id="csSlots">
+            ${q.answer.map((_,i) => `<div class="cs-slot" data-pos="${i}">${i+1}</div>`).join('')}
+          </div>
+          <button class="cs-reset-btn" id="csReset">↺ Recommencer</button>`;
+      },
+
+      _bindClickSort(q, validateBtn) {
+        const bank  = document.getElementById('csBank');
+        const slots = document.getElementById('csSlots');
+        const reset = document.getElementById('csReset');
+        let placed = []; /* ordered list of words placed */
+
+        const refresh = () => {
+          slots.querySelectorAll('.cs-slot').forEach((slot, i) => {
+            slot.textContent = placed[i] || (i+1);
+            slot.classList.toggle('cs-filled', !!placed[i]);
+          });
+          validateBtn().disabled = placed.length < q.answer.length;
+        };
+
+        bank.addEventListener('click', e => {
+          if (this._answered) return;
+          const chip = e.target.closest('.cs-chip');
+          if (!chip || chip.classList.contains('cs-placed')) return;
+          if (placed.length >= q.answer.length) return;
+          placed.push(chip.dataset.word);
+          chip.classList.add('cs-placed');
+          refresh();
+        });
+
+        slots.addEventListener('click', e => {
+          if (this._answered) return;
+          const slot = e.target.closest('.cs-slot');
+          if (!slot || !slot.classList.contains('cs-filled')) return;
+          const pos = +slot.dataset.pos;
+          const word = placed[pos];
+          placed.splice(pos, 1);
+          /* re-enable chip */
+          bank.querySelectorAll('.cs-chip').forEach(c => {
+            if (c.dataset.word === word && c.classList.contains('cs-placed')) {
+              c.classList.remove('cs-placed');
+              return;
+            }
+          });
+          refresh();
+        });
+
+        reset.addEventListener('click', () => {
+          if (this._answered) return;
+          placed = [];
+          bank.querySelectorAll('.cs-chip').forEach(c => c.classList.remove('cs-placed'));
+          refresh();
+        });
+
+        /* Store accessor for validate */
+        this._csGetPlaced = () => placed;
+      },
+
+      /* ── RENDU MATCH ───────────────────────────────────────────────────── */
+      _renderMatch(q) {
+        const lefts  = shuffle(q.pairs.map(p => p.left));
+        const rights = shuffle(q.pairs.map(p => p.right));
+        return `
+          <div class="qz-instruction">${htmlEsc(q.instruction)}</div>
+          <div class="match-grid">
+            <div class="match-col" id="matchLeft">
+              ${lefts.map(l => `<button class="match-chip" data-side="left" data-word="${htmlEsc(l)}">${htmlEsc(l)}</button>`).join('')}
+            </div>
+            <div class="match-col" id="matchRight">
+              ${rights.map(r => `<button class="match-chip" data-side="right" data-word="${htmlEsc(r)}">${htmlEsc(r)}</button>`).join('')}
+            </div>
+          </div>`;
+      },
+
+      _bindMatch(q, validateBtn) {
+        let selected = null; /* { side, word, el } */
+        let matched  = 0;
+        const total  = q.pairs.length;
+        const pairMap = {};
+        q.pairs.forEach(p => {
+          pairMap[p.left]  = p.right;
+          pairMap[p.right] = p.left;
+        });
+
+        document.querySelectorAll('.match-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            if (this._answered || chip.hasAttribute('data-paired')) return;
+
+            if (!selected) {
+              chip.classList.add('match-selected');
+              selected = { side: chip.dataset.side, word: chip.dataset.word, el: chip };
+              return;
+            }
+
+            if (selected.el === chip) {
+              chip.classList.remove('match-selected');
+              selected = null;
+              return;
+            }
+
+            if (selected.side === chip.dataset.side) {
+              /* same side — move selection */
+              selected.el.classList.remove('match-selected');
+              chip.classList.add('match-selected');
+              selected = { side: chip.dataset.side, word: chip.dataset.word, el: chip };
+              return;
+            }
+
+            /* Different sides — check pair */
+            const isOk = pairMap[selected.word] === chip.dataset.word;
+            if (isOk) {
+              [selected.el, chip].forEach(el => {
+                el.classList.remove('match-selected');
+                el.classList.add('match-ok');
+                el.setAttribute('data-paired', '1');
+              });
+              matched++;
+              selected = null;
+              if (matched === total) validateBtn().disabled = false;
+            } else {
+              [selected.el, chip].forEach(el => el.classList.add('match-err'));
+              setTimeout(() => {
+                [selected.el, chip].forEach(el => el.classList.remove('match-err', 'match-selected'));
+                selected = null;
+              }, 700);
+            }
+          });
+        });
+
+        this._matchGetScore = () => matched;
+        this._matchTotal    = () => total;
+      },
+
+      /* ── RENDU COL-SORT ────────────────────────────────────────────────── */
+      _renderColSort(q) {
+        return `
+          <div class="qz-instruction">${htmlEsc(q.instruction)}</div>
+          <div style="display:flex;gap:12px;margin-bottom:14px;">
+            <span style="background:rgba(29,191,160,.15);color:#0d7a67;padding:4px 14px;border-radius:100px;font-size:12px;font-weight:700;">${htmlEsc(q.colA)}</span>
+            <span style="background:rgba(245,166,35,.15);color:#92400e;padding:4px 14px;border-radius:100px;font-size:12px;font-weight:700;">${htmlEsc(q.colB)}</span>
+          </div>
+          <div class="col-sort-items" id="colSortItems">
+            ${shuffle([...q.items]).map((item, i) => `
+              <div class="col-sort-item" data-idx="${i}" data-answer="${item.answer}" data-feedback="${htmlEsc(item.feedback)}">
+                <div class="col-sort-text">${htmlEsc(item.text)}</div>
+                <div class="col-sort-btns">
+                  <button class="col-sort-btn col-btn-a" data-col="A">${htmlEsc(q.colA)}</button>
+                  <button class="col-sort-btn col-btn-b" data-col="B">${htmlEsc(q.colB)}</button>
+                </div>
+              </div>`).join('')}
+          </div>`;
+      },
+
+      _bindColSort(q, validateBtn) {
+        let answered = 0;
+        const total  = q.items.length;
+        document.querySelectorAll('.col-sort-item').forEach(item => {
+          item.querySelectorAll('.col-sort-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              if (item.dataset.done) return;
+              item.dataset.done = '1';
+              const correct = btn.dataset.col === item.dataset.answer;
+              btn.classList.add(correct ? (btn.dataset.col === 'A' ? 'col-ok-a' : 'col-ok-b') : 'col-wrong');
+              const other = item.querySelector(`.col-sort-btn[data-col="${item.dataset.answer}"]`);
+              if (!correct) other.classList.add(item.dataset.answer === 'A' ? 'col-ok-a' : 'col-ok-b');
+              item.querySelectorAll('.col-sort-btn').forEach(b => b.disabled = true);
+              /* micro-feedback */
+              const fb = document.createElement('div');
+              fb.style.cssText = `font-size:12px;color:${correct?'#15803d':'#b91c1c'};margin-top:6px;`;
+              fb.textContent = item.dataset.feedback;
+              item.appendChild(fb);
+              answered++;
+              if (answered === total) validateBtn().disabled = false;
+            });
+          });
+        });
+
+        this._colSortGetScore = () => {
+          let ok = 0;
+          document.querySelectorAll('.col-sort-item').forEach(item => {
+            const chosenEl = item.querySelector('.col-ok-a, .col-ok-b');
+            if (chosenEl && chosenEl.dataset.col === item.dataset.answer) ok++;
+          });
+          return ok;
+        };
+        this._colSortTotal = () => total;
+      },
+
+      /* ── VALIDATION ────────────────────────────────────────────────────── */
+      _validate(q) {
+        if (this._answered) return;
+        this._answered = true;
+        document.getElementById('qzValidate').disabled = true;
+
+        let ok = false;
+        let score = 0;
+        let total = 1;
+
+        if (q.type === 'mcq' || q.type === 'dict-mcq') {
+          const sel = document.querySelector('.qz-choice.qz-selected');
+          if (!sel) return;
+          ok = sel.dataset.value === q.answer;
+          score = ok ? 1 : 0;
+          document.querySelectorAll('.qz-choice').forEach(btn => {
+            btn.disabled = true;
+            if (btn.dataset.value === q.answer) btn.classList.add('qz-correct');
+            else if (btn.classList.contains('qz-selected') && !ok) btn.classList.add('qz-wrong');
+          });
+        }
+
+        if (q.type === 'click-sort') {
+          const placed = this._csGetPlaced ? this._csGetPlaced() : [];
+          ok = placed.join('|') === q.answer.join('|');
+          score = ok ? 1 : 0;
+          /* show correct */
+          document.querySelectorAll('.cs-slot').forEach((slot, i) => {
+            const isRight = placed[i] === q.answer[i];
+            slot.classList.add(isRight ? 'cs-ok-slot' : 'cs-err-slot');
+          });
+          document.querySelectorAll('.cs-chip').forEach(chip => {
+            const i = q.answer.indexOf(chip.dataset.word);
+            chip.classList.add('cs-done');
+            chip.classList.add(placed.includes(chip.dataset.word) && ok ? 'cs-ok' : 'cs-err');
+          });
+        }
+
+        if (q.type === 'match') {
+          const m = this._matchGetScore ? this._matchGetScore() : 0;
+          const t = this._matchTotal  ? this._matchTotal()    : q.pairs.length;
+          ok    = m === t;
+          score = m;
+          total = t;
+        }
+
+        if (q.type === 'col-sort') {
+          score = this._colSortGetScore ? this._colSortGetScore() : 0;
+          total = this._colSortTotal   ? this._colSortTotal()    : q.items.length;
+          ok    = score === total;
+        }
+
+        /* Accumulate score (normalize to 1 question = 1 point) */
+        this._score += (score / total);
+
+        /* Feedback */
+        const fb = document.getElementById('qzFeedback');
+        fb.textContent = (ok ? '✓ ' : '✗ ') + q.feedback;
+        fb.className = `qz-feedback visible ${ok ? 'fb-ok' : 'fb-err'}`;
+
+        /* Replace Valider with Suivant */
+        const btn = document.getElementById('qzValidate');
+        btn.disabled = false;
+        const isLast = this._qIdx === this._questions.length - 1;
+        btn.textContent = isLast ? 'Voir mes résultats' : 'Question suivante →';
+        btn.onclick = () => {
+          if (isLast) this._showResult();
+          else { this._qIdx++; this._renderQuestion(); }
+        };
+      },
+
+      /* ── ÉCRAN RÉSULTATS ───────────────────────────────────────────────── */
+      async _showResult() {
+        const total  = this._questions.length;
+        const score  = Math.round(this._score);
+        const passed = score >= Math.ceil(total * 0.8);
+        const num    = this._niveauIdx + 1;
+        const slug   = this._skill.slug;
+
+        /* Save to Supabase */
+        try {
+          if (window.saveExerciseResult) {
+            await saveExerciseResult({
+              exerciseSlug: `lex-${slug}-n${num}`,
+              subject:      'français',
+              category:     'vocabulaire',
+              exerciseType: `niveau-${num}`,
+              level:        `Niveau ${num}`,
+              score,
+              total
+            });
+          }
+        } catch(e) { /* silencieux */ }
+
+        /* Update local unlock cache */
+        if (!this._unlocks[slug]) this._unlocks[slug] = {};
+        if (passed) this._unlocks[slug][`n${num}`] = true;
+
+        const emoji   = passed ? (score === total ? '🏆' : '🌟') : '💪';
+        const unlockMsg = passed && num < 3
+          ? `<div class="qz-result-unlock">🔓 Niveau ${num+1} débloqué !</div>` : '';
+
+        this.body.innerHTML = `
+          <div class="qz-result">
+            <div class="qz-result-emoji">${emoji}</div>
+            <div class="qz-result-score">${score} / ${total}</div>
+            <div class="qz-result-msg">
+              ${passed
+                ? `Bravo ! Tu as réussi le Niveau ${num}.`
+                : `Tu as obtenu ${score} bonne${score>1?'s':''} réponse${score>1?'s':''} sur ${total}. Il faut au moins ${Math.ceil(total*0.8)} pour valider ce niveau. Entraîne-toi encore !`}
+            </div>
+            ${unlockMsg}
+            <div class="qz-actions" style="justify-content:center;gap:12px;">
+              <button class="qz-btn qz-btn-primary" id="qzRetry">↺ Recommencer ce niveau</button>
+              <button class="qz-btn qz-btn-secondary" id="qzLevels">← Tous les niveaux</button>
+            </div>
+          </div>`;
+
+        document.getElementById('qzRetry').addEventListener('click', () => this._startLevel(num));
+        document.getElementById('qzLevels').addEventListener('click', () => this._showLevelSelect());
+        this.panel.scrollTop = 0;
+      },
+
+      /* ── LEGACY ────────────────────────────────────────────────────────── */
+      _renderLegacy() {
+        const exList    = document.getElementById('exerciseList');
+        const exercises = this.currentSkill.exercises[this.currentType];
+        if (this.currentType === 'fillBlank') {
+          exList.innerHTML = exercises.map((ex, i) => this._fillBlankItem(ex, i)).join('');
+        } else {
+          exList.innerHTML = exercises.map((ex, i) => this._mcqItem(ex, i)).join('');
+          this._bindLegacyChoices();
+        }
+      },
+      _fillBlankItem(ex, i) {
         const parts = ex.sentence.split('____');
         const input = `<input class="ex-blank" type="text" autocomplete="off" spellcheck="false"
           aria-label="Votre réponse" data-answer="${htmlEsc(ex.answer)}" placeholder="…">`;
         const sentence = htmlEsc(parts[0]) + input + (parts[1] ? htmlEsc(parts[1]) : '');
-        return `<div class="ex-item">
-          <div class="ex-item-num">Exercice ${i + 1}</div>
+        return `<div class="ex-item"><div class="ex-item-num">Exercice ${i+1}</div>
           <div class="ex-sentence">${sentence}</div>
-          <div class="ex-hint">${htmlEsc(ex.hint)}</div>
-        </div>`;
+          <div class="ex-hint">${htmlEsc(ex.hint)}</div></div>`;
       },
-
-      mcqItem(ex, i) {
+      _mcqItem(ex, i) {
         const shuffled = shuffle(ex.choices);
         const choices  = shuffled.map(c => `
           <button class="ex-choice" data-correct="${htmlEsc(ex.answer)}" data-value="${htmlEsc(c)}">
-            <span class="ex-choice-dot"></span>
-            <span>${htmlEsc(c)}</span>
+            <span class="ex-choice-dot"></span><span>${htmlEsc(c)}</span>
           </button>`).join('');
-        return `<div class="ex-item">
-          <div class="ex-item-num">Exercice ${i + 1}</div>
+        return `<div class="ex-item"><div class="ex-item-num">Exercice ${i+1}</div>
           <div class="ex-question">${htmlEsc(ex.question)}</div>
-          <div class="ex-choices">${choices}</div>
-        </div>`;
+          <div class="ex-choices">${choices}</div></div>`;
       },
-
-      bindChoices() {
+      _bindLegacyChoices() {
         document.querySelectorAll('.ex-choice').forEach(btn => {
           btn.addEventListener('click', () => {
             const item = btn.closest('.ex-item');
-            if (item.querySelector('.correct, .incorrect')) return; /* already answered */
-
+            if (item.querySelector('.correct, .incorrect')) return;
             const correct = btn.dataset.value === btn.dataset.correct;
             btn.classList.add(correct ? 'correct' : 'incorrect');
-
             if (!correct) {
               item.querySelectorAll('.ex-choice').forEach(c => {
                 if (c.dataset.value === c.dataset.correct) c.classList.add('correct');
@@ -1170,7 +1793,7 @@
     };
 
     /* ════════════════════════════════════════════════════════════════════════
-       FILTER / SEARCH / COLLAPSE  (unchanged from previous version)
+       FILTER / SEARCH / COLLAPSE
     ════════════════════════════════════════════════════════════════════════ */
     const searchInput = document.getElementById('searchInput');
     const filterBtns  = document.querySelectorAll('.filter-btn');
@@ -1252,6 +1875,11 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/results.js"></script>
+  <script src="js/lex-comprendre.js"></script>
+  <script src="js/lex-construire.js"></script>
+  <script src="js/lex-relations.js"></script>
   <script src="js/menu.js"></script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */
