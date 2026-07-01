@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comparer des nombres décimaux — Mathématiques — LFM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../js/supabase-client.js" onerror="void 0"></script>
+  <script src="../../js/auth.js" onerror="void 0"></script>
+  <script src="../../js/results.js" onerror="void 0"></script>
+  <style>
+    /* ── Tokens ── */
+    :root {
+      --navy:    #1A2D6B;
+      --gold:    #F5A623;
+      --gold-bg: #FFF3D0;
+      --teal:    #1DBFA0;
+      --err:     #E05252;
+      --bg:      #F8FAFC;
+      --white:   #ffffff;
+      --border:  #E8EDF3;
+      --text:    #1E2532;
+      --muted:   #5F6368;
+      --green:   #16a34a;
+      --green-bg:#dcfce7;
+      --shadow:  0 10px 30px rgba(26,45,107,0.10);
+      --radius:  20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Fredoka', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      padding-top: 50px;
+    }
+
+    /* ── Navbar ── */
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+    .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+    .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+    .navbar__brand img{height:34px;width:auto;}
+    .navbar__nav{display:flex;align-items:center;gap:24px;}
+    .navbar__nav a{text-decoration:none;color:#1a1a1a;font-family:'Fredoka',sans-serif;font-size:14px;font-weight:700;transition:color .2s;}
+    .navbar__nav a:hover{color:#1B4EBF;}
+    .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;font-family:'Fredoka',sans-serif;}
+    .navbar__nav .btn-login{color:#fff!important;}
+    .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Fredoka',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+    .btn-login:hover{background:#0b1e4d;}
+    @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+
+    /* ── Main layout ── */
+    .main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    /* ── Page title ── */
+    .breadcrumb {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--navy); }
+
+    .page-title {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .page-title h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.25;
+    }
+    .page-title .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .page-rule {
+      width: 44px;
+      height: 3px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin: 10px auto 0;
+    }
+
+    /* ── Level tabs ── */
+    .level-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .level-tab {
+      border: 2px solid var(--border);
+      border-radius: 100px;
+      padding: 9px 22px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      background: var(--white);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 200ms;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .level-tab.active {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #fff;
+    }
+    .level-tab.unlocked:hover:not(.active) {
+      border-color: var(--navy);
+      color: var(--navy);
+    }
+    .level-tab.locked {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .level-tab .lock-icon { font-size: 13px; }
+
+    /* ── Double numeration table ── */
+    .num-table-wrapper {
+      overflow-x: auto;
+      margin-bottom: 12px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+    .num-table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      background: var(--white);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .num-table thead th {
+      padding: 8px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-align: center;
+      background: var(--navy);
+      color: #fff;
+      white-space: nowrap;
+    }
+    .num-table thead th.col-entier { background: rgba(26,45,107,0.85); }
+    .num-table thead th.col-dec    { background: rgba(26,45,107,0.70); }
+    .num-table thead th.col-sep {
+      background: var(--navy);
+      color: var(--gold);
+      font-size: 18px;
+      padding: 0 4px;
+      width: 18px;
+    }
+    .num-table thead th.col-label { background: rgba(26,45,107,0.50); width: 32px; font-size: 11px; }
+
+    .num-table tbody td {
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      border-top: 1px solid var(--border);
+      min-width: 60px;
+      transition: background 300ms, color 300ms;
+    }
+    .num-table tbody td.col-label {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 6px;
+      min-width: 32px;
+      background: rgba(26,45,107,0.06);
+    }
+    .num-table tbody td.col-sep {
+      background: var(--white);
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--navy);
+      border-left: 3px solid var(--navy);
+      border-right: 3px solid var(--navy);
+      min-width: 18px;
+      padding: 0 2px;
+    }
+
+    /* Row A: navy-light */
+    .row-a td.col-entier { background: rgba(26,45,107,0.07); color: var(--navy); }
+    .row-a td.col-dec    { background: rgba(26,45,107,0.04); color: var(--navy); }
+    .row-a td.col-label  { background: rgba(26,45,107,0.12); color: var(--navy); }
+
+    /* Row B: gold-bg */
+    .row-b td.col-entier { background: var(--gold-bg); color: #92400e; }
+    .row-b td.col-dec    { background: #fffae8; color: #92400e; }
+    .row-b td.col-label  { background: #FFE8A0; color: #92400e; }
+
+    /* Highlighted diff column */
+    .num-table tbody td.hl-diff {
+      background: var(--teal) !important;
+      color: #fff !important;
+      border-color: rgba(29,191,160,0.3);
+    }
+    /* Empty cell */
+    .num-table tbody td.hl-empty {
+      color: #C0C8D8 !important;
+      font-size: 16px;
+    }
+
+    /* ── Number line ── */
+    .numline-wrapper {
+      background: var(--white);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 14px 16px 8px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+    }
+
+    /* ── Help buttons ── */
+    .help-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .help-btn {
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--white);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 200ms;
+    }
+    .help-btn:hover, .help-btn.active {
+      border-color: var(--teal);
+      color: var(--teal);
+      background: rgba(29,191,160,0.07);
+    }
+
+    /* ── Progress ── */
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .progress-label { font-size: 13px; font-weight: 700; color: var(--navy); }
+    .progress-score { font-size: 13px; font-weight: 600; color: var(--muted); }
+    .progress-bar-bg {
+      height: 7px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--teal);
+      border-radius: 100px;
+      transition: width 400ms ease;
+    }
+
+    /* ── Question card ── */
+    .q-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px 36px;
+      animation: fadeUp 320ms ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .q-type-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 12px;
+    }
+    .q-prompt {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.45;
+      margin-bottom: 24px;
+    }
+    .hl-num {
+      color: var(--gold);
+      font-size: 1.1em;
+    }
+
+    /* ── Sign comparison display ── */
+    .sign-display {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .sign-num {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .num-a { color: var(--navy); }
+    .num-b { color: #92400e; }
+    .sign-circle {
+      font-size: 2rem;
+      color: var(--muted);
+      opacity: 0.5;
+    }
+    .sign-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .sign-btn {
+      width: 68px;
+      height: 68px;
+      border: 2.5px solid var(--border);
+      border-radius: 100px;
+      background: var(--bg);
+      font-family: 'Fredoka', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--navy);
+      cursor: pointer;
+      transition: all 200ms;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sign-btn:hover:not(:disabled):not(.ok):not(.err) {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #fff;
+      transform: scale(1.08);
+    }
+    .sign-btn:disabled { cursor: default; }
+    .sign-btn.ok  { border-color: var(--green); background: var(--green-bg); color: #15803d; }
+    .sign-btn.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── Order drag ── */
+    .order-cards {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 20px;
+      min-height: 56px;
+    }
+    .order-card {
+      padding: 10px 20px;
+      border: 2.5px solid var(--border);
+      border-radius: 14px;
+      background: var(--bg);
+      font-family: 'Fredoka', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+      cursor: pointer;
+      transition: all 200ms;
+    }
+    .order-card:hover:not(:disabled):not(.placed) {
+      border-color: var(--navy);
+      background: rgba(26,45,107,0.05);
+    }
+    .order-card.selected {
+      border-color: var(--teal);
+      background: rgba(29,191,160,0.10);
+      color: var(--teal);
+      transform: scale(1.05);
+    }
+    .order-card.placed {
+      opacity: 0.3;
+      cursor: default;
+    }
+    .order-card:disabled { cursor: default; }
+
+    .order-slots {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .order-slot {
+      min-width: 70px;
+      min-height: 70px;
+      border: 2.5px dashed var(--border);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 200ms;
+      background: var(--bg);
+      padding: 6px 12px;
+      gap: 2px;
+    }
+    .order-slot:hover:not(.ok-slot) { border-color: var(--navy); background: rgba(26,45,107,0.04); }
+    .order-slot.filled  { border-style: solid; border-color: var(--navy); background: rgba(26,45,107,0.05); }
+    .order-slot.ok-slot { border-color: var(--green); background: var(--green-bg); border-style: solid; }
+    .order-slot.err-slot{ border-color: var(--err);   background: #fef2f2;         border-style: solid; }
+    .slot-ord {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .slot-val {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    /* ── Encadrement libre ── */
+    .encad-libre-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .encad-bound {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .encad-lt {
+      color: var(--muted);
+      font-size: 22px;
+    }
+
+    /* ── Encadrement double ── */
+    .encad-double-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .encad-center {
+      font-size: 24px;
+      color: var(--navy);
+    }
+    .encad-input {
+      width: 90px !important;
+      height: 52px !important;
+      font-size: 20px !important;
+    }
+
+    /* ── Free input ── */
+    .free-input {
+      height: 56px;
+      border: 2.5px solid var(--border);
+      border-radius: 14px;
+      padding: 0 18px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--navy);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms;
+      text-align: center;
+    }
+    .free-input:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(26,45,107,0.12);
+      background: var(--white);
+    }
+    .free-input.ok  { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+    .free-input.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── d-input ── */
+    .d-input {
+      width: 64px;
+      height: 52px;
+      border: 2.5px solid var(--border);
+      border-radius: 12px;
+      text-align: center;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms, background 200ms;
+    }
+    .d-input:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(26,45,107,0.12);
+      background: var(--white);
+    }
+    .d-input.ok  { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+    .d-input.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── QCM choices ── */
+    .choices-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .choice-btn {
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 200ms, background 200ms, transform 200ms;
+    }
+    .choice-btn:hover:not(:disabled):not(.ok):not(.err) {
+      border-color: var(--navy);
+      background: rgba(26,45,107,0.04);
+      transform: translateY(-2px);
+    }
+    .choice-btn:disabled { cursor: default; }
+    .choice-btn.ok  { border-color: var(--green); background: var(--green-bg); color: #15803d; }
+    .choice-btn.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── Vrai/Faux ── */
+    .vf-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .vf-btn {
+      flex: 1;
+      padding: 16px;
+      border: 2.5px solid var(--border);
+      border-radius: 16px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--bg);
+      color: var(--text);
+      transition: all 200ms;
+    }
+    .vf-btn:hover:not(:disabled):not(.ok):not(.err) {
+      transform: translateY(-2px);
+      border-color: var(--navy);
+      background: rgba(26,45,107,0.04);
+    }
+    .vf-btn:disabled { cursor: default; }
+    .vf-btn.ok  { border-color: var(--green); background: var(--green-bg); color: #15803d; }
+    .vf-btn.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── Follow-up justification ── */
+    .followup {
+      margin-top: 16px;
+      padding: 16px 20px;
+      background: rgba(26,45,107,0.04);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      display: none;
+    }
+    .followup.visible { display: block; animation: fadeUp 300ms ease; }
+    .followup-text {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      line-height: 2;
+    }
+
+    /* ── Validate button ── */
+    .validate-btn {
+      width: 100%;
+      padding: 15px;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 200ms, transform 200ms, opacity 200ms;
+    }
+    .validate-btn:hover:not(:disabled) { background: #142358; transform: translateY(-2px); }
+    .validate-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* ── Feedback ── */
+    .feedback {
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.55;
+      display: none;
+      animation: fadeUp 250ms ease;
+    }
+    .feedback.visible { display: block; }
+    .feedback.ok-fb  { background: var(--green-bg); color: #15803d; border: 1.5px solid #86efac; }
+    .feedback.err-fb { background: #fef2f2;         color: #b91c1c; border: 1.5px solid #fca5a5; }
+
+    /* ── Next button ── */
+    .next-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      display: none;
+      transition: background 200ms, transform 200ms;
+      animation: fadeUp 250ms ease;
+    }
+    .next-btn.visible { display: block; }
+    .next-btn:hover { background: #17a88d; transform: translateY(-2px); }
+
+    /* ── Result screen ── */
+    .result-screen {
+      display: none;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 48px 36px;
+      text-align: center;
+      animation: fadeUp 350ms ease;
+    }
+    .result-screen.visible { display: block; }
+    .result-emoji { font-size: 56px; margin-bottom: 12px; }
+    .result-title { font-size: 26px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+    .result-score { font-size: 48px; font-weight: 700; color: var(--gold); margin: 12px 0; }
+    .result-msg   { font-size: 16px; color: var(--muted); margin-bottom: 28px; line-height: 1.5; }
+    .result-btns  { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      padding: 13px 32px;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 200ms, transform 200ms;
+    }
+    .btn-primary:hover { background: #142358; transform: translateY(-2px); }
+    .btn-secondary {
+      padding: 13px 32px;
+      background: transparent;
+      color: var(--navy);
+      border: 2px solid var(--border);
+      border-radius: 100px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 200ms;
+    }
+    .btn-secondary:hover { border-color: var(--navy); transform: translateY(-2px); }
+
+    /* ── Confetti ── */
+    .confetti-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 999;
+    }
+    .confetti-piece {
+      position: absolute;
+      top: -10px;
+      border-radius: 2px;
+      animation: confettiFall linear forwards;
+    }
+    @keyframes confettiFall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+
+    /* ── Mobile ── */
+    @media (max-width: 560px) {
+      .main { padding: 20px 12px 48px; }
+      .q-card { padding: 24px 16px; }
+      .sign-btn { width: 56px; height: 56px; font-size: 24px; }
+      .sign-num { font-size: 1.6rem; }
+      .sign-btns { gap: 8px; }
+      .choices-grid { grid-template-columns: 1fr 1fr; }
+      .q-prompt { font-size: 16px; }
+      .order-card { font-size: 18px; padding: 8px 14px; }
+      .slot-val { font-size: 17px; }
+      .encad-input { width: 74px !important; }
+    }
+    @media (max-width: 400px) {
+      .sign-btns { flex-direction: row; }
+      .sign-btn { flex: 1; width: auto; height: 52px; border-radius: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar__inner">
+    <a href="../../index-v2.html" class="navbar__brand">
+      <img src="../../assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="../../index-v2.html">Accueil</a>
+      <a href="../../apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+
+  <div class="page-title">
+    <p class="breadcrumb">Mathématiques &rsaquo; Nombres et calculs &rsaquo; Comparer des nombres décimaux</p>
+    <h1>Comparer des nombres décimaux</h1>
+    <p class="subtitle">Cycle 3 — Nombres et calculs — Nombres décimaux</p>
+    <div class="page-rule"></div>
+  </div>
+
+  <!-- Level tabs -->
+  <div class="level-tabs" id="levelTabs">
+    <button class="level-tab active unlocked" data-level="1" onclick="selectLevel(1)">Niveau 1</button>
+    <button class="level-tab locked"          data-level="2" onclick="selectLevel(2)"><span class="lock-icon" id="lock2">🔒</span> Niveau 2</button>
+    <button class="level-tab locked"          data-level="3" onclick="selectLevel(3)"><span class="lock-icon" id="lock3">🔒</span> Niveau 3</button>
+  </div>
+
+  <!-- Double numeration table -->
+  <div class="num-table-wrapper">
+    <table class="num-table" id="numTable">
+      <thead>
+        <tr>
+          <th class="col-label"></th>
+          <th class="col-entier">Centaines</th>
+          <th class="col-entier">Dizaines</th>
+          <th class="col-entier">Unités</th>
+          <th class="col-sep">║</th>
+          <th class="col-dec">Dixièmes</th>
+          <th class="col-dec">Centièmes</th>
+          <th class="col-dec">Millièmes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-a">
+          <td class="col-label">A</td>
+          <td class="col-entier" id="a-ce">–</td>
+          <td class="col-entier" id="a-di">–</td>
+          <td class="col-entier" id="a-u">–</td>
+          <td class="col-sep">,</td>
+          <td class="col-dec" id="a-d">–</td>
+          <td class="col-dec" id="a-c">–</td>
+          <td class="col-dec" id="a-m">–</td>
+        </tr>
+        <tr class="row-b">
+          <td class="col-label">B</td>
+          <td class="col-entier" id="b-ce">–</td>
+          <td class="col-entier" id="b-di">–</td>
+          <td class="col-entier" id="b-u">–</td>
+          <td class="col-sep">,</td>
+          <td class="col-dec" id="b-d">–</td>
+          <td class="col-dec" id="b-c">–</td>
+          <td class="col-dec" id="b-m">–</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Number line (hidden by default) -->
+  <div class="numline-wrapper" id="numlineWrapper" style="display:none">
+    <div id="numlineSVG"></div>
+  </div>
+
+  <!-- Help buttons -->
+  <div class="help-row">
+    <button class="help-btn" id="helpTableBtn" onclick="highlightFirstDiff()">💡 Aide : tableau</button>
+    <button class="help-btn" id="helpLineBtn"  onclick="toggleNumline()">📏 Aide : droite graduée</button>
+  </div>
+
+  <!-- Progress -->
+  <div id="progressArea">
+    <div class="progress-row">
+      <span class="progress-label" id="progressLabel">Question 1/5</span>
+      <span class="progress-score" id="progressScore">Score : 0</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Question card -->
+  <div class="q-card" id="qCard">
+    <div class="q-type-badge" id="qTypeBadge"></div>
+    <div class="q-prompt"     id="qPrompt"></div>
+    <div id="qBody"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Question suivante →</button>
+  </div>
+
+  <!-- Result screen -->
+  <div class="result-screen" id="resultScreen">
+    <div class="result-emoji" id="resultEmoji"></div>
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-score" id="resultScore"></div>
+    <div class="result-msg"   id="resultMsg"></div>
+    <div class="result-btns">
+      <button class="btn-primary"   id="nextLevelBtn" onclick="goNextLevel()" style="display:none">Niveau suivant 🔓</button>
+      <button class="btn-secondary" onclick="retryLevel()">Réessayer</button>
+      <a class="btn-secondary" href="../../mathématiques-nombres-decimaux.html" style="display:inline-flex;align-items:center;text-decoration:none">← Retour</a>
+    </div>
+  </div>
+
+</main>
+
+<div class="confetti-container" id="confettiContainer"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 · <a href="../../mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a></p>
+  </div>
+</footer>
+
+<script>
+/* ─── Banks ─── */
+const BANKS = {
+  1: [
+    { type: 'A', a: '3,7',  b: '5,2',  signe: '<' },
+    { type: 'B', a: '4,3',  b: '4,7',  signe: '<' },
+    { type: 'C', a: '2,30', b: '2,3',  signe: '=', piege: 'zeros' },
+    { type: 'B', a: '0,9',  b: '0,4',  signe: '>' },
+    { type: 'A', a: '6,1',  b: '2,8',  signe: '>' },
+    { type: 'C', a: '1,10', b: '1,1',  signe: '=', piege: 'zeros' },
+    { type: 'D', nombres: ['1,2','3,1','1,9'], ordre: ['1,2','1,9','3,1'] },
+    { type: 'B', a: '5,5',  b: '5,8',  signe: '<' }
+  ],
+  2: [
+    { type: 'A', a: '1,9',  b: '1,47', signe: '>', piege: 'longueur' },
+    { type: 'B', a: '0,07', b: '0,7',  signe: '<', piege: 'zero_intercale' },
+    { type: 'C', a: '0,25', b: '0,3',  signe: '<', piege: 'longueur' },
+    { type: 'A', a: '3,04', b: '3,4',  signe: '<', piege: 'zero_intercale' },
+    { type: 'D', min: '1,2', max: '1,3' },
+    { type: 'E', nombres: ['2,08','2,8','2,80','2,008'], plus_grand: '2,8', equivalents: ['2,8','2,80'] },
+    { type: 'A', a: '0,5',  b: '0,50', signe: '=', piege: 'zeros' },
+    { type: 'C', a: '0,09', b: '0,9',  signe: '<', piege: 'zero_intercale' }
+  ],
+  3: [
+    { type: 'A', a: '0,245', b: '0,249', signe: '<' },
+    { type: 'A', a: '1,300', b: '1,3',   signe: '=', piege: 'zeros' },
+    { type: 'B', nombres: ['0,35','0,305','0,350','0,053'], ordre: ['0,053','0,305','0,35','0,350'], equivalents: [['0,35','0,350']] },
+    { type: 'C', nombre: '1,347', inf: '1,34', sup: '1,35' },
+    { type: 'D', nombre: '0,072', inf: '0,0',  sup: '0,1' },
+    { type: 'E', min: '2,450', max: '2,451' },
+    { type: 'F', a: '0,9', b: '0,099', signe: '>', justif: { col: 'dixièmes', val_a: '9', val_b: '0' } },
+    { type: 'A', a: '0,100', b: '0,010', signe: '>', piege: 'zero_intercale' }
+  ]
+};
+
+const CONFIG = {
+  1: { perSession: 5, threshold: 4 },
+  2: { perSession: 6, threshold: 5 },
+  3: { perSession: 6, threshold: 5 }
+};
+
+/* ─── State ─── */
+let currentLevel  = 1;
+let session       = [];
+let sessionIdx    = 0;
+let score         = 0;
+let attempts      = 0;
+let answered      = false;
+let levelsDone    = JSON.parse(sessionStorage.getItem('cdLevelsDone') || '{}');
+let currentA      = '';
+let currentB      = '';
+let orderSelIdx   = null;
+
+/* ─── Helpers ─── */
+function toFloat(str) {
+  return parseFloat(String(str).replace(',', '.'));
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function parseNum(str) {
+  const s = String(str).trim().replace(',', '.');
+  const [intStr, decStr = ''] = s.split('.');
+  const ip = intStr.replace(/^0*/, '') || '0';
+  const len = ip.length;
+  return {
+    ce: len >= 3 ? ip[len - 3] : '',
+    di: len >= 2 ? ip[len - 2] : '',
+    u:  ip[len - 1] || '0',
+    d:  decStr[0] || '',
+    c:  decStr[1] || '',
+    m:  decStr[2] || ''
+  };
+}
+
+/* ─── Double numeration table ─── */
+const COLS_ORDER = ['ce','di','u','d','c','m'];
+
+function updateDoubleTable(strA, strB, highlightDiff) {
+  currentA = String(strA);
+  currentB = String(strB);
+  const pA = parseNum(strA);
+  const pB = parseNum(strB);
+
+  let firstDiff = null;
+  if (highlightDiff) {
+    for (const col of COLS_ORDER) {
+      const va = pA[col] !== '' ? pA[col] : '0';
+      const vb = pB[col] !== '' ? pB[col] : '0';
+      if (va !== vb) { firstDiff = col; break; }
+    }
+  }
+
+  for (const col of COLS_ORDER) {
+    const cellA = document.getElementById(`a-${col}`);
+    const cellB = document.getElementById(`b-${col}`);
+    if (!cellA) continue;
+
+    cellA.textContent = pA[col] !== '' ? pA[col] : '–';
+    cellB.textContent = pB[col] !== '' ? pB[col] : '–';
+    cellA.className = cellA.className.replace(/\bcol-\w+\b/g, '').trim();
+    cellB.className = cellB.className.replace(/\bcol-\w+\b/g, '').trim();
+
+    const baseClass = (col === 'ce' || col === 'di' || col === 'u') ? 'col-entier' : 'col-dec';
+    cellA.classList.add(baseClass);
+    cellB.classList.add(baseClass);
+
+    if (pA[col] === '') cellA.classList.add('hl-empty');
+    if (pB[col] === '') cellB.classList.add('hl-empty');
+
+    if (firstDiff && col === firstDiff) {
+      cellA.classList.add('hl-diff');
+      cellB.classList.add('hl-diff');
+    }
+  }
+
+  if (document.getElementById('numlineWrapper').style.display !== 'none') {
+    renderNumline(strA, strB);
+  }
+}
+
+function highlightFirstDiff() {
+  if (currentA && currentB) updateDoubleTable(currentA, currentB, true);
+}
+
+/* ─── Number line ─── */
+function toggleNumline() {
+  const wrap = document.getElementById('numlineWrapper');
+  const btn  = document.getElementById('helpLineBtn');
+  if (wrap.style.display === 'none') {
+    wrap.style.display = '';
+    renderNumline(currentA, currentB);
+    btn.classList.add('active');
+  } else {
+    wrap.style.display = 'none';
+    btn.classList.remove('active');
+  }
+}
+
+function renderNumline(strA, strB) {
+  if (!strA || !strB) return;
+  const a = toFloat(strA), b = toFloat(strB);
+  const W = 560, H = 88, Y = 52, PAD = 52;
+
+  const loR = Math.min(a, b), hiR = Math.max(a, b);
+  const diff = hiR - loR || 0.001;
+
+  let step;
+  if (diff >= 1.5)       step = 1;
+  else if (diff >= 0.15) step = 0.1;
+  else if (diff >= 0.015)step = 0.01;
+  else                   step = 0.001;
+
+  const prec = step >= 1 ? 0 : step >= 0.1 ? 1 : step >= 0.01 ? 2 : 3;
+  const lo = parseFloat(((Math.floor(loR / step) - 1) * step).toFixed(prec + 1));
+  const hi = parseFloat(((Math.ceil(hiR  / step) + 1) * step).toFixed(prec + 1));
+  const range = hi - lo;
+  const toX = v => PAD + ((v - lo) / range) * (W - 2 * PAD);
+  const fmt  = v => v.toFixed(prec).replace('.', ',');
+
+  const ticks = [];
+  for (let v = lo, i = 0; v <= hi + step * 0.01 && i < 30; v = parseFloat((v + step).toFixed(prec + 1)), i++) {
+    ticks.push(parseFloat(v.toFixed(prec + 1)));
+  }
+
+  const isEq = Math.abs(a - b) < 1e-9;
+  const xA = toX(a), xB = toX(b);
+
+  const p = [
+    `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${W}px;height:${H}px;display:block;margin:0 auto">`,
+    `<line x1="${PAD}" y1="${Y}" x2="${W-PAD}" y2="${Y}" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round"/>`
+  ];
+
+  for (const v of ticks) {
+    const x  = toX(v).toFixed(1);
+    const isA = Math.abs(v - a) < step * 0.05;
+    const isB = Math.abs(v - b) < step * 0.05;
+    const big = isA || isB;
+    p.push(`<line x1="${x}" y1="${(Y-(big?9:5)).toFixed(1)}" x2="${x}" y2="${(Y+(big?9:5)).toFixed(1)}" stroke="${big?'#475569':'#CBD5E1'}" stroke-width="${big?2:1}"/>`);
+    p.push(`<text x="${x}" y="${(Y+22).toFixed(1)}" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="11" fill="${isA?'#1A2D6B':isB?'#92400e':'#94A3B8'}">${fmt(v)}</text>`);
+  }
+
+  if (isEq) {
+    p.push(`<circle cx="${xA.toFixed(1)}" cy="${Y}" r="9" fill="#1DBFA0" stroke="white" stroke-width="2.5"/>`);
+    p.push(`<text x="${xA.toFixed(1)}" y="${(Y-16).toFixed(1)}" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="13" font-weight="700" fill="#1DBFA0">${strA} = ${strB}</text>`);
+  } else {
+    const xDist = Math.abs(xA - xB);
+    const offA = xDist < 50 ? -14 : 0;
+    const offB = xDist < 50 ?  14 : 0;
+    p.push(`<circle cx="${xA.toFixed(1)}" cy="${Y}" r="9" fill="#1A2D6B" stroke="white" stroke-width="2.5"/>`);
+    p.push(`<text x="${(xA+offA).toFixed(1)}" y="${(Y-16).toFixed(1)}" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="13" font-weight="700" fill="#1A2D6B">${strA}</text>`);
+    p.push(`<circle cx="${xB.toFixed(1)}" cy="${Y}" r="9" fill="#F5A623" stroke="white" stroke-width="2.5"/>`);
+    p.push(`<text x="${(xB+offB).toFixed(1)}" y="${(Y-16).toFixed(1)}" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="13" font-weight="700" fill="#92400e">${strB}</text>`);
+  }
+
+  p.push('</svg>');
+  document.getElementById('numlineSVG').innerHTML = p.join('');
+}
+
+/* ─── Level management ─── */
+function initLevelTabs() {
+  for (const lv of [1, 2, 3]) {
+    const btn  = document.querySelector(`.level-tab[data-level="${lv}"]`);
+    const lock = document.getElementById(`lock${lv}`);
+    if (levelsDone[lv - 1] || lv === 1) {
+      btn.classList.remove('locked');
+      btn.classList.add('unlocked');
+      if (lock) lock.textContent = '🔓';
+    }
+  }
+}
+
+function selectLevel(lv) {
+  if (lv > 1 && !levelsDone[lv - 1]) return;
+  currentLevel = lv;
+  document.querySelectorAll('.level-tab').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.level-tab[data-level="${lv}"]`).classList.add('active');
+  startLevel();
+}
+
+function startLevel() {
+  session    = shuffle(BANKS[currentLevel]).slice(0, CONFIG[currentLevel].perSession);
+  sessionIdx = 0;
+  score      = 0;
+  document.getElementById('resultScreen').classList.remove('visible');
+  document.getElementById('qCard').style.display    = '';
+  document.getElementById('progressArea').style.display = '';
+  document.getElementById('numlineWrapper').style.display = 'none';
+  document.getElementById('helpLineBtn').classList.remove('active');
+  renderQuestion();
+}
+
+/* ─── Question rendering dispatch ─── */
+function renderQuestion() {
+  const q  = session[sessionIdx];
+  const lv = currentLevel;
+  attempts = 0;
+  answered = false;
+  orderSelIdx = null;
+
+  updateProgress();
+
+  const badge  = document.getElementById('qTypeBadge');
+  const prompt = document.getElementById('qPrompt');
+  const body   = document.getElementById('qBody');
+  const fb     = document.getElementById('feedback');
+  const next   = document.getElementById('nextBtn');
+  fb.className = 'feedback';
+  fb.textContent = '';
+  next.className = 'next-btn';
+
+  // Level 3 has different meanings for type B, C, D, E
+  if (lv === 3) {
+    if (q.type === 'B') {
+      const sorted = [...q.nombres].sort((x, y) => toFloat(x) - toFloat(y));
+      updateDoubleTable(sorted[0], sorted[sorted.length - 1], false);
+      renderOrder(q, badge, prompt, body);
+    } else if (q.type === 'C' || q.type === 'D') {
+      updateDoubleTable(q.inf, q.sup, false);
+      renderEncadrementDouble(q, badge, prompt, body);
+    } else if (q.type === 'E') {
+      updateDoubleTable(q.min, q.max, false);
+      renderEncadrementLibre(q, badge, prompt, body);
+    } else if (q.type === 'F') {
+      updateDoubleTable(q.a, q.b, false);
+      renderVraiFaux(q, badge, prompt, body);
+    } else {
+      // Type A: sign comparison
+      updateDoubleTable(q.a, q.b, false);
+      renderSign(q, badge, prompt, body);
+    }
+    return;
+  }
+
+  // Levels 1 & 2
+  if (q.type === 'A' || q.type === 'B' || q.type === 'C') {
+    updateDoubleTable(q.a, q.b, false);
+    renderSign(q, badge, prompt, body);
+  } else if (lv === 1 && q.type === 'D') {
+    const sorted = [...q.nombres].sort((x, y) => toFloat(x) - toFloat(y));
+    updateDoubleTable(sorted[0], sorted[sorted.length - 1], false);
+    renderOrder(q, badge, prompt, body);
+  } else if (lv === 2 && q.type === 'D') {
+    updateDoubleTable(q.min, q.max, false);
+    renderEncadrementLibre(q, badge, prompt, body);
+  } else if (lv === 2 && q.type === 'E') {
+    updateDoubleTable(q.nombres[0], q.nombres[2], false);
+    renderQCMPlusGrand(q, badge, prompt, body);
+  }
+}
+
+/* ─── Type: Sign comparison (A, B, C for L1/L2; A for L3) ─── */
+function renderSign(q, badge, prompt, body) {
+  const labels = { A: 'Quel signe convient ?', B: 'Quel signe convient ?', C: 'Quel signe convient ?' };
+  badge.textContent = labels[q.type] || 'Quel signe convient ?';
+  prompt.innerHTML = `Compare ces deux nombres :`;
+
+  body.innerHTML = `
+    <div class="sign-display">
+      <span class="sign-num num-a">${q.a}</span>
+      <span class="sign-circle">○</span>
+      <span class="sign-num num-b">${q.b}</span>
+    </div>
+    <div class="sign-btns">
+      <button class="sign-btn" id="sbtn-lt" onclick="validateSign('&lt;')">&lt;</button>
+      <button class="sign-btn" id="sbtn-eq" onclick="validateSign('=')">=</button>
+      <button class="sign-btn" id="sbtn-gt" onclick="validateSign('&gt;')">&gt;</button>
+    </div>
+  `;
+}
+
+function validateSign(chosen) {
+  if (answered) return;
+  const q    = session[sessionIdx];
+  const map  = { '&lt;': '<', '&gt;': '>', '=': '=' };
+  const sign = map[chosen] || chosen;
+
+  const btnIds = { '<': 'sbtn-lt', '=': 'sbtn-eq', '>': 'sbtn-gt' };
+  const clickedBtn = document.getElementById(btnIds[sign]);
+  if (!clickedBtn || clickedBtn.disabled) return;
+
+  if (sign === q.signe) {
+    document.querySelectorAll('.sign-btn').forEach(b => b.disabled = true);
+    clickedBtn.classList.add('ok');
+    handleCorrect(q);
+  } else {
+    clickedBtn.disabled = true;
+    clickedBtn.classList.add('err');
+    handleWrong(q, getHint(q), getCorrectionMsg(q));
+    if (answered) {
+      document.querySelectorAll('.sign-btn').forEach(b => {
+        b.disabled = true;
+        if (b.id === btnIds[q.signe]) b.classList.add('ok');
+      });
+    }
+  }
+}
+
+/* ─── Type: Order (L1 D = 3 numbers; L3 B = 4 numbers) ─── */
+function renderOrder(q, badge, prompt, body) {
+  const n = q.nombres.length;
+  badge.textContent = 'Range dans l\'ordre croissant';
+  prompt.innerHTML  = `Range ces <strong>${n} nombres</strong> du plus petit au plus grand :`;
+
+  const shuffled = shuffle([...q.nombres]);
+  q._shuffled = shuffled;
+  q._slots    = new Array(n).fill(null);
+
+  const slotLabels = ['1<sup>er</sup>', '2<sup>e</sup>', '3<sup>e</sup>', '4<sup>e</sup>'];
+
+  body.innerHTML = `
+    <div class="order-cards" id="orderCards">
+      ${shuffled.map((num, i) => `<button class="order-card" id="ocard-${i}" onclick="pickCard(${i})">${num}</button>`).join('')}
+    </div>
+    <div class="order-slots" id="orderSlots">
+      ${Array.from({length: n}, (_, i) => `
+        <div class="order-slot" id="oslot-${i}" onclick="dropInSlot(${i})">
+          <span class="slot-ord">${slotLabels[i]}</span>
+          <span class="slot-val" id="sval-${i}"></span>
+        </div>
+      `).join('')}
+    </div>
+    <button class="validate-btn" id="validateBtn" onclick="validateOrder()" disabled>Valider l'ordre</button>
+  `;
+}
+
+function pickCard(i) {
+  if (answered) return;
+  const card = document.getElementById(`ocard-${i}`);
+  if (!card || card.classList.contains('placed') || card.disabled) return;
+
+  if (orderSelIdx === i) {
+    card.classList.remove('selected');
+    orderSelIdx = null;
+    return;
+  }
+  document.querySelectorAll('.order-card:not(.placed)').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  orderSelIdx = i;
+}
+
+function dropInSlot(slotIdx) {
+  if (answered) return;
+  const q    = session[sessionIdx];
+  const slot = document.getElementById(`oslot-${slotIdx}`);
+
+  if (q._slots[slotIdx] !== null) {
+    // Unplace
+    const prevCardIdx = q._slots[slotIdx];
+    q._slots[slotIdx] = null;
+    document.getElementById(`sval-${slotIdx}`).textContent = '';
+    slot.classList.remove('filled');
+    const c = document.getElementById(`ocard-${prevCardIdx}`);
+    if (c) { c.classList.remove('placed'); c.disabled = false; }
+    document.getElementById('validateBtn').disabled = true;
+    return;
+  }
+
+  if (orderSelIdx === null) return;
+  q._slots[slotIdx] = orderSelIdx;
+  document.getElementById(`sval-${slotIdx}`).textContent = q._shuffled[orderSelIdx];
+  slot.classList.add('filled');
+  const card = document.getElementById(`ocard-${orderSelIdx}`);
+  card.classList.remove('selected');
+  card.classList.add('placed');
+  card.disabled = true;
+  orderSelIdx = null;
+
+  const allFilled = q._slots.every(s => s !== null);
+  document.getElementById('validateBtn').disabled = !allFilled;
+}
+
+function validateOrder() {
+  if (answered) return;
+  const q      = session[sessionIdx];
+  const placed = q._slots.map(idx => q._shuffled[idx]);
+  const vals   = placed.map(toFloat);
+
+  let correct = true;
+  for (let i = 0; i < vals.length - 1; i++) {
+    if (vals[i] > vals[i + 1]) { correct = false; break; }
+  }
+
+  document.getElementById('validateBtn').disabled = true;
+
+  if (correct) {
+    for (let i = 0; i < placed.length; i++) {
+      document.getElementById(`oslot-${i}`).classList.add('ok-slot');
+    }
+    handleCorrect(q);
+    return;
+  }
+
+  for (let i = 0; i < vals.length - 1; i++) {
+    if (vals[i] > vals[i + 1]) {
+      document.getElementById(`oslot-${i}`).classList.add('err-slot');
+      document.getElementById(`oslot-${i + 1}`).classList.add('err-slot');
+    }
+  }
+
+  const correction = `L'ordre correct est : <strong>${q.ordre.join(' < ')}</strong>.`;
+  handleWrong(q, 'Pas tout à fait ! Vérifie rang par rang dans le tableau. 💡', correction);
+
+  if (answered) {
+    for (let i = 0; i < q.ordre.length; i++) {
+      document.getElementById(`sval-${i}`).textContent = q.ordre[i];
+      document.getElementById(`oslot-${i}`).classList.remove('err-slot', 'filled');
+      document.getElementById(`oslot-${i}`).classList.add('ok-slot');
+    }
+    document.querySelectorAll('.order-card').forEach(c => { c.disabled = true; c.classList.remove('placed','selected'); });
+  } else {
+    // Reset slots for retry
+    q._slots = new Array(q.nombres.length).fill(null);
+    orderSelIdx = null;
+    for (let i = 0; i < q.nombres.length; i++) {
+      document.getElementById(`sval-${i}`).textContent = '';
+      document.getElementById(`oslot-${i}`).classList.remove('filled','err-slot','ok-slot');
+    }
+    document.querySelectorAll('.order-card').forEach(c => {
+      c.classList.remove('placed','selected');
+      c.disabled = false;
+    });
+    document.getElementById('validateBtn').disabled = true;
+  }
+}
+
+/* ─── Type: Encadrement libre (L2 D, L3 E) ─── */
+function renderEncadrementLibre(q, badge, prompt, body) {
+  badge.textContent = 'Encadrement';
+  const mn = q.min, mx = q.max;
+  prompt.innerHTML  = `Trouve un nombre décimal compris <strong>strictement</strong> entre <span class="hl-num">${mn}</span> et <span class="hl-num">${mx}</span> :`;
+
+  body.innerHTML = `
+    <div class="encad-libre-row">
+      <span class="encad-bound">${mn}</span>
+      <span class="encad-lt"> &lt; </span>
+      <input class="free-input" id="freeInput" type="text" inputmode="decimal" placeholder="?" autocomplete="off" style="max-width:160px">
+      <span class="encad-lt"> &lt; </span>
+      <span class="encad-bound">${mx}</span>
+    </div>
+    <button class="validate-btn" id="validateBtn" onclick="validateEncadrementLibre()" disabled>Valider</button>
+  `;
+
+  q._eMin = toFloat(mn);
+  q._eMax = toFloat(mx);
+
+  const inp = document.getElementById('freeInput');
+  inp.addEventListener('input', () => {
+    document.getElementById('validateBtn').disabled = inp.value.trim() === '';
+  });
+  inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') validateEncadrementLibre(); });
+  inp.focus();
+}
+
+function validateEncadrementLibre() {
+  if (answered) return;
+  const q   = session[sessionIdx];
+  const inp = document.getElementById('freeInput');
+  const val = toFloat(inp.value.trim());
+
+  inp.disabled = true;
+  document.getElementById('validateBtn').disabled = true;
+
+  const ok = !isNaN(val) && val > q._eMin && val < q._eMax;
+
+  if (ok) {
+    inp.classList.add('ok');
+    handleCorrect(q);
+  } else {
+    inp.classList.add('err');
+    const hint = `Ton nombre doit être <strong>strictement</strong> entre <strong>${currentA}</strong> et <strong>${currentB}</strong>. Utilise la droite graduée comme aide !`;
+    const corr = `Il fallait un nombre entre <strong>${currentA}</strong> et <strong>${currentB}</strong>. Par exemple : ${((q._eMin + q._eMax) / 2).toFixed(4).replace('.', ',')} convient.`;
+    handleWrong(q, hint, corr);
+    if (!answered) {
+      inp.disabled = false;
+      inp.classList.remove('err');
+      inp.value = '';
+      document.getElementById('validateBtn').disabled = false;
+      inp.focus();
+    }
+  }
+}
+
+/* ─── Type: QCM plus grand (L2 E) ─── */
+function renderQCMPlusGrand(q, badge, prompt, body) {
+  badge.textContent = 'Le plus grand';
+  prompt.innerHTML  = `Quel est le plus grand de ces nombres ?`;
+
+  const shuffled = shuffle([...q.nombres]);
+  q._qcmChoices = shuffled;
+
+  body.innerHTML = `
+    <div class="choices-grid">
+      ${shuffled.map((n, i) => `<button class="choice-btn" id="qcm-${i}" onclick="validateQCM(${i})">${n}</button>`).join('')}
+    </div>
+  `;
+}
+
+function validateQCM(i) {
+  if (answered) return;
+  const q      = session[sessionIdx];
+  const chosen = q._qcmChoices[i];
+  const btn    = document.getElementById(`qcm-${i}`);
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+
+  const isCorrect = q.equivalents.includes(chosen);
+
+  if (isCorrect) {
+    q._qcmChoices.forEach((n, j) => {
+      if (q.equivalents.includes(n)) document.getElementById(`qcm-${j}`).classList.add('ok');
+    });
+    handleCorrect(q);
+  } else {
+    btn.classList.add('err');
+    q._qcmChoices.forEach((n, j) => {
+      if (q.equivalents.includes(n)) document.getElementById(`qcm-${j}`).classList.add('ok');
+    });
+    const corr = `Le plus grand est <strong>${q.plus_grand}</strong> (= ${q.plus_grand}0 = 2,800…). Compare rang par rang : aux dixièmes, <strong>2,8</strong> a 8 dixièmes, c'est le maximum.`;
+    handleWrong(q,
+      `Attention ! Compare rang par rang, pas le nombre de chiffres. Regarde les dixièmes dans le tableau. 💡`,
+      corr
+    );
+  }
+}
+
+/* ─── Type: Encadrement double (L3 C = centièmes, D = dixièmes) ─── */
+function renderEncadrementDouble(q, badge, prompt, body) {
+  const prec = q.type === 'C' ? 'centièmes' : 'dixièmes';
+  badge.textContent = `Encadrement au ${prec}`;
+  prompt.innerHTML  = `Encadre <span class="hl-num">${q.nombre}</span> entre deux <strong>${prec} consécutifs</strong> :`;
+
+  body.innerHTML = `
+    <div class="encad-double-row">
+      <input class="d-input encad-input" id="einf" type="text" inputmode="decimal" placeholder="?" autocomplete="off">
+      <span class="encad-lt"> &lt; </span>
+      <span class="encad-center hl-num">${q.nombre}</span>
+      <span class="encad-lt"> &lt; </span>
+      <input class="d-input encad-input" id="esup" type="text" inputmode="decimal" placeholder="?" autocomplete="off">
+    </div>
+    <button class="validate-btn" id="validateBtn" onclick="validateEncadrementDouble()" disabled>Valider</button>
+  `;
+
+  q._inf = q.inf;
+  q._sup = q.sup;
+
+  const einf = document.getElementById('einf');
+  const esup = document.getElementById('esup');
+  const checkReady = () => {
+    document.getElementById('validateBtn').disabled = einf.value.trim() === '' || esup.value.trim() === '';
+  };
+  einf.addEventListener('input', checkReady);
+  esup.addEventListener('input', checkReady);
+  einf.addEventListener('keydown', ev => { if (ev.key === 'Tab' && !ev.shiftKey) { ev.preventDefault(); esup.focus(); } });
+  esup.addEventListener('keydown', ev => { if (ev.key === 'Enter') validateEncadrementDouble(); });
+  einf.focus();
+}
+
+function validateEncadrementDouble() {
+  if (answered) return;
+  const q    = session[sessionIdx];
+  const einf = document.getElementById('einf');
+  const esup = document.getElementById('esup');
+
+  const infOk = Math.abs(toFloat(einf.value) - toFloat(q._inf)) < 1e-9;
+  const supOk = Math.abs(toFloat(esup.value) - toFloat(q._sup)) < 1e-9;
+
+  einf.disabled = esup.disabled = true;
+  document.getElementById('validateBtn').disabled = true;
+
+  if (infOk && supOk) {
+    einf.classList.add('ok');
+    esup.classList.add('ok');
+    handleCorrect(q);
+  } else {
+    if (!infOk) einf.classList.add('err');
+    if (!supOk) esup.classList.add('err');
+    const prec = q.type === 'C' ? 'centièmes' : 'dixièmes';
+    const hint = `Pas tout à fait. Cherche les deux <strong>${prec}</strong> qui encadrent ce nombre. Regarde le tableau ! 💡`;
+    const corr = `La bonne réponse est <strong>${q._inf}</strong> &lt; ${q.nombre} &lt; <strong>${q._sup}</strong>.`;
+    handleWrong(q, hint, corr);
+    if (!answered) {
+      if (!infOk) { einf.disabled = false; einf.classList.remove('err'); einf.value = ''; }
+      if (!supOk) { esup.disabled = false; esup.classList.remove('err'); esup.value = ''; }
+      document.getElementById('validateBtn').disabled = false;
+      (infOk ? esup : einf).focus();
+    }
+  }
+}
+
+/* ─── Type: Vrai ou Faux + justification (L3 F) ─── */
+function renderVraiFaux(q, badge, prompt, body) {
+  badge.textContent = 'Vrai ou Faux ?';
+  const fa = toFloat(q.a), fb = toFloat(q.b);
+  q._vfAnswer = (fa < fb ? '<' : fa > fb ? '>' : '=') === q.signe;
+
+  prompt.innerHTML = `
+    Vrai ou Faux ?<br>
+    <span class="sign-num num-a" style="font-size:1.6rem">${q.a}</span>
+    <span style="font-size:1.6rem;color:var(--navy);font-weight:700;padding:0 8px">${q.signe}</span>
+    <span class="sign-num num-b" style="font-size:1.6rem">${q.b}</span>
+  `;
+
+  body.innerHTML = `
+    <div class="vf-row">
+      <button class="vf-btn" id="vf-true"  onclick="validateVF(true)">✓ Vrai</button>
+      <button class="vf-btn" id="vf-false" onclick="validateVF(false)">✗ Faux</button>
+    </div>
+    <div class="followup" id="followup"></div>
+  `;
+}
+
+function validateVF(chosen) {
+  if (answered) return;
+  const q       = session[sessionIdx];
+  const trueBtn = document.getElementById('vf-true');
+  const falseBtn= document.getElementById('vf-false');
+  trueBtn.disabled = falseBtn.disabled = true;
+
+  const correct = chosen === q._vfAnswer;
+  (chosen ? trueBtn : falseBtn).classList.add(correct ? 'ok' : 'err');
+  if (!correct) (chosen ? falseBtn : trueBtn).classList.add('ok');
+
+  if (correct && q.justif) {
+    const fu = document.getElementById('followup');
+    fu.innerHTML = `
+      <div class="followup-text">
+        Justifie : aux <strong>${q.justif.col}</strong>,
+        <span class="hl-num">${q.a}</span> a
+        <input class="d-input" id="fu-a" type="text" inputmode="numeric" placeholder="?" style="width:52px;height:44px;font-size:18px">
+        et
+        <span class="hl-num">${q.b}</span> a
+        <input class="d-input" id="fu-b" type="text" inputmode="numeric" placeholder="?" style="width:52px;height:44px;font-size:18px">
+      </div>
+      <button class="validate-btn" id="fuBtn" onclick="validateJustif()" style="margin-top:8px" disabled>Valider la justification</button>
+    `;
+    fu.classList.add('visible');
+    const fuA = document.getElementById('fu-a');
+    const fuB = document.getElementById('fu-b');
+    const fuBtn = document.getElementById('fuBtn');
+    [fuA, fuB].forEach(inp => inp.addEventListener('input', () => {
+      fuBtn.disabled = fuA.value.trim() === '' || fuB.value.trim() === '';
+    }));
+    showFeedback(true, 'Exact ! Maintenant justifie ta réponse :');
+    fuA.focus();
+  } else if (correct) {
+    handleCorrect(q);
+  } else {
+    const corr = `C'est <strong>Vrai</strong> ! Aux ${q.justif ? q.justif.col : 'dixièmes'} : ${q.a} a <strong>${q.justif ? q.justif.val_a : '?'}</strong> et ${q.b} a <strong>${q.justif ? q.justif.val_b : '?'}</strong>.`;
+    handleWrong(q,
+      `Pas tout à fait. Compare les dixièmes en regardant le tableau. 💡`,
+      corr
+    );
+    if (!answered) {
+      trueBtn.disabled = falseBtn.disabled = false;
+      trueBtn.classList.remove('err','ok');
+      falseBtn.classList.remove('err','ok');
+    }
+  }
+}
+
+function validateJustif() {
+  const q   = session[sessionIdx];
+  const fuA = document.getElementById('fu-a');
+  const fuB = document.getElementById('fu-b');
+  const fuBtn = document.getElementById('fuBtn');
+  fuA.disabled = fuB.disabled = true;
+  fuBtn.disabled = true;
+
+  const aOk = fuA.value.trim() === String(q.justif.val_a);
+  const bOk = fuB.value.trim() === String(q.justif.val_b);
+
+  if (aOk && bOk) {
+    fuA.classList.add('ok');
+    fuB.classList.add('ok');
+    handleCorrect(q);
+  } else {
+    if (!aOk) fuA.classList.add('err');
+    if (!bOk) fuB.classList.add('err');
+    const corr = `Aux ${q.justif.col} : <strong>${q.a}</strong> a <strong>${q.justif.val_a}</strong> dixième${q.justif.val_a > 1 ? 's' : ''} et <strong>${q.b}</strong> a <strong>${q.justif.val_b}</strong> — donc ${q.a} &gt; ${q.b}.`;
+    handleWrong(q, `Relis le tableau : cherche la colonne "${q.justif.col}". 💡`, corr);
+    if (!answered) {
+      if (!aOk) { fuA.disabled = false; fuA.classList.remove('err'); fuA.value = ''; }
+      if (!bOk) { fuB.disabled = false; fuB.classList.remove('err'); fuB.value = ''; }
+      fuBtn.disabled = false;
+      (aOk ? fuB : fuA).focus();
+    }
+  }
+}
+
+/* ─── Correct / Wrong ─── */
+function handleCorrect(q) {
+  answered = true;
+  score++;
+  updateDoubleTable(currentA, currentB, true);
+  showFeedback(true, getOkMsg());
+  showNext();
+  updateProgress();
+}
+
+function handleWrong(q, hintMsg, correctionMsg) {
+  attempts++;
+  updateDoubleTable(currentA, currentB, true);
+  if (attempts >= 2) {
+    answered = true;
+    showFeedback(false, correctionMsg || getCorrectionMsg(q));
+    showNext();
+  } else {
+    showFeedback(false, hintMsg || getHint(q));
+  }
+}
+
+/* ─── Feedback messages ─── */
+function getOkMsg() {
+  const msgs = ['Parfait ! 🎉', 'Très bien ! ✓', 'Excellent ! 🌟', 'Bravo, c\'est juste !', 'Correct ! 👍'];
+  return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
+function getHint(q) {
+  if (q.piege === 'longueur') {
+    if (q.type === 'C') {
+      return `On ne compare pas directement les parties décimales entières ! Compare <strong>rang par rang</strong> : dixièmes d'abord. Regarde le tableau ! 💡`;
+    }
+    return `Attention ! Plus de chiffres ne veut pas dire plus grand. <strong>${q.a} = ${toFloat(q.a).toFixed(2).replace('.', ',')}</strong> — regarde les dixièmes dans le tableau. 💡`;
+  }
+  if (q.piege === 'zero_intercale') {
+    return `Attention au <strong>zéro</strong> ! Un zéro aux dixièmes change tout. Compare colonne par colonne en partant de la gauche. 💡`;
+  }
+  if (q.piege === 'zeros') {
+    return `Les zéros à la fin des décimales ne changent pas la valeur. Regarde le tableau : les deux nombres ont les mêmes chiffres ! 💡`;
+  }
+  return `Pas tout à fait. Compare rang par rang dans le tableau, de gauche à droite. 💡`;
+}
+
+function getCorrectionMsg(q) {
+  if (q.piege === 'longueur' && q.a && q.b) {
+    const fa = toFloat(q.a), fb = toFloat(q.b);
+    const sig = fa < fb ? '<' : fa > fb ? '>' : '=';
+    const pA = parseNum(q.a), pB = parseNum(q.b);
+    return `La réponse est <strong>${q.a} ${sig} ${q.b}</strong>. ${q.a} = ${fa.toFixed(2).replace('.', ',')} : aux dixièmes, <strong>${pA.d}</strong> ${sig === '<' ? '<' : '>'} <strong>${pB.d}</strong>.`;
+  }
+  if (q.piege === 'zero_intercale' && q.a && q.b) {
+    const fa = toFloat(q.a), fb = toFloat(q.b);
+    const sig = fa < fb ? '<' : fa > fb ? '>' : '=';
+    const pA = parseNum(q.a), pB = parseNum(q.b);
+    const dA = pA.d || '0', dB = pB.d || '0';
+    return `La réponse est <strong>${q.a} ${sig} ${q.b}</strong>. Aux dixièmes : <strong>${dA}</strong> vs <strong>${dB}</strong> — le zéro compte !`;
+  }
+  if (q.piege === 'zeros' && q.a && q.b) {
+    return `La réponse est <strong>${q.a} = ${q.b}</strong>. Les zéros finaux ne changent pas la valeur !`;
+  }
+  if (q.signe && q.a && q.b) {
+    return `La réponse est <strong>${q.a} ${q.signe} ${q.b}</strong>. Compare rang par rang dans le tableau !`;
+  }
+  return 'Voici la correction dans le tableau de numération.';
+}
+
+/* ─── UI helpers ─── */
+function showFeedback(ok, msg) {
+  const fb = document.getElementById('feedback');
+  fb.className = `feedback visible ${ok ? 'ok-fb' : 'err-fb'}`;
+  fb.innerHTML = msg;
+}
+
+function showNext() {
+  const btn    = document.getElementById('nextBtn');
+  const isLast = sessionIdx === session.length - 1;
+  btn.textContent = isLast ? 'Voir les résultats →' : 'Question suivante →';
+  btn.classList.add('visible');
+}
+
+function nextQuestion() {
+  sessionIdx++;
+  if (sessionIdx >= session.length) {
+    showResults();
+  } else {
+    const card = document.getElementById('qCard');
+    card.style.animation = 'none';
+    requestAnimationFrame(() => { card.style.animation = ''; renderQuestion(); });
+  }
+}
+
+function updateProgress() {
+  const total = session.length;
+  document.getElementById('progressLabel').textContent = `Question ${Math.min(sessionIdx + 1, total)}/${total}`;
+  document.getElementById('progressScore').textContent = `Score : ${score}`;
+  document.getElementById('progressFill').style.width  = `${(sessionIdx / total) * 100}%`;
+}
+
+/* ─── Results ─── */
+function showResults() {
+  const lv        = currentLevel;
+  const total     = session.length;
+  const threshold = CONFIG[lv].threshold;
+  const passed    = score >= threshold;
+
+  document.getElementById('qCard').style.display        = 'none';
+  document.getElementById('progressArea').style.display = 'none';
+  document.getElementById('progressFill').style.width   = '100%';
+
+  document.getElementById('resultEmoji').textContent = passed ? '🏆' : '💪';
+  document.getElementById('resultTitle').textContent = passed ? 'Niveau réussi !'  : 'Courage !';
+  document.getElementById('resultScore').textContent = `${score}/${total}`;
+
+  const nextLevelBtn = document.getElementById('nextLevelBtn');
+  if (passed) {
+    levelsDone[lv] = true;
+    sessionStorage.setItem('cdLevelsDone', JSON.stringify(levelsDone));
+    initLevelTabs();
+    document.getElementById('resultMsg').textContent =
+      `Bravo ! Tu as obtenu ${score} sur ${total} (seuil : ${threshold}/${total}). Tu peux passer au niveau suivant !`;
+    if (lv < 3) {
+      nextLevelBtn.style.display        = 'inline-flex';
+      nextLevelBtn.style.alignItems     = 'center';
+    }
+    launchConfetti();
+    logResult(lv, score, total);
+  } else {
+    document.getElementById('resultMsg').textContent =
+      `Tu as obtenu ${score} sur ${total}. Il faut ${threshold}/${total} pour passer au niveau suivant. Réessaie !`;
+    nextLevelBtn.style.display = 'none';
+  }
+
+  document.getElementById('resultScreen').classList.add('visible');
+}
+
+function goNextLevel() { selectLevel(currentLevel + 1); }
+
+function retryLevel() {
+  document.getElementById('resultScreen').classList.remove('visible');
+  document.getElementById('qCard').style.display        = '';
+  document.getElementById('progressArea').style.display = '';
+  startLevel();
+}
+
+/* ─── Supabase logging ─── */
+function logResult(level, sc, total) {
+  // TODO: Supabase logging
+  if (typeof saveExerciseResult === 'function') {
+    saveExerciseResult({
+      exerciseSlug: 'comparer-decimaux',
+      subject:      'mathématiques',
+      category:     'nombres-decimaux',
+      exerciseType: 'comparaison',
+      level:        `Niveau ${level}`,
+      score:         sc,
+      total:         total
+    });
+  }
+}
+
+/* ─── Confetti ─── */
+function launchConfetti() {
+  const colors    = ['#F5A623','#1DBFA0','#1A2D6B','#E05252','#ffffff'];
+  const container = document.getElementById('confettiContainer');
+  container.innerHTML = '';
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      width:${6+Math.random()*8}px;
+      height:${6+Math.random()*8}px;
+      border-radius:${Math.random()>.5?'50%':'2px'};
+      animation-duration:${1.5+Math.random()*1.5}s;
+      animation-delay:${Math.random()*.6}s;
+    `;
+    container.appendChild(p);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 3200);
+}
+
+/* ─── Init ─── */
+initLevelTabs();
+startLevel();
+</script>
+
+<script src="../../js/menu.js"></script>
+<style>
+  footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+  .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+  .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+  .footer__text .rouge { color: #F5A623; font-weight: 700; }
+  .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+  .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>
