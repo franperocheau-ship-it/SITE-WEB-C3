@@ -130,6 +130,49 @@
     .tbl-loading { text-align: center; padding: 40px; color: var(--muted); font-size: 14px; }
     .tbl-empty   { text-align: center; padding: 40px; color: var(--muted); font-size: 14px; }
 
+    /* ── Gestion des classes ─────────────────────────────────────────────────── */
+    .cls-check { width: 40px; text-align: center; padding: 10px 8px !important; }
+    .cls-check input[type=checkbox] { cursor: pointer; accent-color: #d62839; width: 15px; height: 15px; }
+    .data-table tr.row-selected td { background: rgba(214,40,57,0.04); }
+
+    .btn-class-del {
+      background: none; border: 1.5px solid rgba(214,40,57,0.25);
+      color: var(--red); border-radius: 100px;
+      padding: 5px 12px; font-family: inherit; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: background 180ms, border-color 180ms; white-space: nowrap;
+    }
+    .btn-class-del:hover { background: rgba(214,40,57,0.07); border-color: var(--red); }
+
+    .btn-class-del-bulk {
+      background: #d62839; color: #fff;
+      border: none; border-radius: 100px;
+      padding: 7px 16px; font-family: inherit; font-size: 12px; font-weight: 700;
+      cursor: pointer; transition: background 180ms; white-space: nowrap;
+    }
+    .btn-class-del-bulk:hover:not(:disabled) { background: #b01423; }
+    .btn-class-del-bulk:disabled { opacity: 0.4; cursor: default; }
+
+    .modal-input {
+      width: 100%; box-sizing: border-box;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 10px 14px; font-family: inherit; font-size: 14px;
+      color: var(--text); background: var(--card-bg);
+      outline: none; transition: border-color 180ms, box-shadow 180ms;
+    }
+    .modal-input:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(214,40,57,0.1); }
+    .modal-input.is-valid { border-color: #16a34a; box-shadow: 0 0 0 3px rgba(22,163,74,0.1); }
+
+    .modal-summary {
+      background: var(--bg); border-radius: 8px;
+      padding: 8px 14px; margin-bottom: 14px;
+      font-size: 13px; max-height: 150px; overflow-y: auto;
+      border: 1px solid var(--border);
+    }
+    .modal-summary-item {
+      padding: 6px 0; border-bottom: 1px solid var(--border); color: var(--text);
+    }
+    .modal-summary-item:last-child { border-bottom: none; }
+
     /* Bouton supprimer dans le tableau */
     .btn-teacher-del {
       background: none; border: 1.5px solid rgba(214,40,57,0.25);
@@ -336,10 +379,16 @@
         </div>
       </div>
 
-      <!-- Section : Toutes les classes -->
+      <!-- Section : Gestion des classes -->
       <div class="section-card">
         <div class="section-card-header">
-          <div class="section-card-title">Toutes les classes</div>
+          <div class="section-card-title">Gestion des classes</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span id="cls-select-info" style="font-size:12px;color:var(--muted);display:none"></span>
+            <button class="btn-class-del-bulk" id="cls-bulk-del-btn" style="display:none" disabled>
+              ✕ Supprimer la sélection
+            </button>
+          </div>
         </div>
         <div id="classes-body">
           <div class="tbl-loading">Chargement…</div>
@@ -353,6 +402,24 @@
         </div>
         <div id="feedback-body">
           <div class="tbl-loading">Chargement…</div>
+        </div>
+      </div>
+
+      <!-- Modal : suppression de classe(s) -->
+      <div id="class-delete-modal" class="modal-overlay" style="display:none" role="dialog" aria-modal="true">
+        <div class="modal-box" style="max-width:500px">
+          <div class="modal-icon">⚠️</div>
+          <div class="modal-title" id="cls-modal-title">Supprimer la classe</div>
+          <div class="modal-body" id="cls-modal-body"></div>
+          <div style="margin-bottom:20px">
+            <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:8px"
+                   id="cls-modal-input-label"></label>
+            <input type="text" id="cls-modal-input" class="modal-input" autocomplete="off" spellcheck="false" />
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-ghost btn-sm" id="cls-modal-cancel">Annuler</button>
+            <button class="btn-danger" id="cls-modal-confirm" disabled>Supprimer définitivement</button>
+          </div>
         </div>
       </div>
 
@@ -590,35 +657,223 @@
       }
     });
 
-    /* ── Toutes les classes ──────────────────────────────────────────────── */
-    try {
-      const classes = await lfmAdmin.getAllClasses();
-      const body    = document.getElementById('classes-body');
-      if (classes.length === 0) {
-        body.innerHTML = '<div class="tbl-empty">Aucune classe créée.</div>';
-      } else {
-        body.innerHTML = `<table class="data-table">
-          <thead><tr>
-            <th>Classe</th><th>Niveau</th><th>Année</th><th>Enseignant</th><th>Élèves</th>
-          </tr></thead>
-          <tbody>
-            ${classes.map(c => {
-              const lvl = c.level.toLowerCase().replace('è', 'e');
-              return `<tr>
-                <td style="font-weight:600">${escHtml(c.name)}</td>
-                <td><span class="badge badge-${lvl}">${escHtml(c.level)}</span></td>
-                <td style="color:var(--muted);font-size:13px">${escHtml(c.school_year)}</td>
-                <td>${escHtml(c.teacher_name)}</td>
-                <td>${c.student_count}</td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-        </table>`;
+    /* ── Gestion des classes ─────────────────────────────────────────────── */
+    let _classesData      = [];  // cache de la liste courante
+    let _classesToDelete  = [];  // classes sélectionnées pour suppression
+
+    const _classesBody = document.getElementById('classes-body');
+
+    // Délégation unique pour changements (checkboxes) et clics (bouton supprimer)
+    _classesBody.addEventListener('change', e => {
+      if (e.target.id === 'cls-check-all') {
+        const checked = e.target.checked;
+        _classesBody.querySelectorAll('.cls-row-check').forEach(cb => {
+          cb.checked = checked;
+          cb.closest('tr').classList.toggle('row-selected', checked);
+        });
+      } else if (e.target.classList.contains('cls-row-check')) {
+        e.target.closest('tr').classList.toggle('row-selected', e.target.checked);
+        const all     = _classesBody.querySelectorAll('.cls-row-check');
+        const checked = _classesBody.querySelectorAll('.cls-row-check:checked');
+        const allBox  = document.getElementById('cls-check-all');
+        if (allBox) {
+          allBox.checked       = checked.length === all.length && all.length > 0;
+          allBox.indeterminate = checked.length > 0 && checked.length < all.length;
+        }
       }
-    } catch (e) {
-      document.getElementById('classes-body').innerHTML =
-        `<div class="tbl-empty" style="color:var(--red)">Erreur : ${escHtml(e.message)}</div>`;
+      updateBulkBar();
+    });
+
+    _classesBody.addEventListener('click', e => {
+      const btn = e.target.closest('.btn-class-del');
+      if (!btn) return;
+      const classObj = _classesData.find(c => c.id === btn.dataset.id);
+      if (classObj) openClassDeleteModal([classObj]);
+    });
+
+    document.getElementById('cls-bulk-del-btn').addEventListener('click', () => {
+      const checked      = _classesBody.querySelectorAll('.cls-row-check:checked');
+      const selectedIds  = [...checked].map(cb => cb.dataset.id);
+      const selectedCls  = _classesData.filter(c => selectedIds.includes(c.id));
+      if (selectedCls.length) openClassDeleteModal(selectedCls);
+    });
+
+    function updateBulkBar() {
+      const n   = _classesBody.querySelectorAll('.cls-row-check:checked').length;
+      const info = document.getElementById('cls-select-info');
+      const btn  = document.getElementById('cls-bulk-del-btn');
+      if (n === 0) {
+        info.style.display = 'none';
+        btn.style.display  = 'none';
+      } else {
+        info.textContent   = `${n} classe${n > 1 ? 's' : ''} sélectionnée${n > 1 ? 's' : ''}`;
+        info.style.display = '';
+        btn.textContent    = `✕ Supprimer la sélection (${n})`;
+        btn.style.display  = '';
+        btn.disabled       = false;
+      }
     }
+
+    async function loadClassManagement() {
+      _classesBody.innerHTML = '<div class="tbl-loading">Chargement…</div>';
+      try {
+        _classesData = await lfmAdmin.getClassesWithStats();
+        renderClassTable();
+      } catch (e) {
+        _classesBody.innerHTML = `<div class="tbl-empty" style="color:var(--red)">Erreur : ${escHtml(e.message)}</div>`;
+      }
+    }
+
+    function renderClassTable() {
+      if (_classesData.length === 0) {
+        _classesBody.innerHTML = '<div class="tbl-empty">Aucune classe créée.</div>';
+        updateBulkBar();
+        return;
+      }
+      _classesBody.innerHTML = `<table class="data-table">
+        <thead><tr>
+          <th class="cls-check"><input type="checkbox" id="cls-check-all" title="Tout sélectionner"></th>
+          <th>Classe</th><th>Niveau</th><th>Année</th><th>Enseignant</th><th>Élèves</th><th>Résultats</th><th></th>
+        </tr></thead>
+        <tbody>
+          ${_classesData.map(c => {
+            const lvl = c.level.toLowerCase().replace('è', 'e');
+            return `<tr id="tr-class-${c.id}">
+              <td class="cls-check">
+                <input type="checkbox" class="cls-row-check" data-id="${c.id}" title="Sélectionner">
+              </td>
+              <td style="font-weight:600">${escHtml(c.name)}</td>
+              <td><span class="badge badge-${lvl}">${escHtml(c.level)}</span></td>
+              <td style="color:var(--muted);font-size:13px">${escHtml(c.school_year)}</td>
+              <td>${escHtml(c.teacher_name)}</td>
+              <td>${c.student_count}</td>
+              <td style="color:var(--muted)">${c.result_count}</td>
+              <td>
+                <button class="btn-class-del"
+                  data-id="${c.id}"
+                  data-name="${escHtml(c.name)}">
+                  ✕ Supprimer
+                </button>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+      updateBulkBar();
+    }
+
+    /* ── Modale de suppression de classe(s) ─────────────────────────────── */
+    function openClassDeleteModal(classes) {
+      _classesToDelete = classes;
+      const isSingle   = classes.length === 1;
+      const totalStud  = classes.reduce((s, c) => s + Number(c.student_count), 0);
+      const totalRes   = classes.reduce((s, c) => s + Number(c.result_count),  0);
+
+      document.getElementById('cls-modal-title').textContent =
+        isSingle ? 'Supprimer la classe' : `Supprimer ${classes.length} classes`;
+
+      let bodyHtml;
+      if (isSingle) {
+        const c = classes[0];
+        const ns = Number(c.student_count);
+        const nr = Number(c.result_count);
+        bodyHtml = `Vous allez supprimer la classe <strong>${escHtml(c.name)}</strong> :<br>
+          <ul style="margin:12px 0 12px 20px;font-size:13px;line-height:1.8">
+            <li><strong>${ns}</strong> élève${ns !== 1 ? 's' : ''} sera${ns !== 1 ? 'ont' : ''} définitivement effacé${ns !== 1 ? 's' : ''}</li>
+            <li><strong>${nr}</strong> résultat${nr !== 1 ? 's' : ''} d'exercice${nr !== 1 ? 's' : ''} sera${nr !== 1 ? 'ont' : ''} définitivement effacé${nr !== 1 ? 's' : ''}</li>
+          </ul>
+          Les comptes enseignants ne seront <strong>pas</strong> affectés.`;
+      } else {
+        const summaryHtml = classes.map(c =>
+          `<div class="modal-summary-item">
+            <strong>${escHtml(c.name)}</strong>
+            <span style="color:var(--muted);font-size:12px">
+              — ${c.student_count} élève${c.student_count !== 1 ? 's' : ''},
+              ${c.result_count} résultat${c.result_count !== 1 ? 's' : ''}
+            </span>
+          </div>`
+        ).join('');
+        bodyHtml = `<div class="modal-summary">${summaryHtml}</div>
+          <strong>${totalStud}</strong> élève${totalStud !== 1 ? 's' : ''} et
+          <strong>${totalRes}</strong> résultat${totalRes !== 1 ? 's' : ''} seront définitivement effacés.<br><br>
+          Les comptes enseignants ne seront <strong>pas</strong> affectés.`;
+      }
+
+      document.getElementById('cls-modal-body').innerHTML = bodyHtml;
+      document.getElementById('cls-modal-input-label').innerHTML = isSingle
+        ? `Tapez le nom exact de la classe <em>${escHtml(classes[0].name)}</em> pour confirmer :`
+        : 'Tapez <strong>SUPPRIMER</strong> pour confirmer :';
+      document.getElementById('cls-modal-input').value       = '';
+      document.getElementById('cls-modal-input').placeholder = isSingle ? classes[0].name : 'SUPPRIMER';
+      document.getElementById('cls-modal-input').className   = 'modal-input';
+      document.getElementById('cls-modal-confirm').disabled  = true;
+      document.getElementById('cls-modal-confirm').textContent = 'Supprimer définitivement';
+
+      document.getElementById('class-delete-modal').style.display = 'flex';
+      setTimeout(() => document.getElementById('cls-modal-input').focus(), 50);
+    }
+
+    document.getElementById('cls-modal-input').addEventListener('input', e => {
+      const val      = e.target.value;
+      const expected = _classesToDelete.length === 1 ? _classesToDelete[0].name : 'SUPPRIMER';
+      const ok       = val === expected;
+      document.getElementById('cls-modal-confirm').disabled = !ok;
+      e.target.classList.toggle('is-valid', ok);
+    });
+
+    document.getElementById('cls-modal-cancel').addEventListener('click', () => {
+      document.getElementById('class-delete-modal').style.display = 'none';
+      _classesToDelete = [];
+    });
+
+    document.getElementById('cls-modal-confirm').addEventListener('click', async () => {
+      if (!_classesToDelete.length) return;
+      const btn = document.getElementById('cls-modal-confirm');
+      btn.disabled    = true;
+      btn.textContent = 'Suppression…';
+
+      const classIds = _classesToDelete.map(c => c.id);
+      try {
+        const result = await lfmAdmin.deleteClasses(classIds);
+        document.getElementById('class-delete-modal').style.display = 'none';
+        _classesToDelete = [];
+
+        const { report = [], errors = [] } = result || {};
+        const totalStud = report.reduce((s, r) => s + (r.deleted_students || 0), 0);
+        const totalRes  = report.reduce((s, r) => s + (r.deleted_results  || 0), 0);
+        const n = report.length;
+
+        if (errors.length === 0) {
+          showToast(
+            `${n} classe${n > 1 ? 's' : ''} supprimée${n > 1 ? 's' : ''} — ` +
+            `${totalStud} élève${totalStud !== 1 ? 's' : ''}, ` +
+            `${totalRes} résultat${totalRes !== 1 ? 's' : ''} effacés`
+          );
+        } else {
+          showToast(
+            `Suppression partielle — ${errors.length} erreur(s). ` +
+            errors.map(e => e.error).join(' ; '),
+            'error'
+          );
+        }
+
+        // Rafraîchir liste et compteurs globaux
+        await loadClassManagement();
+        try {
+          const stats = await lfmAdmin.getGlobalStats();
+          document.getElementById('stat-classes').textContent  = stats.classes;
+          document.getElementById('stat-students').textContent = stats.students;
+          document.getElementById('stat-results').textContent  = stats.results;
+        } catch (_) {}
+
+      } catch (e) {
+        showToast('Erreur : ' + e.message, 'error');
+        btn.disabled    = false;
+        btn.textContent = 'Supprimer définitivement';
+      }
+    });
+
+    await loadClassManagement();
 
     /* ── Signalements & propositions (feedback) ──────────────────────────── */
     async function loadFeedbackAdmin() {

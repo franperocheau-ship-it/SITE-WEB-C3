@@ -74,6 +74,24 @@ const lfmAdmin = (() => {
     return data;
   }
 
+  /* ── Classes avec stats complètes (élèves + résultats) ──────────────────── */
+  /* Utilise la fonction SQL get_classes_with_stats() (voir migration V6 du schéma) */
+  async function getClassesWithStats() {
+    const { data, error } = await db.rpc('get_classes_with_stats');
+    if (error) throw error;
+    return data || [];
+  }
+
+  /* ── Supprimer une ou plusieurs classes ──────────────────────────────────── */
+  async function deleteClasses(classIds) {
+    const { data, error } = await db.functions.invoke('delete-class', {
+      body: { class_ids: classIds }
+    });
+    if (error) throw new Error(error.message || 'Erreur lors de la suppression');
+    if (data && data.error) throw new Error(data.error);
+    return data;
+  }
+
   /* ── Toutes les classes avec enseignant et nb élèves ─────────────────────── */
   async function getAllClasses() {
     const { data, error } = await db
@@ -135,6 +153,7 @@ const lfmAdmin = (() => {
   return {
     getGlobalStats,
     getPendingTeachers, approveTeacher, rejectTeacher,
-    getTeachers, getAllClasses, exportAllStudents, deleteTeacher
+    getTeachers, getAllClasses, getClassesWithStats, exportAllStudents,
+    deleteTeacher, deleteClasses
   };
 })();

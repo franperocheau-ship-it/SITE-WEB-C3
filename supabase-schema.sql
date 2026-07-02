@@ -215,6 +215,58 @@ CREATE POLICY "results_all_admin"
 
 
 -- ═══════════════════════════════════════════════════════════════════════════
+--  MISE À JOUR V6 — SUPPRESSION DE CLASSES (GESTION FIN D'ANNÉE)
+--  À exécuter dans Supabase Dashboard → SQL Editor.
+--  Ajoute une fonction RPC admin-only retournant les classes avec stats
+--  complètes (nb élèves + nb résultats) pour l'interface de suppression.
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- Fonction sécurisée : retourne toutes les classes avec enseignant,
+-- nombre d'élèves et nombre de résultats d'exercices.
+-- Accessible uniquement aux admins via RPC.
+CREATE OR REPLACE FUNCTION public.get_classes_with_stats()
+RETURNS TABLE(
+  id            UUID,
+  name          TEXT,
+  level         TEXT,
+  school_year   TEXT,
+  teacher_id    UUID,
+  teacher_name  TEXT,
+  student_count BIGINT,
+  result_count  BIGINT
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF public.my_role() != 'admin' THEN
+    RAISE EXCEPTION 'Accès refusé';
+  END IF;
+
+  RETURN QUERY
+  SELECT
+    c.id,
+    c.name,
+    c.level,
+    c.school_year,
+    c.teacher_id,
+    p.display_name                                                           AS teacher_name,
+    COUNT(DISTINCT s.id)::BIGINT                                             AS student_count,
+    COUNT(DISTINCT er.id)::BIGINT                                            AS result_count
+  FROM public.classes c
+  JOIN public.profiles p ON p.id = c.teacher_id
+  LEFT JOIN public.students s ON s.class_id = c.id
+  LEFT JOIN public.exercise_results er
+         ON er.student_id = s.auth_user_id
+        AND s.auth_user_id IS NOT NULL
+  GROUP BY c.id, c.name, c.level, c.school_year, c.teacher_id, p.display_name
+  ORDER BY c.school_year DESC, c.name;
+END;
+$$;
+
+
+-- ═══════════════════════════════════════════════════════════════════════════
 --  TABLE : students
 --  Élèves créés et gérés directement par l'enseignant.
 --  Non lié à auth.users pour l'instant (connexion élève à brancher plus tard).
