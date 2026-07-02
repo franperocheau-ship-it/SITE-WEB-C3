@@ -328,7 +328,7 @@
 
   document.getElementById('lfm-logout')?.addEventListener('click', async () => {
     try { await window.lfmDb?.auth.signOut(); } catch (_) {}
-    window.location.href = 'index-v2.html';
+    window.location.href = 'index.html';
   });
 
   /* ── Utilitaire ───────────────────────────────────────────────────────────── */

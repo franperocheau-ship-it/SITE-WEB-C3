@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lycée Français de Madrid — Espace d'apprentissage</title>
+  <link rel="stylesheet" href="styles.css?v=9">
+<style>
+    /* ─── NAVBAR PROFICIAMUS ─── */
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+    .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+    .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+    .navbar__brand img{height:34px;width:auto;}
+    .navbar__nav{display:flex;align-items:center;gap:24px;}
+    .navbar__nav a{text-decoration:none;color:#1a1a1a;font-size:14px;font-weight:700;transition:color .2s;}
+    .navbar__nav a:hover{color:#1B4EBF;}
+    .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;}
+    .navbar__nav .btn-login{color:#fff!important;}
+    .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Fredoka',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+    .btn-login:hover{background:#0b1e4d;}
+    @media(max-width:768px){.navbar__brand img{height:44px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}}
+    @media(max-width:480px){.navbar__brand img{height:38px;}.btn-login{padding:7px 13px;font-size:13px;}}
+</style>
+</head>
+<body class="home-page">
+
+  <!-- ═══════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════ -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index-v2.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index-v2.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <!-- ═══════════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════════ -->
+  <section class="hero">
+
+        <!-- LEFT — content -->
+        <div class="hero-content">
+
+          <h1 class="hero-title">
+            <span class="title-navy">BIENVENUE<br>SUR TON</span>
+            <span class="title-red">ESPACE D'APPRENTISSAGE&nbsp;!</span>
+          </h1>
+
+          <p class="hero-sub">
+            Tu y trouveras des ressources adaptées pour apprendre,
+            t'entraîner et progresser en toute confiance.
+          </p>
+
+          <div class="grade-pill">
+            CM1 <span class="pill-dot">•</span> CM2 <span class="pill-dot">•</span> 6ÈME
+          </div>
+
+          <ul class="benefits" role="list">
+            <li class="benefit">
+              <span class="b-check" aria-hidden="true">✓</span>
+              Des exercices variés
+            </li>
+            <li class="benefit">
+              <span class="b-check" aria-hidden="true">✓</span>
+              Des ressources utiles
+            </li>
+            <li class="benefit">
+              <span class="b-check" aria-hidden="true">✓</span>
+              Des jeux pour réviser
+            </li>
+            <li class="benefit">
+              <span class="b-check" aria-hidden="true">✓</span>
+              Des bilans pour situer ton niveau
+            </li>
+          </ul>
+        </div>
+
+        <!-- RIGHT — image + decorative icons -->
+        <div class="hero-visual">
+
+          <!-- Students photo -->
+          <div class="hero-img-frame">
+            <img
+              src="assets/enfants-cm2.png?v=9"
+              alt="Élèves du Lycée Français de Madrid"
+              class="hero-img"
+            >
+          </div>
+
+        </div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SUBJECT CARDS
+  ═══════════════════════════════════════════ -->
+  <section class="cards-section">
+    <div class="container">
+      <div class="cards-grid">
+
+        <!-- Français -->
+        <article class="card">
+          <div class="card-icon">
+            <svg width="56" height="56" viewBox="0 0 64 64" fill="none">
+              <path d="M32 16 Q20 14 10 18 V50 Q20 46 32 48" stroke="#102B6A" stroke-width="2.5" stroke-linejoin="round" fill="none"/>
+              <path d="M32 16 Q44 14 54 18 V50 Q44 46 32 48" stroke="#102B6A" stroke-width="2.5" stroke-linejoin="round" fill="none"/>
+              <line x1="32" y1="16" x2="32" y2="48" stroke="#102B6A" stroke-width="2.5"/>
+              <polygon points="29,48 32,55 35,48" fill="#D62839"/>
+            </svg>
+          </div>
+          <h3 class="card-title">FRANÇAIS</h3>
+          <div class="card-rule"></div>
+          <a href="français.html" class="card-btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">Accéder →</a>
+          <div class="card-accent" style="background:#102B6A"></div>
+        </article>
+
+        <!-- Mathématiques -->
+        <article class="card">
+          <div class="card-icon">
+            <svg width="56" height="56" viewBox="0 0 64 64" fill="none">
+              <rect x="14" y="12" width="36" height="40" rx="4" stroke="#102B6A" stroke-width="2.5"/>
+              <line x1="32" y1="12" x2="32" y2="52" stroke="#102B6A" stroke-width="2"/>
+              <line x1="14" y1="32" x2="50" y2="32" stroke="#102B6A" stroke-width="2"/>
+              <text x="23" y="26" text-anchor="middle" font-size="12" fill="#D62839" font-weight="700">÷</text>
+              <text x="41" y="26" text-anchor="middle" font-size="12" fill="#D62839" font-weight="700">+</text>
+              <text x="23" y="45" text-anchor="middle" font-size="12" fill="#D62839" font-weight="700">×</text>
+              <text x="41" y="45" text-anchor="middle" font-size="12" fill="#D62839" font-weight="700">÷</text>
+            </svg>
+          </div>
+          <h3 class="card-title">MATHÉMATIQUES</h3>
+          <div class="card-rule"></div>
+          <a href="mathématiques.html" class="card-btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">Accéder →</a>
+          <div class="card-accent" style="background:#D62839"></div>
+        </article>
+
+        <!-- Sciences -->
+        <article class="card">
+          <div class="card-icon">
+            <svg width="56" height="56" viewBox="0 0 64 64" fill="none">
+              <line x1="24" y1="12" x2="40" y2="12" stroke="#102B6A" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M28 12 v14 L16 48 h32 L36 26 V12" stroke="#102B6A" stroke-width="2.5" stroke-linejoin="round"/>
+              <path d="M20 42 Q32 38 44 42 L44 48 Q32 44 20 48 Z" fill="#D62839" fill-opacity="0.65"/>
+              <circle cx="26" cy="35" r="2" stroke="#102B6A" stroke-width="1.5"/>
+              <circle cx="33" cy="30" r="1.5" stroke="#102B6A" stroke-width="1.5"/>
+              <circle cx="38" cy="35" r="2" stroke="#102B6A" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <h3 class="card-title">SCIENCES</h3>
+          <div class="card-rule"></div>
+          <button class="card-btn">Accéder →</button>
+          <div class="card-accent" style="background:#102B6A"></div>
+        </article>
+
+        <!-- Histoire -->
+        <article class="card">
+          <div class="card-icon">
+            <svg width="56" height="56" viewBox="0 0 64 64" fill="none">
+              <polygon points="12,24 32,10 52,24" stroke="#102B6A" stroke-width="2.5" stroke-linejoin="round" fill="none"/>
+              <line x1="20" y1="24" x2="20" y2="48" stroke="#102B6A" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="32" y1="24" x2="32" y2="48" stroke="#102B6A" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="44" y1="24" x2="44" y2="48" stroke="#102B6A" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="10" y1="48" x2="54" y2="48" stroke="#102B6A" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="12" y1="52" x2="52" y2="52" stroke="#102B6A" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="card-title">HISTOIRE</h3>
+          <p class="card-subtitle-emile"><span class="emile-desc">History in English</span><svg style="display:inline-block;vertical-align:top;margin-left:4px;pointer-events:none;" width="28" height="15" viewBox="0 0 26 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><clipPath id="hist-emile-flag"><rect x="0" y="0" width="26" height="14" rx="1.5"/></clipPath></defs><rect x="0" y="0" width="26" height="14" rx="1.5" fill="#012169"/><line x1="0" y1="0" x2="26" y2="14" stroke="white" stroke-width="4" clip-path="url(#hist-emile-flag)"/><line x1="26" y1="0" x2="0" y2="14" stroke="white" stroke-width="4" clip-path="url(#hist-emile-flag)"/><line x1="0" y1="0" x2="26" y2="14" stroke="#CF091B" stroke-width="2" clip-path="url(#hist-emile-flag)"/><line x1="26" y1="0" x2="0" y2="14" stroke="#CF091B" stroke-width="2" clip-path="url(#hist-emile-flag)"/><rect x="0" y="5.75" width="26" height="2.5" fill="white" clip-path="url(#hist-emile-flag)"/><rect x="11.75" y="0" width="2.5" height="14" fill="white" clip-path="url(#hist-emile-flag)"/><rect x="0" y="6.25" width="26" height="1.5" fill="#CF091B" clip-path="url(#hist-emile-flag)"/><rect x="12.25" y="0" width="1.5" height="14" fill="#CF091B" clip-path="url(#hist-emile-flag)"/><rect x="0.65" y="0.65" width="24.7" height="12.7" rx="1" fill="none" stroke="#102B6A" stroke-width="1.3"/></svg></p>
+          <div class="card-rule"></div>
+          <a href="histoire.html" class="card-btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">Accéder →</a>
+          <div class="card-accent" style="background:#D62839"></div>
+        </article>
+
+        <!-- Informatique -->
+        <article class="card">
+          <div class="card-icon">
+            <svg width="56" height="56" viewBox="0 0 64 64" fill="none">
+              <rect x="10" y="14" width="44" height="30" rx="3" stroke="#102B6A" stroke-width="2.5"/>
+              <path d="M6 44 h52 l-4 6 H10 Z" stroke="#102B6A" stroke-width="2.5" stroke-linejoin="round" fill="none"/>
+              <polygon points="22,22 22,38 27,34 30,40 33,38 30,32 36,32" fill="#D62839"/>
+            </svg>
+          </div>
+          <h3 class="card-title">INFORMATIQUE</h3>
+          <div class="card-rule"></div>
+          <a href="informatique.html" class="card-btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">Accéder →</a>
+          <div class="card-accent" style="background:#102B6A"></div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════ -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 · <a href="mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/menu.js"></script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>
