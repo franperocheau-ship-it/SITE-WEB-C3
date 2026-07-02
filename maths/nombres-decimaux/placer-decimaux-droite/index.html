@@ -1,0 +1,2346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Placer un nombre décimal sur une droite graduée — Mathématiques — LFM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../../js/supabase-client.js" onerror="void 0"></script>
+  <script src="../../../js/auth.js" onerror="void 0"></script>
+  <script src="../../../js/results.js" onerror="void 0"></script>
+  <style>
+    /* ── Tokens ── */
+    :root {
+      --navy:    #1A2D6B;
+      --gold:    #F5A623;
+      --gold-bg: #FFF3D0;
+      --teal:    #1DBFA0;
+      --err:     #E05252;
+      --bg:      #F8FAFC;
+      --white:   #ffffff;
+      --border:  #E8EDF3;
+      --text:    #1E2532;
+      --muted:   #5F6368;
+      --green:   #16a34a;
+      --green-bg:#dcfce7;
+      --shadow:  0 10px 30px rgba(26,45,107,0.10);
+      --radius:  20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Fredoka', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      padding-top: 50px;
+    }
+
+    /* ── Navbar ── */
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+    .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+    .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+    .navbar__brand img{height:34px;width:auto;}
+    .navbar__nav{display:flex;align-items:center;gap:24px;}
+    .navbar__nav a{text-decoration:none;color:#1a1a1a;font-family:'Fredoka',sans-serif;font-size:14px;font-weight:700;transition:color .2s;}
+    .navbar__nav a:hover{color:#1B4EBF;}
+    .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;font-family:'Fredoka',sans-serif;}
+    .navbar__nav .btn-login{color:#fff!important;}
+    .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Fredoka',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+    .btn-login:hover{background:#0b1e4d;}
+    @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+
+    /* ── Main layout ── */
+    .main {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    /* ── Page title & breadcrumb ── */
+    .breadcrumb {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--navy); }
+
+    .page-title {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .page-title h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.25;
+    }
+    .page-title .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .page-rule {
+      width: 44px;
+      height: 3px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin: 10px auto 0;
+    }
+
+    /* ── Level tabs ── */
+    .level-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .level-tab {
+      border: 2px solid var(--border);
+      border-radius: 100px;
+      padding: 9px 22px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      background: var(--white);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 200ms;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .level-tab.active {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #fff;
+    }
+    .level-tab.unlocked:hover:not(.active) {
+      border-color: var(--navy);
+      color: var(--navy);
+    }
+    .level-tab.locked {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .level-tab .lock-icon { font-size: 13px; }
+
+    /* ── Progress ── */
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .progress-label { font-size: 13px; font-weight: 700; color: var(--navy); }
+    .progress-score { font-size: 13px; font-weight: 600; color: var(--muted); }
+    .progress-bar-bg {
+      height: 7px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--teal);
+      border-radius: 100px;
+      transition: width 400ms ease;
+    }
+
+    /* ── Question card ── */
+    .q-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px 32px 24px;
+      animation: fadeUp 320ms ease;
+      margin-bottom: 16px;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .q-type-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 10px;
+    }
+    .q-prompt {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+    .hl-num {
+      color: var(--gold);
+      font-size: 1.1em;
+    }
+
+    /* ── Grand nombre à placer (affiché en or, 2rem+) ── */
+    .nombre-display {
+      text-align: center;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.01em;
+      margin-bottom: 14px;
+      line-height: 1.1;
+      min-height: 2.8rem;
+    }
+    .nombre-display .frac-sup {
+      font-size: 1.5rem;
+      vertical-align: super;
+    }
+    .nombre-display .frac-bar {
+      display: inline-block;
+      border-bottom: 3px solid var(--gold);
+      padding: 0 4px;
+      margin: 0 2px;
+    }
+    .nombre-display .frac-inf {
+      font-size: 1.5rem;
+      vertical-align: sub;
+    }
+
+    /* ── SVG droite graduée ── */
+    .numline-outer {
+      position: relative;
+      background: var(--white);
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      padding: 10px 4px 6px;
+      margin-bottom: 12px;
+      overflow: visible;
+      cursor: crosshair;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      min-height: 130px;
+    }
+    .numline-outer.reperer-mode,
+    .numline-outer.answered { cursor: default; }
+    .numline-outer.qcm-mode,
+    .numline-outer.associer-mode { cursor: default; }
+
+    #numlineSVG {
+      display: block;
+      width: 100%;
+      overflow: visible;
+    }
+
+    /* Tooltip curseur (Niveau 1 uniquement, mode placer) */
+    .cursor-tooltip {
+      position: absolute;
+      background: var(--navy);
+      color: #fff;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      pointer-events: none;
+      white-space: nowrap;
+      transform: translateX(-50%) translateY(-100%);
+      margin-top: -10px;
+      z-index: 20;
+    }
+    .cursor-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--navy);
+    }
+
+    /* Instruction de clic */
+    .click-hint {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    /* ── Boutons ajustement fin mobile ── */
+    .touch-adjust {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    .adj-btn {
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      width: 44px;
+      height: 44px;
+      font-size: 18px;
+      font-family: 'Fredoka', sans-serif;
+      cursor: pointer;
+      transition: background 200ms, transform 200ms;
+      line-height: 1;
+    }
+    .adj-btn:hover { background: #142358; transform: translateY(-1px); }
+    .adj-btn:active { transform: scale(0.95); }
+    .adj-label {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+      text-align: center;
+    }
+
+    /* ── Saisie libre (mode repérer) ── */
+    .answer-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .answer-row label {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .free-input {
+      height: 56px;
+      border: 2.5px solid var(--border);
+      border-radius: 14px;
+      padding: 0 18px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--navy);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms;
+      text-align: center;
+      width: 160px;
+    }
+    .free-input:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(26,45,107,0.12);
+      background: var(--white);
+    }
+    .free-input.ok  { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+    .free-input.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── Zone associer (N2 Type E : glisser-déposer étiquettes) ── */
+    .associer-zone { margin: 4px 0 14px; }
+
+    .label-chips {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .label-chip {
+      background: var(--navy);
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 100px;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: grab;
+      transition: opacity 200ms, transform 200ms, box-shadow 200ms;
+      user-select: none;
+      -webkit-user-select: none;
+      box-shadow: 0 2px 6px rgba(26,45,107,0.18);
+    }
+    .label-chip:active { cursor: grabbing; }
+    .label-chip.dragging {
+      opacity: 0.5;
+      transform: scale(0.95);
+    }
+    .label-chip.placed {
+      opacity: 0.35;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    /* ── QCM (N3 Type E : estimation) ── */
+    .qcm-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .qcm-btn {
+      padding: 12px 22px;
+      border: 2.5px solid var(--border);
+      border-radius: 12px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--bg);
+      color: var(--text);
+      transition: all 200ms;
+    }
+    .qcm-btn:hover:not(:disabled):not(.ok):not(.err) {
+      border-color: var(--navy);
+      background: rgba(26,45,107,0.04);
+      transform: translateY(-2px);
+    }
+    .qcm-btn:disabled { cursor: default; }
+    .qcm-btn.ok  { border-color: var(--green); background: var(--green-bg); color: #15803d; }
+    .qcm-btn.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── Message lien fraction (N1 Type C) ── */
+    .fraction-link-msg {
+      background: var(--gold-bg);
+      border: 1.5px solid var(--gold);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #92400e;
+      text-align: center;
+      margin-top: 10px;
+      display: none;
+      animation: fadeUp 300ms ease;
+    }
+    .fraction-link-msg.visible { display: block; }
+
+    /* ── Vocabulaire abscisse (N3 Type D) ── */
+    .vocab-info {
+      display: inline-flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: rgba(29,191,160,0.08);
+      border: 1.5px solid var(--teal);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #0f7360;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .vocab-term {
+      font-weight: 700;
+      color: var(--teal);
+    }
+
+    /* ── Progression multi-points (N2 Type F) ── */
+    .multi-progress {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .multi-chips {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .multi-chip {
+      padding: 5px 14px;
+      border-radius: 100px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      border: 2px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      transition: all 200ms;
+    }
+    .multi-chip.active {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #fff;
+    }
+    .multi-chip.done {
+      background: var(--green-bg);
+      border-color: var(--green);
+      color: #15803d;
+    }
+
+    /* ── Bouton valider ── */
+    .validate-btn {
+      width: 100%;
+      padding: 15px;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 200ms, transform 200ms, opacity 200ms;
+      margin-top: 4px;
+    }
+    .validate-btn:hover:not(:disabled) { background: #142358; transform: translateY(-2px); }
+    .validate-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* ── Feedback ── */
+    .feedback {
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.55;
+      display: none;
+      animation: fadeUp 250ms ease;
+    }
+    .feedback.visible { display: block; }
+    .feedback.ok-fb  { background: var(--green-bg); color: #15803d; border: 1.5px solid #86efac; }
+    .feedback.err-fb { background: #fef2f2;         color: #b91c1c; border: 1.5px solid #fca5a5; }
+
+    /* ── Bouton suivant ── */
+    .next-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      display: none;
+      transition: background 200ms, transform 200ms;
+      animation: fadeUp 250ms ease;
+    }
+    .next-btn.visible { display: block; }
+    .next-btn:hover { background: #17a88d; transform: translateY(-2px); }
+
+    /* ── Boutons d'aide (repliables) ── */
+    .help-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .help-btn {
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 7px 16px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--white);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 200ms;
+    }
+    .help-btn:hover, .help-btn.active {
+      border-color: var(--teal);
+      color: var(--teal);
+      background: rgba(29,191,160,0.07);
+    }
+
+    /* ── Panneau tableau de numération (repliable) ── */
+    .num-panel {
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 16px;
+      animation: fadeUp 250ms ease;
+      overflow-x: auto;
+    }
+    .num-panel-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    /* ── Tableau de numération ── */
+    .num-table-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+    }
+    .num-table {
+      width: 100%;
+      min-width: 480px;
+      border-collapse: collapse;
+      background: var(--white);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .num-table thead th {
+      padding: 8px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-align: center;
+      background: var(--navy);
+      color: #fff;
+      white-space: nowrap;
+    }
+    .num-table thead th.col-entier { background: rgba(26,45,107,0.85); }
+    .num-table thead th.col-dec    { background: rgba(26,45,107,0.70); }
+    .num-table thead th.col-sep {
+      background: var(--navy);
+      color: var(--gold);
+      font-size: 18px;
+      padding: 0 4px;
+      width: 18px;
+    }
+    .num-table tbody td {
+      padding: 14px 8px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      border-top: 1px solid var(--border);
+      min-width: 56px;
+      transition: background 300ms, color 300ms;
+    }
+    .num-table tbody td.col-sep {
+      background: var(--white);
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--navy);
+      border-left: 3px solid var(--navy);
+      border-right: 3px solid var(--navy);
+      min-width: 18px;
+      padding: 0 2px;
+    }
+    .row-num td.col-entier { background: rgba(26,45,107,0.07); color: var(--navy); }
+    .row-num td.col-dec    { background: var(--gold-bg);        color: #92400e; }
+    .num-table tbody td.hl-target { background: var(--teal) !important; color: #fff !important; }
+    .num-table tbody td.hl-below  { background: #E8EDF3 !important; color: #9BA3AF !important; }
+    .num-table tbody td.hl-empty  { color: #C0C8D8 !important; font-size: 15px; }
+
+    /* ── Écran de résultats ── */
+    .result-screen {
+      display: none;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 48px 36px;
+      text-align: center;
+      animation: fadeUp 350ms ease;
+    }
+    .result-screen.visible { display: block; }
+    .result-emoji { font-size: 56px; margin-bottom: 12px; }
+    .result-title { font-size: 26px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+    .result-score { font-size: 48px; font-weight: 700; color: var(--gold); margin: 12px 0; }
+    .result-msg   { font-size: 16px; color: var(--muted); margin-bottom: 28px; line-height: 1.5; }
+    .result-btns  { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      padding: 13px 32px;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 200ms, transform 200ms;
+    }
+    .btn-primary:hover { background: #142358; transform: translateY(-2px); }
+    .btn-secondary {
+      padding: 13px 32px;
+      background: transparent;
+      color: var(--navy);
+      border: 2px solid var(--border);
+      border-radius: 100px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 200ms;
+    }
+    .btn-secondary:hover { border-color: var(--navy); transform: translateY(-2px); }
+
+    /* ── Confettis ── */
+    .confetti-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 999;
+    }
+    .confetti-piece {
+      position: absolute;
+      top: -10px;
+      border-radius: 2px;
+      animation: confettiFall linear forwards;
+    }
+    @keyframes confettiFall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+
+    /* ── Animations SVG (via classes sur les éléments) ── */
+    @keyframes pointAppear {
+      from { opacity: 0; transform: scale(0); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes haloFade {
+      0%   { opacity: 0.6; }
+      100% { opacity: 0; }
+    }
+    @keyframes countAppear {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 560px) {
+      .main { padding: 20px 12px 48px; }
+      .q-card { padding: 20px 14px 18px; }
+      .q-prompt { font-size: 15px; }
+      .nombre-display { font-size: 2rem; }
+      .num-table { min-width: 300px; }
+      .num-table tbody td { padding: 10px 4px; font-size: 19px; min-width: 42px; }
+      .num-table tbody td.col-sep { min-width: 14px; padding: 0; }
+      .result-screen { padding: 32px 16px; }
+      .result-btns { flex-direction: column; align-items: stretch; }
+      .free-input { width: 130px; font-size: 20px; height: 50px; }
+      .qcm-btn { font-size: 16px; padding: 10px 14px; }
+      .label-chip { font-size: 14px; padding: 7px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar__inner">
+    <a href="../../../index.html" class="navbar__brand">
+      <img src="../../../assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="../../../index.html">Accueil</a>
+      <a href="../../../apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+
+  <!-- Titre et fil d'Ariane -->
+  <div class="page-title">
+    <p class="breadcrumb">
+      <a href="../../../mathématiques.html">Mathématiques</a> &rsaquo;
+      <a href="../../../mathématiques-nombres-decimaux.html">Nombres décimaux</a> &rsaquo;
+      Placer un nombre décimal sur une droite graduée
+    </p>
+    <h1>Placer un nombre décimal sur une droite graduée</h1>
+    <p class="subtitle">Cycle 3 — Nombres et calculs — Nombres décimaux</p>
+    <div class="page-rule"></div>
+  </div>
+
+  <!-- Onglets de niveau -->
+  <div class="level-tabs" id="levelTabs">
+    <button class="level-tab active unlocked" data-level="1" onclick="selectLevel(1)">Niveau 1</button>
+    <button class="level-tab locked"          data-level="2" onclick="selectLevel(2)"><span class="lock-icon" id="lock2">🔒</span> Niveau 2</button>
+    <button class="level-tab locked"          data-level="3" onclick="selectLevel(3)"><span class="lock-icon" id="lock3">🔒</span> Niveau 3</button>
+  </div>
+
+  <!-- Barre de progression -->
+  <div id="progressArea">
+    <div class="progress-row">
+      <span class="progress-label" id="progressLabel">Question 1/5</span>
+      <span class="progress-score" id="progressScore">Score : 0</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Carte de question -->
+  <div class="q-card" id="qCard">
+    <div class="q-type-badge" id="qTypeBadge">Placer un nombre</div>
+    <div class="q-prompt" id="qPrompt">Place le nombre sur la droite graduée.</div>
+
+    <div id="qBody">
+
+      <!-- Grand nombre à placer (mode placer) -->
+      <div class="nombre-display" id="nombreDisplay" style="display:none"></div>
+
+      <!-- Info vocabulaire abscisse (N3 Type D) -->
+      <div class="vocab-info" id="vocabInfo" style="display:none">
+        <span>📖</span>
+        <span>L'<span class="vocab-term">abscisse</span> d'un point est le nombre qui indique sa position sur la droite graduée.</span>
+      </div>
+
+      <!-- Progression multi-points (N2 placer_multiple) -->
+      <div class="multi-progress" id="multiProgress" style="display:none"></div>
+      <div class="multi-chips" id="multiChips" style="display:none"></div>
+
+      <!-- Conteneur SVG droite graduée -->
+      <div class="numline-outer" id="numlineOuter">
+        <svg id="numlineSVG"
+             viewBox="0 0 700 130"
+             xmlns="http://www.w3.org/2000/svg"
+             style="width:100%;display:block;min-height:120px;">
+          <!-- Rendu dynamiquement par JS (Étape 2) -->
+        </svg>
+        <div class="cursor-tooltip" id="cursorTooltip" style="display:none"></div>
+      </div>
+
+      <!-- Instruction tactile (mode placer) -->
+      <p class="click-hint" id="clickHint" style="display:none">
+        Clique sur la droite pour poser le point — déplace-le avant de valider.
+      </p>
+
+      <!-- Boutons ajustement fin (mobile, mode placer) -->
+      <div class="touch-adjust" id="touchAdjust" style="display:none">
+        <button class="adj-btn" id="adjLeft">◀</button>
+        <span class="adj-label">Ajuster d'une graduation</span>
+        <button class="adj-btn" id="adjRight">▶</button>
+      </div>
+
+      <!-- Zone étiquettes à associer (N2 Type E) -->
+      <div class="associer-zone" id="associerZone" style="display:none">
+        <div class="label-chips" id="labelChips"></div>
+      </div>
+
+      <!-- Choix QCM (N3 Type E) -->
+      <div class="qcm-row" id="qcmRow" style="display:none"></div>
+
+      <!-- Saisie libre (mode repérer) -->
+      <div class="answer-row" id="answerRow" style="display:none">
+        <label for="answerInput">Réponse :</label>
+        <input type="text" class="free-input" id="answerInput"
+               inputmode="decimal" placeholder="?" autocomplete="off">
+      </div>
+
+      <!-- Message lien fraction (N1 lien_fraction) -->
+      <div class="fraction-link-msg" id="fractionLinkMsg"></div>
+
+      <!-- Bouton valider -->
+      <button class="validate-btn" id="validateBtn" disabled>Valider</button>
+
+    </div><!-- /#qBody -->
+
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Question suivante →</button>
+  </div><!-- /.q-card -->
+
+  <!-- Boutons d'aide -->
+  <div class="help-row" id="helpRow">
+    <button class="help-btn" id="helpTableBtn" onclick="toggleNumTable()">
+      💡 Aide : tableau de numération
+    </button>
+    <button class="help-btn" id="helpCountBtn" onclick="animateGradCount()">
+      📏 Aide : compter les graduations
+    </button>
+  </div>
+
+  <!-- Panneau tableau de numération (repliable) -->
+  <div class="num-panel" id="numPanel" style="display:none">
+    <div class="num-panel-title">Tableau de numération</div>
+    <div class="num-table-wrapper">
+      <table class="num-table" id="numTable">
+        <thead>
+          <tr>
+            <th class="col-entier">Centaines</th>
+            <th class="col-entier">Dizaines</th>
+            <th class="col-entier">Unités</th>
+            <th class="col-sep">║</th>
+            <th class="col-dec">Dixièmes</th>
+            <th class="col-dec">Centièmes</th>
+            <th class="col-dec">Millièmes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-num" id="numRow">
+            <td class="col-entier hl-empty" id="cell-ce">–</td>
+            <td class="col-entier hl-empty" id="cell-di">–</td>
+            <td class="col-entier hl-empty" id="cell-u">–</td>
+            <td class="col-sep">,</td>
+            <td class="col-dec hl-empty" id="cell-d">–</td>
+            <td class="col-dec hl-empty" id="cell-c">–</td>
+            <td class="col-dec hl-empty" id="cell-m">–</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Écran de résultats -->
+  <div class="result-screen" id="resultScreen">
+    <div class="result-emoji" id="resultEmoji"></div>
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-score" id="resultScore"></div>
+    <div class="result-msg"   id="resultMsg"></div>
+    <div class="result-btns">
+      <button class="btn-primary" id="nextLevelBtn" onclick="goNextLevel()" style="display:none">
+        Niveau suivant 🔓
+      </button>
+      <button class="btn-secondary" onclick="retryLevel()">Réessayer</button>
+      <a class="btn-secondary" href="../../../mathématiques-nombres-decimaux.html"
+         style="display:inline-flex;align-items:center;text-decoration:none">← Retour</a>
+    </div>
+  </div>
+
+</main>
+
+<div class="confetti-container" id="confettiContainer"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 ·
+      <a href="../../../mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   ÉTAPE 1 — Banques de questions et configuration
+   Étape 2 (SVG + interaction) et Étape 3 (logique niveaux + feedback) à venir.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Banques de questions ─────────────────────────────────────────────── */
+const BANKS = {
+
+  /* ── Niveau 1 : Dixièmes et centièmes, graduations toutes étiquetées ── */
+  1: [
+    {
+      mode: "placer",
+      nombre: "2,7",
+      droite: { min: 2, max: 3, pas: 0.1, etiquettes: [2, 3] },
+      tooltip: true
+    },
+    {
+      mode: "reperer",
+      valeur: "0,4",
+      droite: { min: 0, max: 1, pas: 0.1, etiquettes: [0, 1] },
+      point_label: "A"
+    },
+    {
+      mode: "placer",
+      nombre: "7/10",
+      equivalent: "0,7",
+      droite: { min: 0, max: 1, pas: 0.1, etiquettes: [0, 1] },
+      tooltip: true,
+      lien_fraction: true
+    },
+    {
+      mode: "placer",
+      nombre: "0,45",
+      droite: { min: 0.4, max: 0.5, pas: 0.01, etiquettes: [0.4, 0.5] },
+      tooltip: true
+    },
+    {
+      mode: "reperer",
+      valeur: "3,8",
+      droite: { min: 3, max: 4, pas: 0.1, etiquettes: [3, 4] },
+      point_label: "B"
+    },
+    {
+      mode: "placer",
+      nombre: "1,3",
+      droite: { min: 1, max: 2, pas: 0.1, etiquettes: [1, 2] },
+      tooltip: true
+    },
+    {
+      mode: "reperer",
+      valeur: "0,25",
+      droite: { min: 0.2, max: 0.3, pas: 0.01, etiquettes: [0.2, 0.3] },
+      point_label: "A"
+    },
+    {
+      mode: "placer",
+      nombre: "3/10",
+      equivalent: "0,3",
+      droite: { min: 0, max: 1, pas: 0.1, etiquettes: [0, 1] },
+      tooltip: true,
+      lien_fraction: true
+    }
+  ],
+
+  /* ── Niveau 2 : Millièmes + graduations partiellement étiquetées ── */
+  2: [
+    {
+      mode: "placer",
+      nombre: "5,3",
+      droite: { min: 5, max: 6, pas: 0.1, etiquettes: [5, 6] },
+      tooltip: false
+    },
+    {
+      mode: "reperer",
+      valeur: "2,6",
+      droite: { min: 2, max: 3, pas: 0.1, etiquettes: [2, 3] },
+      point_label: "A"
+    },
+    {
+      mode: "placer",
+      nombre: "0,347",
+      droite: { min: 0.34, max: 0.35, pas: 0.001, etiquettes: [0.34, 0.35] },
+      tooltip: false
+    },
+    {
+      mode: "reperer",
+      valeur: "1,258",
+      droite: { min: 1.25, max: 1.26, pas: 0.001, etiquettes: [1.25, 1.26] },
+      point_label: "B"
+    },
+    {
+      mode: "associer",
+      etiquettes_a_placer: ["0,5", "0,50", "0,55"],
+      droite: { min: 0, max: 1, pas: 0.01, etiquettes: [0, 0.5, 1] },
+      equivalents: [["0,5", "0,50"]],
+      piege: "zeros"
+    },
+    {
+      mode: "placer_multiple",
+      nombres: ["2,4", "2,45", "2,405"],
+      droite: { min: 2.4, max: 2.5, pas: 0.01, etiquettes: [2.4, 2.5] },
+      tooltip: false
+    },
+    {
+      mode: "placer",
+      nombre: "7,08",
+      droite: { min: 7, max: 7.2, pas: 0.01, etiquettes: [7, 7.1, 7.2] },
+      tooltip: false,
+      piege: "zero_dixieme"
+    },
+    {
+      mode: "reperer",
+      valeur: "0,905",
+      droite: { min: 0.9, max: 0.91, pas: 0.001, etiquettes: [0.9, 0.91] },
+      point_label: "C"
+    }
+  ],
+
+  /* ── Niveau 3 : Graduations non unitaires + abscisses + estimation ── */
+  3: [
+    {
+      mode: "reperer",
+      valeur: "1,4",
+      droite: { min: 0, max: 2, pas: 0.2, etiquettes: [0, 1, 2] },
+      point_label: "A",
+      piege: "pas_non_unitaire"
+    },
+    {
+      mode: "placer",
+      nombre: "1,75",
+      droite: { min: 0, max: 2, pas: 0.25, etiquettes: [0, 0.5, 1, 1.5, 2] },
+      tooltip: false,
+      piege: "pas_non_unitaire"
+    },
+    {
+      mode: "reperer",
+      valeur: "4,2",
+      droite: { min: 3.5, max: 4.5, pas: 0.1, etiquettes: [3.5, 4.5] },
+      point_label: "B",
+      piege: "origine_decalee"
+    },
+    {
+      mode: "reperer",
+      valeur: "0,64",
+      droite: { min: 0, max: 1, pas: 0.01, etiquettes: [0, 1] },
+      point_label: "M",
+      vocabulaire: "abscisse"
+    },
+    {
+      mode: "qcm_estimation",
+      valeur: "2,35",
+      droite: { min: 2, max: 3, pas: 0.1, etiquettes: [2, 3] },
+      point_position: 2.35,
+      point_label: "C",
+      choix: ["2,3", "2,35", "2,4", "2,53"],
+      reponse: "2,35"
+    },
+    {
+      mode: "placer",
+      nombre: "0,125",
+      droite: { min: 0, max: 0.5, pas: 0.05, etiquettes: [0, 0.25, 0.5] },
+      tooltip: false,
+      tolerance: "quart_intervalle",
+      piege: "entre_graduations"
+    },
+    {
+      mode: "reperer",
+      valeur: "0,6",
+      droite: { min: 0, max: 1, pas: 0.2, etiquettes: [0, 1] },
+      point_label: "D",
+      piege: "pas_non_unitaire"
+    },
+    {
+      mode: "placer",
+      nombre: "6,8",
+      droite: { min: 5.5, max: 7.5, pas: 0.1, etiquettes: [5.5, 6.5, 7.5] },
+      tooltip: false,
+      piege: "origine_decalee"
+    }
+  ]
+};
+
+/* ─── Configuration par niveau ─────────────────────────────────────────── */
+const CONFIG = {
+  1: { perSession: 5, threshold: 4 },
+  2: { perSession: 6, threshold: 5 },
+  3: { perSession: 6, threshold: 5 }
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ÉTAPE 2 — SVG droite graduée + interaction (clic / drag / snap / tooltip)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Constantes SVG ──────────────────────────────────────────────────── */
+const SVG_W   = 700;   // viewBox width
+const SVG_H   = 130;   // viewBox height
+const SVG_PAD = 64;    // marge gauche / droite
+const SVG_Y   = 70;    // ordonnée de l'axe
+const SVG_AW  = SVG_W - 2 * SVG_PAD;  // largeur utile (572)
+const SNAP_PX = 10;    // distance d'aimantation en px viewBox
+
+/* ── 2. Helpers mathématiques ───────────────────────────────────────────── */
+function toFloat(s) {
+  return parseFloat(String(s).trim().replace(',', '.'));
+}
+function fmtNum(v, prec) {
+  return v.toFixed(prec).replace('.', ',');
+}
+function getPrec(pas) {
+  const s = pas.toFixed(12).replace(/0+$/, '');
+  const i = s.indexOf('.');
+  return i < 0 ? 0 : s.length - i - 1;
+}
+
+/* ── 3. Coordonnées SVG ↔ valeur ────────────────────────────────────────── */
+function valToX(val, droite) {
+  return SVG_PAD + (val - droite.min) / (droite.max - droite.min) * SVG_AW;
+}
+function xToVal(x, droite) {
+  return droite.min + (x - SVG_PAD) / SVG_AW * (droite.max - droite.min);
+}
+/* Convertit un événement pointer en coordonnée x du viewBox SVG */
+function pxToSvgX(evt, svgEl) {
+  const rect  = svgEl.getBoundingClientRect();
+  const scale = SVG_W / rect.width;
+  const cx    = (evt.clientX !== undefined ? evt.clientX
+                  : evt.touches[0].clientX) - rect.left;
+  return cx * scale;
+}
+
+/* ── 4. Graduations et aimantation ─────────────────────────────────────── */
+function getGradValues(droite) {
+  const { min, max, pas } = droite;
+  const n  = Math.round((max - min) / pas);
+  const vs = [];
+  for (let i = 0; i <= n; i++) {
+    vs.push(parseFloat((min + i * pas).toFixed(12)));
+  }
+  return vs;
+}
+function snapVal(val, droite) {
+  const grads     = getGradValues(droite);
+  const threshold = SNAP_PX / SVG_AW * (droite.max - droite.min);
+  let best = val, bestD = Infinity;
+  for (const g of grads) {
+    const d = Math.abs(g - val);
+    if (d < bestD) { bestD = d; best = g; }
+  }
+  return bestD <= threshold ? best : val;
+}
+function rankFromPas(pas) {
+  return ['unite','dixieme','centieme','milieme'][Math.min(getPrec(pas), 3)];
+}
+
+/* ── 5. Rendu SVG principal ─────────────────────────────────────────────── */
+/*
+  opts = {
+    placedVal   : number | null    — point élève (turquoise)
+    fixedVal    : number | null    — point à repérer (gold)
+    fixedLabel  : string           — lettre du point (A, B, M…)
+    multiPts    : [{val,done}]     — points multiples
+    assocPts    : [{val,id,filled,filledLabel}]
+    haloVal     : number | null    — surbrillance zone cible (après 1er échec)
+    showCount   : boolean          — numéros d'intervalles animés
+  }
+*/
+function renderSVG(q, opts = {}) {
+  const svg = document.getElementById('numlineSVG');
+  if (!svg) return;
+  const d     = q.droite;
+  const prec  = getPrec(d.pas);
+  const grads = getGradValues(d);
+  const xL    = SVG_PAD;
+  const xR    = SVG_W - SVG_PAD;
+  const arrX  = xR + 18;
+
+  const s = [];
+
+  /* 5-a. Halo cible (après 1er échec en mode placer) */
+  if (opts.haloVal != null) {
+    const hx      = valToX(opts.haloVal, d);
+    const halfGap = SVG_AW / (grads.length > 1 ? grads.length - 1 : 1) / 2;
+    s.push(`<rect x="${(hx - halfGap).toFixed(1)}" y="${(SVG_Y - 30).toFixed(1)}"
+             width="${(halfGap * 2).toFixed(1)}" height="60"
+             fill="#F5A623" opacity="0.22" rx="6"/>`);
+  }
+
+  /* 5-b. Axe + flèche */
+  s.push(`<line x1="${xL}" y1="${SVG_Y}" x2="${arrX}" y2="${SVG_Y}"
+           stroke="#1A2D6B" stroke-width="2.5" stroke-linecap="round"/>`);
+  s.push(`<polygon points="${arrX},${SVG_Y} ${arrX-11},${SVG_Y-5} ${arrX-11},${SVG_Y+5}"
+           fill="#1A2D6B"/>`);
+
+  /* 5-c. Graduations */
+  for (let i = 0; i < grads.length; i++) {
+    const v   = grads[i];
+    const x   = valToX(v, d);
+    const xs  = x.toFixed(1);
+    const isL = d.etiquettes.some(e => Math.abs(e - v) < 1e-9);
+    const h   = isL ? 13 : 6;
+    const sw  = isL ? 2   : 1.5;
+    const col = isL ? '#1A2D6B' : '#94A3B8';
+
+    s.push(`<line x1="${xs}" y1="${(SVG_Y-h).toFixed(1)}"
+             x2="${xs}" y2="${(SVG_Y+h).toFixed(1)}"
+             stroke="${col}" stroke-width="${sw}"/>`);
+
+    if (isL) {
+      const lbl = fmtNum(v, prec);
+      /* Fond blanc pour lisibilité sur mobile */
+      s.push(`<rect x="${(x-18).toFixed(1)}" y="${(SVG_Y+16).toFixed(1)}"
+               width="36" height="18" fill="#ffffff" opacity="0.85" rx="3"/>`);
+      s.push(`<text x="${xs}" y="${(SVG_Y+30).toFixed(1)}"
+               text-anchor="middle"
+               font-family="Fredoka,sans-serif" font-size="13" font-weight="700"
+               fill="#1A2D6B">${lbl}</text>`);
+    }
+
+    /* Animation comptage intervalles */
+    if (opts.showCount && i > 0) {
+      const prevX = valToX(grads[i-1], d);
+      const midX  = ((x + prevX) / 2).toFixed(1);
+      s.push(`<text x="${midX}" y="${(SVG_Y-20).toFixed(1)}"
+               text-anchor="middle"
+               font-family="Fredoka,sans-serif" font-size="11" fill="#94A3B8"
+               style="animation:countAppear 200ms ease ${i*70}ms both">${i}</text>`);
+    }
+  }
+
+  /* 5-d. Points pour mode ASSOCIER */
+  if (opts.assocPts) {
+    for (const slot of opts.assocPts) {
+      const x    = valToX(slot.val, d).toFixed(1);
+      /* Supporte le multi-remplissage (équivalents 0,5 = 0,50) */
+      const lbls = slot.fills && slot.fills.length > 0
+        ? slot.fills
+        : (slot.filled ? [slot.filledLabel] : []);
+      const col  = lbls.length > 0 ? '#1A2D6B' : '#CBD5E1';
+      s.push(`<circle cx="${x}" cy="${SVG_Y}" r="9"
+               fill="${col}" stroke="white" stroke-width="2"/>`);
+      const disp    = lbls.length > 0 ? lbls.join(' = ') : '?';
+      const textCol = lbls.length > 0 ? '#1A2D6B' : '#94A3B8';
+      const fs      = lbls.length > 1 ? 10 : 12;
+      s.push(`<text x="${x}" y="${(SVG_Y - 18).toFixed(1)}"
+               text-anchor="middle"
+               font-family="Fredoka,sans-serif"
+               font-size="${fs}" font-weight="700"
+               fill="${textCol}">${disp}</text>`);
+    }
+  }
+
+  /* 5-e. Points multiples (placer_multiple) */
+  if (opts.multiPts) {
+    for (const pt of opts.multiPts) {
+      if (pt.val == null) continue;
+      const x   = valToX(pt.val, d).toFixed(1);
+      const col = pt.done ? '#16a34a' : '#1DBFA0';
+      s.push(`<circle cx="${x}" cy="${SVG_Y}" r="8"
+               fill="${col}" stroke="white" stroke-width="2.5"/>`);
+    }
+  }
+
+  /* 5-f. Point élève (mode placer) */
+  if (opts.placedVal != null) {
+    const x = valToX(opts.placedVal, d).toFixed(1);
+    s.push(`<circle id="placedPoint" cx="${x}" cy="${SVG_Y}" r="8"
+             fill="#1DBFA0" stroke="white" stroke-width="2.5"
+             style="cursor:grab;filter:drop-shadow(0 2px 5px rgba(0,0,0,0.20))"/>`);
+  }
+
+  /* 5-g. Point fixe à repérer (mode repérer / qcm_estimation) */
+  if (opts.fixedVal != null) {
+    const x   = valToX(opts.fixedVal, d).toFixed(1);
+    const lbl = opts.fixedLabel || 'A';
+    /* Décale l'étiquette si trop près des bords */
+    const anchor = parseFloat(x) < SVG_PAD + 30 ? 'start'
+                 : parseFloat(x) > xR - 30       ? 'end'
+                 : 'middle';
+    s.push(`<circle cx="${x}" cy="${SVG_Y}" r="9"
+             fill="#F5A623" stroke="white" stroke-width="2.5"/>`);
+    s.push(`<text x="${x}" y="${(SVG_Y-18).toFixed(1)}"
+             text-anchor="${anchor}"
+             font-family="Fredoka,sans-serif" font-size="14" font-weight="700"
+             fill="#1A2D6B">${lbl}</text>`);
+  }
+
+  svg.innerHTML = s.join('\n');
+}
+
+/* ── 6. État de l'interaction ────────────────────────────────────────────── */
+let _q            = null;   // question courante
+let _placedVal    = null;   // valeur posée par l'élève (mode placer)
+let _dragging     = false;
+let _answered     = false;
+let _haloVal      = null;   // halo or après 1er échec
+let _showCount    = false;  // animation comptage active
+let _multiIdx     = 0;      // index point courant (placer_multiple)
+let _multiVals    = [];     // valeurs des points posés
+let _assocState   = [];     // [{val, id, filled, filledLabel}]
+let _activeDrag   = null;   // étiquette chip en cours de drag
+let _dragClone    = null;   // élément DOM fantôme qui suit le pointeur
+
+/* ── 7. Mise en place d'une question ────────────────────────────────────── */
+function setupQuestion(q) {
+  _q          = q;
+  _placedVal  = null;
+  _dragging   = false;
+  _answered   = false;
+  _haloVal    = null;
+  _showCount  = false;
+
+  /* Masquer le bouton Aide comptage (état neutre) */
+  document.getElementById('helpCountBtn').classList.remove('active');
+
+  const el = id => document.getElementById(id);
+  const show = (id, v = '') => { if (el(id)) el(id).style.display = v; };
+  const hide = id           => show(id, 'none');
+
+  /* Tout masquer par défaut */
+  ['nombreDisplay','vocabInfo','multiProgress','multiChips',
+   'clickHint','touchAdjust','associerZone','qcmRow',
+   'answerRow','fractionLinkMsg'].forEach(hide);
+
+  el('numlineOuter').className   = 'numline-outer';
+  el('numlineOuter').style.cursor = 'crosshair';
+  el('validateBtn').disabled     = true;
+  el('cursorTooltip').style.display = 'none';
+
+  /* Détacher tous les anciens handlers pointer */
+  el('numlineOuter').onpointerdown = null;
+
+  switch (q.mode) {
+
+    case 'placer': {
+      show('nombreDisplay');
+      el('nombreDisplay').innerHTML = buildNombreHTML(q.nombre);
+      show('clickHint');
+      if (q.lien_fraction && q.equivalent) {
+        el('fractionLinkMsg').style.display = 'none'; // affiché après validation
+      }
+      renderSVG(q, {});
+      attachPlacerEvents(q);
+      break;
+    }
+
+    case 'reperer': {
+      el('numlineOuter').className    = 'numline-outer reperer-mode';
+      el('numlineOuter').style.cursor = 'default';
+      show('answerRow');
+      if (q.vocabulaire === 'abscisse') show('vocabInfo');
+      const inp = el('answerInput');
+      inp.value = ''; inp.className = 'free-input'; inp.disabled = false;
+      inp.oninput   = () => { el('validateBtn').disabled = inp.value.trim() === ''; fillTableLive(); };
+      inp.onkeydown = e => { if (e.key === 'Enter' && !el('validateBtn').disabled) validateQuestion(); };
+      renderSVG(q, { fixedVal: toFloat(q.valeur), fixedLabel: q.point_label || 'A' });
+      el('validateBtn').onclick = validateQuestion;
+      setTimeout(() => inp.focus(), 80);
+      break;
+    }
+
+    case 'qcm_estimation': {
+      el('numlineOuter').className    = 'numline-outer qcm-mode';
+      el('numlineOuter').style.cursor = 'default';
+      show('qcmRow');
+      buildQCMButtons(q);
+      renderSVG(q, { fixedVal: q.point_position, fixedLabel: q.point_label || 'C' });
+      el('validateBtn').style.display = 'none'; // les boutons QCM valident directement
+      break;
+    }
+
+    case 'associer': {
+      el('numlineOuter').className    = 'numline-outer associer-mode';
+      el('numlineOuter').style.cursor = 'default';
+      show('associerZone');
+      setupAssocier(q);
+      el('validateBtn').onclick = validateQuestion;
+      break;
+    }
+
+    case 'placer_multiple': {
+      _multiIdx  = 0;
+      _multiVals = q.nombres.map(() => null);
+      show('nombreDisplay');
+      show('multiProgress');
+      show('multiChips');
+      show('clickHint');
+      updateMultiUI(q);
+      renderSVG(q, { multiPts: buildMultiPts(q) });
+      attachPlacerEvents(q);
+      el('validateBtn').onclick = validateQuestion;
+      break;
+    }
+  }
+}
+
+/* ── 8. Affichage du nombre à placer (avec fraction si 7/10) ────────────── */
+function buildNombreHTML(n) {
+  const str = String(n);
+  if (str.includes('/')) {
+    const [num, den] = str.split('/');
+    return `<span style="display:inline-flex;flex-direction:column;align-items:center;`
+         + `vertical-align:middle;line-height:1.2;margin:0 4px;">`
+         + `<span style="font-size:1.6rem;border-bottom:3px solid var(--gold);padding:0 10px;">${num}</span>`
+         + `<span style="font-size:1.6rem;padding:0 10px;">${den}</span>`
+         + `</span>`;
+  }
+  return str;
+}
+
+/* ── 9. Mode PLACER — événements pointer ────────────────────────────────── */
+function attachPlacerEvents(q) {
+  const outer = document.getElementById('numlineOuter');
+  outer.onpointerdown = evt => {
+    if (_answered) return;
+    /* Drag du point existant */
+    if (evt.target && evt.target.id === 'placedPoint') {
+      evt.preventDefault();
+      _dragging = true;
+      outer.setPointerCapture(evt.pointerId);
+      outer.onpointermove = onPlacer_Move;
+      outer.onpointerup   = onPlacer_Up;
+      return;
+    }
+    /* Clic pour poser le point */
+    evt.preventDefault();
+    const svgEl = document.getElementById('numlineSVG');
+    const rawX  = pxToSvgX(evt, svgEl);
+    if (rawX < SVG_PAD - 5 || rawX > SVG_W - SVG_PAD + 5) return;
+    const val = snapVal(xToVal(rawX, q.droite), q.droite);
+    placerSetPoint(val);
+    /* Démarrer le drag immédiatement */
+    _dragging = true;
+    outer.setPointerCapture(evt.pointerId);
+    outer.onpointermove = onPlacer_Move;
+    outer.onpointerup   = onPlacer_Up;
+  };
+}
+
+function onPlacer_Move(evt) {
+  if (!_dragging || _answered) return;
+  evt.preventDefault();
+  const svgEl  = document.getElementById('numlineSVG');
+  const rawX   = pxToSvgX(evt, svgEl);
+  const clamped = Math.max(SVG_PAD, Math.min(SVG_W - SVG_PAD, rawX));
+  const val    = snapVal(xToVal(clamped, _q.droite), _q.droite);
+  placerSetPoint(val);
+}
+
+function onPlacer_Up() {
+  _dragging = false;
+  const outer = document.getElementById('numlineOuter');
+  outer.onpointermove = null;
+  outer.onpointerup   = null;
+}
+
+function placerSetPoint(val) {
+  if (_q.mode === 'placer_multiple') {
+    _multiVals[_multiIdx] = val;
+    renderSVG(_q, { multiPts: buildMultiPts(_q), haloVal: _haloVal, showCount: _showCount });
+  } else {
+    _placedVal = val;
+    renderSVG(_q, { placedVal: val, haloVal: _haloVal, showCount: _showCount });
+  }
+  document.getElementById('validateBtn').disabled = false;
+  /* Boutons ajustement fin (mobile) */
+  if (window.matchMedia('(pointer:coarse)').matches) {
+    const adj = document.getElementById('touchAdjust');
+    adj.style.display = 'flex';
+    document.getElementById('adjLeft').onclick  = () => adjustPoint(-1);
+    document.getElementById('adjRight').onclick = () => adjustPoint(+1);
+  }
+  fillTableLive();
+}
+
+function lockPlacerUI() {
+  const outer = document.getElementById('numlineOuter');
+  outer.className    = 'numline-outer answered';
+  outer.style.cursor = 'default';
+  outer.onpointerdown = null;
+  outer.onpointermove = null;
+  outer.onpointerup   = null;
+  document.getElementById('validateBtn').disabled = true;
+  document.getElementById('touchAdjust').style.display = 'none';
+  document.getElementById('cursorTooltip').style.display = 'none';
+}
+
+/* ── 10. Tooltip curseur (Niveau 1, mode placer, tooltip:true) ──────────── */
+function attachHoverTooltip(q) {
+  const outer   = document.getElementById('numlineOuter');
+  const tooltip = document.getElementById('cursorTooltip');
+  outer.addEventListener('pointermove', evt => {
+    if (_placedVal != null || _answered) return; // après clic : updateTooltip gère
+    const svgEl = document.getElementById('numlineSVG');
+    const rawX  = pxToSvgX(evt, svgEl);
+    if (rawX < SVG_PAD || rawX > SVG_W - SVG_PAD) { tooltip.style.display = 'none'; return; }
+    const val  = xToVal(rawX, q.droite);
+    const prec = getPrec(q.droite.pas);
+    positionTooltip(rawX, fmtNum(val, prec), svgEl);
+  });
+  outer.addEventListener('pointerleave', () => {
+    if (_placedVal == null) tooltip.style.display = 'none';
+  });
+}
+
+function updateTooltip(val) {
+  if (!_q || !_q.tooltip || _answered) {
+    document.getElementById('cursorTooltip').style.display = 'none';
+    return;
+  }
+  const svgEl = document.getElementById('numlineSVG');
+  const rawX  = valToX(val, _q.droite);
+  const prec  = getPrec(_q.droite.pas);
+  positionTooltip(rawX, fmtNum(val, prec), svgEl);
+}
+
+function positionTooltip(svgXCoord, text, svgEl) {
+  const tooltip = document.getElementById('cursorTooltip');
+  const rect    = svgEl.getBoundingClientRect();
+  const pixX    = (svgXCoord / SVG_W) * rect.width;
+  const pixY    = (SVG_Y / SVG_H) * rect.height;
+  tooltip.style.display = '';
+  tooltip.style.left    = `${pixX}px`;
+  tooltip.style.top     = `${pixY - 12}px`;
+  tooltip.textContent   = text;
+}
+
+/* ── 11. Boutons ajustement fin ─────────────────────────────────────────── */
+function adjustPoint(dir) {
+  if (!_q || _answered) return;
+  const pas = _q.droite.pas;
+  const cur = _q.mode === 'placer_multiple' ? _multiVals[_multiIdx] : _placedVal;
+  if (cur == null) return;
+  const nv = parseFloat((cur + dir * pas).toFixed(12));
+  const cl = Math.max(_q.droite.min, Math.min(_q.droite.max, nv));
+  placerSetPoint(cl);
+}
+
+/* ── 12. Mode ASSOCIER (glisser-déposer étiquettes) ─────────────────────── */
+function setupAssocier(q) {
+  /* Points distincts sur la droite */
+  const vals   = q.etiquettes_a_placer.map(e => toFloat(e));
+  const uniq   = [...new Map(vals.map((v, i) => [v.toFixed(12), { v, i }])).values()];
+  _assocState  = uniq.map(({ v }, i) => ({ val: v, id: `s${i}`, filled: false, filledLabel: null }));
+
+  /* Chips étiquettes */
+  document.getElementById('labelChips').innerHTML = q.etiquettes_a_placer.map((lbl, i) =>
+    `<div class="label-chip" id="chip${i}">${lbl}</div>`
+  ).join('');
+
+  /* Activer le drag pointer sur chaque chip */
+  q.etiquettes_a_placer.forEach((lbl, i) => {
+    const chip = document.getElementById(`chip${i}`);
+    chip.addEventListener('pointerdown', evt => {
+      if (chip.classList.contains('placed')) return;
+      evt.preventDefault();
+      startChipDrag(lbl, chip, evt);
+    });
+  });
+
+  renderSVG(q, { assocPts: _assocState });
+}
+
+function startChipDrag(lbl, chipEl, evt) {
+  _activeDrag = lbl;
+  /* Clone flottant */
+  _dragClone  = document.createElement('div');
+  _dragClone.className   = 'label-chip';
+  _dragClone.textContent = lbl;
+  _dragClone.style.cssText = `position:fixed;pointer-events:none;z-index:200;opacity:0.88;
+    transform:rotate(2deg);transition:none;`;
+  document.body.appendChild(_dragClone);
+  moveClone(evt);
+
+  document.addEventListener('pointermove', onChipMove, { passive: false });
+  document.addEventListener('pointerup',   onChipUp);
+}
+
+function onChipMove(evt) {
+  evt.preventDefault();
+  if (_dragClone) moveClone(evt);
+}
+
+function moveClone(evt) {
+  const x = evt.clientX - 30;
+  const y = evt.clientY - 18;
+  _dragClone.style.left = `${x}px`;
+  _dragClone.style.top  = `${y}px`;
+}
+
+function onChipUp(evt) {
+  document.removeEventListener('pointermove', onChipMove);
+  document.removeEventListener('pointerup',   onChipUp);
+  if (_dragClone) { _dragClone.remove(); _dragClone = null; }
+  if (!_activeDrag) return;
+
+  /* Détecter si déposé sur le SVG */
+  const outer = document.getElementById('numlineOuter');
+  const rect  = outer.getBoundingClientRect();
+  if (evt.clientX >= rect.left && evt.clientX <= rect.right &&
+      evt.clientY >= rect.top  && evt.clientY <= rect.bottom) {
+    const svgEl  = document.getElementById('numlineSVG');
+    const svgXC  = pxToSvgX(evt, svgEl);
+    if (svgXC >= SVG_PAD && svgXC <= SVG_W - SVG_PAD) {
+      const val  = snapVal(xToVal(svgXC, _q.droite), _q.droite);
+      doAssocDrop(_activeDrag, val);
+    }
+  }
+  _activeDrag = null;
+}
+
+function doAssocDrop(lbl, val) {
+  let closest = null, closestD = Infinity;
+  for (const slot of _assocState) {
+    const d = Math.abs(slot.val - val);
+    if (d < closestD) { closestD = d; closest = slot; }
+  }
+  if (!closest) return;
+
+  if (closest.filled && Math.abs(toFloat(lbl) - closest.val) < 1e-9) {
+    /* Équivalent numérique → empiler au même slot (ex : 0,5 et 0,50) */
+    if (!closest.fills) closest.fills = [closest.filledLabel];
+    if (!closest.fills.includes(lbl)) closest.fills.push(lbl);
+    closest.filledLabel = lbl;
+  } else {
+    /* Valeur différente : libérer toutes les étiquettes de l'ancien slot */
+    if (closest.filled) {
+      const olds = closest.fills || [closest.filledLabel];
+      olds.forEach(old => {
+        document.querySelectorAll('.label-chip').forEach(c => {
+          if (c.textContent === old) c.classList.remove('placed');
+        });
+      });
+    }
+    closest.filled      = true;
+    closest.filledLabel = lbl;
+    closest.fills       = [lbl];
+  }
+
+  document.querySelectorAll('.label-chip').forEach(c => {
+    if (c.textContent === lbl) c.classList.add('placed');
+  });
+
+  renderSVG(_q, { assocPts: _assocState });
+
+  /* Valider dès que TOUS les chips (pas seulement les slots) sont placés */
+  const total  = _q.etiquettes_a_placer.length;
+  const placed = document.querySelectorAll('#labelChips .label-chip.placed').length;
+  document.getElementById('validateBtn').disabled = placed < total;
+}
+
+/* ── 13. Mode PLACER_MULTIPLE ────────────────────────────────────────────── */
+function buildMultiPts(q) {
+  return q.nombres.map((n, i) => ({
+    val:  _multiVals[i],
+    done: i < _multiIdx
+  }));
+}
+
+function updateMultiUI(q) {
+  document.getElementById('multiProgress').textContent =
+    `Nombre à placer (${_multiIdx + 1}/${q.nombres.length}) :`;
+  document.getElementById('multiChips').innerHTML = q.nombres.map((n, i) =>
+    `<div class="multi-chip ${i < _multiIdx ? 'done' : (i === _multiIdx ? 'active' : '')}">`
+    + `${i < _multiIdx ? '✓ ' : ''}${n}</div>`
+  ).join('');
+  document.getElementById('nombreDisplay').innerHTML = buildNombreHTML(q.nombres[_multiIdx]);
+}
+
+/* ── 14. Mode QCM ────────────────────────────────────────────────────────── */
+function buildQCMButtons(q) {
+  document.getElementById('qcmRow').innerHTML = q.choix.map(c =>
+    `<button class="qcm-btn" onclick="validateQCM('${c}')">${c}</button>`
+  ).join('');
+}
+
+function validateQCM(chosen) {
+  if (_answered) return;
+  document.querySelectorAll('.qcm-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === _q.reponse)               b.classList.add('ok');
+    else if (b.textContent === chosen) b.classList.add('err');
+  });
+  handleResult(chosen === _q.reponse, _q, null, null);
+}
+
+/* ── 15. Validation unifiée ──────────────────────────────────────────────── */
+function validateQuestion() {
+  if (_answered) return;
+  const q = _q;
+  switch (q.mode) {
+    case 'placer':          validatePlacer(q);         break;
+    case 'reperer':         validateReperer(q);        break;
+    case 'associer':        validateAssocier(q);       break;
+    case 'placer_multiple': validatePlacerMultiple(q); break;
+  }
+}
+document.getElementById('validateBtn').onclick = validateQuestion;
+
+function validatePlacer(q) {
+  if (_placedVal == null) return;
+  const target  = toFloat(q.equivalent || q.nombre);
+  const tol     = q.tolerance === 'quart_intervalle'
+    ? q.droite.pas * 0.25 : q.droite.pas * 0.5;
+  const correct = Math.abs(_placedVal - target) <= tol;
+  lockPlacerUI();
+  handleResult(correct, q, _placedVal, target);
+}
+
+function validateReperer(q) {
+  const inp     = document.getElementById('answerInput');
+  const got     = toFloat(inp.value);
+  const exp     = toFloat(q.valeur);
+  const correct = Math.abs(got - exp) < 1e-9;
+  inp.disabled  = true;
+  inp.oninput   = null;
+  document.getElementById('validateBtn').disabled = true;
+  inp.className = correct ? 'free-input ok' : 'free-input err';
+  handleResult(correct, q, null, exp);
+}
+
+function validateAssocier(q) {
+  let allOk = true;
+  for (const slot of _assocState) {
+    if (!slot.filled) { allOk = false; break; }
+    /* Vérifier chaque étiquette empilée sur ce slot */
+    const fills = slot.fills || [slot.filledLabel];
+    for (const lbl of fills) {
+      if (Math.abs(toFloat(lbl) - slot.val) > 1e-9) { allOk = false; break; }
+    }
+    if (!allOk) break;
+  }
+  /* Vérifier aussi que tous les chips sont placés */
+  const total  = q.etiquettes_a_placer.length;
+  const placed = document.querySelectorAll('#labelChips .label-chip.placed').length;
+  if (placed < total) allOk = false;
+
+  document.getElementById('validateBtn').disabled = true;
+  document.querySelectorAll('.label-chip').forEach(c => c.style.pointerEvents = 'none');
+  handleResult(allOk, q, null, null);
+}
+
+function validatePlacerMultiple(q) {
+  const cur = _multiVals[_multiIdx];
+  if (cur == null) return;
+  const target  = toFloat(q.nombres[_multiIdx]);
+  const tol     = q.droite.pas * 0.5;
+  const correct = Math.abs(cur - target) <= tol;
+
+  if (correct && _multiIdx < q.nombres.length - 1) {
+    /* Point validé → passer au suivant sans décompter */
+    _multiIdx++;
+    document.getElementById('validateBtn').disabled = true;
+    updateMultiUI(q);
+    renderSVG(q, { multiPts: buildMultiPts(q) });
+    document.getElementById('clickHint').style.display = '';
+    showFeedback(true, `Bien ! Place maintenant <strong>${q.nombres[_multiIdx]}</strong>.`, false);
+    return;
+  }
+  /* Dernier point ou erreur */
+  lockPlacerUI();
+  handleResult(correct, q, cur, target);
+}
+
+/* ── 16. Tableau de numération ───────────────────────────────────────────── */
+function toggleNumTable() {
+  const panel = document.getElementById('numPanel');
+  const btn   = document.getElementById('helpTableBtn');
+  const open  = panel.style.display === 'none';
+  panel.style.display = open ? '' : 'none';
+  btn.classList.toggle('active', open);
+  if (open && _q) fillTableForCurrentQuestion();
+}
+
+function fillTableForCurrentQuestion() {
+  if (!_q) return;
+  const q = _q;
+  if (q.mode === 'placer') {
+    const src = q.equivalent || q.nombre;
+    fillNumTable(src, rankFromPas(q.droite.pas), true);
+  } else if (q.mode === 'placer_multiple') {
+    fillNumTable(q.nombres[_multiIdx], rankFromPas(q.droite.pas), true);
+  } else if (q.mode === 'reperer') {
+    const inp = document.getElementById('answerInput');
+    inp.value.trim() ? fillNumTable(inp.value.trim(), null, false) : clearNumTable();
+  }
+}
+
+function fillTableLive() {
+  if (document.getElementById('numPanel').style.display === 'none') return;
+  fillTableForCurrentQuestion();
+}
+
+function fillNumTable(nombre, rangCible, highlight) {
+  const s      = String(nombre).trim().replace(',', '.');
+  const parts  = s.split('.');
+  const intP   = (parts[0] || '0').replace(/^0+/, '') || '0';
+  const decP   = parts[1] || '';
+  const len    = intP.length;
+  const vals   = {
+    ce: len >= 3 ? intP[len-3] : '',
+    di: len >= 2 ? intP[len-2] : '',
+    u:  intP[len-1] || '0',
+    d:  decP[0] || '',
+    c:  decP[1] || '',
+    m:  decP[2] || ''
+  };
+  const rIdx   = { unite:2, dixieme:3, centieme:4, milieme:5 };
+  const tIdx   = rangCible ? (rIdx[rangCible] ?? -1) : -1;
+  const ccls   = { ce:'col-entier',di:'col-entier',u:'col-entier',d:'col-dec',c:'col-dec',m:'col-dec' };
+  ['ce','di','u','d','c','m'].forEach((col, i) => {
+    const cell = document.getElementById(`cell-${col}`);
+    if (!cell) return;
+    cell.textContent = vals[col] !== '' ? vals[col] : '–';
+    cell.className   = ccls[col];
+    if (vals[col] === '')                           cell.classList.add('hl-empty');
+    if (highlight && i === tIdx)                    cell.classList.add('hl-target');
+    if (highlight && tIdx >= 0 && i > tIdx)        cell.classList.add('hl-below');
+  });
+}
+
+function clearNumTable() {
+  const ccls = { ce:'col-entier',di:'col-entier',u:'col-entier',d:'col-dec',c:'col-dec',m:'col-dec' };
+  ['ce','di','u','d','c','m'].forEach(col => {
+    const cell = document.getElementById(`cell-${col}`);
+    if (!cell) return;
+    cell.textContent = '–';
+    cell.className   = ccls[col] + ' hl-empty';
+  });
+}
+
+/* ── 17. Animation comptage des intervalles ─────────────────────────────── */
+function animateGradCount() {
+  if (!_q) return;
+  _showCount = !_showCount;
+  document.getElementById('helpCountBtn').classList.toggle('active', _showCount);
+  redrawCurrentSVG();
+}
+
+function redrawCurrentSVG() {
+  if (!_q) return;
+  const opts = { haloVal: _haloVal, showCount: _showCount };
+  if (_q.mode === 'placer')          opts.placedVal  = _placedVal;
+  if (_q.mode === 'reperer')       { opts.fixedVal   = toFloat(_q.valeur); opts.fixedLabel = _q.point_label; }
+  if (_q.mode === 'qcm_estimation'){ opts.fixedVal   = _q.point_position; opts.fixedLabel = _q.point_label; }
+  if (_q.mode === 'associer')        opts.assocPts   = _assocState;
+  if (_q.mode === 'placer_multiple') opts.multiPts   = buildMultiPts(_q);
+  renderSVG(_q, opts);
+}
+
+/* ── 18. Aides visuelles appelées depuis Step 3 ─────────────────────────── */
+function showHalo(targetVal) {
+  _haloVal = targetVal;
+  redrawCurrentSVG();
+}
+
+function showCorrection(targetVal, q) {
+  /* Pas de redrawCurrentSVG : on conserve le point élève (mauvaise position) visible */
+  const svg  = document.getElementById('numlineSVG');
+  const x    = valToX(targetVal, q.droite).toFixed(1);
+  const prec = getPrec(q.droite.pas);
+  const c    = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  c.setAttribute('cx', x); c.setAttribute('cy', SVG_Y);
+  c.setAttribute('r', '9'); c.setAttribute('fill', '#16a34a');
+  c.setAttribute('stroke', 'white'); c.setAttribute('stroke-width', '2.5');
+  c.style.animation = 'pointAppear 400ms ease both';
+  svg.appendChild(c);
+  const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  t.setAttribute('x', x); t.setAttribute('y', (SVG_Y - 18).toFixed(1));
+  t.setAttribute('text-anchor', 'middle');
+  t.setAttribute('font-family', 'Fredoka,sans-serif');
+  t.setAttribute('font-size', '13'); t.setAttribute('font-weight', '700');
+  t.setAttribute('fill', '#15803d');
+  t.textContent = fmtNum(targetVal, prec);
+  svg.appendChild(t);
+}
+
+/* ── 19. Gestion des niveaux et sessions ────────────────────────────────── */
+let currentLevel = 1;
+let levelsDone   = JSON.parse(sessionStorage.getItem('pddLevelsDone') || '{}');
+let session      = [];
+let sessionIdx   = 0;
+let score        = 0;
+let attempts     = 0;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function initLevelTabs() {
+  [2, 3].forEach(lv => {
+    const btn  = document.querySelector(`.level-tab[data-level="${lv}"]`);
+    const lock = document.getElementById(`lock${lv}`);
+    if (levelsDone[lv - 1]) {
+      btn.classList.remove('locked'); btn.classList.add('unlocked');
+      if (lock) lock.textContent = '🔓';
+    }
+  });
+}
+
+function selectLevel(lv) {
+  if (lv > 1 && !levelsDone[lv - 1]) return;
+  currentLevel = lv;
+  document.querySelectorAll('.level-tab').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.level-tab[data-level="${lv}"]`).classList.add('active');
+  document.getElementById('validateBtn').style.display = '';
+  startLevel();
+}
+
+function startLevel() {
+  session    = shuffle(BANKS[currentLevel]).slice(0, CONFIG[currentLevel].perSession);
+  sessionIdx = 0;
+  score      = 0;
+  document.getElementById('resultScreen').classList.remove('visible');
+  document.getElementById('qCard').style.display        = '';
+  document.getElementById('progressArea').style.display = '';
+  document.getElementById('helpRow').style.display      = '';
+  document.getElementById('numPanel').style.display     = 'none';
+  document.getElementById('helpTableBtn').classList.remove('active');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  attempts = 0;
+  const q  = session[sessionIdx];
+  updateProgress();
+  /* Reset feedback + next */
+  const fb = document.getElementById('feedback');
+  const nb = document.getElementById('nextBtn');
+  fb.className = 'feedback'; fb.innerHTML = '';
+  nb.className = 'next-btn';
+  /* Badge et énoncé */
+  document.getElementById('qTypeBadge').textContent = getBadge(q);
+  document.getElementById('qPrompt').innerHTML      = getPrompt(q);
+  /* SVG + interaction */
+  setupQuestion(q);
+  /* Tableau de numération */
+  if (document.getElementById('numPanel').style.display !== 'none') {
+    fillTableForCurrentQuestion();
+  }
+}
+
+function getBadge(q) {
+  const map = {
+    placer:          'Placer un nombre',
+    reperer:         q.vocabulaire === 'abscisse' ? "Lire l'abscisse" : 'Repérer un point',
+    qcm_estimation:  'Estimation',
+    associer:        'Associer les étiquettes',
+    placer_multiple: 'Placer plusieurs nombres'
+  };
+  return map[q.mode] || 'Exercice';
+}
+
+function getPrompt(q) {
+  if (q.mode === 'placer') {
+    const base = `Place <span class="hl-num">${q.nombre}</span> sur la droite graduée.`;
+    return q.lien_fraction
+      ? base + `<br><em style="font-size:0.82em;color:var(--muted);font-weight:600">`
+             + `On peut aussi écrire ${q.equivalent}</em>`
+      : base;
+  }
+  if (q.mode === 'reperer') {
+    return q.vocabulaire === 'abscisse'
+      ? `Quelle est l'<strong>abscisse</strong> du point <span class="hl-num">${q.point_label}</span> ?`
+      : `Quel nombre correspond au point <span class="hl-num">${q.point_label}</span> ?`;
+  }
+  if (q.mode === 'qcm_estimation') {
+    return `Le point <span class="hl-num">${q.point_label}</span> est entre deux graduations.`
+         + ` Quelle est la valeur la plus probable de son abscisse ?`;
+  }
+  if (q.mode === 'associer') {
+    return `Associe chaque étiquette à sa position sur la droite.`
+         + ` <em style="color:var(--muted);font-size:0.85em">Glisse les étiquettes sur les points.</em>`;
+  }
+  if (q.mode === 'placer_multiple') {
+    return `Place <span class="hl-num">${q.nombres.join('</span>, <span class="hl-num">')}</span>`
+         + ` sur la droite graduée.`;
+  }
+  return '';
+}
+
+function updateProgress() {
+  const total = session.length;
+  document.getElementById('progressLabel').textContent = `Question ${Math.min(sessionIdx+1,total)}/${total}`;
+  document.getElementById('progressScore').textContent = `Score : ${score}`;
+  document.getElementById('progressFill').style.width  = `${(sessionIdx/total)*100}%`;
+}
+
+function nextQuestion() {
+  sessionIdx++;
+  if (sessionIdx >= session.length) { showResults(); return; }
+  const card = document.getElementById('qCard');
+  card.style.animation = 'none';
+  requestAnimationFrame(() => { card.style.animation = ''; renderQuestion(); });
+}
+
+function retryLevel() {
+  document.getElementById('resultScreen').classList.remove('visible');
+  document.getElementById('qCard').style.display        = '';
+  document.getElementById('progressArea').style.display = '';
+  document.getElementById('helpRow').style.display      = '';
+  startLevel();
+}
+
+function goNextLevel() { selectLevel(currentLevel + 1); }
+
+function showResults() {
+  document.getElementById('qCard').style.display        = 'none';
+  document.getElementById('progressArea').style.display = 'none';
+  document.getElementById('helpRow').style.display      = 'none';
+  document.getElementById('numPanel').style.display     = 'none';
+
+  const lv     = currentLevel;
+  const total  = session.length;
+  const thresh = CONFIG[lv].threshold;
+  const passed = score >= thresh;
+
+  document.getElementById('resultEmoji').textContent = passed ? '🏆' : '💪';
+  document.getElementById('resultTitle').textContent = passed ? 'Niveau réussi !' : 'Continue comme ça !';
+  document.getElementById('resultScore').textContent = `${score}/${total}`;
+
+  const nlBtn = document.getElementById('nextLevelBtn');
+  if (passed) {
+    levelsDone[lv] = true;
+    sessionStorage.setItem('pddLevelsDone', JSON.stringify(levelsDone));
+    initLevelTabs();
+    document.getElementById('resultMsg').textContent = lv < 3
+      ? `Bravo ! Tu as obtenu ${score} sur ${total} (seuil : ${thresh}/${total}). Le niveau suivant est débloqué !`
+      : `Félicitations ! Tu maîtrises les trois niveaux de la droite graduée !`;
+    if (lv < 3) {
+      nlBtn.style.display    = 'inline-flex';
+      nlBtn.style.alignItems = 'center';
+    } else {
+      nlBtn.style.display = 'none';
+    }
+    launchConfetti();
+    logResult(lv, score, total);
+  } else {
+    document.getElementById('resultMsg').textContent =
+      `Tu as obtenu ${score} sur ${total}. Il faut ${thresh}/${total} pour passer au niveau suivant. Réessaie !`;
+    nlBtn.style.display = 'none';
+  }
+
+  document.getElementById('resultScreen').classList.add('visible');
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ÉTAPE 3 — Feedback pédagogique, score, déverrouillage, Supabase
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Messages positifs ──────────────────────────────────────────────────── */
+function getOkMsg() {
+  const msgs = ['Parfait ! 🎉','Très bien ! ✓','Excellent ! 🌟',"Bravo, c'est juste !",'Super ! 👍'];
+  return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
+/* ── Indice pédagogique après 1er échec ─────────────────────────────────── */
+function getHintMsg(q, placedVal, targetVal) {
+  const piege  = q.piege;
+  const prec   = getPrec(q.droite.pas);
+  const pasStr = fmtNum(q.droite.pas, prec);
+
+  if (piege === 'pas_non_unitaire') {
+    const n    = Math.round((q.droite.max - q.droite.min) / q.droite.pas);
+    const eMin = fmtNum(q.droite.etiquettes[0], getPrec(q.droite.etiquettes[0]));
+    const eLst = q.droite.etiquettes[q.droite.etiquettes.length - 1];
+    return `Attention ! Compte les intervalles entre <strong>${eMin}</strong> et `
+         + `<strong>${fmtNum(eLst, getPrec(eLst))}</strong> : il y en a <strong>${n}</strong>. `
+         + `Chaque graduation vaut donc <strong>${pasStr}</strong>, pas 0,1. 💡`;
+  }
+
+  if (piege === 'origine_decalee') {
+    return `Regarde bien la première étiquette : cette droite commence à `
+         + `<strong>${fmtNum(q.droite.etiquettes[0], prec)}</strong>, pas à 0 ! `
+         + `Compte les intervalles depuis cette valeur. 💡`;
+  }
+
+  if (piege === 'zero_dixieme') {
+    return `Attention ! Le chiffre des <strong>dixièmes</strong> est 0 — regarde bien `
+         + `chaque colonne du tableau de numération. La valeur ne se lit pas directement. 💡`;
+  }
+
+  if (piege === 'entre_graduations') {
+    return `<strong>${q.nombre}</strong> ne tombe pas sur une graduation : il est exactement `
+         + `à mi-chemin entre deux. Repère les deux graduations qui l'encadrent et vise le milieu ! 💡`;
+  }
+
+  if (piege === 'zeros') {
+    return `Rappel : <strong>0,5</strong> et <strong>0,50</strong>, c'est le même nombre. `
+         + `Les zéros en fin de décimale ne changent pas la valeur. Ils vont au <em>même point</em> ! 💡`;
+  }
+
+  /* Erreur de placement (mode placer) */
+  if ((q.mode === 'placer' || q.mode === 'placer_multiple')
+      && placedVal != null && targetVal != null) {
+    const dir = placedVal < targetVal ? 'trop à gauche' : 'trop à droite';
+    return `Ton point est <strong>${dir}</strong>. Utilise le tableau de numération `
+         + `pour identifier le bon intervalle. 💡`;
+  }
+
+  if (q.mode === 'reperer') {
+    return `Pas tout à fait. Repère les étiquettes, puis compte les intervalles `
+         + `depuis la graduation étiquetée la plus proche. 💡`;
+  }
+
+  if (q.mode === 'qcm_estimation') {
+    return `Ce n'est pas la bonne valeur. Le point est exactement à mi-chemin `
+         + `entre deux graduations — quelle valeur est à égale distance des deux ? 💡`;
+  }
+
+  return `Pas tout à fait. Utilise le tableau de numération et recompte `
+       + `soigneusement les intervalles (les espaces, pas les traits) ! 💡`;
+}
+
+/* ── Correction après 2e échec ──────────────────────────────────────────── */
+function getCorrectionMsg(q, corrVal) {
+  const prec = getPrec(q.droite.pas);
+
+  if (q.mode === 'placer') {
+    const lbl = q.lien_fraction ? `${q.nombre} = ${q.equivalent}` : q.nombre;
+    return corrVal != null
+      ? `La position de <strong>${lbl}</strong> est <strong>${fmtNum(corrVal, prec)}</strong>. `
+      + `Le point vert indique l'emplacement exact.`
+      : `La bonne position est indiquée par le point vert.`;
+  }
+
+  if (q.mode === 'reperer') {
+    const n = Math.round((q.droite.max - q.droite.min) / q.droite.pas);
+    return `La valeur du point <strong>${q.point_label}</strong> est <strong>${q.valeur}</strong>. `
+         + `Il y a <strong>${n} intervalles</strong> sur cette droite — chacun vaut `
+         + `<strong>${fmtNum(q.droite.pas, prec)}</strong>.`;
+  }
+
+  if (q.mode === 'qcm_estimation') {
+    return `La bonne réponse était <strong>${q.reponse}</strong> : c'est la valeur `
+         + `exactement à mi-chemin entre les deux graduations encadrantes.`;
+  }
+
+  if (q.mode === 'associer') {
+    const eqs = (q.equivalents || [])
+      .map(p => `<strong>${p.join('</strong> et <strong>')}</strong>`)
+      .join(', ');
+    return eqs
+      ? `${eqs} désignent le même nombre : ils vont donc au même point sur la droite !`
+      : `Vérifie la valeur numérique de chaque étiquette et sa position.`;
+  }
+
+  return `Regarde le point vert et le tableau pour comprendre la position exacte.`;
+}
+
+/* ── handleResult — règle des 2 tentatives ──────────────────────────────── */
+function handleResult(correct, q, placedVal, targetVal) {
+  if (correct) {
+    _answered = true;
+    score++;
+    updateProgress();
+
+    /* Correction visuelle — ne pas ajouter de 2e point sur la réponse correcte */
+    if (q.mode === 'placer' && targetVal != null) {
+      fillNumTable(fmtNum(targetVal, getPrec(q.droite.pas)),
+                   rankFromPas(q.droite.pas), true);
+      if (document.getElementById('numPanel').style.display === 'none') toggleNumTable();
+    } else if (q.mode === 'reperer') {
+      fillNumTable(q.valeur, rankFromPas(q.droite.pas), true);
+      if (document.getElementById('numPanel').style.display === 'none') toggleNumTable();
+    }
+
+    /* Message lien fraction (N1 Type C) */
+    if (q.lien_fraction && q.equivalent) {
+      const fm = document.getElementById('fractionLinkMsg');
+      fm.innerHTML = `<strong>${q.nombre} = ${q.equivalent}</strong> — c'est le même point sur la droite !`;
+      fm.classList.add('visible');
+    }
+
+    showFeedback(true, getOkMsg(), true);
+
+  } else {
+    /* QCM et ASSOCIER : résultat immédiat, pas de 2e chance */
+    const oneShot = (q.mode === 'qcm_estimation' || q.mode === 'associer');
+    attempts++;
+
+    if (attempts === 1 && !oneShot) {
+      /* ── 1er échec : indice + aides visuelles, question reste active ── */
+      const hint = getHintMsg(q, placedVal, targetVal);
+
+      /* Halo zone cible (mode placer / placer_multiple) */
+      if ((q.mode === 'placer' || q.mode === 'placer_multiple') && targetVal != null) {
+        showHalo(targetVal);
+      }
+
+      /* Animation comptage automatique (mode repérer) */
+      if (q.mode === 'reperer' && !_showCount) {
+        _showCount = true;
+        document.getElementById('helpCountBtn').classList.add('active');
+        redrawCurrentSVG();
+      }
+
+      /* Ouvrir le tableau de numération */
+      if (document.getElementById('numPanel').style.display === 'none') toggleNumTable();
+
+      /* Remettre la saisie active (mode repérer) */
+      if (q.mode === 'reperer') {
+        const inp = document.getElementById('answerInput');
+        setTimeout(() => {
+          inp.className = 'free-input';
+          inp.value     = '';
+          inp.disabled  = false;
+          document.getElementById('validateBtn').disabled = true;
+          inp.focus();
+        }, 600);
+      }
+
+      /* Remettre les événements placer (mode placer) */
+      if (q.mode === 'placer') {
+        document.getElementById('numlineOuter').className    = 'numline-outer';
+        document.getElementById('numlineOuter').style.cursor = 'crosshair';
+        document.getElementById('validateBtn').disabled      = false;
+        attachPlacerEvents(q);
+      }
+
+      showFeedback(false, hint, false);
+
+    } else {
+      /* ── 2e échec (ou mode one-shot) : correction complète ── */
+      _answered = true;
+      updateProgress();
+
+      const corrVal = targetVal != null  ? targetVal
+        : q.mode === 'reperer'           ? toFloat(q.valeur)
+        : null;
+
+      /* Point vert de correction seulement pour modes placer (repérer : le point or suffit) */
+      if (corrVal != null && (q.mode === 'placer' || q.mode === 'placer_multiple')) {
+        showCorrection(corrVal, q);
+      }
+
+      const tblSrc = q.mode === 'reperer' ? q.valeur
+        : corrVal != null ? fmtNum(corrVal, getPrec(q.droite.pas)) : null;
+      if (tblSrc) {
+        fillNumTable(tblSrc, rankFromPas(q.droite.pas), true);
+        if (document.getElementById('numPanel').style.display === 'none') toggleNumTable();
+      }
+
+      /* Verrouiller la saisie (mode repérer) */
+      if (q.mode === 'reperer') {
+        const inp = document.getElementById('answerInput');
+        inp.disabled  = true;
+        inp.className = 'free-input err';
+      }
+
+      showFeedback(false, getCorrectionMsg(q, corrVal), true);
+    }
+  }
+}
+
+/* ── showFeedback ───────────────────────────────────────────────────────── */
+function showFeedback(ok, msg, showNextBtn = true) {
+  const fb = document.getElementById('feedback');
+  fb.className = `feedback visible ${ok ? 'ok-fb' : 'err-fb'}`;
+  fb.innerHTML = msg;
+  if (showNextBtn) {
+    const nb     = document.getElementById('nextBtn');
+    const isLast = sessionIdx === session.length - 1;
+    nb.textContent = isLast ? 'Voir les résultats →' : 'Question suivante →';
+    nb.className   = 'next-btn visible';
+  }
+}
+
+/* ── Confettis ──────────────────────────────────────────────────────────── */
+function launchConfetti() {
+  const colors    = ['#F5A623','#1DBFA0','#1A2D6B','#E05252','#ffffff'];
+  const container = document.getElementById('confettiContainer');
+  container.innerHTML = '';
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      animation-duration:${1.5+Math.random()*1.5}s;
+      animation-delay:${Math.random()*0.6}s;
+    `;
+    container.appendChild(p);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 3200);
+}
+
+/* ── Logging Supabase ───────────────────────────────────────────────────── */
+function logResult(level, sc, total) {
+  if (typeof saveExerciseResult === 'function') {
+    saveExerciseResult({
+      exerciseSlug: 'placer-decimaux-droite',
+      subject:      'mathématiques',
+      category:     'nombres-decimaux',
+      exerciseType: 'droite-graduee',
+      level:        `Niveau ${level}`,
+      score:        sc,
+      total:        total
+    });
+  }
+}
+
+/* ─── Init ─── */
+initLevelTabs();
+startLevel();
+</script>
+
+<script src="../../../js/menu.js"></script>
+<style>
+  footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+  .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+  .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+  .footer__text .rouge { color: #F5A623; font-weight: 700; }
+  .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+  .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

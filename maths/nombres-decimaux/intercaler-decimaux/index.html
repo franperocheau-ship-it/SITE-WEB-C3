@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intercaler un nombre décimal entre deux nombres — Mathématiques — LFM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../../js/supabase-client.js" onerror="void 0"></script>
+  <script src="../../../js/auth.js" onerror="void 0"></script>
+  <script src="../../../js/results.js" onerror="void 0"></script>
+  <style>
+    /* ── Tokens ── */
+    :root {
+      --navy:    #1A2D6B;
+      --gold:    #F5A623;
+      --gold-bg: #FFF3D0;
+      --teal:    #1DBFA0;
+      --err:     #E05252;
+      --bg:      #F8FAFC;
+      --white:   #ffffff;
+      --border:  #E8EDF3;
+      --text:    #1E2532;
+      --muted:   #5F6368;
+      --green:   #16a34a;
+      --green-bg:#dcfce7;
+      --shadow:  0 10px 30px rgba(26,45,107,0.10);
+      --radius:  20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Fredoka', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      padding-top: 50px;
+    }
+
+    /* ── Navbar ── */
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+    .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+    .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+    .navbar__brand img{height:34px;width:auto;}
+    .navbar__nav{display:flex;align-items:center;gap:24px;}
+    .navbar__nav a{text-decoration:none;color:#1a1a1a;font-family:'Fredoka',sans-serif;font-size:14px;font-weight:700;transition:color .2s;}
+    .navbar__nav a:hover{color:#1B4EBF;}
+    .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;font-family:'Fredoka',sans-serif;}
+    .navbar__nav .btn-login{color:#fff!important;}
+    .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Fredoka',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+    .btn-login:hover{background:#0b1e4d;}
+    @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+
+    /* ── Main layout ── */
+    .main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    /* ── Page title ── */
+    .breadcrumb {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--navy); }
+
+    .page-title {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .page-title h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.25;
+    }
+    .page-title .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .page-rule {
+      width: 44px;
+      height: 3px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin: 10px auto 0;
+    }
+
+    /* ── Level tabs ── */
+    .level-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .level-tab {
+      border: 2px solid var(--border);
+      border-radius: 100px;
+      padding: 9px 22px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      background: var(--white);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 200ms;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .level-tab.active {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #fff;
+    }
+    .level-tab.unlocked:hover:not(.active) {
+      border-color: var(--navy);
+      color: var(--navy);
+    }
+    .level-tab.locked {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .level-tab .lock-icon { font-size: 13px; }
+
+    /* ── Numeration table triple (inf / réponse / sup) ── */
+    .num-table-wrapper {
+      overflow-x: auto;
+      margin-bottom: 12px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+    .num-table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      background: var(--white);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .num-table thead th {
+      padding: 8px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-align: center;
+      background: var(--navy);
+      color: #fff;
+      white-space: nowrap;
+    }
+    .num-table thead th.col-entier { background: rgba(26,45,107,0.85); }
+    .num-table thead th.col-dec    { background: rgba(26,45,107,0.70); }
+    .num-table thead th.col-sep {
+      background: var(--navy);
+      color: var(--gold);
+      font-size: 18px;
+      padding: 0 4px;
+      width: 18px;
+    }
+    .num-table thead th.col-label {
+      background: var(--navy);
+      color: rgba(255,255,255,0.7);
+      font-size: 10px;
+      width: 68px;
+      min-width: 68px;
+      text-align: right;
+      padding-right: 8px;
+    }
+
+    .num-table tbody td {
+      padding: 11px 8px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      border-top: 1px solid var(--border);
+      min-width: 54px;
+      transition: background 300ms, color 300ms;
+    }
+    .num-table tbody td.col-sep {
+      background: var(--white);
+      font-size: 26px;
+      font-weight: 900;
+      color: var(--navy);
+      border-left: 3px solid var(--navy);
+      border-right: 3px solid var(--navy);
+      min-width: 18px;
+      padding: 0 2px;
+    }
+    .num-table tbody td.col-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: right;
+      padding-right: 10px;
+      white-space: nowrap;
+      background: rgba(26,45,107,0.03);
+    }
+
+    /* Row inf (borne inférieure) : fond navy clair */
+    .row-inf td.col-entier { background: rgba(26,45,107,0.08); color: var(--navy); }
+    .row-inf td.col-dec    { background: rgba(26,45,107,0.05); color: var(--navy); }
+
+    /* Row réponse (saisie élève) */
+    .row-rep td.col-entier { background: var(--white); }
+    .row-rep td.col-dec    { background: var(--white); }
+    .row-rep td.input-cell {
+      border: 2px dashed var(--gold);
+      background: #fffdf7;
+      color: var(--navy);
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .row-rep td.input-cell.filled { border-style: solid; border-color: var(--teal); background: rgba(29,191,160,0.06); }
+    .row-rep td.input-cell.ok     { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+    .row-rep td.col-label { background: rgba(29,191,160,0.07); }
+
+    /* Row sup (borne supérieure) : fond gold doux */
+    .row-sup td.col-entier { background: var(--gold-bg); color: #92400e; }
+    .row-sup td.col-dec    { background: var(--gold-bg); color: #92400e; }
+
+    /* Colonne zone d'intervention : surlignage turquoise */
+    .num-table tbody td.hl-target {
+      background: var(--teal) !important;
+      color: #fff !important;
+    }
+    /* Case vide (–) */
+    .num-table tbody td.hl-empty {
+      color: #C0C8D8 !important;
+      font-size: 15px;
+    }
+
+    /* ── Number line wrapper ── */
+    .numline-wrapper {
+      background: var(--white);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 14px 16px 8px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+    }
+
+    /* ── Help buttons ── */
+    .help-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .help-btn {
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--white);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 200ms;
+    }
+    .help-btn:hover, .help-btn.active {
+      border-color: var(--teal);
+      color: var(--teal);
+      background: rgba(29,191,160,0.07);
+    }
+
+    /* ── Progress ── */
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .progress-label { font-size: 13px; font-weight: 700; color: var(--navy); }
+    .progress-score { font-size: 13px; font-weight: 600; color: var(--muted); }
+    .progress-bar-bg {
+      height: 7px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--teal);
+      border-radius: 100px;
+      transition: width 400ms ease;
+    }
+
+    /* ── Question card ── */
+    .q-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px 36px;
+      animation: fadeUp 320ms ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .q-type-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 12px;
+    }
+    .q-prompt {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.45;
+      margin-bottom: 24px;
+    }
+    .hl-num {
+      color: var(--gold);
+      font-size: 1.1em;
+    }
+
+    /* ── Zone d'intercalation principale  inf < ☐ < sup ── */
+    .intercal-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+    .intercal-bound {
+      color: var(--navy);
+      font-weight: 700;
+    }
+    .intercal-lt {
+      color: var(--teal);
+      font-size: 1.4rem;
+    }
+
+    /* Multi-champs (2 ou 3 nombres à trouver) */
+    .multi-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .multi-field-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      justify-content: center;
+    }
+    .field-num-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    /* ── Champ libre principal ── */
+    .free-input {
+      height: 56px;
+      border: 2.5px solid var(--border);
+      border-radius: 14px;
+      padding: 0 18px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--navy);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms;
+      text-align: center;
+      max-width: 200px;
+      width: 100%;
+    }
+    .free-input:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(26,45,107,0.12);
+      background: var(--white);
+    }
+    .free-input.ok  { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+    .free-input.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── Fraction input (Niveau 1 Type E) ── */
+    .frac-input-wrap {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+    .frac-num-input {
+      width: 80px;
+      height: 48px;
+      border: 2.5px solid var(--border);
+      border-radius: 10px;
+      text-align: center;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 200ms;
+    }
+    .frac-num-input:focus { border-color: var(--navy); background: var(--white); }
+    .frac-num-input.ok  { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+    .frac-num-input.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+    .frac-bar {
+      width: 80px; height: 3px;
+      background: var(--navy);
+      border-radius: 2px;
+    }
+    .frac-den {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    /* ── Boutons choix (QCM) ── */
+    .choices-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .choice-btn {
+      padding: 14px 28px;
+      border: 2.5px solid var(--border);
+      border-radius: 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--bg);
+      color: var(--text);
+      transition: all 200ms;
+    }
+    .choice-btn:hover:not(:disabled):not(.ok):not(.err) {
+      border-color: var(--navy);
+      background: rgba(26,45,107,0.04);
+      transform: translateY(-2px);
+    }
+    .choice-btn:disabled { cursor: default; }
+    .choice-btn.ok  { border-color: var(--green); background: var(--green-bg); color: #15803d; }
+    .choice-btn.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* QCM multi-réponses : cases à cocher style pill */
+    .multi-choices {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .multi-choice-lbl {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 20px;
+      border: 2.5px solid var(--border);
+      border-radius: 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--bg);
+      transition: all 200ms;
+      user-select: none;
+    }
+    .multi-choice-lbl:has(input:checked) {
+      border-color: var(--gold);
+      background: var(--gold-bg);
+      color: #92400e;
+    }
+    .multi-choice-lbl input[type=checkbox] { display: none; }
+    .multi-choice-lbl.ok  { border-color: var(--green) !important; background: var(--green-bg) !important; color: #15803d !important; }
+    .multi-choice-lbl.err { border-color: var(--err)   !important; background: #fef2f2         !important; color: var(--err)   !important; }
+    .multi-choice-lbl.neutral-wrong { border-color: var(--border) !important; background: var(--bg) !important; opacity: 0.5; }
+
+    /* ── Oui/Non ── */
+    .vf-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .vf-btn {
+      flex: 1;
+      padding: 16px;
+      border: 2.5px solid var(--border);
+      border-radius: 16px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--bg);
+      color: var(--text);
+      transition: all 200ms;
+    }
+    .vf-btn:hover:not(:disabled):not(.ok):not(.err) {
+      transform: translateY(-2px);
+      border-color: var(--navy);
+      background: rgba(26,45,107,0.04);
+    }
+    .vf-btn:disabled { cursor: default; }
+    .vf-btn.ok  { border-color: var(--green); background: var(--green-bg); color: #15803d; }
+    .vf-btn.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── Encadré densité (infinité) ── */
+    .density-box {
+      background: rgba(29,191,160,0.10);
+      border: 2px solid var(--teal);
+      border-radius: 14px;
+      padding: 14px 18px;
+      text-align: center;
+      margin-top: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #054336;
+      line-height: 1.55;
+      display: none;
+      animation: fadeUp 300ms ease;
+    }
+    .density-box.visible { display: block; }
+    .density-inf { font-size: 24px; font-weight: 700; color: var(--teal); }
+
+    /* ── SVG clic droite graduée ── */
+    #clickLineWrapper {
+      background: var(--white);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 14px 16px 8px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+    #clickLineSVG { cursor: crosshair; display: block; }
+    .click-tooltip {
+      position: fixed;
+      background: var(--navy);
+      color: #fff;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 8px;
+      pointer-events: none;
+      display: none;
+      z-index: 2000;
+    }
+
+    /* ── Validate button ── */
+    .validate-btn {
+      width: 100%;
+      padding: 15px;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 200ms, transform 200ms, opacity 200ms;
+    }
+    .validate-btn:hover:not(:disabled) { background: #142358; transform: translateY(-2px); }
+    .validate-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* ── Feedback ── */
+    .feedback {
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.55;
+      display: none;
+      animation: fadeUp 250ms ease;
+    }
+    .feedback.visible { display: block; }
+    .feedback.ok-fb  { background: var(--green-bg); color: #15803d; border: 1.5px solid #86efac; }
+    .feedback.err-fb { background: #fef2f2;         color: #b91c1c; border: 1.5px solid #fca5a5; }
+
+    /* ── Next button ── */
+    .next-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      display: none;
+      transition: background 200ms, transform 200ms;
+      animation: fadeUp 250ms ease;
+    }
+    .next-btn.visible { display: block; }
+    .next-btn:hover { background: #17a88d; transform: translateY(-2px); }
+
+    /* ── Result screen ── */
+    .result-screen {
+      display: none;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 48px 36px;
+      text-align: center;
+      animation: fadeUp 350ms ease;
+    }
+    .result-screen.visible { display: block; }
+    .result-emoji { font-size: 56px; margin-bottom: 12px; }
+    .result-title { font-size: 26px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+    .result-score { font-size: 48px; font-weight: 700; color: var(--gold); margin: 12px 0; }
+    .result-msg   { font-size: 16px; color: var(--muted); margin-bottom: 28px; line-height: 1.5; }
+    .result-btns  { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      padding: 13px 32px;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 200ms, transform 200ms;
+    }
+    .btn-primary:hover { background: #142358; transform: translateY(-2px); }
+    .btn-secondary {
+      padding: 13px 32px;
+      background: transparent;
+      color: var(--navy);
+      border: 2px solid var(--border);
+      border-radius: 100px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 200ms;
+    }
+    .btn-secondary:hover { border-color: var(--navy); transform: translateY(-2px); }
+
+    /* ── Confetti ── */
+    .confetti-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 999;
+    }
+    .confetti-piece {
+      position: absolute;
+      top: -10px;
+      border-radius: 2px;
+      animation: confettiFall linear forwards;
+    }
+    @keyframes confettiFall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+
+    /* ── Mobile ── */
+    @media (max-width: 560px) {
+      .main    { padding: 20px 12px 48px; }
+      .q-card  { padding: 24px 16px; }
+      .q-prompt { font-size: 16px; }
+      .intercal-row { font-size: 1.3rem; gap: 8px; }
+      .free-input   { font-size: 20px; height: 50px; }
+      .num-table              { min-width: 300px; }
+      .num-table tbody td     { padding: 8px 4px; font-size: 18px; min-width: 40px; }
+      .num-table tbody td.col-sep { min-width: 14px; padding: 0; }
+      .num-table tbody td.col-label { font-size: 10px; padding-right: 6px; min-width: 56px; }
+      .numline-wrapper { overflow-x: scroll; }
+      .result-screen { padding: 32px 20px; }
+      .result-btns   { flex-direction: column; align-items: stretch; }
+      .choices-row   { gap: 8px; }
+      .choice-btn    { font-size: 17px; padding: 12px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar__inner">
+    <a href="../../../index.html" class="navbar__brand">
+      <img src="../../../assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="../../../index.html">Accueil</a>
+      <a href="../../../apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+
+  <div class="page-title">
+    <p class="breadcrumb">
+      <a href="../../../mathématiques.html">Mathématiques</a> &rsaquo;
+      <a href="../../../mathématiques-nombres-decimaux.html">Nombres décimaux</a> &rsaquo;
+      Intercaler un nombre décimal entre deux nombres
+    </p>
+    <h1>Intercaler un nombre décimal entre deux nombres</h1>
+    <p class="subtitle">Cycle 3 — Nombres et calculs — Nombres décimaux</p>
+    <div class="page-rule"></div>
+  </div>
+
+  <!-- Level tabs -->
+  <div class="level-tabs" id="levelTabs">
+    <button class="level-tab active unlocked" data-level="1" onclick="selectLevel(1)">Niveau 1</button>
+    <button class="level-tab locked"          data-level="2" onclick="selectLevel(2)"><span class="lock-icon" id="lock2">🔒</span> Niveau 2</button>
+    <button class="level-tab locked"          data-level="3" onclick="selectLevel(3)"><span class="lock-icon" id="lock3">🔒</span> Niveau 3</button>
+  </div>
+
+  <!-- Tableau de numération triple : borne inf / réponse élève / borne sup -->
+  <div class="num-table-wrapper">
+    <table class="num-table" id="numTable">
+      <thead>
+        <tr>
+          <th class="col-label"></th>
+          <th class="col-entier">Centaines</th>
+          <th class="col-entier">Dizaines</th>
+          <th class="col-entier">Unités</th>
+          <th class="col-sep">║</th>
+          <th class="col-dec">Dixièmes</th>
+          <th class="col-dec">Centièmes</th>
+          <th class="col-dec">Millièmes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-inf" id="rowInf">
+          <td class="col-label">borne inf.</td>
+          <td class="col-entier hl-empty" id="inf-ce">–</td>
+          <td class="col-entier hl-empty" id="inf-di">–</td>
+          <td class="col-entier"          id="inf-u">0</td>
+          <td class="col-sep">,</td>
+          <td class="col-dec"             id="inf-d">2</td>
+          <td class="col-dec"             id="inf-c">4</td>
+          <td class="col-dec"             id="inf-m">8</td>
+        </tr>
+        <tr class="row-rep" id="rowRep">
+          <td class="col-label" style="color:var(--teal)">ta réponse</td>
+          <td class="col-entier input-cell" id="rep-ce">–</td>
+          <td class="col-entier input-cell" id="rep-di">–</td>
+          <td class="col-entier input-cell" id="rep-u"> </td>
+          <td class="col-sep" style="border-left:3px solid var(--gold);border-right:3px solid var(--gold)">,</td>
+          <td class="col-dec input-cell"    id="rep-d"> </td>
+          <td class="col-dec input-cell"    id="rep-c"> </td>
+          <td class="col-dec input-cell"    id="rep-m"> </td>
+        </tr>
+        <tr class="row-sup" id="rowSup">
+          <td class="col-label">borne sup.</td>
+          <td class="col-entier hl-empty" id="sup-ce">–</td>
+          <td class="col-entier hl-empty" id="sup-di">–</td>
+          <td class="col-entier"          id="sup-u">0</td>
+          <td class="col-sep">,</td>
+          <td class="col-dec"             id="sup-d">2</td>
+          <td class="col-dec"             id="sup-c">4</td>
+          <td class="col-dec hl-target"   id="sup-m">9</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Droite graduée (hidden by default) -->
+  <div class="numline-wrapper" id="numlineWrapper" style="display:none">
+    <div id="numlineSVG"></div>
+  </div>
+
+  <!-- Help buttons -->
+  <div class="help-row">
+    <button class="help-btn" id="helpTableBtn" onclick="showTableExample()">💡 Aide : voir dans le tableau</button>
+    <button class="help-btn" id="helpLineBtn"  onclick="toggleNumline()">📏 Aide : droite graduée</button>
+  </div>
+
+  <!-- Progress -->
+  <div id="progressArea">
+    <div class="progress-row">
+      <span class="progress-label" id="progressLabel">Question 1/5</span>
+      <span class="progress-score" id="progressScore">Score : 0</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Question card -->
+  <div class="q-card" id="qCard">
+    <div class="q-type-badge" id="qTypeBadge">Intercalation libre</div>
+    <div class="q-prompt" id="qPrompt">Trouve un nombre décimal compris entre <span class="hl-num">0,248</span> et <span class="hl-num">0,249</span> :</div>
+    <div id="qBody">
+      <div class="intercal-row">
+        <span class="intercal-bound">0,248</span>
+        <span class="intercal-lt">&lt;</span>
+        <input class="free-input" type="text" inputmode="decimal" placeholder="?" autocomplete="off" style="max-width:160px">
+        <span class="intercal-lt">&lt;</span>
+        <span class="intercal-bound">0,249</span>
+      </div>
+      <button class="validate-btn" disabled>Valider</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Question suivante →</button>
+  </div>
+
+  <!-- Result screen -->
+  <div class="result-screen" id="resultScreen">
+    <div class="result-emoji" id="resultEmoji"></div>
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-score" id="resultScore"></div>
+    <div class="result-msg"   id="resultMsg"></div>
+    <div class="result-btns">
+      <button class="btn-primary"   id="nextLevelBtn" onclick="goNextLevel()" style="display:none">Niveau suivant 🔓</button>
+      <button class="btn-secondary" onclick="retryLevel()">Réessayer</button>
+      <a class="btn-secondary" href="../../../mathématiques-nombres-decimaux.html"
+         style="display:inline-flex;align-items:center;text-decoration:none">← Retour</a>
+    </div>
+  </div>
+
+</main>
+
+<!-- Tooltip clic droite graduée -->
+<div class="click-tooltip" id="clickTooltip"></div>
+
+<div class="confetti-container" id="confettiContainer"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 ·
+      <a href="../../../mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   BANQUES DE QUESTIONS
+══════════════════════════════════════════════════════ */
+const BANKS = {
+  1: [
+    { type: 'A', inf: '3',   sup: '4'   },
+    { type: 'A', inf: '0',   sup: '1'   },
+    { type: 'B', inf: '2,3', sup: '2,4' },
+    { type: 'B', inf: '0,6', sup: '0,7' },
+    { type: 'C', inf: '2,3', sup: '2,4' },
+    { type: 'D',
+      inf: '1,2', sup: '1,5',
+      choix: ['1,6', '1,3', '0,9', '1,5'],
+      reponse: '1,3',
+      pieges: { '1,5': 'borne_exclue', '0,9': 'trop_petit', '1,6': 'trop_grand' }
+    },
+    { type: 'E', inf_frac: '1/10', sup_frac: '3/10', inf: '0,1', sup: '0,3', den: 10 },
+    { type: 'C', inf: '4,1', sup: '4,2' }
+  ],
+  2: [
+    { type: 'A', inf: '0,47', sup: '0,48' },
+    { type: 'B', inf: '2,0',  sup: '2,1',  piege: 'zero_dixieme' },
+    { type: 'C', inf: '3,40', sup: '3,41', piege: 'vide_apparent' },
+    { type: 'D', nombre: '0,50', inf: '0,4', sup: '0,6', equivalent: '0,5' },
+    { type: 'E2', inf: '1,2',  sup: '1,3' },
+    { type: 'F',
+      inf: '0,5', sup: '0,6',
+      choix: ['0,50', '0,55', '0,6', '0,05', '0,500'],
+      corrects: ['0,55'],
+      pieges: { '0,50': 'egal_borne_inf', '0,6': 'egal_borne_sup', '0,05': 'trop_petit', '0,500': 'egal_borne_inf' }
+    },
+    { type: 'A', inf: '1,07', sup: '1,08' },
+    { type: 'C', inf: '0,09', sup: '0,10', piege: 'vide_apparent' }
+  ],
+  3: [
+    { type: 'A', inf: '0,248',  sup: '0,249' },
+    { type: 'B3', inf: '1,41',  sup: '1,42'  },
+    { type: 'C3', inf: '2,450', sup: '2,451' },
+    { type: 'D3',
+      inf: '0,1', sup: '0,2',
+      choix: ['Aucun', 'Exactement 8', 'Une infinité', 'Exactement 9'],
+      reponse: 'Une infinité'
+    },
+    { type: 'E3', inf: '0,3',    sup: '0,4'   },
+    { type: 'F3', inf: '0,249',  sup: '0,250', exemple: '0,2495' },
+    { type: 'A',  inf: '3,0041', sup: '3,0042' },
+    { type: 'C3', inf: '0,100',  sup: '0,101'  }
+  ]
+};
+
+const CONFIG = {
+  1: { perSession: 5, threshold: 4 },
+  2: { perSession: 6, threshold: 5 },
+  3: { perSession: 6, threshold: 5 }
+};
+
+/* ══════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════ */
+let currentLevel = 1;
+let levelsDone   = JSON.parse(sessionStorage.getItem('idLevelsDone') || '{}');
+let session      = [];
+let sessionIdx   = 0;
+let score        = 0;
+let attempts     = 0;
+let answered     = false;
+let _currentQ    = null;
+
+/* ══════════════════════════════════════════════════════
+   UTILITAIRES
+══════════════════════════════════════════════════════ */
+function toFloat(str) { return parseFloat(String(str).trim().replace(',', '.')); }
+
+function estDansIntervalle(valeur, inf, sup) {
+  const v = toFloat(valeur);
+  const a = toFloat(inf);
+  const b = toFloat(sup);
+  return !isNaN(v) && v > a && v < b;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function getOkMsg() {
+  const msgs = ['Parfait ! 🎉', 'Très bien ! ✓', 'Excellent ! 🌟', "Bravo, c'est juste !", 'Correct ! 👍'];
+  return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
+function exampleInInterval(inf, sup) {
+  const a = toFloat(inf), b = toFloat(sup);
+  const mid = (a + b) / 2;
+  const prec = Math.max(
+    (String(inf).split(',')[1] || '').length,
+    (String(sup).split(',')[1] || '').length
+  ) + 1;
+  return mid.toFixed(prec).replace('.', ',');
+}
+
+function feedbackTooLarge(val, sup) {
+  return `<strong>${val}</strong> est plus grand que <strong>${sup}</strong> ! Cherche un nombre plus petit.`;
+}
+function feedbackTooSmall(val, inf) {
+  return `<strong>${val}</strong> est plus petit que <strong>${inf}</strong> ! Cherche un nombre plus grand.`;
+}
+function feedbackEqualBound(val) {
+  return `<strong>${val}</strong> est exactement égal à la borne ! Le nombre doit être <em>strictement</em> entre les deux bornes.`;
+}
+function feedbackRang(val, bound, col) {
+  return `Attention au rang des ${col} ! Regarde la case <strong>${col}</strong> dans le tableau.`;
+}
+function feedbackIntervalleVide() {
+  return `Il existe toujours un nombre décimal entre deux décimaux ! Essaie d'ajouter un chiffre de plus après la virgule.`;
+}
+
+function preciseError(val, inf, sup) {
+  const v = toFloat(val), a = toFloat(inf), b = toFloat(sup);
+  if (isNaN(v)) return `"${val}" n'est pas un nombre valide. Utilise la virgule ou le point.`;
+  if (Math.abs(v - a) < 1e-12) return feedbackEqualBound(val);
+  if (Math.abs(v - b) < 1e-12) return feedbackEqualBound(val);
+  if (v < a) return feedbackTooSmall(val, inf);
+  if (v > b) return feedbackTooLarge(val, sup);
+  return `<strong>${val}</strong> n'est pas dans l'intervalle ouvert.`;
+}
+
+/* ══════════════════════════════════════════════════════
+   TABLEAU DE NUMÉRATION TRIPLE
+══════════════════════════════════════════════════════ */
+function parseNum(str) {
+  const s = String(str || '0').replace(',', '.');
+  const [intStr = '0', decStr = ''] = s.split('.');
+  const ip  = intStr.replace(/^0*/, '') || '0';
+  const len = ip.length;
+  return {
+    ce: len >= 3 ? ip[len - 3] : '',
+    di: len >= 2 ? ip[len - 2] : '',
+    u:  ip[len - 1] || '0',
+    d:  decStr[0] || '',
+    c:  decStr[1] || '',
+    m:  decStr[2] || ''
+  };
+}
+
+function fillTableRow(prefix, vals, rowClass, targetCol) {
+  const cols = ['ce', 'di', 'u', 'd', 'c', 'm'];
+  cols.forEach(col => {
+    const cell = document.getElementById(`${prefix}-${col}`);
+    if (!cell) return;
+    const v = vals[col];
+    cell.textContent = v !== '' ? v : '–';
+    const base = col === 'ce' || col === 'di' || col === 'u' ? 'col-entier' : 'col-dec';
+    let cls = base;
+    if (v === '') cls += ' hl-empty';
+    if (targetCol && col === targetCol) cls += ' hl-target';
+    cell.className = cls;
+    if (prefix === 'rep') cell.classList.add('input-cell');
+  });
+}
+
+function detectTargetCol(inf, sup) {
+  const a = parseNum(inf), b = parseNum(sup);
+  const cols = ['ce', 'di', 'u', 'd', 'c', 'm'];
+  for (const col of cols) {
+    if ((a[col] || '0') !== (b[col] || '0')) return col;
+  }
+  return null;
+}
+
+function updateTripleTable(inf, sup, repVal) {
+  const targetCol = detectTargetCol(inf, sup);
+  const vInf = parseNum(inf);
+  const vSup = parseNum(sup);
+  const vRep = repVal ? parseNum(repVal) : null;
+
+  fillTableRow('inf', vInf, 'row-inf', null);
+  fillTableRow('sup', vSup, 'row-sup', targetCol);
+
+  const cols = ['ce', 'di', 'u', 'd', 'c', 'm'];
+  cols.forEach(col => {
+    const cell = document.getElementById(`rep-${col}`);
+    if (!cell) return;
+    const base = col === 'ce' || col === 'di' || col === 'u' ? 'col-entier' : 'col-dec';
+    cell.className = `${base} input-cell`;
+    if (vRep) {
+      const v = vRep[col];
+      cell.textContent = v !== '' ? v : '–';
+      if (v !== '') cell.classList.add('filled');
+      if (v === '') cell.classList.add('hl-empty');
+    } else {
+      cell.textContent = ' ';
+    }
+    if (targetCol && col === targetCol) cell.classList.add('hl-target');
+  });
+}
+
+function showTableExample() {
+  if (!_currentQ) return;
+  const q = _currentQ;
+  const inf = q.inf || '';
+  const sup = q.sup || '';
+  const ex  = exampleInInterval(inf, sup);
+  updateTripleTable(inf, sup, ex);
+}
+
+/* ══════════════════════════════════════════════════════
+   DROITE GRADUÉE — intervalle zoomé
+══════════════════════════════════════════════════════ */
+function toggleNumline() {
+  const wrap = document.getElementById('numlineWrapper');
+  const btn  = document.getElementById('helpLineBtn');
+  const q    = _currentQ;
+  if (!q) return;
+  if (wrap.style.display === 'none') {
+    wrap.style.display = '';
+    btn.classList.add('active');
+    renderNumline(q.inf, q.sup, null);
+  } else {
+    wrap.style.display = 'none';
+    btn.classList.remove('active');
+  }
+}
+
+function renderNumline(infStr, supStr, answerStr) {
+  const el = document.getElementById('numlineSVG');
+  if (!el) return;
+  const a = toFloat(infStr), b = toFloat(supStr);
+  if (isNaN(a) || isNaN(b)) return;
+
+  const W = 560, H = 112, Y = 62, PAD = 60;
+  const toX = v => PAD + ((v - a) / (b - a)) * (W - 2 * PAD);
+
+  const prec = Math.max(
+    (String(infStr).split(',')[1] || '').length,
+    (String(supStr).split(',')[1] || '').length
+  );
+  const step  = Math.pow(10, -(prec + 1));
+  const tPrec = prec + 1;
+
+  const fmt = (v, p) => {
+    let s = v.toFixed(p);
+    return s.replace('.', ',');
+  };
+
+  const s = [];
+  s.push(`<svg id="numlineSVG_inner" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" `
+       + `style="width:100%;min-width:${W}px;height:${H}px;display:block;">`);
+
+  /* Zone surlignée entre les bornes */
+  s.push(`<rect x="${toX(a).toFixed(1)}" y="${(Y-2).toFixed(1)}" `
+       + `width="${(toX(b)-toX(a)).toFixed(1)}" height="4" fill="${answerStr ? '#1DBFA0' : '#F5A623'}" opacity="0.25" rx="2"/>`);
+
+  /* Axe */
+  s.push(`<line x1="${PAD}" y1="${Y}" x2="${W-PAD}" y2="${Y}" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round"/>`);
+
+  /* Graduations : 10 intervalles */
+  const range = b - a;
+  const tickStep = range / 10;
+  for (let i = 0; i <= 10; i++) {
+    const v      = parseFloat((a + tickStep * i).toFixed(tPrec + 1));
+    const x      = toX(v).toFixed(1);
+    const isBound = i === 0 || i === 10;
+    const isMid   = i === 5;
+    const tickH   = isBound ? 14 : (isMid ? 9 : 5);
+    const color   = isBound ? '#1A2D6B' : (isMid ? '#94A3B8' : '#D1D9E6');
+    const sw      = isBound ? 2.5 : (isMid ? 1.5 : 1);
+    s.push(`<line x1="${x}" y1="${(Y-tickH).toFixed(1)}" x2="${x}" y2="${(Y+tickH).toFixed(1)}" stroke="${color}" stroke-width="${sw}"/>`);
+    if (isBound) {
+      const lbl = i === 0 ? fmt(a, prec) : fmt(b, prec);
+      s.push(`<text x="${x}" y="${(Y+30).toFixed(1)}" text-anchor="middle" `
+           + `font-family="Fredoka,sans-serif" font-size="13" font-weight="700" fill="#1A2D6B">${lbl}</text>`);
+    } else if (isMid) {
+      s.push(`<text x="${x}" y="${(Y+24).toFixed(1)}" text-anchor="middle" `
+           + `font-family="Fredoka,sans-serif" font-size="10" fill="#94A3B8">${fmt(v, tPrec)}</text>`);
+    }
+  }
+
+  /* Marqueurs navy bornes */
+  [a, b].forEach(v => {
+    const x = toX(v);
+    const arrow = `M${(x-6).toFixed(1)},${(Y-22).toFixed(1)} L${(x+6).toFixed(1)},${(Y-22).toFixed(1)} L${x.toFixed(1)},${(Y-14).toFixed(1)} Z`;
+    s.push(`<path d="${arrow}" fill="#1A2D6B"/>`);
+  });
+  s.push(`<text x="${toX(a).toFixed(1)}" y="${(Y-26).toFixed(1)}" text-anchor="${toX(a)<80?'start':'middle'}" font-family="Fredoka,sans-serif" font-size="12" font-weight="700" fill="#1A2D6B">${fmt(a,prec)}</text>`);
+  s.push(`<text x="${toX(b).toFixed(1)}" y="${(Y-26).toFixed(1)}" text-anchor="${toX(b)>W-80?'end':'middle'}" font-family="Fredoka,sans-serif" font-size="12" font-weight="700" fill="#1A2D6B">${fmt(b,prec)}</text>`);
+
+  /* Point réponse turquoise */
+  if (answerStr !== null && answerStr !== undefined) {
+    const av = toFloat(answerStr);
+    if (!isNaN(av) && av > a && av < b) {
+      const ax = toX(av);
+      s.push(`<circle cx="${ax.toFixed(1)}" cy="${Y}" r="9" fill="#1DBFA0" stroke="white" stroke-width="2.5"/>`);
+      const off = (ax - toX(a)) < 55 ? 22 : (toX(b) - ax) < 55 ? -22 : 0;
+      s.push(`<text x="${(ax+off).toFixed(1)}" y="${(Y-17).toFixed(1)}" text-anchor="middle" `
+           + `font-family="Fredoka,sans-serif" font-size="12" font-weight="700" fill="#054336">${String(answerStr).replace('.',',')}</text>`);
+    }
+  }
+
+  s.push('</svg>');
+  el.innerHTML = s.join('');
+}
+
+/* ══════════════════════════════════════════════════════
+   DROITE CLIQUABLE (Niveau 3 Type E3)
+══════════════════════════════════════════════════════ */
+function renderClickLine(infStr, supStr) {
+  const wrap = document.getElementById('clickLineWrapper');
+  const cont = document.getElementById('clickLineCont');
+  if (!wrap || !cont) return;
+
+  const a = toFloat(infStr), b = toFloat(supStr);
+  const W = 560, H = 100, Y = 50, PAD = 60;
+  const prec = Math.max(
+    (String(infStr).split(',')[1] || '').length,
+    (String(supStr).split(',')[1] || '').length
+  );
+  const fmt = (v, p) => v.toFixed(p).replace('.', ',');
+  const toX = v => PAD + ((v - a) / (b - a)) * (W - 2 * PAD);
+  const toV = x => a + ((x - PAD) / (W - 2 * PAD)) * (b - a);
+
+  const svgLines = [];
+  svgLines.push(`<rect x="${toX(a).toFixed(1)}" y="${(Y-2).toFixed(1)}" width="${(toX(b)-toX(a)).toFixed(1)}" height="4" fill="#F5A623" opacity="0.30" rx="2"/>`);
+  svgLines.push(`<line x1="${PAD}" y1="${Y}" x2="${W-PAD}" y2="${Y}" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round"/>`);
+
+  for (let i = 0; i <= 10; i++) {
+    const v = parseFloat((a + (b-a)/10*i).toFixed(prec+2));
+    const x = toX(v).toFixed(1);
+    const isBound = i === 0 || i === 10;
+    const isMid   = i === 5;
+    const tickH   = isBound ? 13 : (isMid ? 8 : 4);
+    const color   = isBound ? '#1A2D6B' : (isMid ? '#94A3B8' : '#D1D9E6');
+    svgLines.push(`<line x1="${x}" y1="${(Y-tickH).toFixed(1)}" x2="${x}" y2="${(Y+tickH).toFixed(1)}" stroke="${color}" stroke-width="${isBound?2.5:1}"/>`);
+    if (isBound) {
+      const lbl = i===0 ? fmt(a,prec) : fmt(b,prec);
+      svgLines.push(`<text x="${x}" y="${(Y+28).toFixed(1)}" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="13" font-weight="700" fill="#1A2D6B">${lbl}</text>`);
+    }
+  }
+
+  [a, b].forEach(v => {
+    const x = toX(v);
+    const arrow = `M${(x-6).toFixed(1)},${(Y-21).toFixed(1)} L${(x+6).toFixed(1)},${(Y-21).toFixed(1)} L${x.toFixed(1)},${(Y-13).toFixed(1)} Z`;
+    svgLines.push(`<path d="${arrow}" fill="#1A2D6B"/>`);
+    svgLines.push(`<text x="${x.toFixed(1)}" y="${(Y-25).toFixed(1)}" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="12" font-weight="700" fill="#1A2D6B">${fmt(v,prec)}</text>`);
+  });
+
+  svgLines.push(`<circle id="clickDot" cx="-20" cy="${Y}" r="9" fill="#1DBFA0" stroke="white" stroke-width="2.5" opacity="0"/>`);
+  svgLines.push(`<text id="clickLabel" x="-20" y="${(Y-17).toFixed(1)}" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="12" font-weight="700" fill="#054336"></text>`);
+
+  cont.innerHTML = `<svg id="clickLineSVGEl" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"
+    style="width:100%;min-width:${W}px;height:${H}px;display:block;cursor:crosshair;">
+    ${svgLines.join('')}
+  </svg>`;
+
+  const svg = document.getElementById('clickLineSVGEl');
+  const tooltip = document.getElementById('clickTooltip');
+
+  function svgX(clientX) {
+    const rect = svg.getBoundingClientRect();
+    const ratio = W / rect.width;
+    return (clientX - rect.left) * ratio;
+  }
+
+  function displayV(x) {
+    const rawV = toV(x);
+    const p = prec + 2;
+    return parseFloat(rawV.toFixed(p));
+  }
+
+  svg.addEventListener('mousemove', e => {
+    const x   = svgX(e.clientX);
+    const v   = displayV(x);
+    const lbl = v.toFixed(prec + 2).replace('.', ',');
+    tooltip.style.display = 'block';
+    tooltip.style.left    = (e.clientX + 12) + 'px';
+    tooltip.style.top     = (e.clientY - 30) + 'px';
+    tooltip.textContent   = lbl;
+  });
+
+  svg.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+
+  svg.addEventListener('click', e => {
+    if (answered) return;
+    const x   = svgX(e.clientX);
+    const v   = displayV(x);
+    const lbl = v.toFixed(prec + 2).replace('.', ',');
+    const dot = document.getElementById('clickDot');
+    const lbEl= document.getElementById('clickLabel');
+    dot.setAttribute('cx', x.toFixed(1));
+    dot.setAttribute('opacity', '1');
+    lbEl.setAttribute('x', x.toFixed(1));
+    lbEl.textContent = lbl;
+    validateClickLine(v, lbl, a, b);
+  });
+}
+
+function validateClickLine(v, lbl, a, b) {
+  if (answered) return;
+  const q = _currentQ;
+  if (v > a && v < b) {
+    renderNumline(q.inf, q.sup, lbl);
+    document.getElementById('numlineWrapper').style.display = '';
+    updateTripleTable(q.inf, q.sup, lbl);
+    handleCorrect(lbl);
+  } else {
+    const hint = v <= a
+      ? `Ce point est à gauche de la borne inférieure ${q.inf}. Clique entre les deux repères navy.`
+      : `Ce point est à droite de la borne supérieure ${q.sup}. Clique entre les deux repères navy.`;
+    handleWrong(hint, `Il fallait cliquer entre <strong>${q.inf}</strong> et <strong>${q.sup}</strong>.`);
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   LEVEL TABS
+══════════════════════════════════════════════════════ */
+function initLevelTabs() {
+  for (const lv of [2, 3]) {
+    const btn  = document.querySelector(`.level-tab[data-level="${lv}"]`);
+    const lock = document.getElementById(`lock${lv}`);
+    if (levelsDone[lv - 1]) {
+      btn.classList.remove('locked');
+      btn.classList.add('unlocked');
+      if (lock) lock.textContent = '🔓';
+    }
+  }
+}
+
+function selectLevel(lv) {
+  if (lv > 1 && !levelsDone[lv - 1]) return;
+  currentLevel = lv;
+  document.querySelectorAll('.level-tab').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.level-tab[data-level="${lv}"]`).classList.add('active');
+  startLevel();
+}
+
+/* ══════════════════════════════════════════════════════
+   SESSION
+══════════════════════════════════════════════════════ */
+function startLevel() {
+  session    = shuffle(BANKS[currentLevel]).slice(0, CONFIG[currentLevel].perSession);
+  sessionIdx = 0;
+  score      = 0;
+
+  document.getElementById('resultScreen').classList.remove('visible');
+  document.getElementById('qCard').style.display        = '';
+  document.getElementById('progressArea').style.display = '';
+  document.getElementById('numlineWrapper').style.display = 'none';
+  document.getElementById('helpLineBtn').classList.remove('active');
+
+  renderQuestion();
+}
+
+/* ══════════════════════════════════════════════════════
+   RENDU DES QUESTIONS
+══════════════════════════════════════════════════════ */
+function renderQuestion() {
+  const q = session[sessionIdx];
+  _currentQ = q;
+  attempts  = 0;
+  answered  = false;
+
+  /* Reset tableau et droite */
+  updateTripleTable(q.inf || '0', q.sup || '1', null);
+  document.getElementById('numlineWrapper').style.display = 'none';
+  document.getElementById('helpLineBtn').classList.remove('active');
+
+  updateProgress();
+
+  const fb   = document.getElementById('feedback');
+  const next = document.getElementById('nextBtn');
+  fb.className   = 'feedback';
+  fb.textContent = '';
+  next.className = 'next-btn';
+
+  /* Masquer la droite cliquable si elle existe */
+  const cwrap = document.getElementById('clickLineWrapper');
+  if (cwrap) cwrap.remove();
+
+  const badge  = document.getElementById('qTypeBadge');
+  const prompt = document.getElementById('qPrompt');
+  const body   = document.getElementById('qBody');
+
+  const level = currentLevel;
+  if      (level === 1 && q.type === 'A') renderL1A(q, badge, prompt, body);
+  else if (level === 1 && q.type === 'B') renderL1B(q, badge, prompt, body);
+  else if (level === 1 && q.type === 'C') renderL1C(q, badge, prompt, body);
+  else if (level === 1 && q.type === 'D') renderL1D(q, badge, prompt, body);
+  else if (level === 1 && q.type === 'E') renderL1E(q, badge, prompt, body);
+  else if (level === 2 && q.type === 'A') renderL2A(q, badge, prompt, body);
+  else if (level === 2 && q.type === 'B') renderL2B(q, badge, prompt, body);
+  else if (level === 2 && q.type === 'C') renderL2C(q, badge, prompt, body);
+  else if (level === 2 && q.type === 'D') renderL2D(q, badge, prompt, body);
+  else if (level === 2 && q.type === 'E2') renderL2E(q, badge, prompt, body);
+  else if (level === 2 && q.type === 'F') renderL2F(q, badge, prompt, body);
+  else if (level === 3 && q.type === 'A') renderL3A(q, badge, prompt, body);
+  else if (level === 3 && q.type === 'B3') renderL3B(q, badge, prompt, body);
+  else if (level === 3 && q.type === 'C3') renderL3C(q, badge, prompt, body);
+  else if (level === 3 && q.type === 'D3') renderL3D(q, badge, prompt, body);
+  else if (level === 3 && q.type === 'E3') renderL3E(q, badge, prompt, body);
+  else if (level === 3 && q.type === 'F3') renderL3F(q, badge, prompt, body);
+}
+
+/* ── Helpers HTML ── */
+function buildValidateBtn() {
+  return `<button class="validate-btn" id="validateBtn" disabled>Valider</button>`;
+}
+
+function buildFreeRow(inf, sup) {
+  return `<div class="intercal-row">
+    <span class="intercal-bound">${inf}</span>
+    <span class="intercal-lt">&lt;</span>
+    <input class="free-input" id="freeInput" type="text" inputmode="decimal" placeholder="?" autocomplete="off">
+    <span class="intercal-lt">&lt;</span>
+    <span class="intercal-bound">${sup}</span>
+  </div>`;
+}
+
+function wireFreeInput(validateFn) {
+  const inp = document.getElementById('freeInput');
+  const btn = document.getElementById('validateBtn');
+  btn.onclick = validateFn;
+  inp.addEventListener('input',   () => { btn.disabled = inp.value.trim() === ''; });
+  inp.addEventListener('keydown', e  => { if (e.key === 'Enter' && !btn.disabled) validateFn(); });
+  inp.focus();
+}
+
+/* ══════════════════════════════════════════════════════
+   NIVEAU 1
+══════════════════════════════════════════════════════ */
+
+/* Type A — Intervalle large (unité) */
+function renderL1A(q, badge, prompt, body) {
+  badge.textContent = 'Intercalation à l\'unité';
+  prompt.innerHTML  = `Trouve un nombre décimal compris entre <span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> :`;
+  body.innerHTML    = buildFreeRow(q.inf, q.sup) + buildValidateBtn();
+  wireFreeInput(validateFree);
+}
+
+/* Type B — Intervalle au dixième */
+function renderL1B(q, badge, prompt, body) {
+  badge.textContent = 'Intercalation au dixième';
+  prompt.innerHTML  = `Trouve un nombre décimal compris entre <span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> :`;
+  body.innerHTML    = buildFreeRow(q.inf, q.sup) + buildValidateBtn();
+  wireFreeInput(validateFree);
+}
+
+/* Type C — Compléter un encadrement */
+function renderL1C(q, badge, prompt, body) {
+  badge.textContent = 'Compléter un encadrement';
+  prompt.innerHTML  = `Complète l'encadrement :`;
+  body.innerHTML = `<div class="intercal-row">
+    <span class="intercal-bound">${q.inf}</span>
+    <span class="intercal-lt">&lt;</span>
+    <input class="free-input" id="freeInput" type="text" inputmode="decimal" placeholder="☐" autocomplete="off">
+    <span class="intercal-lt">&lt;</span>
+    <span class="intercal-bound">${q.sup}</span>
+  </div>${buildValidateBtn()}`;
+  wireFreeInput(validateFree);
+}
+
+/* Type D — QCM à choix unique */
+function renderL1D(q, badge, prompt, body) {
+  badge.textContent = 'Choisir le bon nombre';
+  prompt.innerHTML  = `Lequel de ces nombres est compris entre <span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> ?`;
+  const btns = q.choix.map(c =>
+    `<button class="choice-btn" data-val="${c}" onclick="validateL1D('${c}')">${c}</button>`
+  ).join('');
+  body.innerHTML = `<div class="choices-row">${btns}</div>`;
+}
+
+function validateL1D(chosen) {
+  if (answered) return;
+  const q    = _currentQ;
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(b => b.disabled = true);
+  const clickedBtn = [...btns].find(b => b.dataset.val === chosen);
+
+  if (chosen === q.reponse) {
+    clickedBtn.classList.add('ok');
+    updateTripleTable(q.inf, q.sup, chosen);
+    handleCorrect(chosen);
+    return;
+  }
+
+  clickedBtn.classList.add('err');
+  let hint = preciseError(chosen, q.inf, q.sup);
+  const p  = q.pieges[chosen];
+  if (p === 'borne_exclue') hint = `<strong>${chosen}</strong> est exactement égal à la borne supérieure — l'intervalle est strict (bornes exclues) !`;
+  else if (p === 'trop_petit') hint = feedbackTooSmall(chosen, q.inf);
+  else if (p === 'trop_grand') hint = feedbackTooLarge(chosen, q.sup);
+
+  handleWrong(hint, `La bonne réponse est <strong>${q.reponse}</strong>, car ${q.inf} < ${q.reponse} < ${q.sup}.`);
+  if (!answered) {
+    clickedBtn.classList.remove('err');
+    btns.forEach(b => b.disabled = false);
+  }
+}
+
+/* Type E — Fraction décimale */
+function renderL1E(q, badge, prompt, body) {
+  badge.textContent = 'Fraction décimale';
+  prompt.innerHTML  = `Trouve une fraction décimale comprise entre <span class="hl-num">${q.inf_frac}</span> et <span class="hl-num">${q.sup_frac}</span> :`;
+  body.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:24px">
+      <div class="frac-input-wrap">
+        <input class="frac-num-input" id="fracNum" type="text" inputmode="numeric" placeholder="?" autocomplete="off">
+        <div class="frac-bar"></div>
+        <div class="frac-den">${q.den}</div>
+      </div>
+      <div style="font-size:13px;color:var(--muted)">ou bien un nombre décimal :</div>
+      <input class="free-input" id="freeInput" type="text" inputmode="decimal" placeholder="0,??" autocomplete="off">
+    </div>
+    ${buildValidateBtn()}`;
+
+  const fracN = document.getElementById('fracNum');
+  const freeI = document.getElementById('freeInput');
+  const btn   = document.getElementById('validateBtn');
+  const check = () => { btn.disabled = fracN.value.trim() === '' && freeI.value.trim() === ''; };
+  fracN.addEventListener('input', check);
+  freeI.addEventListener('input', check);
+  btn.onclick = validateL1E;
+  freeI.addEventListener('keydown', e => { if (e.key === 'Enter' && !btn.disabled) validateL1E(); });
+  fracN.focus();
+}
+
+function validateL1E() {
+  if (answered) return;
+  const q     = _currentQ;
+  const fracN = document.getElementById('fracNum');
+  const freeI = document.getElementById('freeInput');
+  const btn   = document.getElementById('validateBtn');
+  btn.disabled = true;
+
+  let valStr = freeI.value.trim();
+  let fromFrac = false;
+
+  if (fracN.value.trim() !== '') {
+    const num = parseFloat(fracN.value.trim());
+    if (!isNaN(num)) {
+      valStr    = (num / q.den).toFixed(4).replace(/0+$/, '').replace('.', ',');
+      fromFrac  = true;
+    }
+  }
+
+  if (estDansIntervalle(valStr, q.inf, q.sup)) {
+    if (fromFrac) fracN.classList.add('ok');
+    else { const fi = document.getElementById('freeInput'); if (fi) fi.classList.add('ok'); }
+    updateTripleTable(q.inf, q.sup, valStr);
+    handleCorrect(valStr);
+    return;
+  }
+
+  if (fromFrac) fracN.classList.add('err');
+  else { const fi = document.getElementById('freeInput'); if (fi) fi.classList.add('err'); }
+  handleWrong(
+    `Ce nombre n'est pas compris entre <strong>${q.inf_frac}</strong> et <strong>${q.sup_frac}</strong>.`,
+    `Par exemple <strong>2/${q.den}</strong> convient, car c'est ${(2/q.den).toFixed(2).replace('.',',')} — compris entre ${q.inf} et ${q.sup}.`
+  );
+  if (!answered) {
+    fracN.classList.remove('err');
+    if (document.getElementById('freeInput')) document.getElementById('freeInput').classList.remove('err');
+    fracN.value = ''; if (document.getElementById('freeInput')) document.getElementById('freeInput').value = '';
+    btn.disabled = true;
+    fracN.focus();
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   NIVEAU 2
+══════════════════════════════════════════════════════ */
+
+/* Type A — au centième */
+function renderL2A(q, badge, prompt, body) {
+  badge.textContent = 'Intercalation au centième';
+  prompt.innerHTML  = `Trouve un nombre décimal compris entre <span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> :`;
+  body.innerHTML    = buildFreeRow(q.inf, q.sup) + buildValidateBtn();
+  wireFreeInput(validateFree);
+}
+
+/* Type B — piège zéro aux dixièmes */
+function renderL2B(q, badge, prompt, body) {
+  badge.textContent = 'Attention au rang des dixièmes !';
+  prompt.innerHTML  = `Trouve un nombre décimal compris entre <span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> :`;
+  body.innerHTML    = buildFreeRow(q.inf, q.sup) + buildValidateBtn();
+  wireFreeInput(validateFree);
+}
+
+/* Type C — intervalle apparent vide */
+function renderL2C(q, badge, prompt, body) {
+  badge.textContent = 'Intervalle serré — es-tu sûr(e) ?';
+  prompt.innerHTML  = `Trouve un nombre décimal compris entre <span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> :`;
+  body.innerHTML    = buildFreeRow(q.inf, q.sup) + buildValidateBtn();
+  wireFreeInput(validateFree);
+}
+
+/* Type D — équivalences Oui/Non */
+function renderL2D(q, badge, prompt, body) {
+  badge.textContent = 'Équivalences décimales';
+  prompt.innerHTML  = `Est-ce que <span class="hl-num">${q.nombre}</span> est compris entre <span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> ?`;
+  body.innerHTML = `<div class="vf-row">
+    <button class="vf-btn" id="vf-oui" onclick="validateL2D(true)">✓ Oui</button>
+    <button class="vf-btn" id="vf-non" onclick="validateL2D(false)">✗ Non</button>
+  </div>`;
+  _currentQ._step2done = false;
+}
+
+function validateL2D(chosen) {
+  if (answered) return;
+  const q    = _currentQ;
+  const oui  = document.getElementById('vf-oui');
+  const non  = document.getElementById('vf-non');
+  oui.disabled = non.disabled = true;
+  const isCorrect = chosen === true;
+
+  if (isCorrect) {
+    oui.classList.add('ok');
+    const body = document.getElementById('qBody');
+    showFeedback(true, `Oui ! <strong>${q.nombre}</strong> = <strong>${q.equivalent}</strong> — ce sont le même nombre ! Tous les deux sont entre ${q.inf} et ${q.sup}.`);
+    updateTripleTable(q.inf, q.sup, q.equivalent);
+    handleCorrect(q.nombre);
+    return;
+  }
+
+  non.classList.add('err');
+  handleWrong(
+    `Si ! <strong>${q.nombre}</strong> et <strong>${q.equivalent}</strong> sont le même nombre. Les zéros finaux ne changent pas la valeur.`,
+    `<strong>${q.nombre}</strong> = <strong>${q.equivalent}</strong>, donc il est bien compris entre ${q.inf} et ${q.sup}.`
+  );
+  if (!answered) {
+    non.classList.remove('err');
+    oui.disabled = non.disabled = false;
+  }
+}
+
+/* Type E2 — intercaler deux nombres */
+function renderL2E(q, badge, prompt, body) {
+  badge.textContent = 'Deux nombres à intercaler';
+  prompt.innerHTML  = `Trouve <strong>deux nombres différents</strong> compris entre <span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> :`;
+  body.innerHTML = `
+    <div class="multi-fields">
+      <div class="multi-field-row">
+        <span class="field-num-label">1er nombre</span>
+        <span class="intercal-lt">${q.inf} &lt;</span>
+        <input class="free-input" id="multi0" type="text" inputmode="decimal" placeholder="?" autocomplete="off" style="max-width:140px">
+        <span class="intercal-lt">&lt; ${q.sup}</span>
+      </div>
+      <div class="multi-field-row">
+        <span class="field-num-label">2e nombre</span>
+        <span class="intercal-lt">${q.inf} &lt;</span>
+        <input class="free-input" id="multi1" type="text" inputmode="decimal" placeholder="?" autocomplete="off" style="max-width:140px">
+        <span class="intercal-lt">&lt; ${q.sup}</span>
+      </div>
+    </div>
+    ${buildValidateBtn()}`;
+  wireMultiInputs(2, validateMultiFree);
+}
+
+/* Type F — QCM multi-réponses */
+function renderL2F(q, badge, prompt, body) {
+  badge.textContent = 'QCM — plusieurs réponses possibles';
+  prompt.innerHTML  = `Lesquels de ces nombres sont compris entre <span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> ? (plusieurs réponses possibles)`;
+  const items = q.choix.map(c => `
+    <label class="multi-choice-lbl" data-val="${c}">
+      <input type="checkbox" value="${c}"> ${c}
+    </label>`).join('');
+  body.innerHTML = `<div class="multi-choices">${items}</div>${buildValidateBtn()}`;
+  const btn = document.getElementById('validateBtn');
+  btn.onclick = validateL2F;
+  document.querySelectorAll('.multi-choice-lbl input').forEach(cb => {
+    cb.addEventListener('change', () => {
+      btn.disabled = ![...document.querySelectorAll('.multi-choice-lbl input:checked')].length;
+    });
+  });
+}
+
+function validateL2F() {
+  if (answered) return;
+  const q    = _currentQ;
+  const lbls = [...document.querySelectorAll('.multi-choice-lbl')];
+  lbls.forEach(l => { l.querySelector('input').disabled = true; });
+  const btn = document.getElementById('validateBtn');
+  btn.disabled = true;
+
+  const checked  = lbls.filter(l => l.querySelector('input').checked).map(l => l.dataset.val);
+  const corrects = q.corrects;
+  const allRight = corrects.every(c => checked.includes(c)) && checked.every(c => corrects.includes(c));
+
+  if (allRight) {
+    lbls.filter(l => corrects.includes(l.dataset.val)).forEach(l => l.classList.add('ok'));
+    handleCorrect(corrects[0]);
+    return;
+  }
+
+  const hints = [];
+  lbls.forEach(l => {
+    const v   = l.dataset.val;
+    const sel = l.querySelector('input').checked;
+    const ok  = corrects.includes(v);
+    if (sel && !ok) {
+      l.classList.add('err');
+      const p = q.pieges[v];
+      if (p === 'egal_borne_inf') hints.push(`<strong>${v}</strong> = ${q.inf} (borne exclue)`);
+      else if (p === 'egal_borne_sup') hints.push(`<strong>${v}</strong> = ${q.sup} (borne exclue)`);
+      else if (p === 'trop_petit') hints.push(`<strong>${v}</strong> est trop petit (${v} < ${q.inf})`);
+    }
+    if (!sel && ok) l.classList.add('ok');
+    if (!sel && !ok) l.classList.add('neutral-wrong');
+  });
+
+  const corrStr = corrects.map(c => `<strong>${c}</strong>`).join(', ');
+  handleWrong(
+    `Pas tout à fait. ${hints.join(' ; ')}.`,
+    `Seul(s) ${corrStr} est (sont) strictement entre ${q.inf} et ${q.sup}.`
+  );
+}
+
+/* ══════════════════════════════════════════════════════
+   NIVEAU 3
+══════════════════════════════════════════════════════ */
+
+/* Type A — au millième / dix-millième */
+function renderL3A(q, badge, prompt, body) {
+  const prec = (String(q.inf).split(',')[1] || '').length;
+  const labels = { 3: 'au millième', 4: 'au dix-millième' };
+  badge.textContent = `Intercalation ${labels[prec] || 'précis'}`;
+  prompt.innerHTML  = `Trouve un nombre décimal compris entre <span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> :`;
+  body.innerHTML    = buildFreeRow(q.inf, q.sup) + buildValidateBtn();
+  wireFreeInput(validateFree);
+}
+
+/* Type B3 — piège intervalle vide + suivie d'exemple */
+function renderL3B(q, badge, prompt, body) {
+  badge.textContent = 'Densité des décimaux';
+  prompt.innerHTML  = `Y a-t-il un nombre décimal entre <span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> ?`;
+  body.innerHTML = `<div class="vf-row">
+    <button class="vf-btn" id="vf-oui" onclick="validateL3B(true)">✓ Oui</button>
+    <button class="vf-btn" id="vf-non" onclick="validateL3B(false)">✗ Non</button>
+  </div>`;
+  _currentQ._b3step = 1;
+}
+
+function validateL3B(chosen) {
+  if (answered) return;
+  const q   = _currentQ;
+  const oui = document.getElementById('vf-oui');
+  const non = document.getElementById('vf-non');
+  oui.disabled = non.disabled = true;
+
+  if (!chosen) {
+    non.classList.add('err');
+    handleWrong(
+      feedbackIntervalleVide(),
+      `Il existe une infinité de nombres entre ${q.inf} et ${q.sup} !`
+    );
+    if (!answered) {
+      non.classList.remove('err');
+      oui.disabled = non.disabled = false;
+    }
+    return;
+  }
+
+  oui.classList.add('ok');
+  showFeedback(true, `Exact ! Entre deux décimaux, on peut toujours en trouver un autre.`);
+
+  /* Étape 2 : donner un exemple */
+  const body = document.getElementById('qBody');
+  const step2 = document.createElement('div');
+  step2.style.marginTop = '16px';
+  step2.innerHTML = `<p style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:12px">Donne maintenant un exemple :</p>
+    ${buildFreeRow(q.inf, q.sup)}
+    ${buildValidateBtn()}`;
+  body.appendChild(step2);
+  wireFreeInput(validateFree);
+  document.getElementById('freeInput').focus();
+}
+
+/* Type C3 — trois nombres à intercaler */
+function renderL3C(q, badge, prompt, body) {
+  badge.textContent = 'Trois nombres à intercaler';
+  prompt.innerHTML  = `Trouve <strong>trois nombres différents</strong> compris entre <span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> :`;
+  const rows = [0, 1, 2].map(i => `
+    <div class="multi-field-row">
+      <span class="field-num-label">${i+1}e nombre</span>
+      <span class="intercal-lt">${q.inf} &lt;</span>
+      <input class="free-input" id="multi${i}" type="text" inputmode="decimal" placeholder="?" autocomplete="off" style="max-width:140px">
+      <span class="intercal-lt">&lt; ${q.sup}</span>
+    </div>`).join('');
+  body.innerHTML = `<div class="multi-fields">${rows}</div>${buildValidateBtn()}`;
+  wireMultiInputs(3, validateMultiFree);
+}
+
+/* Type D3 — QCM densité / infinité */
+function renderL3D(q, badge, prompt, body) {
+  badge.textContent = 'Combien de nombres ?';
+  prompt.innerHTML  = `Combien de nombres décimaux y a-t-il entre <span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> ?`;
+  const btns = q.choix.map(c =>
+    `<button class="choice-btn" data-val="${encodeURIComponent(c)}" style="font-size:15px;padding:12px 18px" onclick="validateL3D(this,'${encodeURIComponent(c)}')">${c}</button>`
+  ).join('');
+  body.innerHTML = `<div class="choices-row" style="flex-direction:column;max-width:320px;margin:0 auto">${btns}</div>
+    <div class="density-box" id="densityBox">
+      <div class="density-inf">∞</div>
+      Il en existe une <strong>infinité</strong> ! Par exemple :<br>
+      ${q.inf.replace(',','.')}1 / ${q.inf.replace(',','.')}11 / ${q.inf.replace(',','.')}111…<br>
+      On peut toujours ajouter un chiffre.
+    </div>`;
+}
+
+function validateL3D(btnEl, encodedVal) {
+  if (answered) return;
+  const q   = _currentQ;
+  const val = decodeURIComponent(encodedVal);
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+
+  if (val === q.reponse) {
+    btnEl.classList.add('ok');
+    document.getElementById('densityBox').classList.add('visible');
+    handleCorrect(val);
+  } else {
+    btnEl.classList.add('err');
+    handleWrong(
+      `Pas tout à fait ! Entre deux décimaux, la réponse n'est jamais finie.`,
+      `Il y a une <strong>infinité</strong> de nombres entre ${q.inf} et ${q.sup}.`
+    );
+    if (!answered) {
+      btnEl.classList.remove('err');
+      document.querySelectorAll('.choice-btn').forEach(b => b.disabled = false);
+    } else {
+      /* Montrer la bonne réponse */
+      document.querySelectorAll('.choice-btn').forEach(b => {
+        if (decodeURIComponent(b.dataset.val) === q.reponse) b.classList.add('ok');
+      });
+      document.getElementById('densityBox').classList.add('visible');
+    }
+  }
+}
+
+/* Type E3 — clic sur droite graduée */
+function renderL3E(q, badge, prompt, body) {
+  badge.textContent = 'Clic sur la droite graduée';
+  prompt.innerHTML  = `Place un nombre entre <span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> en cliquant sur la droite graduée :`;
+
+  /* Insérer la droite cliquable AVANT le q-card */
+  const qCard = document.getElementById('qCard');
+  let cwrap = document.getElementById('clickLineWrapper');
+  if (!cwrap) {
+    cwrap = document.createElement('div');
+    cwrap.id = 'clickLineWrapper';
+    cwrap.style.cssText = `background:var(--white);border-radius:14px;box-shadow:var(--shadow);padding:14px 16px 8px;margin-bottom:12px;overflow-x:auto;`;
+    const cont = document.createElement('div');
+    cont.id = 'clickLineCont';
+    cwrap.appendChild(cont);
+    qCard.parentNode.insertBefore(cwrap, qCard);
+  }
+
+  body.innerHTML = '';
+  renderClickLine(q.inf, q.sup);
+}
+
+/* Type F3 — valeur la plus proche */
+function renderL3F(q, badge, prompt, body) {
+  badge.textContent = 'Valeur la plus proche d\'une borne';
+  prompt.innerHTML  = `Quel nombre à 4 décimales est <strong>strictement compris</strong> entre <span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> ?`;
+  body.innerHTML = `${buildFreeRow(q.inf, q.sup)}
+    <p style="font-size:13px;color:var(--muted);text-align:center;margin:-14px 0 16px">
+      💡 Indice : pense à ce que signifie « à 4 décimales ».
+    </p>
+    ${buildValidateBtn()}`;
+  wireFreeInput(validateFree);
+}
+
+/* ══════════════════════════════════════════════════════
+   VALIDATION COMMUNE
+══════════════════════════════════════════════════════ */
+
+/* Validation champ unique */
+function validateFree() {
+  if (answered) return;
+  const q   = _currentQ;
+  const inp = document.getElementById('freeInput');
+  const btn = document.getElementById('validateBtn');
+  if (!inp) return;
+  btn.disabled = true;
+  const val = inp.value.trim();
+
+  if (estDansIntervalle(val, q.inf, q.sup)) {
+    inp.classList.add('ok');
+    inp.disabled = true;
+    updateTripleTable(q.inf, q.sup, val);
+    renderNumline(q.inf, q.sup, val);
+    document.getElementById('numlineWrapper').style.display = '';
+    document.getElementById('helpLineBtn').classList.add('active');
+    handleCorrect(val);
+    return;
+  }
+
+  inp.classList.add('err');
+  const hint = preciseError(val, q.inf, q.sup);
+  const correction = `Par exemple, <strong>${exampleInInterval(q.inf, q.sup)}</strong> convient car ${q.inf} &lt; ${exampleInInterval(q.inf, q.sup)} &lt; ${q.sup}.`;
+  handleWrong(hint, correction);
+  if (!answered) {
+    inp.classList.remove('err');
+    inp.value    = '';
+    inp.disabled = false;
+    btn.disabled = false;
+    inp.focus();
+  }
+}
+
+/* Validation multi-champs */
+function wireMultiInputs(n, validateFn) {
+  const inputs = Array.from({ length: n }, (_, i) => document.getElementById(`multi${i}`));
+  const btn    = document.getElementById('validateBtn');
+  btn.onclick  = validateFn;
+  inputs.forEach((inp, i) => {
+    inp.addEventListener('input', () => { btn.disabled = inputs.some(el => el.value.trim() === ''); });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Tab' && !e.shiftKey && i < inputs.length - 1) { e.preventDefault(); inputs[i+1].focus(); }
+      if (e.key === 'Enter' && !btn.disabled) validateFn();
+    });
+  });
+  inputs[0].focus();
+}
+
+function validateMultiFree() {
+  if (answered) return;
+  const q = _currentQ;
+  const inputs = [...document.querySelectorAll('[id^=multi]')];
+  const btn    = document.getElementById('validateBtn');
+  btn.disabled = true;
+  const vals   = inputs.map(el => el.value.trim());
+
+  /* Vérifier tous dans l'intervalle */
+  const allInInterval = vals.every(v => estDansIntervalle(v, q.inf, q.sup));
+  /* Vérifier tous différents */
+  const allDistinct   = new Set(vals.map(v => toFloat(v))).size === vals.length;
+
+  if (allInInterval && allDistinct) {
+    inputs.forEach(el => { el.classList.add('ok'); el.disabled = true; });
+    updateTripleTable(q.inf, q.sup, vals[0]);
+    renderNumline(q.inf, q.sup, vals[0]);
+    document.getElementById('numlineWrapper').style.display = '';
+    document.getElementById('helpLineBtn').classList.add('active');
+    handleCorrect(vals[0]);
+    return;
+  }
+
+  let hint = '';
+  if (!allDistinct) {
+    hint = `Tes réponses sont identiques (ou équivalentes). Trouve des nombres <strong>différents</strong> !`;
+  } else {
+    const bad = vals.find(v => !estDansIntervalle(v, q.inf, q.sup));
+    hint = bad ? preciseError(bad, q.inf, q.sup) : feedbackIntervalleVide();
+  }
+
+  inputs.forEach((el, i) => {
+    if (!estDansIntervalle(vals[i], q.inf, q.sup) || !allDistinct) {
+      el.classList.add('err');
+    }
+  });
+
+  const ex  = exampleInInterval(q.inf, q.sup);
+  const ex2 = exampleInInterval(ex.replace(',','.'), q.sup.replace(',','.'));
+  handleWrong(hint,
+    `Par exemple <strong>${ex}</strong> et <strong>${ex2.replace('.',',')}</strong> conviennent tous les deux.`
+  );
+  if (!answered) {
+    inputs.forEach(el => { el.classList.remove('err'); el.value = ''; el.disabled = false; });
+    btn.disabled = true;
+    inputs[0].focus();
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   CORRECT / WRONG / FEEDBACK
+══════════════════════════════════════════════════════ */
+function handleCorrect(val) {
+  answered = true;
+  score++;
+  showFeedback(true, getOkMsg());
+  showNext();
+  updateProgress();
+}
+
+function handleWrong(hint, correction) {
+  attempts++;
+  if (attempts === 1) {
+    /* 1er échec : montrer tableau et droite */
+    const q = _currentQ;
+    if (q.inf && q.sup) {
+      renderNumline(q.inf, q.sup, null);
+      document.getElementById('numlineWrapper').style.display = '';
+      document.getElementById('helpLineBtn').classList.add('active');
+    }
+    showFeedback(false, hint);
+  } else {
+    /* 2e échec : correction + verrouiller */
+    answered = true;
+    document.querySelectorAll('#qBody input, #qBody button').forEach(el => el.disabled = true);
+    showFeedback(false, correction);
+    showNext();
+    updateProgress();
+  }
+}
+
+function showFeedback(ok, msg) {
+  const fb = document.getElementById('feedback');
+  fb.className = `feedback visible ${ok ? 'ok-fb' : 'err-fb'}`;
+  fb.innerHTML = msg;
+}
+
+function showNext() {
+  const btn    = document.getElementById('nextBtn');
+  const isLast = sessionIdx === session.length - 1;
+  btn.textContent = isLast ? 'Voir les résultats →' : 'Question suivante →';
+  btn.classList.add('visible');
+}
+
+function updateProgress() {
+  const total = session.length;
+  document.getElementById('progressLabel').textContent = `Question ${Math.min(sessionIdx + 1, total)}/${total}`;
+  document.getElementById('progressScore').textContent = `Score : ${score}`;
+  document.getElementById('progressFill').style.width  = `${(sessionIdx / total) * 100}%`;
+}
+
+/* ══════════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════════ */
+function nextQuestion() {
+  sessionIdx++;
+  if (sessionIdx >= session.length) { showResults(); return; }
+  const card = document.getElementById('qCard');
+  card.style.animation = 'none';
+  requestAnimationFrame(() => { card.style.animation = ''; renderQuestion(); });
+}
+
+function goNextLevel() { selectLevel(currentLevel + 1); }
+
+function retryLevel() {
+  document.getElementById('resultScreen').classList.remove('visible');
+  document.getElementById('qCard').style.display        = '';
+  document.getElementById('progressArea').style.display = '';
+  startLevel();
+}
+
+/* ══════════════════════════════════════════════════════
+   RÉSULTATS
+══════════════════════════════════════════════════════ */
+function showResults() {
+  const lv        = currentLevel;
+  const total     = session.length;
+  const threshold = CONFIG[lv].threshold;
+  const passed    = score >= threshold;
+
+  document.getElementById('qCard').style.display          = 'none';
+  document.getElementById('progressArea').style.display   = 'none';
+  document.getElementById('numlineWrapper').style.display = 'none';
+  document.getElementById('helpLineBtn').classList.remove('active');
+  const cwrap = document.getElementById('clickLineWrapper');
+  if (cwrap) cwrap.remove();
+
+  document.getElementById('resultEmoji').textContent = passed ? '🏆' : '💪';
+  document.getElementById('resultTitle').textContent = passed ? 'Niveau réussi !' : 'Continue comme ça !';
+  document.getElementById('resultScore').textContent = `${score}/${total}`;
+
+  const nextLevelBtn = document.getElementById('nextLevelBtn');
+  if (passed) {
+    levelsDone[lv] = true;
+    sessionStorage.setItem('idLevelsDone', JSON.stringify(levelsDone));
+    initLevelTabs();
+    document.getElementById('resultMsg').textContent = lv < 3
+      ? `Bravo ! Tu as obtenu ${score} sur ${total} (seuil : ${threshold}/${total}). Le niveau suivant est débloqué !`
+      : `Bravo ! Tu as obtenu ${score} sur ${total}. Félicitations, tu maîtrises les trois niveaux !`;
+    if (lv < 3) {
+      nextLevelBtn.style.display    = 'inline-flex';
+      nextLevelBtn.style.alignItems = 'center';
+    }
+    launchConfetti();
+    logResult(lv, score, total);
+  } else {
+    document.getElementById('resultMsg').textContent =
+      `Tu as obtenu ${score} sur ${total}. Il faut ${threshold}/${total} pour passer au niveau suivant. Réessaie !`;
+    nextLevelBtn.style.display = 'none';
+  }
+  document.getElementById('resultScreen').classList.add('visible');
+}
+
+/* ══════════════════════════════════════════════════════
+   SUPABASE LOGGING
+══════════════════════════════════════════════════════ */
+function logResult(level, sc, total) {
+  // TODO: Supabase logging
+  if (typeof saveExerciseResult === 'function') {
+    saveExerciseResult({
+      exerciseSlug: 'intercaler-decimaux',
+      subject:      'mathématiques',
+      category:     'nombres-decimaux',
+      exerciseType: 'intercalation',
+      level:        `Niveau ${level}`,
+      score:         sc,
+      total:         total
+    });
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   CONFETTI
+══════════════════════════════════════════════════════ */
+function launchConfetti() {
+  const colors    = ['#F5A623', '#1DBFA0', '#1A2D6B', '#E05252', '#ffffff'];
+  const container = document.getElementById('confettiContainer');
+  container.innerHTML = '';
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `
+      left:${Math.random() * 100}%;
+      background:${colors[Math.floor(Math.random() * colors.length)]};
+      width:${6 + Math.random() * 8}px;
+      height:${6 + Math.random() * 8}px;
+      border-radius:${Math.random() > 0.5 ? '50%' : '2px'};
+      animation-duration:${1.5 + Math.random() * 1.5}s;
+      animation-delay:${Math.random() * 0.6}s;
+    `;
+    container.appendChild(p);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 3200);
+}
+
+/* ══════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════ */
+initLevelTabs();
+startLevel();
+</script>
+
+<script src="../../../js/menu.js"></script>
+<style>
+  footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+  .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+  .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+  .footer__text .rouge { color: #F5A623; font-weight: 700; }
+  .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+  .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encadrer un nombre décimal — Mathématiques — LFM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../js/supabase-client.js" onerror="void 0"></script>
+  <script src="../../js/auth.js" onerror="void 0"></script>
+  <script src="../../js/results.js" onerror="void 0"></script>
+  <style>
+    /* ── Tokens ── */
+    :root {
+      --navy:    #1A2D6B;
+      --gold:    #F5A623;
+      --gold-bg: #FFF3D0;
+      --teal:    #1DBFA0;
+      --err:     #E05252;
+      --bg:      #F8FAFC;
+      --white:   #ffffff;
+      --border:  #E8EDF3;
+      --text:    #1E2532;
+      --muted:   #5F6368;
+      --green:   #16a34a;
+      --green-bg:#dcfce7;
+      --shadow:  0 10px 30px rgba(26,45,107,0.10);
+      --radius:  20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Fredoka', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      padding-top: 50px;
+    }
+
+    /* ── Navbar ── */
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+    .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+    .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+    .navbar__brand img{height:34px;width:auto;}
+    .navbar__nav{display:flex;align-items:center;gap:24px;}
+    .navbar__nav a{text-decoration:none;color:#1a1a1a;font-family:'Fredoka',sans-serif;font-size:14px;font-weight:700;transition:color .2s;}
+    .navbar__nav a:hover{color:#1B4EBF;}
+    .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;font-family:'Fredoka',sans-serif;}
+    .navbar__nav .btn-login{color:#fff!important;}
+    .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Fredoka',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+    .btn-login:hover{background:#0b1e4d;}
+    @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+
+    /* ── Main layout ── */
+    .main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    /* ── Page title ── */
+    .breadcrumb {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--navy); }
+
+    .page-title {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .page-title h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.25;
+    }
+    .page-title .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .page-rule {
+      width: 44px;
+      height: 3px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin: 10px auto 0;
+    }
+
+    /* ── Level tabs ── */
+    .level-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .level-tab {
+      border: 2px solid var(--border);
+      border-radius: 100px;
+      padding: 9px 22px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      background: var(--white);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 200ms;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .level-tab.active {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #fff;
+    }
+    .level-tab.unlocked:hover:not(.active) {
+      border-color: var(--navy);
+      color: var(--navy);
+    }
+    .level-tab.locked {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .level-tab .lock-icon { font-size: 13px; }
+
+    /* ── Numeration table ── */
+    .num-table-wrapper {
+      overflow-x: auto;
+      margin-bottom: 12px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+    .num-table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      background: var(--white);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .num-table thead th {
+      padding: 8px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-align: center;
+      background: var(--navy);
+      color: #fff;
+      white-space: nowrap;
+    }
+    .num-table thead th.col-entier { background: rgba(26,45,107,0.85); }
+    .num-table thead th.col-dec    { background: rgba(26,45,107,0.70); }
+    .num-table thead th.col-sep {
+      background: var(--navy);
+      color: var(--gold);
+      font-size: 18px;
+      padding: 0 4px;
+      width: 18px;
+    }
+
+    .num-table tbody td {
+      padding: 14px 8px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      border-top: 1px solid var(--border);
+      min-width: 60px;
+      transition: background 300ms, color 300ms;
+    }
+    .num-table tbody td.col-sep {
+      background: var(--white);
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--navy);
+      border-left: 3px solid var(--navy);
+      border-right: 3px solid var(--navy);
+      min-width: 18px;
+      padding: 0 2px;
+    }
+
+    /* Single-number row: entier = navy clair, décimal = gold doux */
+    .row-num td.col-entier { background: rgba(26,45,107,0.07); color: var(--navy); }
+    .row-num td.col-dec    { background: var(--gold-bg);        color: #92400e; }
+
+    /* Rang cible : surlignage turquoise */
+    .num-table tbody td.hl-target {
+      background: var(--teal) !important;
+      color: #fff !important;
+    }
+    /* Rangs sous le rang cible : grisés */
+    .num-table tbody td.hl-below {
+      background: #E8EDF3 !important;
+      color: #9BA3AF !important;
+    }
+    /* Case vide (–) */
+    .num-table tbody td.hl-empty {
+      color: #C0C8D8 !important;
+      font-size: 16px;
+    }
+
+    /* ── Number line wrapper ── */
+    .numline-wrapper {
+      background: var(--white);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 14px 16px 8px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+    }
+
+    /* ── Help buttons ── */
+    .help-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .help-btn {
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--white);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 200ms;
+    }
+    .help-btn:hover, .help-btn.active {
+      border-color: var(--teal);
+      color: var(--teal);
+      background: rgba(29,191,160,0.07);
+    }
+
+    /* ── Progress ── */
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .progress-label { font-size: 13px; font-weight: 700; color: var(--navy); }
+    .progress-score { font-size: 13px; font-weight: 600; color: var(--muted); }
+    .progress-bar-bg {
+      height: 7px;
+      background: var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--teal);
+      border-radius: 100px;
+      transition: width 400ms ease;
+    }
+
+    /* ── Question card ── */
+    .q-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px 36px;
+      animation: fadeUp 320ms ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .q-type-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 12px;
+    }
+    .q-prompt {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.45;
+      margin-bottom: 24px;
+    }
+    .hl-num {
+      color: var(--gold);
+      font-size: 1.1em;
+    }
+
+    /* ── Encadrement display (☐ < x < ☐) ── */
+    .encad-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+    .encad-num {
+      color: var(--gold);
+      font-weight: 700;
+    }
+    .encad-lt {
+      color: var(--muted);
+      font-size: 1.4rem;
+    }
+    /* Multi-encadrement (double/triple) : chaque ligne sur sa rangée */
+    .encad-multi-block {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .encad-multi-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+    .encad-rang-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      min-width: 90px;
+      text-align: right;
+    }
+
+    /* ── d-input ── */
+    .d-input {
+      width: 90px;
+      height: 52px;
+      border: 2.5px solid var(--border);
+      border-radius: 12px;
+      text-align: center;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms, background 200ms;
+    }
+    .d-input:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(26,45,107,0.12);
+      background: var(--white);
+    }
+    .d-input.ok  { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+    .d-input.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── Free input (intercalation) ── */
+    .free-input {
+      height: 56px;
+      border: 2.5px solid var(--border);
+      border-radius: 14px;
+      padding: 0 18px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--navy);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms;
+      text-align: center;
+      max-width: 200px;
+    }
+    .free-input:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(26,45,107,0.12);
+      background: var(--white);
+    }
+    .free-input.ok  { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+    .free-input.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── Vrai / Faux buttons ── */
+    .vf-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .vf-btn {
+      flex: 1;
+      padding: 16px;
+      border: 2.5px solid var(--border);
+      border-radius: 16px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--bg);
+      color: var(--text);
+      transition: all 200ms;
+    }
+    .vf-btn:hover:not(:disabled):not(.ok):not(.err) {
+      transform: translateY(-2px);
+      border-color: var(--navy);
+      background: rgba(26,45,107,0.04);
+    }
+    .vf-btn:disabled { cursor: default; }
+    .vf-btn.ok  { border-color: var(--green); background: var(--green-bg); color: #15803d; }
+    .vf-btn.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── Choice buttons (arrondi QCM) ── */
+    .choices-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .choice-btn {
+      padding: 14px 28px;
+      border: 2.5px solid var(--border);
+      border-radius: 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--bg);
+      color: var(--text);
+      transition: all 200ms;
+    }
+    .choice-btn:hover:not(:disabled):not(.ok):not(.err) {
+      border-color: var(--navy);
+      background: rgba(26,45,107,0.04);
+      transform: translateY(-2px);
+    }
+    .choice-btn:disabled { cursor: default; }
+    .choice-btn.ok  { border-color: var(--green); background: var(--green-bg); color: #15803d; }
+    .choice-btn.err { border-color: var(--err);   background: #fef2f2;         color: var(--err); }
+
+    /* ── Validate button ── */
+    .validate-btn {
+      width: 100%;
+      padding: 15px;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 200ms, transform 200ms, opacity 200ms;
+    }
+    .validate-btn:hover:not(:disabled) { background: #142358; transform: translateY(-2px); }
+    .validate-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* ── Feedback ── */
+    .feedback {
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.55;
+      display: none;
+      animation: fadeUp 250ms ease;
+    }
+    .feedback.visible { display: block; }
+    .feedback.ok-fb  { background: var(--green-bg); color: #15803d; border: 1.5px solid #86efac; }
+    .feedback.err-fb { background: #fef2f2;         color: #b91c1c; border: 1.5px solid #fca5a5; }
+
+    /* ── Next button ── */
+    .next-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      display: none;
+      transition: background 200ms, transform 200ms;
+      animation: fadeUp 250ms ease;
+    }
+    .next-btn.visible { display: block; }
+    .next-btn:hover { background: #17a88d; transform: translateY(-2px); }
+
+    /* ── Result screen ── */
+    .result-screen {
+      display: none;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 48px 36px;
+      text-align: center;
+      animation: fadeUp 350ms ease;
+    }
+    .result-screen.visible { display: block; }
+    .result-emoji { font-size: 56px; margin-bottom: 12px; }
+    .result-title { font-size: 26px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+    .result-score { font-size: 48px; font-weight: 700; color: var(--gold); margin: 12px 0; }
+    .result-msg   { font-size: 16px; color: var(--muted); margin-bottom: 28px; line-height: 1.5; }
+    .result-btns  { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      padding: 13px 32px;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 200ms, transform 200ms;
+    }
+    .btn-primary:hover { background: #142358; transform: translateY(-2px); }
+    .btn-secondary {
+      padding: 13px 32px;
+      background: transparent;
+      color: var(--navy);
+      border: 2px solid var(--border);
+      border-radius: 100px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 200ms;
+    }
+    .btn-secondary:hover { border-color: var(--navy); transform: translateY(-2px); }
+
+    /* ── Confetti ── */
+    .confetti-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 999;
+    }
+    .confetti-piece {
+      position: absolute;
+      top: -10px;
+      border-radius: 2px;
+      animation: confettiFall linear forwards;
+    }
+    @keyframes confettiFall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+
+    /* ── Mobile ── */
+    @media (max-width: 560px) {
+      /* Layout */
+      .main    { padding: 20px 12px 48px; }
+      .q-card  { padding: 24px 16px; }
+      .q-prompt { font-size: 16px; }
+
+      /* Encadrement */
+      .encad-row       { font-size: 1.3rem; gap: 8px; }
+      .encad-multi-row { font-size: 1.1rem; }
+      .encad-rang-label { min-width: 70px; font-size: 11px; }
+
+      /* Champs de saisie */
+      .d-input    { width: 74px; height: 46px; font-size: 18px; }
+      .free-input { width: 140px; max-width: 100%; height: 50px; font-size: 20px; }
+
+      /* Boutons Vrai/Faux et arrondi */
+      .vf-row  { gap: 8px; }
+      .vf-btn  { font-size: 16px; padding: 12px 8px; }
+
+      /* Tableau de numération : cellules plus compactes, supprime le min-width */
+      .num-table               { min-width: 300px; }
+      .num-table tbody td      { padding: 10px 4px; font-size: 20px; min-width: 44px; }
+      .num-table tbody td.col-sep { min-width: 14px; padding: 0; }
+
+      /* Droite graduée : scroll horizontal si nécessaire */
+      .numline-wrapper { overflow-x: scroll; }
+
+      /* Écran de résultats */
+      .result-screen { padding: 32px 20px; }
+      .result-btns   { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar__inner">
+    <a href="../../index.html" class="navbar__brand">
+      <img src="../../assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="../../index.html">Accueil</a>
+      <a href="../../apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+
+  <div class="page-title">
+    <p class="breadcrumb">
+      <a href="../../mathématiques.html">Mathématiques</a> &rsaquo;
+      <a href="../../mathématiques-nombres-decimaux.html">Nombres et calculs</a> &rsaquo;
+      Encadrer un nombre décimal
+    </p>
+    <h1>Encadrer un nombre décimal</h1>
+    <p class="subtitle">Cycle 3 — Nombres et calculs — Nombres décimaux</p>
+    <div class="page-rule"></div>
+  </div>
+
+  <!-- Level tabs -->
+  <div class="level-tabs" id="levelTabs">
+    <button class="level-tab active unlocked" data-level="1" onclick="selectLevel(1)">Niveau 1</button>
+    <button class="level-tab locked"          data-level="2" onclick="selectLevel(2)"><span class="lock-icon" id="lock2">🔒</span> Niveau 2</button>
+    <button class="level-tab locked"          data-level="3" onclick="selectLevel(3)"><span class="lock-icon" id="lock3">🔒</span> Niveau 3</button>
+  </div>
+
+  <!--
+    Tableau de numération — une seule ligne : le nombre à encadrer.
+    Colonnes entière : fond navy clair (rgba(26,45,107,0.07))
+    Colonnes décimale : fond gold doux (#FFF3D0)
+    Virgule : séparateur épais navy (border-left/right 3px)
+    .hl-target → surligné turquoise (rang cible)
+    .hl-below  → grisé (rangs inférieurs au rang cible)
+    .hl-empty  → case vide (–)
+    La logique JS mettra à jour les id cell-ce/di/u/d/c/m et les classes dynamiquement.
+    Exemple statique ci-dessous : 1,347, encadrement au centième.
+  -->
+  <div class="num-table-wrapper">
+    <table class="num-table" id="numTable">
+      <thead>
+        <tr>
+          <th class="col-entier">Centaines</th>
+          <th class="col-entier">Dizaines</th>
+          <th class="col-entier">Unités</th>
+          <th class="col-sep">║</th>
+          <th class="col-dec">Dixièmes</th>
+          <th class="col-dec">Centièmes</th>
+          <th class="col-dec">Millièmes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-num" id="numRow">
+          <td class="col-entier hl-empty" id="cell-ce">–</td>
+          <td class="col-entier hl-empty" id="cell-di">–</td>
+          <td class="col-entier"          id="cell-u">1</td>
+          <td class="col-sep">,</td>
+          <td class="col-dec"             id="cell-d">3</td>
+          <td class="col-dec hl-target"   id="cell-c">4</td>
+          <td class="col-dec hl-below"    id="cell-m">7</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Number line (hidden by default — droite graduée SVG, rendue dynamiquement) -->
+  <div class="numline-wrapper" id="numlineWrapper" style="display:none">
+    <div id="numlineSVG"></div>
+  </div>
+
+  <!-- Help buttons -->
+  <div class="help-row">
+    <button class="help-btn" id="helpTableBtn" onclick="highlightTargetCell()">💡 Aide : tableau</button>
+    <button class="help-btn" id="helpLineBtn"  onclick="toggleNumline()">📏 Aide : droite graduée</button>
+  </div>
+
+  <!-- Progress -->
+  <div id="progressArea">
+    <div class="progress-row">
+      <span class="progress-label" id="progressLabel">Question 1/5</span>
+      <span class="progress-score" id="progressScore">Score : 0</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Question card -->
+  <div class="q-card" id="qCard">
+    <div class="q-type-badge" id="qTypeBadge">Encadrement à l'unité</div>
+    <div class="q-prompt" id="qPrompt">
+      Encadre <span class="hl-num">1,347</span> entre deux nombres entiers consécutifs :
+    </div>
+    <div id="qBody">
+      <!-- Aperçu statique de la zone d'encadrement — remplacé dynamiquement par JS -->
+      <div class="encad-row">
+        <input class="d-input" type="text" inputmode="decimal" placeholder="?" autocomplete="off">
+        <span class="encad-lt">&lt;</span>
+        <span class="encad-num">1,347</span>
+        <span class="encad-lt">&lt;</span>
+        <input class="d-input" type="text" inputmode="decimal" placeholder="?" autocomplete="off">
+      </div>
+      <button class="validate-btn" disabled>Valider</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Question suivante →</button>
+  </div>
+
+  <!-- Result screen -->
+  <div class="result-screen" id="resultScreen">
+    <div class="result-emoji" id="resultEmoji"></div>
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-score" id="resultScore"></div>
+    <div class="result-msg"   id="resultMsg"></div>
+    <div class="result-btns">
+      <button class="btn-primary"   id="nextLevelBtn" onclick="goNextLevel()" style="display:none">Niveau suivant 🔓</button>
+      <button class="btn-secondary" onclick="retryLevel()">Réessayer</button>
+      <a class="btn-secondary" href="../../mathématiques-nombres-decimaux.html"
+         style="display:inline-flex;align-items:center;text-decoration:none">← Retour</a>
+    </div>
+  </div>
+
+</main>
+
+<div class="confetti-container" id="confettiContainer"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau — CC BY-NC-SA 4.0 ·
+      <a href="../../mentions-legales.html" style="color:#ffffff99;text-decoration:none;">Mentions légales</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+/* ─── State ─── */
+let currentLevel   = 1;
+let levelsDone     = JSON.parse(sessionStorage.getItem('edLevelsDone') || '{}');
+let _currentNombre = '1,347';   // démonstration statique — remplacé par startLevel()
+let _currentRang   = 'centieme';
+
+/* ─── Level tabs ─── */
+function initLevelTabs() {
+  for (const lv of [2, 3]) {
+    const btn  = document.querySelector(`.level-tab[data-level="${lv}"]`);
+    const lock = document.getElementById(`lock${lv}`);
+    if (levelsDone[lv - 1]) {
+      btn.classList.remove('locked');
+      btn.classList.add('unlocked');
+      if (lock) lock.textContent = '🔓';
+    }
+  }
+}
+
+function selectLevel(lv) {
+  if (lv > 1 && !levelsDone[lv - 1]) return;
+  currentLevel = lv;
+  document.querySelectorAll('.level-tab').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.level-tab[data-level="${lv}"]`).classList.add('active');
+  startLevel();
+}
+
+/* ─── Numeration table ─── */
+function updateNumTable(nombre, rangCible, showHighlight = false) {
+  // rangCible : 'unite' | 'dixieme' | 'centieme' | 'milieme'
+  const s = String(nombre).replace(',', '.');
+  const [intStr = '0', decStr = ''] = s.split('.');
+  const ip = intStr.replace(/^0*/, '') || '0';
+  const len = ip.length;
+
+  const vals = {
+    ce: len >= 3 ? ip[len - 3] : '',
+    di: len >= 2 ? ip[len - 2] : '',
+    u:  ip[len - 1] || '0',
+    d:  decStr[0] || '',
+    c:  decStr[1] || '',
+    m:  decStr[2] || ''
+  };
+
+  const rangsOrdre = ['ce', 'di', 'u', 'd', 'c', 'm'];
+  const rangIdx    = { unite: 2, dixieme: 3, centieme: 4, milieme: 5 };
+  const targetIdx  = rangIdx[rangCible] ?? -1;
+
+  const colClass = { ce: 'col-entier', di: 'col-entier', u: 'col-entier', d: 'col-dec', c: 'col-dec', m: 'col-dec' };
+
+  rangsOrdre.forEach((col, i) => {
+    const cell = document.getElementById(`cell-${col}`);
+    if (!cell) return;
+    cell.textContent = vals[col] !== '' ? vals[col] : '–';
+    cell.className   = colClass[col];
+    if (vals[col] === '')                          cell.classList.add('hl-empty');
+    if (showHighlight && i === targetIdx)          cell.classList.add('hl-target');
+    if (showHighlight && i > targetIdx && targetIdx >= 0) cell.classList.add('hl-below');
+  });
+}
+
+function highlightTargetCell() {
+  if (!_currentQ) return;
+  updateNumTable(_currentQ.nombre, _currentQ.rang, true);
+}
+
+/* ─── Droite graduée ─── */
+function toggleNumline() {
+  const wrap = document.getElementById('numlineWrapper');
+  const btn  = document.getElementById('helpLineBtn');
+  if (wrap.style.display === 'none') {
+    wrap.style.display = '';
+    btn.classList.add('active');
+    renderNumline(_currentNombre, _currentRang);
+  } else {
+    wrap.style.display = 'none';
+    btn.classList.remove('active');
+  }
+}
+
+function renderNumline(nombre, rang) {
+  _currentNombre = nombre;
+  _currentRang   = rang;
+
+  const el  = document.getElementById('numlineSVG');
+  if (!el) return;
+  const val = parseFloat(String(nombre).replace(',', '.'));
+  if (isNaN(val)) return;
+
+  /* ── Paramètres selon le rang ── */
+  let inf, sup, step, boundsPrec;
+  switch (rang) {
+    case 'unite':
+      inf        = Math.floor(val);
+      sup        = inf + 1;
+      step       = 0.1;
+      boundsPrec = 0;
+      break;
+    case 'dixieme':
+      inf        = Math.floor(val * 10) / 10;
+      sup        = parseFloat((inf + 0.1).toFixed(1));
+      step       = 0.01;
+      boundsPrec = 1;
+      break;
+    case 'centieme':
+      inf        = Math.floor(val * 100) / 100;
+      sup        = parseFloat((inf + 0.01).toFixed(2));
+      step       = 0.001;
+      boundsPrec = 2;
+      break;
+    case 'milieme':
+      inf        = Math.floor(val * 1000) / 1000;
+      sup        = parseFloat((inf + 0.001).toFixed(3));
+      step       = 0.0001;
+      boundsPrec = 3;
+      break;
+    default:
+      return;
+  }
+
+  const tickPrec = boundsPrec + 1; // précision des graduations intermédiaires
+  const W = 560, H = 112, Y = 62, PAD = 54;
+
+  const toX = v => PAD + ((v - inf) / (sup - inf)) * (W - 2 * PAD);
+  const fmt = (v, p) => v.toFixed(p).replace('.', ',');
+
+  const xInf = toX(inf);
+  const xSup = toX(sup);
+  const xVal = toX(val);
+
+  const s = [];
+  s.push(`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" `
+       + `style="width:100%;min-width:${W}px;height:${H}px;display:block;">`);
+
+  /* Zone colorée entre inf et le nombre (repère visuel) */
+  if (xVal > xInf) {
+    s.push(`<rect x="${xInf.toFixed(1)}" y="${(Y - 1).toFixed(1)}" `
+         + `width="${(xVal - xInf).toFixed(1)}" height="2" `
+         + `fill="#1DBFA0" opacity="0.3" rx="1"/>`);
+  }
+
+  /* Axe principal */
+  s.push(`<line x1="${PAD}" y1="${Y}" x2="${W - PAD}" y2="${Y}" `
+       + `stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round"/>`);
+
+  /* ── Graduations (11 ticks = 10 intervalles) ── */
+  for (let i = 0; i <= 10; i++) {
+    const v       = parseFloat((inf + step * i).toFixed(tickPrec));
+    const x       = toX(v).toFixed(1);
+    const isBound = i === 0 || i === 10;
+    const isMid   = i === 5;
+
+    const tickH = isBound ? 14 : (isMid ? 9 : 5);
+    const color  = isBound ? '#1A2D6B' : (isMid ? '#94A3B8' : '#D1D9E6');
+    const sw     = isBound ? 2.5 : (isMid ? 1.5 : 1);
+
+    s.push(`<line x1="${x}" y1="${(Y - tickH).toFixed(1)}" `
+         + `x2="${x}" y2="${(Y + tickH).toFixed(1)}" `
+         + `stroke="${color}" stroke-width="${sw}"/>`);
+
+    /* Étiquettes : bornes en navy bold, graduation médiane en gris */
+    if (isBound) {
+      const label = i === 0 ? fmt(inf, boundsPrec) : fmt(sup, boundsPrec);
+      /* Fond blanc derrière l'étiquette pour lisibilité */
+      s.push(`<text x="${x}" y="${(Y + 32).toFixed(1)}" text-anchor="middle" `
+           + `font-family="Fredoka,sans-serif" font-size="13" font-weight="700" fill="#1A2D6B">`
+           + `${label}</text>`);
+    } else if (isMid) {
+      s.push(`<text x="${x}" y="${(Y + 25).toFixed(1)}" text-anchor="middle" `
+           + `font-family="Fredoka,sans-serif" font-size="10" fill="#94A3B8">`
+           + `${fmt(v, tickPrec)}</text>`);
+    }
+  }
+
+  /* ── Marqueurs navy pour les bornes (triangles pointant vers le bas) ── */
+  const markerPath = (cx, label) => {
+    const mx = parseFloat(cx);
+    const arrow = `M${(mx - 6).toFixed(1)},${(Y - 22).toFixed(1)} `
+                + `L${(mx + 6).toFixed(1)},${(Y - 22).toFixed(1)} `
+                + `L${mx.toFixed(1)},${(Y - 14).toFixed(1)} Z`;
+    return `<path d="${arrow}" fill="#1A2D6B"/>`;
+  };
+  s.push(markerPath(xInf, fmt(inf, boundsPrec)));
+  s.push(markerPath(xSup, fmt(sup, boundsPrec)));
+
+  /* Étiquettes navy au-dessus des marqueurs bornes */
+  const labelOffInf = (xVal - xInf) < 60 ? -2 : 0;
+  const labelOffSup = (xSup - xVal) < 60 ?  2 : 0;
+  s.push(`<text x="${(xInf + labelOffInf).toFixed(1)}" y="${(Y - 26).toFixed(1)}" `
+       + `text-anchor="${xInf < 80 ? 'start' : 'middle'}" `
+       + `font-family="Fredoka,sans-serif" font-size="12" font-weight="700" fill="#1A2D6B">`
+       + `${fmt(inf, boundsPrec)}</text>`);
+  s.push(`<text x="${(xSup + labelOffSup).toFixed(1)}" y="${(Y - 26).toFixed(1)}" `
+       + `text-anchor="${xSup > W - 80 ? 'end' : 'middle'}" `
+       + `font-family="Fredoka,sans-serif" font-size="12" font-weight="700" fill="#1A2D6B">`
+       + `${fmt(sup, boundsPrec)}</text>`);
+
+  /* ── Point gold : le nombre à encadrer ── */
+  s.push(`<circle cx="${xVal.toFixed(1)}" cy="${Y}" r="9" `
+       + `fill="#F5A623" stroke="white" stroke-width="2.5"/>`);
+  /* Étiquette gold au-dessus du point — décalée si trop proche d'une borne */
+  const txtOff = (xVal - xInf) < 55 ? 22 : (xSup - xVal) < 55 ? -22 : 0;
+  s.push(`<text x="${(xVal + txtOff).toFixed(1)}" y="${(Y - 17).toFixed(1)}" `
+       + `text-anchor="middle" font-family="Fredoka,sans-serif" font-size="12" `
+       + `font-weight="700" fill="#92400e">${nombre}</text>`);
+
+  s.push('</svg>');
+  el.innerHTML = s.join('');
+}
+
+/* ─── Banks & Config ─── */
+const BANKS = {
+  1: [
+    { type: 'A', nombre: '3,7',  rang: 'unite',   inf: '3',   sup: '4'   },
+    { type: 'A', nombre: '0,4',  rang: 'unite',   inf: '0',   sup: '1'   },
+    { type: 'B', nombre: '3,72', rang: 'dixieme', inf: '3,7', sup: '3,8' },
+    { type: 'B', nombre: '0,43', rang: 'dixieme', inf: '0,4', sup: '0,5' },
+    { type: 'C', nombre: '2,8',  rang: 'unite',   champ: 'sup', known: '2,5', reponse: '3'  },
+    { type: 'C', nombre: '4,3',  rang: 'unite',   champ: 'inf', known: '5',   reponse: '4'  },
+    { type: 'D', nombre: '3,7',  rang: 'unite',   enonce: '3 < 3,7 < 4', reponse: true  },
+    { type: 'D', nombre: '3,7',  rang: 'unite',   enonce: '2 < 3,7 < 4', reponse: false,
+      explication: 'La borne inférieure doit être 3, pas 2.' }
+  ],
+  2: [
+    { type: 'A', nombre: '3,47',  rang: 'dixieme',  inf: '3,4',  sup: '3,5'  },
+    { type: 'B', nombre: '2,08',  rang: 'dixieme',  inf: '2,0',  sup: '2,1',  piege: 'zero_dixieme' },
+    { type: 'C', nombre: '3,473', rang: 'centieme', inf: '3,47', sup: '3,48' },
+    { type: 'C', nombre: '0,251', rang: 'centieme', inf: '0,25', sup: '0,26' },
+    { type: 'D', nombre: '1,85',
+      encadrements: [
+        { rang: 'unite',   inf: '1',   sup: '2'   },
+        { rang: 'dixieme', inf: '1,8', sup: '1,9' }
+      ]
+    },
+    { type: 'E', inf: '0,4', sup: '0,5' },
+    { type: 'B', nombre: '5,03',  rang: 'dixieme',  inf: '5,0',  sup: '5,1',  piege: 'zero_dixieme' },
+    { type: 'A', nombre: '7,61',  rang: 'dixieme',  inf: '7,6',  sup: '7,7'  }
+  ],
+  3: [
+    { type: 'A', nombre: '1,347',  rang: 'centieme', inf: '1,34', sup: '1,35'  },
+    { type: 'B', nombre: '0,2483', rang: 'milieme',  inf: '0,248',sup: '0,249' },
+    { type: 'C', nombre: '2,008',  rang: 'centieme', inf: '2,00', sup: '2,01',  piege: 'zero_centieme' },
+    { type: 'D', nombre: '0,345',
+      encadrements: [
+        { rang: 'unite',    inf: '0',    sup: '1'    },
+        { rang: 'dixieme',  inf: '0,3',  sup: '0,4'  },
+        { rang: 'centieme', inf: '0,34', sup: '0,35' }
+      ]
+    },
+    { type: 'E', inf: '2,450', sup: '2,451' },
+    { type: 'F', nombre: '1,347', dixieme_inf: '1,3', dixieme_sup: '1,4',
+      plus_proche: '1,3', arrondi: '1,3' },
+    { type: 'A', nombre: '4,562', rang: 'centieme', inf: '4,56', sup: '4,57'  },
+    { type: 'B', nombre: '0,0034',rang: 'milieme',  inf: '0,003',sup: '0,004', piege: 'zero_intercale' }
+  ]
+};
+
+const CONFIG = {
+  1: { perSession: 5, threshold: 4 },
+  2: { perSession: 6, threshold: 5 },
+  3: { perSession: 6, threshold: 5 }
+};
+
+/* ─── Helpers ─── */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function toFloat(str) {
+  return parseFloat(String(str).trim().replace(',', '.'));
+}
+
+function getOkMsg() {
+  const msgs = ['Parfait ! 🎉', 'Très bien ! ✓', 'Excellent ! 🌟', "Bravo, c'est juste !", 'Correct ! 👍'];
+  return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
+/* ─── Session state ─── */
+let session    = [];
+let sessionIdx = 0;
+let score      = 0;
+let attempts   = 0;
+let answered   = false;
+let _currentQ  = null;
+
+function startLevel() {
+  session    = shuffle(BANKS[currentLevel]).slice(0, CONFIG[currentLevel].perSession);
+  sessionIdx = 0;
+  score      = 0;
+
+  document.getElementById('resultScreen').classList.remove('visible');
+  document.getElementById('qCard').style.display        = '';
+  document.getElementById('progressArea').style.display = '';
+
+  const wrap = document.getElementById('numlineWrapper');
+  wrap.style.display = 'none';
+  document.getElementById('helpLineBtn').classList.remove('active');
+
+  renderQuestion();
+}
+
+/* ─── Question rendering ─── */
+
+/* Retourne le nombre et le rang à utiliser pour le tableau et la droite graduée.
+   Pour le type D (double encadrement) on prend le rang le plus fin.
+   Pour le type E (intercalation) on calcule le milieu des bornes. */
+function detectRang(infStr, supStr) {
+  const d = Math.max(
+    (String(infStr).split(',')[1] || '').length,
+    (String(supStr).split(',')[1] || '').length
+  );
+  return ['unite', 'dixieme', 'centieme', 'milieme'][Math.min(d, 3)] || 'dixieme';
+}
+
+function qDisplayParams(q) {
+  if (q.type === 'D' && q.encadrements) {
+    const finest = q.encadrements[q.encadrements.length - 1];
+    return { nombre: q.nombre, rang: finest.rang };
+  }
+  if (q.type === 'E') {
+    const rang = detectRang(q.inf, q.sup);
+    const prec = (q.inf.split(',')[1] || '').length + 1;
+    const mid  = ((toFloat(q.inf) + toFloat(q.sup)) / 2).toFixed(prec).replace('.', ',');
+    return { nombre: mid, rang };
+  }
+  if (q.type === 'F') {
+    return { nombre: q.nombre, rang: 'dixieme' };
+  }
+  return { nombre: q.nombre, rang: q.rang };
+}
+
+function renderQuestion() {
+  const q = session[sessionIdx];
+  _currentQ = q;
+  attempts  = 0;
+  answered  = false;
+
+  const { nombre: tN, rang: tR } = qDisplayParams(q);
+  updateNumTable(tN, tR, false);
+
+  updateProgress();
+
+  const fb   = document.getElementById('feedback');
+  const next = document.getElementById('nextBtn');
+  fb.className   = 'feedback';
+  fb.textContent = '';
+  next.className = 'next-btn';
+
+  const badge  = document.getElementById('qTypeBadge');
+  const prompt = document.getElementById('qPrompt');
+  const body   = document.getElementById('qBody');
+
+  if (currentLevel === 1) {
+    if      (q.type === 'A') renderTypeA(q, badge, prompt, body);
+    else if (q.type === 'B') renderTypeB(q, badge, prompt, body);
+    else if (q.type === 'C') renderTypeC(q, badge, prompt, body);
+    else if (q.type === 'D') renderTypeD(q, badge, prompt, body);
+  } else {
+    if      (q.type === 'D') renderTypeDoubleEncad(q, badge, prompt, body);
+    else if (q.type === 'E') renderTypeIntercale(q, badge, prompt, body);
+    else if (q.type === 'F') renderTypeF(q, badge, prompt, body);
+    else                     renderTypeEncad(q, badge, prompt, body);
+  }
+}
+
+function renderTypeA(q, badge, prompt, body) {
+  badge.textContent = "Encadrement à l'unité";
+  prompt.innerHTML  = `Encadre <span class="hl-num">${q.nombre}</span> entre deux <strong>nombres entiers consécutifs</strong> :`;
+  body.innerHTML    = buildEncadRow(q.nombre) + buildValidateBtn();
+  wireEncadInputs(validateAB);
+}
+
+function renderTypeB(q, badge, prompt, body) {
+  badge.textContent = 'Encadrement au dixième';
+  prompt.innerHTML  = `Encadre <span class="hl-num">${q.nombre}</span> entre deux <strong>dixièmes consécutifs</strong> :`;
+  body.innerHTML    = buildEncadRow(q.nombre) + buildValidateBtn();
+  wireEncadInputs(validateAB);
+}
+
+function renderTypeC(q, badge, prompt, body) {
+  badge.textContent = 'Trouver la borne manquante';
+  prompt.innerHTML  = `Complète l'encadrement :`;
+
+  const num = `<span class="encad-num">${q.nombre}</span>`;
+  const lt  = `<span class="encad-lt">&lt;</span>`;
+  const inp = `<input class="d-input" id="emiss" type="text" inputmode="decimal" `
+            + `placeholder="?" autocomplete="off" style="min-width:80px">`;
+  const kn  = `<span class="encad-num" style="color:var(--navy)">${q.known}</span>`;
+  const row = q.champ === 'sup'
+    ? `${kn} ${lt} ${num} ${lt} ${inp}`
+    : `${inp} ${lt} ${num} ${lt} ${kn}`;
+
+  body.innerHTML = `<div class="encad-row">${row}</div>${buildValidateBtn()}`;
+
+  const inp_el = document.getElementById('emiss');
+  const btn_el = document.getElementById('validateBtn');
+  btn_el.onclick = validateC;
+  inp_el.addEventListener('input',   () => { btn_el.disabled = inp_el.value.trim() === ''; });
+  inp_el.addEventListener('keydown', e  => { if (e.key === 'Enter' && !btn_el.disabled) validateC(); });
+  inp_el.focus();
+}
+
+function renderTypeD(q, badge, prompt, body) {
+  badge.textContent = 'Vrai ou Faux ?';
+  prompt.innerHTML  = `Cet encadrement est-il correct ?`;
+
+  const parts = q.enonce.split(' < ');
+  const display = parts.map((p, i) =>
+    i === 1
+      ? `<span class="hl-num">${p}</span>`
+      : `<strong style="color:var(--navy)">${p}</strong>`
+  ).join(' &lt; ');
+
+  body.innerHTML = `
+    <div style="text-align:center;font-size:1.6rem;font-weight:700;line-height:1.8;margin-bottom:20px">
+      ${display}
+    </div>
+    <div class="vf-row">
+      <button class="vf-btn" id="vf-v" onclick="validateD(true)">✓ Vrai</button>
+      <button class="vf-btn" id="vf-f" onclick="validateD(false)">✗ Faux</button>
+    </div>`;
+}
+
+/* ── Builders HTML ── */
+function buildEncadRow(nombre) {
+  return `<div class="encad-row">
+    <input class="d-input" id="einf" type="text" inputmode="decimal"
+           placeholder="?" autocomplete="off" style="min-width:80px">
+    <span class="encad-lt">&lt;</span>
+    <span class="encad-num">${nombre}</span>
+    <span class="encad-lt">&lt;</span>
+    <input class="d-input" id="esup" type="text" inputmode="decimal"
+           placeholder="?" autocomplete="off" style="min-width:80px">
+  </div>`;
+}
+
+function buildValidateBtn() {
+  return `<button class="validate-btn" id="validateBtn" disabled>Valider</button>`;
+}
+
+function wireEncadInputs(validateFn) {
+  const einf = document.getElementById('einf');
+  const esup = document.getElementById('esup');
+  const btn  = document.getElementById('validateBtn');
+  const checkReady = () => { btn.disabled = einf.value.trim() === '' || esup.value.trim() === ''; };
+  einf.addEventListener('input', checkReady);
+  esup.addEventListener('input', checkReady);
+  einf.addEventListener('keydown', e => { if (e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); esup.focus(); } });
+  esup.addEventListener('keydown', e => { if (e.key === 'Enter' && !btn.disabled) validateFn(); });
+  btn.onclick = validateFn;
+  einf.focus();
+}
+
+/* ─── Validation ─── */
+function validateAB() {
+  if (answered) return;
+  const q    = session[sessionIdx];
+  const einf = document.getElementById('einf');
+  const esup = document.getElementById('esup');
+  const btn  = document.getElementById('validateBtn');
+  btn.disabled = true;
+
+  const fInf = toFloat(einf.value);
+  const fSup = toFloat(esup.value);
+  const corr = `La bonne réponse est <strong>${q.inf}</strong> &lt; <span class="encad-num">${q.nombre}</span> &lt; <strong>${q.sup}</strong>.`;
+
+  /* Bornes inversées */
+  if (!isNaN(fInf) && !isNaN(fSup) && fInf > fSup) {
+    einf.classList.add('err');
+    esup.classList.add('err');
+    handleWrong(q,
+      "L'encadrement s'écrit toujours : petit &lt; nombre &lt; grand. <strong>Inverse tes deux bornes !</strong>",
+      corr
+    );
+    if (!answered) {
+      einf.classList.remove('err'); esup.classList.remove('err');
+      einf.value = ''; esup.value = '';
+      einf.disabled = esup.disabled = false;
+      btn.disabled = true;
+      einf.focus();
+    }
+    return;
+  }
+
+  /* Confusion unité / dixième */
+  if (q.rang === 'dixieme' && Number.isInteger(fInf) && Number.isInteger(fSup)) {
+    einf.classList.add('err'); esup.classList.add('err');
+    const d = String(q.nombre).replace(',', '.').split('.')[1]?.[0] ?? '?';
+    handleWrong(q,
+      `Tu as encadré à l'unité, pas au dixième !<br>`
+      + `Regarde la case <strong>Dixièmes</strong> dans le tableau : le chiffre est <strong>${d}</strong>, `
+      + `donc les dixièmes consécutifs sont <strong>${q.inf}</strong> et <strong>${q.sup}</strong>.`,
+      corr
+    );
+    if (!answered) {
+      einf.classList.remove('err'); esup.classList.remove('err');
+      einf.value = ''; esup.value = '';
+      einf.disabled = esup.disabled = false;
+      btn.disabled = true; einf.focus();
+    }
+    return;
+  }
+
+/* Piège zéro centième : écrire "2,0" au lieu de "2,00" */
+  if (q.piege === 'zero_centieme') {
+    const decLen   = v => (String(v).trim().split(',')[1] || '').length;
+    const infPiege = decLen(einf.value) < decLen(q.inf) && Math.abs(fInf - toFloat(q.inf)) < 1e-9;
+    const supPiege = decLen(esup.value) < decLen(q.sup) && Math.abs(fSup - toFloat(q.sup)) < 1e-9;
+    if (infPiege || supPiege) {
+      const badInp = infPiege ? einf : esup;
+      const badExp = infPiege ? q.inf : q.sup;
+      badInp.classList.add('err');
+      handleWrong(q,
+        `<strong>${badInp.value.trim()}</strong> et <strong>${badExp}</strong> sont égaux, `
+        + `mais ici on encadre au centième. La borne s'écrit <strong>${badExp}</strong> `
+        + `avec deux chiffres après la virgule.`,
+        `La bonne réponse est <strong>${q.inf}</strong> &lt; <span class="encad-num">${q.nombre}</span> &lt; <strong>${q.sup}</strong>.`
+      );
+      if (!answered) {
+        badInp.classList.remove('err'); badInp.value = '';
+        badInp.disabled = false;
+        btn.disabled = einf.value.trim() === '' || esup.value.trim() === '';
+        badInp.focus();
+      }
+      return;
+    }
+  }
+
+  const infOk = Math.abs(fInf - toFloat(q.inf)) < 1e-9;
+  const supOk = Math.abs(fSup - toFloat(q.sup)) < 1e-9;
+
+  if (infOk && supOk) {
+    einf.classList.add('ok'); esup.classList.add('ok');
+    einf.disabled = esup.disabled = true;
+    handleCorrect(q);
+    return;
+  }
+
+  if (!infOk) einf.classList.add('err');
+  if (!supOk) esup.classList.add('err');
+  const colNames = { unite: 'Unités', dixieme: 'Dixièmes', centieme: 'Centièmes', milieme: 'Millièmes' };
+  const col = colNames[q.rang] || 'Unités';
+  let hintMsg = `Pas tout à fait. Regarde la colonne <strong>${col}</strong> dans le tableau ! 💡`;
+  if (q.piege === 'zero_intercale') {
+    const decShifted = (stu, exp) => {
+      const s = toFloat(stu), e = toFloat(exp);
+      if (isNaN(s) || isNaN(e) || e === 0) return false;
+      const r = s / e;
+      return Math.abs(r - 10) < 0.01 || Math.abs(r - 100) < 0.01 || Math.abs(r - 1000) < 0.01;
+    };
+    if ((!infOk && decShifted(einf.value, q.inf)) || (!supOk && decShifted(esup.value, q.sup))) {
+      hintMsg = `Attention aux zéros intercalés ! <strong>${q.nombre}</strong> a des zéros `
+              + `juste après la virgule. Regarde bien la colonne <strong>${col}</strong> dans le tableau. 💡`;
+    }
+  }
+  handleWrong(q, hintMsg, corr);
+  if (!answered) {
+    if (!infOk) { einf.classList.remove('err'); einf.value = ''; einf.disabled = false; }
+    if (!supOk) { esup.classList.remove('err'); esup.value = ''; esup.disabled = false; }
+    btn.disabled = einf.value.trim() === '' || esup.value.trim() === '';
+    (!infOk ? einf : esup).focus();
+  }
+}
+
+function validateC() {
+  if (answered) return;
+  const q   = session[sessionIdx];
+  const inp = document.getElementById('emiss');
+  const btn = document.getElementById('validateBtn');
+  btn.disabled = true;
+
+  if (Math.abs(toFloat(inp.value) - toFloat(q.reponse)) < 1e-9) {
+    inp.classList.add('ok');
+    inp.disabled = true;
+    handleCorrect(q);
+    return;
+  }
+
+  inp.classList.add('err');
+  handleWrong(q,
+    'Cherche le nombre <strong>entier</strong> qui complète l\'encadrement. Regarde la case <strong>Unités</strong> dans le tableau ! 💡',
+    `La bonne réponse est <strong>${q.reponse}</strong>.`
+  );
+  if (!answered) {
+    inp.classList.remove('err'); inp.value = '';
+    inp.disabled = false; btn.disabled = false;
+    inp.focus();
+  }
+}
+
+function validateD(chosen) {
+  if (answered) return;
+  const q    = session[sessionIdx];
+  const btnV = document.getElementById('vf-v');
+  const btnF = document.getElementById('vf-f');
+  btnV.disabled = btnF.disabled = true;
+
+  const correct    = chosen === q.reponse;
+  const clickedBtn = chosen ? btnV : btnF;
+  const correctBtn = q.reponse ? btnV : btnF;
+
+  if (correct) {
+    clickedBtn.classList.add('ok');
+    handleCorrect(q);
+    return;
+  }
+
+  clickedBtn.classList.add('err');
+  const hint = q.explication
+    ? `Pas tout à fait. ${q.explication} Vérifie dans le tableau ! 💡`
+    : "Cet encadrement n'est pas correct. Regarde le tableau de numération ! 💡";
+  const corr = `La bonne réponse est <strong>${q.reponse ? 'Vrai' : 'Faux'}</strong>. `
+             + (q.explication || '');
+  handleWrong(q, hint, corr);
+
+  if (answered) {
+    correctBtn.classList.add('ok');
+  } else {
+    clickedBtn.classList.remove('err');
+    btnV.disabled = btnF.disabled = false;
+  }
+}
+
+/* ─── Niveau 2 : renderers ─── */
+
+function renderTypeEncad(q, badge, prompt, body) {
+  const labels  = { unite: "Encadrement à l'unité",    dixieme:  'Encadrement au dixième',
+                    centieme: 'Encadrement au centième', milieme: 'Encadrement au millième' };
+  const prompts = { unite: 'nombres entiers consécutifs', dixieme:  'dixièmes consécutifs',
+                    centieme: 'centièmes consécutifs',     milieme: 'millièmes consécutifs' };
+  badge.textContent = labels[q.rang]   || 'Encadrement';
+  prompt.innerHTML  = `Encadre <span class="hl-num">${q.nombre}</span> entre deux <strong>${prompts[q.rang] || 'valeurs consécutives'}</strong> :`;
+  body.innerHTML    = buildEncadRow(q.nombre) + buildValidateBtn();
+  wireEncadInputs(validateAB);
+}
+
+function renderTypeDoubleEncad(q, badge, prompt, body) {
+  const n = q.encadrements.length;
+  const encLabels  = { 2: 'Double', 3: 'Triple' };
+  const encCountFr = { 2: 'deux',   3: 'trois'  };
+  badge.textContent = `${encLabels[n] || n + '×'} encadrement`;
+  prompt.innerHTML  = `Complète les ${encCountFr[n] || n} encadrements de <span class="hl-num">${q.nombre}</span> :`;
+
+  const rl   = { unite: "à l'unité", dixieme: 'au dixième', centieme: 'au centième', milieme: 'au millième' };
+  const rows = q.encadrements.map((enc, i) => `
+    <div class="encad-multi-row">
+      <input class="d-input" id="einf-${i}" type="text" inputmode="decimal"
+             placeholder="?" autocomplete="off" style="min-width:80px">
+      <span class="encad-lt">&lt;</span>
+      <span class="encad-num">${q.nombre}</span>
+      <span class="encad-lt">&lt;</span>
+      <input class="d-input" id="esup-${i}" type="text" inputmode="decimal"
+             placeholder="?" autocomplete="off" style="min-width:80px">
+      <span class="encad-rang-label">${rl[enc.rang] || enc.rang}</span>
+    </div>`).join('');
+
+  body.innerHTML = `<div class="encad-multi-block">${rows}</div>${buildValidateBtn()}`;
+
+  const allInputs = q.encadrements.flatMap((_, i) => [
+    document.getElementById(`einf-${i}`),
+    document.getElementById(`esup-${i}`)
+  ]);
+  const btn = document.getElementById('validateBtn');
+  btn.onclick = validateDoubleEncad;
+  const checkReady = () => { btn.disabled = allInputs.some(inp => inp.value.trim() === ''); };
+  allInputs.forEach((inp, i) => {
+    inp.addEventListener('input', checkReady);
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Tab' && !e.shiftKey && i < allInputs.length - 1) {
+        e.preventDefault(); allInputs[i + 1].focus();
+      }
+      if (e.key === 'Enter' && !btn.disabled) validateDoubleEncad();
+    });
+  });
+  allInputs[0].focus();
+}
+
+function renderTypeIntercale(q, badge, prompt, body) {
+  badge.textContent = 'Intercalation';
+  prompt.innerHTML  = `Trouve un nombre décimal <strong>strictement compris</strong> entre `
+    + `<span class="hl-num">${q.inf}</span> et <span class="hl-num">${q.sup}</span> :`;
+
+  body.innerHTML = `
+    <div class="encad-row">
+      <span class="encad-num" style="color:var(--navy)">${q.inf}</span>
+      <span class="encad-lt">&lt;</span>
+      <input class="free-input" id="freeInput" type="text" inputmode="decimal"
+             placeholder="?" autocomplete="off" style="max-width:160px">
+      <span class="encad-lt">&lt;</span>
+      <span class="encad-num" style="color:var(--navy)">${q.sup}</span>
+    </div>
+    ${buildValidateBtn()}`;
+
+  const inp = document.getElementById('freeInput');
+  const btn = document.getElementById('validateBtn');
+  btn.onclick = validateIntercale;
+  inp.addEventListener('input',   () => { btn.disabled = inp.value.trim() === ''; });
+  inp.addEventListener('keydown', e  => { if (e.key === 'Enter' && !btn.disabled) validateIntercale(); });
+  inp.focus();
+}
+
+/* ─── Niveau 2 : validateurs ─── */
+
+function validateDoubleEncad() {
+  if (answered) return;
+  const q   = session[sessionIdx];
+  const btn = document.getElementById('validateBtn');
+  btn.disabled = true;
+
+  let allOk = true;
+  const hints = [];
+  const corrParts = [];
+  const rl  = { unite: "l'unité",  dixieme: 'le dixième', centieme: 'le centième' };
+  const col = { unite: 'Unités',   dixieme: 'Dixièmes',   centieme: 'Centièmes'  };
+
+  q.encadrements.forEach((enc, i) => {
+    const einf = document.getElementById(`einf-${i}`);
+    const esup = document.getElementById(`esup-${i}`);
+    const infOk = Math.abs(toFloat(einf.value) - toFloat(enc.inf)) < 1e-9;
+    const supOk = Math.abs(toFloat(esup.value) - toFloat(enc.sup)) < 1e-9;
+    if (!infOk || !supOk) {
+      allOk = false;
+      if (!infOk) einf.classList.add('err');
+      if (!supOk) esup.classList.add('err');
+      hints.push(`Vérifie l'encadrement à ${rl[enc.rang] || enc.rang} — colonne <strong>${col[enc.rang] || enc.rang}</strong> dans le tableau. 💡`);
+    }
+    corrParts.push(`<strong>${enc.inf}</strong> &lt; <span class="encad-num">${q.nombre}</span> &lt; <strong>${enc.sup}</strong>`);
+  });
+
+  if (allOk) {
+    q.encadrements.forEach((_, i) => {
+      ['einf', 'esup'].forEach(id => {
+        const el = document.getElementById(`${id}-${i}`);
+        el.classList.add('ok'); el.disabled = true;
+      });
+    });
+    handleCorrect(q);
+    return;
+  }
+
+  handleWrong(q, hints.join('<br>'), `Bonnes réponses : ${corrParts.join(' et ')}.`);
+
+  if (!answered) {
+    q.encadrements.forEach((_, i) => {
+      ['einf', 'esup'].forEach(id => {
+        const el = document.getElementById(`${id}-${i}`);
+        if (el && el.classList.contains('err')) {
+          el.classList.remove('err'); el.value = ''; el.disabled = false;
+        }
+      });
+    });
+    const firstEmpty = [...document.querySelectorAll('#qBody input:not(:disabled)')].find(el => !el.value);
+    if (firstEmpty) firstEmpty.focus();
+    btn.disabled = [...document.querySelectorAll('#qBody input')].some(el => el.value.trim() === '');
+  }
+}
+
+function validateIntercale() {
+  if (answered) return;
+  const q   = session[sessionIdx];
+  const inp = document.getElementById('freeInput');
+  const btn = document.getElementById('validateBtn');
+  btn.disabled = true;
+
+  const val  = toFloat(inp.value);
+  const fInf = toFloat(q.inf);
+  const fSup = toFloat(q.sup);
+
+  if (!isNaN(val) && val > fInf && val < fSup) {
+    inp.classList.add('ok'); inp.disabled = true;
+    handleCorrect(q);
+    return;
+  }
+
+  inp.classList.add('err');
+  const prec = (q.inf.split(',')[1] || '').length + 1;
+  const ex   = ((fInf + fSup) / 2).toFixed(prec).replace('.', ',');
+  handleWrong(q,
+    `Ce nombre n'est pas entre <strong>${q.inf}</strong> et <strong>${q.sup}</strong>. `
+    + `Essaie un nombre avec un chiffre de plus après la virgule.`,
+    `Il fallait un nombre strictement entre <strong>${q.inf}</strong> et <strong>${q.sup}</strong>. `
+    + `Par exemple <strong>${ex}</strong> convient.`
+  );
+  if (!answered) {
+    inp.classList.remove('err'); inp.value = '';
+    inp.disabled = false; btn.disabled = false;
+    inp.focus();
+  }
+}
+
+/* ─── Niveau 3 : Type F (encadrement et arrondi) ─── */
+
+function renderTypeF(q, badge, prompt, body) {
+  badge.textContent = 'Encadrement et arrondi';
+  prompt.innerHTML  = `Quel dixième est le plus proche de <span class="hl-num">${q.nombre}</span> ?`;
+
+  body.innerHTML = `
+    <div style="text-align:center;font-size:1.4rem;font-weight:700;margin-bottom:16px">
+      <strong style="color:var(--navy)">${q.dixieme_inf}</strong>
+      &lt; <span class="hl-num">${q.nombre}</span> &lt;
+      <strong style="color:var(--navy)">${q.dixieme_sup}</strong>
+    </div>
+    <div class="vf-row">
+      <button class="vf-btn" id="btn-dix-inf" onclick="validateF_step1('${q.dixieme_inf}')">${q.dixieme_inf}</button>
+      <button class="vf-btn" id="btn-dix-sup" onclick="validateF_step1('${q.dixieme_sup}')">${q.dixieme_sup}</button>
+    </div>
+    <div id="f-step2" style="display:none">
+      <p style="margin:20px 0 8px;text-align:center;font-size:1.05rem;font-weight:600">
+        Donc, <span class="hl-num">${q.nombre}</span> arrondi au dixième est :
+      </p>
+      <div class="encad-row" style="justify-content:center">
+        <input class="free-input" id="arrondiInput" type="text" inputmode="decimal"
+               placeholder="?" autocomplete="off" style="max-width:120px">
+      </div>
+      ${buildValidateBtn()}
+    </div>`;
+}
+
+function validateF_step1(chosen) {
+  if (answered) return;
+  const q    = session[sessionIdx];
+  const btnI = document.getElementById('btn-dix-inf');
+  const btnS = document.getElementById('btn-dix-sup');
+  btnI.disabled = btnS.disabled = true;
+  const clickedBtn = chosen === q.dixieme_inf ? btnI : btnS;
+
+  if (chosen === q.plus_proche) {
+    clickedBtn.classList.add('ok');
+    showFeedback(true, `Oui ! <strong>${chosen}</strong> est le plus proche. Maintenant écris l'arrondi ↓`);
+    const step2 = document.getElementById('f-step2');
+    step2.style.display = '';
+    const inp = document.getElementById('arrondiInput');
+    const btn = document.getElementById('validateBtn');
+    btn.onclick = validateF_step2;
+    inp.addEventListener('input',   () => { btn.disabled = inp.value.trim() === ''; });
+    inp.addEventListener('keydown', e  => { if (e.key === 'Enter' && !btn.disabled) validateF_step2(); });
+    inp.focus();
+  } else {
+    clickedBtn.classList.add('err');
+    handleWrong(q,
+      `Non. Regarde les deux dixièmes et calcule lequel est le plus proche de <strong>${q.nombre}</strong>. 💡`,
+      `Le dixième le plus proche de <strong>${q.nombre}</strong> est <strong>${q.plus_proche}</strong>.`
+    );
+    if (!answered) {
+      clickedBtn.classList.remove('err');
+      btnI.disabled = btnS.disabled = false;
+    }
+  }
+}
+
+function validateF_step2() {
+  if (answered) return;
+  const q   = session[sessionIdx];
+  const inp = document.getElementById('arrondiInput');
+  const btn = document.getElementById('validateBtn');
+  btn.disabled = true;
+
+  if (Math.abs(toFloat(inp.value) - toFloat(q.arrondi)) < 1e-9) {
+    inp.classList.add('ok'); inp.disabled = true;
+    handleCorrect(q);
+    return;
+  }
+
+  inp.classList.add('err');
+  handleWrong(q,
+    `L'arrondi au dixième, c'est le dixième le plus proche — tu viens de le trouver à l'étape 1 ! 💡`,
+    `L'arrondi de <strong>${q.nombre}</strong> au dixième est <strong>${q.arrondi}</strong>.`
+  );
+  if (!answered) {
+    inp.classList.remove('err'); inp.value = '';
+    inp.disabled = false; btn.disabled = false;
+    inp.focus();
+  }
+}
+
+/* ─── Correct / Wrong ─── */
+function handleCorrect(q) {
+  answered = true;
+  score++;
+  const { nombre: dN, rang: dR } = qDisplayParams(q);
+  updateNumTable(dN, dR, true);
+  const wrap = document.getElementById('numlineWrapper');
+  wrap.style.display = '';
+  document.getElementById('helpLineBtn').classList.add('active');
+  renderNumline(dN, dR);
+  showFeedback(true, getOkMsg());
+  showNext();
+  updateProgress();
+}
+
+function handleWrong(q, hint, correction) {
+  attempts++;
+  if (attempts === 1) {
+    /* 1er échec : surligner tableau + afficher droite graduée */
+    const { nombre: dN, rang: dR } = qDisplayParams(q);
+    updateNumTable(dN, dR, true);
+    const wrap = document.getElementById('numlineWrapper');
+    wrap.style.display = '';
+    document.getElementById('helpLineBtn').classList.add('active');
+    renderNumline(dN, dR);
+    showFeedback(false, hint);
+  } else {
+    /* 2e échec : correction + verrouiller tout */
+    answered = true;
+    document.querySelectorAll('#qBody input').forEach(i  => i.disabled  = true);
+    document.querySelectorAll('#qBody button').forEach(b => b.disabled  = true);
+    showFeedback(false, correction);
+    showNext();
+    updateProgress();
+  }
+}
+
+/* ─── UI helpers ─── */
+function showFeedback(ok, msg) {
+  const fb = document.getElementById('feedback');
+  fb.className = `feedback visible ${ok ? 'ok-fb' : 'err-fb'}`;
+  fb.innerHTML = msg;
+}
+
+function showNext() {
+  const btn    = document.getElementById('nextBtn');
+  const isLast = sessionIdx === session.length - 1;
+  btn.textContent = isLast ? 'Voir les résultats →' : 'Question suivante →';
+  btn.classList.add('visible');
+}
+
+function updateProgress() {
+  const total = session.length;
+  document.getElementById('progressLabel').textContent = `Question ${Math.min(sessionIdx + 1, total)}/${total}`;
+  document.getElementById('progressScore').textContent = `Score : ${score}`;
+  document.getElementById('progressFill').style.width  = `${(sessionIdx / total) * 100}%`;
+}
+
+/* ─── Navigation ─── */
+function nextQuestion() {
+  sessionIdx++;
+  if (sessionIdx >= session.length) { showResults(); return; }
+  const card = document.getElementById('qCard');
+  card.style.animation = 'none';
+  requestAnimationFrame(() => { card.style.animation = ''; renderQuestion(); });
+}
+
+function goNextLevel() { selectLevel(currentLevel + 1); }
+
+function retryLevel() {
+  document.getElementById('resultScreen').classList.remove('visible');
+  document.getElementById('qCard').style.display        = '';
+  document.getElementById('progressArea').style.display = '';
+  startLevel();
+}
+
+/* ─── Results ─── */
+function showResults() {
+  const lv        = currentLevel;
+  const total     = session.length;
+  const threshold = CONFIG[lv].threshold;
+  const passed    = score >= threshold;
+
+  document.getElementById('qCard').style.display          = 'none';
+  document.getElementById('progressArea').style.display   = 'none';
+  document.getElementById('numlineWrapper').style.display  = 'none';
+  document.getElementById('helpLineBtn').classList.remove('active');
+
+  document.getElementById('resultEmoji').textContent = passed ? '🏆' : '💪';
+  document.getElementById('resultTitle').textContent = passed ? 'Niveau réussi !' : 'Continue comme ça !';
+  document.getElementById('resultScore').textContent = `${score}/${total}`;
+
+  const nextLevelBtn = document.getElementById('nextLevelBtn');
+  if (passed) {
+    levelsDone[lv] = true;
+    sessionStorage.setItem('edLevelsDone', JSON.stringify(levelsDone));
+    initLevelTabs();
+    document.getElementById('resultMsg').textContent =
+      lv < 3
+        ? `Bravo ! Tu as obtenu ${score} sur ${total} (seuil : ${threshold}/${total}). Le niveau suivant est débloqué !`
+        : `Bravo ! Tu as obtenu ${score} sur ${total} (seuil : ${threshold}/${total}). Félicitations, tu as maîtrisé les trois niveaux !`;
+    if (lv < 3) {
+      nextLevelBtn.style.display    = 'inline-flex';
+      nextLevelBtn.style.alignItems = 'center';
+    }
+    launchConfetti();
+    logResult(lv, score, total);
+  } else {
+    document.getElementById('resultMsg').textContent =
+      `Tu as obtenu ${score} sur ${total}. Il faut ${threshold}/${total} pour passer au niveau suivant. Réessaie !`;
+    nextLevelBtn.style.display = 'none';
+  }
+
+  document.getElementById('resultScreen').classList.add('visible');
+}
+
+/* ─── Supabase logging ─── */
+function logResult(level, sc, total) {
+  if (typeof saveExerciseResult === 'function') {
+    saveExerciseResult({
+      exerciseSlug: 'encadrer-decimaux',
+      subject:      'mathématiques',
+      category:     'nombres-decimaux',
+      exerciseType: 'encadrement',
+      level:        `Niveau ${level}`,
+      score:         sc,
+      total:         total
+    });
+  }
+}
+
+/* ─── Confetti ─── */
+function launchConfetti() {
+  const colors    = ['#F5A623', '#1DBFA0', '#1A2D6B', '#E05252', '#ffffff'];
+  const container = document.getElementById('confettiContainer');
+  container.innerHTML = '';
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = `
+      left:${Math.random() * 100}%;
+      background:${colors[Math.floor(Math.random() * colors.length)]};
+      width:${6 + Math.random() * 8}px;
+      height:${6 + Math.random() * 8}px;
+      border-radius:${Math.random() > 0.5 ? '50%' : '2px'};
+      animation-duration:${1.5 + Math.random() * 1.5}s;
+      animation-delay:${Math.random() * 0.6}s;
+    `;
+    container.appendChild(p);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 3200);
+}
+
+/* ─── Init ─── */
+initLevelTabs();
+startLevel();
+</script>
+
+<script src="../../js/menu.js"></script>
+<style>
+  footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+  .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+  .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+  .footer__text .rouge { color: #F5A623; font-weight: 700; }
+  .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+  .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>
