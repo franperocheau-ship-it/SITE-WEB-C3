@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Écrire un décimal sous forme de fraction — Mathématiques — Lycée Français de Madrid</title>
   <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="level-select.css">
+  <script src="js/level-select.js"></script>
   <style>
     /* ── Layout ─────────────────────────────────────────────────── */
     .page-wrap    { background: var(--bg); min-height: calc(100vh - 88px); padding-bottom: 64px; }
@@ -28,9 +30,6 @@
     .ex-page-title    { font-weight: 800; font-size: 21px; color: var(--blue); line-height: 1.35; max-width: 540px; margin: 0 auto 10px; }
     .ex-page-rule     { width: 44px; height: 3px; background: var(--red); border-radius: 2px; margin: 0 auto 12px; }
     .ex-page-subtitle { font-size: 13px; color: var(--muted); }
-
-    /* ── Level stack ─────────────────────────────────────────────── */
-    .levels-stack { display: flex; flex-direction: column; gap: 20px; }
 
     /* ── Level card ──────────────────────────────────────────────── */
     .level-card {
@@ -157,11 +156,32 @@
     }
     .btn-next:hover { background: #15803d; transform: translateY(-2px); }
 
-    /* ── Level complete ──────────────────────────────────────────── */
+    /* ── Level complete / result screen ────────────────────────────── */
     .level-complete { text-align: center; padding: 28px 16px; background: rgba(22,163,74,0.06); border-radius: 14px; }
+    .level-complete.failed { background: rgba(214,40,57,0.05); }
     .level-complete-icon  { font-size: 42px; margin-bottom: 8px; }
     .level-complete-title { font-size: 17px; font-weight: 800; color: #15803d; margin-bottom: 4px; }
+    .level-complete.failed .level-complete-title { color: var(--red); }
     .level-complete-score { font-size: 14px; color: var(--muted); font-weight: 600; }
+    .level-complete-msg   { font-size: 13px; color: var(--muted); font-weight: 600; margin-top: 6px; }
+
+    .result-btns {
+      display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .ex-btn-primary {
+      background: var(--blue); color: #fff; border: none; border-radius: 100px;
+      padding: 13px 32px; font-family: inherit; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: background 200ms, transform 200ms;
+    }
+    .ex-btn-primary:hover { background: #0d2255; transform: translateY(-2px); }
+    .ex-btn-secondary {
+      background: transparent; color: var(--blue); border: 1.5px solid var(--border);
+      border-radius: 100px; padding: 13px 32px; font-family: inherit; font-size: 14px;
+      font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex;
+      align-items: center; transition: border-color 200ms, background 200ms, transform 200ms;
+    }
+    .ex-btn-secondary:hover { border-color: var(--blue); background: rgba(16,43,106,0.04); transform: translateY(-2px); }
 
     /* ── Responsive ──────────────────────────────────────────────── */
     @media (max-width: 768px) {
@@ -219,65 +239,34 @@
 
         <!-- Page header -->
         <div class="ex-page-header">
-          <div class="ex-page-badges">
-            <span class="badge badge-cm1">CM1</span>
-            <span class="badge badge-cm2">CM2</span>
-            <span class="badge badge-6e">6e</span>
-          </div>
+          <div class="ex-page-badges" id="levelBadges"></div>
           <h1 class="ex-page-title">Écrire un nombre décimal sous forme de fraction décimale</h1>
           <div class="ex-page-rule"></div>
           <p class="ex-page-subtitle">Lis le nombre décimal et écris la fraction décimale correspondante — 3 niveaux progressifs.</p>
         </div>
 
-        <!-- Level cards -->
-        <div class="levels-stack">
+        <!-- Level selection screen — content injected by LevelSelect -->
+        <div id="levelSelectScreen"></div>
 
-          <!-- Niveau 1 -->
-          <div class="level-card" id="lc-0">
+        <!-- Active level card (reused across levels) -->
+        <div id="exerciseScreen" style="display:none">
+          <div class="level-card">
             <div class="lc-header">
               <div class="lc-header-left">
-                <div class="lc-num">1</div>
+                <div class="lc-num" id="lc-num"></div>
                 <div>
-                  <div class="lc-title">Dixièmes et centièmes</div>
-                  <div class="lc-sub">Fractions avec dénominateur 10 ou 100.</div>
+                  <div class="lc-title" id="lc-title"></div>
+                  <div class="lc-sub" id="lc-sub"></div>
                 </div>
               </div>
-              <span class="lc-status active" id="lc-badge-0">En cours</span>
+              <span class="lc-status active">En cours</span>
             </div>
-            <div class="lc-body" id="lb-0"></div>
+            <div class="lc-body" id="lc-body"></div>
           </div>
+        </div>
 
-          <!-- Niveau 2 -->
-          <div class="level-card locked" id="lc-1">
-            <div class="lc-header">
-              <div class="lc-header-left">
-                <div class="lc-num">2</div>
-                <div>
-                  <div class="lc-title">Centièmes, millièmes et nombres > 1</div>
-                  <div class="lc-sub">Décimaux avec dénominateur 100 ou 1 000, dont certains supérieurs à 1.</div>
-                </div>
-              </div>
-              <span class="lc-status locked" id="lc-badge-1">Verrouillé</span>
-            </div>
-            <div class="lc-body" id="lb-1"></div>
-          </div>
-
-          <!-- Niveau 3 -->
-          <div class="level-card locked" id="lc-2">
-            <div class="lc-header">
-              <div class="lc-header-left">
-                <div class="lc-num">3</div>
-                <div>
-                  <div class="lc-title">Millièmes et décimaux avancés</div>
-                  <div class="lc-sub">Millièmes et grands décimaux, mélange de fractions < 1 et > 1.</div>
-                </div>
-              </div>
-              <span class="lc-status locked" id="lc-badge-2">Verrouillé</span>
-            </div>
-            <div class="lc-body" id="lb-2"></div>
-          </div>
-
-        </div><!-- /.levels-stack -->
+        <!-- Result screen -->
+        <div id="resultScreen" style="display:none"></div>
       </div><!-- /.ex-container -->
     </div><!-- /.page-content -->
   </div><!-- /.page-wrap -->
@@ -351,22 +340,67 @@
   const N_Q        = 5;
   const VALID_DENS = new Set([10, 100, 1000]);
 
+  const CD_LEVEL_TITLES = ['Dixièmes et centièmes', 'Centièmes, millièmes et nombres > 1', 'Millièmes et décimaux avancés'];
+  const CD_LEVEL_DESCS  = [
+    'Fractions avec dénominateur 10 ou 100.',
+    'Décimaux avec dénominateur 100 ou 1 000, dont certains supérieurs à 1.',
+    'Millièmes et grands décimaux, mélange de fractions < 1 et > 1.'
+  ];
+
   /* ════════════════════════════════════════════════════════════════════
      STATE
   ════════════════════════════════════════════════════════════════════ */
-  const state = [0, 1, 2].map(() => ({
-    qIdx:         0,
-    score:        0,
-    firstAttempt: true,
-    done:         false,
-    questionDone: new Array(N_Q).fill(false),
-  }));
+  let currentLevel  = 1;
+  let cdLevelSelect = null;
+  let st            = null; /* état du niveau en cours */
+
+  /* ════════════════════════════════════════════════════════════════════
+     LEVEL SELECT
+  ════════════════════════════════════════════════════════════════════ */
+  function backToLevelSelect() {
+    document.getElementById('resultScreen').style.display   = 'none';
+    document.getElementById('exerciseScreen').style.display = 'none';
+    cdLevelSelect.renderSelectScreen();
+    document.getElementById('levelSelectScreen').style.display = '';
+  }
+
+  function initLevelSelect() {
+    cdLevelSelect = LevelSelect.create({
+      exerciseKey: 'ecrire-decimal-sous-forme-fraction',
+      levels: [1, 2, 3].map((lv, i) => ({ id: lv, label: CD_LEVEL_TITLES[i], description: CD_LEVEL_DESCS[i] })),
+      threshold: 0.8,
+      onSelectLevel: (lv) => {
+        currentLevel = parseInt(lv, 10);
+        document.getElementById('levelSelectScreen').style.display = 'none';
+        startLevel();
+        cdLevelSelect.renderBadges(currentLevel);
+      },
+      selectContainer: document.getElementById('levelSelectScreen'),
+      badgesContainer: document.getElementById('levelBadges')
+    });
+    cdLevelSelect.renderSelectScreen();
+    document.getElementById('levelSelectScreen').style.display = '';
+  }
+
+  function startLevel() {
+    st = {
+      qIdx:         0,
+      score:        0,
+      firstAttempt: true,
+      questionDone: new Array(N_Q).fill(false),
+    };
+    document.getElementById('resultScreen').style.display   = 'none';
+    document.getElementById('exerciseScreen').style.display = '';
+    document.getElementById('lc-num').textContent   = currentLevel;
+    document.getElementById('lc-title').textContent = CD_LEVEL_TITLES[currentLevel - 1];
+    document.getElementById('lc-sub').textContent   = CD_LEVEL_DESCS[currentLevel - 1];
+    render();
+  }
 
   /* ════════════════════════════════════════════════════════════════════
      HELPERS
   ════════════════════════════════════════════════════════════════════ */
-  function progressDotsHtml(lvlIdx) {
-    const st = state[lvlIdx];
+  function progressDotsHtml() {
     return Array.from({ length: N_Q }, (_, i) => {
       let cls = 'q-dot';
       if (st.questionDone[i]) cls += ' done';
@@ -378,14 +412,13 @@
   /* ════════════════════════════════════════════════════════════════════
      RENDER
   ════════════════════════════════════════════════════════════════════ */
-  function render(lvlIdx) {
-    const st = state[lvlIdx];
-    const q  = LEVELS[lvlIdx].questions[st.qIdx];
+  function render() {
+    const q = LEVELS[currentLevel - 1].questions[st.qIdx];
 
-    document.getElementById(`lb-${lvlIdx}`).innerHTML = `
+    document.getElementById('lc-body').innerHTML = `
       <div class="q-progress">
         <span class="q-progress-label">Question ${st.qIdx + 1} / ${N_Q}</span>
-        <div class="q-progress-dots">${progressDotsHtml(lvlIdx)}</div>
+        <div class="q-progress-dots">${progressDotsHtml()}</div>
       </div>
 
       <div class="display-box">
@@ -395,10 +428,10 @@
       <div class="sub-label">Écris sous forme de fraction décimale</div>
       <div class="frac-input-area">
         <div class="frac-input-display">
-          <input class="frac-inp" id="frac-num-l${lvlIdx}" type="number"
+          <input class="frac-inp" id="frac-num" type="number"
             min="0" placeholder="?" inputmode="numeric" aria-label="Numérateur">
           <div class="frac-inp-bar"></div>
-          <input class="frac-inp" id="frac-den-l${lvlIdx}" type="number"
+          <input class="frac-inp" id="frac-den" type="number"
             min="1" placeholder="10, 100…" inputmode="numeric" aria-label="Dénominateur">
         </div>
         <div class="frac-input-hint">
@@ -406,24 +439,24 @@
         </div>
       </div>
 
-      <div class="expl-box" id="expl-l${lvlIdx}"></div>
-      <div class="q-feedback" id="fb-l${lvlIdx}"></div>
+      <div class="expl-box" id="expl-box"></div>
+      <div class="q-feedback" id="fb-box"></div>
 
-      <button class="btn-validate" id="val-btn-l${lvlIdx}">Vérifier</button>
-      <button class="btn-next"     id="next-btn-l${lvlIdx}">Question suivante →</button>
+      <button class="btn-validate" id="val-btn">Vérifier</button>
+      <button class="btn-next"     id="next-btn">Question suivante →</button>
     `;
 
-    const numInp = document.getElementById(`frac-num-l${lvlIdx}`);
-    const denInp = document.getElementById(`frac-den-l${lvlIdx}`);
+    const numInp = document.getElementById('frac-num');
+    const denInp = document.getElementById('frac-den');
 
     [numInp, denInp].forEach(inp => {
       inp.addEventListener('keydown', e => {
-        if (e.key === 'Enter') document.getElementById(`val-btn-l${lvlIdx}`).click();
+        if (e.key === 'Enter') document.getElementById('val-btn').click();
       });
     });
 
-    document.getElementById(`val-btn-l${lvlIdx}`).addEventListener('click',  () => validate(lvlIdx));
-    document.getElementById(`next-btn-l${lvlIdx}`).addEventListener('click', () => nextQ(lvlIdx));
+    document.getElementById('val-btn').addEventListener('click',  validate);
+    document.getElementById('next-btn').addEventListener('click', nextQ);
 
     numInp.focus();
   }
@@ -431,13 +464,12 @@
   /* ════════════════════════════════════════════════════════════════════
      VALIDATE
   ════════════════════════════════════════════════════════════════════ */
-  function validate(lvlIdx) {
-    const st     = state[lvlIdx];
-    const q      = LEVELS[lvlIdx].questions[st.qIdx];
-    const numInp = document.getElementById(`frac-num-l${lvlIdx}`);
-    const denInp = document.getElementById(`frac-den-l${lvlIdx}`);
-    const fb     = document.getElementById(`fb-l${lvlIdx}`);
-    const expl   = document.getElementById(`expl-l${lvlIdx}`);
+  function validate() {
+    const q      = LEVELS[currentLevel - 1].questions[st.qIdx];
+    const numInp = document.getElementById('frac-num');
+    const denInp = document.getElementById('frac-den');
+    const fb     = document.getElementById('fb-box');
+    const expl   = document.getElementById('expl-box');
 
     const entN = parseInt(numInp.value, 10);
     const entD = parseInt(denInp.value, 10);
@@ -476,8 +508,8 @@
       if (st.firstAttempt) st.score++;
       st.questionDone[st.qIdx] = true;
 
-      document.getElementById(`val-btn-l${lvlIdx}`).style.display  = 'none';
-      document.getElementById(`next-btn-l${lvlIdx}`).style.display = 'block';
+      document.getElementById('val-btn').style.display  = 'none';
+      document.getElementById('next-btn').style.display = 'block';
 
     } else {
       numInp.classList.add('wrong'); numInp.classList.remove('correct');
@@ -494,33 +526,58 @@
   /* ════════════════════════════════════════════════════════════════════
      NAVIGATION
   ════════════════════════════════════════════════════════════════════ */
-  function nextQ(lvlIdx) {
-    const st = state[lvlIdx];
+  function nextQ() {
     st.qIdx++;
     st.firstAttempt = true;
 
     if (st.qIdx >= N_Q) {
-      completeLevel(lvlIdx);
+      showResults();
     } else {
-      render(lvlIdx);
-      document.getElementById(`lc-${lvlIdx}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      render();
+      document.getElementById('exerciseScreen').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
-  function completeLevel(lvlIdx) {
-    const st    = state[lvlIdx];
-    st.done     = true;
-    const badge = document.getElementById(`lc-badge-${lvlIdx}`);
+  function showResults() {
+    const lv = currentLevel;
+    const { passed, isLast } = cdLevelSelect.completeLevel(lv, st.score, N_Q);
 
-    document.getElementById(`lb-${lvlIdx}`).innerHTML = `
-      <div class="level-complete">
-        <div class="level-complete-icon">🎉</div>
-        <div class="level-complete-title">Niveau ${lvlIdx + 1} terminé !</div>
-        <div class="level-complete-score">Score : ${st.score} / ${N_Q} bonne${st.score > 1 ? 's' : ''} réponse${st.score > 1 ? 's' : ''} du premier coup</div>
+    document.getElementById('exerciseScreen').style.display = 'none';
+
+    const msg = passed
+      ? (!isLast ? `Le niveau ${lv + 1} est débloqué !` : 'Félicitations, tu maîtrises les trois niveaux !')
+      : `Il faut au moins 4 bonnes réponses sur ${N_Q} (80 %) pour débloquer le niveau suivant.`;
+
+    let btnsHTML = `<div class="result-btns">`;
+    if (passed && !isLast) {
+      btnsHTML += `<button class="ex-btn-primary" id="next-level-btn">Niveau ${lv + 1} →</button>`;
+    }
+    btnsHTML += `<button class="ex-btn-secondary" id="retry-btn">Recommencer ce niveau</button>`;
+    btnsHTML += `<button class="ex-btn-secondary" id="choose-level-btn">← Choisir un niveau</button>`;
+    btnsHTML += `</div>`;
+
+    document.getElementById('resultScreen').innerHTML = `
+      <div class="level-card">
+        <div class="lc-body">
+          <div class="level-complete${passed ? '' : ' failed'}">
+            <div class="level-complete-icon">${passed ? '🎉' : '💪'}</div>
+            <div class="level-complete-title">${passed ? `Niveau ${lv} terminé !` : 'Pas encore…'}</div>
+            <div class="level-complete-score">Score : ${st.score} / ${N_Q} bonne${st.score > 1 ? 's' : ''} réponse${st.score > 1 ? 's' : ''} du premier coup</div>
+            <div class="level-complete-msg">${msg}</div>
+            ${btnsHTML}
+          </div>
+        </div>
       </div>
     `;
-    badge.textContent = 'Terminé ✓';
-    badge.className   = 'lc-status done';
+    document.getElementById('resultScreen').style.display = '';
+
+    document.getElementById('retry-btn').addEventListener('click', startLevel);
+    document.getElementById('choose-level-btn').addEventListener('click', backToLevelSelect);
+    document.getElementById('next-level-btn')?.addEventListener('click', () => {
+      currentLevel = lv + 1;
+      startLevel();
+      cdLevelSelect.renderBadges(currentLevel);
+    });
 
     if (typeof saveExerciseResult === 'function') {
       saveExerciseResult({
@@ -528,29 +585,19 @@
         subject:      'mathématiques',
         category:     'Nombres décimaux',
         exerciseType: 'custom',
-        level:        lvlIdx + 1,
+        level:        lv,
         score:        st.score,
         total:        N_Q,
       });
     }
 
-    if (lvlIdx < 2) setTimeout(() => unlock(lvlIdx + 1), 500);
-  }
-
-  function unlock(lvlIdx) {
-    const card  = document.getElementById(`lc-${lvlIdx}`);
-    const badge = document.getElementById(`lc-badge-${lvlIdx}`);
-    card.classList.remove('locked');
-    badge.textContent = 'En cours';
-    badge.className   = 'lc-status active';
-    render(lvlIdx);
-    setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   /* ════════════════════════════════════════════════════════════════════
      INIT
   ════════════════════════════════════════════════════════════════════ */
-  render(0);
+  initLevelSelect();
   </script>
 
   <script src="js/menu.js"></script>
