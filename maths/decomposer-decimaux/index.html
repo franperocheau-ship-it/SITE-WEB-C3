@@ -11,6 +11,8 @@
   <script src="../../js/supabase-client.js" onerror="void 0"></script>
   <script src="../../js/auth.js" onerror="void 0"></script>
   <script src="../../js/results.js" onerror="void 0"></script>
+  <link rel="stylesheet" href="../../level-select.css">
+  <script src="../../js/level-select.js"></script>
   <style>
     /* ── Tokens ── */
     :root {
@@ -86,43 +88,6 @@
       margin: 10px auto 0;
     }
 
-    /* ── Level tabs ── */
-    .level-tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 24px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .level-tab {
-      border: 2px solid var(--border);
-      border-radius: 100px;
-      padding: 9px 22px;
-      font-family: 'Fredoka', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      background: var(--white);
-      color: var(--muted);
-      cursor: pointer;
-      transition: all 200ms;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .level-tab.active {
-      background: var(--navy);
-      border-color: var(--navy);
-      color: #fff;
-    }
-    .level-tab.unlocked:hover:not(.active) {
-      border-color: var(--navy);
-      color: var(--navy);
-    }
-    .level-tab.locked {
-      opacity: 0.55;
-      cursor: not-allowed;
-    }
-    .level-tab .lock-icon { font-size: 13px; }
 
     /* ── Numeration table ── */
     .num-table-wrapper {
@@ -634,17 +599,14 @@
 <main class="main">
 
   <div class="page-title">
+    <div id="levelBadges" class="ls-page-badges"></div>
     <h1>Décomposer un nombre décimal</h1>
     <p class="subtitle">Cycle 3 — Nombres et calculs — Nombres décimaux</p>
     <div class="page-rule"></div>
   </div>
 
-  <!-- Level tabs -->
-  <div class="level-tabs" id="levelTabs">
-    <button class="level-tab active unlocked" data-level="1" onclick="selectLevel(1)">Niveau 1</button>
-    <button class="level-tab locked"          data-level="2" onclick="selectLevel(2)"><span class="lock-icon" id="lock2">🔒</span> Niveau 2</button>
-    <button class="level-tab locked"          data-level="3" onclick="selectLevel(3)"><span class="lock-icon" id="lock3">🔒</span> Niveau 3</button>
-  </div>
+  <!-- Level selection screen — content injected by LevelSelect -->
+  <div id="levelSelectScreen"></div>
 
   <!-- Numeration table -->
   <div class="num-table-wrapper">
@@ -703,6 +665,7 @@
     <div class="result-btns">
       <button class="btn-primary"   id="nextLevelBtn"  onclick="goNextLevel()"  style="display:none">Niveau suivant 🔓</button>
       <button class="btn-secondary" onclick="retryLevel()">Réessayer</button>
+      <button class="btn-secondary" onclick="backToLevelSelect()">← Choisir un niveau</button>
       <a class="btn-secondary" href="../../mathématiques-nombres-decimaux.html" style="display:inline-flex;align-items:center;text-decoration:none">← Retour</a>
     </div>
   </div>
@@ -761,7 +724,7 @@ let session         = [];
 let sessionIdx      = 0;
 let score           = 0;
 let attempts        = 0; // attempts on current question
-let levelsDone      = JSON.parse(sessionStorage.getItem('ddLevelsDone') || '{}');
+let cdLevelSelect   = null;
 let answered        = false;
 let followupActive  = false;
 let followupDone    = false;
@@ -838,30 +801,44 @@ function buildQuestions(level) {
 
 /* ─── Level management ─── */
 
-function initLevelTabs() {
-  for (const lv of [1, 2, 3]) {
-    const btn  = document.querySelector(`.level-tab[data-level="${lv}"]`);
-    const lock = document.getElementById(`lock${lv}`);
-    if (levelsDone[lv - 1] || lv === 1) {
-      btn.classList.remove('locked');
-      btn.classList.add('unlocked');
-      if (lock) lock.textContent = '🔓';
-    }
-  }
+const CD_LEVEL_DESCS = [
+  'Décomposer un nombre à une décimale (partie entière + dixièmes)',
+  'Décomposer un nombre à deux décimales, avec zéros pièges',
+  'Décomposer un nombre à trois décimales et écritures équivalentes'
+];
+
+function backToLevelSelect() {
+  document.getElementById('resultScreen').classList.remove('visible');
+  document.getElementById('qCard').style.display        = 'none';
+  document.getElementById('progressArea').style.display = 'none';
+  cdLevelSelect.renderSelectScreen();
+  document.getElementById('levelSelectScreen').style.display = '';
 }
 
-function selectLevel(lv) {
-  if (lv > 1 && !levelsDone[lv - 1]) return;
-  currentLevel = lv;
-  document.querySelectorAll('.level-tab').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.level-tab[data-level="${lv}"]`).classList.add('active');
-  startLevel();
+function initLevelSelect() {
+  cdLevelSelect = LevelSelect.create({
+    exerciseKey: 'decomposer-decimaux',
+    levels: [1, 2, 3].map((lv, i) => ({ id: lv, description: CD_LEVEL_DESCS[i] })),
+    threshold: 0.8,
+    autoConfetti: false,
+    onSelectLevel: (lv) => {
+      currentLevel = parseInt(lv, 10);
+      document.getElementById('levelSelectScreen').style.display = 'none';
+      startLevel();
+      cdLevelSelect.renderBadges(currentLevel);
+    },
+    selectContainer: document.getElementById('levelSelectScreen'),
+    badgesContainer: document.getElementById('levelBadges')
+  });
+  cdLevelSelect.renderSelectScreen();
+  document.getElementById('levelSelectScreen').style.display = '';
 }
 
 function startLevel() {
   session    = buildQuestions(currentLevel);
   sessionIdx = 0;
   score      = 0;
+  document.getElementById('levelSelectScreen').style.display = 'none';
   document.getElementById('resultScreen').classList.remove('visible');
   document.getElementById('qCard').style.display = '';
   document.getElementById('progressArea').style.display = '';
@@ -1564,10 +1541,10 @@ function updateProgress() {
 /* ─── Results ─── */
 
 function showResults() {
-  const lv        = currentLevel;
-  const total     = session.length;
+  const lv    = currentLevel;
+  const total = session.length;
+  const { passed, isLast } = cdLevelSelect.completeLevel(lv, score, total);
   const threshold = CONFIG[lv].threshold;
-  const passed    = score >= threshold;
 
   document.getElementById('qCard').style.display        = 'none';
   document.getElementById('progressArea').style.display = 'none';
@@ -1580,12 +1557,9 @@ function showResults() {
 
   const nextLevelBtn = document.getElementById('nextLevelBtn');
   if (passed) {
-    levelsDone[lv] = true;
-    sessionStorage.setItem('ddLevelsDone', JSON.stringify(levelsDone));
-    initLevelTabs();
     document.getElementById('resultMsg').textContent =
       `Bravo ! Tu as obtenu ${score} sur ${total} (seuil : ${threshold}/${total}). Tu peux passer au niveau suivant !`;
-    if (lv < 3) {
+    if (!isLast) {
       nextLevelBtn.style.display = 'inline-flex';
       nextLevelBtn.style.alignItems = 'center';
     }
@@ -1601,7 +1575,9 @@ function showResults() {
 }
 
 function goNextLevel() {
-  selectLevel(currentLevel + 1);
+  currentLevel = currentLevel + 1;
+  startLevel();
+  cdLevelSelect.renderBadges(currentLevel);
 }
 
 function retryLevel() {
@@ -1653,8 +1629,9 @@ function launchConfetti() {
 
 /* ─── Init ─── */
 
-initLevelTabs();
-startLevel();
+document.getElementById('qCard').style.display        = 'none';
+document.getElementById('progressArea').style.display  = 'none';
+initLevelSelect();
 </script>
 
   <!-- FOOTER -->

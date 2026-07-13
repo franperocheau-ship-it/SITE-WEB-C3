@@ -6,8 +6,10 @@
    dédiées (.ls-*) pour ne dépendre d'aucun style propre à une page, et un
    nombre de niveaux variable (2 à 5).
 
-   Dépend des tokens globaux définis dans styles.css :
-   --card-bg, --border, --blue, --text, --muted, --shadow-sm, --font-display
+   Toutes les références aux tokens globaux de styles.css (--card-bg,
+   --border, --blue, --text, --muted, --shadow-sm, --font-display, ...) ont
+   une valeur de repli : le composant s'affiche correctement même sur une
+   page autonome qui ne charge pas styles.css (ex: maths/*, francais/*).
    ═══════════════════════════════════════════════════════════════════════ */
 
 :root {
@@ -26,7 +28,7 @@
 .ls-select-label {
   text-align: center;
   font-size: 15px;
-  color: var(--muted);
+  color: var(--muted, #5F6368);
   font-weight: 500;
   margin-bottom: 24px;
 }
@@ -41,8 +43,8 @@
 
 .ls-card {
   width: 100%;
-  background: var(--card-bg);
-  border: 1.5px solid var(--border);
+  background: var(--card-bg, #ffffff);
+  border: 1.5px solid var(--border, #E8EDF3);
   border-radius: 16px;
   padding: 18px 22px;
   display: flex;
@@ -55,8 +57,8 @@
 }
 
 .ls-card:hover {
-  border-color: var(--blue);
-  box-shadow: var(--shadow-sm);
+  border-color: var(--blue, #102B6A);
+  box-shadow: var(--shadow-sm, 0 4px 16px rgba(16,43,106,0.06));
   transform: translateY(-2px);
 }
 
@@ -71,7 +73,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-display);
+  font-family: var(--font-display, 'Fredoka', sans-serif);
   font-weight: 800;
   font-size: 13px;
   padding: 4px 12px;
@@ -89,14 +91,24 @@
 .ls-card-name {
   font-weight: 700;
   font-size: 15px;
-  color: var(--text);
+  color: var(--text, #1E2532);
 }
 
 .ls-card-desc {
   display: block;
   font-size: 12px;
-  color: var(--muted);
+  color: var(--muted, #5F6368);
   margin-top: 2px;
+}
+
+/* ── Conteneur des pastilles de progression, en haut de page ─────────── */
+
+.ls-page-badges {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 0 0 18px;
 }
 
 /* ── Pastilles de progression (haut de page) ─────────────────────────── */
@@ -107,7 +119,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-display);
+  font-family: var(--font-display, 'Fredoka', sans-serif);
   font-weight: 800;
   font-size: 10px;
   letter-spacing: 0.06em;
@@ -117,16 +129,16 @@
 }
 
 .ls-badge--locked {
-  background: var(--border);
-  border-color: var(--border);
-  color: var(--muted);
+  background: var(--border, #E8EDF3);
+  border-color: var(--border, #E8EDF3);
+  color: var(--muted, #5F6368);
   opacity: 0.7;
 }
 
 .ls-badge--unlocked {
   background: #ffffff;
-  border-color: var(--border);
-  color: var(--muted);
+  border-color: var(--border, #E8EDF3);
+  color: var(--muted, #5F6368);
 }
 
 .ls-badge--current {

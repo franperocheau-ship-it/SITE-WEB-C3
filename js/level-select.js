@@ -70,6 +70,7 @@ const LevelSelect = (() => {
    * @param {Element}  [config.badgesContainer] Élément dans lequel injecter les pastilles de progression (optionnel).
    * @param {Function} [config.onBackToSelect] Callback appelé quand l'élève clique "← Choisir un niveau" depuis l'écran de résultats, AVANT le ré-affichage de l'écran de sélection. Sert à basculer la visibilité des écrans propres à la page (ex: cacher les résultats, ré-afficher le conteneur d'exercice) — logique propre à chaque page, pas au composant.
    * @param {string}   [config.introHTML] HTML optionnel affiché entre le titre et la grille de niveaux (ex: rappel de règle).
+   * @param {boolean}  [config.autoConfetti=true] Si false, `completeLevel()` ne déclenche pas les confettis du composant — utile quand la page appelle déjà sa propre animation de confettis (conserver l'existant plutôt que d'en ajouter une seconde).
    */
   function create(config) {
     const {
@@ -80,7 +81,8 @@ const LevelSelect = (() => {
       selectContainer,
       badgesContainer,
       onBackToSelect,
-      introHTML = ''
+      introHTML = '',
+      autoConfetti = true
     } = config;
 
     function isUnlocked(index) {
@@ -157,7 +159,7 @@ const LevelSelect = (() => {
           validated.push(levelId);
           setValidated(exerciseKey, validated);
         }
-        showConfetti();
+        if (autoConfetti) showConfetti();
         if (!isLast) nextLevelId = levels[idx + 1].id;
       }
 

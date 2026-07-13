@@ -11,6 +11,8 @@
   <script src="../../js/supabase-client.js" onerror="void 0"></script>
   <script src="../../js/auth.js" onerror="void 0"></script>
   <script src="../../js/results.js" onerror="void 0"></script>
+  <link rel="stylesheet" href="../../level-select.css">
+  <script src="../../js/level-select.js"></script>
   <style>
     /* ── Tokens ── */
     :root {
@@ -66,19 +68,6 @@
     .page-title h1 { font-size: 26px; font-weight: 700; color: var(--navy); line-height: 1.25; }
     .page-title .subtitle { font-size: 13px; color: var(--muted); margin-top: 6px; }
     .page-rule { width: 44px; height: 3px; background: var(--gold); border-radius: 2px; margin: 10px auto 0; }
-
-    /* ── Level tabs ── */
-    .level-tabs { display: flex; gap: 10px; margin-bottom: 24px; justify-content: center; flex-wrap: wrap; }
-    .level-tab {
-      border: 2px solid var(--border); border-radius: 100px; padding: 9px 22px;
-      font-family: 'Fredoka', sans-serif; font-size: 14px; font-weight: 700;
-      background: var(--white); color: var(--muted); cursor: pointer; transition: all 200ms;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .level-tab.active   { background: var(--navy); border-color: var(--navy); color: #fff; }
-    .level-tab.unlocked:hover:not(.active) { border-color: var(--navy); color: var(--navy); }
-    .level-tab.locked   { opacity: 0.55; cursor: not-allowed; }
-    .level-tab .lock-icon { font-size: 13px; }
 
     /* ── Multi-row numeration table ── */
     .num-table-wrapper {
@@ -367,17 +356,14 @@
       <a href="../../mathématiques-nombres-decimaux.html">Mathématiques</a> &rsaquo;
       Nombres et calculs &rsaquo; Ranger des nombres décimaux
     </p>
+    <div id="levelBadges" class="ls-page-badges"></div>
     <h1>Ranger des nombres décimaux</h1>
     <p class="subtitle">Cycle 3 — Nombres et calculs — Nombres décimaux</p>
     <div class="page-rule"></div>
   </div>
 
-  <!-- Level tabs -->
-  <div class="level-tabs" id="levelTabs">
-    <button class="level-tab active unlocked" data-level="1" onclick="selectLevel(1)">Niveau 1</button>
-    <button class="level-tab locked"          data-level="2" onclick="selectLevel(2)"><span class="lock-icon" id="lock2">🔒</span> Niveau 2</button>
-    <button class="level-tab locked"          data-level="3" onclick="selectLevel(3)"><span class="lock-icon" id="lock3">🔒</span> Niveau 3</button>
-  </div>
+  <!-- Level selection screen — content injected by LevelSelect -->
+  <div id="levelSelectScreen"></div>
 
   <!-- Multi-row numeration table -->
   <div class="num-table-wrapper">
@@ -438,6 +424,7 @@
     <div class="result-btns">
       <button class="btn-primary" id="nextLevelBtn" onclick="goNextLevel()" style="display:none">Niveau suivant 🔓</button>
       <button class="btn-secondary" onclick="retryLevel()">Réessayer</button>
+      <button class="btn-secondary" onclick="backToLevelSelect()">← Choisir un niveau</button>
       <a class="btn-secondary" href="../../mathématiques-nombres-decimaux.html" style="display:inline-flex;align-items:center;text-decoration:none">← Retour</a>
     </div>
   </div>
@@ -511,7 +498,7 @@ let sessionIdx   = 0;
 let score        = 0;
 let attempts     = 0;
 let answered     = false;
-let levelsDone   = JSON.parse(sessionStorage.getItem('rdLevelsDone') || '{}');
+let cdLevelSelect = null;
 
 // Drag state
 let dragCards        = [];    // shuffled array of number strings for current question
@@ -723,30 +710,44 @@ function toggleNumline() {
 /* ═══════════════════════════════════════════════════════
    LEVEL MANAGEMENT
 ═══════════════════════════════════════════════════════ */
-function initLevelTabs() {
-  for (const lv of [1, 2, 3]) {
-    const btn  = document.querySelector(`.level-tab[data-level="${lv}"]`);
-    const lock = document.getElementById(`lock${lv}`);
-    if (levelsDone[lv - 1] || lv === 1) {
-      btn.classList.remove('locked');
-      btn.classList.add('unlocked');
-      if (lock) lock.textContent = '🔓';
-    }
-  }
+const CD_LEVEL_DESCS = [
+  'Ranger 3 nombres simples, mêmes longueurs',
+  'Ranger 4 nombres, zéros pièges et intrus',
+  'Ranger des nombres à trois décimales, écritures équivalentes'
+];
+
+function backToLevelSelect() {
+  document.getElementById('resultScreen').classList.remove('visible');
+  document.getElementById('qCard').style.display        = 'none';
+  document.getElementById('progressArea').style.display = 'none';
+  cdLevelSelect.renderSelectScreen();
+  document.getElementById('levelSelectScreen').style.display = '';
 }
 
-function selectLevel(lv) {
-  if (lv > 1 && !levelsDone[lv - 1]) return;
-  currentLevel = lv;
-  document.querySelectorAll('.level-tab').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.level-tab[data-level="${lv}"]`).classList.add('active');
-  startLevel();
+function initLevelSelect() {
+  cdLevelSelect = LevelSelect.create({
+    exerciseKey: 'ranger-decimaux',
+    levels: [1, 2, 3].map((lv, i) => ({ id: lv, description: CD_LEVEL_DESCS[i] })),
+    threshold: 0.8,
+    autoConfetti: false,
+    onSelectLevel: (lv) => {
+      currentLevel = parseInt(lv, 10);
+      document.getElementById('levelSelectScreen').style.display = 'none';
+      startLevel();
+      cdLevelSelect.renderBadges(currentLevel);
+    },
+    selectContainer: document.getElementById('levelSelectScreen'),
+    badgesContainer: document.getElementById('levelBadges')
+  });
+  cdLevelSelect.renderSelectScreen();
+  document.getElementById('levelSelectScreen').style.display = '';
 }
 
 function startLevel() {
   session    = shuffle(BANKS[currentLevel]).slice(0, CONFIG[currentLevel].perSession);
   sessionIdx = 0;
   score      = 0;
+  document.getElementById('levelSelectScreen').style.display = 'none';
   document.getElementById('resultScreen').classList.remove('visible');
   document.getElementById('qCard').style.display       = '';
   document.getElementById('progressArea').style.display = '';
@@ -1462,10 +1463,10 @@ function updateProgress() {
    RESULTS
 ═══════════════════════════════════════════════════════ */
 function showResults() {
-  const lv        = currentLevel;
-  const total     = session.length;
+  const lv    = currentLevel;
+  const total = session.length;
+  const { passed, isLast } = cdLevelSelect.completeLevel(lv, score, total);
   const threshold = CONFIG[lv].threshold;
-  const passed    = score >= threshold;
 
   document.getElementById('qCard').style.display        = 'none';
   document.getElementById('progressArea').style.display = 'none';
@@ -1477,12 +1478,9 @@ function showResults() {
 
   const nextLevelBtn = document.getElementById('nextLevelBtn');
   if (passed) {
-    levelsDone[lv] = true;
-    sessionStorage.setItem('rdLevelsDone', JSON.stringify(levelsDone));
-    initLevelTabs();
     document.getElementById('resultMsg').textContent =
       `Bravo ! Tu as obtenu ${score} sur ${total} (seuil : ${threshold}/${total}). Tu peux passer au niveau suivant !`;
-    if (lv < 3) {
+    if (!isLast) {
       nextLevelBtn.style.display    = 'inline-flex';
       nextLevelBtn.style.alignItems = 'center';
     }
@@ -1497,7 +1495,11 @@ function showResults() {
   document.getElementById('resultScreen').classList.add('visible');
 }
 
-function goNextLevel()  { selectLevel(currentLevel + 1); }
+function goNextLevel() {
+  currentLevel = currentLevel + 1;
+  startLevel();
+  cdLevelSelect.renderBadges(currentLevel);
+}
 
 function retryLevel() {
   document.getElementById('resultScreen').classList.remove('visible');
@@ -1549,8 +1551,9 @@ function launchConfetti() {
 /* ═══════════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════════ */
-initLevelTabs();
-startLevel();
+document.getElementById('qCard').style.display        = 'none';
+document.getElementById('progressArea').style.display  = 'none';
+initLevelSelect();
 </script>
 
 <script src="../../js/menu.js"></script>
