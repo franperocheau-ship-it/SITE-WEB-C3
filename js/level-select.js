@@ -69,6 +69,7 @@ const LevelSelect = (() => {
    * @param {Element}  config.selectContainer Élément dans lequel injecter l'écran "Choisis ton niveau".
    * @param {Element}  [config.badgesContainer] Élément dans lequel injecter les pastilles de progression (optionnel).
    * @param {Function} [config.onBackToSelect] Callback appelé quand l'élève clique "← Choisir un niveau" depuis l'écran de résultats, AVANT le ré-affichage de l'écran de sélection. Sert à basculer la visibilité des écrans propres à la page (ex: cacher les résultats, ré-afficher le conteneur d'exercice) — logique propre à chaque page, pas au composant.
+   * @param {string}   [config.introHTML] HTML optionnel affiché entre le titre et la grille de niveaux (ex: rappel de règle).
    */
   function create(config) {
     const {
@@ -78,7 +79,8 @@ const LevelSelect = (() => {
       onSelectLevel,
       selectContainer,
       badgesContainer,
-      onBackToSelect
+      onBackToSelect,
+      introHTML = ''
     } = config;
 
     function isUnlocked(index) {
@@ -109,6 +111,7 @@ const LevelSelect = (() => {
       const validated = getValidated(exerciseKey);
       selectContainer.innerHTML = `
         <p class="ls-select-label">Choisis ton niveau</p>
+        ${introHTML}
         <div class="ls-grid">
           ${levels.map((lvl, i) => {
             const unlocked = isUnlocked(i);

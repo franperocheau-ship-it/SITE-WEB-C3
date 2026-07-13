@@ -3778,11 +3778,8 @@
           <div class="ex-type-grid" id="ex-type-grid"></div>
         </div>
 
-        <!-- ── Level selection screen (produire-3-formes) ── -->
-        <div id="level-select-screen" class="ex-hidden">
-          <p class="ex-type-select-label">Quel est ton niveau ?</p>
-          <div class="ex-type-grid" id="ex-level-grid"></div>
-        </div>
+        <!-- ── Level selection screen (produire-3-formes, accord-ecrit) — content injected by LevelSelect ── -->
+        <div id="level-select-screen" class="ex-hidden"></div>
 
         <!-- ── Exercise screen ── -->
         <div id="exercise-screen">
@@ -3899,7 +3896,9 @@
     let wordOrderAnswer  = [];   /* word-order type */
     let conjTableRows    = [];   /* conjugation-table type */
     let pfiSelectedLevel = null; /* produire-3-formes : niveau sélectionné */
+    let pfiLevelSelect   = null; /* produire-3-formes : instance LevelSelect */
     let accordLevel      = null; /* accord-ecrit      : niveau sélectionné */
+    let accordLevelSelect = null; /* accord-ecrit     : instance LevelSelect */
     let apcodLevel       = null; /* accord-participe-cod : niveau sélectionné */
     let decompLevel      = null; /* decomposer-fraction : niveau sélectionné */
     let fpLevel           = null; /* fractions-problemes : niveau sélectionné */
@@ -4046,35 +4045,16 @@
         "CM2": "3 formes : intonation, est-ce que et inversion",
         "6e":  "3 formes : intonation, est-ce que et inversion"
       };
-      const badgeCls = { "CM1": "badge-cm1", "CM2": "badge-cm2", "6e": "badge-6e" };
 
-      const pfiValidated = pfiGetValidated();
-      const grid = document.getElementById("ex-level-grid");
-      grid.innerHTML = levels.map((l, i) => {
-        const prevLv   = i > 0 ? levels[i - 1] : null;
-        const unlocked = i === 0 || pfiValidated.includes(prevLv);
-        const done     = pfiValidated.includes(l);
-        const cls      = !unlocked ? ' vb-locked-card' : '';
-        const disabled = !unlocked ? ' disabled' : '';
-        const descText = !unlocked
-          ? 'Valide le niveau précédent pour débloquer'
-          : done ? (descs[l] || '') + ' ✓' : (descs[l] || '');
-        return `<button class="ex-type-card${cls}" data-level="${l}"${disabled}>
-          <span class="ex-type-icon" style="width:auto">
-            <span class="badge ${badgeCls[l] || 'badge-cm1'}" style="font-size:13px;padding:4px 12px">${LEVEL_LABELS[l] ?? l}</span>
-          </span>
-          <div>
-            <span class="ex-type-name">${LEVEL_LABELS[l] ?? l}</span>
-            <span class="ex-type-desc">${descText}</span>
-          </div>
-        </button>`;
-      }).join('');
-
-      grid.querySelectorAll(".ex-type-card:not([disabled])").forEach(btn =>
-        btn.addEventListener("click", () => {
-          pfiSelectedLevel   = btn.dataset.level;
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      pfiLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          pfiSelectedLevel   = l;
           sessionLevelList   = [...levels];
-          sessionLevelLabels = levels.map(l => LEVEL_LABELS[l] ?? l);
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
           sessionLevelIdx    = levels.indexOf(pfiSelectedLevel);
           sessionLevelLoader = (lv) => {
             pfiSelectedLevel = lv;
@@ -4084,15 +4064,18 @@
             currentIndex = 0;
             score        = 0;
             showQuestion(0);
+            pfiLevelSelect.renderBadges(lv);
           };
           document.getElementById("level-select-screen").classList.add("ex-hidden");
           document.getElementById("exercise-screen").classList.remove("ex-hidden");
           showQuestion(0);
+          pfiLevelSelect.renderBadges(l);
           window.scrollTo({ top: 0, behavior: "smooth" });
-        })
-      );
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      pfiLevelSelect.renderSelectScreen();
     }
 
     function showAccordLevelSelect() {
@@ -4107,34 +4090,15 @@
         "CM2": "Notions intermédiaires",
         "6e":  "Notions avancées"
       };
-      const badgeCls = { "CM1": "badge-cm1", "CM2": "badge-cm2", "6e": "badge-6e" };
       const diffMap  = { "CM1": 1, "CM2": 2, "6e": 3 };
 
-      const accordValidated = accordGetValidated();
-      const grid = document.getElementById("ex-level-grid");
-      grid.innerHTML = levels.map((l, i) => {
-        const prevLv   = i > 0 ? levels[i - 1] : null;
-        const unlocked = i === 0 || accordValidated.includes(prevLv);
-        const done     = accordValidated.includes(l);
-        const cls      = !unlocked ? ' vb-locked-card' : '';
-        const disabled = !unlocked ? ' disabled' : '';
-        const descText = !unlocked
-          ? 'Valide le niveau précédent pour débloquer'
-          : done ? (descs[l] || '') + ' ✓' : (descs[l] || '');
-        return `<button class="ex-type-card${cls}" data-level="${l}"${disabled}>
-          <span class="ex-type-icon" style="width:auto">
-            <span class="badge ${badgeCls[l] || 'badge-cm1'}" style="font-size:13px;padding:4px 12px">${LEVEL_LABELS[l] ?? l}</span>
-          </span>
-          <div>
-            <span class="ex-type-name">${LEVEL_LABELS[l] ?? l}</span>
-            <span class="ex-type-desc">${descText}</span>
-          </div>
-        </button>`;
-      }).join('');
-
-      grid.querySelectorAll(".ex-type-card:not([disabled])").forEach(btn =>
-        btn.addEventListener("click", () => {
-          accordLevel = btn.dataset.level;
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      accordLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          accordLevel = l;
           const diff  = diffMap[accordLevel];
           const filtered = (sessionData.bank || []).filter(q => q.difficulty === diff);
           const n = sessionData.questionsPerSession || 15;
@@ -4142,7 +4106,7 @@
           currentIndex = 0;
           score        = 0;
           sessionLevelList   = [...levels];
-          sessionLevelLabels = levels.map(l => LEVEL_LABELS[l] ?? l);
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
           sessionLevelIdx    = levels.indexOf(accordLevel);
           sessionLevelLoader = (lv) => {
             accordLevel = lv;
@@ -4155,16 +4119,19 @@
             currentIndex = 0;
             score        = 0;
             showQuestion(0);
+            accordLevelSelect.renderBadges(lv);
           };
           document.getElementById("q-total").textContent = questions.length;
           document.getElementById("level-select-screen").classList.add("ex-hidden");
           document.getElementById("exercise-screen").classList.remove("ex-hidden");
           showQuestion(0);
+          accordLevelSelect.renderBadges(l);
           window.scrollTo({ top: 0, behavior: "smooth" });
-        })
-      );
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      accordLevelSelect.renderSelectScreen();
     }
 
     function startSessionWithType(type) {
@@ -4975,13 +4942,11 @@
 
       document.getElementById("score-msg").textContent = msg;
 
-      if (pct >= 80 && currentType === 'produire-3-formes' && pfiSelectedLevel) {
-        const _v = pfiGetValidated();
-        if (!_v.includes(pfiSelectedLevel)) { _v.push(pfiSelectedLevel); pfiSetValidated(_v); }
+      if (currentType === 'produire-3-formes' && pfiSelectedLevel && pfiLevelSelect) {
+        pfiLevelSelect.completeLevel(pfiSelectedLevel, score, total);
       }
-      if (pct >= 80 && currentType === 'accord-ecrit' && accordLevel) {
-        const _v = accordGetValidated();
-        if (!_v.includes(accordLevel)) { _v.push(accordLevel); accordSetValidated(_v); }
+      if (currentType === 'accord-ecrit' && accordLevel && accordLevelSelect) {
+        accordLevelSelect.completeLevel(accordLevel, score, total);
       }
 
       _setupResultsScreen(pct);
@@ -12318,23 +12283,18 @@
        Niveau 3 : identifier l'adverbe puis ce qu'il modifie (2 étapes, retry)
        ══════════════════════════════════════════════════════════════════════════ */
 
-    const ADV_SEUIL    = 0.75;
+    const ADV_SEUIL    = 0.8;
     const ADV_POSITIFS  = ["✅ Bravo !", "✨ Très bien !", "🌟 Exact !", "👏 Super !"];
     const ADV_CHOICES3  = ["un verbe", "un adjectif", "un autre adverbe", "une phrase entière"];
+    const ADV_LEVEL_DEFS = [
+      { lv: 1, desc: 'Clique sur le seul adverbe de la phrase' },
+      { lv: 2, desc: 'Certaines phrases en contiennent plusieurs' },
+      { lv: 3, desc: 'Identifie l\'adverbe puis ce qu\'il modifie' }
+    ];
 
     let advState = null;
+    let advLevelSelect = null;
 
-    function advSlugKey(suffix) {
-      const s = new URLSearchParams(window.location.search).get('slug') || 'adv';
-      return s + '_' + suffix;
-    }
-    function advGetValidated() {
-      try { return JSON.parse(localStorage.getItem(advSlugKey('validated')) || '[]'); }
-      catch { return []; }
-    }
-    function advSetValidated(arr) {
-      localStorage.setItem(advSlugKey('validated'), JSON.stringify(arr));
-    }
     function advShuffle(arr) {
       const a = [...arr];
       for (let i = a.length - 1; i > 0; i--) {
@@ -12342,6 +12302,15 @@
         [a[i], a[j]] = [a[j], a[i]];
       }
       return a;
+    }
+
+    /* ── Retour à l'écran "Choisis ton niveau" depuis les résultats ──────────── */
+    function advBackToSelectScreen() {
+      advState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
     }
 
     /* ── Init ───────────────────────────────────────────────────────────────── */
@@ -12358,44 +12327,17 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
 
-      advRenderLevelSelect(document.getElementById('ex-card'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    /* ── Sélection de niveau ────────────────────────────────────────────────── */
-    function advRenderLevelSelect(card) {
-      const validated = advGetValidated();
-      const lvDefs = [
-        { lv: 1, icon: '⭐',     label: 'Niveau 1 — Reconnaître un adverbe',        desc: 'Clique sur le seul adverbe de la phrase' },
-        { lv: 2, icon: '⭐⭐',   label: 'Niveau 2 — Trouver tous les adverbes',     desc: 'Certaines phrases en contiennent plusieurs' },
-        { lv: 3, icon: '⭐⭐⭐', label: 'Niveau 3 — Que modifie l\'adverbe ?',      desc: 'Identifie l\'adverbe puis ce qu\'il modifie' }
-      ];
-      card.innerHTML = `
-        <p class="ex-type-select-label">Choisis ton niveau</p>
-        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
-          ${lvDefs.map((d, i) => {
-            const unlocked = i === 0 || validated.includes(i - 1);
-            const done     = validated.includes(i);
-            const cls      = !unlocked ? ' vb-locked-card' : '';
-            const disabled = !unlocked ? ' disabled' : '';
-            const desc     = !unlocked ? 'Valide le niveau précédent pour débloquer'
-                           : done ? d.desc + ' · Validé !' : d.desc;
-            const bdgCls   = ['badge-cm1', 'badge-cm2', 'badge-6e'][i] || 'badge-cm1';
-            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${disabled}>
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
-                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
-              </span>
-              <div>
-                <span class="ex-type-name">Niveau ${d.lv}</span>
-                <span class="ex-type-desc">${desc}</span>
-              </div>
-            </button>`;
-          }).join('')}
-        </div>
-      `;
-      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
-        btn.addEventListener('click', () => advStartLevel(parseInt(btn.dataset.level)))
-      );
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      advLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: ADV_LEVEL_DEFS.map(d => ({ id: d.lv, description: d.desc })),
+        threshold: ADV_SEUIL,
+        onSelectLevel: lv => advStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: advBackToSelectScreen
+      });
+      advLevelSelect.renderSelectScreen();
     }
 
     /* ── Démarre un niveau ──────────────────────────────────────────────────── */
@@ -12656,14 +12598,8 @@
     /* ── Résultats d'un niveau ──────────────────────────────────────────────── */
     function advShowLevelResults() {
       const { level, score: lvScore, total } = advState;
-      const pct    = lvScore / total;
-      const passed = pct >= ADV_SEUIL;
+      const { passed, pct, isLast } = advLevelSelect.completeLevel(level, lvScore, total);
       const pctPct = Math.round(pct * 100);
-
-      if (passed) {
-        const validated = advGetValidated();
-        if (!validated.includes(level - 1)) { validated.push(level - 1); advSetValidated(validated); }
-      }
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -12677,11 +12613,11 @@
 
       const backHref  = sessionData.backLink?.href  || 'français-grammaire.html';
       const backLabel = `← Retour à la ${sessionData.backLink?.label || 'Grammaire'}`;
-      const isLast    = level >= 3;
-      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 75 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
 
       const lvLabels     = ['', 'Niveau 1', 'Niveau 2', 'Niveau 3'];
       const lvNextLabels = ['', 'Niveau 2 — Trouver tous les adverbes', 'Niveau 3 — Que modifie l\'adverbe ?', ''];
+      const backToSelectBtn = advLevelSelect.backToSelectButtonHTML();
 
       let msg, btnsHTML;
 
@@ -12690,6 +12626,7 @@
         btnsHTML = `
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="adv-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
           </div>`;
       } else if (passed) {
@@ -12698,6 +12635,7 @@
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="adv-next-btn">${lvNextLabels[level]} →</button>
             <button class="ex-btn-secondary" id="adv-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
       } else {
@@ -12706,12 +12644,14 @@
         btnsHTML = `
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="adv-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
           </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
-      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
 
       document.getElementById('adv-retry-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
@@ -12724,10 +12664,12 @@
         advStartLevel(advState.level + 1);
       });
       document.getElementById('adv-restart-btn')?.addEventListener('click', () => {
+        advLevelSelect.reset();
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
         advInitSession();
       });
+      advLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -13153,20 +13095,16 @@
        Seuil 75 % — localStorage — déverrouillage progressif
        ══════════════════════════════════════════════════════════════════════════ */
 
-    const GNSP_SEUIL    = 0.75;
+    const GNSP_SEUIL    = 0.8;
     const GNSP_POSITIFS = ["Très bien !", "Parfait !", "Excellent !", "C'est juste !", "Bravo !"];
+    const GNSP_LEVEL_DEFS = [
+      { lv: 1, desc: 'Clique sur tous les mots qui composent le GNS' },
+      { lv: 2, desc: 'Trouve le genre et le nombre, puis choisis le pronom' },
+      { lv: 3, desc: 'Remplace le GNS par le bon pronom dans la phrase entière' }
+    ];
     let gnspState = null;
+    let gnspLevelSelect = null;
 
-    function gnspSlugKey(suffix) {
-      const s = new URLSearchParams(window.location.search).get('slug') || 'gnsp';
-      return s + '_' + suffix;
-    }
-    function gnspGetValidated() {
-      try { return JSON.parse(localStorage.getItem(gnspSlugKey('validated')) || '[]'); } catch { return []; }
-    }
-    function gnspSetValidated(arr) {
-      localStorage.setItem(gnspSlugKey('validated'), JSON.stringify(arr));
-    }
     function gnspShuffle(arr) {
       const a = [...arr];
       for (let i = a.length - 1; i > 0; i--) {
@@ -13182,6 +13120,15 @@
     }
     function gnspPos() { return GNSP_POSITIFS[Math.floor(Math.random() * GNSP_POSITIFS.length)]; }
 
+    /* ── Retour à l'écran "Choisis ton niveau" depuis les résultats ───────── */
+    function gnspBackToSelectScreen() {
+      gnspState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
     /* ── Init ───────────────────────────────────────────────────────────── */
     function gnspInitSession() {
       gnspState = null;
@@ -13192,44 +13139,19 @@
       document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
-      gnspRenderLevelSelect(document.getElementById('ex-card'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
 
-    /* ── Sélection de niveau ─────────────────────────────────────────────── */
-    function gnspRenderLevelSelect(card) {
-      const validated = gnspGetValidated();
-      const lvDefs = [
-        { lv: 1, icon: '⭐',     label: 'Niveau 1 — Trouve le groupe nominal sujet',
-          desc: 'Clique sur tous les mots qui composent le GNS' },
-        { lv: 2, icon: '⭐⭐',   label: 'Niveau 2 — Quel pronom ?',
-          desc: 'Trouve le genre et le nombre, puis choisis le pronom' },
-        { lv: 3, icon: '⭐⭐⭐', label: 'Niveau 3 — Réécris la phrase',
-          desc: 'Remplace le GNS par le bon pronom dans la phrase entière' }
-      ];
-      card.innerHTML = `
-        <p class="ex-type-select-label">Choisis ton niveau</p>
-        <div class="ea-rule-chip">📌 Test du sujet : <em>Qui est-ce qui + verbe ?</em> — on remplace TOUT le groupe nominal sujet, pas seulement le nom-noyau.</div>
-        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
-          ${lvDefs.map((d, i) => {
-            const unlocked = i === 0 || validated.includes(i - 1);
-            const done     = validated.includes(i);
-            const cls      = !unlocked ? ' vb-locked-card' : '';
-            const dis      = !unlocked ? ' disabled' : '';
-            const desc     = !unlocked ? 'Valide le niveau précédent pour débloquer'
-                           : done ? d.desc + ' · Validé !' : d.desc;
-            const bdgCls   = ['badge-cm1', 'badge-cm2', 'badge-6e'][i] || 'badge-cm1';
-            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${dis}>
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
-                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
-              </span>
-              <div><span class="ex-type-name">Niveau ${d.lv}</span><span class="ex-type-desc">${desc}</span></div>
-            </button>`;
-          }).join('')}
-        </div>`;
-      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
-        btn.addEventListener('click', () => gnspStartLevel(parseInt(btn.dataset.level)))
-      );
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      gnspLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: GNSP_LEVEL_DEFS.map(d => ({ id: d.lv, description: d.desc })),
+        threshold: GNSP_SEUIL,
+        onSelectLevel: lv => gnspStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: gnspBackToSelectScreen,
+        introHTML: '<div class="ea-rule-chip">📌 Test du sujet : <em>Qui est-ce qui + verbe ?</em> — on remplace TOUT le groupe nominal sujet, pas seulement le nom-noyau.</div>'
+      });
+      gnspLevelSelect.renderSelectScreen();
     }
 
     /* ── Démarre un niveau ───────────────────────────────────────────────── */
@@ -13473,14 +13395,8 @@
     /* ── Résultats d'un niveau ───────────────────────────────────────────── */
     function gnspShowLevelResults() {
       const { level, score: lvScore, total } = gnspState;
-      const pct    = lvScore / total;
-      const passed = pct >= GNSP_SEUIL;
+      const { passed, pct, isLast } = gnspLevelSelect.completeLevel(level, lvScore, total);
       const pctPct = Math.round(pct * 100);
-
-      if (passed) {
-        const validated = gnspGetValidated();
-        if (!validated.includes(level - 1)) { validated.push(level - 1); gnspSetValidated(validated); }
-      }
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -13493,15 +13409,16 @@
 
       const backHref  = sessionData.backLink?.href  || 'français-grammaire.html';
       const backLabel = `← Retour à la ${sessionData.backLink?.label || 'Grammaire'}`;
-      const isLast    = level >= 3;
-      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 75 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
       const lvNextLabels = ['', 'Niveau 2 — Quel pronom ?', 'Niveau 3 — Réécris la phrase !', ''];
+      const backToSelectBtn = gnspLevelSelect.backToSelectButtonHTML();
 
       let msg, btnsHTML;
       if (passed && isLast) {
         msg = `${stars} Bravo ! Tu sais remplacer un groupe nominal sujet par le bon pronom personnel sujet !`;
         btnsHTML = `<div class="ex-results-btns">
           <button class="ex-btn-primary" id="gnsp-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
           <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
         </div>`;
       } else if (passed) {
@@ -13509,6 +13426,7 @@
         btnsHTML = `<div class="ex-results-btns">
           <button class="ex-btn-primary" id="gnsp-next-btn">${lvNextLabels[level]} →</button>
           <button class="ex-btn-secondary" id="gnsp-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
         </div>
         <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
       } else {
@@ -13516,12 +13434,14 @@
         msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour passer. On réessaie ?`;
         btnsHTML = `<div class="ex-results-btns">
           <button class="ex-btn-primary" id="gnsp-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
           <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
         </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
-      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
 
       document.getElementById('gnsp-retry-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
@@ -13534,10 +13454,12 @@
         gnspStartLevel(gnspState.level + 1);
       });
       document.getElementById('gnsp-restart-btn')?.addEventListener('click', () => {
+        gnspLevelSelect.reset();
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
         gnspInitSession();
       });
+      gnspLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -13562,20 +13484,15 @@
 
     const DDN_SEUIL    = 0.8;
     const DDN_POSITIFS = ['Bravo !', 'Excellent !', 'Parfait !', 'Très bien !', 'Super !'];
+    const DDN_LEVEL_DEFS = [
+      { lv: 1, desc: 'Clique sur le déterminant démonstratif dans la phrase (ce, cet, cette, ces)' },
+      { lv: 2, desc: 'Observe le nom, analyse son genre et son nombre, puis choisis ce / cet / cette / ces' },
+      { lv: 3, desc: 'Complète 20 phrases avec ce (déterminant devant un nom) ou se (pronom réfléchi devant un verbe)' }
+    ];
 
     let ddnState = null;
+    let ddnLevelSelect = null;
 
-    function ddnSlugKey(suffix) {
-      const slug = new URLSearchParams(window.location.search).get('slug') || 'det-demo';
-      return slug + '_' + suffix;
-    }
-    function ddnGetValidated() {
-      try { return JSON.parse(localStorage.getItem(ddnSlugKey('niveaux_valides')) || '[]'); }
-      catch { return []; }
-    }
-    function ddnSetValidated(arr) {
-      localStorage.setItem(ddnSlugKey('niveaux_valides'), JSON.stringify(arr));
-    }
     function ddnShuffle(arr) {
       const a = [...arr];
       for (let i = a.length - 1; i > 0; i--) {
@@ -13585,6 +13502,15 @@
       return a;
     }
     function ddnPos() { return DDN_POSITIFS[Math.floor(Math.random() * DDN_POSITIFS.length)]; }
+
+    /* ── Retour à l'écran "Choisis ton niveau" depuis les résultats ──────────── */
+    function ddnBackToSelectScreen() {
+      ddnState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
 
     /* ── Init ───────────────────────────────────────────────────────────────── */
     function ddnInitSession() {
@@ -13596,44 +13522,19 @@
       document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
-      ddnRenderLevelSelect(document.getElementById('ex-card'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
 
-    /* ── Sélecteur de niveau ────────────────────────────────────────────────── */
-    function ddnRenderLevelSelect(card) {
-      const validated = ddnGetValidated();
-      const lvDefs = [
-        { lv: 1, icon: '⭐',     label: 'Niveau 1 — Repère le déterminant démonstratif',
-          desc: 'Clique sur le déterminant démonstratif dans la phrase (ce, cet, cette, ces)' },
-        { lv: 2, icon: '⭐⭐',   label: 'Niveau 2 — Choisis le bon démonstratif',
-          desc: 'Observe le nom, analyse son genre et son nombre, puis choisis ce / cet / cette / ces' },
-        { lv: 3, icon: '⭐⭐⭐', label: 'Niveau 3 — ce ou se ?',
-          desc: 'Complète 20 phrases avec ce (déterminant devant un nom) ou se (pronom réfléchi devant un verbe)' }
-      ];
-      card.innerHTML = `
-        <p class="ex-type-select-label">Choisis ton niveau</p>
-        <div class="ea-rule-chip">📌 <em>ce / cet / cette / ces</em> se place <strong>devant un nom</strong> pour désigner quelque chose de précis.</div>
-        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
-          ${lvDefs.map((d, i) => {
-            const unlocked = i === 0 || validated.includes(i - 1);
-            const done     = validated.includes(i);
-            const cls      = !unlocked ? ' vb-locked-card' : '';
-            const dis      = !unlocked ? ' disabled' : '';
-            const desc     = !unlocked ? 'Valide le niveau précédent pour débloquer'
-                           : done ? d.desc + ' · Validé !' : d.desc;
-            const bdgCls   = ['badge-cm1', 'badge-cm2', 'badge-6e'][i] || 'badge-cm1';
-            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${dis}>
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
-                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
-              </span>
-              <div><span class="ex-type-name">Niveau ${d.lv}</span><span class="ex-type-desc">${desc}</span></div>
-            </button>`;
-          }).join('')}
-        </div>`;
-      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
-        btn.addEventListener('click', () => ddnStartLevel(parseInt(btn.dataset.level)))
-      );
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      ddnLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: DDN_LEVEL_DEFS.map(d => ({ id: d.lv, description: d.desc })),
+        threshold: DDN_SEUIL,
+        onSelectLevel: lv => ddnStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: ddnBackToSelectScreen,
+        introHTML: '<div class="ea-rule-chip">📌 <em>ce / cet / cette / ces</em> se place <strong>devant un nom</strong> pour désigner quelque chose de précis.</div>'
+      });
+      ddnLevelSelect.renderSelectScreen();
     }
 
     /* ── Démarrer un niveau ─────────────────────────────────────────────────── */
@@ -13990,15 +13891,9 @@
     /* ── Résultats de niveau (commun aux 3 niveaux) ─────────────────────────── */
     function ddnShowLevelResults() {
       const { level, score: lvScore, total } = ddnState;
-      const pct    = lvScore / total;
-      const passed = pct >= DDN_SEUIL;
+      const { passed, pct, isLast } = ddnLevelSelect.completeLevel(level, lvScore, total);
       const pctPct = Math.round(pct * 100);
       const stars  = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
-
-      if (passed) {
-        const validated = ddnGetValidated();
-        if (!validated.includes(level - 1)) { validated.push(level - 1); ddnSetValidated(validated); }
-      }
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -14011,14 +13906,15 @@
 
       const backHref  = sessionData.backLink?.href  || 'français-grammaire.html';
       const backLabel = '← Retour à la ' + (sessionData.backLink?.label || 'Grammaire');
-      const isLast    = level >= 3;
       const lvNextLabels = ['', 'Niveau 2 — Choisis le bon démonstratif →', 'Niveau 3 — ce ou se ? →', ''];
+      const backToSelectBtn = ddnLevelSelect.backToSelectButtonHTML();
 
       let msg, btnsHTML;
       if (passed && isLast) {
         msg = `${stars} Félicitations ! Tu maîtrises les déterminants démonstratifs et la distinction ce / se !`;
         btnsHTML = `<div class="ex-results-btns">
           <button class="ex-btn-primary" id="ddn-restart-btn">Recommencer depuis le début</button>
+          ${backToSelectBtn}
           <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
         </div>`;
       } else if (passed) {
@@ -14026,6 +13922,7 @@
         btnsHTML = `<div class="ex-results-btns">
           <button class="ex-btn-primary" id="ddn-next-btn">${lvNextLabels[level]}</button>
           <button class="ex-btn-secondary" id="ddn-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
         </div>
         <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
       } else {
@@ -14033,12 +13930,14 @@
         msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour passer au niveau suivant. On réessaie ?`;
         btnsHTML = `<div class="ex-results-btns">
           <button class="ex-btn-primary" id="ddn-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
           <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
         </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
-      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
 
       document.getElementById('ddn-retry-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
@@ -14051,11 +13950,12 @@
         ddnStartLevel(ddnState.level + 1);
       });
       document.getElementById('ddn-restart-btn')?.addEventListener('click', () => {
-        ddnSetValidated([]);
+        ddnLevelSelect.reset();
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
         ddnInitSession();
       });
+      ddnLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -14081,36 +13981,14 @@
 
     const GNP_SEUIL  = 0.8;
     const GNP_LEVELS = [1, 2, 3];
+    const GNP_LEVEL_DESCS = [
+      'Pluriels réguliers en -s — déterminant + nom simple',
+      'Pluriels irréguliers (-aux, -eux, -x, invariables) + adjectif',
+      'Adjectifs irréguliers (bel/vieil/nouvel), exceptions et noms composés',
+    ];
 
     let gnpState = null;
-
-    function gnpGetValidated() {
-      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_gnp_valides';
-      try { return JSON.parse(localStorage.getItem(key) || '[]'); }
-      catch { return []; }
-    }
-
-    function gnpSetValidated(arr) {
-      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_gnp_valides';
-      localStorage.setItem(key, JSON.stringify(arr));
-    }
-
-    function pfiGetValidated() {
-      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_pfi_valides';
-      try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
-    }
-    function pfiSetValidated(arr) {
-      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_pfi_valides';
-      localStorage.setItem(key, JSON.stringify(arr));
-    }
-    function accordGetValidated() {
-      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_accord_valides';
-      try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
-    }
-    function accordSetValidated(arr) {
-      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_accord_valides';
-      localStorage.setItem(key, JSON.stringify(arr));
-    }
+    let gnpLevelSelect = null;
 
     function gnpNorm(str) {
       return str.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[''`´'']/g, '');
@@ -14133,6 +14011,14 @@
       }).join(' ');
     }
 
+    function gnpBackToSelectScreen() {
+      gnpState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
     function gnpInitSession() {
       gnpState     = null;
       score        = 0;
@@ -14146,47 +14032,17 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
 
-      gnpRenderLevelSelect(document.getElementById('ex-card'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function gnpRenderLevelSelect(card) {
-      const validated = gnpGetValidated();
-      const descs = [
-        'Pluriels réguliers en -s — déterminant + nom simple',
-        'Pluriels irréguliers (-aux, -eux, -x, invariables) + adjectif',
-        'Adjectifs irréguliers (bel/vieil/nouvel), exceptions et noms composés',
-      ];
-      const _gnpBadgeCls = ['badge-cm1', 'badge-cm2', 'badge-6e'];
-      card.innerHTML = `
-        <p class="ex-type-select-label">Choisis ton niveau</p>
-        <div class="ex-type-grid">
-          ${GNP_LEVELS.map((lv, i) => {
-            const prevLv   = i > 0 ? GNP_LEVELS[i - 1] : null;
-            const unlocked = i === 0 || validated.includes(prevLv);
-            const done     = validated.includes(lv);
-            const cls      = !unlocked ? ' vb-locked-card' : '';
-            const disabled = !unlocked ? ' disabled' : '';
-            const desc     = !unlocked
-              ? 'Valide le niveau précédent pour débloquer'
-              : done ? descs[i] + ' · Niveau validé !'
-              : descs[i];
-            const bdgCls   = _gnpBadgeCls[i] || 'badge-cm1';
-            return `<button class="ex-type-card${cls}" data-level="${lv}"${disabled}>
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
-                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${i + 1}</span>
-              </span>
-              <div>
-                <span class="ex-type-name">Niveau ${i + 1}</span>
-                <span class="ex-type-desc">${desc}</span>
-              </div>
-            </button>`;
-          }).join('')}
-        </div>
-      `;
-      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
-        btn.addEventListener('click', () => gnpStartLevel(parseInt(btn.dataset.level, 10)))
-      );
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      gnpLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: GNP_LEVELS.map((lv, i) => ({ id: lv, description: GNP_LEVEL_DESCS[i] })),
+        threshold: GNP_SEUIL,
+        onSelectLevel: lv => gnpStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: gnpBackToSelectScreen
+      });
+      gnpLevelSelect.renderSelectScreen();
     }
 
     function gnpStartLevel(lv) {
@@ -14278,19 +14134,10 @@
 
     function gnpShowLevelResults() {
       const { level, score: lvScore, total } = gnpState;
-      const pct    = lvScore / total;
-      const passed = pct >= GNP_SEUIL;
-
-      if (passed) {
-        const validated = gnpGetValidated();
-        if (!validated.includes(level)) { validated.push(level); gnpSetValidated(validated); }
-        faireShowConfetti();
-      }
-
-      const lvIdx  = GNP_LEVELS.indexOf(level);
-      const isLast = lvIdx === GNP_LEVELS.length - 1;
-      const nextLv = !isLast ? GNP_LEVELS[lvIdx + 1] : null;
-      const allDone = gnpGetValidated().length >= GNP_LEVELS.length;
+      const { passed, isLast, nextLevelId, allValidated } = gnpLevelSelect.completeLevel(level, lvScore, total);
+      const pct    = total > 0 ? lvScore / total : 0;
+      const nextLv = nextLevelId;
+      const allDone = allValidated;
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -14308,6 +14155,7 @@
         lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') + ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
 
       const backHref = sessionData.backLink?.href || 'français-orthographe.html';
+      const backToSelectBtn = gnpLevelSelect.backToSelectButtonHTML();
       let msg, btnsHTML;
 
       if (passed && allDone && isLast) {
@@ -14315,6 +14163,7 @@
         btnsHTML = `
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="gnp-reset-btn">Recommencer depuis le début</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
       } else if (passed) {
@@ -14323,10 +14172,12 @@
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="gnp-next-btn">Passer au niveau ${nextLv} →</button>
             <button class="ex-btn-secondary" id="gnp-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>` : `
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="gnp-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
       } else {
@@ -14335,12 +14186,14 @@
         btnsHTML = `
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="gnp-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
-      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
 
       document.getElementById('gnp-retry-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
@@ -14353,11 +14206,12 @@
         gnpStartLevel(nextLv);
       });
       document.getElementById('gnp-reset-btn')?.addEventListener('click', () => {
-        gnpSetValidated([]);
+        gnpLevelSelect.reset();
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
         gnpInitSession();
       });
+      gnpLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -14394,17 +14248,7 @@
     ];
 
     let genreState = null;
-
-    function genreGetValidated() {
-      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_genre_valides';
-      try { return JSON.parse(localStorage.getItem(key) || '[]'); }
-      catch { return []; }
-    }
-
-    function genreSetValidated(arr) {
-      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_genre_valides';
-      localStorage.setItem(key, JSON.stringify(arr));
-    }
+    let genreLevelSelect = null;
 
     function genreNorm(str) {
       return str.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[''`´'']/g, '');
@@ -14453,6 +14297,14 @@
       }).join(' ');
     }
 
+    function genreBackToSelectScreen() {
+      genreState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
     function genreInitSession() {
       genreState   = null;
       score        = 0;
@@ -14466,43 +14318,17 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
 
-      genreRenderLevelSelect(document.getElementById('ex-card'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function genreRenderLevelSelect(card) {
-      const validated = genreGetValidated();
-      const badgeCls  = ['badge-cm1', 'badge-cm2', 'badge-6e'];
-      card.innerHTML = `
-        <p class="ex-type-select-label">Choisis ton niveau</p>
-        <div class="ex-type-grid">
-          ${GENRE_LEVELS.map((lv, i) => {
-            const prevLv   = i > 0 ? GENRE_LEVELS[i - 1] : null;
-            const unlocked = i === 0 || validated.includes(prevLv);
-            const done     = validated.includes(lv);
-            const cls      = !unlocked ? ' vb-locked-card' : '';
-            const dis      = !unlocked ? ' disabled' : '';
-            const desc     = !unlocked
-              ? 'Valide le niveau précédent pour débloquer'
-              : done
-                ? GENRE_LEVEL_DESCS[i] + ' · Niveau validé !'
-                : GENRE_LEVEL_DESCS[i];
-            const bdgCls   = badgeCls[i] || 'badge-cm1';
-            return `<button class="ex-type-card${cls}" data-level="${lv}"${dis}>
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
-                <span class="badge ${bdgCls}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${i + 1}</span>
-              </span>
-              <div>
-                <span class="ex-type-name">Niveau ${i + 1}</span>
-                <span class="ex-type-desc">${desc}</span>
-              </div>
-            </button>`;
-          }).join('')}
-        </div>
-      `;
-      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
-        btn.addEventListener('click', () => genreStartLevel(parseInt(btn.dataset.level, 10)))
-      );
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      genreLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: GENRE_LEVELS.map((lv, i) => ({ id: lv, description: GENRE_LEVEL_DESCS[i] })),
+        threshold: GENRE_SEUIL,
+        onSelectLevel: lv => genreStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: genreBackToSelectScreen
+      });
+      genreLevelSelect.renderSelectScreen();
     }
 
     function genreStartLevel(lv) {
@@ -14622,19 +14448,9 @@
 
     function genreShowLevelResults() {
       const { level, score: rawScore, correctCount, total } = genreState;
-      const correctPct = correctCount / total;
-      const passed     = correctPct >= GENRE_SEUIL;
-
-      if (passed) {
-        const validated = genreGetValidated();
-        if (!validated.includes(level)) { validated.push(level); genreSetValidated(validated); }
-        faireShowConfetti();
-      }
-
-      const lvIdx  = GENRE_LEVELS.indexOf(level);
-      const isLast = lvIdx === GENRE_LEVELS.length - 1;
-      const nextLv = !isLast ? GENRE_LEVELS[lvIdx + 1] : null;
-      const allDone = genreGetValidated().length >= GENRE_LEVELS.length;
+      const { passed, isLast, nextLevelId, allValidated } = genreLevelSelect.completeLevel(level, correctCount, total);
+      const nextLv  = nextLevelId;
+      const allDone = allValidated;
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -14652,6 +14468,7 @@
         ' réponse' + (correctCount !== 1 ? 's' : '') + ' sur ' + total;
 
       const backHref = sessionData.backLink?.href || 'français-orthographe.html';
+      const backToSelectBtn = genreLevelSelect.backToSelectButtonHTML();
       let msg, btnsHTML;
 
       if (passed && allDone && isLast) {
@@ -14659,6 +14476,7 @@
         btnsHTML = `
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="genre-reset-btn">Recommencer depuis le début</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
       } else if (passed) {
@@ -14667,10 +14485,12 @@
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="genre-next-btn">Passer au niveau ${nextLv} →</button>
             <button class="ex-btn-secondary" id="genre-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>` : `
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="genre-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
       } else {
@@ -14679,12 +14499,14 @@
         btnsHTML = `
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="genre-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
-      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
 
       document.getElementById('genre-retry-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
@@ -14697,11 +14519,12 @@
         genreStartLevel(nextLv);
       });
       document.getElementById('genre-reset-btn')?.addEventListener('click', () => {
-        genreSetValidated([]);
+        genreLevelSelect.reset();
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
         genreInitSession();
       });
+      genreLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -15152,20 +14975,14 @@
 
     const PCA_SEUIL    = 0.80;
     const PCA_POSITIFS = ['Excellent ! 🎉', 'Bravo ! ⭐', 'Parfait ! 🌟', 'Super ! 👏'];
+    const PCA_LEVEL_DEFS = [
+      { lv: 1, desc: "Participes en -é et -i (1<sup>er</sup> et 2<sup>e</sup> groupe)" },
+      { lv: 2, desc: "Participes irréguliers en -s, -u, -t (3<sup>e</sup> groupe)" },
+      { lv: 3, desc: "Mélange des trois groupes · phrases complexes" }
+    ];
 
     let pcaState = null;
-
-    function pcaSlugKey(suffix) {
-      const s = new URLSearchParams(window.location.search).get('slug') || 'pca';
-      return s + '_' + suffix;
-    }
-    function pcaGetValidated() {
-      try { return JSON.parse(localStorage.getItem(pcaSlugKey('validated')) || '[]'); }
-      catch { return []; }
-    }
-    function pcaSetValidated(arr) {
-      localStorage.setItem(pcaSlugKey('validated'), JSON.stringify(arr));
-    }
+    let pcaLevelSelect = null;
 
     /* Normalisation : insensible à la casse et aux espaces, mais sensible aux accents */
     function pcaNorm(str) {
@@ -15226,6 +15043,15 @@
       return html;
     }
 
+    /* ── Retour à l'écran "Choisis ton niveau" depuis les résultats ──────────── */
+    function pcaBackToSelectScreen() {
+      pcaState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
     /* ── Init session ─────────────────────────────────────────────────────────── */
     function pcaInitSession() {
       pcaState = null;
@@ -15239,50 +15065,18 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
 
-      pcaRenderLevelSelect(document.getElementById('ex-card'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    /* ── Sélection de niveau ─────────────────────────────────────────────────── */
-    function pcaRenderLevelSelect(card) {
-      const validated = pcaGetValidated();
-      const lvDefs = [
-        { lv: 1, desc: "Participes en -é et -i (1<sup>er</sup> et 2<sup>e</sup> groupe)" },
-        { lv: 2, desc: "Participes irréguliers en -s, -u, -t (3<sup>e</sup> groupe)" },
-        { lv: 3, desc: "Mélange des trois groupes · phrases complexes" }
-      ];
-      const badgeCls = ['badge-cm1', 'badge-cm2', 'badge-6e'];
-
-      card.innerHTML = `
-        <p class="ex-type-select-label">Choisis ton niveau</p>
-        <div class="pqp-rule-chip" style="display:flex;margin:0 auto 20px;max-width:520px">
-          📌 Passé composé = <em>avoir</em> au présent + participe passé
-        </div>
-        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
-          ${lvDefs.map((d, i) => {
-            const unlocked = i === 0 || validated.includes(i - 1);
-            const done     = validated.includes(i);
-            const cls      = !unlocked ? ' vb-locked-card' : '';
-            const disabled = !unlocked ? ' disabled' : '';
-            const desc     = !unlocked
-              ? 'Valide le niveau précédent pour débloquer (80 % requis)'
-              : done ? d.desc + ' · <strong>Validé ✓</strong>' : d.desc;
-            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${disabled}>
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
-                <span class="badge ${badgeCls[i]}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
-              </span>
-              <div>
-                <span class="ex-type-name">Niveau ${d.lv}</span>
-                <span class="ex-type-desc">${desc}</span>
-              </div>
-            </button>`;
-          }).join('')}
-        </div>
-      `;
-
-      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
-        btn.addEventListener('click', () => pcaStartLevel(parseInt(btn.dataset.level)))
-      );
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      pcaLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: PCA_LEVEL_DEFS.map(d => ({ id: d.lv, description: d.desc })),
+        threshold: PCA_SEUIL,
+        onSelectLevel: lv => pcaStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: pcaBackToSelectScreen,
+        introHTML: '<div class="pqp-rule-chip" style="display:flex;margin:0 auto 20px;max-width:520px">📌 Passé composé = <em>avoir</em> au présent + participe passé</div>'
+      });
+      pcaLevelSelect.renderSelectScreen();
     }
 
     /* ── Démarre un niveau ───────────────────────────────────────────────────── */
@@ -15460,15 +15254,9 @@
     /* ── Résultats d'un niveau ───────────────────────────────────────────────── */
     function pcaShowLevelResults() {
       const { lv, rawScore, rawMax } = pcaState;
-      const pct    = rawMax > 0 ? rawScore / rawMax : 0;
-      const passed = pct >= PCA_SEUIL;
+      const { passed, pct, isLast } = pcaLevelSelect.completeLevel(lv, rawScore, rawMax);
       const s20    = rawMax > 0 ? Math.round(pct * 20) : 0;
       const pctPct = Math.round(pct * 100);
-
-      if (passed) {
-        const validated = pcaGetValidated();
-        if (!validated.includes(lv - 1)) { validated.push(lv - 1); pcaSetValidated(validated); }
-      }
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -15481,16 +15269,17 @@
       document.getElementById('score-pct').textContent   = pctPct + ' %';
 
       const stars    = s20 >= 19 ? '🌟🌟🌟' : s20 >= 16 ? '⭐⭐' : s20 >= 10 ? '⭐' : '';
-      const isLast   = lv >= 3;
       const backHref  = sessionData.backLink?.href  || 'français-conjugaison.html';
       const backLabel = `← Retour à la ${sessionData.backLink?.label || 'Conjugaison'}`;
       const lvNextLabel = ['', 'Niveau 2 — Participes irréguliers →', 'Niveau 3 — Mélange & phrases complexes →', ''];
+      const backToSelectBtn = pcaLevelSelect.backToSelectButtonHTML();
 
       let msg, btnsHTML;
       if (passed && isLast) {
         msg = `${stars} Bravo ! Tu maîtrises le passé composé avec avoir aux trois niveaux !`;
         btnsHTML = `<div class="ex-results-btns">
           <button class="ex-btn-primary" id="pca-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
           <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
         </div>`;
       } else if (passed) {
@@ -15498,6 +15287,7 @@
         btnsHTML = `<div class="ex-results-btns">
           <button class="ex-btn-primary" id="pca-next-btn">${lvNextLabel[lv]}</button>
           <button class="ex-btn-secondary" id="pca-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
         </div>
         <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
       } else {
@@ -15506,12 +15296,14 @@
         msg = `${stars || '💪'} Pas encore… il faut ${neededS20}/20 pour passer au niveau suivant. On réessaie ?`;
         btnsHTML = `<div class="ex-results-btns">
           <button class="ex-btn-primary" id="pca-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
           <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
         </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
-      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
 
       document.getElementById('pca-retry-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
@@ -15524,10 +15316,12 @@
         pcaStartLevel(pcaState.lv + 1);
       });
       document.getElementById('pca-restart-btn')?.addEventListener('click', () => {
+        pcaLevelSelect.reset();
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
         pcaInitSession();
       });
+      pcaLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -15553,20 +15347,14 @@
 
     const EOA_SEUIL    = 0.80;
     const EOA_POSITIFS = ['Excellent ! 🎉', 'Bravo ! ⭐', 'Parfait ! 🌟', 'Super ! 👏', 'Très bien ! 👍'];
+    const EOA_LEVEL_DEFS = [
+      { lv: 1, desc: "Verbes courants — être ou avoir, cas non ambigu" },
+      { lv: 2, desc: "Pronominaux et pièges (avoir lui-même, être lui-même, passer…)" },
+      { lv: 3, desc: "Verbes à double auxiliaire selon le sens (monter, sortir…)" }
+    ];
 
     let eoaState = null;
-
-    function eoaSlugKey(suffix) {
-      const s = new URLSearchParams(window.location.search).get('slug') || 'eoa';
-      return s + '_' + suffix;
-    }
-    function eoaGetValidated() {
-      try { return JSON.parse(localStorage.getItem(eoaSlugKey('validated')) || '[]'); }
-      catch { return []; }
-    }
-    function eoaSetValidated(arr) {
-      localStorage.setItem(eoaSlugKey('validated'), JSON.stringify(arr));
-    }
+    let eoaLevelSelect = null;
 
     function eoaNorm(str) {
       return str.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[''`´'']/g, "'");
@@ -15650,6 +15438,15 @@
       return `<div class="ex-feedback-wrong">❌ Les verbes de mouvement ou d'état (<em>aller, partir, arriver, naître…</em>) se conjuguent avec <strong>être</strong>. Les autres prennent généralement <strong>avoir</strong>.</div>`;
     }
 
+    /* ── Retour à l'écran "Choisis ton niveau" depuis les résultats ────────── */
+    function eoaBackToSelectScreen() {
+      eoaState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
     /* ── Init ────────────────────────────────────────────────────────────── */
     function eoaInitSession() {
       eoaState = null;
@@ -15663,50 +15460,18 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
 
-      eoaRenderLevelSelect(document.getElementById('ex-card'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    /* ── Sélection de niveau ─────────────────────────────────────────────── */
-    function eoaRenderLevelSelect(card) {
-      const validated = eoaGetValidated();
-      const lvDefs = [
-        { lv: 1, desc: "Verbes courants — être ou avoir, cas non ambigu" },
-        { lv: 2, desc: "Pronominaux et pièges (avoir lui-même, être lui-même, passer…)" },
-        { lv: 3, desc: "Verbes à double auxiliaire selon le sens (monter, sortir…)" }
-      ];
-      const badgeCls = ['badge-cm1', 'badge-cm2', 'badge-6e'];
-
-      card.innerHTML = `
-        <p class="ex-type-select-label">Choisis ton niveau</p>
-        <div class="pqp-rule-chip" style="display:flex;margin:0 auto 20px;max-width:520px">
-          📌 Passé composé = <em>être</em> ou <em>avoir</em> au présent + participe passé
-        </div>
-        <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
-          ${lvDefs.map((d, i) => {
-            const unlocked = i === 0 || validated.includes(i - 1);
-            const done     = validated.includes(i);
-            const cls      = !unlocked ? ' vb-locked-card' : '';
-            const disabled = !unlocked ? ' disabled' : '';
-            const desc     = !unlocked
-              ? 'Valide le niveau précédent pour débloquer (80 % requis)'
-              : done ? d.desc + ' · <strong>Validé ✓</strong>' : d.desc;
-            return `<button class="ex-type-card${cls}" data-level="${d.lv}"${disabled}>
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
-                <span class="badge ${badgeCls[i]}" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau ${d.lv}</span>
-              </span>
-              <div>
-                <span class="ex-type-name">Niveau ${d.lv}</span>
-                <span class="ex-type-desc">${desc}</span>
-              </div>
-            </button>`;
-          }).join('')}
-        </div>
-      `;
-
-      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
-        btn.addEventListener('click', () => eoaStartLevel(parseInt(btn.dataset.level)))
-      );
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      eoaLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: EOA_LEVEL_DEFS.map(d => ({ id: d.lv, description: d.desc })),
+        threshold: EOA_SEUIL,
+        onSelectLevel: lv => eoaStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: eoaBackToSelectScreen,
+        introHTML: '<div class="pqp-rule-chip" style="display:flex;margin:0 auto 20px;max-width:520px">📌 Passé composé = <em>être</em> ou <em>avoir</em> au présent + participe passé</div>'
+      });
+      eoaLevelSelect.renderSelectScreen();
     }
 
     /* ── Démarre un niveau ───────────────────────────────────────────────── */
@@ -15862,15 +15627,9 @@
     /* ── Résultats d'un niveau ───────────────────────────────────────────── */
     function eoaShowLevelResults() {
       const { lv, rawScore, rawMax } = eoaState;
-      const pct    = rawMax > 0 ? rawScore / rawMax : 0;
-      const passed = pct >= EOA_SEUIL;
+      const { passed, pct, isLast } = eoaLevelSelect.completeLevel(lv, rawScore, rawMax);
       const s20    = rawMax > 0 ? Math.round(pct * 20) : 0;
       const pctPct = Math.round(pct * 100);
-
-      if (passed) {
-        const validated = eoaGetValidated();
-        if (!validated.includes(lv - 1)) { validated.push(lv - 1); eoaSetValidated(validated); }
-      }
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -15883,16 +15642,17 @@
       document.getElementById('score-pct').textContent   = pctPct + ' %';
 
       const stars  = s20 >= 19 ? '🌟🌟🌟' : s20 >= 16 ? '⭐⭐' : s20 >= 10 ? '⭐' : '';
-      const isLast = lv >= 3;
       const backHref  = sessionData.backLink?.href  || 'français-conjugaison.html';
       const backLabel = `← Retour à la ${sessionData.backLink?.label || 'Conjugaison'}`;
       const lvNextLabel = ['', 'Niveau 2 — Pronominaux et pièges →', 'Niveau 3 — Double auxiliaire →', ''];
+      const backToSelectBtn = eoaLevelSelect.backToSelectButtonHTML();
 
       let msg, btnsHTML;
       if (passed && isLast) {
         msg = `${stars} Bravo ! Tu maîtrises le choix de l'auxiliaire aux trois niveaux !`;
         btnsHTML = `<div class="ex-results-btns">
           <button class="ex-btn-primary" id="eoa-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
           <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
         </div>`;
       } else if (passed) {
@@ -15900,18 +15660,21 @@
         btnsHTML = `<div class="ex-results-btns">
           <button class="ex-btn-primary" id="eoa-next-btn">${lvNextLabel[lv]}</button>
           <button class="ex-btn-secondary" id="eoa-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
         </div>
         <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
       } else {
         msg = `${stars || '💪'} Pas encore… il faut 80 % pour passer au niveau suivant. On réessaie ?`;
         btnsHTML = `<div class="ex-results-btns">
           <button class="ex-btn-primary" id="eoa-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
           <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
         </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
-      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
 
       document.getElementById('eoa-retry-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
@@ -15924,10 +15687,12 @@
         eoaStartLevel(eoaState.lv + 1);
       });
       document.getElementById('eoa-restart-btn')?.addEventListener('click', () => {
+        eoaLevelSelect.reset();
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
         eoaInitSession();
       });
+      eoaLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
