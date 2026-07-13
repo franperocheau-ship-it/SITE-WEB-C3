@@ -5,10 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Exercice — Français — Lycée Français de Madrid</title>
   <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="level-select.css?v=1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/results.js"></script>
+  <script src="js/level-select.js?v=1"></script>
   <script src="exercise-data.js?v=13"></script>
   <style>
     /* ── Exercise container (narrows content to readable width) ── */
@@ -118,7 +120,7 @@
       text-align: center;
     }
 
-    /* ── Sentence display (find-conjugated-verb) ───────────── */
+    /* ── Sentence display (shared by several types) ───────────── */
     .ex-sentence-display {
       font-size: 20px;
       font-weight: 700;
@@ -4325,8 +4327,6 @@
       const card = document.getElementById("ex-card");
       if (currentType === "infinitif-et-groupe") {
         renderInfinitifEtGroupe(card, q);
-      } else if (currentType === "find-conjugated-verb") {
-        renderFindConjugatedVerb(card, q);
       } else if (currentType === "fill-blank") {
         renderFillBlank(card, q);
       } else if (currentType === "multiple-choice") {
@@ -4527,51 +4527,6 @@
       }
 
       showNextBtn();
-    }
-
-    /* ── Type: find-conjugated-verb (1-step, auto-advance) ───────────────── */
-
-    function renderFindConjugatedVerb(card, q) {
-      card.innerHTML = `
-        <p class="ex-question-label">Quel est le verbe conjugué dans cette phrase ?</p>
-        <div class="ex-sentence-display">${q.sentence}</div>
-        <div class="ex-choices-grid" id="ex-choices-grid"></div>
-        <div class="ex-feedback-area" id="feedback1"></div>
-      `;
-
-      const grid = document.getElementById("ex-choices-grid");
-      grid.innerHTML = shuffle(q.choices)
-        .map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`)
-        .join("");
-      grid.querySelectorAll(".ex-choice").forEach(btn =>
-        btn.addEventListener("click", () => handleFindConjugatedVerb(btn, q))
-      );
-    }
-
-    function handleFindConjugatedVerb(btn, q) {
-      document.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
-
-      const isRight = btn.dataset.value === q.answer;
-
-      document.querySelectorAll(".ex-choice").forEach(b => {
-        if (b.dataset.value === q.answer) b.classList.add("is-correct");
-      });
-      if (!isRight) btn.classList.add("is-wrong");
-
-      if (isRight) {
-        score++;
-        setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
-      } else {
-        setFeedback("feedback1", `
-          <div class="ex-feedback-wrong">
-            ❌ Ce n'est pas la bonne réponse.<br>
-            Le verbe conjugué est : <strong>« ${q.answer} »</strong>.
-          </div>
-        `);
-      }
-
-      /* Auto-advance: longer pause when wrong so the correction can be read */
-      setTimeout(nextQuestion, isRight ? 1200 : 2400);
     }
 
     /* ── Type: fill-blank ────────────────────────────────────────────────── */
@@ -10257,7 +10212,12 @@
        ══════════════════════════════════════════════════════════════════════════ */
 
     const FAIRE_SEUIL = 0.8;
-    const FAIRE_LEVELS = ['CM1', 'CM2', '6e'];
+    const FAIRE_LEVEL_IDS = ['CM1', 'CM2', '6e'];
+    const FAIRE_LEVEL_DESCS = [
+      'Présent, Imparfait, Futur simple, Passé composé',
+      'Passé simple, Plus-que-parfait',
+      'Impératif, Conditionnel',
+    ];
     const FAIRE_TEMPS_CLASS = {
       'Présent':          'faire-temps-present',
       'Imparfait':        'faire-temps-imparfait',
@@ -10272,16 +10232,7 @@
     const FAIRE_POSITIFS = ['Excellent ! 🎉', 'Bravo ! ⭐', 'Parfait ! 🌟', 'Super ! 👏'];
 
     let faireState = null;
-
-    function faireGetValidated() {
-      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_niveaux_valides';
-      try { return JSON.parse(localStorage.getItem(key) || '[]'); }
-      catch { return []; }
-    }
-    function faireSetValidated(arr) {
-      const key = (new URLSearchParams(window.location.search).get('slug') || 'unknown') + '_niveaux_valides';
-      localStorage.setItem(key, JSON.stringify(arr));
-    }
+    let faireLevelSelect = null;
 
     function faireShuffle(arr) {
       const a = [...arr];
@@ -10298,6 +10249,15 @@
         .replace(/[''`´'']/g, '');
     }
 
+    /* ── Retour à l'écran "Choisis ton niveau" depuis l'écran de résultats ── */
+    function faireBackToSelectScreen() {
+      faireState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
     /* ── Init : cache la barre de progression, affiche le choix de niveau ── */
     function faireInitSession() {
       faireState   = null;
@@ -10312,46 +10272,18 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
 
-      faireRenderLevelSelect(document.getElementById('ex-card'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      faireLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: FAIRE_LEVEL_IDS.map((id, i) => ({ id, description: FAIRE_LEVEL_DESCS[i] })),
+        threshold: FAIRE_SEUIL,
+        onSelectLevel: faireStartLevel,
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: faireBackToSelectScreen
+      });
 
-    /* ── Écran de sélection de niveau (verrouillé / déverrouillé) ────────── */
-    function faireRenderLevelSelect(card) {
-      const validated = faireGetValidated();
-      const descs = [
-        'Présent, Imparfait, Futur simple, Passé composé',
-        'Passé simple, Plus-que-parfait',
-        'Impératif, Conditionnel',
-      ];
-      const _faireBadgeCls = { "CM1": "badge-cm1", "CM2": "badge-cm2", "6e": "badge-6e" };
-      card.innerHTML = `
-        <p class="ex-type-select-label">Choisis ton niveau</p>
-        <div class="ex-type-grid">
-          ${FAIRE_LEVELS.map((lv, i) => {
-            const unlocked = i === 0 || validated.includes(FAIRE_LEVELS[i - 1]);
-            const done     = validated.includes(lv);
-            const cls      = !unlocked ? ' vb-locked-card' : '';
-            const disabled = !unlocked ? ' disabled' : '';
-            const desc     = !unlocked
-              ? 'Valide le niveau précédent pour débloquer'
-              : done ? descs[i] + ' · Niveau validé !'
-              : descs[i];
-            return `<button class="ex-type-card${cls}" data-level="${lv}"${disabled}>
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0">
-                <span class="badge ${_faireBadgeCls[lv] || 'badge-cm1'}" style="font-size:13px;padding:4px 12px;white-space:nowrap">${LEVEL_LABELS[lv] ?? lv}</span>
-              </span>
-              <div>
-                <span class="ex-type-name">${LEVEL_LABELS[lv] ?? lv}</span>
-                <span class="ex-type-desc">${desc}</span>
-              </div>
-            </button>`;
-          }).join('')}
-        </div>
-      `;
-      card.querySelectorAll('.ex-type-card:not([disabled])').forEach(btn =>
-        btn.addEventListener('click', () => faireStartLevel(btn.dataset.level))
-      );
+      faireLevelSelect.renderSelectScreen();
     }
 
     /* ── Démarre un niveau : mélange le pool et lance la première question ── */
@@ -10365,6 +10297,7 @@
       if (prog) prog.classList.remove('ex-hidden');
 
       document.getElementById('q-total').textContent = qs.length;
+      faireLevelSelect.renderBadges(lv);
       faireRenderQuestion();
     }
 
@@ -10435,19 +10368,8 @@
     /* ── Résultats d'un niveau ───────────────────────────────────────────── */
     function faireShowLevelResults() {
       const { level, score: lvScore, total } = faireState;
-      const pct    = lvScore / total;
-      const passed = pct >= FAIRE_SEUIL;
-
-      if (passed) {
-        const validated = faireGetValidated();
-        if (!validated.includes(level)) { validated.push(level); faireSetValidated(validated); }
-        faireShowConfetti();
-      }
-
-      const lvIdx   = FAIRE_LEVELS.indexOf(level);
-      const isLast  = lvIdx === FAIRE_LEVELS.length - 1;
-      const allDone = faireGetValidated().length >= FAIRE_LEVELS.length;
-      const nextLv  = !isLast ? FAIRE_LEVELS[lvIdx + 1] : null;
+      const { passed, pct, isLast, nextLevelId, allValidated } = faireLevelSelect.completeLevel(level, lvScore, total);
+      const nextLvNum = nextLevelId ? FAIRE_LEVEL_IDS.indexOf(nextLevelId) + 1 : null;
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -10462,23 +10384,28 @@
       let msg, btnsHTML;
       const backHref = sessionData.backLink?.href || 'français-conjugaison.html';
 
-      if (passed && allDone && isLast) {
-        msg = '🎊 Bravo ! Tu maîtrises la conjugaison du verbe FAIRE à tous les niveaux ! Tu es un(e) champion(ne) de conjugaison !';
+      const backToSelectBtn = faireLevelSelect.backToSelectButtonHTML();
+
+      if (passed && allValidated && isLast) {
+        msg = `🎊 Bravo ! Tu maîtrises la conjugaison du verbe ${(sessionData.verb || '').toUpperCase()} à tous les niveaux ! Tu es un(e) champion(ne) de conjugaison !`;
         btnsHTML = `
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="faire-reset-btn">Recommencer depuis le début</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
       } else if (passed) {
-        msg = `Niveau ${level} validé ! 🏆${nextLv ? ` Le niveau ${nextLv} est débloqué !` : ''}`;
-        btnsHTML = nextLv ? `
+        msg = `Niveau validé ! 🏆${nextLvNum ? ` Le niveau ${nextLvNum} est débloqué !` : ''}`;
+        btnsHTML = nextLevelId ? `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="faire-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-primary" id="faire-next-btn">Passer au niveau ${nextLvNum} →</button>
             <button class="ex-btn-secondary" id="faire-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>` : `
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="faire-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
       } else {
@@ -10486,12 +10413,14 @@
         btnsHTML = `
           <div class="ex-results-btns">
             <button class="ex-btn-primary" id="faire-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
       }
 
       document.getElementById('score-msg').textContent         = msg;
-      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
 
       document.getElementById('faire-retry-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
@@ -10501,14 +10430,15 @@
       document.getElementById('faire-next-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        faireStartLevel(nextLv);
+        faireStartLevel(nextLevelId);
       });
       document.getElementById('faire-reset-btn')?.addEventListener('click', () => {
-        faireSetValidated([]);
+        faireLevelSelect.reset();
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
         faireInitSession();
       });
+      faireLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -10526,7 +10456,8 @@
       });
     }
 
-    /* ── Confettis CSS-only (20 divs animés) ────────────────────────────── */
+    /* ── Confettis CSS-only (20 divs animés) — encore utilisé par d'autres
+       types non migrés vers le composant LevelSelect (pqp/genre/gn-pluriel-niveaux) ── */
     function faireShowConfetti() {
       const colors = ['#27ae60','#2980b9','#8e44ad','#e67e22','#c0392b','#1abc9c','#e91e8c','#f39c12'];
       const container = document.createElement('div');

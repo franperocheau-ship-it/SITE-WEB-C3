@@ -1,0 +1,196 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Composant partagé — Écran "Choisis ton niveau"
+   Utilisé par exercise.html (moteur partagé) et par les pages d'exercice
+   autonomes. Réplique visuelle du modèle de référence "Conjuguer ALLER"
+   (anciennes classes .ex-type-* / .badge-cm1/cm2/6e), avec des classes
+   dédiées (.ls-*) pour ne dépendre d'aucun style propre à une page, et un
+   nombre de niveaux variable (2 à 5).
+
+   Dépend des tokens globaux définis dans styles.css :
+   --card-bg, --border, --blue, --text, --muted, --shadow-sm, --font-display
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Couleurs des pastilles de niveau, dans l'ordre. Niveaux 1-3 reprennent
+     exactement les valeurs du modèle ALLER. Niveaux 4-5 étendent la palette
+     pour les exercices à 4-5 niveaux (ex: change-temps-niveaux). */
+  --ls-color-1: var(--color-niveau-cm1, #1DBFA0);
+  --ls-color-2: var(--color-niveau-cm2, #4A90D9);
+  --ls-color-3: var(--color-niveau-6e, #F5A623);
+  --ls-color-4: #D6336C;
+  --ls-color-5: #7C5CBF;
+}
+
+/* ── Écran "Choisis ton niveau" ──────────────────────────────────────── */
+
+.ls-select-label {
+  text-align: center;
+  font-size: 15px;
+  color: var(--muted);
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.ls-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.ls-card {
+  width: 100%;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 200ms, box-shadow 200ms, transform 200ms;
+}
+
+.ls-card:hover {
+  border-color: var(--blue);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+}
+
+.ls-card--locked {
+  opacity: 0.48;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+.ls-pastille {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+  background: var(--ls-color);
+  color: #ffffff;
+}
+
+.ls-card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.ls-card-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.ls-card-desc {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* ── Pastilles de progression (haut de page) ─────────────────────────── */
+/* États : verrouillé (grisé) → débloqué (contour neutre) →
+   en cours (contour marqué de la couleur du niveau) → validé (plein). */
+
+.ls-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 1.5px solid transparent;
+}
+
+.ls-badge--locked {
+  background: var(--border);
+  border-color: var(--border);
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.ls-badge--unlocked {
+  background: #ffffff;
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+.ls-badge--current {
+  background: #ffffff;
+  border-color: var(--ls-color);
+  color: var(--ls-color);
+}
+
+.ls-badge--done {
+  background: var(--ls-color);
+  border-color: var(--ls-color);
+  color: #ffffff;
+}
+
+/* ── Bouton "← Choisir un niveau" (écran de résultats) ───────────────── */
+/* Reprend le style de .ex-btn-secondary pour rester cohérent visuellement
+   dans exercise.html ; sert aussi de style par défaut sur les pages
+   autonomes qui n'ont pas cette classe. */
+
+.ls-back-btn {
+  background: transparent;
+  color: var(--blue, #102B6A);
+  border: 1.5px solid var(--border, #E8EDF3);
+  border-radius: 100px;
+  padding: 13px 36px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: border-color 200ms, background 200ms, transform 200ms;
+}
+
+.ls-back-btn:hover {
+  border-color: var(--blue, #102B6A);
+  background: rgba(16,43,106,0.04);
+  transform: translateY(-2px);
+}
+
+/* ── Confettis (identiques au modèle ALLER) ──────────────────────────── */
+
+.ls-confetti-container {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.ls-confetti-piece {
+  position: absolute;
+  top: -20px;
+  border-radius: 2px;
+  animation: lsConfettiFall linear forwards;
+}
+
+@keyframes lsConfettiFall {
+  0%   { transform: translateY(0) rotate(0deg);       opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+@media (max-width: 600px) {
+  .ls-card { padding: 14px 16px; gap: 12px; }
+}
