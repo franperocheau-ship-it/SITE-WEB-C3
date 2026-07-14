@@ -66,7 +66,7 @@ const lfmTeacher = (() => {
   async function getClasses() {
     const { data, error } = await db
       .from('classes')
-      .select('id, name, level, school_year, created_at')
+      .select('id, name, level, school_year, mode_acces, created_at')
       .order('created_at', { ascending: true });
     if (error) throw error;
 
@@ -98,6 +98,55 @@ const lfmTeacher = (() => {
     const { data, error } = await db.from('classes').update(updates).eq('id', id).select().single();
     if (error) throw error;
     return data;
+  }
+
+  async function updateClassAccessMode(id, modeAcces) {
+    const { data, error } = await db
+      .from('classes').update({ mode_acces: modeAcces }).eq('id', id).select().single();
+    if (error) throw error;
+    return data;
+  }
+
+  /* ── Parcours guidé : exercices actifs par classe ───────────────────────────── */
+
+  async function getActiveExercises(classId) {
+    const { data, error } = await db
+      .from('class_active_exercises')
+      .select('exercise_id')
+      .eq('class_id', classId);
+    if (error) throw error;
+    return (data || []).map(r => r.exercise_id);
+  }
+
+  async function addActiveExercise(classId, exerciseId) {
+    const { error } = await db
+      .from('class_active_exercises')
+      .upsert({ class_id: classId, exercise_id: exerciseId }, { onConflict: 'class_id,exercise_id', ignoreDuplicates: true });
+    if (error) throw error;
+  }
+
+  async function removeActiveExercise(classId, exerciseId) {
+    const { error } = await db
+      .from('class_active_exercises')
+      .delete().eq('class_id', classId).eq('exercise_id', exerciseId);
+    if (error) throw error;
+  }
+
+  async function addActiveExercisesBulk(classId, exerciseIds) {
+    if (!exerciseIds.length) return;
+    const rows = exerciseIds.map(exercise_id => ({ class_id: classId, exercise_id }));
+    const { error } = await db
+      .from('class_active_exercises')
+      .upsert(rows, { onConflict: 'class_id,exercise_id', ignoreDuplicates: true });
+    if (error) throw error;
+  }
+
+  async function removeActiveExercisesBulk(classId, exerciseIds) {
+    if (!exerciseIds.length) return;
+    const { error } = await db
+      .from('class_active_exercises')
+      .delete().eq('class_id', classId).in('exercise_id', exerciseIds);
+    if (error) throw error;
   }
 
   async function deleteClass(id) {
@@ -375,10 +424,12 @@ const lfmTeacher = (() => {
   }
 
   return {
-    getClasses, createClass, updateClass, deleteClass,
+    getClasses, createClass, updateClass, updateClassAccessMode, deleteClass,
     getStudents, getAllStudents, createStudent, createStudentsBulk, updateStudent,
     deleteStudent, moveStudent, resetStudentPassword,
     getClassResults, getStudentResults, getStudentStats,
+    getActiveExercises, addActiveExercise, removeActiveExercise,
+    addActiveExercisesBulk, removeActiveExercisesBulk,
     exportCSV, exportAllStudentsCSV, getStats
   };
 })();

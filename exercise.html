@@ -3692,6 +3692,126 @@
       .fdtn-td     { padding: 8px 4px; }
     }
 
+    /* ══════════════════════════════════════════════════════════════
+       MOTS INVARIABLES — mécanique "série sans erreur"
+    ══════════════════════════════════════════════════════════════ */
+    .mi-counters {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .mi-streak {
+      font-family: var(--font-display, 'Fredoka', sans-serif);
+      font-size: 44px;
+      font-weight: 800;
+      color: var(--blue);
+      line-height: 1.15;
+      transition: transform 150ms ease;
+    }
+    .mi-streak.mi-bump { transform: scale(1.15); }
+    .mi-record {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .mi-listen-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+    .mi-listen-btn {
+      background: rgba(16,43,106,0.06);
+      border: 1.5px solid rgba(16,43,106,0.20);
+      border-radius: 100px;
+      padding: 10px 22px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--blue);
+      cursor: pointer;
+      transition: background 180ms, transform 180ms;
+    }
+    .mi-listen-btn:hover { background: rgba(16,43,106,0.12); transform: translateY(-1px); }
+    .mi-listen-btn:disabled { opacity: 0.5; cursor: default; }
+    .mi-context {
+      text-align: center;
+      font-size: 14px;
+      font-style: italic;
+      color: var(--muted);
+      margin: -6px 0 18px;
+      min-height: 20px;
+      opacity: 0;
+      transition: opacity 400ms ease;
+    }
+    .mi-context.mi-visible { opacity: 1; }
+    .mi-input-row {
+      display: flex;
+      gap: 10px;
+      max-width: 460px;
+      margin: 0 auto 18px;
+    }
+    .mi-input {
+      flex: 1;
+      text-align: center;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      font-family: inherit;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms, background 200ms;
+    }
+    .mi-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(16,43,106,0.10); }
+    .mi-input.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.07); color: #15803d; }
+    .mi-input.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.07); color: var(--red); animation: pqpShake 400ms ease; }
+    .mi-input:disabled   { cursor: default; }
+    .mi-feedback-area {
+      max-width: 460px;
+      margin: 0 auto 8px;
+      text-align: center;
+      min-height: 26px;
+    }
+    .mi-feedback-correct {
+      font-size: 17px;
+      font-weight: 800;
+      color: #16a34a;
+    }
+    .mi-feedback-wrong {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--red);
+      line-height: 1.5;
+    }
+    .mi-feedback-wrong .mi-correct-word { font-size: 19px; font-weight: 800; }
+    .mi-diff-char {
+      background: rgba(214,40,57,0.16);
+      border-radius: 3px;
+      padding: 0 1px;
+    }
+    .mi-stop-row {
+      text-align: center;
+      margin-top: 28px;
+    }
+    .mi-stop-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .mi-stop-btn:hover { color: var(--text); }
+    .mi-stars { font-size: 22px; margin-bottom: 6px; }
+    @media (max-width: 480px) {
+      .mi-streak { font-size: 36px; }
+      .mi-input  { font-size: 19px; }
+    }
+
   </style>
 </head>
 <body>
@@ -4203,6 +4323,9 @@
         return;
       } else if (currentType === "fraction-decimale-tableau-niveaux") {
         fdtnInitSession();
+        return;
+      } else if (currentType === "mots-invariables-serie") {
+        miInitSession();
         return;
       } else {
         bankSource = sessionData.bank;
@@ -20057,6 +20180,364 @@
         total:        20,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
       });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       LES MOTS INVARIABLES  —  type : mots-invariables-serie
+       Mécanique différente des autres exercices : pas de score /20, mais une
+       série sans erreur. L'élève entend le mot (SpeechSynthesis, fr-FR,
+       rate 0.85), l'écrit, et enchaîne le plus de mots corrects d'affilée.
+       Une seule erreur remet le compteur de série à zéro.
+       Niveau "validé" (déblocage du suivant) quand le record de série de la
+       session atteint MI_TARGETS[niveau].
+    ══════════════════════════════════════════════════════════════════════════ */
+
+    const MI_TARGETS = { CM1: 15, CM2: 15, "6e": 10 };
+    const MI_LEVEL_DESCS = {
+      CM1: "40 mots invariables courants — enchaîne un maximum de mots sans erreur",
+      CM2: "40 mots invariables moins fréquents ou plus longs",
+      "6e": "20 mots difficiles et homophones grammaticaux pièges"
+    };
+
+    let miState       = null;
+    let miLevelSelect = null;
+
+    /* La liste des voix se charge de façon asynchrone dans Chrome — on la
+       réveille dès le chargement du script pour qu'elle soit prête (et que
+       "Google français" soit disponible) avant le premier mot prononcé. */
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+
+    /* "Google français" (Chrome, moteur réseau) est de loin la plus claire
+       et la plus naturelle des voix fr disponibles côté navigateur — on la
+       force dès qu'elle existe. Sinon, repli sur une voix fr-FR non
+       "compact" (les voix embarquées "compact" de l'OS sont robotiques). */
+    function miVoiceScore(v) {
+      if (v.name === "Google français") return 1000;
+      let score = 0;
+      if (v.lang === "fr-FR") score += 10;
+      else if (v.lang && v.lang.toLowerCase().startsWith("fr")) score += 5;
+      if (v.localService === false) score += 3;
+      if (/google/i.test(v.name)) score += 2;
+      if (/compact/i.test(v.name)) score -= 4;
+      return score;
+    }
+
+    function miPickVoice() {
+      if (!("speechSynthesis" in window)) return null;
+      const voices = (window.speechSynthesis.getVoices() || [])
+        .filter(v => v.lang && v.lang.toLowerCase().startsWith("fr"));
+      const google = voices.find(v => v.name === "Google français");
+      if (google) return google;
+      voices.sort((a, b) => miVoiceScore(b) - miVoiceScore(a));
+      return voices[0] || null;
+    }
+
+    /* Chrome tronque/déforme le début de l'énoncé quand speak() est appelé
+       juste après cancel() dans le même tick (bug connu du moteur réseau
+       "Google français"). On n'annule que si une lecture est vraiment en
+       cours, et on laisse un court délai au moteur avant de relancer. */
+    function miSpeak(text, onEnd) {
+      if (!("speechSynthesis" in window)) { if (onEnd) onEnd(); return; }
+      const synth = window.speechSynthesis;
+
+      const fire = () => {
+        const utter  = new SpeechSynthesisUtterance(text);
+        utter.lang   = "fr-FR";
+        utter.rate   = 0.85;
+        utter.pitch  = 1;
+        utter.volume = 1;
+        const voice = miPickVoice();
+        if (voice) utter.voice = voice;
+        let done = false;
+        const finish = () => { if (!done) { done = true; if (onEnd) onEnd(); } };
+        utter.onend   = finish;
+        utter.onerror = finish;
+        synth.speak(utter);
+      };
+
+      if (synth.speaking || synth.pending) {
+        synth.cancel();
+        setTimeout(fire, 150);
+      } else {
+        fire();
+      }
+    }
+
+    function miNorm(str) {
+      return (str || "").trim().toLowerCase().replace(/\s+/g, " ");
+    }
+
+    /* Met en évidence, dans le mot correct, la zone qui diffère de la saisie
+       (alignement par préfixe/suffixe communs — suffisant pour une faute
+       de lettre, d'accent ou de doublement typique à ce niveau). */
+    function miDiffHighlight(correct, typed) {
+      const c = correct;
+      const cL = c.toLowerCase();
+      const tL = (typed || "").trim().toLowerCase();
+      let prefix = 0;
+      const maxPrefix = Math.min(cL.length, tL.length);
+      while (prefix < maxPrefix && cL[prefix] === tL[prefix]) prefix++;
+      let suffix = 0;
+      const maxSuffix = Math.min(cL.length, tL.length) - prefix;
+      while (suffix < maxSuffix && cL[cL.length - 1 - suffix] === tL[tL.length - 1 - suffix]) suffix++;
+      const midStart = prefix;
+      const midEnd   = c.length - suffix;
+      if (midStart >= midEnd) return c;
+      return c.slice(0, midStart) +
+        '<span class="mi-diff-char">' + c.slice(midStart, midEnd) + '</span>' +
+        c.slice(midEnd);
+    }
+
+    function miWordBank(lv) {
+      const key = lv === "CM1" ? "level1Words" : lv === "CM2" ? "level2Words" : "level3Words";
+      const raw = sessionData[key] || [];
+      return raw.map(w => typeof w === "string" ? { word: w, context: null } : w);
+    }
+
+    function miDrawNext() {
+      if (miState.deckPos >= miState.deck.length) {
+        miState.deck    = shuffle(miState.pool);
+        miState.deckPos = 0;
+      }
+      miState.current = miState.deck[miState.deckPos];
+      miState.deckPos++;
+    }
+
+    /* ── Retour à l'écran "Choisis ton niveau" depuis les résultats ────────── */
+    function miBackToSelectScreen() {
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      miState = null;
+      document.getElementById("results-screen").classList.add("ex-hidden");
+      document.getElementById("exercise-screen").classList.remove("ex-hidden");
+      const prog = document.querySelector("#exercise-screen .ex-progress");
+      if (prog) prog.classList.add("ex-hidden");
+    }
+
+    /* ── Init ────────────────────────────────────────────────────────────── */
+    function miInitSession() {
+      miState = null;
+      sessionStartTime = Date.now();
+
+      document.getElementById("results-screen").classList.add("ex-hidden");
+      document.getElementById("exercise-screen").classList.remove("ex-hidden");
+      document.getElementById("ex-type-back-btn").classList.add("ex-hidden");
+
+      const prog = document.querySelector("#exercise-screen .ex-progress");
+      if (prog) prog.classList.add("ex-hidden");
+
+      const slug   = new URLSearchParams(window.location.search).get("slug") || "unknown";
+      const levels = sessionData.levels || ["CM1", "CM2", "6e"];
+
+      miLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: MI_LEVEL_DESCS[l] || "" })),
+        threshold: 1,
+        onSelectLevel: lv => miStartLevel(lv),
+        selectContainer: document.getElementById("ex-card"),
+        badgesContainer: document.getElementById("ex-badges"),
+        onBackToSelect: miBackToSelectScreen,
+        introHTML: '<div class="pqp-rule-chip" style="display:flex;margin:0 auto 20px;max-width:520px">🔥 Enchaîne un maximum de mots sans erreur — une seule faute et la série repart à zéro !</div>'
+      });
+      miLevelSelect.renderSelectScreen();
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function miStartLevel(lv) {
+      const pool = miWordBank(lv);
+      miState = {
+        lv,
+        target:  MI_TARGETS[lv] || 15,
+        pool,
+        deck:    shuffle(pool),
+        deckPos: 0,
+        current: null,
+        streak:  0,
+        record:  0,
+        attempts: 0,
+        correct:  0
+      };
+      miDrawNext();
+      miRenderItem();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /* ── Rendu d'un item ─────────────────────────────────────────────────── */
+    function miRenderItem() {
+      const card = document.getElementById("ex-card");
+      const { streak, record } = miState;
+
+      card.innerHTML = `
+        <div class="mi-counters">
+          <div class="mi-streak" id="mi-streak">🔥 Série : ${streak}</div>
+          <div class="mi-record" id="mi-record">🏆 Record : ${record}</div>
+        </div>
+        <div class="mi-listen-row">
+          <button type="button" class="mi-listen-btn" id="mi-listen-btn">🔊 Réécouter</button>
+        </div>
+        <div class="mi-context" id="mi-context"></div>
+        <div class="mi-input-row">
+          <input type="text" class="mi-input" id="mi-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                 placeholder="Écris le mot que tu entends…">
+          <button type="button" class="ex-validate-btn" id="mi-val-btn">Valider</button>
+        </div>
+        <div class="mi-feedback-area" id="mi-feedback"></div>
+        <div class="mi-stop-row">
+          <button type="button" class="mi-stop-btn" id="mi-stop-btn">Arrêter et voir mes résultats</button>
+        </div>
+      `;
+
+      document.getElementById("mi-listen-btn").addEventListener("click", () => miSpeakCurrent());
+      document.getElementById("mi-stop-btn").addEventListener("click", miShowResults);
+
+      const doValidate = () => miValidate();
+      document.getElementById("mi-val-btn").addEventListener("click", doValidate);
+      document.getElementById("mi-input").addEventListener("keydown", e => { if (e.key === "Enter") doValidate(); });
+
+      miSpeakCurrent(() => {
+        const context = miState.current.context;
+        if (context) {
+          const ctx = document.getElementById("mi-context");
+          if (ctx) {
+            ctx.textContent = context;
+            ctx.classList.add("mi-visible");
+          }
+        }
+      });
+
+      setTimeout(() => document.getElementById("mi-input")?.focus(), 80);
+    }
+
+    function miSpeakCurrent(onEnd) {
+      const listenBtn = document.getElementById("mi-listen-btn");
+      if (listenBtn) listenBtn.disabled = true;
+      miSpeak(miState.current.word, () => {
+        if (listenBtn) listenBtn.disabled = false;
+        if (onEnd) onEnd();
+      });
+    }
+
+    /* ── Validation d'une saisie ─────────────────────────────────────────── */
+    function miValidate() {
+      const input  = document.getElementById("mi-input");
+      const valBtn = document.getElementById("mi-val-btn");
+      if (!input || !input.value.trim() || input.disabled) return;
+
+      const typed   = input.value;
+      const correct = miState.current.word;
+      const isRight = miNorm(typed) === miNorm(correct);
+
+      input.disabled  = true;
+      valBtn.disabled = true;
+      document.getElementById("mi-listen-btn").disabled = true;
+      document.getElementById("mi-stop-btn").disabled    = true;
+
+      miState.attempts++;
+
+      if (isRight) {
+        miState.correct++;
+        miState.streak++;
+        if (miState.streak > miState.record) miState.record = miState.streak;
+
+        input.classList.add("is-correct");
+        document.getElementById("mi-feedback").innerHTML =
+          `<div class="mi-feedback-correct">✅ ${correct}</div>`;
+
+        const streakEl = document.getElementById("mi-streak");
+        document.getElementById("mi-record").textContent = `🏆 Record : ${miState.record}`;
+        streakEl.textContent = `🔥 Série : ${miState.streak}`;
+        streakEl.classList.add("mi-bump");
+        setTimeout(() => streakEl.classList.remove("mi-bump"), 150);
+
+        setTimeout(() => { miDrawNext(); miRenderItem(); }, 800);
+      } else {
+        miState.streak = 0;
+        input.classList.add("is-wrong");
+        document.getElementById("mi-feedback").innerHTML = `
+          <div class="mi-feedback-wrong">
+            Raté ! Le mot s'écrit : <span class="mi-correct-word">${miDiffHighlight(correct, typed)}</span>.<br>
+            Ta série repart à zéro.
+          </div>`;
+        document.getElementById("mi-streak").textContent = "🔥 Série : 0";
+
+        setTimeout(() => { miDrawNext(); miRenderItem(); }, 2000);
+      }
+    }
+
+    /* ── Résultats de fin de session ─────────────────────────────────────── */
+    function miShowResults() {
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      const { lv, record, attempts, correct, target } = miState;
+      const pct = attempts > 0 ? Math.round(correct / attempts * 100) : 0;
+
+      const { passed, isLast } = miLevelSelect.completeLevel(lv, Math.min(record, target), target);
+
+      const prog = document.querySelector("#exercise-screen .ex-progress");
+      if (prog) prog.classList.add("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.remove("ex-hidden");
+
+      document.getElementById("score-value").textContent = "🏆 " + record;
+      document.getElementById("score-pct").textContent   =
+        attempts + " mot" + (attempts !== 1 ? "s" : "") + " tenté" + (attempts !== 1 ? "s" : "") + " · " + pct + " % de réussite";
+
+      const stars = record >= target                    ? "🌟🌟🌟"
+                  : record >= Math.ceil(target * 0.6)    ? "⭐⭐"
+                  : record >= Math.ceil(target * 0.3)    ? "⭐"
+                  : "";
+
+      const backHref  = sessionData.backLink?.href  || "français-orthographe.html";
+      const backLabel = `← Retour à l'${sessionData.backLink?.label || "Orthographe"}`;
+      const backToSelectBtn = miLevelSelect.backToSelectButtonHTML();
+
+      const encouragement = attempts === 0
+        ? "Écoute bien chaque mot puis écris-le !"
+        : passed
+          ? (isLast ? "Bravo ! Tu maîtrises les mots invariables aux trois niveaux !" : "Niveau validé ! Le niveau suivant est débloqué !")
+          : (record === 0 ? "On y retourne, tu vas y arriver !" : `Encore un effort pour atteindre une série de ${target} mots !`);
+
+      const msg = (stars ? stars + " " : "") + encouragement;
+
+      const btnsHTML = (passed && !isLast)
+        ? `<div class="ex-results-btns">
+             <button class="ex-btn-primary" id="mi-restart-btn">Rejouer</button>
+             ${backToSelectBtn}
+           </div>
+           <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`
+        : `<div class="ex-results-btns">
+             <button class="ex-btn-primary" id="mi-restart-btn">Rejouer</button>
+             ${backToSelectBtn}
+             <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+           </div>`;
+
+      document.getElementById("score-msg").textContent = msg;
+      const resultsBtnsWrap = document.getElementById("ex-results-btns-wrap");
+      resultsBtnsWrap.innerHTML = btnsHTML;
+
+      document.getElementById("mi-restart-btn")?.addEventListener("click", () => {
+        document.getElementById("results-screen").classList.add("ex-hidden");
+        document.getElementById("exercise-screen").classList.remove("ex-hidden");
+        miStartLevel(lv);
+      });
+      miLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      if (attempts > 0) {
+        const slug = new URLSearchParams(window.location.search).get("slug");
+        const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+        saveExerciseResult({
+          exerciseSlug: slug, subject, category,
+          exerciseType: "mots-invariables-serie",
+          level:        LEVEL_LABELS[lv] ?? lv,
+          score:        correct,
+          total:        attempts,
+          durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        });
+      }
     }
 
     /* ── Start ────────────────────────────────────────────────────────────── */

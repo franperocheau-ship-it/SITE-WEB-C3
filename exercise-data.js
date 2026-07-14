@@ -9093,6 +9093,67 @@ const EXERCISE_DATA = {
       { num: 2345, den: 1000, decimal: 2.345, decimalStr: "2,345", tab: { u: 2, di: 3, ce: 4, mi: 5 } },
       { num:   30, den: 1000, decimal: 0.03,  decimalStr: "0,030", tab: { u: 0, di: 0, ce: 3, mi: 0 } }
     ]
+  },
+
+  /* ══════════════════════════════════════════════════════════════
+     LES MOTS INVARIABLES  (type : mots-invariables-serie)
+     Mécanique différente des autres exercices : pas de score /20,
+     mais une série sans erreur (dictée à l'oreille via SpeechSynthesis).
+     Niveau 1 : mots invariables courants (fréquence haute, courts)
+     Niveau 2 : mots invariables moins fréquents ou plus longs
+     Niveau 3 : mots invariables difficiles / homophones grammaticaux pièges
+       (objets { word, context } — la phrase de contexte n'est révélée
+       qu'après l'écoute, pour lever l'ambiguïté du mot entendu)
+  ══════════════════════════════════════════════════════════════ */
+  "ortho-mots-invariables": {
+    title: "Les mots invariables",
+    domaine:    "Français",
+    competence: "Orthographe — Mots invariables",
+    levels: ["CM1", "CM2", "6e"],
+    type: "mots-invariables-serie",
+    backLink: { href: "français-orthographe.html", label: "Orthographe" },
+
+    level1Words: [
+      "alors", "après", "assez", "aussi", "avant", "avec", "beaucoup",
+      "bien", "bientôt", "car", "chez", "comme", "contre", "dans", "dedans",
+      "dehors", "déjà", "demain", "depuis", "derrière", "dessous", "dessus",
+      "devant", "donc", "encore", "enfin", "ensemble", "entre", "environ",
+      "hier", "ici", "jamais", "là", "loin", "longtemps", "mais", "maintenant",
+      "même", "moins", "non"
+    ],
+
+    level2Words: [
+      "ailleurs", "ainsi", "alentour", "alors que", "auparavant", "aussitôt",
+      "autant", "autrefois", "autrement", "auprès", "cependant", "certainement",
+      "davantage", "désormais", "dorénavant", "effectivement", "également",
+      "ensuite", "exprès", "facilement", "forcément", "guère", "hormis",
+      "jadis", "jusqu'à", "lorsque", "malgré", "néanmoins", "notamment",
+      "nulle part", "or", "parfois", "parmi", "partout", "pendant", "plutôt",
+      "pourtant", "pourvu que", "presque", "puisque"
+    ],
+
+    level3Words: [
+      { word: "quant",        context: "Quant à lui, il ne sait pas." },
+      { word: "davantage",    context: "Il travaille davantage." },
+      { word: "plutôt",       context: "Je préfère plutôt rester ici." },
+      { word: "tandis que",   context: "Elle chante tandis que lui dessine." },
+      { word: "voire",        context: "C'est difficile, voire impossible." },
+      { word: "sinon",        context: "Dépêche-toi, sinon tu seras en retard." },
+      { word: "désormais",    context: "Désormais, il fait attention." },
+      { word: "cependant",    context: "Il était fatigué, cependant il continua." },
+      { word: "néanmoins",    context: "C'est risqué, néanmoins je tente." },
+      { word: "dorénavant",   context: "Dorénavant, tu rangeras ta chambre." },
+      { word: "afin de",      context: "Il s'entraîne afin de progresser." },
+      { word: "quoique",      context: "Quoiqu'il soit tard, il continue." },
+      { word: "nonobstant",   context: "Nonobstant les difficultés, il réussit." },
+      { word: "toutefois",    context: "Il était triste, toutefois il sourit." },
+      { word: "par ailleurs", context: "Par ailleurs, il faut noter que…" },
+      { word: "hormis",       context: "Hormis Paul, tout le monde est venu." },
+      { word: "certes",       context: "Certes, c'est compliqué." },
+      { word: "à moins que",  context: "Je viendrai, à moins qu'il pleuve." },
+      { word: "pourvu que",   context: "Pourvu qu'il fasse beau demain !" },
+      { word: "quoi que",     context: "Quoi qu'il arrive, sois courageux." }
+    ]
   }
 
 };

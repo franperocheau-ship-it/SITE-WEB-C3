@@ -198,6 +198,164 @@
     .detail-class-name { font-weight: 800; font-size: 22px; color: var(--blue); margin: 6px 0 4px; }
     .detail-class-meta { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 10px; }
 
+    /* ── Mode d'accès (libre / guidé) ────────────────────────────────────────── */
+    .access-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 22px 26px;
+      margin-bottom: 20px;
+    }
+    .access-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .access-card-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--color-brand-navy);
+    }
+    .access-card-sub {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+    .access-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--bg);
+      border-radius: 100px;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+    .access-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      border: none;
+      border-radius: 100px;
+      background: none;
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 180ms, color 180ms;
+      white-space: nowrap;
+    }
+    .access-toggle-btn:disabled { opacity: 0.6; cursor: default; }
+    .access-toggle-btn[data-mode="libre"].is-active { background: var(--color-brand-navy); color: #fff; }
+    .access-toggle-btn[data-mode="guide"].is-active { background: var(--color-niveau-cm1); color: #fff; }
+
+    .access-panel { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 18px; }
+    .access-panel-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .access-search { flex: 1; min-width: 200px; padding: 10px 14px; font-size: 14px; }
+    .access-counter {
+      font-family: var(--font-display);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--color-brand-navy);
+      background: rgba(245,166,35,0.14);
+      border: 1px solid rgba(245,166,35,0.35);
+      padding: 6px 14px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+    .access-tree { display: flex; flex-direction: column; gap: 8px; max-height: 560px; overflow-y: auto; }
+
+    .ax-domaine { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .ax-domaine-summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: rgba(26,45,107,0.05);
+      cursor: pointer;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--color-brand-navy);
+    }
+    .ax-caret {
+      font-size: 11px;
+      color: var(--muted);
+      transition: transform 180ms;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+    .ax-domaine.is-open > .ax-domaine-summary .ax-caret { transform: rotate(90deg); }
+    .ax-domaine-count { margin-left: auto; font-size: 11.5px; font-weight: 600; color: var(--muted); font-family: var(--font-body); }
+    .ax-notions { padding: 6px 10px 10px 30px; display: none; flex-direction: column; gap: 4px; }
+    .ax-domaine.is-open > .ax-notions { display: flex; }
+
+    .ax-notion { border-radius: 10px; }
+    .ax-notion-summary {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text);
+      border-radius: 8px;
+    }
+    .ax-notion-summary:hover { background: var(--bg); }
+    .ax-notion.is-open > .ax-notion-summary .ax-caret { transform: rotate(90deg); }
+    .ax-notion-count { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--muted); }
+    .ax-exercises { padding: 2px 0 6px 24px; display: none; flex-direction: column; gap: 2px; }
+    .ax-notion.is-open > .ax-exercises { display: flex; }
+
+    .ax-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      color: var(--text);
+    }
+    .ax-row:hover { background: var(--bg); }
+    .ax-row label { flex: 1; cursor: pointer; }
+    .ax-check { width: 17px; height: 17px; accent-color: var(--color-niveau-cm1); cursor: pointer; flex-shrink: 0; }
+    .ax-notion-summary .ax-check,
+    .ax-domaine-summary .ax-check { accent-color: var(--color-brand-navy); }
+
+    .ax-status { width: 16px; height: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .ax-spinner {
+      width: 12px; height: 12px;
+      border: 2px solid var(--border);
+      border-top-color: var(--color-brand-navy);
+      border-radius: 50%;
+      animation: ax-spin 0.6s linear infinite;
+    }
+    @keyframes ax-spin { to { transform: rotate(360deg); } }
+    .ax-check-ok { color: var(--color-niveau-cm1); font-weight: 800; font-size: 14px; animation: ax-pop 220ms ease; }
+    @keyframes ax-pop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .ax-empty { text-align: center; padding: 24px; color: var(--muted); font-size: 13.5px; }
+    .ax-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 28px;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+    .ax-loading .ax-spinner { width: 15px; height: 15px; border-width: 2.5px; }
+
     /* ── Students table ──────────────────────────────────────────────────────── */
     .table-wrap {
       background: var(--card-bg);
@@ -567,6 +725,27 @@
           </div>
         </div>
 
+        <!-- Mode d'accès aux exercices -->
+        <div class="access-card">
+          <div class="access-card-head">
+            <div>
+              <div class="access-card-title">Mode d'accès aux exercices</div>
+              <div class="access-card-sub" id="access-sub">Navigation libre : les élèves voient tout le catalogue.</div>
+            </div>
+            <div class="access-toggle" id="access-toggle">
+              <button type="button" class="access-toggle-btn" data-mode="libre">🔓 Navigation libre</button>
+              <button type="button" class="access-toggle-btn" data-mode="guide">🎯 Parcours guidé</button>
+            </div>
+          </div>
+          <div class="access-panel" id="access-panel" style="display:none">
+            <div class="access-panel-head">
+              <input class="form-input access-search" id="ax-search" type="text" placeholder="🔍 Rechercher un exercice…">
+              <span class="access-counter" id="ax-counter">0 exercices actifs sur 0</span>
+            </div>
+            <div class="access-tree" id="ax-tree"></div>
+          </div>
+        </div>
+
         <!-- En-tête élèves -->
         <div class="section-header">
           <span class="section-title">Élèves</span>
@@ -826,6 +1005,11 @@
   let _movingStudentId  = null;
   let _pendingDelete    = null;
 
+  /* ── Mode d'accès aux exercices (libre / guidé) ─────────────────────────────── */
+  let _activeExerciseIds = new Set();
+  let _openGroups         = new Set();
+  let _exerciseTreeCache  = null;
+
   function normalize(str) {
     return str.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, '-');
   }
@@ -1002,7 +1186,12 @@
       if (!_classes.length) _classes = await lfmTeacher.getClasses();
       _currentClass = _classes.find(c => c.id === classId);
       if (!_currentClass) { navigate({}); return; }
-      _students = await lfmTeacher.getStudents(classId);
+      const [students, activeIds] = await Promise.all([
+        lfmTeacher.getStudents(classId),
+        lfmTeacher.getActiveExercises(classId)
+      ]);
+      _students          = students;
+      _activeExerciseIds = new Set(activeIds);
     } catch (e) {
       showToast('Erreur lors du chargement', 'error');
       navigate({});
@@ -1021,6 +1210,7 @@
     document.getElementById('detail-class-name').textContent = c.name;
     document.getElementById('detail-year').textContent    = c.school_year;
     renderDetailStudents();
+    renderAccessCard();
   }
 
   function renderDetailStudents() {
@@ -1072,6 +1262,312 @@
     if (action === 'reset')  confirmResetPassword(student);
     if (action === 'move')   openModalMove(student);
     if (action === 'delete') confirmDeleteById('student', id, student.display_name);
+  });
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     MODE D'ACCÈS AUX EXERCICES (LIBRE / GUIDÉ)
+  ═══════════════════════════════════════════════════════════════════════════ */
+
+  function axNormalize(str) {
+    return String(str ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  }
+
+  /* Chargement paresseux de exercise-data.js (~9000 lignes) et de son catalogue
+     d'organisation js/exercise-catalog.js : uniquement à la première ouverture
+     du panneau "Parcours guidé", pas dans le <head>. */
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload  = () => resolve();
+      script.onerror = () => reject(new Error(`Impossible de charger ${src}.`));
+      document.head.appendChild(script);
+    });
+  }
+
+  let _exerciseAssetsPromise = null;
+  function loadExerciseAssets() {
+    if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG !== 'undefined') return Promise.resolve();
+    if (_exerciseAssetsPromise) return _exerciseAssetsPromise;
+    _exerciseAssetsPromise = Promise.all([
+      typeof EXERCISE_DATA    !== 'undefined' ? null : loadScript('exercise-data.js'),
+      typeof EXERCISE_CATALOG !== 'undefined' ? null : loadScript('js/exercise-catalog.js')
+    ]).catch(err => { _exerciseAssetsPromise = null; throw err; });
+    return _exerciseAssetsPromise;
+  }
+
+  async function ensureExerciseDataLoaded() {
+    if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG !== 'undefined') {
+      renderAccessTree();
+      return;
+    }
+    document.getElementById('ax-tree').innerHTML = '<div class="ax-loading"><span class="ax-spinner"></span> Chargement du catalogue des exercices…</div>';
+    document.getElementById('ax-search').disabled = true;
+    try {
+      await loadExerciseAssets();
+      document.getElementById('ax-search').disabled = false;
+      renderAccessTree();
+    } catch (err) {
+      document.getElementById('ax-tree').innerHTML = `<div class="ax-empty">${esc(err.message)}</div>`;
+    }
+  }
+
+  /* Matière > Sous-thème > Exercice, dérivé de EXERCISE_CATALOG (organisation
+     réelle du site — voir js/exercise-catalog.js). Tout slug de EXERCISE_DATA
+     absent du catalogue est regroupé dans "Autres exercices" pour qu'aucun
+     exercice ne soit jamais invisible. */
+  function buildExerciseTree() {
+    if (_exerciseTreeCache) return _exerciseTreeCache;
+    const used = new Set();
+
+    const tree = EXERCISE_CATALOG.map(({ matiere, sousThemes }) => ({
+      domaine: matiere,
+      notions: sousThemes.map(({ nom, slugs }) => ({
+        notion: nom,
+        items: slugs
+          .filter(slug => EXERCISE_DATA[slug])
+          .map(slug => {
+            used.add(slug);
+            return { slug, title: EXERCISE_DATA[slug].title };
+          })
+      }))
+    }));
+
+    const rest = Object.keys(EXERCISE_DATA)
+      .filter(slug => !used.has(slug))
+      .sort((a, b) => EXERCISE_DATA[a].title.localeCompare(EXERCISE_DATA[b].title, 'fr'))
+      .map(slug => ({ slug, title: EXERCISE_DATA[slug].title }));
+
+    if (rest.length > 0) {
+      tree.push({ domaine: 'Autres exercices', notions: [{ notion: 'Absents du catalogue', items: rest }] });
+    }
+
+    _exerciseTreeCache = tree;
+    return tree;
+  }
+
+  function exerciseTotalCount() {
+    return Object.keys(EXERCISE_DATA).length;
+  }
+
+  function renderAccessCard() {
+    const mode = _currentClass.mode_acces || 'libre';
+    document.querySelectorAll('#access-toggle .access-toggle-btn').forEach(btn => {
+      btn.classList.toggle('is-active', btn.dataset.mode === mode);
+    });
+    document.getElementById('access-sub').textContent = mode === 'guide'
+      ? 'Parcours guidé : les élèves ne voient que les exercices activés ci-dessous.'
+      : 'Navigation libre : les élèves voient tout le catalogue.';
+    document.getElementById('access-panel').style.display = mode === 'guide' ? 'block' : 'none';
+    if (mode === 'guide') {
+      document.getElementById('ax-search').value = '';
+      ensureExerciseDataLoaded();
+    }
+  }
+
+  document.getElementById('access-toggle').addEventListener('click', async e => {
+    const btn = e.target.closest('.access-toggle-btn');
+    if (!btn || btn.classList.contains('is-active')) return;
+    const newMode = btn.dataset.mode;
+
+    document.querySelectorAll('#access-toggle .access-toggle-btn').forEach(b => b.disabled = true);
+    try {
+      await lfmTeacher.updateClassAccessMode(_currentClass.id, newMode);
+      _currentClass.mode_acces = newMode;
+      const idx = _classes.findIndex(c => c.id === _currentClass.id);
+      if (idx !== -1) _classes[idx].mode_acces = newMode;
+      renderAccessCard();
+      showToast(newMode === 'guide' ? 'Parcours guidé activé' : 'Navigation libre activée');
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    } finally {
+      document.querySelectorAll('#access-toggle .access-toggle-btn').forEach(b => b.disabled = false);
+    }
+  });
+
+  function updateAxCounter() {
+    document.getElementById('ax-counter').textContent =
+      `${_activeExerciseIds.size} exercice${_activeExerciseIds.size !== 1 ? 's' : ''} actif${_activeExerciseIds.size !== 1 ? 's' : ''} sur ${exerciseTotalCount()}`;
+  }
+
+  function renderAccessTree() {
+    const tree  = buildExerciseTree();
+    const query = axNormalize(document.getElementById('ax-search').value.trim());
+    let html = '';
+
+    tree.forEach(({ domaine, notions }) => {
+      let notionsHtml = '';
+      let domaineActive = 0, domaineTotal = 0;
+
+      notions.forEach(({ notion, items }) => {
+        const filtered = query ? items.filter(it => axNormalize(it.title).includes(query)) : items;
+        if (filtered.length === 0) return;
+
+        const activeInNotion = filtered.filter(it => _activeExerciseIds.has(it.slug)).length;
+        domaineActive += activeInNotion;
+        domaineTotal  += filtered.length;
+        const notionKey = domaine + '::' + notion;
+        const isOpen = _openGroups.has(notionKey) || !!query;
+
+        const rows = filtered.map(it => `
+          <div class="ax-row">
+            <input type="checkbox" class="ax-check" id="ax-ex-${esc(it.slug)}" data-slug="${esc(it.slug)}" ${_activeExerciseIds.has(it.slug) ? 'checked' : ''}>
+            <label for="ax-ex-${esc(it.slug)}">${esc(it.title)}</label>
+            <span class="ax-status" data-status-for="${esc(it.slug)}"></span>
+          </div>
+        `).join('');
+
+        notionsHtml += `
+          <div class="ax-notion${isOpen ? ' is-open' : ''}" data-notion-key="${esc(notionKey)}">
+            <div class="ax-notion-summary" data-toggle="notion">
+              <span class="ax-caret">▸</span>
+              <input type="checkbox" class="ax-check" data-notion-all="${esc(notionKey)}">
+              <span>${esc(notion)}</span>
+              <span class="ax-notion-count">${activeInNotion}/${filtered.length}</span>
+            </div>
+            <div class="ax-exercises">${rows}</div>
+          </div>
+        `;
+      });
+
+      if (!notionsHtml) return;
+
+      const isDomaineOpen = _openGroups.has(domaine) || !!query;
+      html += `
+        <div class="ax-domaine${isDomaineOpen ? ' is-open' : ''}" data-domaine-key="${esc(domaine)}">
+          <div class="ax-domaine-summary" data-toggle="domaine">
+            <span class="ax-caret">▸</span>
+            <input type="checkbox" class="ax-check" data-domaine-all="${esc(domaine)}">
+            <span>${esc(domaine)}</span>
+            <span class="ax-domaine-count">${domaineActive}/${domaineTotal}</span>
+          </div>
+          <div class="ax-notions">${notionsHtml}</div>
+        </div>
+      `;
+    });
+
+    const treeEl = document.getElementById('ax-tree');
+    treeEl.innerHTML = html || '<div class="ax-empty">Aucun exercice ne correspond à la recherche.</div>';
+    updateGroupCheckStates(treeEl);
+    updateAxCounter();
+  }
+
+  /* Coche/indéterminé des cases "tout sélectionner", dérivés des lignes visibles. */
+  function updateGroupCheckStates(scope) {
+    scope.querySelectorAll('.ax-notion').forEach(notionEl => {
+      const boxes  = notionEl.querySelectorAll('.ax-exercises input[data-slug]');
+      const all    = boxes.length;
+      const active = Array.from(boxes).filter(b => b.checked).length;
+      const cb     = notionEl.querySelector('[data-notion-all]');
+      cb.checked       = all > 0 && active === all;
+      cb.indeterminate = active > 0 && active < all;
+    });
+    scope.querySelectorAll('.ax-domaine').forEach(domaineEl => {
+      const boxes  = domaineEl.querySelectorAll('.ax-exercises input[data-slug]');
+      const all    = boxes.length;
+      const active = Array.from(boxes).filter(b => b.checked).length;
+      const cb     = domaineEl.querySelector('[data-domaine-all]');
+      cb.checked       = all > 0 && active === all;
+      cb.indeterminate = active > 0 && active < all;
+    });
+  }
+
+  const axTreeEl = document.getElementById('ax-tree');
+
+  /* Expand/collapse manuel (évite le conflit case à cocher / <summary> natif). */
+  axTreeEl.addEventListener('click', e => {
+    if (e.target.matches('input[type=checkbox]') || e.target.closest('label')) return;
+    const summary = e.target.closest('[data-toggle]');
+    if (!summary) return;
+    if (summary.dataset.toggle === 'domaine') {
+      const el  = summary.closest('.ax-domaine');
+      const key = el.dataset.domaineKey;
+      el.classList.toggle('is-open');
+      el.classList.contains('is-open') ? _openGroups.add(key) : _openGroups.delete(key);
+    } else {
+      const el  = summary.closest('.ax-notion');
+      const key = el.dataset.notionKey;
+      el.classList.toggle('is-open');
+      el.classList.contains('is-open') ? _openGroups.add(key) : _openGroups.delete(key);
+    }
+  });
+
+  axTreeEl.addEventListener('change', async e => {
+    const cb = e.target;
+    if (!cb.matches('input[type=checkbox]')) return;
+
+    if (cb.dataset.slug) {
+      await axToggleExercise(cb.dataset.slug, cb.checked, cb);
+    } else if (cb.dataset.notionAll) {
+      await axToggleGroup(cb, cb.closest('.ax-notion').querySelectorAll('.ax-exercises input[data-slug]'));
+    } else if (cb.dataset.domaineAll) {
+      await axToggleGroup(cb, cb.closest('.ax-domaine').querySelectorAll('.ax-exercises input[data-slug]'));
+    }
+  });
+
+  function axShowStatus(slug, state) {
+    const el = axTreeEl.querySelector(`[data-status-for="${CSS.escape(slug)}"]`);
+    if (!el) return;
+    if (state === 'saving') {
+      el.innerHTML = '<span class="ax-spinner"></span>';
+    } else if (state === 'saved') {
+      el.innerHTML = '<span class="ax-check-ok">✓</span>';
+      setTimeout(() => { if (el.querySelector('.ax-check-ok')) el.innerHTML = ''; }, 1200);
+    } else {
+      el.innerHTML = '';
+    }
+  }
+
+  async function axToggleExercise(slug, isActive, checkboxEl) {
+    axShowStatus(slug, 'saving');
+    try {
+      if (isActive) {
+        await lfmTeacher.addActiveExercise(_currentClass.id, slug);
+        _activeExerciseIds.add(slug);
+      } else {
+        await lfmTeacher.removeActiveExercise(_currentClass.id, slug);
+        _activeExerciseIds.delete(slug);
+      }
+      axShowStatus(slug, 'saved');
+      updateGroupCheckStates(axTreeEl);
+      updateAxCounter();
+    } catch (err) {
+      checkboxEl.checked = !isActive;
+      axShowStatus(slug, 'idle');
+      showToast('Erreur : ' + err.message, 'error');
+    }
+  }
+
+  async function axToggleGroup(groupCb, exerciseBoxes) {
+    const turnOn = groupCb.checked;
+    const slugs  = Array.from(exerciseBoxes).map(b => b.dataset.slug);
+    const toChange = slugs.filter(slug => _activeExerciseIds.has(slug) !== turnOn);
+    if (toChange.length === 0) return;
+
+    toChange.forEach(slug => axShowStatus(slug, 'saving'));
+    try {
+      if (turnOn) {
+        await lfmTeacher.addActiveExercisesBulk(_currentClass.id, toChange);
+        toChange.forEach(slug => _activeExerciseIds.add(slug));
+      } else {
+        await lfmTeacher.removeActiveExercisesBulk(_currentClass.id, toChange);
+        toChange.forEach(slug => _activeExerciseIds.delete(slug));
+      }
+      exerciseBoxes.forEach(b => { b.checked = _activeExerciseIds.has(b.dataset.slug); });
+      toChange.forEach(slug => axShowStatus(slug, 'saved'));
+      updateGroupCheckStates(axTreeEl);
+      updateAxCounter();
+    } catch (err) {
+      toChange.forEach(slug => axShowStatus(slug, 'idle'));
+      showToast('Erreur : ' + err.message, 'error');
+      renderAccessTree();
+    }
+  }
+
+  let _axSearchTimer;
+  document.getElementById('ax-search').addEventListener('input', () => {
+    clearTimeout(_axSearchTimer);
+    _axSearchTimer = setTimeout(renderAccessTree, 120);
   });
 
   /* ═══════════════════════════════════════════════════════════════════════════
