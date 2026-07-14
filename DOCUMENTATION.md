@@ -282,3 +282,24 @@ En fin d'année :
 ### 6.7 Support et retours
 
 Pour signaler un problème ou proposer une amélioration, créez une issue sur le dépôt GitHub du projet.
+
+### 6.8 Historique des lots LevelSelect
+
+Le composant partagé `js/level-select.js` (verrouillage séquentiel des niveaux, seuil de réussite,
+pastilles, sessionStorage, confettis) a été déployé exercice par exercice plutôt qu'en une seule fois.
+Les lots 0 à 5 ont migré vers ce composant tous les exercices qui reposent sur de vrais niveaux
+progressifs (grammaire, conjugaison, nombres entiers, nombres décimaux, algèbre, etc.) — y compris,
+pour certains, un mécanisme générique interne à `exercise.html` (`showLevelSelect()` /
+`showAccordLevelSelect()`) qui ne suit pas la convention de nommage `type: "...-niveaux"`.
+
+Un audit ultérieur a recensé les exercices d'`exercise-data.js` qui n'utilisent toujours pas
+`LevelSelect` : 39 au total, principalement des quiz plats à session unique (conjugaison des groupes
+réguliers, types de phrases, déterminants, fractions, nombres entiers). Pour chacun, une recommandation
+a été établie : créer de vrais niveaux progressifs, garder en mono-niveau assumé (le cas échéant),
+fusionner avec un exercice existant, ou supprimer (cas d'une banque à un seul item). Ce solde est traité
+lot par lot, sur le même modèle que les migrations précédentes.
+
+Séparément, 26 pages autonomes hors `exercise-data.js` (les 10 pages d'homophones
+`ortho-distinguer-*.html` et les 16 exercices `js/lex-*.js` de `français-lexique.html`) ont déjà leur
+propre système de niveaux verrouillés codé à la main, sans passer par le composant partagé — elles ne
+relèvent pas du même audit mais d'un chantier de consolidation de code à part.
