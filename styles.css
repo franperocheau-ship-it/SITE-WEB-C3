@@ -956,6 +956,40 @@ body:has(.navbar) { padding-top: 50px; }
 }
 .back-link:hover { opacity: 1; }
 
+/* ─── Ligne de navigation d'un hub de matière (retour + bascule) ──────────── */
+
+.hub-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.subject-switch-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+  transition: opacity 180ms, letter-spacing 180ms;
+}
+.subject-switch-link:hover { opacity: 0.88; letter-spacing: 0.01em; }
+
+.subject-switch-link--maths {
+  background: var(--color-brand-gold);
+  color: #6b420a;
+}
+.subject-switch-link--francais {
+  background: var(--color-brand-navy);
+  color: #ffffff;
+}
+
 /* ─── En-tête de page ───────────────────────────────────────────────────── */
 
 .page-header {
@@ -967,6 +1001,17 @@ body:has(.navbar) { padding-top: 50px; }
   display: flex;
   justify-content: center;
   margin-bottom: 14px;
+}
+
+.page-header-icon img {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+}
+
+.page-header-icon img[src*="grammaire.png"] {
+  width: 104px;
+  height: 104px;
 }
 
 .page-title {
@@ -1028,6 +1073,18 @@ body:has(.navbar) { padding-top: 50px; }
   display: block;
 }
 
+.hub-card-img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  margin-bottom: 14px;
+}
+
+.hub-card-img[src*="grammaire.png"] {
+  width: 86px;
+  height: 86px;
+}
+
 .hub-card-title {
   font-family: var(--font-display);
   font-weight: 800;
@@ -1042,7 +1099,7 @@ body:has(.navbar) { padding-top: 50px; }
   width: 36px;
   height: 3px;
   border-radius: 2px;
-  margin: 0 auto;
+  margin: 0 auto 16px;
 }
 
 .hub-card:nth-child(odd) .hub-card-rule  { background: #F5A623; }
