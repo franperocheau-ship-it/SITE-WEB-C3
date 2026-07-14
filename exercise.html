@@ -2773,32 +2773,6 @@
        TYPE : decomposer-nombre-entier-niveaux
     ══════════════════════════════════════════════════════════════════ */
 
-    .dni-tab-bar {
-      display: flex;
-      border-bottom: 2px solid var(--border);
-      margin-bottom: 24px;
-    }
-    .dni-tab {
-      flex: 1;
-      background: none;
-      border: none;
-      border-bottom: 3px solid transparent;
-      margin-bottom: -2px;
-      padding: 11px 8px;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--muted);
-      cursor: pointer;
-      text-align: center;
-      transition: color 150ms, border-color 150ms;
-    }
-    .dni-tab.is-active {
-      color: var(--blue);
-      border-bottom-color: var(--blue);
-    }
-    .dni-tab:hover:not(.is-active) { color: var(--text); }
-
     /* Niveau 1 — champs numériques */
     .dni-fields-row {
       display: flex;
@@ -3851,28 +3825,11 @@
       <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
          target="_blank" rel="license noopener noreferrer">
         <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="14" height="14" aria-label="Creative Commons">
-            <circle cx="50" cy="50" r="47" fill="none" stroke="currentColor" stroke-width="6"/>
-            <text x="50" y="67" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold" font-size="42" fill="currentColor">cc</text>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="14" height="14" aria-label="Attribution">
-            <circle cx="50" cy="50" r="47" fill="none" stroke="currentColor" stroke-width="6"/>
-            <circle cx="50" cy="28" r="10" fill="currentColor"/>
-            <rect x="34" y="42" width="32" height="6" rx="3" fill="currentColor"/>
-            <rect x="40" y="50" width="20" height="22" rx="3" fill="currentColor"/>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="14" height="14" aria-label="Non Commercial">
-            <circle cx="50" cy="50" r="47" fill="none" stroke="currentColor" stroke-width="6"/>
-            <text x="50" y="67" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold" font-size="46" fill="currentColor">$</text>
-            <line x1="20" y1="20" x2="80" y2="80" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="14" height="14" aria-label="No Derivatives">
-            <circle cx="50" cy="50" r="47" fill="none" stroke="currentColor" stroke-width="6"/>
-            <rect x="22" y="35" width="56" height="8" rx="4" fill="currentColor"/>
-            <rect x="22" y="52" width="56" height="8" rx="4" fill="currentColor"/>
-            <rect x="22" y="69" width="40" height="8" rx="4" fill="currentColor"/>
-          </svg>
-        </span>
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
       </a>
       &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
   </div>
@@ -3919,6 +3876,8 @@
     let vpTableSt    = null;     /* valeur-position  : état tableau étape 2 */
     let fdgdState    = null;     /* fraction-decimale-grille-droite-niveaux */
     let fdtnState    = null;     /* fraction-decimale-tableau-niveaux       */
+    let fdgdLevelSelect = null;
+    let fdtnLevelSelect = null;
 
     const LEVEL_LABELS = { "CM1": "Niveau 1", "CM2": "Niveau 2", "6e": "Niveau 3" };
 
@@ -16780,6 +16739,22 @@
     ══════════════════════════════════════════════════════════════════════ */
 
     let dniState = null;
+    let dniLevelSelect = null;
+
+    const DNI_SEUIL = 0.80;
+    const DNI_LV_DEFS = [
+      { lv: 1, desc: '4 champs numériques : milliers, centaines, dizaines, unités' },
+      { lv: 2, desc: 'Étiquettes positionnelles à placer' },
+      { lv: 3, desc: 'Écriture additive, en produits et en lettres' }
+    ];
+
+    function dniBackToSelectScreen() {
+      dniState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
 
     function dniInitSession() {
       dniState = null;
@@ -16789,7 +16764,17 @@
       document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
-      dniStartLevel(1);
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      dniLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: DNI_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: DNI_SEUIL,
+        onSelectLevel: (lv) => dniStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: dniBackToSelectScreen
+      });
+      dniLevelSelect.renderSelectScreen();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -16803,6 +16788,7 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
       document.getElementById('q-total').textContent = qs.length;
+      if (dniLevelSelect) dniLevelSelect.renderBadges(lv);
       dniRenderQuestion();
     }
 
@@ -16817,31 +16803,12 @@
       else dniRenderLvl3(card, q);
     }
 
-    /* ── Barre d'onglets ──────────────────────────────────────────────── */
-
-    function dniTabBar(activeLv) {
-      return [1,2,3].map(lv =>
-        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
-      ).join('');
-    }
-
-    function dniSetupTabs() {
-      document.querySelectorAll('.dni-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const lv = parseInt(btn.dataset.lv, 10);
-          if (lv === dniState.level) return;
-          dniStartLevel(lv);
-        });
-      });
-    }
-
     /* ══════════════════════════════════════════════════════════════════
        NIVEAU 1 — 4 champs numériques (milliers / centaines / dizaines / unités)
     ══════════════════════════════════════════════════════════════════ */
 
     function dniRenderLvl1(card, q) {
       card.innerHTML = `
-        <div class="dni-tab-bar">${dniTabBar(1)}</div>
         <p class="ex-question-label">Décompose ce nombre en milliers, centaines, dizaines et unités.</p>
         <div class="vp-number-display">${q.display}</div>
         <div class="dni-fields-row">
@@ -16874,7 +16841,6 @@
         <button class="ex-validate-btn" id="dni-validate-btn" style="width:100%;margin-top:16px">Vérifier</button>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
-      dniSetupTabs();
       ['dni-mil','dni-cen','dni-diz','dni-uni'].forEach(id => {
         const el = document.getElementById(id);
         el.addEventListener('input', dniUpdatePreview);
@@ -16936,7 +16902,6 @@
       ).join('');
       const labelsHtml = shuffle([...q.parts]).map(v => `<button class="dni-label-btn" data-val="${v}">${dniFmtVal(v)}</button>`).join('');
       card.innerHTML = `
-        <div class="dni-tab-bar">${dniTabBar(2)}</div>
         <p class="ex-question-label">Place les valeurs de position pour décomposer ce nombre.</p>
         <div class="vp-number-display">${q.display}</div>
         <div class="dni-slots-row" id="dni-slots">${slotsHtml}</div>
@@ -16945,7 +16910,6 @@
         <button class="ex-validate-btn" id="dni-validate-btn" style="width:100%;margin-top:16px">Vérifier</button>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
-      dniSetupTabs();
       dniSetupLvl2(q);
     }
 
@@ -17049,7 +17013,6 @@
 
     function dniRenderLvl3(card, q) {
       card.innerHTML = `
-        <div class="dni-tab-bar">${dniTabBar(3)}</div>
         <p class="ex-question-label">Décompose ce nombre de trois façons différentes.</p>
         <div class="vp-number-display">${q.display}</div>
         <div class="dni-lvl3-fields">
@@ -17075,7 +17038,6 @@
         <button class="ex-validate-btn" id="dni-validate-btn" style="width:100%;margin-top:16px">Vérifier</button>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
-      dniSetupTabs();
       document.getElementById('dni-lettres').addEventListener('keydown', e => {
         if (e.key === 'Enter') document.getElementById('dni-validate-btn').click();
       });
@@ -17144,11 +17106,10 @@
 
     function dniShowLevelResults() {
       const { level, score: lvScore, total } = dniState;
-      const pct    = lvScore / total;
-      const s20    = Math.round(pct * 20);
+      const s20    = Math.round(lvScore / total * 20);
       const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
-      const isLast = level === 3;
-      const nextLv = level + 1;
+
+      const { passed, isLast } = dniLevelSelect.completeLevel(level, lvScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -17161,24 +17122,35 @@
         lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') + ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      const backToSelectBtn = dniLevelSelect.backToSelectButtonHTML();
       let msg, btnsHTML;
 
-      if (isLast) {
+      if (passed && isLast) {
         msg = `🎊 Bravo ! Tu maîtrises la décomposition des nombres entiers aux 3 niveaux !${stars}`;
         btnsHTML = `
-          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="dni-retry-btn">Recommencer ce niveau</button>
+            <button class="ex-btn-primary" id="dni-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
-      } else {
-        msg = `Niveau ${level} terminé !${stars}`;
+      } else if (passed) {
+        msg = `Niveau ${level} validé !${stars} 🏆 Le Niveau ${level + 1} est débloqué !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="dni-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-primary" id="dni-next-btn">Niveau ${level + 1} →</button>
             <button class="ex-btn-secondary" id="dni-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      } else {
+        const needed = Math.ceil(total * DNI_SEUIL);
+        msg = `Pas encore… il faut ${needed} / ${total} bonnes réponses pour valider ce niveau. On réessaie ?${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="dni-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
@@ -17192,8 +17164,15 @@
       document.getElementById('dni-next-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        dniStartLevel(nextLv);
+        dniStartLevel(level + 1);
       });
+      document.getElementById('dni-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        dniLevelSelect.reset();
+        dniInitSession();
+      });
+      dniLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -17218,6 +17197,22 @@
     ══════════════════════════════════════════════════════════════════════ */
 
     let cniState = null;
+    let cniLevelSelect = null;
+
+    const CNI_SEUIL = 0.80;
+    const CNI_LV_DEFS = [
+      { lv: 1, desc: 'Décomposition canonique → 1 champ numérique' },
+      { lv: 2, desc: 'Somme de parties non canoniques → 1 champ numérique' },
+      { lv: 3, desc: 'Somme de produits avec grandes puissances → 1 champ numérique' }
+    ];
+
+    function cniBackToSelectScreen() {
+      cniState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
 
     function cniInitSession() {
       cniState = null;
@@ -17227,7 +17222,17 @@
       document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
-      cniStartLevel(1);
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      cniLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: CNI_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: CNI_SEUIL,
+        onSelectLevel: (lv) => cniStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: cniBackToSelectScreen
+      });
+      cniLevelSelect.renderSelectScreen();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -17240,6 +17245,7 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
       document.getElementById('q-total').textContent = qs.length;
+      if (cniLevelSelect) cniLevelSelect.renderBadges(lv);
       cniRenderQuestion();
     }
 
@@ -17254,24 +17260,6 @@
       else                  cniRenderLvl3(card, q);
     }
 
-    /* ── Barre d'onglets (réutilise le style .dni-tab) ─────────────── */
-
-    function cniTabBar(activeLv) {
-      return [1,2,3].map(lv =>
-        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
-      ).join('');
-    }
-
-    function cniSetupTabs() {
-      document.querySelectorAll('.dni-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const lv = parseInt(btn.dataset.lv, 10);
-          if (lv === cniState.level) return;
-          cniStartLevel(lv);
-        });
-      });
-    }
-
     /* ── Formatage nombre français (espace tous les 3 chiffres) ─────── */
 
     function cniFmt(n) { return n.toLocaleString('fr-FR'); }
@@ -17282,7 +17270,6 @@
 
     function cniRenderLvl1(card, q) {
       card.innerHTML = `
-        <div class="dni-tab-bar">${cniTabBar(1)}</div>
         <p class="ex-question-label">Quel est le nombre entier correspondant à cette décomposition ?</p>
         <div class="cni-decomp-display">${q.display}</div>
         <div class="cni-input-wrap">
@@ -17293,7 +17280,6 @@
         <button class="ex-validate-btn" id="cni-validate-btn" style="width:100%;margin-top:16px">Vérifier</button>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
-      cniSetupTabs();
       const inp = document.getElementById('cni-answer');
       inp.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('cni-validate-btn').click(); });
       setTimeout(() => inp.focus(), 50);
@@ -17332,7 +17318,6 @@
 
     function cniRenderLvl2(card, q) {
       card.innerHTML = `
-        <div class="dni-tab-bar">${cniTabBar(2)}</div>
         <p class="ex-question-label">Calcule le nombre entier correspondant à cette somme.</p>
         <div class="cni-decomp-display">${q.display}</div>
         <div class="cni-input-wrap">
@@ -17343,7 +17328,6 @@
         <button class="ex-validate-btn" id="cni-validate-btn" style="width:100%;margin-top:16px">Vérifier</button>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
-      cniSetupTabs();
       const inp = document.getElementById('cni-answer');
       inp.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('cni-validate-btn').click(); });
       setTimeout(() => inp.focus(), 50);
@@ -17377,7 +17361,6 @@
 
     function cniRenderLvl3(card, q) {
       card.innerHTML = `
-        <div class="dni-tab-bar">${cniTabBar(3)}</div>
         <p class="ex-question-label">Compose le nombre entier à partir de cette expression.</p>
         <div class="cni-decomp-display">${q.display}</div>
         <div class="cni-input-wrap">
@@ -17388,7 +17371,6 @@
         <button class="ex-validate-btn" id="cni-validate-btn" style="width:100%;margin-top:16px">Vérifier</button>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
-      cniSetupTabs();
       const inp = document.getElementById('cni-answer');
       inp.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('cni-validate-btn').click(); });
       setTimeout(() => inp.focus(), 50);
@@ -17438,11 +17420,10 @@
 
     function cniShowLevelResults() {
       const { level, score: lvScore, total } = cniState;
-      const pct   = lvScore / total;
-      const s20   = Math.round(pct * 20);
+      const s20   = Math.round(lvScore / total * 20);
       const stars = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
-      const isLast = level === 3;
-      const nextLv = level + 1;
+
+      const { passed, isLast } = cniLevelSelect.completeLevel(level, lvScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -17455,24 +17436,35 @@
         lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') + ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      const backToSelectBtn = cniLevelSelect.backToSelectButtonHTML();
       let msg, btnsHTML;
 
-      if (isLast) {
+      if (passed && isLast) {
         msg = `🎊 Bravo ! Tu maîtrises la composition des nombres entiers aux 3 niveaux !${stars}`;
         btnsHTML = `
-          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="cni-retry-btn">Recommencer ce niveau</button>
+            <button class="ex-btn-primary" id="cni-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
-      } else {
-        msg = `Niveau ${level} terminé !${stars}`;
+      } else if (passed) {
+        msg = `Niveau ${level} validé !${stars} 🏆 Le Niveau ${level + 1} est débloqué !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="cni-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-primary" id="cni-next-btn">Niveau ${level + 1} →</button>
             <button class="ex-btn-secondary" id="cni-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      } else {
+        const needed = Math.ceil(total * CNI_SEUIL);
+        msg = `Pas encore… il faut ${needed} / ${total} bonnes réponses pour valider ce niveau. On réessaie ?${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="cni-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
@@ -17486,8 +17478,15 @@
       document.getElementById('cni-next-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        cniStartLevel(nextLv);
+        cniStartLevel(level + 1);
       });
+      document.getElementById('cni-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cniLevelSelect.reset();
+        cniInitSession();
+      });
+      cniLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -17509,6 +17508,22 @@
        ════════════════════════════════════════════════════════════════════════ */
 
     let cneState = null;
+    let cneLevelSelect = null;
+
+    const CNE_SEUIL = 0.80;
+    const CNE_LV_DEFS = [
+      { lv: 1, desc: '4 chiffres — pièges : zéros intercalés, chiffres identiques sauf un rang' },
+      { lv: 2, desc: 'Nombres plus grands, comparaisons plus fines' },
+      { lv: 3, desc: 'Niveau expert' }
+    ];
+
+    function cneBackToSelectScreen() {
+      cneState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
 
     function cneInitSession() {
       cneState = null;
@@ -17524,7 +17539,17 @@
         toast.className = 'cne-streak-toast';
         document.body.appendChild(toast);
       }
-      cneStartLevel(1);
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      cneLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: CNE_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: CNE_SEUIL,
+        onSelectLevel: (lv) => cneStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: cneBackToSelectScreen
+      });
+      cneLevelSelect.renderSelectScreen();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -17537,6 +17562,7 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
       document.getElementById('q-total').textContent = qs.length;
+      if (cneLevelSelect) cneLevelSelect.renderBadges(lv);
       cneRenderQuestion();
     }
 
@@ -17548,29 +17574,12 @@
       cneRenderCard(document.getElementById('ex-card'), q, level);
     }
 
-    function cneTabBar(activeLv) {
-      return [1,2,3].map(lv =>
-        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
-      ).join('');
-    }
-
-    function cneSetupTabs() {
-      document.querySelectorAll('.dni-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const lv = parseInt(btn.dataset.lv, 10);
-          if (lv === cneState.level) return;
-          cneStartLevel(lv);
-        });
-      });
-    }
-
     function cneRenderCard(card, q, lv) {
       const { score, idx } = cneState;
       const attemptsLabel = idx === 0
         ? 'Aucun essai pour l\'instant'
         : `${score} bonne${score !== 1 ? 's' : ''} sur ${idx} essai${idx !== 1 ? 's' : ''}`;
       card.innerHTML = `
-        <div class="dni-tab-bar">${cneTabBar(lv)}</div>
         <p class="ex-question-label">Compare les deux nombres — choisis &lt; ou &gt;</p>
         <div class="cne-numbers-row">
           <div class="cne-number">${q.left}</div>
@@ -17585,7 +17594,6 @@
         <div class="cne-score-bar" id="cne-score">${attemptsLabel}</div>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
-      cneSetupTabs();
       document.querySelectorAll('.cne-sign-btn').forEach(btn => {
         btn.addEventListener('click', () => cneHandleAnswer(btn.dataset.sign, q));
       });
@@ -17655,8 +17663,8 @@
       const { level, score: lvScore, total } = cneState;
       const s20   = Math.round(lvScore / total * 20);
       const stars = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
-      const isLast = level === 3;
-      const nextLv = level + 1;
+
+      const { passed, isLast } = cneLevelSelect.completeLevel(level, lvScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -17670,24 +17678,35 @@
         ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      const backToSelectBtn = cneLevelSelect.backToSelectButtonHTML();
       let msg, btnsHTML;
 
-      if (isLast) {
+      if (passed && isLast) {
         msg = `🎊 Bravo ! Tu maîtrises la comparaison des nombres entiers aux 3 niveaux !${stars}`;
         btnsHTML = `
-          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="cne-retry-btn">Recommencer ce niveau</button>
+            <button class="ex-btn-primary" id="cne-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
-      } else {
-        msg = `Niveau ${level} terminé !${stars}`;
+      } else if (passed) {
+        msg = `Niveau ${level} validé !${stars} 🏆 Le Niveau ${level + 1} est débloqué !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="cne-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-primary" id="cne-next-btn">Niveau ${level + 1} →</button>
             <button class="ex-btn-secondary" id="cne-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      } else {
+        const needed = Math.ceil(total * CNE_SEUIL);
+        msg = `Pas encore… il faut ${needed} / ${total} bonnes réponses pour valider ce niveau. On réessaie ?${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="cne-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
@@ -17701,8 +17720,15 @@
       document.getElementById('cne-next-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        cneStartLevel(nextLv);
+        cneStartLevel(level + 1);
       });
+      document.getElementById('cne-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cneLevelSelect.reset();
+        cneInitSession();
+      });
+      cneLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -17727,6 +17753,14 @@
     ══════════════════════════════════════════════════════════════════════ */
 
     let rniState = null;
+    let rniLevelSelect = null;
+
+    const RNI_SEUIL = 0.80;
+    const RNI_LV_DEFS = [
+      { lv: 1, desc: '4 nombres à 4 chiffres' },
+      { lv: 2, desc: 'Nombres plus grands, écarts plus fins' },
+      { lv: 3, desc: 'Niveau expert' }
+    ];
 
     function rniFmt(n) {
       return n.toLocaleString('fr-FR');
@@ -17736,20 +17770,12 @@
       return i === 0 ? '1<sup>er</sup>' : `${i + 1}<sup>e</sup>`;
     }
 
-    function rniTabBar(activeLv) {
-      return [1,2,3].map(lv =>
-        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
-      ).join('');
-    }
-
-    function rniSetupTabs() {
-      document.querySelectorAll('.dni-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const lv = parseInt(btn.dataset.lv, 10);
-          if (lv === rniState.level) return;
-          rniStartLevel(lv);
-        });
-      });
+    function rniBackToSelectScreen() {
+      rniState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
     }
 
     function rniInitSession() {
@@ -17766,7 +17792,17 @@
         toast.className = 'rni-streak-toast';
         document.body.appendChild(toast);
       }
-      rniStartLevel(1);
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      rniLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: RNI_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: RNI_SEUIL,
+        onSelectLevel: (lv) => rniStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: rniBackToSelectScreen
+      });
+      rniLevelSelect.renderSelectScreen();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -17779,6 +17815,7 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
       document.getElementById('q-total').textContent = qs.length;
+      if (rniLevelSelect) rniLevelSelect.renderBadges(lv);
       rniRenderQuestion();
     }
 
@@ -17815,7 +17852,6 @@
       ).join('');
 
       card.innerHTML = `
-        <div class="dni-tab-bar">${rniTabBar(lv)}</div>
         <p class="ex-question-label">Range ces nombres dans l'ordre ${q.order}.</p>
         <div class="rni-order-badge">${orderLabel}</div>
         <div class="ex-bank-label">Nombres à placer :</div>
@@ -17828,7 +17864,6 @@
         <button class="ex-validate-btn" id="rni-validate-btn" style="width:100%;margin-top:12px" disabled>Vérifier</button>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
-      rniSetupTabs();
       rniSetupInteraction(q, lv);
     }
 
@@ -17971,8 +18006,8 @@
       const { level, score: lvScore, total } = rniState;
       const s20    = Math.round(lvScore / total * 20);
       const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
-      const isLast = level === 3;
-      const nextLv = level + 1;
+
+      const { passed, isLast } = rniLevelSelect.completeLevel(level, lvScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -17986,24 +18021,35 @@
         ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      const backToSelectBtn = rniLevelSelect.backToSelectButtonHTML();
       let msg, btnsHTML;
 
-      if (isLast) {
+      if (passed && isLast) {
         msg = `🎊 Bravo ! Tu sais ranger des nombres entiers aux 3 niveaux !${stars}`;
         btnsHTML = `
-          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="rni-retry-btn">Recommencer ce niveau</button>
+            <button class="ex-btn-primary" id="rni-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
-      } else {
-        msg = `Niveau ${level} terminé !${stars}`;
+      } else if (passed) {
+        msg = `Niveau ${level} validé !${stars} 🏆 Le Niveau ${level + 1} est débloqué !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="rni-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-primary" id="rni-next-btn">Niveau ${level + 1} →</button>
             <button class="ex-btn-secondary" id="rni-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      } else {
+        const needed = Math.ceil(total * RNI_SEUIL);
+        msg = `Pas encore… il faut ${needed} / ${total} bonnes réponses pour valider ce niveau. On réessaie ?${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="rni-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
@@ -18017,8 +18063,15 @@
       document.getElementById('rni-next-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        rniStartLevel(nextLv);
+        rniStartLevel(level + 1);
       });
+      document.getElementById('rni-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        rniLevelSelect.reset();
+        rniInitSession();
+      });
+      rniLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -18080,24 +18133,25 @@
       'million':              'million le plus proche au-dessus',
     };
 
+    let eniLevelSelect = null;
+
+    const ENI_SEUIL = 0.80;
+    const ENI_LV_DEFS = [
+      { lv: 1, desc: 'Dizaine / centaine — nombres à 3-4 chiffres' },
+      { lv: 2, desc: 'Millier / dizaine de milliers — 5-6 chiffres' },
+      { lv: 3, desc: 'Centaine de milliers / million — jusqu\'à 8 chiffres' }
+    ];
+
     function eniFmt(n) {
       return n.toLocaleString('fr-FR');
     }
 
-    function eniTabBar(activeLv) {
-      return [1, 2, 3].map(lv =>
-        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
-      ).join('');
-    }
-
-    function eniSetupTabs() {
-      document.querySelectorAll('.dni-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const lv = parseInt(btn.dataset.lv, 10);
-          if (lv === eniState.level) return;
-          eniStartLevel(lv);
-        });
-      });
+    function eniBackToSelectScreen() {
+      eniState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
     }
 
     function eniInitSession() {
@@ -18114,7 +18168,17 @@
         toast.className = 'eni-streak-toast';
         document.body.appendChild(toast);
       }
-      eniStartLevel(1);
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      eniLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: ENI_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: ENI_SEUIL,
+        onSelectLevel: (lv) => eniStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: eniBackToSelectScreen
+      });
+      eniLevelSelect.renderSelectScreen();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -18127,6 +18191,7 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
       document.getElementById('q-total').textContent = qs.length;
+      if (eniLevelSelect) eniLevelSelect.renderBadges(lv);
       eniRenderQuestion();
     }
 
@@ -18145,7 +18210,6 @@
         : `${score} bonne${score !== 1 ? 's' : ''} sur ${idx} essai${idx !== 1 ? 's' : ''}`;
       const article = ENI_RANG_ARTICLE[q.rang] || q.rang;
       card.innerHTML = `
-        <div class="dni-tab-bar">${eniTabBar(lv)}</div>
         <p class="ex-question-label">Encadre ${q.display} ${article}</p>
         <div class="eni-bracket-row">
           <input type="number" class="eni-bound-input" id="eni-lower" placeholder="?" min="0" autocomplete="off" inputmode="numeric" />
@@ -18159,7 +18223,6 @@
         <button class="ex-validate-btn" id="eni-validate-btn" style="width:100%;margin-top:12px" disabled>Vérifier</button>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
-      eniSetupTabs();
 
       const lowerInput  = document.getElementById('eni-lower');
       const upperInput  = document.getElementById('eni-upper');
@@ -18267,8 +18330,8 @@
       const { level, score: lvScore, total } = eniState;
       const s20    = Math.round(lvScore / total * 20);
       const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
-      const isLast = level === 3;
-      const nextLv = level + 1;
+
+      const { passed, isLast } = eniLevelSelect.completeLevel(level, lvScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -18282,24 +18345,35 @@
         ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      const backToSelectBtn = eniLevelSelect.backToSelectButtonHTML();
       let msg, btnsHTML;
 
-      if (isLast) {
+      if (passed && isLast) {
         msg = `🎊 Bravo ! Tu sais encadrer des nombres entiers aux 3 niveaux !${stars}`;
         btnsHTML = `
-          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="eni-retry-btn">Recommencer ce niveau</button>
+            <button class="ex-btn-primary" id="eni-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
-      } else {
-        msg = `Niveau ${level} terminé !${stars}`;
+      } else if (passed) {
+        msg = `Niveau ${level} validé !${stars} 🏆 Le Niveau ${level + 1} est débloqué !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="eni-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-primary" id="eni-next-btn">Niveau ${level + 1} →</button>
             <button class="ex-btn-secondary" id="eni-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      } else {
+        const needed = Math.ceil(total * ENI_SEUIL);
+        msg = `Pas encore… il faut ${needed} / ${total} bonnes réponses pour valider ce niveau. On réessaie ?${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="eni-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
@@ -18313,8 +18387,15 @@
       document.getElementById('eni-next-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        eniStartLevel(nextLv);
+        eniStartLevel(level + 1);
       });
+      document.getElementById('eni-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        eniLevelSelect.reset();
+        eniInitSession();
+      });
+      eniLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -18339,6 +18420,14 @@
     ═══════════════════════════════════════════════════════════════════════ */
 
     let dgnState = null;
+    let dgnLevelSelect = null;
+
+    const DGN_SEUIL = 0.80;
+    const DGN_LV_DEFS = [
+      { lv: 1, desc: 'Nombres à 3-4 chiffres — 2/4/5/6/10 intervalles' },
+      { lv: 2, desc: 'Nombres à 5-6 chiffres — 4/5/6/10 intervalles' },
+      { lv: 3, desc: 'Jusqu\'au million et au-delà — 2/4/5/10 intervalles' }
+    ];
 
     function dgnFmt(n) {
       if (n < 1000) return String(n);
@@ -18416,22 +18505,6 @@
       return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block;max-width:100%;overflow:visible">${s}</svg>`;
     }
 
-    function dgnTabBar(activeLv) {
-      return [1, 2, 3].map(lv =>
-        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
-      ).join('');
-    }
-
-    function dgnSetupTabs() {
-      document.querySelectorAll('.dni-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const lv = parseInt(btn.dataset.lv, 10);
-          if (lv === dgnState.level) return;
-          dgnStartLevel(lv);
-        });
-      });
-    }
-
     function dgnRenderCard(card, q, lv) {
       const { score, idx } = dgnState;
       const attemptsLabel = idx === 0
@@ -18439,7 +18512,6 @@
         : `${score} bonne${score !== 1 ? 's' : ''} sur ${idx} essai${idx !== 1 ? 's' : ''}`;
 
       card.innerHTML = `
-        <div class="dni-tab-bar">${dgnTabBar(lv)}</div>
         <p class="ex-question-label">Quelle est la valeur indiquée par la flèche ?</p>
         <div class="dgn-svg-wrap" id="dgn-svg-wrap">${dgnBuildSvg(q, null, false, false)}</div>
         <div style="text-align:center;margin-top:18px">
@@ -18451,8 +18523,6 @@
         <button class="ex-validate-btn" id="dgn-validate-btn" style="width:100%;margin-top:12px" disabled>Vérifier</button>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
-
-      dgnSetupTabs();
 
       const svgWrap = document.getElementById('dgn-svg-wrap');
       const input   = document.getElementById('dgn-answer');
@@ -18570,7 +18640,16 @@
       if (prog) prog.classList.remove('ex-hidden');
       document.getElementById('q-total').textContent     = pool.length;
       document.getElementById('ex-bar-fill').style.width = '0%';
+      if (dgnLevelSelect) dgnLevelSelect.renderBadges(lv);
       dgnRenderQuestion();
+    }
+
+    function dgnBackToSelectScreen() {
+      dgnState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
     }
 
     function dgnInitSession() {
@@ -18587,7 +18666,17 @@
         toast.className = 'eni-streak-toast';
         document.body.appendChild(toast);
       }
-      dgnStartLevel(1);
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      dgnLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: DGN_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: DGN_SEUIL,
+        onSelectLevel: (lv) => dgnStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: dgnBackToSelectScreen
+      });
+      dgnLevelSelect.renderSelectScreen();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -18595,8 +18684,8 @@
       const { level, score: lvScore, total } = dgnState;
       const s20    = Math.round(lvScore / total * 20);
       const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
-      const isLast = level === 3;
-      const nextLv = level + 1;
+
+      const { passed, isLast } = dgnLevelSelect.completeLevel(level, lvScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -18610,24 +18699,35 @@
         ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      const backToSelectBtn = dgnLevelSelect.backToSelectButtonHTML();
       let msg, btnsHTML;
 
-      if (isLast) {
+      if (passed && isLast) {
         msg = `🎊 Bravo ! Tu sais lire des nombres sur une droite graduée aux 3 niveaux !${stars}`;
         btnsHTML = `
-          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="dgn-retry-btn">Recommencer ce niveau</button>
+            <button class="ex-btn-primary" id="dgn-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
-      } else {
-        msg = `Niveau ${level} terminé !${stars}`;
+      } else if (passed) {
+        msg = `Niveau ${level} validé !${stars} 🏆 Le Niveau ${level + 1} est débloqué !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="dgn-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-primary" id="dgn-next-btn">Niveau ${level + 1} →</button>
             <button class="ex-btn-secondary" id="dgn-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      } else {
+        const needed = Math.ceil(total * DGN_SEUIL);
+        msg = `Pas encore… il faut ${needed} / ${total} bonnes réponses pour valider ce niveau. On réessaie ?${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="dgn-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
@@ -18641,8 +18741,15 @@
       document.getElementById('dgn-next-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        dgnStartLevel(nextLv);
+        dgnStartLevel(level + 1);
       });
+      document.getElementById('dgn-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        dgnLevelSelect.reset();
+        dgnInitSession();
+      });
+      dgnLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -18667,12 +18774,19 @@
     ══════════════════════════════════════════════════════════════════════ */
 
     let aniState = null;
+    let aniLevelSelect = null;
 
+    const ANI_SEUIL = 0.80;
     const ANI_RANG = {
       1: { rang: 'dizaine',  rangInf: 'unités',    article: 'à la dizaine près',  rankFromRight: 0 },
       2: { rang: 'centaine', rangInf: 'dizaines',   article: 'à la centaine près', rankFromRight: 1 },
       3: { rang: 'millier',  rangInf: 'centaines',  article: 'au millier près',    rankFromRight: 2 },
     };
+    const ANI_LV_DEFS = [
+      { lv: 1, desc: ANI_RANG[1].article + ' (chiffre décisif : ' + ANI_RANG[1].rangInf + ')' },
+      { lv: 2, desc: ANI_RANG[2].article + ' (chiffre décisif : ' + ANI_RANG[2].rangInf + ')' },
+      { lv: 3, desc: ANI_RANG[3].article + ' (chiffre décisif : ' + ANI_RANG[3].rangInf + ')' }
+    ];
 
     function aniFmt(n) { return n.toLocaleString('fr-FR'); }
 
@@ -18695,20 +18809,12 @@
       return result;
     }
 
-    function aniTabBar(activeLv) {
-      return [1, 2, 3].map(lv =>
-        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
-      ).join('');
-    }
-
-    function aniSetupTabs() {
-      document.querySelectorAll('.dni-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const lv = parseInt(btn.dataset.lv, 10);
-          if (lv === aniState.level) return;
-          aniStartLevel(lv);
-        });
-      });
+    function aniBackToSelectScreen() {
+      aniState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
     }
 
     function aniInitSession() {
@@ -18725,7 +18831,17 @@
         toast.className = 'eni-streak-toast';
         document.body.appendChild(toast);
       }
-      aniStartLevel(1);
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      aniLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: ANI_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: ANI_SEUIL,
+        onSelectLevel: (lv) => aniStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: aniBackToSelectScreen
+      });
+      aniLevelSelect.renderSelectScreen();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -18738,6 +18854,7 @@
       if (prog) prog.classList.remove('ex-hidden');
       document.getElementById('q-total').textContent     = pool.length;
       document.getElementById('ex-bar-fill').style.width = '0%';
+      if (aniLevelSelect) aniLevelSelect.renderBadges(lv);
       aniRenderQuestion();
     }
 
@@ -18757,7 +18874,6 @@
       const hlDisplay = aniHighlightDisplay(q.display, r.rankFromRight);
 
       card.innerHTML = `
-        <div class="dni-tab-bar">${aniTabBar(lv)}</div>
         <p class="ex-question-label">Arrondis ce nombre ${r.article}</p>
         <div class="ani-number-display">${hlDisplay}</div>
         <div class="ani-rule-box">
@@ -18773,7 +18889,6 @@
         <div class="ani-score-row" id="ani-score">${attemptsLabel}</div>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
-      aniSetupTabs();
 
       const input       = document.getElementById('ani-input');
       const validateBtn = document.getElementById('ani-validate-btn');
@@ -18877,8 +18992,8 @@
       const { level, score: lvScore, total } = aniState;
       const s20    = Math.round(lvScore / total * 20);
       const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
-      const isLast = level === 3;
-      const nextLv = level + 1;
+
+      const { passed, isLast } = aniLevelSelect.completeLevel(level, lvScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -18892,24 +19007,35 @@
         ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      const backToSelectBtn = aniLevelSelect.backToSelectButtonHTML();
       let msg, btnsHTML;
 
-      if (isLast) {
+      if (passed && isLast) {
         msg = `🎊 Bravo ! Tu sais arrondir des nombres entiers aux 3 niveaux !${stars}`;
         btnsHTML = `
-          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="ani-retry-btn">Recommencer ce niveau</button>
+            <button class="ex-btn-primary" id="ani-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
-      } else {
-        msg = `Niveau ${level} terminé !${stars}`;
+      } else if (passed) {
+        msg = `Niveau ${level} validé !${stars} 🏆 Le Niveau ${level + 1} est débloqué !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="ani-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-primary" id="ani-next-btn">Niveau ${level + 1} →</button>
             <button class="ex-btn-secondary" id="ani-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      } else {
+        const needed = Math.ceil(total * ANI_SEUIL);
+        msg = `Pas encore… il faut ${needed} / ${total} bonnes réponses pour valider ce niveau. On réessaie ?${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="ani-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
@@ -18923,8 +19049,15 @@
       document.getElementById('ani-next-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        aniStartLevel(nextLv);
+        aniStartLevel(level + 1);
       });
+      document.getElementById('ani-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        aniLevelSelect.reset();
+        aniInitSession();
+      });
+      aniLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -18949,21 +19082,21 @@
     ══════════════════════════════════════════════════════════════════════ */
 
     let aaState = null;
+    let aaLevelSelect = null;
 
-    function aaTabBar(activeLv) {
-      return [1,2,3].map(lv =>
-        `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-lv="${lv}">Niveau ${lv}</button>`
-      ).join('');
-    }
+    const AA_SEUIL = 0.80;
+    const AA_LV_DEFS = [
+      { lv: 1, desc: '2 choix — excès ou défaut, 2 valeurs proches' },
+      { lv: 2, desc: '3 choix — choisir le rang d\'arrondi adapté au contexte' },
+      { lv: 3, desc: '2 à 3 choix — raisonnement sur excès / défaut et rang' }
+    ];
 
-    function aaSetupTabs() {
-      document.querySelectorAll('.dni-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const lv = parseInt(btn.dataset.lv, 10);
-          if (lv === aaState.level) return;
-          aaStartLevel(lv);
-        });
-      });
+    function aaBackToSelectScreen() {
+      aaState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
     }
 
     function aaInitSession() {
@@ -18980,7 +19113,17 @@
         toast.className = 'cne-streak-toast';
         document.body.appendChild(toast);
       }
-      aaStartLevel(1);
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      aaLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: AA_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: AA_SEUIL,
+        onSelectLevel: (lv) => aaStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: aaBackToSelectScreen
+      });
+      aaLevelSelect.renderSelectScreen();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -18994,6 +19137,7 @@
       if (prog) prog.classList.remove('ex-hidden');
       document.getElementById('q-total').textContent     = pool.length;
       document.getElementById('ex-bar-fill').style.width = '0%';
+      if (aaLevelSelect) aaLevelSelect.renderBadges(lv);
       aaRenderQuestion();
     }
 
@@ -19016,7 +19160,6 @@
       ).join('');
 
       card.innerHTML = `
-        <div class="dni-tab-bar">${aaTabBar(lv)}</div>
         <p class="ex-question-label">Lis le problème et choisis l'arrondi le plus adapté à la situation.</p>
         <div class="aa-enonce">${q.enonce}</div>
         <div class="aa-choices" id="aa-choices">${choicesHtml}</div>
@@ -19025,7 +19168,6 @@
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
 
-      aaSetupTabs();
       document.querySelectorAll('.aa-choice-btn').forEach(btn => {
         btn.addEventListener('click', () => aaHandleAnswer(btn, q));
       });
@@ -19092,8 +19234,8 @@
       const { level, score: lvScore, total } = aaState;
       const s20    = Math.round(lvScore / total * 20);
       const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
-      const isLast = level === 3;
-      const nextLv = level + 1;
+
+      const { passed, isLast } = aaLevelSelect.completeLevel(level, lvScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -19107,24 +19249,35 @@
         ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
+      const backToSelectBtn = aaLevelSelect.backToSelectButtonHTML();
       let msg, btnsHTML;
 
-      if (isLast) {
+      if (passed && isLast) {
         msg = `🎊 Bravo ! Tu sais choisir le bon arrondi selon la situation aux 3 niveaux !${stars}`;
         btnsHTML = `
-          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="aa-retry-btn">Recommencer ce niveau</button>
+            <button class="ex-btn-primary" id="aa-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
-      } else {
-        msg = `Niveau ${level} terminé !${stars}`;
+      } else if (passed) {
+        msg = `Niveau ${level} validé !${stars} 🏆 Le Niveau ${level + 1} est débloqué !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="aa-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-primary" id="aa-next-btn">Niveau ${level + 1} →</button>
             <button class="ex-btn-secondary" id="aa-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      } else {
+        const needed = Math.ceil(total * AA_SEUIL);
+        msg = `Pas encore… il faut ${needed} / ${total} bonnes réponses pour valider ce niveau. On réessaie ?${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="aa-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
@@ -19138,8 +19291,15 @@
       document.getElementById('aa-next-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        aaStartLevel(nextLv);
+        aaStartLevel(level + 1);
       });
+      document.getElementById('aa-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        aaLevelSelect.reset();
+        aaInitSession();
+      });
+      aaLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -19163,6 +19323,21 @@
        Niveau 3 (/1000): droite 20 graduations (pas 50/1000) + saisie
     ══════════════════════════════════════════════════════════════════════ */
 
+    const FDGD_SEUIL = 0.80;
+    const FDGD_LV_DEFS = [
+      { lv: 1, desc: 'Dixièmes (/10) — grille 10 cases + droite graduée + saisie' },
+      { lv: 2, desc: 'Centièmes (/100) — grille 10×10 + droite graduée + saisie' },
+      { lv: 3, desc: 'Millièmes (/1000) — droite graduée + saisie' }
+    ];
+
+    function fdgdBackToSelectScreen() {
+      fdgdState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
     function fdgdInitSession() {
       fdgdState = null;
       sessionStartTime = Date.now();
@@ -19171,7 +19346,17 @@
       document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
-      fdgdStartLevel(1);
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      fdgdLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: FDGD_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: FDGD_SEUIL,
+        onSelectLevel: (lv) => fdgdStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: fdgdBackToSelectScreen
+      });
+      fdgdLevelSelect.renderSelectScreen();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -19182,6 +19367,7 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
       document.getElementById('q-total').textContent = qs.length;
+      if (fdgdLevelSelect) fdgdLevelSelect.renderBadges(lv);
       fdgdRenderQuestion();
     }
 
@@ -19198,25 +19384,6 @@
       } else {
         fdgdRenderGrille(card, q);
       }
-    }
-
-    /* ── Onglets de niveau ─────────────────────────────────────────────── */
-    function fdgdTabBar(activeLv) {
-      return '<div class="dni-tab-bar">' +
-        [1, 2, 3].map(lv =>
-          `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-fdgd-lv="${lv}">Niveau ${lv}</button>`
-        ).join('') +
-        '</div>';
-    }
-
-    function fdgdSetupTabs() {
-      document.querySelectorAll('[data-fdgd-lv]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const lv = parseInt(btn.dataset.fdgdLv, 10);
-          if (lv === fdgdState.level) return;
-          fdgdStartLevel(lv);
-        });
-      });
     }
 
     /* ── Étape 1 — Grille de coloriage (saisie → coloriage automatique) ── */
@@ -19262,7 +19429,6 @@
       }
 
       card.innerHTML = `
-        ${fdgdTabBar(fdgdState.level)}
         <div class="fdgd-step-tag">Étape 1 — Coloriage</div>
         <div class="nline-question-area" style="margin-bottom:12px">${_rfracHtml(num, den)}</div>
         <div class="fdgd-input-wrap">
@@ -19275,8 +19441,6 @@
         <div class="fdgd-counter" id="fdgd-counter">0 case coloriée / ${den}</div>
         <button class="ex-validate-btn" id="fdgd-next-step-btn" style="width:100%;margin-top:4px">Étape suivante →</button>
       `;
-
-      fdgdSetupTabs();
 
       const inp      = document.getElementById('fdgd-count-input');
       const errEl    = document.getElementById('fdgd-input-error');
@@ -19389,7 +19553,6 @@
       }
 
       card.innerHTML = `
-        ${fdgdTabBar(fdgdState.level)}
         <div class="fdgd-step-tag">Étape ${stepNum} — Droite graduée</div>
         <p class="ex-question-label">Place cette fraction sur la droite graduée.</p>
         <div class="nline-question-area" style="margin-bottom:16px">${_rfracHtml(num, den)}</div>
@@ -19397,8 +19560,6 @@
         <p class="nline-status" id="fdgd-droite-status">Clique sur une graduation pour la sélectionner.</p>
         <button class="ex-validate-btn" id="fdgd-droite-next-btn" disabled style="width:100%;margin-top:4px">Étape suivante →</button>
       `;
-
-      fdgdSetupTabs();
 
       const wrap    = document.getElementById('fdgd-droite-wrap');
       const statEl  = document.getElementById('fdgd-droite-status');
@@ -19435,7 +19596,6 @@
       const stepNum = isLv3 ? 2 : 3;
 
       card.innerHTML = `
-        ${fdgdTabBar(fdgdState.level)}
         <div class="fdgd-step-tag">Étape ${stepNum} — Écriture décimale</div>
         <p class="ex-question-label">Écris le nombre décimal correspondant à cette fraction.</p>
         <div class="nline-question-area" style="margin-bottom:16px">${_rfracHtml(num, den)}</div>
@@ -19446,8 +19606,6 @@
         <div class="ex-feedback-area" id="fdgd-feedback"></div>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
-
-      fdgdSetupTabs();
 
       const inp = document.getElementById('fdgd-dec-input');
       const btn = document.getElementById('fdgd-dec-validate');
@@ -19524,8 +19682,8 @@
       const { level, score: lvScore, total } = fdgdState;
       const s20   = Math.round(lvScore / total * 20);
       const stars = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
-      const isLast = level === 3;
-      const nextLv = level + 1;
+
+      const { passed, isLast } = fdgdLevelSelect.completeLevel(level, lvScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -19538,23 +19696,34 @@
         lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') + ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
 
       const backHref = sessionData.backLink?.href || 'mathématiques-fractions.html';
+      const backToSelectBtn = fdgdLevelSelect.backToSelectButtonHTML();
       let msg, btnsHTML;
-      if (isLast) {
+      if (passed && isLast) {
         msg = `🎊 Bravo ! Tu maîtrises les fractions décimales aux 3 niveaux !${stars}`;
         btnsHTML = `
-          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="fdgd-retry-btn">Recommencer ce niveau</button>
+            <button class="ex-btn-primary" id="fdgd-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
-      } else {
-        msg = `Niveau ${level} terminé !${stars}`;
+      } else if (passed) {
+        msg = `Niveau ${level} validé !${stars} 🏆 Le Niveau ${level + 1} est débloqué !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="fdgd-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-primary" id="fdgd-next-btn">Niveau ${level + 1} →</button>
             <button class="ex-btn-secondary" id="fdgd-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      } else {
+        const needed = Math.ceil(total * FDGD_SEUIL);
+        msg = `Pas encore… il faut ${needed} / ${total} bonnes réponses pour valider ce niveau. On réessaie ?${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="fdgd-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
@@ -19568,8 +19737,15 @@
       document.getElementById('fdgd-next-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        fdgdStartLevel(nextLv);
+        fdgdStartLevel(level + 1);
       });
+      document.getElementById('fdgd-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        fdgdLevelSelect.reset();
+        fdgdInitSession();
+      });
+      fdgdLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -19594,6 +19770,21 @@
        Niveau 3 (/1000): colonnes U + Di + Ce + Mi
     ══════════════════════════════════════════════════════════════════════ */
 
+    const FDTN_SEUIL = 0.80;
+    const FDTN_LV_DEFS = [
+      { lv: 1, desc: 'Colonnes Unités + Dixièmes (/10)' },
+      { lv: 2, desc: 'Colonnes Unités + Dixièmes + Centièmes (/100)' },
+      { lv: 3, desc: 'Colonnes Unités + Dixièmes + Centièmes + Millièmes (/1000)' }
+    ];
+
+    function fdtnBackToSelectScreen() {
+      fdtnState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
     function fdtnInitSession() {
       fdtnState = null;
       sessionStartTime = Date.now();
@@ -19602,7 +19793,17 @@
       document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
-      fdtnStartLevel(1);
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      fdtnLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: FDTN_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: FDTN_SEUIL,
+        onSelectLevel: (lv) => fdtnStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: fdtnBackToSelectScreen
+      });
+      fdtnLevelSelect.renderSelectScreen();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -19613,6 +19814,7 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
       document.getElementById('q-total').textContent = qs.length;
+      if (fdtnLevelSelect) fdtnLevelSelect.renderBadges(lv);
       fdtnRenderQuestion();
     }
 
@@ -19623,25 +19825,6 @@
       document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
       const card = document.getElementById('ex-card');
       fdtnRenderTableau(card, q);
-    }
-
-    /* ── Onglets de niveau ─────────────────────────────────────────────── */
-    function fdtnTabBar(activeLv) {
-      return '<div class="dni-tab-bar">' +
-        [1, 2, 3].map(lv =>
-          `<button class="dni-tab${lv === activeLv ? ' is-active' : ''}" data-fdtn-lv="${lv}">Niveau ${lv}</button>`
-        ).join('') +
-        '</div>';
-    }
-
-    function fdtnSetupTabs() {
-      document.querySelectorAll('[data-fdtn-lv]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const lv = parseInt(btn.dataset.fdtnLv, 10);
-          if (lv === fdtnState.level) return;
-          fdtnStartLevel(lv);
-        });
-      });
     }
 
     /* ── Colonnes actives selon le niveau ──────────────────────────────── */
@@ -19680,7 +19863,6 @@
       }).join('');
 
       card.innerHTML = `
-        ${fdtnTabBar(fdtnState.level)}
         <p class="ex-question-label">Place les chiffres de cette fraction dans le tableau de numération.</p>
         <div class="nline-question-area" style="margin-bottom:16px">${_rfracHtml(num, den)}</div>
         <div class="fdtn-table-wrap">
@@ -19702,8 +19884,6 @@
           <button class="ex-next-btn ex-hidden" id="next-btn"></button>
         </div>
       `;
-
-      fdtnSetupTabs();
 
       const inputs = [...card.querySelectorAll('.fdtn-input')];
 
@@ -19800,8 +19980,8 @@
       const { level, score: lvScore, total } = fdtnState;
       const s20    = Math.round(lvScore / total * 20);
       const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
-      const isLast = level === 3;
-      const nextLv = level + 1;
+
+      const { passed, isLast } = fdtnLevelSelect.completeLevel(level, lvScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -19814,23 +19994,34 @@
         lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') + ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
 
       const backHref = sessionData.backLink?.href || 'mathématiques-fractions.html';
+      const backToSelectBtn = fdtnLevelSelect.backToSelectButtonHTML();
       let msg, btnsHTML;
-      if (isLast) {
+      if (passed && isLast) {
         msg = `🎊 Bravo ! Tu maîtrises le tableau de numération aux 3 niveaux !${stars}`;
         btnsHTML = `
-          <div class="ex-congrats-all">🎉 Bravo, tu as terminé tous les niveaux !</div>
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="fdtn-retry-btn">Recommencer ce niveau</button>
+            <button class="ex-btn-primary" id="fdtn-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
           </div>`;
-      } else {
-        msg = `Niveau ${level} terminé !${stars}`;
+      } else if (passed) {
+        msg = `Niveau ${level} validé !${stars} 🏆 Le Niveau ${level + 1} est débloqué !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="fdtn-next-btn">Passer au niveau ${nextLv} →</button>
+            <button class="ex-btn-primary" id="fdtn-next-btn">Niveau ${level + 1} →</button>
             <button class="ex-btn-secondary" id="fdtn-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      } else {
+        const needed = Math.ceil(total * FDTN_SEUIL);
+        msg = `Pas encore… il faut ${needed} / ${total} bonnes réponses pour valider ce niveau. On réessaie ?${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="fdtn-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
       }
 
       document.getElementById('score-msg').textContent          = msg;
@@ -19844,8 +20035,15 @@
       document.getElementById('fdtn-next-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        fdtnStartLevel(nextLv);
+        fdtnStartLevel(level + 1);
       });
+      document.getElementById('fdtn-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        fdtnLevelSelect.reset();
+        fdtnInitSession();
+      });
+      fdtnLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
