@@ -4776,6 +4776,9 @@
       } else if (currentType === "change-temps-niveaux") {
         ctInitSession();
         return;
+      } else if (currentType === "verbes-particuliers-niveaux") {
+        cvpInitSession();
+        return;
       } else if (currentType === "change-sujet-niveaux") {
         csjInitSession();
         return;
@@ -4980,6 +4983,8 @@
         /* session managed by pceInitSession — no-op here */
       } else if (currentType === "change-temps-niveaux") {
         /* session managed by ctInitSession — no-op here */
+      } else if (currentType === "verbes-particuliers-niveaux") {
+        /* session managed by cvpInitSession — no-op here */
       } else if (currentType === "decomposer-nombre-entier-niveaux") {
         /* session managed by dniInitSession — no-op here */
       } else if (currentType === "composer-nombre-entier-niveaux") {
@@ -16764,6 +16769,219 @@
         level:        'Niveau ' + lv,
         score:        s20,
         total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : verbes-particuliers-niveaux
+       « Conjuguer les verbes particuliers du 1er groupe au présent »
+       5 niveaux déverrouillables à 80 % (-cer, -ger, -yer, -eler/-eter doublement,
+       -eler/-eter accent grave). Saisie libre, un seul essai par question.
+       ════════════════════════════════════════════════════════════════════════ */
+
+    const CVP_SEUIL = 0.8;
+
+    const CVP_LV_DEFS = [
+      { lv: 1, desc: 'Le ç devant a et o : nous commençons, nous avançons' },
+      { lv: 2, desc: 'Le e devant a et o : nous mangeons, nous voyageons' },
+      { lv: 3, desc: 'Le y devient i devant un e muet : je nettoie, ils emploient' },
+      { lv: 4, desc: 'La consonne double devant un e muet : j\'appelle, je jette' },
+      { lv: 5, desc: 'Un accent grave devant un e muet : j\'achète, je gèle' }
+    ];
+
+    let cvpState = null;
+    let cvpLevelSelect = null;
+
+    function cvpBackToSelectScreen() {
+      cvpState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    function cvpShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    /* ── Init : réinitialise et affiche le sélecteur de niveau ──────────── */
+    function cvpInitSession() {
+      cvpState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      cvpLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: CVP_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: CVP_SEUIL,
+        onSelectLevel: (lv) => cvpStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: cvpBackToSelectScreen
+      });
+      cvpLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function cvpStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const pool = cvpShuffle((sessionData.bank || []).filter(item => item.level === lv));
+      const qs   = pool.slice(0, sessionData.questionsPerSession || 10);
+      cvpState   = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+      document.getElementById('q-total').textContent = qs.length;
+
+      cvpLevelSelect.renderBadges(lv);
+      cvpRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Affiche une question (saisie libre, un seul essai) ──────────────── */
+    function cvpRenderQuestion(card) {
+      const { questions, idx, total } = cvpState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      card.innerHTML = `
+        <p class="ex-question-label">Conjugue le verbe suivant dans la phrase.</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="cvp-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="cvp-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="cvp-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+
+      const input  = document.getElementById('cvp-input');
+      const valBtn = document.getElementById('cvp-val-btn');
+      setTimeout(() => input.focus(), 50);
+
+      function submit() {
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          cvpState.score++;
+          document.getElementById('cvp-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+        } else {
+          document.getElementById('cvp-fb').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.answer}</strong>
+            </div>
+          `;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+
+      valBtn.addEventListener('click', submit);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        cvpState.idx++;
+        if (cvpState.idx >= cvpState.questions.length) cvpShowLevelResults();
+        else cvpRenderQuestion(document.getElementById('ex-card'));
+      });
+    }
+
+    /* ── Résultats de fin de niveau ───────────────────────────────────────── */
+    function cvpShowLevelResults() {
+      const { level, score: lvScore, total } = cvpState;
+      const { passed, pct, isLast } = cvpLevelSelect.completeLevel(level, lvScore, total);
+      const pctPct = Math.round(pct * 100);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-conjugaison.html';
+      const backLabel = `← Retour à ${sessionData.backLink?.label || 'la Conjugaison'}`;
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const backToSelectBtn = cvpLevelSelect.backToSelectButtonHTML();
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises tous les verbes particuliers du 1er groupe !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cvp-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cvp-next-btn">Niveau ${level + 1} →</button>
+          <button class="ex-btn-secondary" id="cvp-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * CVP_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour débloquer le niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cvp-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
+
+      document.getElementById('cvp-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cvpStartLevel(cvpState.level);
+      });
+      document.getElementById('cvp-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cvpStartLevel(level + 1);
+      });
+      document.getElementById('cvp-restart-btn')?.addEventListener('click', () => {
+        cvpLevelSelect.reset();
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cvpInitSession();
+      });
+      cvpLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'verbes-particuliers-niveaux',
+        level:        'Niveau ' + level,
+        score:        lvScore,
+        total,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
       });
     }
