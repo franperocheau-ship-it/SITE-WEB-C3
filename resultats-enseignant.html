@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Résultats — Espace enseignant — LFM</title>
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="js/supabase-client.js"></script>
@@ -581,10 +581,12 @@
     "ecrire-nombre-entier-chiffres":            { domaine:"Mathématiques", competence:"Nombres entiers — Écriture chiffrée",              title:"Écrire un nombre en chiffres" },
     "ecrire-nombre-entier-lettres":             { domaine:"Mathématiques", competence:"Nombres entiers — Écriture en lettres",            title:"Écrire un nombre en lettres" },
     "identifier-valeur-chiffre-position":       { domaine:"Mathématiques", competence:"Nombres entiers — Valeur positionnelle",           title:"Identifier la valeur d'un chiffre selon sa position" },
-    // Histoire EMILE
-    "vocabulaire-revolution-francaise":         { domaine:"Histoire", competence:"EMILE — Révolution française",                          title:"Vocabulaire de la Révolution française" },
-    "vocabulaire-napoleon-bonaparte":           { domaine:"Histoire", competence:"EMILE — Napoléon Bonaparte",                            title:"Vocabulaire — Napoléon Bonaparte" },
   };
+
+  /* Repli pour un exercise_slug absent de EXERCISE_META (exercice retiré du
+     catalogue depuis) : la ligne reste affichée, groupée à part, avec le
+     titre lisible enregistré sur le résultat lui-même (exercise_title). */
+  const UNKNOWN_META = { domaine: 'Autres', competence: 'Exercice retiré du catalogue' };
 
   /* ═══════════════════════════════════════════════════════════════════════════
      INIT
@@ -665,12 +667,11 @@
 
       /* Grouper domaine → compétence → niveau */
       const LEVEL_ORDER  = ['CE2', 'CM1', 'CM2', '6e'];
-      const DOMAIN_ORDER = ['Français', 'Mathématiques', 'Histoire'];
+      const DOMAIN_ORDER = ['Français', 'Mathématiques'];
       const byDomaine    = {};
 
       for (const r of latest) {
-        const meta = EXERCISE_META[r.exercise_slug];
-        if (!meta) continue;
+        const meta = EXERCISE_META[r.exercise_slug] || UNKNOWN_META;
         const { domaine, competence } = meta;
         const sep         = competence.indexOf(' — ');
         const sousDomaine = sep >= 0 ? competence.slice(0, sep)      : competence;
@@ -694,7 +695,7 @@
       const domaineKeys = DOMAIN_ORDER.filter(d => byDomaine[d]);
       Object.keys(byDomaine).forEach(d => { if (!domaineKeys.includes(d)) domaineKeys.push(d); });
 
-      const DOMAIN_ICONS = { Français: '📚', Mathématiques: '📐', Histoire: '🏛' };
+      const DOMAIN_ICONS = { Français: '📚', Mathématiques: '📐', Autres: '🗂' };
       let html = '';
 
       domaineKeys.forEach(domaine => {
@@ -1285,12 +1286,11 @@
 
       /* Grouper domaine → sous-domaine → compétence → niveau */
       const LEVEL_ORDER  = ['CE2', 'CM1', 'CM2', '6e'];
-      const DOMAIN_ORDER = ['Français', 'Mathématiques', 'Histoire'];
+      const DOMAIN_ORDER = ['Français', 'Mathématiques'];
       const byDomaine    = {};
 
       for (const r of latest) {
-        const meta = EXERCISE_META[r.exercise_slug];
-        if (!meta) continue;
+        const meta = EXERCISE_META[r.exercise_slug] || UNKNOWN_META;
         const { domaine, competence } = meta;
         const sep         = competence.indexOf(' — ');
         const sousDomaine = sep >= 0 ? competence.slice(0, sep)  : competence;
@@ -1311,7 +1311,7 @@
       const domaineKeys = DOMAIN_ORDER.filter(d => byDomaine[d]);
       Object.keys(byDomaine).forEach(d => { if (!domaineKeys.includes(d)) domaineKeys.push(d); });
 
-      const DOMAIN_ICONS = { Français: '📚', Mathématiques: '📐', Histoire: '🏛' };
+      const DOMAIN_ICONS = { Français: '📚', Mathématiques: '📐', Autres: '🗂' };
       let html = '';
 
       domaineKeys.forEach(domaine => {

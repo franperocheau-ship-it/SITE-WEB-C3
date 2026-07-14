@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Conjugaison — Français — Lycée Français de Madrid</title>
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/guided-access.js?v=1"></script>
   <style>
     /* ── Filter bar ─────────────────────────────────────────── */
     .filter-bar {
@@ -186,6 +190,8 @@
     }
 
     .skill-card.card-hidden { display: none; }
+    .skill-card-locked { opacity: 0.45; cursor: not-allowed; }
+    .skill-card-locked:hover { transform: none; box-shadow: none; border-color: var(--border); }
 
     .skill-badges {
       display: flex;
@@ -210,126 +216,6 @@
     }
 
     .empty-state.visible { display: block; }
-
-    /* ── Video banner ───────────────────────────────────────── */
-    .video-banner {
-      display: flex;
-      align-items: stretch;
-      border-radius: 16px;
-      overflow: hidden;
-      margin-bottom: 20px;
-      cursor: pointer;
-      text-decoration: none;
-      background: var(--card-bg);
-      border: 1.5px solid rgba(16,43,106,0.14);
-      box-shadow: 0 2px 14px rgba(16,43,106,0.09);
-      transition: transform 260ms cubic-bezier(.4,0,.2,1), box-shadow 260ms cubic-bezier(.4,0,.2,1);
-    }
-
-    .video-banner:hover {
-      transform: translateY(-4px) scale(1.005);
-      box-shadow: 0 12px 32px rgba(16,43,106,0.18);
-    }
-
-    .video-banner-illu {
-      width: 210px;
-      flex-shrink: 0;
-      background: linear-gradient(140deg, #102B6A 0%, #1b3d96 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* decorative circle in top-left corner of illustration */
-    .video-banner-illu::before {
-      content: '';
-      position: absolute;
-      top: -28px;
-      left: -28px;
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.05);
-    }
-
-    /* decorative circle in bottom-right corner */
-    .video-banner-illu::after {
-      content: '';
-      position: absolute;
-      bottom: -20px;
-      right: -20px;
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.04);
-    }
-
-    .video-banner-body {
-      flex: 1;
-      padding: 22px 28px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 5px;
-    }
-
-    .video-banner-eyebrow {
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.13em;
-      text-transform: uppercase;
-      color: var(--red);
-    }
-
-    .video-banner-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--blue);
-      line-height: 1.45;
-      max-width: 500px;
-    }
-
-    .video-banner-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--red);
-      color: #fff;
-      border-radius: 100px;
-      padding: 9px 20px;
-      font-size: 12px;
-      font-weight: 700;
-      margin-top: 12px;
-      align-self: flex-start;
-      transition: background 200ms, transform 200ms;
-    }
-
-    .video-banner:hover .video-banner-cta {
-      background: #bf001e;
-      transform: scale(1.04);
-    }
-
-    .video-banner-deco {
-      width: 92px;
-      flex-shrink: 0;
-      background: rgba(16,43,106,0.03);
-      border-left: 1.5px solid rgba(16,43,106,0.07);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    @media (max-width: 900px) {
-      .video-banner-deco { display: none; }
-    }
-
-    @media (max-width: 768px) {
-      .video-banner { flex-direction: column; }
-      .video-banner-illu { width: 100%; height: 110px; }
-      .video-banner-body { padding: 18px 20px; }
-    }
 
     /* ── Responsive ─────────────────────────────────────────── */
     @media (max-width: 768px) {
@@ -550,246 +436,6 @@
       },
     ];
 
-    /* ── Video banner HTML ─────────────────────────────────────────────────── */
-    const VIDEO_BANNER_HTML = `
-      <a class="video-banner"
-         href="https://youtu.be/SLSNOtULV5Q?si=_FZAR2jBHzDurXUo"
-         target="_blank"
-         rel="noopener noreferrer">
-
-        <!-- Left: illustration -->
-        <div class="video-banner-illu">
-          <svg width="170" height="116" viewBox="0 0 170 116" fill="none" xmlns="http://www.w3.org/2000/svg">
-
-            <!-- Notebook body -->
-            <rect x="12" y="8" width="80" height="100" rx="7"
-                  fill="rgba(255,255,255,0.10)" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
-
-            <!-- Binding strip -->
-            <rect x="12" y="8" width="15" height="100" rx="5"
-                  fill="rgba(255,255,255,0.07)"/>
-
-            <!-- Spiral binding dots -->
-            <circle cx="19.5" cy="24"  r="2.8" fill="rgba(255,255,255,0.55)"/>
-            <circle cx="19.5" cy="40"  r="2.8" fill="rgba(255,255,255,0.55)"/>
-            <circle cx="19.5" cy="56"  r="2.8" fill="rgba(255,255,255,0.55)"/>
-            <circle cx="19.5" cy="72"  r="2.8" fill="rgba(255,255,255,0.55)"/>
-            <circle cx="19.5" cy="88"  r="2.8" fill="rgba(255,255,255,0.55)"/>
-
-            <!-- Text line 1 -->
-            <rect x="34" y="24" width="44" height="4" rx="2"
-                  fill="rgba(255,255,255,0.30)"/>
-
-            <!-- Highlighted verb pill (red) -->
-            <rect x="34" y="37" width="28" height="10" rx="5"
-                  fill="#D62839" fill-opacity="0.92"/>
-            <!-- Word after verb -->
-            <rect x="67" y="40"  width="18" height="4" rx="2"
-                  fill="rgba(255,255,255,0.20)"/>
-
-            <!-- Text lines below verb -->
-            <rect x="34" y="58" width="50" height="4" rx="2"
-                  fill="rgba(255,255,255,0.22)"/>
-            <rect x="34" y="72" width="36" height="4" rx="2"
-                  fill="rgba(255,255,255,0.17)"/>
-            <rect x="34" y="86" width="42" height="4" rx="2"
-                  fill="rgba(255,255,255,0.13)"/>
-
-            <!-- Play button circle -->
-            <circle cx="136" cy="58" r="26"
-                    fill="rgba(255,255,255,0.13)" stroke="rgba(255,255,255,0.42)" stroke-width="2"/>
-            <!-- Inner glow ring -->
-            <circle cx="136" cy="58" r="19"
-                    fill="rgba(255,255,255,0.07)"/>
-            <!-- Play triangle -->
-            <polygon points="130,49 130,67 148,58"
-                     fill="rgba(255,255,255,0.90)"/>
-
-          </svg>
-        </div>
-
-        <!-- Center: text + CTA -->
-        <div class="video-banner-body">
-          <div class="video-banner-eyebrow">Besoin d'un coup de pouce ?</div>
-          <div class="video-banner-title">
-            Regarde cette vidéo pour mieux identifier le groupe d'un verbe !
-          </div>
-          <div class="video-banner-cta">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-              <polygon points="3,2 3,10 10,6" fill="currentColor"/>
-            </svg>
-            Regarder la vidéo
-          </div>
-        </div>
-
-        <!-- Right: decorative play mark -->
-        <div class="video-banner-deco">
-          <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
-            <circle cx="30" cy="30" r="27"
-                    stroke="rgba(16,43,106,0.11)" stroke-width="2"/>
-            <circle cx="30" cy="30" r="19"
-                    stroke="rgba(16,43,106,0.07)" stroke-width="1.5"/>
-            <polygon points="25,21 25,39 42,30"
-                     fill="rgba(16,43,106,0.13)"/>
-          </svg>
-        </div>
-
-      </a>
-    `;
-
-    /* ── Video banner — Passé composé ─────────────────────────────────────── */
-    const VIDEO_BANNER_PASSE_COMPOSE_HTML = `
-      <a class="video-banner"
-         href="https://www.youtube.com/watch?v=HoFX8PxMYno"
-         target="_blank"
-         rel="noopener noreferrer">
-
-        <div class="video-banner-illu">
-          <svg width="170" height="116" viewBox="0 0 170 116" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="12" y="8" width="80" height="100" rx="7"
-                  fill="rgba(255,255,255,0.10)" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
-            <rect x="12" y="8" width="15" height="100" rx="5"
-                  fill="rgba(255,255,255,0.07)"/>
-            <circle cx="19.5" cy="24"  r="2.8" fill="rgba(255,255,255,0.55)"/>
-            <circle cx="19.5" cy="40"  r="2.8" fill="rgba(255,255,255,0.55)"/>
-            <circle cx="19.5" cy="56"  r="2.8" fill="rgba(255,255,255,0.55)"/>
-            <circle cx="19.5" cy="72"  r="2.8" fill="rgba(255,255,255,0.55)"/>
-            <circle cx="19.5" cy="88"  r="2.8" fill="rgba(255,255,255,0.55)"/>
-            <rect x="34" y="24" width="44" height="4" rx="2"
-                  fill="rgba(255,255,255,0.30)"/>
-            <rect x="34" y="37" width="28" height="10" rx="5"
-                  fill="#D62839" fill-opacity="0.92"/>
-            <rect x="67" y="40"  width="18" height="4" rx="2"
-                  fill="rgba(255,255,255,0.20)"/>
-            <rect x="34" y="58" width="50" height="4" rx="2"
-                  fill="rgba(255,255,255,0.22)"/>
-            <rect x="34" y="72" width="36" height="4" rx="2"
-                  fill="rgba(255,255,255,0.17)"/>
-            <rect x="34" y="86" width="42" height="4" rx="2"
-                  fill="rgba(255,255,255,0.13)"/>
-            <circle cx="136" cy="58" r="26"
-                    fill="rgba(255,255,255,0.13)" stroke="rgba(255,255,255,0.42)" stroke-width="2"/>
-            <circle cx="136" cy="58" r="19"
-                    fill="rgba(255,255,255,0.07)"/>
-            <polygon points="130,49 130,67 148,58"
-                     fill="rgba(255,255,255,0.90)"/>
-          </svg>
-        </div>
-
-        <div class="video-banner-body">
-          <div class="video-banner-eyebrow">Besoin d'un coup de pouce ?</div>
-          <div class="video-banner-title">
-            Comment conjuguer au passé composé avec l'auxiliaire être ?
-          </div>
-          <div class="video-banner-cta">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-              <polygon points="3,2 3,10 10,6" fill="currentColor"/>
-            </svg>
-            Regarder la vidéo
-          </div>
-        </div>
-
-        <div class="video-banner-deco">
-          <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
-            <circle cx="30" cy="30" r="27"
-                    stroke="rgba(16,43,106,0.11)" stroke-width="2"/>
-            <circle cx="30" cy="30" r="19"
-                    stroke="rgba(16,43,106,0.07)" stroke-width="1.5"/>
-            <polygon points="25,21 25,39 42,30"
-                     fill="rgba(16,43,106,0.13)"/>
-          </svg>
-        </div>
-
-      </a>
-    `;
-
-    /* ── Video banner — Passé simple ──────────────────────────────────────── */
-    const VIDEO_BANNER_PASSE_SIMPLE_HTML = `
-      <a class="video-banner"
-         href="https://www.youtube.com/watch?v=ulBSXfXrlBE"
-         target="_blank"
-         rel="noopener noreferrer">
-
-        <!-- Left: illustration -->
-        <div class="video-banner-illu">
-          <svg width="170" height="116" viewBox="0 0 170 116" fill="none" xmlns="http://www.w3.org/2000/svg">
-
-            <!-- Notebook body -->
-            <rect x="12" y="8" width="80" height="100" rx="7"
-                  fill="rgba(255,255,255,0.10)" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
-
-            <!-- Binding strip -->
-            <rect x="12" y="8" width="15" height="100" rx="5"
-                  fill="rgba(255,255,255,0.07)"/>
-
-            <!-- Spiral binding dots -->
-            <circle cx="19.5" cy="24"  r="2.8" fill="rgba(255,255,255,0.55)"/>
-            <circle cx="19.5" cy="40"  r="2.8" fill="rgba(255,255,255,0.55)"/>
-            <circle cx="19.5" cy="56"  r="2.8" fill="rgba(255,255,255,0.55)"/>
-            <circle cx="19.5" cy="72"  r="2.8" fill="rgba(255,255,255,0.55)"/>
-            <circle cx="19.5" cy="88"  r="2.8" fill="rgba(255,255,255,0.55)"/>
-
-            <!-- Text line 1 -->
-            <rect x="34" y="24" width="44" height="4" rx="2"
-                  fill="rgba(255,255,255,0.30)"/>
-
-            <!-- Highlighted verb pill (red) -->
-            <rect x="34" y="37" width="28" height="10" rx="5"
-                  fill="#D62839" fill-opacity="0.92"/>
-            <!-- Word after verb -->
-            <rect x="67" y="40"  width="18" height="4" rx="2"
-                  fill="rgba(255,255,255,0.20)"/>
-
-            <!-- Text lines below verb -->
-            <rect x="34" y="58" width="50" height="4" rx="2"
-                  fill="rgba(255,255,255,0.22)"/>
-            <rect x="34" y="72" width="36" height="4" rx="2"
-                  fill="rgba(255,255,255,0.17)"/>
-            <rect x="34" y="86" width="42" height="4" rx="2"
-                  fill="rgba(255,255,255,0.13)"/>
-
-            <!-- Play button circle -->
-            <circle cx="136" cy="58" r="26"
-                    fill="rgba(255,255,255,0.13)" stroke="rgba(255,255,255,0.42)" stroke-width="2"/>
-            <!-- Inner glow ring -->
-            <circle cx="136" cy="58" r="19"
-                    fill="rgba(255,255,255,0.07)"/>
-            <!-- Play triangle -->
-            <polygon points="130,49 130,67 148,58"
-                     fill="rgba(255,255,255,0.90)"/>
-
-          </svg>
-        </div>
-
-        <!-- Center: text + CTA -->
-        <div class="video-banner-body">
-          <div class="video-banner-eyebrow">Besoin d'un coup de pouce ?</div>
-          <div class="video-banner-title" style="white-space: nowrap;">
-            Comment conjuguer au passé simple les verbes du 1er et du 2ᵉ groupe ?
-          </div>
-          <div class="video-banner-cta">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-              <polygon points="3,2 3,10 10,6" fill="currentColor"/>
-            </svg>
-            Regarder la vidéo
-          </div>
-        </div>
-
-        <!-- Right: decorative play mark -->
-        <div class="video-banner-deco">
-          <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
-            <circle cx="30" cy="30" r="27"
-                    stroke="rgba(16,43,106,0.11)" stroke-width="2"/>
-            <circle cx="30" cy="30" r="19"
-                    stroke="rgba(16,43,106,0.07)" stroke-width="1.5"/>
-            <polygon points="25,21 25,39 42,30"
-                     fill="rgba(16,43,106,0.13)"/>
-          </svg>
-        </div>
-
-      </a>
-    `;
-
     /* ── Badge rendering ───────────────────────────────────────────────────── */
     function renderBadges(levels) {
       return levels.map(level => {
@@ -833,13 +479,27 @@
       "identifier-verbe-conjugue":          "francais/grammaire/identifier-verbe-conjugue/index.html"
     };
 
+    /* Un CUSTOM_HREFS peut rediriger vers "exercise.html?slug=AUTRE-SLUG" (le
+       slug réel dans EXERCISE_DATA/class_active_exercises diffère alors de
+       l'identifiant de compétence skill.slug) — on résout le vrai slug pour
+       vérifier le mode guidé. */
+    function guidedExerciseId(skill) {
+      const custom = CUSTOM_HREFS[skill.slug];
+      if (!custom) return skill.slug;
+      const m = custom.match(/[?&]slug=([^&]+)/);
+      return m ? decodeURIComponent(m[1]) : skill.slug;
+    }
+
     /* ── Skill card rendering ──────────────────────────────────────────────── */
     function renderSkillCard(skill, sectionId) {
-      const hasExercise = EXERCISE_SLUGS.has(skill.slug) || skill.slug in CUSTOM_HREFS;
-      const href        = CUSTOM_HREFS[skill.slug] || (EXERCISE_SLUGS.has(skill.slug) ? `exercise.html?slug=${skill.slug}` : "#");
+      const inCatalog   = EXERCISE_SLUGS.has(skill.slug) || skill.slug in CUSTOM_HREFS;
+      const isBlocked   = inCatalog && typeof lfmGuidedAccess !== 'undefined' && !lfmGuidedAccess.isAllowedSync(guidedExerciseId(skill));
+      const hasExercise = inCatalog && !isBlocked;
+      const href        = hasExercise ? (CUSTOM_HREFS[skill.slug] || `exercise.html?slug=${skill.slug}`) : "#";
       const onclick     = hasExercise ? "" : `onclick="return false;"`;
+      const lockedClass = isBlocked ? " skill-card-locked" : "";
       return `
-        <a class="skill-card"
+        <a class="skill-card${lockedClass}"
            href="${href}"
            data-slug="${skill.slug}"
            data-levels="${skill.levels.join(",")}"
@@ -847,7 +507,7 @@
            data-section="${sectionId}"
            ${onclick}>
           <div class="skill-badges">${renderBadges(skill.levels)}</div>
-          <div class="skill-title">${skill.title}</div>
+          <div class="skill-title">${skill.title}${isBlocked ? ' 🔒' : ''}</div>
         </a>
       `;
     }
@@ -860,14 +520,9 @@
       const subSectionsHTML = section.subSections.map((sub, subIdx) => {
         const skillsHTML = sub.skills.map(skill => renderSkillCard(skill, section.id)).join("");
         const labelHTML  = sub.label ? `<div class="subsection-label">${sub.label}</div>` : "";
-        let bannerHTML = "";
-        if (section.id === "le-verbe" && subIdx === 0) bannerHTML = VIDEO_BANNER_HTML;
-        if (section.id === "temps-indicatif" && sub.label === "Passé simple") bannerHTML = VIDEO_BANNER_PASSE_SIMPLE_HTML;
-        if (section.id === "temps-indicatif" && sub.label === "Passé composé") bannerHTML = VIDEO_BANNER_PASSE_COMPOSE_HTML;
         return `
           <div class="subsection" data-subsection="${section.id}-${subIdx}">
             ${labelHTML}
-            ${bannerHTML}
             <div class="skills-grid">${skillsHTML}</div>
           </div>
         `;
@@ -891,7 +546,8 @@
     }
 
     /* ── Init ──────────────────────────────────────────────────────────────── */
-    function init() {
+    async function init() {
+      if (typeof lfmGuidedAccess !== 'undefined') await lfmGuidedAccess.get();
       document.getElementById("skills-container").innerHTML =
         SECTIONS.map(renderSection).join("");
       bindEvents();
@@ -977,8 +633,6 @@
     init();
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
   <script src="js/menu.js"></script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */

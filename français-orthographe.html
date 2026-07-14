@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Orthographe — Français — Lycée Français de Madrid</title>
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/guided-access.js?v=1"></script>
   <style>
     /* ── Filter bar ─────────────────────────────────────────── */
     .filter-bar {
@@ -186,6 +190,8 @@
     }
 
     .skill-card.card-hidden { display: none; }
+    .skill-card-locked { opacity: 0.45; cursor: not-allowed; }
+    .skill-card-locked:hover { transform: none; box-shadow: none; border-color: var(--border); }
 
     .skill-badges {
       display: flex;
@@ -438,13 +444,27 @@
       }).join("");
     }
 
+    /* Un CUSTOM_HREFS peut rediriger vers "exercise.html?slug=AUTRE-SLUG" (le
+       slug réel dans EXERCISE_DATA/class_active_exercises diffère alors de
+       l'identifiant de compétence skill.slug) — on résout le vrai slug pour
+       vérifier le mode guidé. */
+    function guidedExerciseId(skill) {
+      const custom = CUSTOM_HREFS[skill.slug];
+      if (!custom) return skill.slug;
+      const m = custom.match(/[?&]slug=([^&]+)/);
+      return m ? decodeURIComponent(m[1]) : skill.slug;
+    }
+
     /* ── Skill card rendering ──────────────────────────────────────────────── */
     function renderSkillCard(skill, sectionId) {
-      const hasExercise = EXERCISE_SLUGS.has(skill.slug) || skill.slug in CUSTOM_HREFS;
-      const href        = CUSTOM_HREFS[skill.slug] || (EXERCISE_SLUGS.has(skill.slug) ? `exercise.html?slug=${skill.slug}` : "#");
+      const inCatalog   = EXERCISE_SLUGS.has(skill.slug) || skill.slug in CUSTOM_HREFS;
+      const isBlocked   = inCatalog && typeof lfmGuidedAccess !== 'undefined' && !lfmGuidedAccess.isAllowedSync(guidedExerciseId(skill));
+      const hasExercise = inCatalog && !isBlocked;
+      const href        = hasExercise ? (CUSTOM_HREFS[skill.slug] || `exercise.html?slug=${skill.slug}`) : "#";
       const onclick     = hasExercise ? "" : `onclick="return false;"`;
+      const lockedClass = isBlocked ? " skill-card-locked" : "";
       return `
-        <a class="skill-card"
+        <a class="skill-card${lockedClass}"
            href="${href}"
            data-slug="${skill.slug}"
            data-levels="${skill.levels.join(",")}"
@@ -452,7 +472,7 @@
            data-section="${sectionId}"
            ${onclick}>
           <div class="skill-badges">${renderBadges(skill.levels)}</div>
-          <div class="skill-title">${skill.title}</div>
+          <div class="skill-title">${skill.title}${isBlocked ? ' 🔒' : ''}</div>
         </a>
       `;
     }
@@ -491,7 +511,8 @@
     }
 
     /* ── Init ──────────────────────────────────────────────────────────────── */
-    function init() {
+    async function init() {
+      if (typeof lfmGuidedAccess !== 'undefined') await lfmGuidedAccess.get();
       document.getElementById("skills-container").innerHTML =
         SECTIONS.map(renderSection).join("");
       bindEvents();
@@ -577,8 +598,6 @@
     init();
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
   <script src="js/menu.js"></script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */

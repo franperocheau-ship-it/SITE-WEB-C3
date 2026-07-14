@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mes classes — Espace enseignant — LFM</title>
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="js/supabase-client.js"></script>
@@ -272,7 +272,7 @@
       border-radius: 100px;
       white-space: nowrap;
     }
-    .access-tree { display: flex; flex-direction: column; gap: 8px; max-height: 560px; overflow-y: auto; }
+    .access-tree { display: flex; flex-direction: column; gap: 8px; }
 
     .ax-domaine { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
     .ax-domaine-summary {
@@ -316,6 +316,17 @@
     .ax-notion-count { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--muted); }
     .ax-exercises { padding: 2px 0 6px 24px; display: none; flex-direction: column; gap: 2px; }
     .ax-notion.is-open > .ax-exercises { display: flex; }
+
+    .ax-group-label {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 10px 10px 2px;
+    }
+    .ax-group-label:first-child { padding-top: 4px; }
 
     .ax-row {
       display: flex;
@@ -1287,17 +1298,17 @@
 
   let _exerciseAssetsPromise = null;
   function loadExerciseAssets() {
-    if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG !== 'undefined') return Promise.resolve();
+    if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined') return Promise.resolve();
     if (_exerciseAssetsPromise) return _exerciseAssetsPromise;
     _exerciseAssetsPromise = Promise.all([
-      typeof EXERCISE_DATA    !== 'undefined' ? null : loadScript('exercise-data.js'),
-      typeof EXERCISE_CATALOG !== 'undefined' ? null : loadScript('js/exercise-catalog.js')
+      typeof EXERCISE_DATA               !== 'undefined' ? null : loadScript('exercise-data.js?v=18'),
+      typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined' ? null : loadScript('js/exercise-catalog.js?v=6')
     ]).catch(err => { _exerciseAssetsPromise = null; throw err; });
     return _exerciseAssetsPromise;
   }
 
   async function ensureExerciseDataLoaded() {
-    if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG !== 'undefined') {
+    if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined') {
       renderAccessTree();
       return;
     }
@@ -1312,42 +1323,89 @@
     }
   }
 
-  /* Matière > Sous-thème > Exercice, dérivé de EXERCISE_CATALOG (organisation
-     réelle du site — voir js/exercise-catalog.js). Tout slug de EXERCISE_DATA
-     absent du catalogue est regroupé dans "Autres exercices" pour qu'aucun
-     exercice ne soit jamais invisible. */
+  /* Matière > Sous-thème > Exercice.
+     - Chaque exercice de EXERCISE_DATA est classé automatiquement par
+       domaine + préfixe de `competence` (avant " — ") : aucune liste à
+       maintenir, un nouvel exercice ajouté à EXERCISE_DATA apparaît de
+       lui-même au bon endroit.
+     - Les exercices "autonomes" (hors EXERCISE_DATA — homophones, lexique,
+       identifier-verbe-conjugue) sont rattachés explicitement via
+       EXERCISE_CATALOG_AUTONOMOUS (js/exercise-catalog.js).
+     - Tout exercice sans catégorie reconnue est exclu du panneau et signalé
+       par un console.warn : pas de section fourre-tout. */
   function buildExerciseTree() {
     if (_exerciseTreeCache) return _exerciseTreeCache;
-    const used = new Set();
+    const byCategory = {};
 
-    const tree = EXERCISE_CATALOG.map(({ matiere, sousThemes }) => ({
-      domaine: matiere,
-      notions: sousThemes.map(({ nom, slugs }) => ({
-        notion: nom,
-        items: slugs
-          .filter(slug => EXERCISE_DATA[slug])
-          .map(slug => {
-            used.add(slug);
-            return { slug, title: EXERCISE_DATA[slug].title };
-          })
-      }))
-    }));
-
-    const rest = Object.keys(EXERCISE_DATA)
-      .filter(slug => !used.has(slug))
-      .sort((a, b) => EXERCISE_DATA[a].title.localeCompare(EXERCISE_DATA[b].title, 'fr'))
-      .map(slug => ({ slug, title: EXERCISE_DATA[slug].title }));
-
-    if (rest.length > 0) {
-      tree.push({ domaine: 'Autres exercices', notions: [{ notion: 'Absents du catalogue', items: rest }] });
+    function addItem(category, subCategory, slug, title) {
+      if (!category || !subCategory) {
+        console.warn('[Parcours guidé] Exercice sans catégorie reconnue, exclu du panneau :', slug);
+        return;
+      }
+      if (!byCategory[category]) byCategory[category] = {};
+      if (!byCategory[category][subCategory]) byCategory[category][subCategory] = [];
+      byCategory[category][subCategory].push({ slug, title });
     }
 
-    _exerciseTreeCache = tree;
-    return tree;
+    Object.keys(EXERCISE_DATA).forEach(slug => {
+      const ex     = EXERCISE_DATA[slug];
+      const sepIdx = ex.competence.indexOf(' — ');
+      const subCategory = sepIdx !== -1 ? ex.competence.slice(0, sepIdx) : ex.competence;
+      addItem(ex.domaine, subCategory, slug, ex.title);
+    });
+
+    EXERCISE_CATALOG_AUTONOMOUS.forEach(({ slug, title, category, subCategory }) => {
+      addItem(category, subCategory, slug, title);
+    });
+
+    const DOMAINE_ORDER = ['Français', 'Mathématiques'];
+    const domaines = Object.keys(byCategory).sort((a, b) => {
+      const ia = DOMAINE_ORDER.indexOf(a), ib = DOMAINE_ORDER.indexOf(b);
+      if (ia === -1 && ib === -1) return a.localeCompare(b, 'fr');
+      if (ia === -1) return 1;
+      if (ib === -1) return -1;
+      return ia - ib;
+    });
+
+    _exerciseTreeCache = domaines.map(domaine => ({
+      domaine,
+      notions: Object.keys(byCategory[domaine]).sort((a, b) => a.localeCompare(b, 'fr')).map(notion => ({
+        notion,
+        items: applyGroupOrder(domaine, notion, byCategory[domaine][notion])
+      }))
+    }));
+    return _exerciseTreeCache;
+  }
+
+  /* Applique le 3e niveau optionnel "groupes" (EXERCISE_CATALOG_GROUPS) : ordre
+     et étiquette de groupe pour les slugs couverts, tri alphabétique par
+     défaut sinon (comportement inchangé pour les sous-thèmes sans groupes). */
+  function applyGroupOrder(domaine, notion, rawItems) {
+    const groupDefs = EXERCISE_CATALOG_GROUPS[domaine] && EXERCISE_CATALOG_GROUPS[domaine][notion];
+    if (!groupDefs) return rawItems.slice().sort((a, b) => a.title.localeCompare(b.title, 'fr'));
+
+    const bySlug = new Map(rawItems.map(it => [it.slug, it]));
+    const used   = new Set();
+    const items  = [];
+
+    groupDefs.forEach(({ groupe, slugs }) => {
+      slugs.forEach(slug => {
+        const it = bySlug.get(slug);
+        if (!it) return;
+        used.add(slug);
+        items.push({ ...it, groupe });
+      });
+    });
+
+    const rest = rawItems
+      .filter(it => !used.has(it.slug))
+      .sort((a, b) => a.title.localeCompare(b.title, 'fr'));
+
+    return items.concat(rest);
   }
 
   function exerciseTotalCount() {
-    return Object.keys(EXERCISE_DATA).length;
+    return Object.keys(EXERCISE_DATA).length + EXERCISE_CATALOG_AUTONOMOUS.length;
   }
 
   function renderAccessCard() {
@@ -1409,13 +1467,21 @@
         const notionKey = domaine + '::' + notion;
         const isOpen = _openGroups.has(notionKey) || !!query;
 
-        const rows = filtered.map(it => `
-          <div class="ax-row">
-            <input type="checkbox" class="ax-check" id="ax-ex-${esc(it.slug)}" data-slug="${esc(it.slug)}" ${_activeExerciseIds.has(it.slug) ? 'checked' : ''}>
-            <label for="ax-ex-${esc(it.slug)}">${esc(it.title)}</label>
-            <span class="ax-status" data-status-for="${esc(it.slug)}"></span>
-          </div>
-        `).join('');
+        let lastGroupe = null;
+        const rows = filtered.map(it => {
+          const groupLabel = (it.groupe && it.groupe !== lastGroupe)
+            ? `<div class="ax-group-label">${esc(it.groupe)}</div>`
+            : '';
+          lastGroupe = it.groupe || null;
+          return `
+            ${groupLabel}
+            <div class="ax-row">
+              <input type="checkbox" class="ax-check" id="ax-ex-${esc(it.slug)}" data-slug="${esc(it.slug)}" ${_activeExerciseIds.has(it.slug) ? 'checked' : ''}>
+              <label for="ax-ex-${esc(it.slug)}">${esc(it.title)}</label>
+              <span class="ax-status" data-status-for="${esc(it.slug)}"></span>
+            </div>
+          `;
+        }).join('');
 
         notionsHtml += `
           <div class="ax-notion${isOpen ? ' is-open' : ''}" data-notion-key="${esc(notionKey)}">

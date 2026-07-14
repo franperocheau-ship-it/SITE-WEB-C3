@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nombres décimaux — Mathématiques — Lycée Français de Madrid</title>
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/guided-access.js?v=1"></script>
   <style>
     /* ── Page layout ────────────────────────────────────────── */
     .page-wrap {
@@ -268,6 +272,8 @@
     }
 
     .skill-card.card-hidden { display: none; }
+    .skill-card-locked { opacity: 0.45; cursor: not-allowed; }
+    .skill-card-locked:hover { transform: none; box-shadow: none; border-color: var(--border); }
 
     .skill-badges {
       display: flex;
@@ -536,25 +542,39 @@
 
     /* ── Custom exercise pages (slug → file) ─────────────────────────────── */
     const CUSTOM_PAGES = new Map([
-      ["associer-fraction-decimale",              "fraction-decimale-association.html"],
+      ["associer-fraction-decimale",              "exercise.html?slug=associer-decimal-fraction"],
       ["ecrire-fraction-sous-forme-decimale",     "ecrire-fraction-decimale.html"],
       ["ecrire-decimal-sous-forme-fraction",      "ecrire-decimal-fraction.html"],
-      ["decomposer-nombre-decimal",               "maths/decomposer-decimaux/index.html"],
-      ["composer-nombre-decimal-decomposition",   "maths/composer-decimaux/index.html"],
-      ["comparer-deux-nombres-decimaux",          "maths/comparer-decimaux/index.html"],
-      ["ranger-nombres-decimaux",                 "maths/ranger-decimaux/index.html"],
-      ["encadrer-nombre-decimal",                 "maths/encadrer-decimaux/index.html"],
-      ["placer-decimal-droite-graduee",           "maths/nombres-decimaux/placer-decimaux-droite/index.html"],
-      ["intercaler-decimal",                      "maths/nombres-decimaux/intercaler-decimaux/index.html"],
+      ["decomposer-nombre-decimal",               "exercise.html?slug=decomposer-decimaux"],
+      ["composer-nombre-decimal-decomposition",   "exercise.html?slug=composer-decimaux"],
+      ["comparer-deux-nombres-decimaux",          "exercise.html?slug=comparer-decimaux"],
+      ["ranger-nombres-decimaux",                 "exercise.html?slug=ranger-decimaux"],
+      ["encadrer-nombre-decimal",                 "exercise.html?slug=encadrer-decimaux"],
+      ["placer-decimal-droite-graduee",           "exercise.html?slug=placer-decimaux-droite"],
+      ["intercaler-decimal",                      "exercise.html?slug=intercaler-decimaux"],
     ]);
+
+    /* Un CUSTOM_PAGES peut pointer vers "exercise.html?slug=AUTRE-SLUG" (le
+       slug réel dans EXERCISE_DATA/class_active_exercises diffère alors de
+       l'identifiant de compétence skill.slug) — on résout le vrai slug pour
+       vérifier le mode guidé. */
+    function guidedExerciseId(skill) {
+      const custom = CUSTOM_PAGES.get(skill.slug);
+      if (!custom) return skill.slug;
+      const m = custom.match(/[?&]slug=([^&]+)/);
+      return m ? decodeURIComponent(m[1]) : skill.slug;
+    }
 
     /* ── Skill card rendering ──────────────────────────────────────────────── */
     function renderSkillCard(skill, sectionId) {
-      const customUrl = CUSTOM_PAGES.get(skill.slug);
-      const href      = customUrl ? customUrl : "#";
-      const onclick   = customUrl ? "" : `onclick="return false;"`;
+      const inCatalog   = CUSTOM_PAGES.has(skill.slug);
+      const isBlocked   = inCatalog && typeof lfmGuidedAccess !== 'undefined' && !lfmGuidedAccess.isAllowedSync(guidedExerciseId(skill));
+      const hasExercise = inCatalog && !isBlocked;
+      const href        = hasExercise ? CUSTOM_PAGES.get(skill.slug) : "#";
+      const onclick     = hasExercise ? "" : `onclick="return false;"`;
+      const lockedClass = isBlocked ? " skill-card-locked" : "";
       return `
-        <a class="skill-card"
+        <a class="skill-card${lockedClass}"
            href="${href}"
            data-slug="${skill.slug}"
            data-levels="${skill.levels.join(",")}"
@@ -562,7 +582,7 @@
            data-section="${sectionId}"
            ${onclick}>
           <div class="skill-badges">${renderBadges(skill.levels)}</div>
-          <div class="skill-title">${skill.title}</div>
+          <div class="skill-title">${skill.title}${isBlocked ? ' 🔒' : ''}</div>
         </a>
       `;
     }
@@ -601,7 +621,8 @@
     }
 
     /* ── Init ──────────────────────────────────────────────────────────────── */
-    function init() {
+    async function init() {
+      if (typeof lfmGuidedAccess !== 'undefined') await lfmGuidedAccess.get();
       document.getElementById("skills-container").innerHTML =
         SECTIONS.map(renderSection).join("");
       bindEvents();
@@ -687,8 +708,6 @@
     init();
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
   <script src="js/menu.js"></script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */

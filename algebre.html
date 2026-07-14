@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Algèbre — Mathématiques — Lycée Français de Madrid</title>
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
   <style>
     .page-wrap {
       background: var(--bg);
@@ -60,7 +60,8 @@
 
     .hub-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, minmax(240px, 320px));
+      justify-content: center;
       gap: 24px;
     }
 
@@ -138,6 +139,10 @@
       height: 4px;
     }
 
+    .hub-card-locked { opacity: 0.45; cursor: not-allowed; }
+    .hub-card-locked:hover { transform: none; box-shadow: var(--shadow-sm); }
+    .hub-card-locked:hover .hub-card-btn { background: var(--blue); }
+
     @media (max-width: 1024px) { .page-content { padding: 0 40px; } }
     @media (max-width: 768px) {
       .page-content { padding: 0 24px; }
@@ -199,49 +204,25 @@
         </div>
         <h1 class="page-title">ALGÈBRE</h1>
         <div class="page-title-rule"></div>
-        <p class="page-subtitle">Chaque symbole cache un nombre. Choisis un niveau pour les démasquer !</p>
+        <p class="page-subtitle">Chaque symbole cache un nombre. Choisis un exercice pour les démasquer !</p>
       </div>
 
       <div class="hub-grid">
 
-        <a class="hub-card" href="algebre-cm1.html">
+        <a class="hub-card" href="algebre-symboles-mysteres.html" data-slug="algebre-symboles-mysteres">
           <span class="hub-card-emoji">🎅</span>
-          <div class="hub-card-title">Niveau 1</div>
-          <div class="hub-card-desc">2 symboles, additions et multiplications</div>
+          <div class="hub-card-title">Symboles mystères</div>
+          <div class="hub-card-desc">Résous des équations pour trouver la valeur cachée de chaque symbole — 3 niveaux progressifs</div>
           <span class="hub-card-btn">Jouer →</span>
           <div class="hub-card-accent" style="background:#2EA05A"></div>
         </a>
 
-        <a class="hub-card" href="algebre-cm2.html">
-          <span class="hub-card-emoji">🥾</span>
-          <div class="hub-card-title">Niveau 2</div>
-          <div class="hub-card-desc">3 symboles, additions, soustractions, multiplications</div>
-          <span class="hub-card-btn">Jouer →</span>
-          <div class="hub-card-accent" style="background:#E68C14"></div>
-        </a>
-
-        <a class="hub-card" href="algebre-6e.html">
-          <span class="hub-card-emoji">❄️</span>
-          <div class="hub-card-title">Niveau 3</div>
-          <div class="hub-card-desc">4 symboles, toutes les opérations, parfois des décimaux</div>
-          <span class="hub-card-btn">Jouer →</span>
-          <div class="hub-card-accent" style="background:#D62839"></div>
-        </a>
-
-        <a class="hub-card" href="algebre-systemes-cm2.html">
+        <a class="hub-card" href="algebre-systemes-equations.html" data-slug="algebre-systemes-equations">
           <span class="hub-card-emoji">🧩</span>
-          <div class="hub-card-title">Niveau 4</div>
-          <div class="hub-card-desc">Systèmes d'équations imagées avec parenthèses — CM2</div>
+          <div class="hub-card-title">Systèmes d'équations</div>
+          <div class="hub-card-desc">Des systèmes d'équations imagées avec parenthèses à résoudre — 2 niveaux progressifs</div>
           <span class="hub-card-btn">Jouer →</span>
           <div class="hub-card-accent" style="background:#7C3AED"></div>
-        </a>
-
-        <a class="hub-card" href="algebre-systemes-6e.html">
-          <span class="hub-card-emoji">🔭</span>
-          <div class="hub-card-title">Niveau 5</div>
-          <div class="hub-card-desc">Systèmes avancés, parenthèses variables, résolution en cascade — 6e</div>
-          <span class="hub-card-btn">Jouer →</span>
-          <div class="hub-card-accent" style="background:#0891B2"></div>
         </a>
 
       </div>
@@ -272,6 +253,22 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/guided-access.js?v=1"></script>
+  <script>
+    (async function applyGuidedAccessToAlgebreHub() {
+      if (typeof lfmGuidedAccess === 'undefined') return;
+      await lfmGuidedAccess.get();
+      document.querySelectorAll('.hub-card[data-slug]').forEach(card => {
+        const slug = card.dataset.slug;
+        if (lfmGuidedAccess.isAllowedSync(slug)) return;
+        card.classList.add('hub-card-locked');
+        card.addEventListener('click', e => e.preventDefault());
+        const title = card.querySelector('.hub-card-title');
+        if (title) title.textContent += ' 🔒';
+      });
+    })();
+  </script>
   <script src="js/menu.js"></script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */
