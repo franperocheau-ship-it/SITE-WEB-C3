@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Algèbre — Symboles mystères — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="level-select.css">
+  <script src="js/level-select.js"></script>
+  <style>
+    .page-wrap { background: var(--bg); min-height: calc(100vh - 88px); padding-bottom: 64px; }
+    .page-content { max-width: 720px; margin: 0 auto; padding: 0 64px; }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--blue); font-size: 13px; font-weight: 600;
+      text-decoration: none; padding: 20px 0 0; opacity: 0.75;
+      transition: opacity 180ms;
+    }
+    .back-link:hover { opacity: 1; }
+
+    .page-header { text-align: center; padding: 28px 0 20px; }
+    .page-header-icon { display: flex; justify-content: center; margin-bottom: 14px; }
+    .page-title { font-weight: 900; font-size: 32px; color: var(--blue); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; }
+    .page-title-rule { width: 44px; height: 3px; background: var(--red); border-radius: 2px; margin: 0 auto 16px; }
+    .page-subtitle { font-size: 14px; color: var(--muted); font-weight: 400; }
+
+    .ex-page-badges { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-top: 18px; }
+
+    .level-card {
+      position: relative;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--level-accent, var(--blue)) 8%, transparent), var(--card-bg) 140px);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      border: 1.5px solid color-mix(in srgb, var(--level-accent, var(--blue)) 28%, transparent);
+      padding: 28px 28px 24px;
+      margin-top: 24px;
+    }
+
+    .level-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .level-title { font-weight: 800; font-size: 17px; color: var(--blue); letter-spacing: 0.02em; }
+    .level-desc { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+    .level-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 100px; font-weight: 800; font-size: 12px; letter-spacing: 0.06em;
+      padding: 6px 16px; flex-shrink: 0;
+      background: color-mix(in srgb, var(--level-accent, var(--blue)) 16%, transparent);
+      color: var(--level-accent, var(--blue));
+      border: 1.5px solid color-mix(in srgb, var(--level-accent, var(--blue)) 38%, transparent);
+    }
+
+    .puzzle-progress { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .pp-label { font-size: 12px; font-weight: 700; color: var(--blue); letter-spacing: 0.05em; }
+    .pp-dots  { display: flex; gap: 6px; }
+    .pp-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--border); border: 1.5px solid transparent;
+      transition: background 300ms;
+    }
+    .pp-dot.done    { background: #16a34a; border-color: #16a34a; }
+    .pp-dot.current { background: var(--level-accent, var(--blue)); border-color: var(--level-accent, var(--blue)); }
+
+    .equations { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+
+    .equation {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      background: rgba(16,43,106,0.035); border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 12px 16px; flex-wrap: wrap;
+    }
+    .equation.verif { background: rgba(16,43,106,0.06); }
+
+    .eq-sym { font-size: 30px; line-height: 1; min-width: 48px; text-align: center; }
+    .eq-op  { font-size: 20px; font-weight: 800; color: var(--blue); }
+    .eq-eq  { font-size: 20px; font-weight: 800; color: var(--muted); }
+    .eq-val { font-size: 20px; font-weight: 800; color: var(--red); min-width: 32px; text-align: center; }
+
+    .answers-wrap { margin-bottom: 18px; }
+    .answers-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+
+    .answers-table { display: grid; gap: 12px; grid-auto-flow: column; grid-auto-columns: minmax(80px, 1fr); }
+    .answer-cell { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .answer-sym { font-size: 34px; line-height: 1; }
+
+    .answer-input {
+      width: 100%; max-width: 90px; text-align: center;
+      border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 6px;
+      font-size: 15px; font-weight: 700; font-family: inherit; color: var(--text);
+      background: var(--card-bg); outline: none;
+      transition: border-color 180ms, box-shadow 180ms, background 180ms;
+    }
+    .answer-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(16,43,106,0.08); }
+    .answer-input.correct { border-color: #2EA05A; background: rgba(46,160,90,0.10); }
+    .answer-input.wrong   { border-color: var(--red); background: rgba(214,40,57,0.08); }
+    .answer-input:disabled { cursor: not-allowed; }
+
+    .answer-fb { font-size: 16px; height: 18px; line-height: 1; }
+
+    .level-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+    .btn {
+      border: none; border-radius: 100px; padding: 11px 22px;
+      font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;
+      transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover { box-shadow: var(--shadow-sm); }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { color: var(--blue); border-color: var(--blue); }
+
+    .level-result { margin-left: auto; font-size: 13px; font-weight: 700; color: var(--muted); }
+    .level-result.win { color: #1f7a44; }
+
+    /* ── Result screen ─────────────────────────────────────────── */
+    .level-complete { text-align: center; padding: 28px 16px; background: rgba(22,163,74,0.06); border-radius: 14px; }
+    .level-complete.failed { background: rgba(214,40,57,0.05); }
+    .level-complete-icon  { font-size: 42px; margin-bottom: 8px; }
+    .level-complete-title { font-size: 17px; font-weight: 800; color: #15803d; margin-bottom: 4px; }
+    .level-complete.failed .level-complete-title { color: var(--red); }
+    .level-complete-score { font-size: 14px; color: var(--muted); font-weight: 600; }
+    .level-complete-msg   { font-size: 13px; color: var(--muted); font-weight: 600; margin-top: 6px; }
+    .result-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+    .ex-btn-primary {
+      background: var(--blue); color: #fff; border: none; border-radius: 100px;
+      padding: 13px 32px; font-family: inherit; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: background 200ms, transform 200ms;
+    }
+    .ex-btn-primary:hover { background: #0d2255; transform: translateY(-2px); }
+    .ex-btn-secondary {
+      background: transparent; color: var(--blue); border: 1.5px solid var(--border);
+      border-radius: 100px; padding: 13px 32px; font-family: inherit; font-size: 14px;
+      font-weight: 700; cursor: pointer; transition: border-color 200ms, background 200ms, transform 200ms;
+    }
+    .ex-btn-secondary:hover { border-color: var(--blue); background: rgba(16,43,106,0.04); transform: translateY(-2px); }
+
+    @media (max-width: 1024px) { .page-content { padding: 0 40px; } }
+    @media (max-width: 768px) {
+      .page-content { padding: 0 24px; }
+      .level-card { padding: 22px 18px 20px; }
+      .eq-sym { font-size: 26px; }
+      .answers-table { grid-auto-flow: row; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); }
+      .level-result { margin-left: 0; width: 100%; text-align: center; }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <!-- NAVBAR-PROFICIAMUS-CSS -->
+  <style>
+  /* ─── Navbar Proficiamus (extrait d'index.html) ─── */
+  body{padding-top:50px;}
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+  .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+  .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+  .navbar__brand img{height:34px;width:auto;}
+  .navbar__brand-text{display:flex;flex-direction:column;}
+  .navbar__name{font-size:18px;font-weight:800;line-height:1;letter-spacing:1px;}
+  .navbar__tagline{font-size:12px;font-style:italic;font-weight:700;color:#102B6A;margin-top:2px;}
+  .navbar__nav{display:flex;align-items:center;gap:24px;}
+  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-size:14px;font-weight:700;transition:color .2s;}
+  .navbar__nav a:hover{color:#1B4EBF;}
+  .navbar__nav a.active{color:#2D9C3C;border-bottom:2px solid #2D9C3C;padding-bottom:2px;}
+  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;}
+  .navbar__nav .btn-login{color:#fff!important;}
+  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+  .btn-login:hover{background:#0b1e4d;}
+  @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <!-- MAIN -->
+  <div class="page-wrap">
+    <div class="page-content">
+
+      <a href="algebre.html" class="back-link">← Algèbre</a>
+
+      <div class="page-header">
+        <div class="page-header-icon">
+          <svg width="56" height="56" viewBox="0 0 64 64" fill="none">
+            <rect x="10" y="10" width="44" height="44" rx="8" stroke="#102B6A" stroke-width="2.5"/>
+            <text x="32" y="40" text-anchor="middle" font-size="26" fill="#D62839" font-weight="800">?</text>
+          </svg>
+        </div>
+        <h1 class="page-title">SYMBOLES MYSTÈRES</h1>
+        <div class="page-title-rule"></div>
+        <p class="page-subtitle">Chaque symbole cache un nombre. Résous les équations pour les démasquer !</p>
+        <div class="ex-page-badges" id="levelBadges"></div>
+      </div>
+
+      <div id="levelSelectScreen"></div>
+
+      <div id="exerciseScreen" style="display:none">
+        <div class="level-card" id="level-card">
+          <div class="level-head">
+            <div>
+              <div class="level-title">Symboles mystères</div>
+              <div class="level-desc" id="lvl-desc"></div>
+            </div>
+            <span class="level-badge" id="lvl-badge"></span>
+          </div>
+
+          <div class="puzzle-progress">
+            <span class="pp-label" id="pp-label"></span>
+            <div class="pp-dots" id="pp-dots"></div>
+          </div>
+
+          <div class="equations" id="equations"></div>
+
+          <div class="answers-wrap">
+            <div class="answers-label">Tableau de réponses</div>
+            <div class="answers-table" id="answers"></div>
+          </div>
+
+          <div class="level-actions">
+            <button class="btn btn-primary" id="verify-btn">Vérifier</button>
+            <button class="btn btn-primary" id="next-btn" style="display:none">Puzzle suivant →</button>
+            <span class="level-result" id="result"></span>
+          </div>
+        </div>
+      </div>
+
+      <div id="resultScreen" style="display:none"></div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau – LFM &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script>
+    /* ════════════════════════════════════════════════════════════════
+       DONNÉES — 3 niveaux, mécanique de jeu identique (générateur de
+       puzzle), complexité croissante. Générateurs repris à l'identique
+       des anciennes pages algebre-cm1 / algebre-cm2 / algebre-6e.html.
+    ════════════════════════════════════════════════════════════════ */
+    const opSymbol = { add: "+", sub: "−", mul: "×", div: "÷" };
+    function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function round1(n) { return Math.round(n * 10) / 10; }
+
+    /* ── Niveau 1 : 2 symboles, additions et multiplications ─────────── */
+    function generatePuzzle1() {
+      let A = randInt(2, 9);
+      let B = randInt(2, 9);
+      while (B === A) B = randInt(2, 9);
+      const values = [A, B];
+
+      const firstIdx = Math.random() < 0.5 ? 0 : 1;
+      const otherIdx = 1 - firstIdx;
+      const selfOp = Math.random() < 0.5 ? "add" : "mul";
+      const v0 = values[firstIdx];
+      const eq1 = { terms: [firstIdx, firstIdx], op: selfOp, value: selfOp === "add" ? v0 + v0 : v0 * v0 };
+
+      const linkOp = Math.random() < 0.5 ? "add" : "mul";
+      const terms2 = Math.random() < 0.5 ? [firstIdx, otherIdx] : [otherIdx, firstIdx];
+      const eq2 = { terms: terms2, op: linkOp, value: linkOp === "add" ? A + B : A * B };
+
+      const equations = [eq1, eq2];
+
+      if (Math.random() < 0.5) {
+        if (Math.random() < 0.5) {
+          const bonusOp = Math.random() < 0.5 ? "add" : "mul";
+          const v1 = values[otherIdx];
+          equations.push({ terms: [otherIdx, otherIdx], op: bonusOp, value: bonusOp === "add" ? v1 + v1 : v1 * v1 });
+        } else {
+          const bonusOp = linkOp === "add" ? "mul" : "add";
+          const bonusTerms = Math.random() < 0.5 ? [0, 1] : [1, 0];
+          equations.push({ terms: bonusTerms, op: bonusOp, value: bonusOp === "add" ? A + B : A * B });
+        }
+      }
+
+      return { values, equations };
+    }
+
+    /* ── Niveau 2 : 3 symboles, +, −, × et équation de vérification ──── */
+    function generatePuzzle2() {
+      const values = [];
+      const equations = [];
+
+      values[0] = randInt(2, 9);
+      equations.push({ terms: [0, 0], op: "add", value: values[0] + values[0] });
+
+      values[1] = randInt(values[0] + 1, values[0] + 12);
+      equations.push({ terms: [1, 0], op: "sub", value: values[1] - values[0] });
+
+      values[2] = randInt(1, 9);
+      equations.push({ terms: [2, 0], op: "mul", value: values[2] * values[0] });
+
+      const total = round1(values.reduce((a, b) => a + b, 0));
+      equations.push({ terms: [0, 1, 2], op: "sumcheck", value: total, verif: true });
+
+      return { values, equations };
+    }
+
+    /* ── Niveau 3 : 4 symboles, toutes opérations, décimaux ───────────── */
+    function generatePuzzle3() {
+      const values = [];
+      const equations = [];
+
+      values[0] = randInt(2, 9);
+      equations.push({ terms: [0, 0], op: "add", value: values[0] + values[0] });
+
+      values[1] = randInt(values[0] + 1, values[0] + 12);
+      equations.push({ terms: [1, 0], op: "sub", value: values[1] - values[0] });
+
+      values[2] = randInt(1, 9);
+      equations.push({ terms: [2, 0], op: "mul", value: values[2] * values[0] });
+
+      const quotients = [1, 1.5, 2, 2.5, 3, 3.5, 4];
+      const q = quotients[randInt(0, quotients.length - 1)];
+      values[3] = round1(values[1] * q);
+      equations.push({ terms: [3, 1], op: "div", value: round1(values[3] / values[1]) });
+
+      const total = round1(values.reduce((a, b) => a + b, 0));
+      equations.push({ terms: [0, 1, 2, 3], op: "sumcheck", value: total, verif: true });
+
+      return { values, equations };
+    }
+
+    const LEVELS = [
+      {
+        id: "niv1", label: "2 symboles",
+        description: "2 symboles à démasquer, avec des additions et des multiplications.",
+        symbols: ["🎅", "🥾"],
+        accent: "var(--ls-color-1)",
+        generatePuzzle: generatePuzzle1
+      },
+      {
+        id: "niv2", label: "3 symboles",
+        description: "3 symboles à démasquer : additions, soustractions, multiplications et une équation de vérification.",
+        symbols: ["🎅", "🥾", "🧤"],
+        accent: "var(--ls-color-2)",
+        generatePuzzle: generatePuzzle2
+      },
+      {
+        id: "niv3", label: "4 symboles",
+        description: "4 symboles à démasquer avec toutes les opérations, parfois des nombres décimaux.",
+        symbols: ["🎅", "🥾", "🧤", "❄️"],
+        accent: "var(--ls-color-3)",
+        generatePuzzle: generatePuzzle3
+      }
+    ];
+
+    const N_PUZZLES = 5;
+
+    function renderEquation(eq, symbols) {
+      let parts;
+      if (eq.op === "sumcheck") {
+        parts = eq.terms.map((idx, i) => {
+          const sep = i === 0 ? "" : `<span class="eq-op">+</span>`;
+          return `${sep}<span class="eq-sym">${symbols[idx]}</span>`;
+        }).join("");
+      } else {
+        const [a, b] = eq.terms;
+        parts = `
+          <span class="eq-sym">${symbols[a]}</span>
+          <span class="eq-op">${opSymbol[eq.op]}</span>
+          <span class="eq-sym">${symbols[b]}</span>
+        `;
+      }
+      return `
+        <div class="equation${eq.verif ? " verif" : ""}">
+          ${parts}
+          <span class="eq-eq">=</span>
+          <span class="eq-val">${eq.value}</span>
+        </div>
+      `;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       ÉTAT ET NAVIGATION
+    ════════════════════════════════════════════════════════════════ */
+    let msSelect        = null;
+    let currentLevelIdx = null;
+    let currentPuzzle   = null;
+    let st               = null;
+
+    function initLevelSelect() {
+      msSelect = LevelSelect.create({
+        exerciseKey: 'algebre-symboles-mysteres',
+        levels: LEVELS.map(l => ({ id: l.id, label: l.label, description: l.description })),
+        threshold: 0.8,
+        onSelectLevel: (id) => {
+          const idx = LEVELS.findIndex(l => l.id === id);
+          document.getElementById('levelSelectScreen').style.display = 'none';
+          startLevel(idx);
+          msSelect.renderBadges(id);
+        },
+        selectContainer: document.getElementById('levelSelectScreen'),
+        badgesContainer: document.getElementById('levelBadges'),
+        onBackToSelect: () => {
+          document.getElementById('exerciseScreen').style.display = 'none';
+          document.getElementById('resultScreen').style.display   = 'none';
+          document.getElementById('levelSelectScreen').style.display = '';
+        }
+      });
+      msSelect.renderSelectScreen();
+      document.getElementById('levelSelectScreen').style.display = '';
+    }
+
+    function startLevel(idx) {
+      currentLevelIdx = idx;
+      st = { puzzleIdx: 0, score: 0 };
+      document.getElementById('resultScreen').style.display   = 'none';
+      document.getElementById('exerciseScreen').style.display = '';
+      document.getElementById('level-card').style.setProperty('--level-accent', LEVELS[idx].accent);
+      newPuzzle();
+    }
+
+    function newPuzzle() {
+      const level = LEVELS[currentLevelIdx];
+      currentPuzzle = level.generatePuzzle();
+      render();
+    }
+
+    function progressDotsHtml() {
+      return Array.from({ length: N_PUZZLES }, (_, i) => {
+        let cls = 'pp-dot';
+        if (i < st.puzzleIdx) cls += ' done';
+        else if (i === st.puzzleIdx) cls += ' current';
+        return `<span class="${cls}"></span>`;
+      }).join('');
+    }
+
+    function render() {
+      const level = LEVELS[currentLevelIdx];
+
+      document.getElementById('lvl-desc').textContent  = level.description;
+      document.getElementById('lvl-badge').textContent = `Niveau ${currentLevelIdx + 1}`;
+
+      document.getElementById('pp-label').textContent = `Puzzle ${st.puzzleIdx + 1} / ${N_PUZZLES}`;
+      document.getElementById('pp-dots').innerHTML    = progressDotsHtml();
+
+      document.getElementById('equations').innerHTML = currentPuzzle.equations
+        .map(eq => renderEquation(eq, level.symbols)).join('');
+
+      document.getElementById('answers').innerHTML = level.symbols.map((sym, i) => `
+        <div class="answer-cell">
+          <span class="answer-sym">${sym}</span>
+          <input type="number" step="any" class="answer-input" id="input-${i}" placeholder="?">
+          <span class="answer-fb" id="fb-${i}"></span>
+        </div>
+      `).join('');
+
+      document.getElementById('verify-btn').style.display = '';
+      document.getElementById('next-btn').style.display   = 'none';
+      const result = document.getElementById('result');
+      result.textContent = '';
+      result.className   = 'level-result';
+
+      document.getElementById('verify-btn').onclick = checkPuzzle;
+      document.getElementById('next-btn').onclick    = nextPuzzle;
+    }
+
+    function checkPuzzle() {
+      const level  = LEVELS[currentLevelIdx];
+      const values = currentPuzzle.values;
+      const result = document.getElementById('result');
+
+      const allFilled = values.every((_, i) => document.getElementById(`input-${i}`).value.trim() !== '');
+      if (!allFilled) {
+        result.textContent = 'Remplis toutes les cases avant de vérifier.';
+        result.className   = 'level-result';
+        return;
+      }
+
+      let allCorrect = true;
+      values.forEach((val, i) => {
+        const input = document.getElementById(`input-${i}`);
+        const fb    = document.getElementById(`fb-${i}`);
+        const num   = parseFloat(input.value.trim().replace(',', '.'));
+        const ok    = Math.abs(num - val) < 0.01;
+
+        input.classList.toggle('correct', ok);
+        input.classList.toggle('wrong', !ok);
+        input.disabled = true;
+        fb.textContent = ok ? '✅' : '❌';
+        if (!ok) allCorrect = false;
+      });
+
+      if (allCorrect) st.score++;
+      result.textContent = allCorrect ? '🎉 Bravo, tout est juste !' : 'Pas tout à fait juste cette fois.';
+      result.classList.toggle('win', allCorrect);
+
+      document.getElementById('verify-btn').style.display = 'none';
+      document.getElementById('next-btn').style.display   = '';
+    }
+
+    function nextPuzzle() {
+      st.puzzleIdx++;
+      if (st.puzzleIdx >= N_PUZZLES) {
+        showResults();
+      } else {
+        newPuzzle();
+        document.getElementById('exerciseScreen').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function showResults() {
+      const level = LEVELS[currentLevelIdx];
+      const { passed, isLast, nextLevelId } = msSelect.completeLevel(level.id, st.score, N_PUZZLES);
+
+      document.getElementById('exerciseScreen').style.display = 'none';
+
+      const msg = passed
+        ? (!isLast ? `Le niveau ${currentLevelIdx + 2} est débloqué !` : 'Félicitations, tu maîtrises les trois niveaux !')
+        : `Il faut au moins 4 puzzles réussis sur ${N_PUZZLES} (80 %) pour débloquer le niveau suivant.`;
+
+      let btnsHTML = `<div class="result-btns">`;
+      if (passed && !isLast) {
+        btnsHTML += `<button class="ex-btn-primary" id="next-level-btn">Niveau ${currentLevelIdx + 2} →</button>`;
+      }
+      btnsHTML += `<button class="ex-btn-secondary" id="retry-btn">Recommencer ce niveau</button>`;
+      btnsHTML += msSelect.backToSelectButtonHTML();
+      btnsHTML += `</div>`;
+
+      document.getElementById('resultScreen').innerHTML = `
+        <div class="level-card" style="--level-accent:${level.accent}">
+          <div class="level-complete${passed ? '' : ' failed'}">
+            <div class="level-complete-icon">${passed ? '🎉' : '💪'}</div>
+            <div class="level-complete-title">${passed ? `Niveau ${currentLevelIdx + 1} terminé !` : 'Pas encore…'}</div>
+            <div class="level-complete-score">Score : ${st.score} / ${N_PUZZLES} puzzles réussis</div>
+            <div class="level-complete-msg">${msg}</div>
+            ${btnsHTML}
+          </div>
+        </div>
+      `;
+      document.getElementById('resultScreen').style.display = '';
+
+      document.getElementById('retry-btn').addEventListener('click', () => startLevel(currentLevelIdx));
+      document.getElementById('next-level-btn')?.addEventListener('click', () => {
+        const nextIdx = LEVELS.findIndex(l => l.id === nextLevelId);
+        startLevel(nextIdx);
+        msSelect.renderBadges(nextLevelId);
+      });
+      msSelect.wireBackToSelectButton(document.getElementById('resultScreen'));
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    initLevelSelect();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/menu.js"></script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>
