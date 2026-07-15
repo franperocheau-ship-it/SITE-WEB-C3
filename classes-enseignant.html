@@ -274,6 +274,62 @@
     }
     .access-tree { display: flex; flex-direction: column; gap: 8px; }
 
+    /* ── Cible du parcours guidé (classe / groupe / élève) ───────────────────── */
+    .access-target-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .access-target-row .form-label { margin: 0; white-space: nowrap; }
+    .access-target-select { max-width: 300px; width: auto; flex-shrink: 1; }
+
+    .access-inherit-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      background: rgba(29,191,160,0.10);
+      border: 1px solid rgba(29,191,160,0.30);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      color: var(--color-brand-navy);
+    }
+    .access-inherit-banner strong { font-weight: 700; }
+
+    /* ── Modal : liste des groupes ────────────────────────────────────────────── */
+    .group-list { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; }
+    .group-list-empty { font-size: 13px; color: var(--muted); padding: 8px 0; }
+    .group-list-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .group-color-swatch { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .group-list-name { flex: 1; font-weight: 600; font-size: 14px; color: var(--text); }
+    .group-list-count { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .group-list-actions { display: flex; gap: 4px; }
+    .form-color {
+      width: 44px;
+      height: 44px;
+      padding: 3px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+
+    /* ── Colonne "Groupe" dans le tableau élèves ──────────────────────────────── */
+    .group-select { min-width: 140px; padding: 7px 10px; font-size: 13px; }
+
     .ax-domaine { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
     .ax-domaine-summary {
       display: flex;
@@ -749,6 +805,12 @@
             </div>
           </div>
           <div class="access-panel" id="access-panel" style="display:none">
+            <div class="access-target-row">
+              <label class="form-label" for="ax-target-select">Cible</label>
+              <select class="form-select access-target-select" id="ax-target-select"></select>
+              <button type="button" class="btn btn-outline btn-sm" onclick="openModalGroups()">👥 Gérer les groupes</button>
+            </div>
+            <div class="access-inherit-banner" id="access-inherit-banner" style="display:none"></div>
             <div class="access-panel-head">
               <input class="form-input access-search" id="ax-search" type="text" placeholder="🔍 Rechercher un exercice…">
               <span class="access-counter" id="ax-counter">0 exercices actifs sur 0</span>
@@ -777,6 +839,7 @@
                 <th>Nom</th>
                 <th>Identifiant</th>
                 <th>Mot de passe</th>
+                <th>Groupe</th>
                 <th class="th-actions">Actions</th>
               </tr>
             </thead>
@@ -997,6 +1060,30 @@
       </div>
     </div>
 
+    <!-- ── Gestion des groupes de besoin ────────────────────────────────────── -->
+    <div class="modal" id="modal-groups" style="display:none">
+      <div class="modal-header">
+        <h2 class="modal-title">Groupes de besoin</h2>
+        <button class="modal-close" onclick="closeModal()" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="group-list" id="group-list"></div>
+        <form id="form-group" onsubmit="submitGroup(event)" novalidate>
+          <div class="form-field">
+            <label class="form-label" for="fg-name">Nouveau groupe</label>
+            <div style="display:flex;gap:8px">
+              <input class="form-input" id="fg-name" type="text" placeholder="Ex. Renforcement" required style="flex:1">
+              <input class="form-color" id="fg-color" type="color" value="#1DBFA0" title="Couleur du groupe">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-ghost" type="button" onclick="closeModal()">Fermer</button>
+            <button class="btn btn-primary" type="submit" id="fg-submit">+ Créer le groupe</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
   </div>
 
   <!-- Zone d'impression (visible uniquement @media print) -->
@@ -1016,10 +1103,25 @@
   let _movingStudentId  = null;
   let _pendingDelete    = null;
 
+  /* ── Groupes de besoin (v9) ──────────────────────────────────────────────────── */
+  let _groups          = [];
+  let _editingGroupId  = null;
+
   /* ── Mode d'accès aux exercices (libre / guidé) ─────────────────────────────── */
   let _activeExerciseIds = new Set();
   let _openGroups         = new Set();
   let _exerciseTreeCache  = null;
+  /* Cible du panneau : la classe entière (défaut), un groupe ou un élève. */
+  let _currentTarget = { type: 'class', id: null };
+  /* IDs de groupes/élèves ayant au moins un exercice actif configuré — pour
+     le repère visuel dans le sélecteur de cible. */
+  let _configuredGroupIds  = new Set();
+  let _configuredStudentIds = new Set();
+  /* Pour la cible "élève" : source de la liste actuellement affichée quand
+     l'élève n'a pas encore de liste personnelle (lecture seule tant que
+     "Personnaliser" n'a pas été cliqué). */
+  let _studentInherit = null; // { source: 'group'|'class', list: string[], groupName?: string } | null
+  let _studentPersonalized = false;
 
   function normalize(str) {
     return str.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, '-');
@@ -1197,12 +1299,18 @@
       if (!_classes.length) _classes = await lfmTeacher.getClasses();
       _currentClass = _classes.find(c => c.id === classId);
       if (!_currentClass) { navigate({}); return; }
-      const [students, activeIds] = await Promise.all([
+      const [students, groups, activeIds] = await Promise.all([
         lfmTeacher.getStudents(classId),
+        lfmTeacher.getGroups(classId),
         lfmTeacher.getActiveExercises(classId)
       ]);
       _students          = students;
+      _groups            = groups;
       _activeExerciseIds = new Set(activeIds);
+      /* La cible repart toujours sur "toute la classe" à l'ouverture d'une
+         classe — pas de mémorisation de la dernière cible entre deux classes. */
+      _currentTarget   = { type: 'class', id: classId };
+      _studentInherit  = null;
     } catch (e) {
       showToast('Erreur lors du chargement', 'error');
       navigate({});
@@ -1251,6 +1359,12 @@
         <td><span class="td-cred">${esc(s.username)}</span></td>
         <td><span class="td-cred" id="pwd-${s.id}">${esc(s.password)}</span></td>
         <td>
+          <select class="form-select group-select" data-sid="${s.id}">
+            <option value="">— Aucun groupe —</option>
+            ${_groups.map(g => `<option value="${g.id}" ${s.group_id === g.id ? 'selected' : ''}>${esc(g.name)}</option>`).join('')}
+          </select>
+        </td>
+        <td>
           <div class="td-actions">
             <button class="btn btn-outline btn-sm btn-icon" data-action="edit"   data-sid="${s.id}" title="Modifier le nom">✏️</button>
             <button class="btn btn-ghost  btn-sm btn-icon" data-action="reset"  data-sid="${s.id}" title="Réinitialiser le mot de passe">🔄</button>
@@ -1261,6 +1375,34 @@
       </tr>
     `).join('');
   }
+
+  document.getElementById('detail-tbody').addEventListener('change', async e => {
+    const sel = e.target.closest('.group-select');
+    if (!sel) return;
+    const studentId = sel.dataset.sid;
+    const groupId   = sel.value || null;
+    sel.disabled = true;
+    try {
+      await lfmTeacher.assignStudentToGroup(studentId, groupId);
+      const s = _students.find(s => s.id === studentId);
+      if (s) s.group_id = groupId;
+      showToast('Groupe mis à jour');
+      /* Le sélecteur de cible peut afficher des repères "liste configurée" —
+         pas besoin de le rafraîchir ici : l'affectation seule ne change pas
+         qui a une liste, seulement qui hérite de quoi. La bannière d'un
+         élève actuellement affiché (s'il est la cible) doit en revanche
+         être recalculée. */
+      if (_currentTarget.type === 'student' && _currentTarget.id === studentId) {
+        await loadActiveSetForTarget();
+        renderAccessTree();
+      }
+    } catch (err) {
+      sel.value = _students.find(s => s.id === studentId)?.group_id || '';
+      showToast('Erreur : ' + err.message, 'error');
+    } finally {
+      sel.disabled = false;
+    }
+  });
 
   document.getElementById('detail-tbody').addEventListener('click', e => {
     const btn = e.target.closest('[data-action]');
@@ -1309,7 +1451,7 @@
 
   async function ensureExerciseDataLoaded() {
     if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined') {
-      renderAccessTree();
+      await onGuidedPanelReady();
       return;
     }
     document.getElementById('ax-tree').innerHTML = '<div class="ax-loading"><span class="ax-spinner"></span> Chargement du catalogue des exercices…</div>';
@@ -1317,10 +1459,208 @@
     try {
       await loadExerciseAssets();
       document.getElementById('ax-search').disabled = false;
-      renderAccessTree();
+      await onGuidedPanelReady();
     } catch (err) {
       document.getElementById('ax-tree').innerHTML = `<div class="ax-empty">${esc(err.message)}</div>`;
     }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     CIBLE DU PARCOURS GUIDÉ (classe / groupe / élève) — v9
+  ═══════════════════════════════════════════════════════════════════════════ */
+
+  /* Point d'entrée une fois le catalogue chargé : calcule les repères
+     "liste configurée", peuple le sélecteur de cible, charge l'ensemble
+     actif de la cible courante, puis affiche l'arbre. */
+  async function onGuidedPanelReady() {
+    await refreshConfiguredIndicators();
+    populateTargetSelector();
+    await loadActiveSetForTarget();
+    renderAccessTree();
+  }
+
+  async function refreshConfiguredIndicators() {
+    const groupIds   = _groups.map(g => g.id);
+    const studentIds = _students.map(s => s.id);
+    const [configuredGroups, configuredStudents] = await Promise.all([
+      lfmTeacher.getGroupIdsWithActiveExercises(groupIds),
+      lfmTeacher.getStudentIdsWithActiveExercises(studentIds)
+    ]);
+    _configuredGroupIds   = new Set(configuredGroups);
+    _configuredStudentIds = new Set(configuredStudents);
+  }
+
+  /* "●" en préfixe = au moins un exercice actif configuré pour ce groupe/élève
+     (repère visuel demandé). Conserve la sélection courante si elle existe
+     toujours ; repli sur "Toute la classe" sinon (groupe/élève supprimé ou
+     jamais sélectionné). */
+  function populateTargetSelector() {
+    const sel = document.getElementById('ax-target-select');
+    const prevValue = _currentTarget.type === 'class' ? 'class' : `${_currentTarget.type}:${_currentTarget.id}`;
+
+    let html = `<option value="class">Toute la classe</option>`;
+
+    if (_groups.length) {
+      html += `<optgroup label="Groupes">` + _groups.map(g => {
+        const dot = _configuredGroupIds.has(g.id) ? '● ' : '';
+        return `<option value="group:${g.id}">${dot}${esc(g.name)}</option>`;
+      }).join('') + `</optgroup>`;
+    }
+
+    if (_students.length) {
+      html += `<optgroup label="Élèves">` + _students.map(s => {
+        const dot = _configuredStudentIds.has(s.id) ? '● ' : '';
+        return `<option value="student:${s.id}">${dot}${esc(s.display_name)}</option>`;
+      }).join('') + `</optgroup>`;
+    }
+
+    sel.innerHTML = html;
+    sel.value = prevValue;
+    if (sel.value !== prevValue) {
+      /* La cible précédente n'existe plus (groupe/élève supprimé) : repli. */
+      _currentTarget = { type: 'class', id: _currentClass.id };
+      sel.value = 'class';
+    }
+  }
+
+  document.getElementById('ax-target-select').addEventListener('change', async e => {
+    const val = e.target.value;
+    if (val === 'class') {
+      _currentTarget = { type: 'class', id: _currentClass.id };
+    } else {
+      const [type, id] = val.split(':');
+      _currentTarget = { type, id };
+    }
+    await loadActiveSetForTarget();
+    renderAccessTree();
+  });
+
+  /* Charge _activeExerciseIds pour la cible courante. Pour un élève, résout
+     aussi ce qu'il hériterait (groupe si non vide, sinon classe) — utilisé
+     par la bannière et par "Personnaliser", que l'élève ait déjà une liste
+     personnelle ou non. */
+  async function loadActiveSetForTarget() {
+    _studentInherit       = null;
+    _studentPersonalized  = false;
+
+    if (_currentTarget.type === 'class') {
+      _activeExerciseIds = new Set(await lfmTeacher.getActiveExercises(_currentClass.id));
+    } else if (_currentTarget.type === 'group') {
+      _activeExerciseIds = new Set(await lfmTeacher.getActiveExercisesForGroup(_currentTarget.id));
+    } else {
+      const student = _students.find(s => s.id === _currentTarget.id);
+      const personal = await lfmTeacher.getActiveExercisesForStudent(_currentTarget.id);
+
+      let source = 'class', groupName = null, inheritedList = null;
+      if (student && student.group_id) {
+        const groupList = await lfmTeacher.getActiveExercisesForGroup(student.group_id);
+        if (groupList.length > 0) {
+          source = 'group';
+          groupName = _groups.find(g => g.id === student.group_id)?.name || null;
+          inheritedList = groupList;
+        }
+      }
+      if (inheritedList === null) inheritedList = await lfmTeacher.getActiveExercises(_currentClass.id);
+      _studentInherit = { source, groupName, list: inheritedList };
+
+      if (personal.length > 0) {
+        _activeExerciseIds      = new Set(personal);
+        _studentPersonalized    = true;
+      } else {
+        _activeExerciseIds      = new Set(inheritedList);
+        _studentPersonalized    = false;
+      }
+    }
+    renderInheritBanner();
+  }
+
+  function renderInheritBanner() {
+    const banner = document.getElementById('access-inherit-banner');
+    if (_currentTarget.type !== 'student') { banner.style.display = 'none'; return; }
+
+    if (_studentPersonalized) {
+      banner.innerHTML = `
+        <span>✓ Liste personnalisée pour cet élève.</span>
+        <button type="button" class="btn btn-outline btn-sm" onclick="revertCurrentStudent()">Revenir à la liste héritée</button>
+      `;
+    } else {
+      const label = _studentInherit.source === 'group'
+        ? `la liste du groupe <strong>${esc(_studentInherit.groupName || '?')}</strong>`
+        : `la liste de la classe`;
+      const canPersonalize = _studentInherit.list.length > 0;
+      banner.innerHTML = `
+        <span>Cet élève suit actuellement ${label} (pas de liste personnelle).</span>
+        ${canPersonalize ? `<button type="button" class="btn btn-primary btn-sm" onclick="personalizeCurrentStudent()">Personnaliser</button>` : ''}
+      `;
+    }
+    banner.style.display = 'flex';
+  }
+
+  /* Copie la liste héritée (groupe ou classe) comme point de départ de la
+     liste personnelle de l'élève. Une case cochée/décochée directement dans
+     l'arbre personnalise aussi immédiatement (voir axToggleExercise) — ce
+     bouton est une commodité pour partir de la liste existante plutôt que
+     de zéro. */
+  async function personalizeCurrentStudent() {
+    if (_currentTarget.type !== 'student' || !_studentInherit || !_studentInherit.list.length) return;
+    const studentId = _currentTarget.id;
+    try {
+      await lfmTeacher.addActiveExercisesBulkToStudent(studentId, _studentInherit.list);
+      _configuredStudentIds.add(studentId);
+      showToast('Liste personnalisée à partir de la liste héritée');
+      await loadActiveSetForTarget();
+      populateTargetSelector();
+      renderAccessTree();
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    }
+  }
+
+  /* Supprime toute la liste personnelle de l'élève : il retombe sur son
+     groupe (s'il en a un et qu'il est configuré) ou sur la classe. */
+  async function revertCurrentStudent() {
+    if (_currentTarget.type !== 'student') return;
+    const studentId = _currentTarget.id;
+    try {
+      await lfmTeacher.removeActiveExercisesBulkFromStudent(studentId, [..._activeExerciseIds]);
+      _configuredStudentIds.delete(studentId);
+      showToast('Retour à la liste héritée');
+      await loadActiveSetForTarget();
+      populateTargetSelector();
+      renderAccessTree();
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    }
+  }
+
+  /* Sélectionne les fonctions lfmTeacher à utiliser selon la cible courante
+     — class_active_exercises / group_active_exercises / student_active_exercises. */
+  function axApi() {
+    if (_currentTarget.type === 'group') {
+      return {
+        add: lfmTeacher.addActiveExerciseToGroup,
+        remove: lfmTeacher.removeActiveExerciseFromGroup,
+        addBulk: lfmTeacher.addActiveExercisesBulkToGroup,
+        removeBulk: lfmTeacher.removeActiveExercisesBulkFromGroup,
+        targetId: _currentTarget.id
+      };
+    }
+    if (_currentTarget.type === 'student') {
+      return {
+        add: lfmTeacher.addActiveExerciseToStudent,
+        remove: lfmTeacher.removeActiveExerciseFromStudent,
+        addBulk: lfmTeacher.addActiveExercisesBulkToStudent,
+        removeBulk: lfmTeacher.removeActiveExercisesBulkFromStudent,
+        targetId: _currentTarget.id
+      };
+    }
+    return {
+      add: lfmTeacher.addActiveExercise,
+      remove: lfmTeacher.removeActiveExercise,
+      addBulk: lfmTeacher.addActiveExercisesBulk,
+      removeBulk: lfmTeacher.removeActiveExercisesBulk,
+      targetId: _currentClass.id
+    };
   }
 
   /* Matière > Sous-thème > Exercice.
@@ -1420,6 +1760,8 @@
     if (mode === 'guide') {
       document.getElementById('ax-search').value = '';
       ensureExerciseDataLoaded();
+    } else {
+      document.getElementById('access-inherit-banner').style.display = 'none';
     }
   }
 
@@ -1435,7 +1777,23 @@
       const idx = _classes.findIndex(c => c.id === _currentClass.id);
       if (idx !== -1) _classes[idx].mode_acces = newMode;
       renderAccessCard();
-      showToast(newMode === 'guide' ? 'Parcours guidé activé' : 'Navigation libre activée');
+
+      if (newMode === 'guide') {
+        /* Note de réactivation (décision v9) : si des listes de groupe/élève
+           existaient déjà pour cette classe, les repasser en 'guide' les
+           réactive telles quelles (mode_acces est l'interrupteur maître). */
+        const groupIds   = _groups.map(g => g.id);
+        const studentIds = _students.map(s => s.id);
+        const [cg, cs] = await Promise.all([
+          lfmTeacher.getGroupIdsWithActiveExercises(groupIds),
+          lfmTeacher.getStudentIdsWithActiveExercises(studentIds)
+        ]);
+        showToast(cg.length || cs.length
+          ? 'Parcours guidé activé — des listes de groupe/élève existantes sont réactivées'
+          : 'Parcours guidé activé');
+      } else {
+        showToast('Navigation libre activée');
+      }
     } catch (err) {
       showToast('Erreur : ' + err.message, 'error');
     } finally {
@@ -1586,13 +1944,32 @@
 
   async function axToggleExercise(slug, isActive, checkboxEl) {
     axShowStatus(slug, 'saving');
+    const api = axApi();
     try {
-      if (isActive) {
-        await lfmTeacher.addActiveExercise(_currentClass.id, slug);
-        _activeExerciseIds.add(slug);
+      /* Copy-on-first-toggle : un élève qui n'a pas encore de liste
+         personnelle et suit une liste héritée (groupe/classe) doit d'abord
+         se voir figer cette liste héritée comme base personnelle — sinon
+         le premier clic écraserait silencieusement tout le reste de la
+         liste héritée par une liste d'un seul exercice. */
+      if (_currentTarget.type === 'student' && !_studentPersonalized && _studentInherit.list.length) {
+        await lfmTeacher.addActiveExercisesBulkToStudent(_currentTarget.id, _studentInherit.list);
+      }
+
+      if (isActive) await api.add(api.targetId, slug);
+      else          await api.remove(api.targetId, slug);
+
+      if (_currentTarget.type === 'student') {
+        /* Recharge pour refléter la bannière ("✓ Liste personnalisée" dès
+           ce premier clic) et, en cas de retour à 0 ligne personnelle, le
+           retour à la liste héritée. */
+        await loadActiveSetForTarget();
       } else {
-        await lfmTeacher.removeActiveExercise(_currentClass.id, slug);
-        _activeExerciseIds.delete(slug);
+        if (isActive) _activeExerciseIds.add(slug);
+        else          _activeExerciseIds.delete(slug);
+        if (_currentTarget.type === 'group') {
+          if (_activeExerciseIds.size > 0) _configuredGroupIds.add(_currentTarget.id);
+          else _configuredGroupIds.delete(_currentTarget.id);
+        }
       }
       axShowStatus(slug, 'saved');
       updateGroupCheckStates(axTreeEl);
@@ -1610,14 +1987,26 @@
     const toChange = slugs.filter(slug => _activeExerciseIds.has(slug) !== turnOn);
     if (toChange.length === 0) return;
 
+    const api = axApi();
     toChange.forEach(slug => axShowStatus(slug, 'saving'));
     try {
-      if (turnOn) {
-        await lfmTeacher.addActiveExercisesBulk(_currentClass.id, toChange);
-        toChange.forEach(slug => _activeExerciseIds.add(slug));
+      /* Copy-on-first-toggle — voir axToggleExercise. */
+      if (_currentTarget.type === 'student' && !_studentPersonalized && _studentInherit.list.length) {
+        await lfmTeacher.addActiveExercisesBulkToStudent(_currentTarget.id, _studentInherit.list);
+      }
+
+      if (turnOn) await api.addBulk(api.targetId, toChange);
+      else        await api.removeBulk(api.targetId, toChange);
+
+      if (_currentTarget.type === 'student') {
+        await loadActiveSetForTarget();
       } else {
-        await lfmTeacher.removeActiveExercisesBulk(_currentClass.id, toChange);
-        toChange.forEach(slug => _activeExerciseIds.delete(slug));
+        if (turnOn) toChange.forEach(slug => _activeExerciseIds.add(slug));
+        else        toChange.forEach(slug => _activeExerciseIds.delete(slug));
+        if (_currentTarget.type === 'group') {
+          if (_activeExerciseIds.size > 0) _configuredGroupIds.add(_currentTarget.id);
+          else _configuredGroupIds.delete(_currentTarget.id);
+        }
       }
       exerciseBoxes.forEach(b => { b.checked = _activeExerciseIds.has(b.dataset.slug); });
       toChange.forEach(slug => axShowStatus(slug, 'saved'));
@@ -1844,6 +2233,21 @@
         closeModal();
         navigate({});
         showToast('Classe supprimée');
+      } else if (type === 'group') {
+        await lfmTeacher.deleteGroup(id);
+        _groups = _groups.filter(g => g.id !== id);
+        /* ON DELETE SET NULL côté DB — refléter localement sans recharger. */
+        _students.forEach(s => { if (s.group_id === id) s.group_id = null; });
+        _configuredGroupIds.delete(id);
+        if (_currentTarget.type === 'group' && _currentTarget.id === id) {
+          _currentTarget = { type: 'class', id: _currentClass.id };
+          await loadActiveSetForTarget();
+        }
+        renderDetailStudents();
+        populateTargetSelector();
+        renderAccessTree();
+        showToast('Groupe supprimé');
+        openModalGroups();
       } else {
         await lfmTeacher.deleteStudent(id);
         _students = _students.filter(s => s.id !== id);
@@ -1859,6 +2263,97 @@
       btn.disabled   = false;
       _pendingDelete = null;
     }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     MODAL : GROUPES DE BESOIN (v9)
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function openModalGroups() {
+    _editingGroupId = null;
+    document.getElementById('form-group').reset();
+    document.getElementById('fg-color').value = '#1DBFA0';
+    document.getElementById('fg-submit').textContent = '+ Créer le groupe';
+    renderGroupList();
+    openModal('groups');
+    setTimeout(() => document.getElementById('fg-name').focus(), 80);
+  }
+
+  function renderGroupList() {
+    const wrap = document.getElementById('group-list');
+    if (!_groups.length) {
+      wrap.innerHTML = '<div class="group-list-empty">Aucun groupe pour cette classe.</div>';
+      return;
+    }
+    wrap.innerHTML = _groups.map(g => {
+      const count = _students.filter(s => s.group_id === g.id).length;
+      return `
+        <div class="group-list-item">
+          <span class="group-color-swatch" style="background:${esc(g.color || '#94A3B8')}"></span>
+          <span class="group-list-name">${esc(g.name)}</span>
+          <span class="group-list-count">${count} élève${count !== 1 ? 's' : ''}</span>
+          <div class="group-list-actions">
+            <button type="button" class="btn btn-ghost btn-sm btn-icon" title="Renommer" onclick="startEditGroup('${g.id}')">✏️</button>
+            <button type="button" class="btn btn-danger btn-sm btn-icon" title="Supprimer" onclick="confirmDeleteGroup('${g.id}')">🗑</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function startEditGroup(id) {
+    const g = _groups.find(g => g.id === id);
+    if (!g) return;
+    _editingGroupId = id;
+    document.getElementById('fg-name').value  = g.name;
+    document.getElementById('fg-color').value = g.color || '#1DBFA0';
+    document.getElementById('fg-submit').textContent = 'Enregistrer';
+    document.getElementById('fg-name').focus();
+  }
+
+  async function submitGroup(e) {
+    e.preventDefault();
+    const btn   = document.getElementById('fg-submit');
+    const name  = document.getElementById('fg-name').value.trim();
+    const color = document.getElementById('fg-color').value;
+    if (!name) return;
+
+    btn.disabled = true;
+    try {
+      if (_editingGroupId) {
+        const updated = await lfmTeacher.updateGroup(_editingGroupId, { name, color });
+        const idx = _groups.findIndex(g => g.id === _editingGroupId);
+        if (idx !== -1) _groups[idx] = updated;
+        showToast('Groupe modifié');
+      } else {
+        const created = await lfmTeacher.createGroup(_currentClass.id, name, color);
+        _groups.push(created);
+        showToast('Groupe créé');
+      }
+      _editingGroupId = null;
+      document.getElementById('form-group').reset();
+      document.getElementById('fg-color').value = '#1DBFA0';
+      document.getElementById('fg-submit').textContent = '+ Créer le groupe';
+      renderGroupList();
+      renderDetailStudents();
+      populateTargetSelector();
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function confirmDeleteGroup(id) {
+    const g = _groups.find(g => g.id === id);
+    if (!g) return;
+    const count = _students.filter(s => s.group_id === id).length;
+    _pendingDelete = { type: 'group', id };
+    document.getElementById('conf-title').textContent = 'Supprimer le groupe';
+    document.getElementById('conf-text').innerHTML = count > 0
+      ? `Voulez-vous vraiment supprimer le groupe <strong>${esc(g.name)}</strong> ?<br>
+         <span class="confirm-warning">${count} élève${count !== 1 ? 's' : ''} repassera${count !== 1 ? 'nt' : ''} sur la liste de la classe.</span>`
+      : `Voulez-vous vraiment supprimer le groupe <strong>${esc(g.name)}</strong> ?`;
+    openModal('confirm');
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════

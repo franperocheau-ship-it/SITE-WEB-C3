@@ -149,6 +149,156 @@ const lfmTeacher = (() => {
     if (error) throw error;
   }
 
+  /* ── Parcours guidé différencié : groupes de besoin (v9) ────────────────────
+     getGroups() renvoie les groupes bruts (id, name, color, class_id,
+     created_at) — le nombre d'élèves par groupe se calcule côté appelant en
+     croisant avec la liste déjà chargée via getStudents(), plutôt que par un
+     count() embarqué côté requête (plus simple, évite toute dépendance à la
+     détection de relation FK de PostgREST). */
+
+  async function getGroups(classId) {
+    const { data, error } = await db
+      .from('groups')
+      .select('*')
+      .eq('class_id', classId)
+      .order('name', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  }
+
+  async function createGroup(classId, name, color) {
+    const { data, error } = await db
+      .from('groups')
+      .insert({ class_id: classId, name: name.trim(), color: color || null })
+      .select().single();
+    if (error) throw error;
+    return data;
+  }
+
+  async function updateGroup(id, updates) {
+    const { data, error } = await db
+      .from('groups').update(updates).eq('id', id).select().single();
+    if (error) throw error;
+    return data;
+  }
+
+  async function deleteGroup(id) {
+    const { error } = await db.from('groups').delete().eq('id', id);
+    if (error) throw error;
+  }
+
+  async function assignStudentToGroup(studentId, groupId) {
+    return updateStudent(studentId, { group_id: groupId || null });
+  }
+
+  /* ── Parcours guidé différencié : exercices actifs par groupe (v9) ──────────
+     Même API que les fonctions class_active_exercises ci-dessus, ciblant
+     group_active_exercises. */
+
+  async function getActiveExercisesForGroup(groupId) {
+    const { data, error } = await db
+      .from('group_active_exercises')
+      .select('exercise_id')
+      .eq('group_id', groupId);
+    if (error) throw error;
+    return (data || []).map(r => r.exercise_id);
+  }
+
+  async function addActiveExerciseToGroup(groupId, exerciseId) {
+    const { error } = await db
+      .from('group_active_exercises')
+      .upsert({ group_id: groupId, exercise_id: exerciseId }, { onConflict: 'group_id,exercise_id', ignoreDuplicates: true });
+    if (error) throw error;
+  }
+
+  async function removeActiveExerciseFromGroup(groupId, exerciseId) {
+    const { error } = await db
+      .from('group_active_exercises')
+      .delete().eq('group_id', groupId).eq('exercise_id', exerciseId);
+    if (error) throw error;
+  }
+
+  async function addActiveExercisesBulkToGroup(groupId, exerciseIds) {
+    if (!exerciseIds.length) return;
+    const rows = exerciseIds.map(exercise_id => ({ group_id: groupId, exercise_id }));
+    const { error } = await db
+      .from('group_active_exercises')
+      .upsert(rows, { onConflict: 'group_id,exercise_id', ignoreDuplicates: true });
+    if (error) throw error;
+  }
+
+  async function removeActiveExercisesBulkFromGroup(groupId, exerciseIds) {
+    if (!exerciseIds.length) return;
+    const { error } = await db
+      .from('group_active_exercises')
+      .delete().eq('group_id', groupId).in('exercise_id', exerciseIds);
+    if (error) throw error;
+  }
+
+  /* ── Parcours guidé différencié : exercices actifs par élève (v9) ───────────
+     Même API, ciblant student_active_exercises (personnalisation
+     individuelle, priorité maximale — voir get_my_guided_access() v9). */
+
+  async function getActiveExercisesForStudent(studentId) {
+    const { data, error } = await db
+      .from('student_active_exercises')
+      .select('exercise_id')
+      .eq('student_id', studentId);
+    if (error) throw error;
+    return (data || []).map(r => r.exercise_id);
+  }
+
+  async function addActiveExerciseToStudent(studentId, exerciseId) {
+    const { error } = await db
+      .from('student_active_exercises')
+      .upsert({ student_id: studentId, exercise_id: exerciseId }, { onConflict: 'student_id,exercise_id', ignoreDuplicates: true });
+    if (error) throw error;
+  }
+
+  async function removeActiveExerciseFromStudent(studentId, exerciseId) {
+    const { error } = await db
+      .from('student_active_exercises')
+      .delete().eq('student_id', studentId).eq('exercise_id', exerciseId);
+    if (error) throw error;
+  }
+
+  async function addActiveExercisesBulkToStudent(studentId, exerciseIds) {
+    if (!exerciseIds.length) return;
+    const rows = exerciseIds.map(exercise_id => ({ student_id: studentId, exercise_id }));
+    const { error } = await db
+      .from('student_active_exercises')
+      .upsert(rows, { onConflict: 'student_id,exercise_id', ignoreDuplicates: true });
+    if (error) throw error;
+  }
+
+  async function removeActiveExercisesBulkFromStudent(studentId, exerciseIds) {
+    if (!exerciseIds.length) return;
+    const { error } = await db
+      .from('student_active_exercises')
+      .delete().eq('student_id', studentId).in('exercise_id', exerciseIds);
+    if (error) throw error;
+  }
+
+  /* ── Indicateurs "liste configurée" (sélecteur de cible + note de
+     réactivation du mode guidé) — un seul aller-retour par lot d'IDs plutôt
+     qu'une requête par groupe/élève. */
+
+  async function getGroupIdsWithActiveExercises(groupIds) {
+    if (!groupIds.length) return [];
+    const { data, error } = await db
+      .from('group_active_exercises').select('group_id').in('group_id', groupIds);
+    if (error) throw error;
+    return [...new Set((data || []).map(r => r.group_id))];
+  }
+
+  async function getStudentIdsWithActiveExercises(studentIds) {
+    if (!studentIds.length) return [];
+    const { data, error } = await db
+      .from('student_active_exercises').select('student_id').in('student_id', studentIds);
+    if (error) throw error;
+    return [...new Set((data || []).map(r => r.student_id))];
+  }
+
   async function deleteClass(id) {
     // Récupérer les IDs des élèves avant la suppression
     const { data: students, error: fetchErr } = await db
@@ -278,7 +428,12 @@ const lfmTeacher = (() => {
   }
 
   async function moveStudent(id, newClassId) {
-    return updateStudent(id, { class_id: newClassId || null });
+    /* group_id est toujours remis à NULL : un groupe est propre à une classe
+       (v9), il ne peut pas survivre à un changement de classe. Le trigger
+       check_group_class_match() rejetterait de toute façon l'incohérence,
+       mais autant l'éviter proprement ici plutôt que de laisser l'appelant
+       découvrir l'erreur SQL. */
+    return updateStudent(id, { class_id: newClassId || null, group_id: null });
   }
 
   /* ── Résultats par classe ────────────────────────────────────────────────── */
@@ -430,6 +585,12 @@ const lfmTeacher = (() => {
     getClassResults, getStudentResults, getStudentStats,
     getActiveExercises, addActiveExercise, removeActiveExercise,
     addActiveExercisesBulk, removeActiveExercisesBulk,
+    getGroups, createGroup, updateGroup, deleteGroup, assignStudentToGroup,
+    getActiveExercisesForGroup, addActiveExerciseToGroup, removeActiveExerciseFromGroup,
+    addActiveExercisesBulkToGroup, removeActiveExercisesBulkFromGroup,
+    getActiveExercisesForStudent, addActiveExerciseToStudent, removeActiveExerciseFromStudent,
+    addActiveExercisesBulkToStudent, removeActiveExercisesBulkFromStudent,
+    getGroupIdsWithActiveExercises, getStudentIdsWithActiveExercises,
     exportCSV, exportAllStudentsCSV, getStats
   };
 })();
