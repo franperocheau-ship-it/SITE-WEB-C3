@@ -1301,7 +1301,7 @@
     if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined') return Promise.resolve();
     if (_exerciseAssetsPromise) return _exerciseAssetsPromise;
     _exerciseAssetsPromise = Promise.all([
-      typeof EXERCISE_DATA               !== 'undefined' ? null : loadScript('exercise-data.js?v=18'),
+      typeof EXERCISE_DATA               !== 'undefined' ? null : loadScript('exercise-data.js?v=20'),
       typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined' ? null : loadScript('js/exercise-catalog.js?v=6')
     ]).catch(err => { _exerciseAssetsPromise = null; throw err; });
     return _exerciseAssetsPromise;

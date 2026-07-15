@@ -1336,516 +1336,6 @@ const EXERCISE_DATA = {
     ]
   },
 
-  "identifier-phrase-declarative": {
-    title: "Identifier une phrase déclarative",
-    domaine:    "Français",
-    competence: "Grammaire — Types de phrases : déclarative",
-    levels: ["CM1", "CM2", "6e"],
-    type: "yes-no",
-    questionsPerSession: 15,
-    yesNoLabel: "Cette phrase est-elle déclarative ?",
-    targetTypeName: "déclarative",
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-
-    bank: [
-      /* ── Phrases déclaratives — début (phrases courtes) ── */
-      { sentence: "Le chien court.",                                                           isDeclarative: true  },
-      { sentence: "Je mange une pomme.",                                                       isDeclarative: true  },
-      { sentence: "Emma joue du piano.",                                                       isDeclarative: true  },
-      { sentence: "Il pleut depuis ce matin.",                                                 isDeclarative: true  },
-      { sentence: "Le train arrive à la gare.",                                                isDeclarative: true  },
-      /* ── Phrases déclaratives — milieu ── */
-      { sentence: "Mon frère lit une bande dessinée.",                                         isDeclarative: true  },
-      { sentence: "Les oiseaux chantent dans les arbres.",                                     isDeclarative: true  },
-      { sentence: "La maîtresse distribue les cahiers.",                                       isDeclarative: true  },
-      { sentence: "Les enfants jouent dans la cour.",                                          isDeclarative: true  },
-      { sentence: "Papa prépare le dîner.",                                                    isDeclarative: true  },
-      /* ── Phrases déclaratives — fin (phrases développées) ── */
-      { sentence: "Le jardin est couvert de fleurs.",                                          isDeclarative: true  },
-      { sentence: "Vous êtes très gentils.",                                                   isDeclarative: true  },
-      { sentence: "Le soleil se couche derrière les montagnes.",                               isDeclarative: true  },
-      { sentence: "Après la récréation, les élèves retournent calmement dans leur classe.",    isDeclarative: true  },
-      { sentence: "Dans le jardin, les fleurs poussent rapidement au printemps.",              isDeclarative: true  },
-      /* ── Phrases non déclaratives — début (courtes) ── */
-      { sentence: "Où vas-tu ?",                                                               isDeclarative: false, phraseType: "interrogative" },
-      { sentence: "Ferme la fenêtre.",                                                         isDeclarative: false, phraseType: "impérative"    },
-      { sentence: "Range tes affaires.",                                                       isDeclarative: false, phraseType: "impérative"    },
-      /* ── Phrases non déclaratives — milieu ── */
-      { sentence: "Comment t'appelles-tu ?",                                                   isDeclarative: false, phraseType: "interrogative" },
-      { sentence: "As-tu fini ton exercice ?",                                                 isDeclarative: false, phraseType: "interrogative" },
-      { sentence: "Écoute attentivement.",                                                     isDeclarative: false, phraseType: "impérative"    },
-      { sentence: "Pourquoi regardes-tu le ciel ?",                                            isDeclarative: false, phraseType: "interrogative" },
-      { sentence: "Que fais-tu ce soir ?",                                                     isDeclarative: false, phraseType: "interrogative" },
-      { sentence: "Prenez vos cahiers.",                                                       isDeclarative: false, phraseType: "impérative"    },
-      { sentence: "Traverse la rue avec prudence.",                                            isDeclarative: false, phraseType: "impérative"    },
-      /* ── Phrases non déclaratives — fin (plus longues) ── */
-      { sentence: "Referme le livre.",                                                         isDeclarative: false, phraseType: "impérative"    },
-      { sentence: "Quand partons-nous ?",                                                      isDeclarative: false, phraseType: "interrogative" },
-      { sentence: "Peux-tu m'aider ?",                                                        isDeclarative: false, phraseType: "interrogative" },
-      { sentence: "Veux-tu venir avec nous ?",                                                 isDeclarative: false, phraseType: "interrogative" },
-      { sentence: "Peux-tu expliquer comment tu as trouvé cette réponse ?",                   isDeclarative: false, phraseType: "interrogative" }
-    ]
-  },
-
-  "transformer-declarative-interrogative": {
-    title: "Transformer une phrase déclarative en phrase interrogative",
-    domaine:    "Français",
-    competence: "Grammaire — Types de phrases : interrogative",
-    levels: ["CM1", "CM2", "6e"],
-    type: "transform-interrogative",
-    questionsPerSession: 10,
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-
-    bank: [
-      {
-        sentence:  "Tu ranges tes affaires.",
-        keyWords:  ["ranges", "affaires"],
-        modelEcQ:  "Est-ce que tu ranges tes affaires ?",
-        modelInv:  "Ranges-tu tes affaires ?"
-      },
-      {
-        sentence:  "Il mange une pomme.",
-        keyWords:  ["mange", "pomme"],
-        modelEcQ:  "Est-ce qu'il mange une pomme ?",
-        modelInv:  "Mange-t-il une pomme ?"
-      },
-      {
-        sentence:  "Les enfants jouent dans le jardin.",
-        keyWords:  ["enfants", "jouent", "jardin"],
-        modelEcQ:  "Est-ce que les enfants jouent dans le jardin ?",
-        modelInv:  "Les enfants jouent-ils dans le jardin ?"
-      },
-      {
-        sentence:  "Elle lit un livre.",
-        keyWords:  ["lit", "livre"],
-        modelEcQ:  "Est-ce qu'elle lit un livre ?",
-        modelInv:  "Lit-elle un livre ?"
-      },
-      {
-        sentence:  "Vous aimez la musique.",
-        keyWords:  ["aimez", "musique"],
-        modelEcQ:  "Est-ce que vous aimez la musique ?",
-        modelInv:  "Aimez-vous la musique ?"
-      },
-      {
-        sentence:  "Papa prépare le dîner.",
-        keyWords:  ["prépare", "dîner"],
-        modelEcQ:  "Est-ce que papa prépare le dîner ?",
-        modelInv:  "Papa prépare-t-il le dîner ?"
-      },
-      {
-        sentence:  "Nous partons en vacances demain.",
-        keyWords:  ["partons", "vacances", "demain"],
-        modelEcQ:  "Est-ce que nous partons en vacances demain ?",
-        modelInv:  "Partons-nous en vacances demain ?"
-      },
-      {
-        sentence:  "Le chat dort sur le canapé.",
-        keyWords:  ["chat", "dort", "canapé"],
-        modelEcQ:  "Est-ce que le chat dort sur le canapé ?",
-        modelInv:  "Le chat dort-il sur le canapé ?"
-      },
-      {
-        sentence:  "Les élèves écoutent la maîtresse.",
-        keyWords:  ["élèves", "écoutent", "maîtresse"],
-        modelEcQ:  "Est-ce que les élèves écoutent la maîtresse ?",
-        modelInv:  "Les élèves écoutent-ils la maîtresse ?"
-      },
-      {
-        sentence:  "Tu viens à la fête samedi.",
-        keyWords:  ["viens", "fête", "samedi"],
-        modelEcQ:  "Est-ce que tu viens à la fête samedi ?",
-        modelInv:  "Viens-tu à la fête samedi ?"
-      }
-    ]
-  },
-
-  "transformer-affirmative-negative": {
-    title: "Transformer une phrase affirmative en phrase négative",
-    domaine:    "Français",
-    competence: "Grammaire — Types de phrases : négative",
-    levels: ["CM1", "CM2", "6e"],
-    type: "transform-negative",
-    questionsPerSession: 10,
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-
-    bank: [
-      {
-        sentence:  "Tu ranges tes affaires.",
-        keyWords:  ["ranges", "affaires"],
-        modelNeg:  "Tu ne ranges pas tes affaires."
-      },
-      {
-        sentence:  "Il mange des bonbons.",
-        keyWords:  ["mange", "bonbons"],
-        modelNeg:  "Il ne mange pas de bonbons."
-      },
-      {
-        sentence:  "Les enfants jouent dans le jardin.",
-        keyWords:  ["enfants", "jouent", "jardin"],
-        modelNeg:  "Les enfants ne jouent pas dans le jardin."
-      },
-      {
-        sentence:  "Elle lit tous les soirs.",
-        keyWords:  ["lit", "soirs"],
-        modelNeg:  "Elle ne lit pas tous les soirs."
-      },
-      {
-        sentence:  "Nous aimons la pizza.",
-        keyWords:  ["aimons", "pizza"],
-        modelNeg:  "Nous n'aimons pas la pizza."
-      },
-      {
-        sentence:  "Je comprends la leçon.",
-        keyWords:  ["comprends", "leçon"],
-        modelNeg:  "Je ne comprends pas la leçon."
-      },
-      {
-        sentence:  "Le chat dort sur le canapé.",
-        keyWords:  ["chat", "dort", "canapé"],
-        modelNeg:  "Le chat ne dort pas sur le canapé."
-      },
-      {
-        sentence:  "Vous regardez la télévision.",
-        keyWords:  ["regardez", "télévision"],
-        modelNeg:  "Vous ne regardez pas la télévision."
-      },
-      {
-        sentence:  "Papa prépare le dîner.",
-        keyWords:  ["prépare", "dîner"],
-        modelNeg:  "Papa ne prépare pas le dîner."
-      },
-      {
-        sentence:  "Les élèves écoutent la maîtresse.",
-        keyWords:  ["élèves", "écoutent", "maîtresse"],
-        modelNeg:  "Les élèves n'écoutent pas la maîtresse."
-      }
-    ]
-  },
-
-  "identifier-phrase-interrogative": {
-    title: "Identifier une phrase interrogative",
-    domaine:    "Français",
-    competence: "Grammaire — Types de phrases : interrogative",
-    levels: ["CM1", "CM2", "6e"],
-    type: "yes-no",
-    questionsPerSession: 15,
-    yesNoLabel: "Cette phrase est-elle interrogative ?",
-    targetTypeName: "interrogative",
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-
-    bank: [
-      /* ── Phrases interrogatives (cibles) ── */
-      { sentence: "Où vas-tu ce matin ?",                    isTarget: true  },
-      { sentence: "As-tu fini tes devoirs ?",                isTarget: true  },
-      { sentence: "Qu'est-ce que tu aimes lire ?",           isTarget: true  },
-      { sentence: "Est-ce que tu viens à la fête ?",         isTarget: true  },
-      { sentence: "Comment s'appelle ton chat ?",            isTarget: true  },
-      { sentence: "Pourquoi es-tu en retard ?",              isTarget: true  },
-      { sentence: "Veux-tu jouer avec nous ?",               isTarget: true  },
-      /* ── Distracteurs ── */
-      { sentence: "Le soleil brille dans le ciel bleu.",     isTarget: false, phraseType: "déclarative"  },
-      { sentence: "Ma sœur aime beaucoup la lecture.",       isTarget: false, phraseType: "déclarative"  },
-      { sentence: "Nous partons en vacances demain.",        isTarget: false, phraseType: "déclarative"  },
-      { sentence: "Les fleurs poussent au printemps.",       isTarget: false, phraseType: "déclarative"  },
-      { sentence: "Pose ton cartable sur la chaise.",        isTarget: false, phraseType: "impérative"   },
-      { sentence: "Ouvrez vos cahiers à la page dix.",       isTarget: false, phraseType: "impérative"   },
-      { sentence: "Comme il fait beau aujourd'hui !",        isTarget: false, phraseType: "exclamative"  },
-      { sentence: "Quelle belle journée !",                  isTarget: false, phraseType: "exclamative"  }
-    ]
-  },
-
-  "identifier-phrase-imperative": {
-    title: "Identifier une phrase impérative",
-    domaine:    "Français",
-    competence: "Grammaire — Types de phrases : impérative",
-    levels: ["CM1", "CM2", "6e"],
-    type: "yes-no",
-    questionsPerSession: 15,
-    yesNoLabel: "Cette phrase est-elle impérative ?",
-    targetTypeName: "impérative",
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-
-    bank: [
-      /* ── Phrases impératives (cibles) ── */
-      { sentence: "Ferme la porte.",                         isTarget: true  },
-      { sentence: "Range tes affaires.",                     isTarget: true  },
-      { sentence: "Lis ce livre avec attention.",            isTarget: true  },
-      { sentence: "Venez écouter l'histoire.",               isTarget: true  },
-      { sentence: "N'oublie pas ton manteau.",               isTarget: true  },
-      { sentence: "Levez-vous tous ensemble.",               isTarget: true  },
-      { sentence: "Écris ton prénom en haut de la page.",    isTarget: true  },
-      /* ── Distracteurs ── */
-      { sentence: "La cloche sonne à midi.",                 isTarget: false, phraseType: "déclarative"   },
-      { sentence: "Les enfants jouent dans la cour.",        isTarget: false, phraseType: "déclarative"   },
-      { sentence: "Mon chien s'appelle Rex.",                isTarget: false, phraseType: "déclarative"   },
-      { sentence: "Est-ce que tu as chaud ?",                isTarget: false, phraseType: "interrogative" },
-      { sentence: "Où habitent tes grands-parents ?",        isTarget: false, phraseType: "interrogative" },
-      { sentence: "Peux-tu m'expliquer cela ?",              isTarget: false, phraseType: "interrogative" },
-      { sentence: "Comme tu es courageux !",                 isTarget: false, phraseType: "exclamative"   },
-      { sentence: "Quelle bonne idée !",                     isTarget: false, phraseType: "exclamative"   }
-    ]
-  },
-
-  "identifier-phrase-negative": {
-    title: "Identifier une phrase négative",
-    domaine:    "Français",
-    competence: "Grammaire — Types de phrases : négative",
-    levels: ["CM1", "CM2", "6e"],
-    type: "yes-no",
-    questionsPerSession: 15,
-    yesNoLabel: "Cette phrase est-elle négative ?",
-    targetTypeName: "négative",
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-
-    bank: [
-      /* ── Phrases négatives (cibles) ── */
-      { sentence: "Je ne mange pas de viande.",              isTarget: true  },
-      { sentence: "Elle ne lit jamais le soir.",             isTarget: true  },
-      { sentence: "Nous n'allons plus à cette école.",       isTarget: true  },
-      { sentence: "Il n'a pas encore fini ses devoirs.",     isTarget: true  },
-      { sentence: "N'oublie pas tes affaires.",              isTarget: true  },
-      { sentence: "Ne crie pas dans les couloirs.",          isTarget: true  },
-      { sentence: "Il ne dit rien à personne.",              isTarget: true  },
-      /* ── Distracteurs (formes affirmatives) ── */
-      { sentence: "Le chat dort sur le canapé.",             isTarget: false, phraseType: "affirmative"   },
-      { sentence: "Mes amis jouent au foot.",                isTarget: false, phraseType: "affirmative"   },
-      { sentence: "Quelle belle histoire !",                 isTarget: false, phraseType: "affirmative"   },
-      { sentence: "Viens jouer avec moi.",                   isTarget: false, phraseType: "affirmative"   },
-      { sentence: "As-tu faim ?",                           isTarget: false, phraseType: "affirmative"   },
-      { sentence: "Prends ton manteau.",                     isTarget: false, phraseType: "affirmative"   },
-      { sentence: "La rivière coule doucement.",             isTarget: false, phraseType: "affirmative"   },
-      { sentence: "Où est mon stylo ?",                     isTarget: false, phraseType: "affirmative"   }
-    ]
-  },
-
-  "identifier-phrase-exclamative": {
-    title: "Identifier une phrase exclamative",
-    domaine:    "Français",
-    competence: "Grammaire — Types de phrases : exclamative",
-    levels: ["CM1", "CM2", "6e"],
-    type: "yes-no",
-    questionsPerSession: 15,
-    yesNoLabel: "Cette phrase est-elle exclamative ?",
-    targetTypeName: "exclamative",
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-
-    bank: [
-      /* ── Phrases exclamatives (cibles) ── */
-      { sentence: "Quelle belle journée !",                  isTarget: true  },
-      { sentence: "Comme tu es grand !",                     isTarget: true  },
-      { sentence: "Quel dommage !",                          isTarget: true  },
-      { sentence: "Comme c'est magnifique !",                isTarget: true  },
-      { sentence: "Que tu es intelligent !",                 isTarget: true  },
-      { sentence: "Quel beau dessin tu as fait !",           isTarget: true  },
-      { sentence: "Comme il fait froid ce matin !",          isTarget: true  },
-      /* ── Distracteurs ── */
-      { sentence: "Mon chat s'appelle Mimi.",                isTarget: false, phraseType: "déclarative"   },
-      { sentence: "Le vent souffle fort.",                   isTarget: false, phraseType: "déclarative"   },
-      { sentence: "Les élèves écoutent attentivement.",      isTarget: false, phraseType: "déclarative"   },
-      { sentence: "Où est passé mon livre ?",               isTarget: false, phraseType: "interrogative" },
-      { sentence: "Est-ce que tu as bien dormi ?",           isTarget: false, phraseType: "interrogative" },
-      { sentence: "Qui a renversé le vase ?",                isTarget: false, phraseType: "interrogative" },
-      { sentence: "Posez vos crayons.",                      isTarget: false, phraseType: "impérative"    },
-      { sentence: "Mange ta soupe.",                         isTarget: false, phraseType: "impérative"    }
-    ]
-  },
-
-  /* ─────────────────────────────────────────────────────────────────────────
-     Produire différentes formes de phrases interrogatives
-     Type custom : produire-3-formes
-     3 champs par phrase (intonation / est-ce que / inversion)
-     Niveau 1 → 2 formes obligatoires (inversion = bonus)
-     Niveau 2 / Niveau 3 → 3 formes obligatoires
-  ───────────────────────────────────────────────────────────────────────── */
-
-  /* ─── Grammaire : déterminants, noms, adjectifs, phrase complexe ──────── */
-
-  /* ────────────────────────────────────────────────────────────────────────
-     Identifier un article défini — le / la / les / l'
-     Étape 1 : mots-cliquables — détecter les articles dans des phrases
-     Étapes 2–3 : slugs « articles-definis-choix » et « articles-definis-completer »
-  ─────────────────────────────────────────────────────────────────────────── */
-  "identifier-article-defini": {
-    title: "Identifier les articles définis",
-    domaine:    "Français",
-    competence: "Grammaire — Déterminants : articles définis",
-    levels: ["CM1", "CM2", "6e"],
-    type: "mots-cliquables",
-    questionsPerSession: 6,
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-    bank: [
-      {
-        instruction: "Clique sur tous les articles définis dans ce texte.",
-        sentence: "Le chien joue dans le jardin . Il renifle les fleurs et s' approche de la fontaine . Le soleil brille et l' air est doux .",
-        targets: ["Le", "le", "les", "la", "l'"],
-        piege: {},
-        note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet."
-      },
-      {
-        instruction: "Clique sur tous les articles définis dans ce texte.",
-        sentence: "La classe prépare la pièce de théâtre . Les élèves apprennent le texte et l' institutrice sourit . Le spectacle aura lieu vendredi .",
-        targets: ["La", "la", "Les", "le", "l'", "Le"],
-        piege: {},
-        note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet."
-      },
-      {
-        instruction: "Clique sur tous les articles définis dans ce texte.",
-        sentence: "L' hiver arrive dans la montagne . La neige recouvre les sapins et le sentier disparaît sous le blanc . Les randonneurs rentrent au refuge .",
-        targets: ["L'", "la", "La", "les", "le", "Les", "au"],
-        piege: {},
-        note: "💡 <b>L'</b> et <b>au</b> (= à + le) sont des articles définis contractés."
-      },
-      {
-        instruction: "Clique sur tous les articles définis dans ce texte.",
-        sentence: "Le soir , l' enfant lit le livre que sa maman lui a offert . Les illustrations sont magnifiques et les couleurs très vives .",
-        targets: ["Le", "l'", "le", "Les", "les"],
-        piege: {},
-        note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet."
-      },
-      {
-        instruction: "Clique sur tous les articles définis dans ce texte.",
-        sentence: "La fermière nourrit les poules avec le grain . L' après-midi , elle va au marché acheter les légumes . Le soir , elle ferme la porte .",
-        targets: ["La", "les", "le", "L'", "au", "Le", "la"],
-        piege: {},
-        note: "💡 <b>L'</b> et <b>au</b> (= à + le) sont des articles définis contractés."
-      },
-      {
-        instruction: "Clique sur tous les articles définis dans ce texte. Attention, il y a peut-être un piège !",
-        sentence: "Les oiseaux font leur nid dans l' arbre près de la haie . Le chat les observe depuis la fenêtre sans bouger . Il les guette depuis des heures .",
-        targets: ["Les", "l'", "la", "Le"],
-        piege: { "les": "Ici, « les » remplace un nom (les oiseaux). C'est un pronom personnel, pas un article !" },
-        note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet."
-      }
-    ]
-  },
-
-  "articles-definis-choix": {
-    title: "Choisir l'article défini — le / la / les / l'",
-    domaine:    "Français",
-    competence: "Grammaire — Déterminants : articles définis",
-    levels: ["CM1", "CM2", "6e"],
-    type: "choix-etiquette",
-    questionsPerSession: 8,
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-    bank: [
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "🐱", word: "chat",   answer: "le",  choices: ["le", "la", "les", "l'"] },
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "🏫", word: "école",  answer: "l'",  choices: ["le", "la", "les", "l'"] },
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "🌳", word: "arbre",  answer: "l'",  choices: ["le", "la", "les", "l'"] },
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "🐶", word: "chiens", answer: "les", choices: ["le", "la", "les", "l'"] },
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "🌙", word: "lune",   answer: "la",  choices: ["le", "la", "les", "l'"] },
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "🤝", word: "ami",    answer: "l'",  choices: ["le", "la", "les", "l'"] },
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "🌸", word: "fleurs", answer: "les", choices: ["le", "la", "les", "l'"] },
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "☀️", word: "soleil", answer: "le",  choices: ["le", "la", "les", "l'"] }
-    ]
-  },
-
-  "articles-definis-completer": {
-    title: "Compléter avec l'article défini — Le printemps",
-    domaine:    "Français",
-    competence: "Grammaire — Déterminants : articles définis",
-    levels: ["CM1", "CM2", "6e"],
-    type: "glisser-deposer",
-    questionsPerSession: 1,
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-    bank: [
-      {
-        instruction: "Place les bons articles définis dans les cases. Attention à l'intrus !",
-        template: "___ printemps est arrivé ! ___ hirondelles reviennent dans ___ ciel. ___ école organise une sortie dans la forêt.",
-        blanks: ["Le", "Les", "le", "L'"],
-        bank: ["Le", "Les", "le", "L'", "des"]
-      }
-    ]
-  },
-
-  /* ────────────────────────────────────────────────────────────────────────
-     Identifier un article indéfini — un / une / des
-     Étapes 1 + 3 : choix-etiquette (défini/indéfini + choisir un/une/des)
-     Étape 2 : slug « articles-indefinis-premiere-rencontre »
-  ─────────────────────────────────────────────────────────────────────────── */
-  "identifier-article-indefini": {
-    title: "Identifier les articles indéfinis",
-    domaine:    "Français",
-    competence: "Grammaire — Déterminants : articles indéfinis",
-    levels: ["CM1", "CM2", "6e"],
-    type: "mots-cliquables",
-    questionsPerSession: 6,
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-    bank: [
-      {
-        instruction: "Clique sur tous les articles indéfinis dans ce texte.",
-        sentence: "Un enfant joue dans le jardin . Il trouve une coccinelle et des fourmis sous les pierres .",
-        targets: ["Un", "une", "des"],
-        piege: {}
-      },
-      {
-        instruction: "Clique sur tous les articles indéfinis dans ce texte.",
-        sentence: "Des nuages arrivent dans le ciel . Un vent froid souffle et les feuilles tombent . Il faut une veste pour sortir .",
-        targets: ["Des", "Un", "une"],
-        piege: {}
-      },
-      {
-        instruction: "Clique sur tous les articles indéfinis dans ce texte.",
-        sentence: "Dans une vieille maison , un fantôme habite . Des bruits étranges se font entendre la nuit . Les habitants ont très peur .",
-        targets: ["une", "un", "Des"],
-        piege: {}
-      },
-      {
-        instruction: "Clique sur tous les articles indéfinis dans ce texte.",
-        sentence: "Le boulanger prépare des croissants et des baguettes chaque matin . Une cliente arrive et achète un pain aux raisins .",
-        targets: ["des", "Une", "un"],
-        piege: {}
-      },
-      {
-        instruction: "Clique sur tous les articles indéfinis dans ce texte.",
-        sentence: "Un explorateur découvre une grotte cachée dans la forêt . Des stalactites pendent et des cristaux scintillent sous sa lampe .",
-        targets: ["Un", "une", "Des", "des"],
-        piege: {}
-      },
-      {
-        instruction: "Clique sur tous les articles indéfinis dans ce texte.",
-        sentence: "Un matin de printemps , des hirondelles arrivent dans le village . Une hirondelle construit un nid sous le toit de la grange .",
-        targets: ["Un", "des", "Une", "un"],
-        piege: {}
-      }
-    ]
-  },
-
-  "articles-indefinis-premiere-rencontre": {
-    title: "Articles indéfinis — Première et deuxième mention",
-    domaine:    "Français",
-    competence: "Grammaire — Déterminants : articles indéfinis",
-    levels: ["CM1", "CM2", "6e"],
-    type: "glisser-deposer",
-    questionsPerSession: 4,
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-    bank: [
-      {
-        instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.",
-        template: "___ chat noir dort sur la fenêtre. ___ chat s'appelle Minuit.",
-        blanks: ["Un", "Le"],
-        bank: ["Un", "Le", "Une", "La"]
-      },
-      {
-        instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.",
-        template: "___ élève entre dans la salle. ___ élève s'appelle Emma.",
-        blanks: ["Une", "L'"],
-        bank: ["Une", "L'", "Un", "Le"]
-      },
-      {
-        instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.",
-        template: "___ chien aboie dans le jardin. ___ chien appartient à notre voisin.",
-        blanks: ["Un", "Le"],
-        bank: ["Un", "Le", "Une", "La"]
-      },
-      {
-        instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.",
-        template: "___ livre est posé sur la table. ___ livre parle des dinosaures.",
-        blanks: ["Un", "Le"],
-        bank: ["Un", "Le", "Une", "La"]
-      }
-    ]
-  },
 
   /* ────────────────────────────────────────────────────────────────────────
      Identifier un déterminant démonstratif — ce / cet / cette / ces
@@ -2019,134 +1509,6 @@ const EXERCISE_DATA = {
         explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>parlent</em>. Test : <em>nous nous parlons</em>." },
       { sentence: "Ce matin, Paul ___ lève tôt.",                       answer: "se",
         explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>lève</em>. Test : <em>je me lève</em>. Dans cette même phrase, <em>Ce</em> est un déterminant démonstratif devant le nom <em>matin</em>." }
-    ]
-  },
-
-  /* ────────────────────────────────────────────────────────────────────────
-     Identifier un déterminant possessif — cliquer dans des phrases
-     10 phrases, toutes les formes (mon/ma/mes … leur/leurs), pièges inclus
-  ─────────────────────────────────────────────────────────────────────────── */
-  "identifier-determinant-possessif": {
-    title: "Identifier les déterminants possessifs",
-    domaine:    "Français",
-    competence: "Grammaire — Déterminants possessifs",
-    levels: ["CM1", "CM2", "6e"],
-    type: "mots-cliquables",
-    questionsPerSession: 10,
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-    bank: [
-      {
-        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
-        sentence: "Je range mes affaires dans mon cartable .",
-        targets: ["mes", "mon"],
-        piege: {},
-        note: "📌 <strong>mes</strong> et <strong>mon</strong> indiquent l'appartenance à la 1<sup>re</sup> personne du singulier (<em>je</em>)."
-      },
-      {
-        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
-        sentence: "Tu as oublié ton stylo et tes cahiers .",
-        targets: ["ton", "tes"],
-        piege: {},
-        note: "📌 <strong>ton</strong> et <strong>tes</strong> : 2<sup>e</sup> personne du singulier (<em>tu</em>). <em>Ton</em> devant un nom masculin, <em>tes</em> au pluriel."
-      },
-      {
-        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
-        sentence: "Il promène son chien avec ses amis .",
-        targets: ["son", "ses"],
-        piege: {},
-        note: "📌 <strong>son</strong> et <strong>ses</strong> : 3<sup>e</sup> personne du singulier (<em>il</em>). <em>Son</em> devant un nom singulier, <em>ses</em> au pluriel."
-      },
-      {
-        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
-        sentence: "Elle lit ses livres dans sa chambre .",
-        targets: ["ses", "sa"],
-        piege: {},
-        note: "📌 <strong>ses</strong> et <strong>sa</strong> : 3<sup>e</sup> personne du singulier (<em>elle</em>). <em>Sa</em> devant un nom féminin singulier."
-      },
-      {
-        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
-        sentence: "Nous adorons notre école et nos professeurs .",
-        targets: ["notre", "nos"],
-        piege: {},
-        note: "📌 <strong>notre</strong> et <strong>nos</strong> : 1<sup>re</sup> personne du pluriel (<em>nous</em>). <em>Notre</em> au singulier, <em>nos</em> au pluriel."
-      },
-      {
-        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
-        sentence: "Vous avez rangé votre sac et vos affaires .",
-        targets: ["votre", "vos"],
-        piege: {},
-        note: "📌 <strong>votre</strong> et <strong>vos</strong> : 2<sup>e</sup> personne du pluriel ou de politesse (<em>vous</em>)."
-      },
-      {
-        instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention au piège !",
-        sentence: "Les enfants jouent avec leurs jouets dans leur chambre .",
-        targets: ["leurs", "leur"],
-        piege: { "Les": "« Les » est un article défini, pas un déterminant possessif." },
-        note: "📌 <strong>leurs</strong> et <strong>leur</strong> : 3<sup>e</sup> personne du pluriel (<em>ils/elles</em>). <em>Leur</em> devant un nom singulier, <em>leurs</em> devant un nom pluriel."
-      },
-      {
-        instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention aux pièges !",
-        sentence: "Mon petit frère prête sa guitare à ses camarades le week-end .",
-        targets: ["Mon", "sa", "ses"],
-        piege: { "le": "« le » est un article défini, pas un déterminant possessif." },
-        note: "📌 Trois possessifs : <strong>Mon</strong> (masc. sing., 1<sup>re</sup> pers.), <strong>sa</strong> (fém. sing., 3<sup>e</sup> pers.), <strong>ses</strong> (plur., 3<sup>e</sup> pers.)."
-      },
-      {
-        instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention au piège !",
-        sentence: "Ta mère et ton père sont partis avec leurs valises ce matin .",
-        targets: ["Ta", "ton", "leurs"],
-        piege: { "ce": "« ce » est un déterminant démonstratif (il montre un moment précis), pas un possessif." },
-        note: "📌 <strong>Ta</strong> et <strong>ton</strong> (2<sup>e</sup> pers. sing.) + <strong>leurs</strong> (3<sup>e</sup> pers. plur.) dans la même phrase."
-      },
-      {
-        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
-        sentence: "Notre jardin et nos fleurs sont magnifiques en été .",
-        targets: ["Notre", "nos"],
-        piege: {},
-        note: "📌 <strong>Notre</strong> et <strong>nos</strong> : 1<sup>re</sup> personne du pluriel (<em>nous</em>)."
-      }
-    ]
-  },
-
-  "possessifs-dans-phrases": {
-    title: "Repérer les déterminants possessifs dans une phrase",
-    domaine:    "Français",
-    competence: "Grammaire — Déterminants possessifs",
-    levels: ["CM1", "CM2", "6e"],
-    type: "mots-cliquables",
-    questionsPerSession: 5,
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-    bank: [
-      {
-        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
-        sentence: "Je range mes affaires dans mon sac .",
-        targets: ["mes", "mon"],
-        piege: {}
-      },
-      {
-        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
-        sentence: "Elle prête son crayon à sa camarade .",
-        targets: ["son", "sa"],
-        piege: {}
-      },
-      {
-        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
-        sentence: "Nous adorons notre école et nos professeurs .",
-        targets: ["notre", "nos"],
-        piege: {}
-      },
-      {
-        instruction: "Clique sur tous les déterminants possessifs dans la phrase.",
-        sentence: "Il promène son chien avec ses amis .",
-        targets: ["son", "ses"],
-        piege: {}
-      },
-      {
-        instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention au piège !",
-        sentence: "Leurs parents les attendent devant leur maison .",
-        targets: ["Leurs", "leur"],
-        piege: { "les": "« les » est un pronom personnel complément, pas un possessif !" }
-      }
     ]
   },
 
@@ -9490,6 +8852,288 @@ const EXERCISE_DATA = {
       { mode: 'mcq', display: { type: 'fraction', num: 36, den: 100 }, answer: { decimal: 0.36 }, choiceType: 'decimal',
         choices: [ { label: '0,36', decimal: 0.36 }, { label: '0,63', decimal: 0.63 }, { label: '3,6', decimal: 3.6 }, { label: '0,036', decimal: 0.036 } ],
         correctIdx: 0, line: { min: 0, max: 1, step: 0.1 } }
+    ]
+  },
+
+  "identifier-type-phrase": {
+    title:      "Identifier le type et la forme d'une phrase",
+    domaine:    "Français",
+    competence: "Grammaire — Identifier le type et la forme de la phrase",
+    type:       "identifier-type-phrase-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+
+    /* Fusion de identifier-phrase-declarative/interrogative/imperative/exclamative
+       (Lot 6, groupe 1). Niveaux 1-3 : QCM sur le TYPE de phrase (mutuellement
+       exclusifs). Niveau 4 : identifier-phrase-negative — la négation est une
+       FORME (orthogonale aux types, ex. une phrase peut être déclarative ET
+       négative), traitée à part en oui/non plutôt que fondue dans le QCM. */
+
+    lvl1: [
+      { sentence: "Le chien court.", correctType: "déclarative" },
+      { sentence: "Je mange une pomme.", correctType: "déclarative" },
+      { sentence: "Emma joue du piano.", correctType: "déclarative" },
+      { sentence: "Il pleut depuis ce matin.", correctType: "déclarative" },
+      { sentence: "Le train arrive à la gare.", correctType: "déclarative" },
+      { sentence: "Mon frère lit une bande dessinée.", correctType: "déclarative" },
+      { sentence: "Les oiseaux chantent dans les arbres.", correctType: "déclarative" },
+      { sentence: "La maîtresse distribue les cahiers.", correctType: "déclarative" },
+      { sentence: "Les enfants jouent dans la cour.", correctType: "déclarative" },
+      { sentence: "Papa prépare le dîner.", correctType: "déclarative" },
+      { sentence: "Le jardin est couvert de fleurs.", correctType: "déclarative" },
+      { sentence: "Vous êtes très gentils.", correctType: "déclarative" },
+      { sentence: "Le soleil se couche derrière les montagnes.", correctType: "déclarative" },
+      { sentence: "Après la récréation, les élèves retournent calmement dans leur classe.", correctType: "déclarative" },
+      { sentence: "Dans le jardin, les fleurs poussent rapidement au printemps.", correctType: "déclarative" },
+      { sentence: "Où vas-tu ce matin ?", correctType: "interrogative" },
+      { sentence: "As-tu fini tes devoirs ?", correctType: "interrogative" },
+      { sentence: "Qu'est-ce que tu aimes lire ?", correctType: "interrogative" },
+      { sentence: "Est-ce que tu viens à la fête ?", correctType: "interrogative" },
+      { sentence: "Comment s'appelle ton chat ?", correctType: "interrogative" },
+      { sentence: "Pourquoi es-tu en retard ?", correctType: "interrogative" },
+      { sentence: "Veux-tu jouer avec nous ?", correctType: "interrogative" }
+    ],
+
+    lvl2: [
+      { sentence: "Le chien court.", correctType: "déclarative" },
+      { sentence: "Je mange une pomme.", correctType: "déclarative" },
+      { sentence: "Emma joue du piano.", correctType: "déclarative" },
+      { sentence: "Il pleut depuis ce matin.", correctType: "déclarative" },
+      { sentence: "Le train arrive à la gare.", correctType: "déclarative" },
+      { sentence: "Mon frère lit une bande dessinée.", correctType: "déclarative" },
+      { sentence: "Les oiseaux chantent dans les arbres.", correctType: "déclarative" },
+      { sentence: "La maîtresse distribue les cahiers.", correctType: "déclarative" },
+      { sentence: "Les enfants jouent dans la cour.", correctType: "déclarative" },
+      { sentence: "Papa prépare le dîner.", correctType: "déclarative" },
+      { sentence: "Le jardin est couvert de fleurs.", correctType: "déclarative" },
+      { sentence: "Vous êtes très gentils.", correctType: "déclarative" },
+      { sentence: "Le soleil se couche derrière les montagnes.", correctType: "déclarative" },
+      { sentence: "Après la récréation, les élèves retournent calmement dans leur classe.", correctType: "déclarative" },
+      { sentence: "Dans le jardin, les fleurs poussent rapidement au printemps.", correctType: "déclarative" },
+      { sentence: "Où vas-tu ce matin ?", correctType: "interrogative" },
+      { sentence: "As-tu fini tes devoirs ?", correctType: "interrogative" },
+      { sentence: "Qu'est-ce que tu aimes lire ?", correctType: "interrogative" },
+      { sentence: "Est-ce que tu viens à la fête ?", correctType: "interrogative" },
+      { sentence: "Comment s'appelle ton chat ?", correctType: "interrogative" },
+      { sentence: "Pourquoi es-tu en retard ?", correctType: "interrogative" },
+      { sentence: "Veux-tu jouer avec nous ?", correctType: "interrogative" },
+      { sentence: "Ferme la porte.", correctType: "impérative" },
+      { sentence: "Range tes affaires.", correctType: "impérative" },
+      { sentence: "Lis ce livre avec attention.", correctType: "impérative" },
+      { sentence: "Venez écouter l'histoire.", correctType: "impérative" },
+      { sentence: "N'oublie pas ton manteau.", correctType: "impérative" },
+      { sentence: "Levez-vous tous ensemble.", correctType: "impérative" },
+      { sentence: "Écris ton prénom en haut de la page.", correctType: "impérative" }
+    ],
+
+    lvl3: [
+      { sentence: "Le chien court.", correctType: "déclarative" },
+      { sentence: "Je mange une pomme.", correctType: "déclarative" },
+      { sentence: "Emma joue du piano.", correctType: "déclarative" },
+      { sentence: "Il pleut depuis ce matin.", correctType: "déclarative" },
+      { sentence: "Le train arrive à la gare.", correctType: "déclarative" },
+      { sentence: "Mon frère lit une bande dessinée.", correctType: "déclarative" },
+      { sentence: "Les oiseaux chantent dans les arbres.", correctType: "déclarative" },
+      { sentence: "La maîtresse distribue les cahiers.", correctType: "déclarative" },
+      { sentence: "Les enfants jouent dans la cour.", correctType: "déclarative" },
+      { sentence: "Papa prépare le dîner.", correctType: "déclarative" },
+      { sentence: "Le jardin est couvert de fleurs.", correctType: "déclarative" },
+      { sentence: "Vous êtes très gentils.", correctType: "déclarative" },
+      { sentence: "Le soleil se couche derrière les montagnes.", correctType: "déclarative" },
+      { sentence: "Après la récréation, les élèves retournent calmement dans leur classe.", correctType: "déclarative" },
+      { sentence: "Dans le jardin, les fleurs poussent rapidement au printemps.", correctType: "déclarative" },
+      { sentence: "Où vas-tu ce matin ?", correctType: "interrogative" },
+      { sentence: "As-tu fini tes devoirs ?", correctType: "interrogative" },
+      { sentence: "Qu'est-ce que tu aimes lire ?", correctType: "interrogative" },
+      { sentence: "Est-ce que tu viens à la fête ?", correctType: "interrogative" },
+      { sentence: "Comment s'appelle ton chat ?", correctType: "interrogative" },
+      { sentence: "Pourquoi es-tu en retard ?", correctType: "interrogative" },
+      { sentence: "Veux-tu jouer avec nous ?", correctType: "interrogative" },
+      { sentence: "Ferme la porte.", correctType: "impérative" },
+      { sentence: "Range tes affaires.", correctType: "impérative" },
+      { sentence: "Lis ce livre avec attention.", correctType: "impérative" },
+      { sentence: "Venez écouter l'histoire.", correctType: "impérative" },
+      { sentence: "N'oublie pas ton manteau.", correctType: "impérative" },
+      { sentence: "Levez-vous tous ensemble.", correctType: "impérative" },
+      { sentence: "Écris ton prénom en haut de la page.", correctType: "impérative" },
+      { sentence: "Quelle belle journée !", correctType: "exclamative" },
+      { sentence: "Comme tu es grand !", correctType: "exclamative" },
+      { sentence: "Quel dommage !", correctType: "exclamative" },
+      { sentence: "Comme c'est magnifique !", correctType: "exclamative" },
+      { sentence: "Que tu es intelligent !", correctType: "exclamative" },
+      { sentence: "Quel beau dessin tu as fait !", correctType: "exclamative" },
+      { sentence: "Comme il fait froid ce matin !", correctType: "exclamative" }
+    ],
+
+    lvl4: [
+      { sentence: "Je ne mange pas de viande.", isNegative: true },
+      { sentence: "Elle ne lit jamais le soir.", isNegative: true },
+      { sentence: "Nous n'allons plus à cette école.", isNegative: true },
+      { sentence: "Il n'a pas encore fini ses devoirs.", isNegative: true },
+      { sentence: "N'oublie pas tes affaires.", isNegative: true },
+      { sentence: "Ne crie pas dans les couloirs.", isNegative: true },
+      { sentence: "Il ne dit rien à personne.", isNegative: true },
+      { sentence: "Le chat dort sur le canapé.", isNegative: false },
+      { sentence: "Mes amis jouent au foot.", isNegative: false },
+      { sentence: "Quelle belle histoire !", isNegative: false },
+      { sentence: "Viens jouer avec moi.", isNegative: false },
+      { sentence: "As-tu faim ?", isNegative: false },
+      { sentence: "Prends ton manteau.", isNegative: false },
+      { sentence: "La rivière coule doucement.", isNegative: false }
+    ]
+  },
+
+  "transformer-phrase": {
+    title:      "Transformer une phrase (interrogative, négative)",
+    domaine:    "Français",
+    competence: "Grammaire — Transformer une phrase",
+    type:       "transformer-phrase-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+
+    /* Fusion de transformer-declarative-interrogative (niveau 1) et
+       transformer-affirmative-negative (niveau 2) — Lot 6, groupe 2. */
+
+    lvl1: [
+      { sentence: "Tu ranges tes affaires.", keyWords: ["ranges", "affaires"], modelEcQ: "Est-ce que tu ranges tes affaires ?", modelInv: "Ranges-tu tes affaires ?" },
+      { sentence: "Il mange une pomme.", keyWords: ["mange", "pomme"], modelEcQ: "Est-ce qu'il mange une pomme ?", modelInv: "Mange-t-il une pomme ?" },
+      { sentence: "Les enfants jouent dans le jardin.", keyWords: ["enfants", "jouent", "jardin"], modelEcQ: "Est-ce que les enfants jouent dans le jardin ?", modelInv: "Les enfants jouent-ils dans le jardin ?" },
+      { sentence: "Elle lit un livre.", keyWords: ["lit", "livre"], modelEcQ: "Est-ce qu'elle lit un livre ?", modelInv: "Lit-elle un livre ?" },
+      { sentence: "Vous aimez la musique.", keyWords: ["aimez", "musique"], modelEcQ: "Est-ce que vous aimez la musique ?", modelInv: "Aimez-vous la musique ?" },
+      { sentence: "Papa prépare le dîner.", keyWords: ["prépare", "dîner"], modelEcQ: "Est-ce que papa prépare le dîner ?", modelInv: "Papa prépare-t-il le dîner ?" },
+      { sentence: "Nous partons en vacances demain.", keyWords: ["partons", "vacances", "demain"], modelEcQ: "Est-ce que nous partons en vacances demain ?", modelInv: "Partons-nous en vacances demain ?" },
+      { sentence: "Le chat dort sur le canapé.", keyWords: ["chat", "dort", "canapé"], modelEcQ: "Est-ce que le chat dort sur le canapé ?", modelInv: "Le chat dort-il sur le canapé ?" },
+      { sentence: "Les élèves écoutent la maîtresse.", keyWords: ["élèves", "écoutent", "maîtresse"], modelEcQ: "Est-ce que les élèves écoutent la maîtresse ?", modelInv: "Les élèves écoutent-ils la maîtresse ?" },
+      { sentence: "Tu viens à la fête samedi.", keyWords: ["viens", "fête", "samedi"], modelEcQ: "Est-ce que tu viens à la fête samedi ?", modelInv: "Viens-tu à la fête samedi ?" }
+    ],
+
+    lvl2: [
+      { sentence: "Tu ranges tes affaires.", keyWords: ["ranges", "affaires"], modelNeg: "Tu ne ranges pas tes affaires." },
+      { sentence: "Il mange des bonbons.", keyWords: ["mange", "bonbons"], modelNeg: "Il ne mange pas de bonbons." },
+      { sentence: "Les enfants jouent dans le jardin.", keyWords: ["enfants", "jouent", "jardin"], modelNeg: "Les enfants ne jouent pas dans le jardin." },
+      { sentence: "Elle lit tous les soirs.", keyWords: ["lit", "soirs"], modelNeg: "Elle ne lit pas tous les soirs." },
+      { sentence: "Nous aimons la pizza.", keyWords: ["aimons", "pizza"], modelNeg: "Nous n'aimons pas la pizza." },
+      { sentence: "Je comprends la leçon.", keyWords: ["comprends", "leçon"], modelNeg: "Je ne comprends pas la leçon." },
+      { sentence: "Le chat dort sur le canapé.", keyWords: ["chat", "dort", "canapé"], modelNeg: "Le chat ne dort pas sur le canapé." },
+      { sentence: "Vous regardez la télévision.", keyWords: ["regardez", "télévision"], modelNeg: "Vous ne regardez pas la télévision." },
+      { sentence: "Papa prépare le dîner.", keyWords: ["prépare", "dîner"], modelNeg: "Papa ne prépare pas le dîner." },
+      { sentence: "Les élèves écoutent la maîtresse.", keyWords: ["élèves", "écoutent", "maîtresse"], modelNeg: "Les élèves n'écoutent pas la maîtresse." }
+    ]
+  }
+
+,
+
+  "articles-definis": {
+    title:      "Les articles définis (le, la, les, l')",
+    domaine:    "Français",
+    competence: "Grammaire — Déterminants : articles définis",
+    type:       "articles-definis-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+
+    /* Fusion de identifier-article-defini (niveau 1, mots cliquables),
+       articles-definis-choix (niveau 2, choix d'étiquette) et
+       articles-definis-completer (niveau 3, glisser-déposer) — Lot 6,
+       groupe 3a. Le niveau 3 n'a qu'un seul item (banque d'origine),
+       absorbé tel quel plutôt que supprimé. */
+
+    lvl1: [
+      { instruction: "Clique sur tous les articles définis dans ce texte.", sentence: "Le chien joue dans le jardin . Il renifle les fleurs et s' approche de la fontaine . Le soleil brille et l' air est doux .", targets: ["Le","le","les","la","l'"], piege: {}, note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet." },
+      { instruction: "Clique sur tous les articles définis dans ce texte.", sentence: "La classe prépare la pièce de théâtre . Les élèves apprennent le texte et l' institutrice sourit . Le spectacle aura lieu vendredi .", targets: ["La","la","Les","le","l'","Le"], piege: {}, note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet." },
+      { instruction: "Clique sur tous les articles définis dans ce texte.", sentence: "L' hiver arrive dans la montagne . La neige recouvre les sapins et le sentier disparaît sous le blanc . Les randonneurs rentrent au refuge .", targets: ["L'","la","La","les","le","Les","au"], piege: {}, note: "💡 <b>L'</b> et <b>au</b> (= à + le) sont des articles définis contractés." },
+      { instruction: "Clique sur tous les articles définis dans ce texte.", sentence: "Le soir , l' enfant lit le livre que sa maman lui a offert . Les illustrations sont magnifiques et les couleurs très vives .", targets: ["Le","l'","le","Les","les"], piege: {}, note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet." },
+      { instruction: "Clique sur tous les articles définis dans ce texte.", sentence: "La fermière nourrit les poules avec le grain . L' après-midi , elle va au marché acheter les légumes . Le soir , elle ferme la porte .", targets: ["La","les","le","L'","au","Le","la"], piege: {}, note: "💡 <b>L'</b> et <b>au</b> (= à + le) sont des articles définis contractés." },
+      { instruction: "Clique sur tous les articles définis dans ce texte. Attention, il y a peut-être un piège !", sentence: "Les oiseaux font leur nid dans l' arbre près de la haie . Le chat les observe depuis la fenêtre sans bouger . Il les guette depuis des heures .", targets: ["Les","l'","la","Le"], piege: { "les": "Ici, « les » remplace un nom (les oiseaux). C'est un pronom personnel, pas un article !" }, note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet." }
+    ],
+
+    lvl2: [
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "🐱", word: "chat", answer: "le", choices: ["le","la","les","l'"] },
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "🏫", word: "école", answer: "l'", choices: ["le","la","les","l'"] },
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "🌳", word: "arbre", answer: "l'", choices: ["le","la","les","l'"] },
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "🐶", word: "chiens", answer: "les", choices: ["le","la","les","l'"] },
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "🌙", word: "lune", answer: "la", choices: ["le","la","les","l'"] },
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "🤝", word: "ami", answer: "l'", choices: ["le","la","les","l'"] },
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "🌸", word: "fleurs", answer: "les", choices: ["le","la","les","l'"] },
+      { instruction: "Quel article défini va avec ce nom ?", emoji: "☀️", word: "soleil", answer: "le", choices: ["le","la","les","l'"] }
+    ],
+
+    lvl3: [
+      { instruction: "Place les bons articles définis dans les cases. Attention à l'intrus !", template: "___ printemps est arrivé ! ___ hirondelles reviennent dans ___ ciel. ___ école organise une sortie dans la forêt.", blanks: ["Le","Les","le","L'"], bank: ["Le","Les","le","L'","des"] }
+    ]
+  },
+
+  "determinants-possessifs": {
+    title:      "Les déterminants possessifs",
+    domaine:    "Français",
+    competence: "Grammaire — Déterminants possessifs",
+    type:       "determinants-possessifs-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+
+    /* Fusion de identifier-determinant-possessif (niveau 1) et
+       possessifs-dans-phrases (niveau 2) — Lot 6, groupe 3c. Même
+       mécanique (mots cliquables) pour les deux niveaux. */
+
+    lvl1: [
+      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Je range mes affaires dans mon cartable .", targets: ["mes","mon"], piege: {}, note: "📌 <strong>mes</strong> et <strong>mon</strong> indiquent l'appartenance à la 1<sup>re</sup> personne du singulier (<em>je</em>)." },
+      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Tu as oublié ton stylo et tes cahiers .", targets: ["ton","tes"], piege: {}, note: "📌 <strong>ton</strong> et <strong>tes</strong> : 2<sup>e</sup> personne du singulier (<em>tu</em>). <em>Ton</em> devant un nom masculin, <em>tes</em> au pluriel." },
+      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Il promène son chien avec ses amis .", targets: ["son","ses"], piege: {}, note: "📌 <strong>son</strong> et <strong>ses</strong> : 3<sup>e</sup> personne du singulier (<em>il</em>). <em>Son</em> devant un nom singulier, <em>ses</em> au pluriel." },
+      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Elle lit ses livres dans sa chambre .", targets: ["ses","sa"], piege: {}, note: "📌 <strong>ses</strong> et <strong>sa</strong> : 3<sup>e</sup> personne du singulier (<em>elle</em>). <em>Sa</em> devant un nom féminin singulier." },
+      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Nous adorons notre école et nos professeurs .", targets: ["notre","nos"], piege: {}, note: "📌 <strong>notre</strong> et <strong>nos</strong> : 1<sup>re</sup> personne du pluriel (<em>nous</em>). <em>Notre</em> au singulier, <em>nos</em> au pluriel." },
+      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Vous avez rangé votre sac et vos affaires .", targets: ["votre","vos"], piege: {}, note: "📌 <strong>votre</strong> et <strong>vos</strong> : 2<sup>e</sup> personne du pluriel ou de politesse (<em>vous</em>)." },
+      { instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention au piège !", sentence: "Les enfants jouent avec leurs jouets dans leur chambre .", targets: ["leurs","leur"], piege: { "Les": "« Les » est un article défini, pas un déterminant possessif." }, note: "📌 <strong>leurs</strong> et <strong>leur</strong> : 3<sup>e</sup> personne du pluriel (<em>ils/elles</em>). <em>Leur</em> devant un nom singulier, <em>leurs</em> devant un nom pluriel." },
+      { instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention aux pièges !", sentence: "Mon petit frère prête sa guitare à ses camarades le week-end .", targets: ["Mon","sa","ses"], piege: { "le": "« le » est un article défini, pas un déterminant possessif." }, note: "📌 Trois possessifs : <strong>Mon</strong> (masc. sing., 1<sup>re</sup> pers.), <strong>sa</strong> (fém. sing., 3<sup>e</sup> pers.), <strong>ses</strong> (plur., 3<sup>e</sup> pers.)." },
+      { instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention au piège !", sentence: "Ta mère et ton père sont partis avec leurs valises ce matin .", targets: ["Ta","ton","leurs"], piege: { "ce": "« ce » est un déterminant démonstratif (il montre un moment précis), pas un possessif." }, note: "📌 <strong>Ta</strong> et <strong>ton</strong> (2<sup>e</sup> pers. sing.) + <strong>leurs</strong> (3<sup>e</sup> pers. plur.) dans la même phrase." },
+      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Notre jardin et nos fleurs sont magnifiques en été .", targets: ["Notre","nos"], piege: {}, note: "📌 <strong>Notre</strong> et <strong>nos</strong> : 1<sup>re</sup> personne du pluriel (<em>nous</em>)." }
+    ],
+
+    lvl2: [
+      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Je range mes affaires dans mon sac .", targets: ["mes","mon"], piege: {} },
+      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Elle prête son crayon à sa camarade .", targets: ["son","sa"], piege: {} },
+      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Nous adorons notre école et nos professeurs .", targets: ["notre","nos"], piege: {} },
+      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Il promène son chien avec ses amis .", targets: ["son","ses"], piege: {} },
+      { instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention au piège !", sentence: "Leurs parents les attendent devant leur maison .", targets: ["Leurs","leur"], piege: { "les": "« les » est un pronom personnel complément, pas un possessif !" } }
+    ]
+  }
+
+,
+
+  "articles-indefinis": {
+    title:      "Les articles indéfinis (un, une, des)",
+    domaine:    "Français",
+    competence: "Grammaire — Déterminants : articles indéfinis",
+    type:       "articles-indefinis-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+
+    /* Fusion de identifier-article-indefini (niveau 1, mots cliquables) et
+       articles-indefinis-premiere-rencontre (niveau 2, glisser-déposer) —
+       Lot 6, groupe 3b. Niveau 2 enrichi de 8 items supplémentaires
+       (validés par l'utilisateur) car la banque d'origine (4 items) était
+       trop mince pour un niveau à part entière. */
+
+    lvl1: [
+      { instruction: "Clique sur tous les articles indéfinis dans ce texte.", sentence: "Un enfant joue dans le jardin . Il trouve une coccinelle et des fourmis sous les pierres .", targets: ["Un","une","des"], piege: {} },
+      { instruction: "Clique sur tous les articles indéfinis dans ce texte.", sentence: "Des nuages arrivent dans le ciel . Un vent froid souffle et les feuilles tombent . Il faut une veste pour sortir .", targets: ["Des","Un","une"], piege: {} },
+      { instruction: "Clique sur tous les articles indéfinis dans ce texte.", sentence: "Dans une vieille maison , un fantôme habite . Des bruits étranges se font entendre la nuit . Les habitants ont très peur .", targets: ["une","un","Des"], piege: {} },
+      { instruction: "Clique sur tous les articles indéfinis dans ce texte.", sentence: "Le boulanger prépare des croissants et des baguettes chaque matin . Une cliente arrive et achète un pain aux raisins .", targets: ["des","Une","un"], piege: {} },
+      { instruction: "Clique sur tous les articles indéfinis dans ce texte.", sentence: "Un explorateur découvre une grotte cachée dans la forêt . Des stalactites pendent et des cristaux scintillent sous sa lampe .", targets: ["Un","une","Des","des"], piege: {} },
+      { instruction: "Clique sur tous les articles indéfinis dans ce texte.", sentence: "Un matin de printemps , des hirondelles arrivent dans le village . Une hirondelle construit un nid sous le toit de la grange .", targets: ["Un","des","Une","un"], piege: {} }
+    ],
+
+    lvl2: [
+      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ chat noir dort sur la fenêtre. ___ chat s'appelle Minuit.", blanks: ["Un","Le"], bank: ["Un","Le","Une","La"] },
+      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ élève entre dans la salle. ___ élève s'appelle Emma.", blanks: ["Une","L'"], bank: ["Une","L'","Un","Le"] },
+      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ chien aboie dans le jardin. ___ chien appartient à notre voisin.", blanks: ["Un","Le"], bank: ["Un","Le","Une","La"] },
+      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ livre est posé sur la table. ___ livre parle des dinosaures.", blanks: ["Un","Le"], bank: ["Un","Le","Une","La"] },
+      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ fille chante dans la cour. ___ fille s'appelle Léa.", blanks: ["Une","La"], bank: ["Une","La","Un","Le"] },
+      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ oiseau se pose sur la branche. ___ oiseau chante joliment.", blanks: ["Un","L'"], bank: ["Un","L'","Une","La"] },
+      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ maison est à vendre dans notre rue. ___ maison a un grand jardin.", blanks: ["Une","La"], bank: ["Une","La","Un","Le"] },
+      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ homme traverse la rue prudemment. ___ homme porte un manteau gris.", blanks: ["Un","L'"], bank: ["Un","L'","Une","La"] },
+      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ voiture rouge est garée devant l'école. ___ voiture appartient à la maîtresse.", blanks: ["Une","La"], bank: ["Une","La","Un","Le"] },
+      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ ballon roule jusqu'au but. ___ ballon est neuf.", blanks: ["Un","Le"], bank: ["Un","Le","Une","La"] },
+      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ araignée tisse sa toile dans le coin. ___ araignée est minuscule.", blanks: ["Une","L'"], bank: ["Une","L'","Un","Le"] },
+      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ ami m'attend à la sortie. ___ ami s'appelle Karim.", blanks: ["Un","L'"], bank: ["Un","L'","Une","La"] }
     ]
   }
 
