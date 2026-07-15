@@ -303,3 +303,22 @@ Séparément, 26 pages autonomes hors `exercise-data.js` (les 10 pages d'homopho
 `ortho-distinguer-*.html` et les 16 exercices `js/lex-*.js` de `français-lexique.html`) ont déjà leur
 propre système de niveaux verrouillés codé à la main, sans passer par le composant partagé — elles ne
 relèvent pas du même audit mais d'un chantier de consolidation de code à part.
+
+### 6.9 Parcours guidé différencié (v9)
+
+En production depuis juillet 2026.
+
+Le parcours guidé permet à un enseignant de restreindre le catalogue d'exercices visible par ses
+élèves, à trois niveaux de granularité croissante, construits par migrations successives :
+
+- **v7** (`classes.mode_acces` + `class_active_exercises`) — mode libre/guidé par classe entière.
+- **v8** (`get_my_guided_access()`) — RPC exposée à l'élève, qui résout et renvoie la liste effective
+  sans jamais lui laisser interroger directement `classes`/`class_active_exercises`.
+- **v9** (`groups`, `students.group_id`, `group_active_exercises`, `student_active_exercises`) —
+  ajoute des groupes de besoin par classe et une personnalisation individuelle par élève.
+
+Règle de résolution côté élève (dans `get_my_guided_access()`) : **liste personnelle si elle existe**,
+**sinon liste de son groupe si elle est configurée**, **sinon liste de la classe**. `mode_acces = 'libre'`
+reste l'interrupteur maître : il désactive tout (listes de classe, de groupe et personnelles) sans
+jamais les effacer — repasser une classe en mode guidé réactive telles quelles les listes déjà
+configurées.
