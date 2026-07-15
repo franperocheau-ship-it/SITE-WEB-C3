@@ -310,6 +310,13 @@
     }
     .access-target-row .form-label { margin: 0; white-space: nowrap; }
     .access-target-select { max-width: 300px; width: auto; flex-shrink: 1; }
+    .access-target-hint {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin: -6px 0 14px;
+    }
+    .access-dot-legend { display: inline-block; margin-top: 2px; }
 
     .access-inherit-banner {
       display: flex;
@@ -355,6 +362,26 @@
 
     /* ── Colonne "Groupe" dans le tableau élèves ──────────────────────────────── */
     .group-select { min-width: 140px; padding: 7px 10px; font-size: 13px; }
+    .group-cell { display: flex; align-items: center; gap: 8px; }
+    .group-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+      box-sizing: border-box;
+    }
+    .th-info {
+      display: inline-block; margin-left: 4px; color: var(--muted);
+      font-size: 12px; cursor: help;
+    }
+    .group-info-note {
+      display: flex; align-items: flex-start; gap: 8px;
+      background: rgba(245,166,35,0.10);
+      border: 1px solid rgba(245,166,35,0.35);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: var(--text);
+    }
 
     .ax-domaine { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
     .ax-domaine-summary {
@@ -840,10 +867,14 @@
           </div>
           <div class="access-panel" id="access-panel" style="display:none">
             <div class="access-target-row">
-              <label class="form-label" for="ax-target-select">Cible</label>
+              <label class="form-label" for="ax-target-select">Configurer les exercices pour :</label>
               <select class="form-select access-target-select" id="ax-target-select"></select>
-              <button type="button" class="btn btn-outline btn-sm" onclick="openModalGroups()">👥 Gérer les groupes</button>
             </div>
+            <p class="access-target-hint">
+              🎯 Ici, vous choisissez quels exercices sont débloqués (pour la classe, un groupe ou un élève).
+              L'appartenance des élèves aux groupes se règle dans le tableau Élèves plus bas.
+              <span class="access-dot-legend">« ● » devant un nom = des exercices sont déjà configurés pour cette cible.</span>
+            </p>
             <div class="access-inherit-banner" id="access-inherit-banner" style="display:none"></div>
             <div class="access-panel-head">
               <input class="form-input access-search" id="ax-search" type="text" placeholder="🔍 Rechercher un exercice…">
@@ -857,6 +888,7 @@
         <div class="section-header">
           <span class="section-title">Élèves</span>
           <div class="section-actions">
+            <button class="btn btn-outline btn-sm" onclick="openModalGroups()">👥 Gérer les groupes</button>
             <button class="btn btn-ghost btn-sm" id="btn-print" onclick="printCredentials()">🖨 Imprimer</button>
             <button class="btn btn-ghost btn-sm" id="btn-pdf"   onclick="downloadPDF()">📄 PDF</button>
             <button class="btn btn-ghost btn-sm" id="btn-csv"   onclick="doExportCSV()">⬇ CSV</button>
@@ -873,7 +905,9 @@
                 <th>Nom</th>
                 <th>Identifiant</th>
                 <th>Mot de passe</th>
-                <th>Groupe</th>
+                <th>Groupe
+                  <span class="th-info" title="Ce groupe détermine aussi les exercices proposés en parcours guidé.">ⓘ</span>
+                </th>
                 <th class="th-actions">Actions</th>
               </tr>
             </thead>
@@ -1101,6 +1135,9 @@
         <button class="modal-close" onclick="closeModal()" aria-label="Fermer">×</button>
       </div>
       <div class="modal-body">
+        <div class="group-info-note">
+          ⚠️ Ces groupes déterminent aussi les exercices proposés en parcours guidé : déplacer un élève d'un groupe à l'autre peut changer les exercices qu'il voit.
+        </div>
         <div class="group-list" id="group-list"></div>
         <form id="form-group" onsubmit="submitGroup(event)" novalidate>
           <div class="form-field">
@@ -1366,6 +1403,15 @@
     renderAccessCard();
   }
 
+  /* Pastille de couleur du groupe : neutre (anneau gris) si l'élève n'a pas
+     de groupe — jamais la couleur par défaut du formulaire de création. */
+  function groupDotStyle(groupId) {
+    if (!groupId) return 'background:transparent;border:2px solid var(--border)';
+    const g = _groups.find(g => g.id === groupId);
+    const color = g && /^#[0-9A-Fa-f]{6}$/.test(g.color || '') ? g.color : '#94A3B8';
+    return `background:${color};border:none`;
+  }
+
   function renderDetailStudents() {
     const wrap  = document.getElementById('detail-table-wrap');
     const empty = document.getElementById('empty-detail');
@@ -1393,10 +1439,13 @@
         <td><span class="td-cred">${esc(s.username)}</span></td>
         <td><span class="td-cred" id="pwd-${s.id}">${esc(s.password)}</span></td>
         <td>
-          <select class="form-select group-select" data-sid="${s.id}">
-            <option value="">— Aucun groupe —</option>
-            ${_groups.map(g => `<option value="${g.id}" ${s.group_id === g.id ? 'selected' : ''}>${esc(g.name)}</option>`).join('')}
-          </select>
+          <div class="group-cell">
+            <span class="group-dot" id="group-dot-${s.id}" style="${groupDotStyle(s.group_id)}"></span>
+            <select class="form-select group-select" data-sid="${s.id}">
+              <option value="">— Aucun groupe —</option>
+              ${_groups.map(g => `<option value="${g.id}" ${s.group_id === g.id ? 'selected' : ''}>${esc(g.name)}</option>`).join('')}
+            </select>
+          </div>
         </td>
         <td>
           <div class="td-actions">
@@ -1420,6 +1469,8 @@
       await lfmTeacher.assignStudentToGroup(studentId, groupId);
       const s = _students.find(s => s.id === studentId);
       if (s) s.group_id = groupId;
+      const dot = document.getElementById(`group-dot-${studentId}`);
+      if (dot) dot.setAttribute('style', groupDotStyle(groupId));
       showToast('Groupe mis à jour');
       /* Le sélecteur de cible peut afficher des repères "liste configurée" —
          pas besoin de le rafraîchir ici : l'affectation seule ne change pas
