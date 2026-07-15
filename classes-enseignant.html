@@ -43,30 +43,56 @@
     .breadcrumb a:hover, .breadcrumb .bc-link:hover { text-decoration: underline; }
     .bc-sep { color: var(--border); user-select: none; }
 
-    /* ── Tabs ────────────────────────────────────────────────────────────────── */
-    .page-tabs {
+    /* ── Navigation principale (4 onglets espace enseignant) ────────────────── */
+    .main-tabs {
       display: flex;
+      flex-wrap: wrap;
       gap: 4px;
       background: var(--card-bg);
       border-radius: 14px;
       box-shadow: var(--shadow-sm);
       padding: 5px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       width: fit-content;
     }
+    .main-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      text-decoration: none;
+      transition: background 180ms, color 180ms;
+    }
+    .main-tab.is-active { background: var(--blue); color: #fff; }
+    .main-tab:hover:not(.is-active) { background: rgba(16,43,106,0.06); color: var(--blue); }
+
+    /* ── Sous-onglets (secondaires, ex. Mes classes / Mes élèves) ───────────── */
+    .page-tabs {
+      display: flex;
+      gap: 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+      width: 100%;
+    }
     .page-tab {
-      padding: 9px 20px;
+      padding: 4px 2px 10px;
       background: none;
       border: none;
-      border-radius: 10px;
+      border-bottom: 2px solid transparent;
       font-family: inherit;
       font-size: 13px;
       font-weight: 600;
       color: var(--muted);
       cursor: pointer;
-      transition: background 180ms, color 180ms;
+      transition: color 160ms, border-color 160ms;
     }
-    .page-tab.is-active { background: var(--blue); color: #fff; }
+    .page-tab.is-active { background: none; color: var(--blue); border-bottom-color: var(--blue); }
+    .page-tab:hover:not(.is-active) { color: var(--blue); }
 
     /* ── Section header ──────────────────────────────────────────────────────── */
     .section-header {
@@ -721,10 +747,18 @@
         <span id="bc-class" style="display:none"></span>
       </nav>
 
-      <!-- Tabs (cachés en vue détail) -->
+      <!-- Navigation principale (4 onglets) -->
+      <nav class="main-tabs" aria-label="Navigation espace enseignant">
+        <a class="main-tab is-active" href="classes-enseignant.html">🏫 Mes classes</a>
+        <a class="main-tab" href="pilotage-enseignant.html">🎯 Pilotage des compétences</a>
+        <a class="main-tab" href="resultats-enseignant.html">📊 Résultats</a>
+        <a class="main-tab" href="remediations-enseignant.html">🩹 Remédiations</a>
+      </nav>
+
+      <!-- Sous-onglets (cachés en vue détail) -->
       <div class="page-tabs" id="page-tabs">
-        <button class="page-tab" id="tab-classes" onclick="navigate({})">🏫 Mes classes</button>
-        <button class="page-tab" id="tab-eleves"  onclick="navigate({view:'eleves'})">👤 Mes élèves</button>
+        <button class="page-tab" id="tab-classes" onclick="navigate({})">Mes classes</button>
+        <button class="page-tab" id="tab-eleves"  onclick="navigate({view:'eleves'})">Mes élèves</button>
       </div>
 
       <!-- ────────────────────────────────────────────────────────────────────

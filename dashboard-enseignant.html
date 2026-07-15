@@ -292,15 +292,15 @@
         <a href="classes-enseignant.html" class="dash-card dash-card--active">
           <div class="dash-card-icon">🏫</div>
           <div class="dash-card-title">Mes classes</div>
-          <div class="dash-card-desc">Créez et gérez vos groupes d'élèves par niveau et par année scolaire.</div>
+          <div class="dash-card-desc">Créez et gérez vos classes, vos élèves et leurs groupes de besoin.</div>
           <div class="dash-card-action">Gérer →</div>
           <div class="dash-card-accent"></div>
         </a>
-        <a href="classes-enseignant.html?view=eleves" class="dash-card dash-card--active">
-          <div class="dash-card-icon">👤</div>
-          <div class="dash-card-title">Mes élèves</div>
-          <div class="dash-card-desc">Créez les identifiants de vos élèves et associez-les à votre classe.</div>
-          <div class="dash-card-action">Gérer →</div>
+        <a href="pilotage-enseignant.html" class="dash-card dash-card--active">
+          <div class="dash-card-icon">🎯</div>
+          <div class="dash-card-title">Pilotage des compétences</div>
+          <div class="dash-card-desc">Choisissez pour chaque compétence un parcours libre ou guidé pour vos classes.</div>
+          <div class="dash-card-action">Piloter →</div>
           <div class="dash-card-accent"></div>
         </a>
         <a href="resultats-enseignant.html" class="dash-card dash-card--active">
@@ -310,13 +310,13 @@
           <div class="dash-card-action">Voir les résultats →</div>
           <div class="dash-card-accent"></div>
         </a>
-        <button class="dash-card dash-card--active" id="export-all-btn" style="text-align:left">
-          <div class="dash-card-icon">📥</div>
-          <div class="dash-card-title">Export CSV</div>
-          <div class="dash-card-desc">Téléchargez les identifiants de tous vos élèves au format CSV.</div>
-          <div class="dash-card-action" id="export-action-label">Télécharger →</div>
+        <a href="remediations-enseignant.html" class="dash-card dash-card--active">
+          <div class="dash-card-icon">🩹</div>
+          <div class="dash-card-title">Remédiations</div>
+          <div class="dash-card-desc">Repérez les compétences en difficulté et les ressources pour y remédier.</div>
+          <div class="dash-card-action">Voir →</div>
           <div class="dash-card-accent"></div>
-        </button>
+        </a>
       </div>
 
       <!-- Pied de page -->
@@ -373,22 +373,6 @@
         document.getElementById('stat-classes').textContent = '—';
         document.getElementById('stat-eleves').textContent  = '—';
       }
-
-      /* Export CSV de tous les élèves */
-      document.getElementById('export-all-btn').addEventListener('click', async () => {
-        const btn   = document.getElementById('export-all-btn');
-        const label = document.getElementById('export-action-label');
-        btn.disabled  = true;
-        label.textContent = 'Export…';
-        try {
-          await lfmTeacher.exportAllStudentsCSV();
-        } catch (e) {
-          alert('Erreur lors de l\'export : ' + e.message);
-        } finally {
-          btn.disabled  = false;
-          label.textContent = 'Télécharger →';
-        }
-      });
     })();
   </script>
 <style>
