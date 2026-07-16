@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fiche de remédiation — Espace enseignant — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=10">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="exercise-data.js?v=20"></script>
+  <script src="js/remediation-data.js?v=1"></script>
+  <style>
+    .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
+    .dash-content { max-width: 820px; margin: 0 auto; }
+
+    /* ── Breadcrumb ──────────────────────────────────────────────────────────── */
+    .breadcrumb {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 20px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
+    }
+    .breadcrumb a { color: var(--blue); text-decoration: none; font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .bc-sep { color: var(--border); user-select: none; }
+    .bc-current { font-weight: 600; color: var(--text); }
+
+    /* ── Navigation principale (4 onglets espace enseignant) ────────────────── */
+    .main-tabs {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      background: var(--card-bg); border-radius: 14px; box-shadow: var(--shadow-sm);
+      padding: 5px; margin-bottom: 20px; width: fit-content;
+    }
+    .main-tab {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: 10px;
+      font-family: inherit; font-size: 13px; font-weight: 700;
+      color: var(--muted); text-decoration: none;
+      transition: background 180ms, color 180ms;
+    }
+    .main-tab.is-active { background: var(--blue); color: #fff; }
+    .main-tab:hover:not(.is-active) { background: rgba(16,43,106,0.06); color: var(--blue); }
+
+    /* ── En-tête fiche ───────────────────────────────────────────────────────── */
+    .fiche-header {
+      background: var(--card-bg); border-radius: var(--radius-card); box-shadow: var(--shadow-sm);
+      padding: 24px 28px; margin-bottom: 20px;
+    }
+    .fiche-domaine {
+      display: inline-flex; align-items: center;
+      background: rgba(16,43,106,0.08); color: var(--blue);
+      border-radius: 100px; padding: 3px 12px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .fiche-title { font-weight: 800; font-size: 22px; color: var(--blue); }
+    .fiche-back { display: inline-block; margin-top: 14px; font-size: 13px; color: var(--blue); font-weight: 600; text-decoration: none; }
+    .fiche-back:hover { text-decoration: underline; }
+
+    /* ── Sections de ressources ──────────────────────────────────────────────── */
+    .remed-section {
+      background: var(--card-bg); border-radius: var(--radius-card); box-shadow: var(--shadow-sm);
+      padding: 22px 26px; margin-bottom: 16px;
+    }
+    .remed-section-title { font-weight: 700; font-size: 15px; color: var(--color-brand-navy, var(--blue)); margin-bottom: 14px; }
+    .remed-empty { font-size: 13.5px; color: var(--muted); font-style: italic; padding: 8px 0; }
+    .remed-item {
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px 16px; margin-bottom: 10px;
+    }
+    .remed-item:last-child { margin-bottom: 0; }
+    .remed-item-title { font-weight: 700; font-size: 14px; color: var(--text); margin-bottom: 4px; }
+    .remed-item-desc { font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0 0 8px; }
+    .remed-item-link { font-size: 12.5px; color: var(--blue); font-weight: 600; text-decoration: none; }
+    .remed-item-link:hover { text-decoration: underline; }
+
+    .empty-state { text-align: center; padding: 56px 24px; color: var(--muted); }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-text { font-size: 15px; }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <!-- NAVBAR-PROFICIAMUS-CSS -->
+  <style>
+  /* ─── Navbar Proficiamus (extrait d'index.html) ─── */
+  body{padding-top:50px;}
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+  .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+  .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+  .navbar__brand img{height:34px;width:auto;}
+  .navbar__brand-text{display:flex;flex-direction:column;}
+  .navbar__name{font-size:18px;font-weight:800;line-height:1;letter-spacing:1px;}
+  .navbar__tagline{font-size:12px;font-style:italic;font-weight:700;color:#102B6A;margin-top:2px;}
+  .navbar__nav{display:flex;align-items:center;gap:24px;}
+  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-size:14px;font-weight:700;transition:color .2s;}
+  .navbar__nav a:hover{color:#1B4EBF;}
+  .navbar__nav a.active{color:#2D9C3C;border-bottom:2px solid #2D9C3C;padding-bottom:2px;}
+  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;}
+  .navbar__nav .btn-login{color:#fff!important;}
+  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+  .btn-login:hover{background:#0b1e4d;}
+  @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <!-- CONTENU -->
+  <div class="dash-wrap">
+    <div class="dash-content">
+
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb" aria-label="Fil d'Ariane">
+        <a href="dashboard-enseignant.html">Espace enseignant</a>
+        <span class="bc-sep">›</span>
+        <a href="remediations-enseignant.html" id="bc-remediations">Remédiations</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-current" id="bc-competence">…</span>
+      </nav>
+
+      <!-- Navigation principale (4 onglets) -->
+      <nav class="main-tabs" aria-label="Navigation espace enseignant">
+        <a class="main-tab" href="classes-enseignant.html">🏫 Mes classes</a>
+        <a class="main-tab" href="pilotage-enseignant.html">🎯 Pilotage des compétences</a>
+        <a class="main-tab" href="resultats-enseignant.html">📊 Résultats</a>
+        <a class="main-tab is-active" href="remediations-enseignant.html">🩹 Remédiations</a>
+      </nav>
+
+      <div id="fiche-not-found" style="display:none">
+        <div class="empty-state">
+          <div class="empty-icon">❓</div>
+          <div class="empty-text">Compétence introuvable.<br>
+            <a href="remediations-enseignant.html" style="color:var(--blue);font-weight:600">← Retour aux remédiations</a>
+          </div>
+        </div>
+      </div>
+
+      <div id="fiche-content" style="display:none">
+
+        <!-- En-tête -->
+        <div class="fiche-header">
+          <span class="fiche-domaine" id="fiche-domaine" style="display:none"></span>
+          <div class="fiche-title" id="fiche-title">…</div>
+          <a class="fiche-back" id="back-link" href="remediations-enseignant.html">← Retour aux remédiations</a>
+        </div>
+
+        <!-- Ressources théoriques -->
+        <div class="remed-section">
+          <div class="remed-section-title">📖 Ressources théoriques</div>
+          <div id="section-theorie"></div>
+        </div>
+
+        <!-- Outils -->
+        <div class="remed-section">
+          <div class="remed-section-title">🧰 Outils</div>
+          <div id="section-outils"></div>
+        </div>
+
+        <!-- Dispositifs pédagogiques -->
+        <div class="remed-section">
+          <div class="remed-section-title">👥 Dispositifs pédagogiques</div>
+          <div id="section-dispositifs"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau – LFM &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="js/menu.js"></script>
+  <script>
+  /* Vue enseignant uniquement pour l'instant (Lot D). Le volet élève
+     (proposition de fiche après un score faible) est un chantier ultérieur —
+     il ajoutera probablement un paramètre du type ?vue=eleve ici, avec sa
+     propre garde d'auth (lfmAuth.requireRole('eleve')) et un affichage plus
+     simple ; ne pas anticiper sa structure tant qu'il n'est pas spécifié. */
+
+  let _competence = null;
+
+  function esc(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function renderSection(key, containerId) {
+    const entry = REMEDIATION_DATA[_competence];
+    const items = entry ? (entry[key] || []) : [];
+    const container = document.getElementById(containerId);
+    if (!items.length) {
+      container.innerHTML = '<p class="remed-empty">Ressources en cours d’ajout.</p>';
+      return;
+    }
+    container.innerHTML = items.map(it => `
+      <div class="remed-item">
+        <div class="remed-item-title">${esc(it.titre)}</div>
+        <p class="remed-item-desc">${esc(it.description)}</p>
+        ${it.lien ? `<a href="${esc(it.lien)}" target="_blank" rel="noopener noreferrer" class="remed-item-link">🔗 Ouvrir la ressource</a>` : ''}
+      </div>
+    `).join('');
+  }
+
+  (async () => {
+    const profile = await lfmAuth.requireRole('enseignant');
+    if (!profile) return;
+
+    const params        = new URLSearchParams(window.location.search);
+    const rawCompetence = params.get('competence');
+    const classId       = params.get('class');
+
+    _competence = rawCompetence ? decodeURIComponent(rawCompetence) : null;
+
+    const backHref = classId
+      ? `remediations-enseignant.html?class=${encodeURIComponent(classId)}`
+      : 'remediations-enseignant.html';
+    document.getElementById('bc-remediations').href = backHref;
+    document.getElementById('back-link').href       = backHref;
+
+    if (!_competence) {
+      document.getElementById('fiche-not-found').style.display = 'block';
+      return;
+    }
+
+    document.title = _competence + ' — Remédiation — LFM';
+    document.getElementById('bc-competence').textContent = _competence;
+    document.getElementById('fiche-title').textContent    = _competence;
+
+    /* Le badge domaine est une commodité d'affichage : on cherche le premier
+       exercice d'EXERCISE_DATA portant ce libellé de compétence. Absent si le
+       libellé ne correspond plus à rien (compétence renommée/supprimée). */
+    const match = Object.values(EXERCISE_DATA).find(ex => ex.competence === _competence);
+    if (match) {
+      const badge = document.getElementById('fiche-domaine');
+      badge.textContent   = match.domaine;
+      badge.style.display = 'inline-flex';
+    }
+
+    renderSection('theorie',     'section-theorie');
+    renderSection('outils',      'section-outils');
+    renderSection('dispositifs', 'section-dispositifs');
+
+    document.getElementById('fiche-content').style.display = 'block';
+  })();
+  </script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

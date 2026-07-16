@@ -279,6 +279,17 @@ const lfmTeacher = (() => {
     if (error) throw error;
   }
 
+  /* Réinitialisation complète (bouton "↺" du tableau Élèves, bug UX groupe vs
+     liste perso) : supprime toute la liste personnelle d'un élève d'un coup,
+     sans avoir besoin de connaître son contenu au préalable — contrairement à
+     removeActiveExercisesBulkFromStudent qui exige la liste des exercice_id. */
+  async function clearActiveExercisesForStudent(studentId) {
+    const { error } = await db
+      .from('student_active_exercises')
+      .delete().eq('student_id', studentId);
+    if (error) throw error;
+  }
+
   /* ── Indicateurs "liste configurée" (sélecteur de cible + note de
      réactivation du mode guidé) — un seul aller-retour par lot d'IDs plutôt
      qu'une requête par groupe/élève. */
@@ -297,6 +308,57 @@ const lfmTeacher = (() => {
       .from('student_active_exercises').select('student_id').in('student_id', studentIds);
     if (error) throw error;
     return [...new Set((data || []).map(r => r.student_id))];
+  }
+
+  /* ── Pilotage des compétences : progression par niveaux (Lot C) ─────────────
+     competence_settings (class_id, exercise_id, niveau_mode). Absence de
+     ligne = 'progressif' (défaut, comportement actuel de js/level-select.js)
+     — on ne lit/écrit que ce qui diverge du défaut, pas de seed. Revenir à
+     'progressif' supprime la ligne plutôt que de l'upserter, pour que la
+     table ne garde que ce que l'enseignant a réellement changé. */
+
+  async function getCompetenceSettings(classId) {
+    const { data, error } = await db
+      .from('competence_settings')
+      .select('exercise_id, niveau_mode')
+      .eq('class_id', classId);
+    if (error) throw error;
+    return data || [];
+  }
+
+  async function setNiveauMode(classId, exerciseId, mode) {
+    if (mode === 'ouvert') {
+      const { error } = await db
+        .from('competence_settings')
+        .upsert(
+          { class_id: classId, exercise_id: exerciseId, niveau_mode: 'ouvert', updated_at: new Date().toISOString() },
+          { onConflict: 'class_id,exercise_id' }
+        );
+      if (error) throw error;
+    } else {
+      const { error } = await db
+        .from('competence_settings')
+        .delete().eq('class_id', classId).eq('exercise_id', exerciseId);
+      if (error) throw error;
+    }
+  }
+
+  async function setNiveauModeBulk(classId, exerciseIds, mode) {
+    if (!exerciseIds.length) return;
+    if (mode === 'ouvert') {
+      const rows = exerciseIds.map(exercise_id => ({
+        class_id: classId, exercise_id, niveau_mode: 'ouvert', updated_at: new Date().toISOString()
+      }));
+      const { error } = await db
+        .from('competence_settings')
+        .upsert(rows, { onConflict: 'class_id,exercise_id' });
+      if (error) throw error;
+    } else {
+      const { error } = await db
+        .from('competence_settings')
+        .delete().eq('class_id', classId).in('exercise_id', exerciseIds);
+      if (error) throw error;
+    }
   }
 
   async function deleteClass(id) {
@@ -475,6 +537,35 @@ const lfmTeacher = (() => {
     });
   }
 
+  /* ── Remédiations (Lot D) ─────────────────────────────────────────────────────
+     Données brutes uniquement : le meilleur score par élève et par
+     exercise_id, sans notion de compétence (ça reste le rôle de l'appelant,
+     via EXERCISE_DATA — voir remediations-enseignant.html). Ce fichier ne
+     référence jamais EXERCISE_DATA, il reste une couche d'accès Supabase pure. */
+  async function getRemediationRawData(classId) {
+    const students = await getStudents(classId);
+    const authIds  = students.filter(s => s.auth_user_id).map(s => s.auth_user_id);
+
+    const bestByStudent = {}; // auth_user_id -> { exercise_slug -> meilleur pct }
+    if (authIds.length > 0) {
+      const { data, error } = await db
+        .from('exercise_results')
+        .select('student_id, exercise_slug, pct')
+        .in('student_id', authIds)
+        .limit(2000);
+      if (error) throw error;
+
+      (data || []).forEach(r => {
+        if (!bestByStudent[r.student_id]) bestByStudent[r.student_id] = {};
+        const pct  = parseFloat(r.pct);
+        const prev = bestByStudent[r.student_id][r.exercise_slug];
+        if (prev === undefined || pct > prev) bestByStudent[r.student_id][r.exercise_slug] = pct;
+      });
+    }
+
+    return { students, bestByStudent };
+  }
+
   /* ── Résultats d'un élève ────────────────────────────────────────────────── */
 
   async function getStudentResults(authUserId, limit = 1000) {
@@ -589,8 +680,10 @@ const lfmTeacher = (() => {
     getActiveExercisesForGroup, addActiveExerciseToGroup, removeActiveExerciseFromGroup,
     addActiveExercisesBulkToGroup, removeActiveExercisesBulkFromGroup,
     getActiveExercisesForStudent, addActiveExerciseToStudent, removeActiveExerciseFromStudent,
-    addActiveExercisesBulkToStudent, removeActiveExercisesBulkFromStudent,
+    addActiveExercisesBulkToStudent, removeActiveExercisesBulkFromStudent, clearActiveExercisesForStudent,
     getGroupIdsWithActiveExercises, getStudentIdsWithActiveExercises,
+    getCompetenceSettings, setNiveauMode, setNiveauModeBulk,
+    getRemediationRawData,
     exportCSV, exportAllStudentsCSV, getStats
   };
 })();

@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/teacher.js"></script>
+  <script src="js/teacher.js?v=1"></script>
   <style>
     /* ── Layout ──────────────────────────────────────────────────────────────── */
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
@@ -548,6 +548,15 @@
   let _bilanClassId   = null;
 
   /* ── Métadonnées exercices (domaine + compétence + titre) ─────────────────── */
+  /* TODO (nettoyage futur, hors Lot D) : EXERCISE_META duplique manuellement
+     une partie de ce qui existe déjà dans exercise-data.js (domaine +
+     competence par exercise_slug), avec un risque de dérive si l'un des deux
+     est mis à jour sans l'autre. pilotage-enseignant.html et
+     remediations-enseignant.html importent exercise-data.js directement
+     plutôt que de dupliquer — cette page pourrait faire de même (lazy-load,
+     comme les deux autres) pour supprimer cette copie. Non fait ici : cela
+     dépasse le périmètre du Lot D et touche une fonctionnalité (bilan par
+     compétence) qui n'est pas dans ce chantier. */
   const EXERCISE_META = {
     // Français — Conjugaison
     "retrouver-infinitif-verbe-conjugue":       { domaine:"Français", competence:"Conjugaison — Identifier l'infinitif et le groupe",      title:"Retrouver l'infinitif d'un verbe conjugué puis son groupe" },

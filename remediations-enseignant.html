@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/teacher.js"></script>
+  <script src="js/teacher.js?v=1"></script>
   <style>
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
     .dash-content { max-width: 960px; margin: 0 auto; }
@@ -51,25 +51,83 @@
     .main-tab.is-active { background: var(--blue); color: #fff; }
     .main-tab:hover:not(.is-active) { background: rgba(16,43,106,0.06); color: var(--blue); }
 
-    /* ── Placeholder ─────────────────────────────────────────────────────────── */
-    .placeholder-panel {
-      background: var(--card-bg);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-sm);
-      padding: 64px 32px;
-      text-align: center;
-      max-width: 560px;
-      margin: 40px auto 0;
+    /* ── Sélecteur de classe (même patron que pilotage-enseignant.html) ─────── */
+    .form-label {
+      font-size: 11px; font-weight: 700; color: var(--blue);
+      letter-spacing: 0.05em; text-transform: uppercase;
     }
-    .placeholder-icon { font-size: 48px; margin-bottom: 16px; }
-    .placeholder-title { font-weight: 800; font-size: 22px; color: var(--blue); margin-bottom: 12px; }
-    .placeholder-desc { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
-    .placeholder-badge {
-      display: inline-flex; align-items: center;
-      background: rgba(16,43,106,0.06); color: var(--blue);
-      border-radius: 100px; padding: 5px 16px;
-      font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    .form-select {
+      padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: inherit; font-size: 15px; color: var(--text); background: var(--bg);
+      outline: none; transition: border-color 180ms, box-shadow 180ms; box-sizing: border-box;
     }
+    .form-select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(16,43,106,0.09); }
+    .class-picker {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      background: var(--card-bg); border-radius: var(--radius-card); box-shadow: var(--shadow-sm);
+      padding: 16px 22px; margin-bottom: 20px;
+    }
+    .class-picker .form-label { margin: 0; white-space: nowrap; }
+    #class-select { max-width: 320px; width: auto; }
+
+    /* ── Empty states ────────────────────────────────────────────────────────── */
+    .empty-state { text-align: center; padding: 56px 24px; color: var(--muted); }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-text { font-size: 15px; margin-bottom: 4px; }
+
+    /* ── Liste des compétences chutées ───────────────────────────────────────── */
+    .remed-row {
+      background: var(--card-bg); border-radius: var(--radius-card); box-shadow: var(--shadow-sm);
+      margin-bottom: 10px; overflow: hidden;
+    }
+    .remed-row-header {
+      width: 100%; display: flex; align-items: center; gap: 10px;
+      padding: 16px 20px; background: none; border: none; cursor: pointer;
+      font-family: inherit; text-align: left;
+    }
+    .remed-caret { font-size: 11px; color: var(--muted); transition: transform 180ms; flex-shrink: 0; }
+    .remed-row.is-open .remed-caret { transform: rotate(90deg); }
+    .remed-domaine-icon { font-size: 16px; flex-shrink: 0; }
+    .remed-competence-name { flex: 1; font-weight: 700; font-size: 14.5px; color: var(--text); }
+    .remed-count-badge {
+      background: rgba(214,40,57,0.09); color: var(--red);
+      border-radius: 100px; padding: 4px 12px;
+      font-size: 12px; font-weight: 700; white-space: nowrap; flex-shrink: 0;
+    }
+    .remed-row-body { display: none; padding: 0 20px 18px 46px; }
+    .remed-row.is-open .remed-row-body { display: block; }
+    .remed-student-list { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+    .remed-student-list li {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13.5px; color: var(--text); gap: 10px;
+    }
+    .remed-score {
+      font-weight: 700; font-size: 12.5px;
+      background: rgba(214,40,57,0.09); color: var(--red);
+      border-radius: 100px; padding: 2px 10px; white-space: nowrap;
+    }
+    .remed-fiche-todo {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 12.5px; font-weight: 700; color: var(--muted);
+      background: rgba(16,43,106,0.05); border-radius: 100px; padding: 6px 14px;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 18px; border-radius: 100px; font-family: inherit;
+      font-size: 12.5px; font-weight: 600; cursor: pointer; border: none;
+      text-decoration: none; transition: background 180ms, transform 120ms;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .ax-loading {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 40px; color: var(--muted); font-size: 13.5px;
+    }
+    .ax-spinner {
+      width: 15px; height: 15px; border: 2.5px solid var(--border);
+      border-top-color: var(--blue); border-radius: 50%; animation: ax-spin 0.6s linear infinite;
+    }
+    @keyframes ax-spin { to { transform: rotate(360deg); } }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -132,14 +190,24 @@
         <a class="main-tab is-active" href="remediations-enseignant.html">🩹 Remédiations</a>
       </nav>
 
-      <!-- Placeholder -->
-      <div class="placeholder-panel">
-        <div class="placeholder-icon">🩹</div>
-        <div class="placeholder-title">Remédiations</div>
-        <p class="placeholder-desc">
-          Retrouvez ici les compétences en difficulté et des ressources pour y remédier.
-        </p>
-        <span class="placeholder-badge">Bientôt disponible</span>
+      <!-- Aucune classe -->
+      <div class="empty-state" id="no-classes" style="display:none">
+        <div class="empty-icon">🏫</div>
+        <div class="empty-text">Créez d'abord une classe pour voir ses éventuelles compétences en difficulté.<br>
+          <a href="classes-enseignant.html" style="color:var(--blue);font-weight:600">Créer une classe →</a>
+        </div>
+      </div>
+
+      <div id="remed-content" style="display:none">
+
+        <!-- Sélecteur de classe -->
+        <div class="class-picker">
+          <label class="form-label" for="class-select">Classe</label>
+          <select class="form-select" id="class-select"></select>
+        </div>
+
+        <div id="remed-list"><div class="ax-loading"><span class="ax-spinner"></span> Chargement…</div></div>
+
       </div>
 
     </div>
@@ -168,11 +236,212 @@
 
   <script src="js/menu.js"></script>
   <script>
-    (async () => {
-      const profile = await lfmAuth.requireRole('enseignant');
-      if (!profile) return;
-      document.title = 'Remédiations — ' + profile.display_name + ' — LFM';
-    })();
+  /* ═══════════════════════════════════════════════════════════════════════════
+     STATE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  const REMEDIATION_THRESHOLD = 70; // % — meilleur score en dessous = compétence "chutée" pour cet élève
+
+  let _classes      = [];
+  let _currentClass = null;
+  let _orphanCheckDone = false;
+
+  function esc(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     INIT + SÉLECTEUR DE CLASSE (même patron que pilotage-enseignant.html)
+  ═══════════════════════════════════════════════════════════════════════════ */
+  (async () => {
+    const profile = await lfmAuth.requireRole('enseignant');
+    if (!profile) return;
+    document.title = 'Remédiations — ' + profile.display_name + ' — LFM';
+
+    try {
+      _classes = await lfmTeacher.getClasses();
+    } catch (e) {
+      _classes = [];
+    }
+
+    if (!_classes.length) {
+      document.getElementById('no-classes').style.display = 'block';
+      return;
+    }
+    document.getElementById('remed-content').style.display = 'block';
+    document.getElementById('class-select').innerHTML = _classes.map(c =>
+      `<option value="${c.id}">${esc(c.name)} — ${esc(c.level)} (${esc(c.school_year)})</option>`
+    ).join('');
+
+    const params    = new URLSearchParams(window.location.search);
+    const paramId   = params.get('class');
+    const validParam = paramId && _classes.some(c => c.id === paramId);
+    const initialId  = validParam ? paramId : _classes[0].id;
+
+    document.getElementById('class-select').value = initialId;
+    await loadClass(initialId);
+  })();
+
+  document.getElementById('class-select').addEventListener('change', async e => {
+    const classId = e.target.value;
+    history.replaceState(null, '', `remediations-enseignant.html?class=${encodeURIComponent(classId)}`);
+    await loadClass(classId);
+  });
+
+  async function loadClass(classId) {
+    _currentClass = _classes.find(c => c.id === classId);
+    if (!_currentClass) return;
+
+    document.getElementById('remed-list').innerHTML = '<div class="ax-loading"><span class="ax-spinner"></span> Chargement…</div>';
+
+    try {
+      await loadRemediationAssets();
+      const dropped = await computeDroppedCompetences(classId);
+      renderDropped(dropped);
+    } catch (err) {
+      document.getElementById('remed-list').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">${esc(err.message)}</div></div>`;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     CHARGEMENT PARESSEUX (exercise-data.js + remediation-data.js)
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload  = () => resolve();
+      script.onerror = () => reject(new Error(`Impossible de charger ${src}.`));
+      document.head.appendChild(script);
+    });
+  }
+
+  let _assetsPromise = null;
+  function loadRemediationAssets() {
+    if (typeof EXERCISE_DATA !== 'undefined' && typeof REMEDIATION_DATA !== 'undefined') {
+      checkRemediationDataOrphans();
+      return Promise.resolve();
+    }
+    if (_assetsPromise) return _assetsPromise;
+    _assetsPromise = Promise.all([
+      typeof EXERCISE_DATA      !== 'undefined' ? null : loadScript('exercise-data.js?v=20'),
+      typeof REMEDIATION_DATA   !== 'undefined' ? null : loadScript('js/remediation-data.js?v=1')
+    ]).then(() => checkRemediationDataOrphans())
+      .catch(err => { _assetsPromise = null; throw err; });
+    return _assetsPromise;
+  }
+
+  /* Détecte les clés de REMEDIATION_DATA qui ne correspondent plus à aucune
+     compétence d'EXERCISE_DATA (libellé renommé/supprimé) — jamais bloquant,
+     juste un signal pour l'enseignant qui édite remediation-data.js. Une
+     seule fois par chargement de page, pas à chaque changement de classe. */
+  function checkRemediationDataOrphans() {
+    if (_orphanCheckDone) return;
+    _orphanCheckDone = true;
+    const validCompetences = new Set(Object.values(EXERCISE_DATA).map(ex => ex.competence));
+    Object.keys(REMEDIATION_DATA).forEach(key => {
+      if (!validCompetences.has(key)) {
+        console.warn(`[remediation-data] Clé "${key}" ne correspond à aucune compétence d'exercise-data.js — fiche orpheline (libellé renommé ou supprimé ?).`);
+      }
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     AGRÉGATION : COMPÉTENCES CHUTÉES POUR LA CLASSE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function computeDroppedCompetences(classId) {
+    const { students, bestByStudent } = await lfmTeacher.getRemediationRawData(classId);
+
+    /* competence label -> { domaine, best: Map(auth_user_id -> meilleur pct) } */
+    const byCompetence = {};
+
+    Object.entries(bestByStudent).forEach(([authUserId, perExercise]) => {
+      Object.entries(perExercise).forEach(([slug, pct]) => {
+        const ex = EXERCISE_DATA[slug];
+        if (!ex) return; // exercice autonome ou retiré du catalogue : compétence inconnue, ignoré
+        if (!byCompetence[ex.competence]) byCompetence[ex.competence] = { domaine: ex.domaine, best: new Map() };
+        const bucket = byCompetence[ex.competence];
+        const prev = bucket.best.get(authUserId);
+        if (prev === undefined || pct > prev) bucket.best.set(authUserId, pct);
+      });
+    });
+
+    const dropped = [];
+    Object.entries(byCompetence).forEach(([competence, { domaine, best }]) => {
+      const strugglers = [];
+      best.forEach((pct, authUserId) => {
+        if (pct < REMEDIATION_THRESHOLD) {
+          const student = students.find(s => s.auth_user_id === authUserId);
+          strugglers.push({ display_name: student?.display_name || '?', pct });
+        }
+      });
+      if (strugglers.length > 0) {
+        strugglers.sort((a, b) => a.pct - b.pct);
+        dropped.push({ competence, domaine, strugglers });
+      }
+    });
+
+    dropped.sort((a, b) => b.strugglers.length - a.strugglers.length);
+    return dropped;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     AFFICHAGE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  const DOMAINE_ICONS = { Français: '📚', Mathématiques: '📐' };
+
+  function ficheIsEmpty(competence) {
+    const entry = REMEDIATION_DATA[competence];
+    if (!entry) return true;
+    return !((entry.theorie && entry.theorie.length) || (entry.outils && entry.outils.length) || (entry.dispositifs && entry.dispositifs.length));
+  }
+
+  function renderDropped(dropped) {
+    const container = document.getElementById('remed-list');
+
+    if (!dropped.length) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🎉</div>
+          <div class="empty-text">Aucune difficulté détectée sur cette classe.</div>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = dropped.map(({ competence, domaine, strugglers }) => {
+      const icon = DOMAINE_ICONS[domaine] || '📖';
+      const ficheLink = ficheIsEmpty(competence)
+        ? `<span class="remed-fiche-todo">📝 Fiche à compléter</span>`
+        : `<a class="btn btn-primary" href="remediation.html?competence=${encodeURIComponent(competence)}&class=${encodeURIComponent(_currentClass.id)}">Voir la fiche de remédiation →</a>`;
+
+      return `
+        <div class="remed-row" data-competence="${esc(competence)}">
+          <button type="button" class="remed-row-header" data-remed-toggle>
+            <span class="remed-caret">▸</span>
+            <span class="remed-domaine-icon">${icon}</span>
+            <span class="remed-competence-name">${esc(competence)}</span>
+            <span class="remed-count-badge">${strugglers.length} élève${strugglers.length !== 1 ? 's' : ''}</span>
+          </button>
+          <div class="remed-row-body">
+            <ul class="remed-student-list">
+              ${strugglers.map(s => `
+                <li><span>${esc(s.display_name)}</span><span class="remed-score">${Math.round(s.pct)}%</span></li>
+              `).join('')}
+            </ul>
+            ${ficheLink}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  document.getElementById('remed-list').addEventListener('click', e => {
+    const btn = e.target.closest('[data-remed-toggle]');
+    if (!btn) return;
+    btn.closest('.remed-row').classList.toggle('is-open');
+  });
   </script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */

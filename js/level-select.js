@@ -85,7 +85,18 @@ const LevelSelect = (() => {
       autoConfetti = true
     } = config;
 
+    /* Progression par compétence (Lot C, competence_settings) : 'progressif'
+       (déverrouillage séquentiel, valeur de départ ci-dessous = comportement
+       actuel inchangé tant que le réglage n'est pas résolu) ou 'ouvert' (tous
+       les niveaux accessibles). Résolu au plus une fois par instance — voir
+       renderSelectScreen(). Sans js/niveau-mode.js chargé sur la page, reste
+       'progressif' indéfiniment : aucune rupture pour les pages qui ne
+       l'incluent pas encore. */
+    let _niveauMode         = 'progressif';
+    let _niveauModeResolved = false;
+
     function isUnlocked(index) {
+      if (_niveauMode === 'ouvert') return true;
       if (index === 0) return true;
       const validated = getValidated(exerciseKey);
       return validated.includes(levels[index - 1].id);
@@ -109,7 +120,7 @@ const LevelSelect = (() => {
       }).join('');
     }
 
-    function renderSelectScreen() {
+    function renderSelectScreenSync() {
       const validated = getValidated(exerciseKey);
       selectContainer.innerHTML = `
         <p class="ls-select-label">Choisis ton niveau</p>
@@ -139,6 +150,29 @@ const LevelSelect = (() => {
       );
       renderBadges(null);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* Rendu immédiat avec l'état connu ('progressif' tant que non résolu) —
+       jamais de flash vide ni de dépendance à l'ordre d'affichage du
+       conteneur choisi par la page appelante. Résolution du réglage en
+       arrière-plan, au plus une fois par instance ; un seul re-rendu possible
+       et uniquement dans le sens verrouillé → déverrouillé (jamais l'inverse
+       : un élève ne doit jamais voir un niveau se reverrouiller sous ses
+       yeux). Sans js/niveau-mode.js chargé, _niveauModeResolved reste false
+       mais _niveauMode reste 'progressif' pour toujours — comportement
+       identique à avant cette fonctionnalité. */
+    function renderSelectScreen() {
+      renderSelectScreenSync();
+
+      if (_niveauModeResolved || typeof lfmNiveauMode === 'undefined') return;
+      _niveauModeResolved = true;
+
+      lfmNiveauMode.get(exerciseKey).then(mode => {
+        if (mode === 'ouvert' && _niveauMode !== 'ouvert') {
+          _niveauMode = 'ouvert';
+          renderSelectScreenSync();
+        }
+      }).catch(() => {});
     }
 
     /**

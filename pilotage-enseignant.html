@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/teacher.js"></script>
+  <script src="js/teacher.js?v=1"></script>
   <style>
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
     .dash-content { max-width: 960px; margin: 0 auto; }
@@ -51,25 +51,361 @@
     .main-tab.is-active { background: var(--blue); color: #fff; }
     .main-tab:hover:not(.is-active) { background: rgba(16,43,106,0.06); color: var(--blue); }
 
-    /* ── Placeholder ─────────────────────────────────────────────────────────── */
-    .placeholder-panel {
+    /* ── Buttons ─────────────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background 180ms, transform 120ms, opacity 180ms;
+      text-decoration: none;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.45; cursor: default; transform: none !important; }
+    .btn-primary { background: var(--blue); color: #fff; box-shadow: 0 2px 8px rgba(16,43,106,0.2); }
+    .btn-primary:hover:not(:disabled) { background: #0d2255; }
+    .btn-outline { background: var(--card-bg); color: var(--blue); border: 1.5px solid rgba(16,43,106,0.2); }
+    .btn-outline:hover:not(:disabled) { border-color: var(--blue); }
+    .btn-ghost { background: var(--card-bg); color: var(--muted); border: 1.5px solid var(--border); }
+    .btn-ghost:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
+    .btn-sm { padding: 7px 14px; font-size: 12px; }
+
+    /* ── Form fields ─────────────────────────────────────────────────────────── */
+    .form-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .form-input, .form-select {
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 180ms, box-shadow 180ms;
+      box-sizing: border-box;
+    }
+    .form-input:focus, .form-select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(16,43,106,0.09); }
+
+    /* ── Sélecteur de classe ─────────────────────────────────────────────────── */
+    .class-picker {
+      display: flex;
+      align-items: center;
+      gap: 12px;
       background: var(--card-bg);
       border-radius: var(--radius-card);
       box-shadow: var(--shadow-sm);
-      padding: 64px 32px;
-      text-align: center;
-      max-width: 560px;
-      margin: 40px auto 0;
+      padding: 16px 22px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
-    .placeholder-icon { font-size: 48px; margin-bottom: 16px; }
-    .placeholder-title { font-weight: 800; font-size: 22px; color: var(--blue); margin-bottom: 12px; }
-    .placeholder-desc { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
-    .placeholder-badge {
-      display: inline-flex; align-items: center;
-      background: rgba(16,43,106,0.06); color: var(--blue);
-      border-radius: 100px; padding: 5px 16px;
-      font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    .class-picker .form-label { margin: 0; white-space: nowrap; }
+    #class-select { max-width: 320px; width: auto; }
+    .class-picker-meta { font-size: 13px; color: var(--muted); }
+
+    /* ── Empty state ─────────────────────────────────────────────────────────── */
+    .empty-state { text-align: center; padding: 56px 24px; color: var(--muted); }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-text { font-size: 15px; margin-bottom: 20px; }
+
+    /* ── Mode d'accès (libre / guidé) — déménagé depuis classes-enseignant.html ── */
+    .access-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 22px 26px;
+      margin-bottom: 20px;
     }
+    .access-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .access-card-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--color-brand-navy);
+    }
+    .access-card-sub {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+    .access-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--bg);
+      border-radius: 100px;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+    .access-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      border: none;
+      border-radius: 100px;
+      background: none;
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 180ms, color 180ms;
+      white-space: nowrap;
+    }
+    .access-toggle-btn:disabled { opacity: 0.6; cursor: default; }
+    .access-toggle-btn[data-mode="libre"].is-active { background: var(--color-brand-navy); color: #fff; }
+    .access-toggle-btn[data-mode="guide"].is-active { background: var(--color-niveau-cm1); color: #fff; }
+
+    .access-panel { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 18px; }
+    .access-panel-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .access-search { flex: 1; min-width: 200px; padding: 10px 14px; font-size: 14px; }
+    .access-counter {
+      font-family: var(--font-display);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--color-brand-navy);
+      background: rgba(245,166,35,0.14);
+      border: 1px solid rgba(245,166,35,0.35);
+      padding: 6px 14px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+    .access-tree { display: flex; flex-direction: column; gap: 8px; }
+
+    /* ── Cible du parcours guidé (classe / groupe / élève) ───────────────────── */
+    .access-target-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .access-target-row .form-label { margin: 0; white-space: nowrap; }
+    .access-target-select { max-width: 300px; width: auto; flex-shrink: 1; }
+    .access-target-hint {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin: -6px 0 14px;
+    }
+    .access-dot-legend { display: inline-block; margin-top: 2px; }
+
+    .access-inherit-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      background: rgba(29,191,160,0.10);
+      border: 1px solid rgba(29,191,160,0.30);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      color: var(--color-brand-navy);
+    }
+    .access-inherit-banner strong { font-weight: 700; }
+    .perso-badge-inline {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(245,166,35,0.18);
+      border: 1px solid rgba(245,166,35,0.4);
+      color: var(--color-brand-navy);
+      border-radius: 100px;
+      padding: 3px 11px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .ax-domaine { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .ax-domaine-summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: rgba(26,45,107,0.05);
+      cursor: pointer;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--color-brand-navy);
+    }
+    .ax-caret {
+      font-size: 11px;
+      color: var(--muted);
+      transition: transform 180ms;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+    .ax-domaine.is-open > .ax-domaine-summary .ax-caret { transform: rotate(90deg); }
+    .ax-domaine-count { margin-left: auto; font-size: 11.5px; font-weight: 600; color: var(--muted); font-family: var(--font-body); }
+    .ax-notions { padding: 6px 10px 10px 30px; display: none; flex-direction: column; gap: 4px; }
+    .ax-domaine.is-open > .ax-notions { display: flex; }
+
+    .ax-notion { border-radius: 10px; }
+    .ax-notion-summary {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text);
+      border-radius: 8px;
+    }
+    .ax-notion-summary:hover { background: var(--bg); }
+    .ax-notion.is-open > .ax-notion-summary .ax-caret { transform: rotate(90deg); }
+    .ax-notion-count { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--muted); }
+    .ax-exercises { padding: 2px 0 6px 24px; display: none; flex-direction: column; gap: 2px; }
+    .ax-notion.is-open > .ax-exercises { display: flex; }
+
+    .ax-group-label {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 10px 10px 2px;
+    }
+    .ax-group-label:first-child { padding-top: 4px; }
+
+    .ax-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      color: var(--text);
+    }
+    .ax-row:hover { background: var(--bg); }
+    .ax-row label { flex: 1; cursor: pointer; }
+    .ax-check { width: 17px; height: 17px; accent-color: var(--color-niveau-cm1); cursor: pointer; flex-shrink: 0; }
+    .ax-notion-summary .ax-check,
+    .ax-domaine-summary .ax-check { accent-color: var(--color-brand-navy); }
+
+    .ax-status { width: 16px; height: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .ax-spinner {
+      width: 12px; height: 12px;
+      border: 2px solid var(--border);
+      border-top-color: var(--color-brand-navy);
+      border-radius: 50%;
+      animation: ax-spin 0.6s linear infinite;
+    }
+    @keyframes ax-spin { to { transform: rotate(360deg); } }
+    .ax-check-ok { color: var(--color-niveau-cm1); font-weight: 800; font-size: 14px; animation: ax-pop 220ms ease; }
+    @keyframes ax-pop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .ax-empty { text-align: center; padding: 24px; color: var(--muted); font-size: 13.5px; }
+    .ax-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 28px;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+    .ax-loading .ax-spinner { width: 15px; height: 15px; border-width: 2.5px; }
+
+    /* ── Progression dans les niveaux (Lot C, competence_settings) ──────────── */
+    .comp-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 22px 26px;
+      margin-bottom: 20px;
+    }
+    .comp-card-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--color-brand-navy);
+      margin-bottom: 3px;
+    }
+    .comp-card-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 16px; }
+
+    .comp-domaine { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 10px; }
+    .comp-domaine:last-child { margin-bottom: 0; }
+    .comp-domaine-summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: rgba(26,45,107,0.05);
+      cursor: pointer;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--color-brand-navy);
+      flex-wrap: wrap;
+    }
+    .comp-domaine.is-open > .comp-domaine-summary .ax-caret { transform: rotate(90deg); }
+    .comp-domaine-actions { display: flex; gap: 6px; margin-left: auto; }
+    .comp-rows { padding: 6px 10px 10px; display: none; flex-direction: column; gap: 2px; }
+    .comp-domaine.is-open > .comp-rows { display: flex; }
+
+    .comp-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 10px;
+      border-radius: 8px;
+      flex-wrap: wrap;
+    }
+    .comp-row:hover { background: var(--bg); }
+    .comp-name { flex: 1; min-width: 180px; font-size: 13.5px; color: var(--text); }
+    .comp-row--mixed { background: rgba(245,166,35,0.06); }
+    .comp-mixed-tag {
+      font-size: 11px; font-weight: 700; color: #B8791A;
+      background: rgba(245,166,35,0.16); border-radius: 100px; padding: 2px 9px;
+      cursor: help; white-space: nowrap;
+    }
+    .comp-toggle {
+      display: flex; gap: 4px;
+      background: var(--bg);
+      border-radius: 100px;
+      padding: 3px;
+      flex-shrink: 0;
+    }
+    .comp-toggle-btn {
+      padding: 7px 14px;
+      border: none;
+      border-radius: 100px;
+      background: none;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 180ms, color 180ms;
+      white-space: nowrap;
+    }
+    .comp-toggle-btn.is-active { background: var(--color-brand-navy); color: #fff; }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -132,14 +468,63 @@
         <a class="main-tab" href="remediations-enseignant.html">🩹 Remédiations</a>
       </nav>
 
-      <!-- Placeholder -->
-      <div class="placeholder-panel">
-        <div class="placeholder-icon">🎯</div>
-        <div class="placeholder-title">Pilotage des compétences</div>
-        <p class="placeholder-desc">
-          Choisissez pour chaque compétence si vos élèves progressent librement ou suivent un parcours guidé.
-        </p>
-        <span class="placeholder-badge">Bientôt disponible</span>
+      <!-- Aucune classe -->
+      <div class="empty-state" id="no-classes" style="display:none">
+        <div class="empty-icon">🏫</div>
+        <div class="empty-text">Créez d'abord une classe pour piloter ses exercices.<br>
+          <a href="classes-enseignant.html" style="color:var(--blue);font-weight:600">Créer une classe →</a>
+        </div>
+      </div>
+
+      <div id="pilotage-content" style="display:none">
+
+        <!-- Sélecteur de classe -->
+        <div class="class-picker">
+          <label class="form-label" for="class-select">Classe</label>
+          <select class="form-select" id="class-select"></select>
+          <span class="class-picker-meta" id="class-picker-meta"></span>
+        </div>
+
+        <!-- Section 1 : Exercices visibles (mode d'accès, déménagé depuis Mes classes) -->
+        <div class="access-card">
+          <div class="access-card-head">
+            <div>
+              <div class="access-card-title">Exercices visibles</div>
+              <div class="access-card-sub" id="access-sub">Navigation libre : les élèves voient tout le catalogue.</div>
+            </div>
+            <div class="access-toggle" id="access-toggle">
+              <button type="button" class="access-toggle-btn" data-mode="libre">🔓 Navigation libre</button>
+              <button type="button" class="access-toggle-btn" data-mode="guide">🎯 Parcours guidé</button>
+            </div>
+          </div>
+          <div class="access-panel" id="access-panel" style="display:none">
+            <div class="access-target-row">
+              <label class="form-label" for="ax-target-select">Configurer les exercices pour :</label>
+              <select class="form-select access-target-select" id="ax-target-select"></select>
+            </div>
+            <p class="access-target-hint">
+              🎯 Ici, vous choisissez quels exercices sont débloqués (pour la classe, un groupe ou un élève).
+              L'appartenance des élèves aux groupes se règle dans le tableau Élèves de Mes classes.
+              <span class="access-dot-legend">« ● » devant un nom = des exercices sont déjà configurés pour cette cible — pour un élève, cette liste personnelle prime toujours sur son groupe.</span>
+            </p>
+            <div class="access-inherit-banner" id="access-inherit-banner" style="display:none"></div>
+            <div class="access-panel-head">
+              <input class="form-input access-search" id="ax-search" type="text" placeholder="🔍 Rechercher un exercice…">
+              <span class="access-counter" id="ax-counter">0 exercices actifs sur 0</span>
+            </div>
+            <div class="access-tree" id="ax-tree"></div>
+          </div>
+        </div>
+
+        <!-- Section 2 : Progression dans les niveaux (Lot C, nouveau) -->
+        <div class="comp-card">
+          <div class="comp-card-title">Progression dans les niveaux</div>
+          <div class="comp-card-sub">
+            Par défaut, les niveaux se débloquent un par un (80 % de réussite requis). « Niveaux ouverts » rend tous les niveaux d'une compétence accessibles d'emblée.
+          </div>
+          <div id="comp-tree"><div class="ax-loading"><span class="ax-spinner"></span> Chargement…</div></div>
+        </div>
+
       </div>
 
     </div>
@@ -168,11 +553,835 @@
 
   <script src="js/menu.js"></script>
   <script>
-    (async () => {
-      const profile = await lfmAuth.requireRole('enseignant');
-      if (!profile) return;
-      document.title = 'Pilotage des compétences — ' + profile.display_name + ' — LFM';
-    })();
+  /* ═══════════════════════════════════════════════════════════════════════════
+     STATE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  let _classes      = [];
+  let _currentClass = null;
+  let _students     = [];
+  let _groups       = [];
+
+  /* ── Section 1 : mode d'accès aux exercices (libre / guidé, v7/v9) ──────────── */
+  let _activeExerciseIds   = new Set();
+  let _openGroups          = new Set();
+  let _exerciseTreeCache   = null;
+  let _currentTarget       = { type: 'class', id: null };
+  let _configuredGroupIds  = new Set();
+  let _configuredStudentIds = new Set();
+  let _studentInherit      = null; // { source: 'group'|'class', list: string[], groupName?: string } | null
+  let _studentPersonalized = false;
+
+  /* ── Section 2 : progression dans les niveaux (competence_settings, Lot C) ──── */
+  let _competenceSettings    = new Map(); // exercise_id -> 'ouvert' (absent = progressif)
+  let _competenceTreeCache   = null;
+  let _openCompetenceGroups  = new Set();
+
+  function esc(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  let _toastTimer;
+  function showToast(msg, type) {
+    clearTimeout(_toastTimer);
+    document.querySelector('.toast')?.remove();
+    const t       = document.createElement('div');
+    t.className   = 'toast' + (type === 'error' ? ' is-error' : '');
+    t.textContent = msg;
+    document.body.appendChild(t);
+    _toastTimer = setTimeout(() => t.remove(), 3000);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     INIT + SÉLECTEUR DE CLASSE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  (async () => {
+    const profile = await lfmAuth.requireRole('enseignant');
+    if (!profile) return;
+    document.title = 'Pilotage des compétences — ' + profile.display_name + ' — LFM';
+
+    try {
+      _classes = await lfmTeacher.getClasses();
+    } catch (e) {
+      _classes = [];
+    }
+
+    if (!_classes.length) {
+      document.getElementById('no-classes').style.display = 'block';
+      return;
+    }
+    document.getElementById('pilotage-content').style.display = 'block';
+    populateClassSelector();
+
+    /* ?class=<id> respecté seulement s'il appartient bien à une classe de ce
+       prof (liste déjà scopée par la RLS de getClasses()) — repli silencieux
+       sur la première classe sinon. */
+    const params      = new URLSearchParams(window.location.search);
+    const paramId      = params.get('class');
+    const validParam   = paramId && _classes.some(c => c.id === paramId);
+    const initialId    = validParam ? paramId : _classes[0].id;
+
+    document.getElementById('class-select').value = initialId;
+    await loadClass(initialId);
+  })();
+
+  function populateClassSelector() {
+    document.getElementById('class-select').innerHTML = _classes.map(c =>
+      `<option value="${c.id}">${esc(c.name)} — ${esc(c.level)} (${esc(c.school_year)})</option>`
+    ).join('');
+  }
+
+  document.getElementById('class-select').addEventListener('change', async e => {
+    const classId = e.target.value;
+    history.replaceState(null, '', `pilotage-enseignant.html?class=${encodeURIComponent(classId)}`);
+    await loadClass(classId);
+  });
+
+  async function loadClass(classId) {
+    _currentClass = _classes.find(c => c.id === classId);
+    if (!_currentClass) return;
+
+    document.getElementById('class-picker-meta').textContent =
+      `${_currentClass.student_count} élève${_currentClass.student_count !== 1 ? 's' : ''}`;
+
+    /* Repart toujours de zéro à chaque changement de classe — pas de
+       mémorisation de la dernière cible/recherche/accordéon entre classes. */
+    _currentTarget        = { type: 'class', id: classId };
+    _studentInherit       = null;
+    _studentPersonalized  = false;
+    _openGroups           = new Set();
+    _openCompetenceGroups = new Set();
+    document.getElementById('ax-search').value = '';
+
+    try {
+      const [students, groups] = await Promise.all([
+        lfmTeacher.getStudents(classId),
+        lfmTeacher.getGroups(classId)
+      ]);
+      _students = students;
+      _groups   = groups;
+    } catch (e) {
+      showToast('Erreur lors du chargement de la classe', 'error');
+      return;
+    }
+
+    renderAccessCard();
+    loadCompetenceSection();
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     CATALOGUE D'EXERCICES (chargement paresseux, partagé entre les 2 sections)
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload  = () => resolve();
+      script.onerror = () => reject(new Error(`Impossible de charger ${src}.`));
+      document.head.appendChild(script);
+    });
+  }
+
+  let _exerciseAssetsPromise = null;
+  function loadExerciseAssets() {
+    if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined') return Promise.resolve();
+    if (_exerciseAssetsPromise) return _exerciseAssetsPromise;
+    _exerciseAssetsPromise = Promise.all([
+      typeof EXERCISE_DATA               !== 'undefined' ? null : loadScript('exercise-data.js?v=20'),
+      typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined' ? null : loadScript('js/exercise-catalog.js?v=6')
+    ]).catch(err => { _exerciseAssetsPromise = null; throw err; });
+    return _exerciseAssetsPromise;
+  }
+
+  async function ensureExerciseDataLoaded() {
+    if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined') {
+      await onGuidedPanelReady();
+      return;
+    }
+    document.getElementById('ax-tree').innerHTML = '<div class="ax-loading"><span class="ax-spinner"></span> Chargement du catalogue des exercices…</div>';
+    document.getElementById('ax-search').disabled = true;
+    try {
+      await loadExerciseAssets();
+      document.getElementById('ax-search').disabled = false;
+      await onGuidedPanelReady();
+    } catch (err) {
+      document.getElementById('ax-tree').innerHTML = `<div class="ax-empty">${esc(err.message)}</div>`;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     SECTION 1 — EXERCICES VISIBLES (mode d'accès, déménagé depuis
+     classes-enseignant.html — comportement identique, tables v7/v9 inchangées)
+  ═══════════════════════════════════════════════════════════════════════════ */
+
+  function axNormalize(str) {
+    return String(str ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  }
+
+  async function onGuidedPanelReady() {
+    await refreshConfiguredIndicators();
+    populateTargetSelector();
+    await loadActiveSetForTarget();
+    renderAccessTree();
+  }
+
+  async function refreshConfiguredIndicators() {
+    const groupIds   = _groups.map(g => g.id);
+    const studentIds = _students.map(s => s.id);
+    const [configuredGroups, configuredStudents] = await Promise.all([
+      lfmTeacher.getGroupIdsWithActiveExercises(groupIds),
+      lfmTeacher.getStudentIdsWithActiveExercises(studentIds)
+    ]);
+    _configuredGroupIds   = new Set(configuredGroups);
+    _configuredStudentIds = new Set(configuredStudents);
+  }
+
+  function populateTargetSelector() {
+    const sel = document.getElementById('ax-target-select');
+    const prevValue = _currentTarget.type === 'class' ? 'class' : `${_currentTarget.type}:${_currentTarget.id}`;
+
+    let html = `<option value="class">Toute la classe</option>`;
+
+    if (_groups.length) {
+      html += `<optgroup label="Groupes">` + _groups.map(g => {
+        const dot = _configuredGroupIds.has(g.id) ? '● ' : '';
+        return `<option value="group:${g.id}">${dot}${esc(g.name)}</option>`;
+      }).join('') + `</optgroup>`;
+    }
+
+    if (_students.length) {
+      html += `<optgroup label="Élèves">` + _students.map(s => {
+        const dot = _configuredStudentIds.has(s.id) ? '● ' : '';
+        return `<option value="student:${s.id}">${dot}${esc(s.display_name)}</option>`;
+      }).join('') + `</optgroup>`;
+    }
+
+    sel.innerHTML = html;
+    sel.value = prevValue;
+    if (sel.value !== prevValue) {
+      _currentTarget = { type: 'class', id: _currentClass.id };
+      sel.value = 'class';
+    }
+  }
+
+  document.getElementById('ax-target-select').addEventListener('change', async e => {
+    const val = e.target.value;
+    if (val === 'class') {
+      _currentTarget = { type: 'class', id: _currentClass.id };
+    } else {
+      const [type, id] = val.split(':');
+      _currentTarget = { type, id };
+    }
+    await loadActiveSetForTarget();
+    renderAccessTree();
+  });
+
+  async function loadActiveSetForTarget() {
+    _studentInherit       = null;
+    _studentPersonalized  = false;
+
+    if (_currentTarget.type === 'class') {
+      _activeExerciseIds = new Set(await lfmTeacher.getActiveExercises(_currentClass.id));
+    } else if (_currentTarget.type === 'group') {
+      _activeExerciseIds = new Set(await lfmTeacher.getActiveExercisesForGroup(_currentTarget.id));
+    } else {
+      const student = _students.find(s => s.id === _currentTarget.id);
+      const personal = await lfmTeacher.getActiveExercisesForStudent(_currentTarget.id);
+
+      let source = 'class', groupName = null, inheritedList = null;
+      if (student && student.group_id) {
+        const groupList = await lfmTeacher.getActiveExercisesForGroup(student.group_id);
+        if (groupList.length > 0) {
+          source = 'group';
+          groupName = _groups.find(g => g.id === student.group_id)?.name || null;
+          inheritedList = groupList;
+        }
+      }
+      if (inheritedList === null) inheritedList = await lfmTeacher.getActiveExercises(_currentClass.id);
+      _studentInherit = { source, groupName, list: inheritedList };
+
+      if (personal.length > 0) {
+        _activeExerciseIds      = new Set(personal);
+        _studentPersonalized    = true;
+      } else {
+        _activeExerciseIds      = new Set(inheritedList);
+        _studentPersonalized    = false;
+      }
+    }
+    renderInheritBanner();
+  }
+
+  /* Correctif UX (bug groupe vs liste perso) : badge plus visible ("🔒 Liste
+     personnelle active") qu'un simple texte, et bouton de réinitialisation
+     toujours à portée — la même action que "↺" dans le tableau Élèves de
+     Mes classes. */
+  function renderInheritBanner() {
+    const banner = document.getElementById('access-inherit-banner');
+    if (_currentTarget.type !== 'student') { banner.style.display = 'none'; return; }
+
+    if (_studentPersonalized) {
+      banner.innerHTML = `
+        <span class="perso-badge-inline">🔒 Liste personnelle active — prime sur le groupe</span>
+        <button type="button" class="btn btn-outline btn-sm" onclick="revertCurrentStudent()">↺ Réinitialiser (revenir à la liste héritée)</button>
+      `;
+    } else {
+      const label = _studentInherit.source === 'group'
+        ? `la liste du groupe <strong>${esc(_studentInherit.groupName || '?')}</strong>`
+        : `la liste de la classe`;
+      const canPersonalize = _studentInherit.list.length > 0;
+      banner.innerHTML = `
+        <span>Cet élève suit actuellement ${label} (pas de liste personnelle).</span>
+        ${canPersonalize ? `<button type="button" class="btn btn-primary btn-sm" onclick="personalizeCurrentStudent()">Personnaliser</button>` : ''}
+      `;
+    }
+    banner.style.display = 'flex';
+  }
+
+  async function personalizeCurrentStudent() {
+    if (_currentTarget.type !== 'student' || !_studentInherit || !_studentInherit.list.length) return;
+    const studentId = _currentTarget.id;
+    try {
+      await lfmTeacher.addActiveExercisesBulkToStudent(studentId, _studentInherit.list);
+      _configuredStudentIds.add(studentId);
+      showToast('Liste personnalisée à partir de la liste héritée');
+      await loadActiveSetForTarget();
+      populateTargetSelector();
+      renderAccessTree();
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    }
+  }
+
+  async function revertCurrentStudent() {
+    if (_currentTarget.type !== 'student') return;
+    const studentId = _currentTarget.id;
+    try {
+      await lfmTeacher.clearActiveExercisesForStudent(studentId);
+      _configuredStudentIds.delete(studentId);
+      showToast('Retour à la liste héritée');
+      await loadActiveSetForTarget();
+      populateTargetSelector();
+      renderAccessTree();
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    }
+  }
+
+  function axApi() {
+    if (_currentTarget.type === 'group') {
+      return {
+        add: lfmTeacher.addActiveExerciseToGroup,
+        remove: lfmTeacher.removeActiveExerciseFromGroup,
+        addBulk: lfmTeacher.addActiveExercisesBulkToGroup,
+        removeBulk: lfmTeacher.removeActiveExercisesBulkFromGroup,
+        targetId: _currentTarget.id
+      };
+    }
+    if (_currentTarget.type === 'student') {
+      return {
+        add: lfmTeacher.addActiveExerciseToStudent,
+        remove: lfmTeacher.removeActiveExerciseFromStudent,
+        addBulk: lfmTeacher.addActiveExercisesBulkToStudent,
+        removeBulk: lfmTeacher.removeActiveExercisesBulkFromStudent,
+        targetId: _currentTarget.id
+      };
+    }
+    return {
+      add: lfmTeacher.addActiveExercise,
+      remove: lfmTeacher.removeActiveExercise,
+      addBulk: lfmTeacher.addActiveExercisesBulk,
+      removeBulk: lfmTeacher.removeActiveExercisesBulk,
+      targetId: _currentClass.id
+    };
+  }
+
+  function buildExerciseTree() {
+    if (_exerciseTreeCache) return _exerciseTreeCache;
+    const byCategory = {};
+
+    function addItem(category, subCategory, slug, title) {
+      if (!category || !subCategory) {
+        console.warn('[Parcours guidé] Exercice sans catégorie reconnue, exclu du panneau :', slug);
+        return;
+      }
+      if (!byCategory[category]) byCategory[category] = {};
+      if (!byCategory[category][subCategory]) byCategory[category][subCategory] = [];
+      byCategory[category][subCategory].push({ slug, title });
+    }
+
+    Object.keys(EXERCISE_DATA).forEach(slug => {
+      const ex     = EXERCISE_DATA[slug];
+      const sepIdx = ex.competence.indexOf(' — ');
+      const subCategory = sepIdx !== -1 ? ex.competence.slice(0, sepIdx) : ex.competence;
+      addItem(ex.domaine, subCategory, slug, ex.title);
+    });
+
+    EXERCISE_CATALOG_AUTONOMOUS.forEach(({ slug, title, category, subCategory }) => {
+      addItem(category, subCategory, slug, title);
+    });
+
+    const DOMAINE_ORDER = ['Français', 'Mathématiques'];
+    const domaines = Object.keys(byCategory).sort((a, b) => {
+      const ia = DOMAINE_ORDER.indexOf(a), ib = DOMAINE_ORDER.indexOf(b);
+      if (ia === -1 && ib === -1) return a.localeCompare(b, 'fr');
+      if (ia === -1) return 1;
+      if (ib === -1) return -1;
+      return ia - ib;
+    });
+
+    _exerciseTreeCache = domaines.map(domaine => ({
+      domaine,
+      notions: Object.keys(byCategory[domaine]).sort((a, b) => a.localeCompare(b, 'fr')).map(notion => ({
+        notion,
+        items: applyGroupOrder(domaine, notion, byCategory[domaine][notion])
+      }))
+    }));
+    return _exerciseTreeCache;
+  }
+
+  function applyGroupOrder(domaine, notion, rawItems) {
+    const groupDefs = EXERCISE_CATALOG_GROUPS[domaine] && EXERCISE_CATALOG_GROUPS[domaine][notion];
+    if (!groupDefs) return rawItems.slice().sort((a, b) => a.title.localeCompare(b.title, 'fr'));
+
+    const bySlug = new Map(rawItems.map(it => [it.slug, it]));
+    const used   = new Set();
+    const items  = [];
+
+    groupDefs.forEach(({ groupe, slugs }) => {
+      slugs.forEach(slug => {
+        const it = bySlug.get(slug);
+        if (!it) return;
+        used.add(slug);
+        items.push({ ...it, groupe });
+      });
+    });
+
+    const rest = rawItems
+      .filter(it => !used.has(it.slug))
+      .sort((a, b) => a.title.localeCompare(b.title, 'fr'));
+
+    return items.concat(rest);
+  }
+
+  function exerciseTotalCount() {
+    return Object.keys(EXERCISE_DATA).length + EXERCISE_CATALOG_AUTONOMOUS.length;
+  }
+
+  function renderAccessCard() {
+    const mode = _currentClass.mode_acces || 'libre';
+    document.querySelectorAll('#access-toggle .access-toggle-btn').forEach(btn => {
+      btn.classList.toggle('is-active', btn.dataset.mode === mode);
+    });
+    document.getElementById('access-sub').textContent = mode === 'guide'
+      ? 'Parcours guidé : les élèves ne voient que les exercices activés ci-dessous.'
+      : 'Navigation libre : les élèves voient tout le catalogue.';
+    document.getElementById('access-panel').style.display = mode === 'guide' ? 'block' : 'none';
+    if (mode === 'guide') {
+      document.getElementById('ax-search').value = '';
+      ensureExerciseDataLoaded();
+    } else {
+      document.getElementById('access-inherit-banner').style.display = 'none';
+    }
+  }
+
+  document.getElementById('access-toggle').addEventListener('click', async e => {
+    const btn = e.target.closest('.access-toggle-btn');
+    if (!btn || btn.classList.contains('is-active')) return;
+    const newMode = btn.dataset.mode;
+
+    document.querySelectorAll('#access-toggle .access-toggle-btn').forEach(b => b.disabled = true);
+    try {
+      await lfmTeacher.updateClassAccessMode(_currentClass.id, newMode);
+      _currentClass.mode_acces = newMode;
+      const idx = _classes.findIndex(c => c.id === _currentClass.id);
+      if (idx !== -1) _classes[idx].mode_acces = newMode;
+      renderAccessCard();
+
+      if (newMode === 'guide') {
+        const groupIds   = _groups.map(g => g.id);
+        const studentIds = _students.map(s => s.id);
+        const [cg, cs] = await Promise.all([
+          lfmTeacher.getGroupIdsWithActiveExercises(groupIds),
+          lfmTeacher.getStudentIdsWithActiveExercises(studentIds)
+        ]);
+        showToast(cg.length || cs.length
+          ? 'Parcours guidé activé — des listes de groupe/élève existantes sont réactivées'
+          : 'Parcours guidé activé');
+      } else {
+        showToast('Navigation libre activée');
+      }
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    } finally {
+      document.querySelectorAll('#access-toggle .access-toggle-btn').forEach(b => b.disabled = false);
+    }
+  });
+
+  function updateAxCounter() {
+    document.getElementById('ax-counter').textContent =
+      `${_activeExerciseIds.size} exercice${_activeExerciseIds.size !== 1 ? 's' : ''} actif${_activeExerciseIds.size !== 1 ? 's' : ''} sur ${exerciseTotalCount()}`;
+  }
+
+  function renderAccessTree() {
+    const tree  = buildExerciseTree();
+    const query = axNormalize(document.getElementById('ax-search').value.trim());
+    let html = '';
+
+    tree.forEach(({ domaine, notions }) => {
+      let notionsHtml = '';
+      let domaineActive = 0, domaineTotal = 0;
+
+      notions.forEach(({ notion, items }) => {
+        const filtered = query ? items.filter(it => axNormalize(it.title).includes(query)) : items;
+        if (filtered.length === 0) return;
+
+        const activeInNotion = filtered.filter(it => _activeExerciseIds.has(it.slug)).length;
+        domaineActive += activeInNotion;
+        domaineTotal  += filtered.length;
+        const notionKey = domaine + '::' + notion;
+        const isOpen = _openGroups.has(notionKey) || !!query;
+
+        let lastGroupe = null;
+        const rows = filtered.map(it => {
+          const groupLabel = (it.groupe && it.groupe !== lastGroupe)
+            ? `<div class="ax-group-label">${esc(it.groupe)}</div>`
+            : '';
+          lastGroupe = it.groupe || null;
+          return `
+            ${groupLabel}
+            <div class="ax-row">
+              <input type="checkbox" class="ax-check" id="ax-ex-${esc(it.slug)}" data-slug="${esc(it.slug)}" ${_activeExerciseIds.has(it.slug) ? 'checked' : ''}>
+              <label for="ax-ex-${esc(it.slug)}">${esc(it.title)}</label>
+              <span class="ax-status" data-status-for="${esc(it.slug)}"></span>
+            </div>
+          `;
+        }).join('');
+
+        notionsHtml += `
+          <div class="ax-notion${isOpen ? ' is-open' : ''}" data-notion-key="${esc(notionKey)}">
+            <div class="ax-notion-summary" data-toggle="notion">
+              <span class="ax-caret">▸</span>
+              <input type="checkbox" class="ax-check" data-notion-all="${esc(notionKey)}">
+              <span>${esc(notion)}</span>
+              <span class="ax-notion-count">${activeInNotion}/${filtered.length}</span>
+            </div>
+            <div class="ax-exercises">${rows}</div>
+          </div>
+        `;
+      });
+
+      if (!notionsHtml) return;
+
+      const isDomaineOpen = _openGroups.has(domaine) || !!query;
+      html += `
+        <div class="ax-domaine${isDomaineOpen ? ' is-open' : ''}" data-domaine-key="${esc(domaine)}">
+          <div class="ax-domaine-summary" data-toggle="domaine">
+            <span class="ax-caret">▸</span>
+            <input type="checkbox" class="ax-check" data-domaine-all="${esc(domaine)}">
+            <span>${esc(domaine)}</span>
+            <span class="ax-domaine-count">${domaineActive}/${domaineTotal}</span>
+          </div>
+          <div class="ax-notions">${notionsHtml}</div>
+        </div>
+      `;
+    });
+
+    const treeEl = document.getElementById('ax-tree');
+    treeEl.innerHTML = html || '<div class="ax-empty">Aucun exercice ne correspond à la recherche.</div>';
+    updateGroupCheckStates(treeEl);
+    updateAxCounter();
+  }
+
+  function updateGroupCheckStates(scope) {
+    scope.querySelectorAll('.ax-notion').forEach(notionEl => {
+      const boxes  = notionEl.querySelectorAll('.ax-exercises input[data-slug]');
+      const all    = boxes.length;
+      const active = Array.from(boxes).filter(b => b.checked).length;
+      const cb     = notionEl.querySelector('[data-notion-all]');
+      cb.checked       = all > 0 && active === all;
+      cb.indeterminate = active > 0 && active < all;
+    });
+    scope.querySelectorAll('.ax-domaine').forEach(domaineEl => {
+      const boxes  = domaineEl.querySelectorAll('.ax-exercises input[data-slug]');
+      const all    = boxes.length;
+      const active = Array.from(boxes).filter(b => b.checked).length;
+      const cb     = domaineEl.querySelector('[data-domaine-all]');
+      cb.checked       = all > 0 && active === all;
+      cb.indeterminate = active > 0 && active < all;
+    });
+  }
+
+  const axTreeEl = document.getElementById('ax-tree');
+
+  axTreeEl.addEventListener('click', e => {
+    if (e.target.matches('input[type=checkbox]') || e.target.closest('label')) return;
+    const summary = e.target.closest('[data-toggle]');
+    if (!summary) return;
+    if (summary.dataset.toggle === 'domaine') {
+      const el  = summary.closest('.ax-domaine');
+      const key = el.dataset.domaineKey;
+      el.classList.toggle('is-open');
+      el.classList.contains('is-open') ? _openGroups.add(key) : _openGroups.delete(key);
+    } else {
+      const el  = summary.closest('.ax-notion');
+      const key = el.dataset.notionKey;
+      el.classList.toggle('is-open');
+      el.classList.contains('is-open') ? _openGroups.add(key) : _openGroups.delete(key);
+    }
+  });
+
+  axTreeEl.addEventListener('change', async e => {
+    const cb = e.target;
+    if (!cb.matches('input[type=checkbox]')) return;
+
+    if (cb.dataset.slug) {
+      await axToggleExercise(cb.dataset.slug, cb.checked, cb);
+    } else if (cb.dataset.notionAll) {
+      await axToggleGroup(cb, cb.closest('.ax-notion').querySelectorAll('.ax-exercises input[data-slug]'));
+    } else if (cb.dataset.domaineAll) {
+      await axToggleGroup(cb, cb.closest('.ax-domaine').querySelectorAll('.ax-exercises input[data-slug]'));
+    }
+  });
+
+  function axShowStatus(slug, state) {
+    const el = axTreeEl.querySelector(`[data-status-for="${CSS.escape(slug)}"]`);
+    if (!el) return;
+    if (state === 'saving') {
+      el.innerHTML = '<span class="ax-spinner"></span>';
+    } else if (state === 'saved') {
+      el.innerHTML = '<span class="ax-check-ok">✓</span>';
+      setTimeout(() => { if (el.querySelector('.ax-check-ok')) el.innerHTML = ''; }, 1200);
+    } else {
+      el.innerHTML = '';
+    }
+  }
+
+  async function axToggleExercise(slug, isActive, checkboxEl) {
+    axShowStatus(slug, 'saving');
+    const api = axApi();
+    try {
+      if (_currentTarget.type === 'student' && !_studentPersonalized && _studentInherit.list.length) {
+        await lfmTeacher.addActiveExercisesBulkToStudent(_currentTarget.id, _studentInherit.list);
+      }
+
+      if (isActive) await api.add(api.targetId, slug);
+      else          await api.remove(api.targetId, slug);
+
+      if (_currentTarget.type === 'student') {
+        await loadActiveSetForTarget();
+      } else {
+        if (isActive) _activeExerciseIds.add(slug);
+        else          _activeExerciseIds.delete(slug);
+        if (_currentTarget.type === 'group') {
+          if (_activeExerciseIds.size > 0) _configuredGroupIds.add(_currentTarget.id);
+          else _configuredGroupIds.delete(_currentTarget.id);
+        }
+      }
+      axShowStatus(slug, 'saved');
+      updateGroupCheckStates(axTreeEl);
+      updateAxCounter();
+    } catch (err) {
+      checkboxEl.checked = !isActive;
+      axShowStatus(slug, 'idle');
+      showToast('Erreur : ' + err.message, 'error');
+    }
+  }
+
+  async function axToggleGroup(groupCb, exerciseBoxes) {
+    const turnOn = groupCb.checked;
+    const slugs  = Array.from(exerciseBoxes).map(b => b.dataset.slug);
+    const toChange = slugs.filter(slug => _activeExerciseIds.has(slug) !== turnOn);
+    if (toChange.length === 0) return;
+
+    const api = axApi();
+    toChange.forEach(slug => axShowStatus(slug, 'saving'));
+    try {
+      if (_currentTarget.type === 'student' && !_studentPersonalized && _studentInherit.list.length) {
+        await lfmTeacher.addActiveExercisesBulkToStudent(_currentTarget.id, _studentInherit.list);
+      }
+
+      if (turnOn) await api.addBulk(api.targetId, toChange);
+      else        await api.removeBulk(api.targetId, toChange);
+
+      if (_currentTarget.type === 'student') {
+        await loadActiveSetForTarget();
+      } else {
+        if (turnOn) toChange.forEach(slug => _activeExerciseIds.add(slug));
+        else        toChange.forEach(slug => _activeExerciseIds.delete(slug));
+        if (_currentTarget.type === 'group') {
+          if (_activeExerciseIds.size > 0) _configuredGroupIds.add(_currentTarget.id);
+          else _configuredGroupIds.delete(_currentTarget.id);
+        }
+      }
+      exerciseBoxes.forEach(b => { b.checked = _activeExerciseIds.has(b.dataset.slug); });
+      toChange.forEach(slug => axShowStatus(slug, 'saved'));
+      updateGroupCheckStates(axTreeEl);
+      updateAxCounter();
+    } catch (err) {
+      toChange.forEach(slug => axShowStatus(slug, 'idle'));
+      showToast('Erreur : ' + err.message, 'error');
+      renderAccessTree();
+    }
+  }
+
+  let _axSearchTimer;
+  document.getElementById('ax-search').addEventListener('input', () => {
+    clearTimeout(_axSearchTimer);
+    _axSearchTimer = setTimeout(renderAccessTree, 120);
+  });
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     SECTION 2 — PROGRESSION DANS LES NIVEAUX (Lot C, competence_settings)
+  ═══════════════════════════════════════════════════════════════════════════ */
+
+  /* Une compétence = un ou plusieurs exercice_id d'EXERCISE_DATA partageant le
+     même libellé `competence`, et ayant plus d'un niveau (rien à faire
+     progresser sinon). Les exercices "autonomes" (EXERCISE_CATALOG_AUTONOMOUS)
+     n'ont pas de tableau `levels` accessible ici : ils ne sont pas listés dans
+     cette section (limite connue, sans impact — leur niveau_mode reste
+     'progressif' par défaut, comportement actuel inchangé). */
+  function buildCompetenceTree() {
+    if (_competenceTreeCache) return _competenceTreeCache;
+    const byDomaine = {};
+
+    Object.keys(EXERCISE_DATA).forEach(slug => {
+      const ex = EXERCISE_DATA[slug];
+      if (!ex.levels || ex.levels.length < 2) return;
+      if (!byDomaine[ex.domaine]) byDomaine[ex.domaine] = {};
+      if (!byDomaine[ex.domaine][ex.competence]) byDomaine[ex.domaine][ex.competence] = [];
+      byDomaine[ex.domaine][ex.competence].push(slug);
+    });
+
+    const DOMAINE_ORDER = ['Français', 'Mathématiques'];
+    const domaines = Object.keys(byDomaine).sort((a, b) => {
+      const ia = DOMAINE_ORDER.indexOf(a), ib = DOMAINE_ORDER.indexOf(b);
+      if (ia === -1 && ib === -1) return a.localeCompare(b, 'fr');
+      if (ia === -1) return 1;
+      if (ib === -1) return -1;
+      return ia - ib;
+    });
+
+    _competenceTreeCache = domaines.map(domaine => ({
+      domaine,
+      competences: Object.keys(byDomaine[domaine]).sort((a, b) => a.localeCompare(b, 'fr')).map(competence => ({
+        competence,
+        exerciseIds: byDomaine[domaine][competence]
+      }))
+    }));
+    return _competenceTreeCache;
+  }
+
+  async function loadCompetenceSection() {
+    document.getElementById('comp-tree').innerHTML = '<div class="ax-loading"><span class="ax-spinner"></span> Chargement…</div>';
+    try {
+      await loadExerciseAssets();
+      const rows = await lfmTeacher.getCompetenceSettings(_currentClass.id);
+      _competenceSettings = new Map(rows.map(r => [r.exercise_id, r.niveau_mode]));
+      renderCompetenceSection();
+    } catch (err) {
+      document.getElementById('comp-tree').innerHTML = `<div class="ax-empty">${esc(err.message)}</div>`;
+    }
+  }
+
+  /* Cohérence des compétences couvrant plusieurs exercice_id (rares, ~2 sur
+     78) : si les réglages divergent en base (état hérité), affichage "Mixte"
+     — cliquer un mode force TOUS les exercice_id de cette compétence à ce
+     même mode (résout la divergence immédiatement, pas de résolution
+     silencieuse à la lecture). */
+  function renderCompetenceSection() {
+    const tree = buildCompetenceTree();
+    let html = '';
+
+    tree.forEach(({ domaine, competences }) => {
+      const rows = competences.map(({ competence, exerciseIds }) => {
+        const modes         = exerciseIds.map(id => _competenceSettings.get(id) || 'progressif');
+        const allOuvert      = modes.every(m => m === 'ouvert');
+        const allProgressif  = modes.every(m => m === 'progressif');
+        const mixed          = !allOuvert && !allProgressif;
+        return `
+          <div class="comp-row${mixed ? ' comp-row--mixed' : ''}" data-competence="${esc(competence)}" data-exercise-ids="${esc(exerciseIds.join(','))}">
+            <span class="comp-name">${esc(competence)}</span>
+            ${mixed ? `<span class="comp-mixed-tag" title="Cette compétence couvre plusieurs exercices dont les réglages divergent. Cliquez un mode pour les harmoniser.">⚠ Mixte</span>` : ''}
+            <div class="comp-toggle">
+              <button type="button" class="comp-toggle-btn${!mixed && allProgressif ? ' is-active' : ''}" data-mode="progressif">Niveaux progressifs</button>
+              <button type="button" class="comp-toggle-btn${allOuvert ? ' is-active' : ''}" data-mode="ouvert">Niveaux ouverts</button>
+            </div>
+          </div>`;
+      }).join('');
+
+      const isOpen = _openCompetenceGroups.has(domaine);
+      html += `
+        <div class="comp-domaine${isOpen ? ' is-open' : ''}" data-domaine-key="${esc(domaine)}">
+          <div class="comp-domaine-summary" data-comp-domaine-toggle>
+            <span class="ax-caret">▸</span>
+            <span>${esc(domaine)}</span>
+            <div class="comp-domaine-actions">
+              <button type="button" class="btn btn-ghost btn-sm" data-bulk="progressif" data-domaine="${esc(domaine)}">Tout progressif</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-bulk="ouvert" data-domaine="${esc(domaine)}">Tout ouvert</button>
+            </div>
+          </div>
+          <div class="comp-rows">${rows}</div>
+        </div>`;
+    });
+
+    document.getElementById('comp-tree').innerHTML = html || '<div class="ax-empty">Aucune compétence à plusieurs niveaux dans le catalogue.</div>';
+  }
+
+  document.getElementById('comp-tree').addEventListener('click', async e => {
+    const bulkBtn = e.target.closest('[data-bulk]');
+    if (bulkBtn) {
+      await handleCompetenceBulkDomaine(bulkBtn.dataset.domaine, bulkBtn.dataset.bulk);
+      return;
+    }
+    const toggleBtn = e.target.closest('.comp-toggle-btn');
+    if (toggleBtn) {
+      const row = toggleBtn.closest('.comp-row');
+      await handleCompetenceToggle(row.dataset.exerciseIds.split(','), toggleBtn.dataset.mode);
+      return;
+    }
+    const summary = e.target.closest('[data-comp-domaine-toggle]');
+    if (summary) {
+      const el  = summary.closest('.comp-domaine');
+      const key = el.dataset.domaineKey;
+      el.classList.toggle('is-open');
+      el.classList.contains('is-open') ? _openCompetenceGroups.add(key) : _openCompetenceGroups.delete(key);
+    }
+  });
+
+  async function handleCompetenceToggle(exerciseIds, mode) {
+    try {
+      await lfmTeacher.setNiveauModeBulk(_currentClass.id, exerciseIds, mode);
+      exerciseIds.forEach(id => {
+        if (mode === 'ouvert') _competenceSettings.set(id, 'ouvert');
+        else _competenceSettings.delete(id);
+      });
+      renderCompetenceSection();
+      showToast(mode === 'ouvert' ? 'Niveaux ouverts pour cette compétence' : 'Niveaux progressifs pour cette compétence');
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    }
+  }
+
+  async function handleCompetenceBulkDomaine(domaine, mode) {
+    const tree   = buildCompetenceTree();
+    const entry  = tree.find(d => d.domaine === domaine);
+    if (!entry) return;
+    const allIds = entry.competences.flatMap(c => c.exerciseIds);
+    try {
+      await lfmTeacher.setNiveauModeBulk(_currentClass.id, allIds, mode);
+      allIds.forEach(id => {
+        if (mode === 'ouvert') _competenceSettings.set(id, 'ouvert');
+        else _competenceSettings.delete(id);
+      });
+      renderCompetenceSection();
+      showToast(mode === 'ouvert' ? `Domaine « ${domaine} » : tous les niveaux ouverts` : `Domaine « ${domaine} » : tous les niveaux progressifs`);
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    }
+  }
   </script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */
@@ -182,6 +1391,29 @@
     .footer__text .rouge { color: #F5A623; font-weight: 700; }
     .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
     .footer__credit a { color: #ffffff99; text-decoration: none; }
+
+    /* ─── Toast ─── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(0);
+      background: #1a3a7a;
+      color: #fff;
+      padding: 11px 22px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 2000;
+      box-shadow: 0 4px 20px rgba(16,43,106,0.3);
+      white-space: nowrap;
+      animation: toast-in 200ms ease;
+    }
+    .toast.is-error { background: var(--red); }
+    @keyframes toast-in {
+      from { transform: translateX(-50%) translateY(16px); opacity: 0; }
+      to   { transform: translateX(-50%) translateY(0);    opacity: 1; }
+    }
 </style>
 </body>
 </html>

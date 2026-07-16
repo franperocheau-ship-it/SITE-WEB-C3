@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/teacher.js"></script>
+  <script src="js/teacher.js?v=1"></script>
   <style>
     /* ── Layout ──────────────────────────────────────────────────────────────── */
     .dash-wrap {
@@ -224,116 +224,6 @@
     .detail-class-name { font-weight: 800; font-size: 22px; color: var(--blue); margin: 6px 0 4px; }
     .detail-class-meta { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 10px; }
 
-    /* ── Mode d'accès (libre / guidé) ────────────────────────────────────────── */
-    .access-card {
-      background: var(--card-bg);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-sm);
-      padding: 22px 26px;
-      margin-bottom: 20px;
-    }
-    .access-card-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .access-card-title {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 16px;
-      color: var(--color-brand-navy);
-    }
-    .access-card-sub {
-      font-size: 12.5px;
-      color: var(--muted);
-      margin-top: 3px;
-    }
-    .access-toggle {
-      display: flex;
-      gap: 4px;
-      background: var(--bg);
-      border-radius: 100px;
-      padding: 4px;
-      flex-shrink: 0;
-    }
-    .access-toggle-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 16px;
-      border: none;
-      border-radius: 100px;
-      background: none;
-      font-family: var(--font-display);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-      transition: background 180ms, color 180ms;
-      white-space: nowrap;
-    }
-    .access-toggle-btn:disabled { opacity: 0.6; cursor: default; }
-    .access-toggle-btn[data-mode="libre"].is-active { background: var(--color-brand-navy); color: #fff; }
-    .access-toggle-btn[data-mode="guide"].is-active { background: var(--color-niveau-cm1); color: #fff; }
-
-    .access-panel { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 18px; }
-    .access-panel-head {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-    }
-    .access-search { flex: 1; min-width: 200px; padding: 10px 14px; font-size: 14px; }
-    .access-counter {
-      font-family: var(--font-display);
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--color-brand-navy);
-      background: rgba(245,166,35,0.14);
-      border: 1px solid rgba(245,166,35,0.35);
-      padding: 6px 14px;
-      border-radius: 100px;
-      white-space: nowrap;
-    }
-    .access-tree { display: flex; flex-direction: column; gap: 8px; }
-
-    /* ── Cible du parcours guidé (classe / groupe / élève) ───────────────────── */
-    .access-target-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-    }
-    .access-target-row .form-label { margin: 0; white-space: nowrap; }
-    .access-target-select { max-width: 300px; width: auto; flex-shrink: 1; }
-    .access-target-hint {
-      font-size: 12.5px;
-      color: var(--muted);
-      line-height: 1.5;
-      margin: -6px 0 14px;
-    }
-    .access-dot-legend { display: inline-block; margin-top: 2px; }
-
-    .access-inherit-banner {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      background: rgba(29,191,160,0.10);
-      border: 1px solid rgba(29,191,160,0.30);
-      border-radius: 10px;
-      padding: 10px 14px;
-      margin-bottom: 14px;
-      font-size: 13px;
-      color: var(--color-brand-navy);
-    }
-    .access-inherit-banner strong { font-weight: 700; }
-
     /* ── Modal : liste des groupes ────────────────────────────────────────────── */
     .group-list { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; }
     .group-list-empty { font-size: 13px; color: var(--muted); padding: 8px 0; }
@@ -382,99 +272,34 @@
       line-height: 1.5;
       color: var(--text);
     }
-
-    .ax-domaine { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
-    .ax-domaine-summary {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      background: rgba(26,45,107,0.05);
-      cursor: pointer;
-      font-family: var(--font-display);
-      font-weight: 600;
-      font-size: 14px;
+    .perso-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      background: rgba(245,166,35,0.14);
+      border: 1px solid rgba(245,166,35,0.35);
       color: var(--color-brand-navy);
-    }
-    .ax-caret {
-      font-size: 11px;
-      color: var(--muted);
-      transition: transform 180ms;
-      flex-shrink: 0;
-      display: inline-block;
-    }
-    .ax-domaine.is-open > .ax-domaine-summary .ax-caret { transform: rotate(90deg); }
-    .ax-domaine-count { margin-left: auto; font-size: 11.5px; font-weight: 600; color: var(--muted); font-family: var(--font-body); }
-    .ax-notions { padding: 6px 10px 10px 30px; display: none; flex-direction: column; gap: 4px; }
-    .ax-domaine.is-open > .ax-notions { display: flex; }
-
-    .ax-notion { border-radius: 10px; }
-    .ax-notion-summary {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 9px 10px;
-      cursor: pointer;
+      border-radius: 100px;
+      padding: 2px 9px;
+      font-size: 10.5px;
       font-weight: 700;
-      font-size: 13px;
-      color: var(--text);
-      border-radius: 8px;
+      white-space: nowrap;
+      cursor: help;
     }
-    .ax-notion-summary:hover { background: var(--bg); }
-    .ax-notion.is-open > .ax-notion-summary .ax-caret { transform: rotate(90deg); }
-    .ax-notion-count { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--muted); }
-    .ax-exercises { padding: 2px 0 6px 24px; display: none; flex-direction: column; gap: 2px; }
-    .ax-notion.is-open > .ax-exercises { display: flex; }
 
-    .ax-group-label {
-      font-family: var(--font-display);
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 10px 10px 2px;
-    }
-    .ax-group-label:first-child { padding-top: 4px; }
-
-    .ax-row {
+    /* ── Lien vers le pilotage des exercices (déménagé, Lot C) ──────────────── */
+    .pilotage-link-card {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 7px 10px;
-      border-radius: 8px;
-      font-size: 13.5px;
-      color: var(--text);
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 18px 26px;
+      margin-bottom: 20px;
     }
-    .ax-row:hover { background: var(--bg); }
-    .ax-row label { flex: 1; cursor: pointer; }
-    .ax-check { width: 17px; height: 17px; accent-color: var(--color-niveau-cm1); cursor: pointer; flex-shrink: 0; }
-    .ax-notion-summary .ax-check,
-    .ax-domaine-summary .ax-check { accent-color: var(--color-brand-navy); }
-
-    .ax-status { width: 16px; height: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .ax-spinner {
-      width: 12px; height: 12px;
-      border: 2px solid var(--border);
-      border-top-color: var(--color-brand-navy);
-      border-radius: 50%;
-      animation: ax-spin 0.6s linear infinite;
-    }
-    @keyframes ax-spin { to { transform: rotate(360deg); } }
-    .ax-check-ok { color: var(--color-niveau-cm1); font-weight: 800; font-size: 14px; animation: ax-pop 220ms ease; }
-    @keyframes ax-pop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-    .ax-empty { text-align: center; padding: 24px; color: var(--muted); font-size: 13.5px; }
-    .ax-loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 28px;
-      color: var(--muted);
-      font-size: 13.5px;
-    }
-    .ax-loading .ax-spinner { width: 15px; height: 15px; border-width: 2.5px; }
+    .pilotage-link-text { font-size: 13.5px; color: var(--muted); }
+    .pilotage-link-text strong { color: var(--color-brand-navy); }
 
     /* ── Students table ──────────────────────────────────────────────────────── */
     .table-wrap {
@@ -853,35 +678,12 @@
           </div>
         </div>
 
-        <!-- Mode d'accès aux exercices -->
-        <div class="access-card">
-          <div class="access-card-head">
-            <div>
-              <div class="access-card-title">Mode d'accès aux exercices</div>
-              <div class="access-card-sub" id="access-sub">Navigation libre : les élèves voient tout le catalogue.</div>
-            </div>
-            <div class="access-toggle" id="access-toggle">
-              <button type="button" class="access-toggle-btn" data-mode="libre">🔓 Navigation libre</button>
-              <button type="button" class="access-toggle-btn" data-mode="guide">🎯 Parcours guidé</button>
-            </div>
-          </div>
-          <div class="access-panel" id="access-panel" style="display:none">
-            <div class="access-target-row">
-              <label class="form-label" for="ax-target-select">Configurer les exercices pour :</label>
-              <select class="form-select access-target-select" id="ax-target-select"></select>
-            </div>
-            <p class="access-target-hint">
-              🎯 Ici, vous choisissez quels exercices sont débloqués (pour la classe, un groupe ou un élève).
-              L'appartenance des élèves aux groupes se règle dans le tableau Élèves plus bas.
-              <span class="access-dot-legend">« ● » devant un nom = des exercices sont déjà configurés pour cette cible.</span>
-            </p>
-            <div class="access-inherit-banner" id="access-inherit-banner" style="display:none"></div>
-            <div class="access-panel-head">
-              <input class="form-input access-search" id="ax-search" type="text" placeholder="🔍 Rechercher un exercice…">
-              <span class="access-counter" id="ax-counter">0 exercices actifs sur 0</span>
-            </div>
-            <div class="access-tree" id="ax-tree"></div>
-          </div>
+        <!-- Lien vers le pilotage des exercices (déménagé dans pilotage-enseignant.html, Lot C) -->
+        <div class="pilotage-link-card">
+          <span class="pilotage-link-text">
+            🎯 Mode d'accès, exercices débloqués et progression par niveaux se règlent désormais dans <strong>Pilotage des compétences</strong>.
+          </span>
+          <a class="btn btn-outline btn-sm" id="pilotage-link" href="pilotage-enseignant.html">Piloter les exercices de cette classe →</a>
         </div>
 
         <!-- En-tête élèves -->
@@ -1177,22 +979,10 @@
   /* ── Groupes de besoin (v9) ──────────────────────────────────────────────────── */
   let _groups          = [];
   let _editingGroupId  = null;
-
-  /* ── Mode d'accès aux exercices (libre / guidé) ─────────────────────────────── */
-  let _activeExerciseIds = new Set();
-  let _openGroups         = new Set();
-  let _exerciseTreeCache  = null;
-  /* Cible du panneau : la classe entière (défaut), un groupe ou un élève. */
-  let _currentTarget = { type: 'class', id: null };
-  /* IDs de groupes/élèves ayant au moins un exercice actif configuré — pour
-     le repère visuel dans le sélecteur de cible. */
-  let _configuredGroupIds  = new Set();
-  let _configuredStudentIds = new Set();
-  /* Pour la cible "élève" : source de la liste actuellement affichée quand
-     l'élève n'a pas encore de liste personnelle (lecture seule tant que
-     "Personnaliser" n'a pas été cliqué). */
-  let _studentInherit = null; // { source: 'group'|'class', list: string[], groupName?: string } | null
-  let _studentPersonalized = false;
+  /* Élèves ayant une liste d'exercices personnalisée (student_active_exercises,
+     v9) : prime silencieusement sur l'affectation de groupe — voir badge et
+     avertissement dans renderDetailStudents(). */
+  let _studentsWithPersonalList = new Set();
 
   function normalize(str) {
     return str.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, '-');
@@ -1370,18 +1160,15 @@
       if (!_classes.length) _classes = await lfmTeacher.getClasses();
       _currentClass = _classes.find(c => c.id === classId);
       if (!_currentClass) { navigate({}); return; }
-      const [students, groups, activeIds] = await Promise.all([
+      const [students, groups] = await Promise.all([
         lfmTeacher.getStudents(classId),
-        lfmTeacher.getGroups(classId),
-        lfmTeacher.getActiveExercises(classId)
+        lfmTeacher.getGroups(classId)
       ]);
-      _students          = students;
-      _groups            = groups;
-      _activeExerciseIds = new Set(activeIds);
-      /* La cible repart toujours sur "toute la classe" à l'ouverture d'une
-         classe — pas de mémorisation de la dernière cible entre deux classes. */
-      _currentTarget   = { type: 'class', id: classId };
-      _studentInherit  = null;
+      _students = students;
+      _groups   = groups;
+      _studentsWithPersonalList = new Set(
+        await lfmTeacher.getStudentIdsWithActiveExercises(students.map(s => s.id))
+      );
     } catch (e) {
       showToast('Erreur lors du chargement', 'error');
       navigate({});
@@ -1399,8 +1186,8 @@
     document.getElementById('detail-badge').innerHTML     = `<span class="badge badge-${badgeClass(c.level)}">${esc(c.level)}</span>`;
     document.getElementById('detail-class-name').textContent = c.name;
     document.getElementById('detail-year').textContent    = c.school_year;
+    document.getElementById('pilotage-link').href = `pilotage-enseignant.html?class=${encodeURIComponent(c.id)}`;
     renderDetailStudents();
-    renderAccessCard();
   }
 
   /* Pastille de couleur du groupe : neutre (anneau gris) si l'élève n'a pas
@@ -1445,6 +1232,10 @@
               <option value="">— Aucun groupe —</option>
               ${_groups.map(g => `<option value="${g.id}" ${s.group_id === g.id ? 'selected' : ''}>${esc(g.name)}</option>`).join('')}
             </select>
+            ${_studentsWithPersonalList.has(s.id) ? `
+              <span class="perso-badge" id="perso-badge-${s.id}" title="Cet élève a une liste d'exercices personnalisée (parcours guidé) : elle prime sur son groupe, tant qu'elle n'est pas réinitialisée.">🔒 Liste perso</span>
+              <button type="button" class="btn btn-ghost btn-sm btn-icon" data-action="reset-perso" data-sid="${s.id}" title="Réinitialiser la liste personnalisée — l'élève suivra à nouveau son groupe">↺</button>
+            ` : ''}
           </div>
         </td>
         <td>
@@ -1471,15 +1262,10 @@
       if (s) s.group_id = groupId;
       const dot = document.getElementById(`group-dot-${studentId}`);
       if (dot) dot.setAttribute('style', groupDotStyle(groupId));
-      showToast('Groupe mis à jour');
-      /* Le sélecteur de cible peut afficher des repères "liste configurée" —
-         pas besoin de le rafraîchir ici : l'affectation seule ne change pas
-         qui a une liste, seulement qui hérite de quoi. La bannière d'un
-         élève actuellement affiché (s'il est la cible) doit en revanche
-         être recalculée. */
-      if (_currentTarget.type === 'student' && _currentTarget.id === studentId) {
-        await loadActiveSetForTarget();
-        renderAccessTree();
+      if (_studentsWithPersonalList.has(studentId)) {
+        showToast('⚠️ Cet élève a une liste personnalisée : elle reste prioritaire sur ce nouveau groupe', 'error');
+      } else {
+        showToast('Groupe mis à jour');
       }
     } catch (err) {
       sel.value = _students.find(s => s.id === studentId)?.group_id || '';
@@ -1489,626 +1275,36 @@
     }
   });
 
-  document.getElementById('detail-tbody').addEventListener('click', e => {
+  document.getElementById('detail-tbody').addEventListener('click', async e => {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
     const id      = btn.dataset.sid;
     const action  = btn.dataset.action;
     const student = _students.find(s => s.id === id);
     if (!student) return;
-    if (action === 'edit')   openModalEditStudent(student);
-    if (action === 'reset')  confirmResetPassword(student);
-    if (action === 'move')   openModalMove(student);
-    if (action === 'delete') confirmDeleteById('student', id, student.display_name);
+    if (action === 'edit')        openModalEditStudent(student);
+    if (action === 'reset')       confirmResetPassword(student);
+    if (action === 'move')        openModalMove(student);
+    if (action === 'delete')      confirmDeleteById('student', id, student.display_name);
+    if (action === 'reset-perso') await resetPersoList(student, btn);
   });
 
-  /* ═══════════════════════════════════════════════════════════════════════════
-     MODE D'ACCÈS AUX EXERCICES (LIBRE / GUIDÉ)
-  ═══════════════════════════════════════════════════════════════════════════ */
-
-  function axNormalize(str) {
-    return String(str ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-  }
-
-  /* Chargement paresseux de exercise-data.js (~9000 lignes) et de son catalogue
-     d'organisation js/exercise-catalog.js : uniquement à la première ouverture
-     du panneau "Parcours guidé", pas dans le <head>. */
-  function loadScript(src) {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = src;
-      script.onload  = () => resolve();
-      script.onerror = () => reject(new Error(`Impossible de charger ${src}.`));
-      document.head.appendChild(script);
-    });
-  }
-
-  let _exerciseAssetsPromise = null;
-  function loadExerciseAssets() {
-    if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined') return Promise.resolve();
-    if (_exerciseAssetsPromise) return _exerciseAssetsPromise;
-    _exerciseAssetsPromise = Promise.all([
-      typeof EXERCISE_DATA               !== 'undefined' ? null : loadScript('exercise-data.js?v=20'),
-      typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined' ? null : loadScript('js/exercise-catalog.js?v=6')
-    ]).catch(err => { _exerciseAssetsPromise = null; throw err; });
-    return _exerciseAssetsPromise;
-  }
-
-  async function ensureExerciseDataLoaded() {
-    if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined') {
-      await onGuidedPanelReady();
-      return;
-    }
-    document.getElementById('ax-tree').innerHTML = '<div class="ax-loading"><span class="ax-spinner"></span> Chargement du catalogue des exercices…</div>';
-    document.getElementById('ax-search').disabled = true;
+  /* Correctif UX (bug groupe vs liste perso) : réinitialisation directe de la
+     liste personnalisée d'un élève depuis le tableau, sans passer par
+     pilotage-enseignant.html. */
+  async function resetPersoList(student, btn) {
+    if (!confirm(`Réinitialiser la liste d'exercices personnalisée de ${student.display_name} ?\nL'élève suivra à nouveau son groupe (ou la classe s'il n'en a pas).`)) return;
+    btn.disabled = true;
     try {
-      await loadExerciseAssets();
-      document.getElementById('ax-search').disabled = false;
-      await onGuidedPanelReady();
-    } catch (err) {
-      document.getElementById('ax-tree').innerHTML = `<div class="ax-empty">${esc(err.message)}</div>`;
-    }
-  }
-
-  /* ═══════════════════════════════════════════════════════════════════════════
-     CIBLE DU PARCOURS GUIDÉ (classe / groupe / élève) — v9
-  ═══════════════════════════════════════════════════════════════════════════ */
-
-  /* Point d'entrée une fois le catalogue chargé : calcule les repères
-     "liste configurée", peuple le sélecteur de cible, charge l'ensemble
-     actif de la cible courante, puis affiche l'arbre. */
-  async function onGuidedPanelReady() {
-    await refreshConfiguredIndicators();
-    populateTargetSelector();
-    await loadActiveSetForTarget();
-    renderAccessTree();
-  }
-
-  async function refreshConfiguredIndicators() {
-    const groupIds   = _groups.map(g => g.id);
-    const studentIds = _students.map(s => s.id);
-    const [configuredGroups, configuredStudents] = await Promise.all([
-      lfmTeacher.getGroupIdsWithActiveExercises(groupIds),
-      lfmTeacher.getStudentIdsWithActiveExercises(studentIds)
-    ]);
-    _configuredGroupIds   = new Set(configuredGroups);
-    _configuredStudentIds = new Set(configuredStudents);
-  }
-
-  /* "●" en préfixe = au moins un exercice actif configuré pour ce groupe/élève
-     (repère visuel demandé). Conserve la sélection courante si elle existe
-     toujours ; repli sur "Toute la classe" sinon (groupe/élève supprimé ou
-     jamais sélectionné). */
-  function populateTargetSelector() {
-    const sel = document.getElementById('ax-target-select');
-    const prevValue = _currentTarget.type === 'class' ? 'class' : `${_currentTarget.type}:${_currentTarget.id}`;
-
-    let html = `<option value="class">Toute la classe</option>`;
-
-    if (_groups.length) {
-      html += `<optgroup label="Groupes">` + _groups.map(g => {
-        const dot = _configuredGroupIds.has(g.id) ? '● ' : '';
-        return `<option value="group:${g.id}">${dot}${esc(g.name)}</option>`;
-      }).join('') + `</optgroup>`;
-    }
-
-    if (_students.length) {
-      html += `<optgroup label="Élèves">` + _students.map(s => {
-        const dot = _configuredStudentIds.has(s.id) ? '● ' : '';
-        return `<option value="student:${s.id}">${dot}${esc(s.display_name)}</option>`;
-      }).join('') + `</optgroup>`;
-    }
-
-    sel.innerHTML = html;
-    sel.value = prevValue;
-    if (sel.value !== prevValue) {
-      /* La cible précédente n'existe plus (groupe/élève supprimé) : repli. */
-      _currentTarget = { type: 'class', id: _currentClass.id };
-      sel.value = 'class';
-    }
-  }
-
-  document.getElementById('ax-target-select').addEventListener('change', async e => {
-    const val = e.target.value;
-    if (val === 'class') {
-      _currentTarget = { type: 'class', id: _currentClass.id };
-    } else {
-      const [type, id] = val.split(':');
-      _currentTarget = { type, id };
-    }
-    await loadActiveSetForTarget();
-    renderAccessTree();
-  });
-
-  /* Charge _activeExerciseIds pour la cible courante. Pour un élève, résout
-     aussi ce qu'il hériterait (groupe si non vide, sinon classe) — utilisé
-     par la bannière et par "Personnaliser", que l'élève ait déjà une liste
-     personnelle ou non. */
-  async function loadActiveSetForTarget() {
-    _studentInherit       = null;
-    _studentPersonalized  = false;
-
-    if (_currentTarget.type === 'class') {
-      _activeExerciseIds = new Set(await lfmTeacher.getActiveExercises(_currentClass.id));
-    } else if (_currentTarget.type === 'group') {
-      _activeExerciseIds = new Set(await lfmTeacher.getActiveExercisesForGroup(_currentTarget.id));
-    } else {
-      const student = _students.find(s => s.id === _currentTarget.id);
-      const personal = await lfmTeacher.getActiveExercisesForStudent(_currentTarget.id);
-
-      let source = 'class', groupName = null, inheritedList = null;
-      if (student && student.group_id) {
-        const groupList = await lfmTeacher.getActiveExercisesForGroup(student.group_id);
-        if (groupList.length > 0) {
-          source = 'group';
-          groupName = _groups.find(g => g.id === student.group_id)?.name || null;
-          inheritedList = groupList;
-        }
-      }
-      if (inheritedList === null) inheritedList = await lfmTeacher.getActiveExercises(_currentClass.id);
-      _studentInherit = { source, groupName, list: inheritedList };
-
-      if (personal.length > 0) {
-        _activeExerciseIds      = new Set(personal);
-        _studentPersonalized    = true;
-      } else {
-        _activeExerciseIds      = new Set(inheritedList);
-        _studentPersonalized    = false;
-      }
-    }
-    renderInheritBanner();
-  }
-
-  function renderInheritBanner() {
-    const banner = document.getElementById('access-inherit-banner');
-    if (_currentTarget.type !== 'student') { banner.style.display = 'none'; return; }
-
-    if (_studentPersonalized) {
-      banner.innerHTML = `
-        <span>✓ Liste personnalisée pour cet élève.</span>
-        <button type="button" class="btn btn-outline btn-sm" onclick="revertCurrentStudent()">Revenir à la liste héritée</button>
-      `;
-    } else {
-      const label = _studentInherit.source === 'group'
-        ? `la liste du groupe <strong>${esc(_studentInherit.groupName || '?')}</strong>`
-        : `la liste de la classe`;
-      const canPersonalize = _studentInherit.list.length > 0;
-      banner.innerHTML = `
-        <span>Cet élève suit actuellement ${label} (pas de liste personnelle).</span>
-        ${canPersonalize ? `<button type="button" class="btn btn-primary btn-sm" onclick="personalizeCurrentStudent()">Personnaliser</button>` : ''}
-      `;
-    }
-    banner.style.display = 'flex';
-  }
-
-  /* Copie la liste héritée (groupe ou classe) comme point de départ de la
-     liste personnelle de l'élève. Une case cochée/décochée directement dans
-     l'arbre personnalise aussi immédiatement (voir axToggleExercise) — ce
-     bouton est une commodité pour partir de la liste existante plutôt que
-     de zéro. */
-  async function personalizeCurrentStudent() {
-    if (_currentTarget.type !== 'student' || !_studentInherit || !_studentInherit.list.length) return;
-    const studentId = _currentTarget.id;
-    try {
-      await lfmTeacher.addActiveExercisesBulkToStudent(studentId, _studentInherit.list);
-      _configuredStudentIds.add(studentId);
-      showToast('Liste personnalisée à partir de la liste héritée');
-      await loadActiveSetForTarget();
-      populateTargetSelector();
-      renderAccessTree();
+      await lfmTeacher.clearActiveExercisesForStudent(student.id);
+      _studentsWithPersonalList.delete(student.id);
+      renderDetailStudents();
+      showToast('Liste personnalisée réinitialisée');
     } catch (err) {
       showToast('Erreur : ' + err.message, 'error');
+      btn.disabled = false;
     }
   }
-
-  /* Supprime toute la liste personnelle de l'élève : il retombe sur son
-     groupe (s'il en a un et qu'il est configuré) ou sur la classe. */
-  async function revertCurrentStudent() {
-    if (_currentTarget.type !== 'student') return;
-    const studentId = _currentTarget.id;
-    try {
-      await lfmTeacher.removeActiveExercisesBulkFromStudent(studentId, [..._activeExerciseIds]);
-      _configuredStudentIds.delete(studentId);
-      showToast('Retour à la liste héritée');
-      await loadActiveSetForTarget();
-      populateTargetSelector();
-      renderAccessTree();
-    } catch (err) {
-      showToast('Erreur : ' + err.message, 'error');
-    }
-  }
-
-  /* Sélectionne les fonctions lfmTeacher à utiliser selon la cible courante
-     — class_active_exercises / group_active_exercises / student_active_exercises. */
-  function axApi() {
-    if (_currentTarget.type === 'group') {
-      return {
-        add: lfmTeacher.addActiveExerciseToGroup,
-        remove: lfmTeacher.removeActiveExerciseFromGroup,
-        addBulk: lfmTeacher.addActiveExercisesBulkToGroup,
-        removeBulk: lfmTeacher.removeActiveExercisesBulkFromGroup,
-        targetId: _currentTarget.id
-      };
-    }
-    if (_currentTarget.type === 'student') {
-      return {
-        add: lfmTeacher.addActiveExerciseToStudent,
-        remove: lfmTeacher.removeActiveExerciseFromStudent,
-        addBulk: lfmTeacher.addActiveExercisesBulkToStudent,
-        removeBulk: lfmTeacher.removeActiveExercisesBulkFromStudent,
-        targetId: _currentTarget.id
-      };
-    }
-    return {
-      add: lfmTeacher.addActiveExercise,
-      remove: lfmTeacher.removeActiveExercise,
-      addBulk: lfmTeacher.addActiveExercisesBulk,
-      removeBulk: lfmTeacher.removeActiveExercisesBulk,
-      targetId: _currentClass.id
-    };
-  }
-
-  /* Matière > Sous-thème > Exercice.
-     - Chaque exercice de EXERCISE_DATA est classé automatiquement par
-       domaine + préfixe de `competence` (avant " — ") : aucune liste à
-       maintenir, un nouvel exercice ajouté à EXERCISE_DATA apparaît de
-       lui-même au bon endroit.
-     - Les exercices "autonomes" (hors EXERCISE_DATA — homophones, lexique,
-       identifier-verbe-conjugue) sont rattachés explicitement via
-       EXERCISE_CATALOG_AUTONOMOUS (js/exercise-catalog.js).
-     - Tout exercice sans catégorie reconnue est exclu du panneau et signalé
-       par un console.warn : pas de section fourre-tout. */
-  function buildExerciseTree() {
-    if (_exerciseTreeCache) return _exerciseTreeCache;
-    const byCategory = {};
-
-    function addItem(category, subCategory, slug, title) {
-      if (!category || !subCategory) {
-        console.warn('[Parcours guidé] Exercice sans catégorie reconnue, exclu du panneau :', slug);
-        return;
-      }
-      if (!byCategory[category]) byCategory[category] = {};
-      if (!byCategory[category][subCategory]) byCategory[category][subCategory] = [];
-      byCategory[category][subCategory].push({ slug, title });
-    }
-
-    Object.keys(EXERCISE_DATA).forEach(slug => {
-      const ex     = EXERCISE_DATA[slug];
-      const sepIdx = ex.competence.indexOf(' — ');
-      const subCategory = sepIdx !== -1 ? ex.competence.slice(0, sepIdx) : ex.competence;
-      addItem(ex.domaine, subCategory, slug, ex.title);
-    });
-
-    EXERCISE_CATALOG_AUTONOMOUS.forEach(({ slug, title, category, subCategory }) => {
-      addItem(category, subCategory, slug, title);
-    });
-
-    const DOMAINE_ORDER = ['Français', 'Mathématiques'];
-    const domaines = Object.keys(byCategory).sort((a, b) => {
-      const ia = DOMAINE_ORDER.indexOf(a), ib = DOMAINE_ORDER.indexOf(b);
-      if (ia === -1 && ib === -1) return a.localeCompare(b, 'fr');
-      if (ia === -1) return 1;
-      if (ib === -1) return -1;
-      return ia - ib;
-    });
-
-    _exerciseTreeCache = domaines.map(domaine => ({
-      domaine,
-      notions: Object.keys(byCategory[domaine]).sort((a, b) => a.localeCompare(b, 'fr')).map(notion => ({
-        notion,
-        items: applyGroupOrder(domaine, notion, byCategory[domaine][notion])
-      }))
-    }));
-    return _exerciseTreeCache;
-  }
-
-  /* Applique le 3e niveau optionnel "groupes" (EXERCISE_CATALOG_GROUPS) : ordre
-     et étiquette de groupe pour les slugs couverts, tri alphabétique par
-     défaut sinon (comportement inchangé pour les sous-thèmes sans groupes). */
-  function applyGroupOrder(domaine, notion, rawItems) {
-    const groupDefs = EXERCISE_CATALOG_GROUPS[domaine] && EXERCISE_CATALOG_GROUPS[domaine][notion];
-    if (!groupDefs) return rawItems.slice().sort((a, b) => a.title.localeCompare(b.title, 'fr'));
-
-    const bySlug = new Map(rawItems.map(it => [it.slug, it]));
-    const used   = new Set();
-    const items  = [];
-
-    groupDefs.forEach(({ groupe, slugs }) => {
-      slugs.forEach(slug => {
-        const it = bySlug.get(slug);
-        if (!it) return;
-        used.add(slug);
-        items.push({ ...it, groupe });
-      });
-    });
-
-    const rest = rawItems
-      .filter(it => !used.has(it.slug))
-      .sort((a, b) => a.title.localeCompare(b.title, 'fr'));
-
-    return items.concat(rest);
-  }
-
-  function exerciseTotalCount() {
-    return Object.keys(EXERCISE_DATA).length + EXERCISE_CATALOG_AUTONOMOUS.length;
-  }
-
-  function renderAccessCard() {
-    const mode = _currentClass.mode_acces || 'libre';
-    document.querySelectorAll('#access-toggle .access-toggle-btn').forEach(btn => {
-      btn.classList.toggle('is-active', btn.dataset.mode === mode);
-    });
-    document.getElementById('access-sub').textContent = mode === 'guide'
-      ? 'Parcours guidé : les élèves ne voient que les exercices activés ci-dessous.'
-      : 'Navigation libre : les élèves voient tout le catalogue.';
-    document.getElementById('access-panel').style.display = mode === 'guide' ? 'block' : 'none';
-    if (mode === 'guide') {
-      document.getElementById('ax-search').value = '';
-      ensureExerciseDataLoaded();
-    } else {
-      document.getElementById('access-inherit-banner').style.display = 'none';
-    }
-  }
-
-  document.getElementById('access-toggle').addEventListener('click', async e => {
-    const btn = e.target.closest('.access-toggle-btn');
-    if (!btn || btn.classList.contains('is-active')) return;
-    const newMode = btn.dataset.mode;
-
-    document.querySelectorAll('#access-toggle .access-toggle-btn').forEach(b => b.disabled = true);
-    try {
-      await lfmTeacher.updateClassAccessMode(_currentClass.id, newMode);
-      _currentClass.mode_acces = newMode;
-      const idx = _classes.findIndex(c => c.id === _currentClass.id);
-      if (idx !== -1) _classes[idx].mode_acces = newMode;
-      renderAccessCard();
-
-      if (newMode === 'guide') {
-        /* Note de réactivation (décision v9) : si des listes de groupe/élève
-           existaient déjà pour cette classe, les repasser en 'guide' les
-           réactive telles quelles (mode_acces est l'interrupteur maître). */
-        const groupIds   = _groups.map(g => g.id);
-        const studentIds = _students.map(s => s.id);
-        const [cg, cs] = await Promise.all([
-          lfmTeacher.getGroupIdsWithActiveExercises(groupIds),
-          lfmTeacher.getStudentIdsWithActiveExercises(studentIds)
-        ]);
-        showToast(cg.length || cs.length
-          ? 'Parcours guidé activé — des listes de groupe/élève existantes sont réactivées'
-          : 'Parcours guidé activé');
-      } else {
-        showToast('Navigation libre activée');
-      }
-    } catch (err) {
-      showToast('Erreur : ' + err.message, 'error');
-    } finally {
-      document.querySelectorAll('#access-toggle .access-toggle-btn').forEach(b => b.disabled = false);
-    }
-  });
-
-  function updateAxCounter() {
-    document.getElementById('ax-counter').textContent =
-      `${_activeExerciseIds.size} exercice${_activeExerciseIds.size !== 1 ? 's' : ''} actif${_activeExerciseIds.size !== 1 ? 's' : ''} sur ${exerciseTotalCount()}`;
-  }
-
-  function renderAccessTree() {
-    const tree  = buildExerciseTree();
-    const query = axNormalize(document.getElementById('ax-search').value.trim());
-    let html = '';
-
-    tree.forEach(({ domaine, notions }) => {
-      let notionsHtml = '';
-      let domaineActive = 0, domaineTotal = 0;
-
-      notions.forEach(({ notion, items }) => {
-        const filtered = query ? items.filter(it => axNormalize(it.title).includes(query)) : items;
-        if (filtered.length === 0) return;
-
-        const activeInNotion = filtered.filter(it => _activeExerciseIds.has(it.slug)).length;
-        domaineActive += activeInNotion;
-        domaineTotal  += filtered.length;
-        const notionKey = domaine + '::' + notion;
-        const isOpen = _openGroups.has(notionKey) || !!query;
-
-        let lastGroupe = null;
-        const rows = filtered.map(it => {
-          const groupLabel = (it.groupe && it.groupe !== lastGroupe)
-            ? `<div class="ax-group-label">${esc(it.groupe)}</div>`
-            : '';
-          lastGroupe = it.groupe || null;
-          return `
-            ${groupLabel}
-            <div class="ax-row">
-              <input type="checkbox" class="ax-check" id="ax-ex-${esc(it.slug)}" data-slug="${esc(it.slug)}" ${_activeExerciseIds.has(it.slug) ? 'checked' : ''}>
-              <label for="ax-ex-${esc(it.slug)}">${esc(it.title)}</label>
-              <span class="ax-status" data-status-for="${esc(it.slug)}"></span>
-            </div>
-          `;
-        }).join('');
-
-        notionsHtml += `
-          <div class="ax-notion${isOpen ? ' is-open' : ''}" data-notion-key="${esc(notionKey)}">
-            <div class="ax-notion-summary" data-toggle="notion">
-              <span class="ax-caret">▸</span>
-              <input type="checkbox" class="ax-check" data-notion-all="${esc(notionKey)}">
-              <span>${esc(notion)}</span>
-              <span class="ax-notion-count">${activeInNotion}/${filtered.length}</span>
-            </div>
-            <div class="ax-exercises">${rows}</div>
-          </div>
-        `;
-      });
-
-      if (!notionsHtml) return;
-
-      const isDomaineOpen = _openGroups.has(domaine) || !!query;
-      html += `
-        <div class="ax-domaine${isDomaineOpen ? ' is-open' : ''}" data-domaine-key="${esc(domaine)}">
-          <div class="ax-domaine-summary" data-toggle="domaine">
-            <span class="ax-caret">▸</span>
-            <input type="checkbox" class="ax-check" data-domaine-all="${esc(domaine)}">
-            <span>${esc(domaine)}</span>
-            <span class="ax-domaine-count">${domaineActive}/${domaineTotal}</span>
-          </div>
-          <div class="ax-notions">${notionsHtml}</div>
-        </div>
-      `;
-    });
-
-    const treeEl = document.getElementById('ax-tree');
-    treeEl.innerHTML = html || '<div class="ax-empty">Aucun exercice ne correspond à la recherche.</div>';
-    updateGroupCheckStates(treeEl);
-    updateAxCounter();
-  }
-
-  /* Coche/indéterminé des cases "tout sélectionner", dérivés des lignes visibles. */
-  function updateGroupCheckStates(scope) {
-    scope.querySelectorAll('.ax-notion').forEach(notionEl => {
-      const boxes  = notionEl.querySelectorAll('.ax-exercises input[data-slug]');
-      const all    = boxes.length;
-      const active = Array.from(boxes).filter(b => b.checked).length;
-      const cb     = notionEl.querySelector('[data-notion-all]');
-      cb.checked       = all > 0 && active === all;
-      cb.indeterminate = active > 0 && active < all;
-    });
-    scope.querySelectorAll('.ax-domaine').forEach(domaineEl => {
-      const boxes  = domaineEl.querySelectorAll('.ax-exercises input[data-slug]');
-      const all    = boxes.length;
-      const active = Array.from(boxes).filter(b => b.checked).length;
-      const cb     = domaineEl.querySelector('[data-domaine-all]');
-      cb.checked       = all > 0 && active === all;
-      cb.indeterminate = active > 0 && active < all;
-    });
-  }
-
-  const axTreeEl = document.getElementById('ax-tree');
-
-  /* Expand/collapse manuel (évite le conflit case à cocher / <summary> natif). */
-  axTreeEl.addEventListener('click', e => {
-    if (e.target.matches('input[type=checkbox]') || e.target.closest('label')) return;
-    const summary = e.target.closest('[data-toggle]');
-    if (!summary) return;
-    if (summary.dataset.toggle === 'domaine') {
-      const el  = summary.closest('.ax-domaine');
-      const key = el.dataset.domaineKey;
-      el.classList.toggle('is-open');
-      el.classList.contains('is-open') ? _openGroups.add(key) : _openGroups.delete(key);
-    } else {
-      const el  = summary.closest('.ax-notion');
-      const key = el.dataset.notionKey;
-      el.classList.toggle('is-open');
-      el.classList.contains('is-open') ? _openGroups.add(key) : _openGroups.delete(key);
-    }
-  });
-
-  axTreeEl.addEventListener('change', async e => {
-    const cb = e.target;
-    if (!cb.matches('input[type=checkbox]')) return;
-
-    if (cb.dataset.slug) {
-      await axToggleExercise(cb.dataset.slug, cb.checked, cb);
-    } else if (cb.dataset.notionAll) {
-      await axToggleGroup(cb, cb.closest('.ax-notion').querySelectorAll('.ax-exercises input[data-slug]'));
-    } else if (cb.dataset.domaineAll) {
-      await axToggleGroup(cb, cb.closest('.ax-domaine').querySelectorAll('.ax-exercises input[data-slug]'));
-    }
-  });
-
-  function axShowStatus(slug, state) {
-    const el = axTreeEl.querySelector(`[data-status-for="${CSS.escape(slug)}"]`);
-    if (!el) return;
-    if (state === 'saving') {
-      el.innerHTML = '<span class="ax-spinner"></span>';
-    } else if (state === 'saved') {
-      el.innerHTML = '<span class="ax-check-ok">✓</span>';
-      setTimeout(() => { if (el.querySelector('.ax-check-ok')) el.innerHTML = ''; }, 1200);
-    } else {
-      el.innerHTML = '';
-    }
-  }
-
-  async function axToggleExercise(slug, isActive, checkboxEl) {
-    axShowStatus(slug, 'saving');
-    const api = axApi();
-    try {
-      /* Copy-on-first-toggle : un élève qui n'a pas encore de liste
-         personnelle et suit une liste héritée (groupe/classe) doit d'abord
-         se voir figer cette liste héritée comme base personnelle — sinon
-         le premier clic écraserait silencieusement tout le reste de la
-         liste héritée par une liste d'un seul exercice. */
-      if (_currentTarget.type === 'student' && !_studentPersonalized && _studentInherit.list.length) {
-        await lfmTeacher.addActiveExercisesBulkToStudent(_currentTarget.id, _studentInherit.list);
-      }
-
-      if (isActive) await api.add(api.targetId, slug);
-      else          await api.remove(api.targetId, slug);
-
-      if (_currentTarget.type === 'student') {
-        /* Recharge pour refléter la bannière ("✓ Liste personnalisée" dès
-           ce premier clic) et, en cas de retour à 0 ligne personnelle, le
-           retour à la liste héritée. */
-        await loadActiveSetForTarget();
-      } else {
-        if (isActive) _activeExerciseIds.add(slug);
-        else          _activeExerciseIds.delete(slug);
-        if (_currentTarget.type === 'group') {
-          if (_activeExerciseIds.size > 0) _configuredGroupIds.add(_currentTarget.id);
-          else _configuredGroupIds.delete(_currentTarget.id);
-        }
-      }
-      axShowStatus(slug, 'saved');
-      updateGroupCheckStates(axTreeEl);
-      updateAxCounter();
-    } catch (err) {
-      checkboxEl.checked = !isActive;
-      axShowStatus(slug, 'idle');
-      showToast('Erreur : ' + err.message, 'error');
-    }
-  }
-
-  async function axToggleGroup(groupCb, exerciseBoxes) {
-    const turnOn = groupCb.checked;
-    const slugs  = Array.from(exerciseBoxes).map(b => b.dataset.slug);
-    const toChange = slugs.filter(slug => _activeExerciseIds.has(slug) !== turnOn);
-    if (toChange.length === 0) return;
-
-    const api = axApi();
-    toChange.forEach(slug => axShowStatus(slug, 'saving'));
-    try {
-      /* Copy-on-first-toggle — voir axToggleExercise. */
-      if (_currentTarget.type === 'student' && !_studentPersonalized && _studentInherit.list.length) {
-        await lfmTeacher.addActiveExercisesBulkToStudent(_currentTarget.id, _studentInherit.list);
-      }
-
-      if (turnOn) await api.addBulk(api.targetId, toChange);
-      else        await api.removeBulk(api.targetId, toChange);
-
-      if (_currentTarget.type === 'student') {
-        await loadActiveSetForTarget();
-      } else {
-        if (turnOn) toChange.forEach(slug => _activeExerciseIds.add(slug));
-        else        toChange.forEach(slug => _activeExerciseIds.delete(slug));
-        if (_currentTarget.type === 'group') {
-          if (_activeExerciseIds.size > 0) _configuredGroupIds.add(_currentTarget.id);
-          else _configuredGroupIds.delete(_currentTarget.id);
-        }
-      }
-      exerciseBoxes.forEach(b => { b.checked = _activeExerciseIds.has(b.dataset.slug); });
-      toChange.forEach(slug => axShowStatus(slug, 'saved'));
-      updateGroupCheckStates(axTreeEl);
-      updateAxCounter();
-    } catch (err) {
-      toChange.forEach(slug => axShowStatus(slug, 'idle'));
-      showToast('Erreur : ' + err.message, 'error');
-      renderAccessTree();
-    }
-  }
-
-  let _axSearchTimer;
-  document.getElementById('ax-search').addEventListener('input', () => {
-    clearTimeout(_axSearchTimer);
-    _axSearchTimer = setTimeout(renderAccessTree, 120);
-  });
 
   /* ═══════════════════════════════════════════════════════════════════════════
      MODAL HELPERS
@@ -2323,14 +1519,7 @@
         _groups = _groups.filter(g => g.id !== id);
         /* ON DELETE SET NULL côté DB — refléter localement sans recharger. */
         _students.forEach(s => { if (s.group_id === id) s.group_id = null; });
-        _configuredGroupIds.delete(id);
-        if (_currentTarget.type === 'group' && _currentTarget.id === id) {
-          _currentTarget = { type: 'class', id: _currentClass.id };
-          await loadActiveSetForTarget();
-        }
         renderDetailStudents();
-        populateTargetSelector();
-        renderAccessTree();
         showToast('Groupe supprimé');
         openModalGroups();
       } else {
