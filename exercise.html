@@ -8124,7 +8124,8 @@
       else if (pct >= 60) msg = '👍 Continue comme ça !';
       else                msg = '💪 Encore un petit effort !';
       document.getElementById('score-msg').textContent = msg;
-      _setupResultsScreen();
+      encadrLevelSelect.completeLevel(sessionLevelList[sessionLevelIdx], score, total);
+      _setupResultsScreen(pct);
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
       const slug = new URLSearchParams(window.location.search).get('slug');
