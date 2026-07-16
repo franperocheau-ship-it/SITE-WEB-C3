@@ -10,6 +10,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Conjugaison — Identifier l'infinitif et le groupe",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 1, /* nombre réel de paliers du moteur */
     type: "infinitif-et-groupe",
     questionsPerSession: 20,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -297,6 +298,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Être au présent",
     verb: "être",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 1, /* nombre réel de paliers du moteur */
     exerciseTypes: ["fill-blank", "multiple-choice", "matching", "find-error", "conjugation-table", "guess-subject", "word-order"],
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -392,6 +394,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — 1er groupe au présent",
     type: "text-input",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 1, /* nombre réel de paliers du moteur */
     questionsPerSession: 25,
     sortByDifficulty: true,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -509,6 +512,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Verbes particuliers du 1er groupe",
     type: "verbes-particuliers-niveaux",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 5, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -634,6 +638,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — 2e groupe au présent",
     type: "text-input",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 1, /* nombre réel de paliers du moteur */
     questionsPerSession: 25,
     sortByDifficulty: true,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -731,6 +736,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — 3e groupe au présent",
     type: "text-input",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 1, /* nombre réel de paliers du moteur */
     questionsPerSession: 25,
     sortByDifficulty: true,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -815,6 +821,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Imparfait",
     type: "imparfait-niveaux",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 2, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -929,6 +936,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Futur simple",
     type: "futur-niveaux",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 2, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -1049,6 +1057,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Passé simple",
     type: "text-input",
     levels: ["CM2", "6e"],
+    paliers: 1, /* nombre réel de paliers du moteur */
     questionsPerSession: 25,
     sortByDifficulty: true,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -1160,6 +1169,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Avoir au présent",
     verb: "avoir",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 1, /* nombre réel de paliers du moteur */
     exerciseTypes: ["fill-blank", "multiple-choice", "matching", "find-error", "conjugation-table", "guess-subject", "word-order"],
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -1255,6 +1265,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Passé composé",
     type: "infinitif-passe-compose",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 1, /* nombre réel de paliers du moteur */
     questionsPerSession: 15,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -1300,6 +1311,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Auxiliaires être / avoir",
     type: "auxiliaire-identifier",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 1, /* nombre réel de paliers du moteur */
     questionsPerSession: 15,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -1346,6 +1358,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Grammaire — Déterminants démonstratifs",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type: "det-demo-niveaux",
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
 
@@ -1521,6 +1534,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Grammaire — L'adjectif",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 1, /* nombre réel de paliers du moteur */
     type: "mots-cliquables",
     questionsPerSession: 8,
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
@@ -1656,6 +1670,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Grammaire — L'adverbe",
     levels:  ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type:    "adv-niveaux",
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
 
@@ -1838,6 +1853,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Grammaire — Le nom",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 1, /* nombre réel de paliers du moteur */
     type: "mots-cliquables",
     questionsPerSession: 8,
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
@@ -1941,6 +1957,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Grammaire — Phrase simple et complexe",
     levels: ["CM2", "6e"],
+    paliers: 1, /* nombre réel de paliers du moteur */
     type: "classification-etapes",
     questionsPerSession: 8,
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
@@ -2097,6 +2114,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Grammaire — Connecteurs et conjonctions",
     levels: ["CM2", "6e"],
+    paliers: 1, /* nombre réel de paliers du moteur */
     type: "choix-etiquette",
     questionsPerSession: 4,
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
@@ -2137,6 +2155,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Grammaire — Formes de phrases interrogatives",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type: "produire-3-formes",
     questionsPerSession: 6,
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
@@ -2197,6 +2216,7 @@ const EXERCISE_DATA = {
     competence: "Fractions — Représenter",
     type: "representer-fraction",
     levels: ["CM1", "CM2"],
+    paliers: 2, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
@@ -2243,6 +2263,7 @@ const EXERCISE_DATA = {
     competence: "Fractions — Lire et écrire",
     type: "lire-fraction",
     levels: ["CM1", "CM2"],
+    paliers: 2, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
@@ -2287,6 +2308,7 @@ const EXERCISE_DATA = {
     competence: "Fractions — Décomposer",
     type: "decomposer-fraction",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
@@ -2360,6 +2382,7 @@ const EXERCISE_DATA = {
     competence: "Fractions — Problèmes",
     type: "fractions-problemes",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
@@ -2556,6 +2579,7 @@ const EXERCISE_DATA = {
     competence: "Fractions — Droite graduée",
     type: "placer-fraction-droite",
     levels: ["CM1", "CM2"],
+    paliers: 2, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
@@ -2604,6 +2628,7 @@ const EXERCISE_DATA = {
     competence: "Nombres entiers — Écriture chiffrée",
     type: "nombre-entier",
     levels: ["CM1", "CM2"],
+    paliers: 2, /* nombre réel de paliers du moteur */
     questionsPerSession: 12,
     backLink: { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
@@ -2711,6 +2736,7 @@ const EXERCISE_DATA = {
     competence: "Nombres entiers — Écriture en lettres",
     type: "nombre-entier",
     levels: ["CM1", "CM2"],
+    paliers: 2, /* nombre réel de paliers du moteur */
     questionsPerSession: 12,
     backLink: { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
     bank: [
@@ -2845,6 +2871,7 @@ const EXERCISE_DATA = {
     competence: "Nombres entiers — Valeur positionnelle",
     type:  "valeur-position",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 1, /* nombre réel de paliers du moteur */
     questionsPerSession: 13,
     backLink: { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
@@ -2920,6 +2947,7 @@ const EXERCISE_DATA = {
     competence: "Orthographe — Accord déterminant/nom",
     type:  "accord-ecrit",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     questionsPerSession: 15,
     backLink: { href: "français-orthographe.html", label: "Orthographe" },
     levelDescs: {
@@ -3072,6 +3100,7 @@ const EXERCISE_DATA = {
     competence: "Orthographe — Accord adjectif/nom",
     type:  "accord-ecrit",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     questionsPerSession: 15,
     backLink: { href: "français-orthographe.html", label: "Orthographe" },
     levelDescs: {
@@ -3233,6 +3262,7 @@ const EXERCISE_DATA = {
     domaine:    "Mathématiques",
     competence: "Fractions — Encadrer",
     levels: ["CM1", "CM2"],
+    paliers: 2, /* nombre réel de paliers du moteur */
     type: "encadrer-fraction",
     questionsPerSession: 6,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
@@ -3275,6 +3305,7 @@ const EXERCISE_DATA = {
     domaine:    "Mathématiques",
     competence: "Fractions — Comparer",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type: "comparer-fractions",
     questionsPerSession: 6,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
@@ -3329,6 +3360,7 @@ const EXERCISE_DATA = {
     competence: "Orthographe — Accord participe passé (COD)",
     type:  "accord-participe-cod",
     levels: ["CM2", "6e"],
+    paliers: 2, /* nombre réel de paliers du moteur */
     questionsPerSession: 8,
     backLink: { href: "français-orthographe.html", label: "Orthographe" },
 
@@ -3603,6 +3635,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Verbes irréguliers : FAIRE",
     verb: "faire",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -3701,6 +3734,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Verbes irréguliers : ALLER",
     verb: "aller",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -3806,6 +3840,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Verbes irréguliers : DIRE",
     verb: "dire",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -3912,6 +3947,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Verbes irréguliers : VENIR",
     verb: "venir",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -4018,6 +4054,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Verbes irréguliers : POUVOIR",
     verb: "pouvoir",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -4125,6 +4162,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Verbes irréguliers : VOIR",
     verb: "voir",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -4232,6 +4270,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Verbes irréguliers : VOULOIR",
     verb: "vouloir",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -4339,6 +4378,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Verbes irréguliers : PRENDRE",
     verb: "prendre",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -4440,6 +4480,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Conjugaison — Plus-que-parfait",
     levels: ["CM2", "6e"],
+    paliers: 2, /* nombre réel de paliers du moteur */
     type: "pqp-niveaux",
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -4598,6 +4639,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Conjugaison — Impératif présent",
     levels:             ["CM2", "6e"],
+    paliers:            2, /* nombre réel de paliers du moteur */
     type:               "imp-niveaux",
     questionsPerSession: 10,
     backLink:           { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -4725,6 +4767,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Conjugaison — Conditionnel présent",
     levels:              ["6e"],
+    paliers:             2, /* nombre réel de paliers du moteur */
     type:                "cond-niveaux",
     questionsPerSession: 10,
     backLink:            { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -4853,6 +4896,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Grammaire — Accord sujet-verbe inversé",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 2, /* nombre réel de paliers du moteur */
     type: "sujet-inverse-niveaux",
     questionsPerSession: 6,
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
@@ -4984,6 +5028,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Grammaire — Épithète et attribut du sujet",
     levels:  ["CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type:    "epithete-attribut-niveaux",
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
 
@@ -5190,6 +5235,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Grammaire — Épithète et complément du nom",
     levels:  ["6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type:    "ecn-niveaux",
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
 
@@ -5387,6 +5433,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Grammaire — Pronoms personnels",
     levels: ["CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type: "psc-niveaux",
     questionsPerSession: 10,
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
@@ -5707,6 +5754,7 @@ const EXERCISE_DATA = {
     competence: "Grammaire — Pronoms personnels",
     type: "gnsp-niveaux",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
 
     /* ════════════════════════════════════════════════════════════════════
@@ -5925,6 +5973,7 @@ const EXERCISE_DATA = {
     competence: "Orthographe — Accord dans le groupe nominal",
     type:       "gn-pluriel-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "français-orthographe.html", label: "Orthographe" },
 
     pools: {
@@ -6021,6 +6070,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Orthographe — Transformer un groupe nominal du masculin au féminin",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type: "genre-niveaux",
     backLink: { href: "français-orthographe.html", label: "Orthographe" },
 
@@ -6088,6 +6138,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Orthographe — Identifier le donneur d'accord",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 2, /* nombre réel de paliers du moteur */
     type: "donneur-niveaux",
     backLink: { href: "français-orthographe.html", label: "Orthographe" },
 
@@ -6218,6 +6269,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Passé composé avec avoir",
     type: "pc-avoir-niveaux",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -6501,6 +6553,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Choisir l'auxiliaire être ou avoir au passé composé",
     type: "etre-ou-avoir-niveaux",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     questionsPerSession: 12,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -6566,6 +6619,7 @@ const EXERCISE_DATA = {
     competence: "Conjugaison — Passé composé avec être (accord du participe)",
     type:       "pce-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    2, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
     backLink: { href: "français-orthographe.html", label: "l'Orthographe" },
 
@@ -6689,6 +6743,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Orthographe — Modifier le temps et effectuer les accords nécessaires",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    5, /* nombre réel de paliers du moteur */
     type:       "change-temps-niveaux",
     questionsPerSession: 10,
     backLink:   { href: "français-orthographe.html", label: "Orthographe" },
@@ -7282,6 +7337,7 @@ const EXERCISE_DATA = {
     competence:  "Orthographe — Accord sujet-verbe, adjectif attribut et participe passé",
     type:        "change-sujet-niveaux",
     levels:      ["CM1", "CM2", "6e"],
+    paliers:     4, /* nombre réel de paliers du moteur */
     backLink:    { href: "français-orthographe.html", label: "Orthographe" },
     questionsPerSession: 10,
 
@@ -7699,6 +7755,7 @@ const EXERCISE_DATA = {
     competence: "Nombres entiers — Décomposition",
     type:       "decomposer-nombre-entier-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — 4 champs numériques (milliers / centaines / dizaines / unités) ── */
@@ -7756,6 +7813,7 @@ const EXERCISE_DATA = {
     competence: "Nombres entiers — Comparaison",
     type:       "comparer-nombres-entiers-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — 4 chiffres, pièges : zéros intercalés, chiffres identiques sauf un rang ── */
@@ -7813,6 +7871,7 @@ const EXERCISE_DATA = {
     competence: "Nombres entiers — Composition",
     type:       "composer-nombre-entier-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — décomposition canonique → trouver le nombre ── */
@@ -7855,6 +7914,7 @@ const EXERCISE_DATA = {
     competence: "Nombres entiers",
     type:       "ranger-nombres-entiers-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — 4 nombres à 4 chiffres ────────────────────────────────── */
@@ -7906,6 +7966,7 @@ const EXERCISE_DATA = {
     competence: "Nombres entiers — Encadrement",
     type:       "encadrer-nombre-entier-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — dizaine / centaine, 3–4 chiffres ─────────────────────── */
@@ -7966,6 +8027,7 @@ const EXERCISE_DATA = {
     competence: "Nombres entiers — Droite graduée",
     type:       "droite-graduee-nombres-entiers-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — nombres à 3–4 chiffres, 2/4/5/6/10 intervalles ── */
@@ -8024,6 +8086,7 @@ const EXERCISE_DATA = {
     competence: "Nombres entiers — Arrondi",
     type:       "arrondir-nombre-entier-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — dizaine près, 3–4 chiffres ────────────────────────────
@@ -8087,6 +8150,7 @@ const EXERCISE_DATA = {
     competence: "Nombres entiers — Arrondis en contexte",
     type:       "arrondi-adapte-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — 2 choix, excès ou défaut au rang le plus proche ── */
@@ -8295,6 +8359,7 @@ const EXERCISE_DATA = {
     competence: "Nombres décimaux — Associer une fraction décimale à un nombre décimal",
     type:       "fraction-decimale-grille-droite-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-fractions.html", label: "Fractions" },
 
     /* ── Niveau 1 — /10 ── */
@@ -8347,6 +8412,7 @@ const EXERCISE_DATA = {
     competence: "Nombres décimaux — Associer une fraction décimale à un nombre décimal",
     type:       "fraction-decimale-tableau-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-fractions.html", label: "Fractions" },
 
     /* tab : { u, di, ce, mi } — null = colonne non active */
@@ -8403,6 +8469,7 @@ const EXERCISE_DATA = {
     domaine:    "Français",
     competence: "Orthographe — Mots invariables",
     levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     type: "mots-invariables-serie",
     backLink: { href: "français-orthographe.html", label: "Orthographe" },
 
@@ -8461,6 +8528,7 @@ const EXERCISE_DATA = {
     competence: "Nombres décimaux — Comparaison",
     type:       "comparer-decimaux-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [
@@ -8509,6 +8577,7 @@ const EXERCISE_DATA = {
     competence: "Nombres décimaux — Rangement",
     type:       "ranger-decimaux-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [
@@ -8560,6 +8629,7 @@ const EXERCISE_DATA = {
     competence: "Nombres décimaux — Encadrement",
     type:       "encadrer-decimaux-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [
@@ -8622,6 +8692,7 @@ const EXERCISE_DATA = {
     competence: "Nombres décimaux — Décomposition",
     type:       "decomposer-decimaux-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [
@@ -8670,6 +8741,7 @@ const EXERCISE_DATA = {
     competence: "Nombres décimaux — Composition",
     type:       "composer-decimaux-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [
@@ -8720,6 +8792,7 @@ const EXERCISE_DATA = {
     competence: "Nombres décimaux — Intercalation",
     type:       "intercaler-decimaux-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [
@@ -8776,6 +8849,7 @@ const EXERCISE_DATA = {
     competence: "Nombres décimaux — Droite graduée",
     type:       "placer-decimaux-droite-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [
@@ -8818,6 +8892,7 @@ const EXERCISE_DATA = {
     competence: "Nombres décimaux — Association fraction / décimal",
     type:       "associer-decimal-fraction-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [
@@ -8861,6 +8936,7 @@ const EXERCISE_DATA = {
     competence: "Grammaire — Identifier le type et la forme de la phrase",
     type:       "identifier-type-phrase-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    4, /* nombre réel de paliers du moteur */
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
     /* Fusion de identifier-phrase-declarative/interrogative/imperative/exclamative
@@ -8989,6 +9065,7 @@ const EXERCISE_DATA = {
     competence: "Grammaire — Transformer une phrase",
     type:       "transformer-phrase-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    2, /* nombre réel de paliers du moteur */
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
     /* Fusion de transformer-declarative-interrogative (niveau 1) et
@@ -9029,6 +9106,7 @@ const EXERCISE_DATA = {
     competence: "Grammaire — Déterminants : articles définis",
     type:       "articles-definis-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
     /* Fusion de identifier-article-defini (niveau 1, mots cliquables),
@@ -9068,6 +9146,7 @@ const EXERCISE_DATA = {
     competence: "Grammaire — Déterminants possessifs",
     type:       "determinants-possessifs-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    2, /* nombre réel de paliers du moteur */
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
     /* Fusion de identifier-determinant-possessif (niveau 1) et
@@ -9104,6 +9183,7 @@ const EXERCISE_DATA = {
     competence: "Grammaire — Déterminants : articles indéfinis",
     type:       "articles-indefinis-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    paliers:    2, /* nombre réel de paliers du moteur */
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
     /* Fusion de identifier-article-indefini (niveau 1, mots cliquables) et

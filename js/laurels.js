@@ -52,34 +52,60 @@ function buildLaurelNotionMap() {
   return map;
 }
 
-/* ── Résolution du palier (1/2/3) à partir de la colonne `level` ─────────────
+/* ── Clé de niveau normalisée, pour compter les niveaux DISTINCTS réussis ────
    Le format stocké varie selon le type d'exercice : "Niveau N" (majorité des
-   exercices du moteur générique), "CM1"/"CM2"/"6e" (exercices EXERCISE_DATA
-   pilotés par le flux historique), ou un nombre brut. Une valeur absente ou
-   non reconnue retombe sur le palier 1 (rétrocompatibilité des résultats
-   enregistrés avant l'ajout de ce système). ─────────────────────────────── */
-function laurelLevelTier(levelValue) {
-  if (levelValue === null || levelValue === undefined || levelValue === '') return 1;
+   exercices du moteur générique), "CM1"/"CM2"/"6e" (flux historique), ou un
+   nombre brut. On ne cherche plus un "palier" fixe (1/2/3) : seule compte la
+   distinction entre niveaux (mode libre — l'ordre n'a pas d'importance), donc
+   on normalise chaque valeur vers une position comparable ("1", "2", ...).
+   Une valeur absente retombe sur "1" (rétrocompatibilité : résultats
+   enregistrés avant l'ajout de la colonne `level`, ou exercices sans
+   sélection de niveau). ─────────────────────────────────────────────────── */
+function laurelLevelKey(levelValue) {
+  if (levelValue === null || levelValue === undefined || levelValue === '') return '1';
   const str = String(levelValue).trim();
 
   const niveauMatch = str.match(/niveau\s*(\d+)/i);
-  if (niveauMatch) return Math.min(parseInt(niveauMatch[1], 10), 3);
+  if (niveauMatch) return niveauMatch[1];
 
-  const CANONICAL_GRADE_TIER = { cm1: 1, cm2: 2, '6e': 3 };
-  const gradeTier = CANONICAL_GRADE_TIER[str.toLowerCase()];
-  if (gradeTier) return gradeTier;
+  const CANONICAL_GRADE = { cm1: '1', cm2: '2', '6e': '3' };
+  const grade = CANONICAL_GRADE[str.toLowerCase()];
+  if (grade) return grade;
 
   const asNumber = Number(str);
-  if (!Number.isNaN(asNumber) && asNumber > 0) return Math.min(Math.round(asNumber), 3);
+  if (!Number.isNaN(asNumber) && asNumber > 0) return String(Math.round(asNumber));
 
-  return 1;
+  return str.toLowerCase(); /* valeur non reconnue : traitée comme une position à part, par prudence */
+}
+
+/* Nombre réel de paliers de difficulté d'un exercice — champ `paliers` dans
+   exercise-data.js, distinct de `levels` (sens pédagogique uniquement, utilisé
+   par le bulletin/les badges/le catalogue). Voir audit-levels.mjs pour la
+   vérification de cohérence entre les deux. */
+function laurelTotalLevels(slug) {
+  const ex = (typeof EXERCISE_DATA !== 'undefined') ? EXERCISE_DATA[slug] : null;
+  return (ex && typeof ex.paliers === 'number' && ex.paliers >= 1) ? ex.paliers : 1;
+}
+
+/* ── État de la feuille : squelette → pleine → dorée ─────────────────────────
+   - 1 seul palier : "pleine" directement, jamais dorée (l'or récompense la
+     maîtrise multi-paliers, pas un simple exercice réussi).
+   - 2 paliers : squelette → dorée directement (pas d'état intermédiaire).
+   - 3 paliers ou plus : squelette (1 palier) → pleine (paliers intermédiaires)
+     → dorée (tous réussis). ────────────────────────────────────────────── */
+function laurelLeafState(distinctCount, totalLevels) {
+  if (distinctCount <= 0) return null;
+  if (totalLevels <= 1) return 'pleine';
+  if (distinctCount >= totalLevels) return 'doree';
+  if (distinctCount === 1) return 'squelette';
+  return 'pleine';
 }
 
 /* ── Récupération des résultats + regroupement par exercice distinct ────────
-   Pour chaque exercice_slug : palier le plus haut parmi les tentatives
-   réussies (pct >= 80), et date de première réussite (pour l'ordre des
-   feuilles dans la couronne). Un exercice sans tentative réussie n'apparaît
-   pas dans la map (pas de feuille). ─────────────────────────────────────── */
+   Pour chaque exercice_slug : l'ensemble des niveaux distincts réussis
+   (pct >= 80, peu importe l'ordre — mode libre), et la date de première
+   réussite (pour l'ordre des feuilles dans la couronne). Un exercice sans
+   tentative réussie n'apparaît pas dans la map (pas de feuille). ─────────── */
 async function fetchLaurelsResults(studentId) {
   const { data, error } = await window.lfmDb
     .from('exercise_results')
@@ -92,53 +118,24 @@ async function fetchLaurelsResults(studentId) {
     return new Map();
   }
 
-  const bySlug = new Map(); /* slug -> { tier, firstMasteredAt } */
+  const bySlug = new Map(); /* slug -> { levelKeys: Set<string>, firstMasteredAt } */
   (data || []).forEach(row => {
     const pct = parseFloat(row.pct);
     if (pct < LAUREL_SUCCESS_THRESHOLD) return;
 
-    const tier = laurelLevelTier(row.level);
+    const key = laurelLevelKey(row.level);
     const masteredAt = row.completed_at ? new Date(row.completed_at).getTime() : 0;
-    const existing = bySlug.get(row.exercise_slug);
+    let existing = bySlug.get(row.exercise_slug);
 
     if (!existing) {
-      bySlug.set(row.exercise_slug, { tier, firstMasteredAt: masteredAt });
-    } else {
-      existing.tier = Math.max(existing.tier, tier);
-      existing.firstMasteredAt = Math.min(existing.firstMasteredAt, masteredAt);
+      existing = { levelKeys: new Set(), firstMasteredAt: masteredAt };
+      bySlug.set(row.exercise_slug, existing);
     }
+    existing.levelKeys.add(key);
+    existing.firstMasteredAt = Math.min(existing.firstMasteredAt, masteredAt);
   });
 
   return bySlug;
-}
-
-/* ── Détection des feuilles nouvelles/surclassées depuis la dernière visite ──
-   Persisté en localStorage (pas de migration Supabase pour un simple effet
-   visuel). Une première visite (aucun instantané précédent) n'allume aucune
-   brillance : seule une vraie évolution entre deux visites en déclenche une,
-   pour éviter qu'un élève déjà avancé voie toute sa couronne s'illuminer au
-   premier chargement après la mise en service de cette fonctionnalité. ───── */
-function laurelDetectChanges(studentId, bySlug) {
-  const key = 'laurels-seen-' + studentId;
-  let previous = null;
-  try {
-    const raw = window.localStorage.getItem(key);
-    previous = raw ? JSON.parse(raw) : null;
-  } catch (_) { previous = null; }
-
-  const changed = new Set();
-  if (previous) {
-    bySlug.forEach((info, slug) => {
-      const prevTier = previous[slug] || 0;
-      if (info.tier > prevTier) changed.add(slug);
-    });
-  }
-
-  const snapshot = {};
-  bySlug.forEach((info, slug) => { snapshot[slug] = info.tier; });
-  try { window.localStorage.setItem(key, JSON.stringify(snapshot)); } catch (_) { /* stockage indisponible : pas de brillance, tant pis */ }
-
-  return changed;
 }
 
 /* ── Rang courant + progression vers le suivant ──────────────────────────── */
@@ -184,17 +181,13 @@ function laurelStemPath(cx, cy, r, mirror) {
   return pts.join(' ');
 }
 
-/* ── Répartition des feuilles par palier, pour le compteur sous la couronne ── */
+/* ── Répartition des feuilles, pour le compteur sous la couronne ────────────── */
 function laurelLeafBreakdown(earnedList) {
-  const total  = earnedList.length;
-  const silver = earnedList.filter(e => e.tier === 2).length;
-  const gold   = earnedList.filter(e => e.tier === 3).length;
+  const total = earnedList.length;
+  const gold  = earnedList.filter(e => e.state === 'doree').length;
 
   const parts = [`${total} feuille${total > 1 ? 's' : ''}`];
-  const sub = [];
-  if (silver > 0) sub.push(`${silver} argentée${silver > 1 ? 's' : ''}`);
-  if (gold > 0)   sub.push(`${gold} dorée${gold > 1 ? 's' : ''}`);
-  if (sub.length) parts.push('dont ' + sub.join(' · '));
+  if (gold > 0) parts.push(`dont ${gold} dorée${gold > 1 ? 's' : ''}`);
 
   return parts.join(' · ');
 }
@@ -202,9 +195,11 @@ function laurelLeafBreakdown(earnedList) {
 /* ── Rendu SVG de la couronne (cycle tous les 20, compteur si ≥ 1 complète) ──
    earnedList : exercices maîtrisés, triés par date de première réussite —
    la position dans cette liste = position de la feuille dans la couronne
-   (la couleur/apparence de la feuille suit en revanche son palier courant,
-   qui peut monter sans que sa position ne bouge). ───────────────────────── */
-function renderLaurelCrown(earnedList, isGolden, changedSlugs) {
+   (l'apparence de la feuille suit son état courant, qui peut avancer sans
+   que sa position ne bouge). Chaque feuille se (re)construit à l'affichage :
+   tracé du contour/nervure, puis remplissage, puis virage à l'or si dorée —
+   une seule animation CSS paramétrée par variables custom par feuille. ──── */
+function renderLaurelCrown(earnedList, isGolden) {
   const totalLeaves = earnedList.length;
   const completedCrowns = Math.floor(totalLeaves > 0 ? (totalLeaves - 1) / LAUREL_LEAVES_PER_CROWN : 0);
   const filledInCycle = totalLeaves === 0
@@ -240,40 +235,36 @@ function renderLaurelCrown(earnedList, isGolden, changedSlugs) {
 
     const filled = i < filledInCycle;
     const entry  = filled ? cycleEntries[i] : null;
-    const tier   = entry ? entry.tier : 0;
+    const state  = entry ? entry.state : null;
 
-    /* Niveau 1 : couleur du rang. Niveau 2 : même couleur + contour/nervure
-       argentés. Niveau 3 : entièrement dorée, l'or prime sur le rang. */
-    let fillColor, veinColor, strokeAttr;
     if (!filled) {
-      fillColor = emptyColor;
-      veinColor = '#d5dce6';
-      strokeAttr = '';
-    } else if (tier >= 3) {
-      fillColor = '#F5A623';
-      veinColor = '#B87A0E';
-      strokeAttr = '';
-    } else if (tier === 2) {
-      fillColor = rankLeafColor;
-      veinColor = '#C0C4CC';
-      strokeAttr = ' stroke="#C0C4CC" stroke-width="1.2"';
-    } else {
-      fillColor = rankLeafColor;
-      veinColor = rankVeinColor;
-      strokeAttr = '';
+      leaves += `
+        <g transform="translate(${x.toFixed(2)},${y.toFixed(2)}) rotate(${rotation.toFixed(1)})">
+          <path d="M0,${-ry} Q${rx},0 0,${ry} Q${-rx},0 0,${-ry} Z" fill="${emptyColor}" fill-opacity="0.7"/>
+          <line x1="0" y1="${-ry + 3}" x2="0" y2="${ry - 3}" stroke="#d5dce6" stroke-width="1"/>
+        </g>`;
+      continue;
     }
 
-    const fillOpacity = filled ? 1 : 0.7; /* laisse deviner la tige sous les feuilles vides */
-    const shine = filled && entry && changedSlugs.has(entry.slug);
-    const leafClasses = 'laurel-leaf' + (filled ? ' laurel-leaf--filled' : '') + (shine ? ' laurel-leaf--shine' : '');
+    /* squelette : fill:none, contour + nervure couleur du rang.
+       pleine    : remplie couleur du rang, nervure plus foncée en surimpression.
+       dorée     : entièrement or, l'or prime sur la couleur du rang. */
+    const finalFill = state === 'doree' ? '#F5A623' : rankLeafColor;
+    const finalVein = state === 'doree' ? '#B87A0E' : rankVeinColor;
+    const targetFillOpacity = state === 'squelette' ? 0 : 1;
     const delayMs = i * 40;
-    const animDelay = shine ? `${delayMs}ms, ${delayMs + 420}ms` : `${delayMs}ms`;
+
+    const leafVars =
+      `--leaf-pre-fill:${rankLeafColor};--leaf-pre-vein:${rankVeinColor};` +
+      `--leaf-final-fill:${finalFill};--leaf-final-vein:${finalVein};` +
+      `--leaf-fill-opacity:${targetFillOpacity};`;
 
     leaves += `
       <g transform="translate(${x.toFixed(2)},${y.toFixed(2)}) rotate(${rotation.toFixed(1)})">
-        <g class="${leafClasses}" style="animation-delay:${animDelay}">
-          <path d="M0,${-ry} Q${rx},0 0,${ry} Q${-rx},0 0,${-ry} Z" fill="${fillColor}" fill-opacity="${fillOpacity}"${strokeAttr}/>
-          <line x1="0" y1="${-ry + 3}" x2="0" y2="${ry - 3}" stroke="${veinColor}" stroke-width="1"/>
+        <g class="laurel-leaf laurel-leaf--filled" style="${leafVars}animation-delay:${delayMs}ms">
+          <path class="laurel-leaf-shape" d="M0,${-ry} Q${rx},0 0,${ry} Q${-rx},0 0,${-ry} Z"
+                fill="${finalFill}" fill-opacity="${targetFillOpacity}" stroke="${finalVein}" stroke-width="1.3"/>
+          <line class="laurel-leaf-vein" x1="0" y1="${-ry + 3}" x2="0" y2="${ry - 3}" stroke="${finalVein}" stroke-width="1"/>
         </g>
       </g>`;
   }
@@ -368,13 +359,16 @@ async function initLaurels(studentId) {
     return;
   }
 
-  const changedSlugs = laurelDetectChanges(studentId, bySlug);
-
   /* Ordre des feuilles = ordre de première réussite (stable d'une visite à
-     l'autre) ; une réussite plus tardive à un niveau supérieur relève le
-     palier de la feuille sans changer sa position. */
+     l'autre) ; une réussite plus tardive à un niveau supérieur fait avancer
+     l'état de la feuille sans changer sa position. */
   const earnedList = Array.from(bySlug.entries())
-    .map(([slug, info]) => ({ slug, tier: info.tier, firstMasteredAt: info.firstMasteredAt }))
+    .map(([slug, info]) => {
+      const totalLevels = laurelTotalLevels(slug);
+      const state = laurelLeafState(info.levelKeys.size, totalLevels);
+      return { slug, state, firstMasteredAt: info.firstMasteredAt };
+    })
+    .filter(e => e.state !== null)
     .sort((a, b) => a.firstMasteredAt - b.firstMasteredAt);
 
   const notionMap = buildLaurelNotionMap();
@@ -384,7 +378,7 @@ async function initLaurels(studentId) {
 
   root.innerHTML = `
     <div class="laurel-section">
-      ${renderLaurelCrown(earnedList, isGolden, changedSlugs)}
+      ${renderLaurelCrown(earnedList, isGolden)}
       <div class="laurel-rank-block">
         ${renderLaurelRank(totalLeaves)}
       </div>

@@ -327,7 +327,7 @@
     }
     if (_assetsPromise) return _assetsPromise;
     _assetsPromise = Promise.all([
-      typeof EXERCISE_DATA      !== 'undefined' ? null : loadScript('exercise-data.js?v=20'),
+      typeof EXERCISE_DATA      !== 'undefined' ? null : loadScript('exercise-data.js?v=21'),
       typeof REMEDIATION_DATA   !== 'undefined' ? null : loadScript('js/remediation-data.js?v=1')
     ]).then(() => checkRemediationDataOrphans())
       .catch(err => { _assetsPromise = null; throw err; });

@@ -60,39 +60,46 @@
   transform-origin: center;
 }
 
-.laurel-leaf--filled {
-  opacity: 0;
-  transform: scale(0.4);
+/* Longueur de trait volontairement généreuse (plus grande que le contour réel
+   de la feuille à cette échelle) : suffisant pour un tracé "stroke-dashoffset"
+   propre sans avoir besoin de la longueur exacte du path par feuille. */
+.laurel-leaf-shape {
+  stroke-dasharray: 130;
+  stroke-dashoffset: 0;
 }
 
-.laurel-leaf--filled.laurel-leaf--animate {
-  animation-name: laurelLeafPop;
-  animation-duration: 420ms;
-  animation-timing-function: cubic-bezier(.34,1.56,.64,1);
-  animation-fill-mode: forwards;
+.laurel-leaf-vein {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 0;
 }
 
-/* Feuille nouvelle ou surclassée depuis la dernière visite : le "pop" habituel,
-   suivi d'un flash de brillance (délai de départ fourni en ligne par JS). */
-.laurel-leaf--shine.laurel-leaf--animate {
-  animation-name: laurelLeafPop, laurelShine;
-  animation-duration: 420ms, 1500ms;
-  animation-timing-function: cubic-bezier(.34,1.56,.64,1), ease-in-out;
-  animation-fill-mode: forwards, none;
+/* État de repos (sans JS / animation) : tracé complet, couleurs finales —
+   la feuille reste correcte même si la classe --animate n'est jamais ajoutée. */
+
+.laurel-leaf--filled.laurel-leaf--animate .laurel-leaf-shape {
+  animation: laurelLeafConstruct 600ms ease-out forwards;
 }
 
-@keyframes laurelLeafPop {
-  0%   { opacity: 0; transform: scale(0.4); }
-  60%  { opacity: 1; transform: scale(1.15); }
-  100% { opacity: 1; transform: scale(1); }
+.laurel-leaf--filled.laurel-leaf--animate .laurel-leaf-vein {
+  animation: laurelVeinConstruct 600ms ease-out forwards;
 }
 
-@keyframes laurelShine {
-  0%   { filter: drop-shadow(0 0 0 transparent) brightness(1); }
-  25%  { filter: drop-shadow(0 0 9px #FFD97A) brightness(1.5); }
-  50%  { filter: drop-shadow(0 0 3px #FFD97A) brightness(1.1); }
-  75%  { filter: drop-shadow(0 0 9px #FFD97A) brightness(1.5); }
-  100% { filter: drop-shadow(0 0 0 transparent) brightness(1); }
+/* Construction en 3 temps, pilotée par variables custom posées en ligne par
+   feuille (couleur du rang avant/après, couleur finale, opacité de
+   remplissage cible) : 0-45% tracé du contour, 45-80% remplissage,
+   80-100% virage à l'or (no-op visuel pour les feuilles non dorées, puisque
+   --leaf-final-fill == --leaf-pre-fill dans ce cas). */
+@keyframes laurelLeafConstruct {
+  0%   { stroke-dashoffset: 130; fill-opacity: 0; fill: var(--leaf-pre-fill); stroke: var(--leaf-pre-vein); }
+  45%  { stroke-dashoffset: 0;   fill-opacity: 0; fill: var(--leaf-pre-fill); stroke: var(--leaf-pre-vein); }
+  80%  { stroke-dashoffset: 0;   fill-opacity: var(--leaf-fill-opacity); fill: var(--leaf-pre-fill); stroke: var(--leaf-pre-vein); }
+  100% { stroke-dashoffset: 0;   fill-opacity: var(--leaf-fill-opacity); fill: var(--leaf-final-fill); stroke: var(--leaf-final-vein); }
+}
+
+@keyframes laurelVeinConstruct {
+  0%   { stroke-dashoffset: 40; stroke: var(--leaf-pre-vein); }
+  45%  { stroke-dashoffset: 0;  stroke: var(--leaf-pre-vein); }
+  100% { stroke-dashoffset: 0;  stroke: var(--leaf-final-vein); }
 }
 
 /* ── Rang ──────────────────────────────────────────────────────────────── */

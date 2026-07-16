@@ -690,7 +690,7 @@
     if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined') return Promise.resolve();
     if (_exerciseAssetsPromise) return _exerciseAssetsPromise;
     _exerciseAssetsPromise = Promise.all([
-      typeof EXERCISE_DATA               !== 'undefined' ? null : loadScript('exercise-data.js?v=20'),
+      typeof EXERCISE_DATA               !== 'undefined' ? null : loadScript('exercise-data.js?v=21'),
       typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined' ? null : loadScript('js/exercise-catalog.js?v=6')
     ]).catch(err => { _exerciseAssetsPromise = null; throw err; });
     return _exerciseAssetsPromise;
@@ -1238,18 +1238,23 @@
   ═══════════════════════════════════════════════════════════════════════════ */
 
   /* Une compétence = un ou plusieurs exercice_id d'EXERCISE_DATA partageant le
-     même libellé `competence`, et ayant plus d'un niveau (rien à faire
-     progresser sinon). Les exercices "autonomes" (EXERCISE_CATALOG_AUTONOMOUS)
-     n'ont pas de tableau `levels` accessible ici : ils ne sont pas listés dans
-     cette section (limite connue, sans impact — leur niveau_mode reste
-     'progressif' par défaut, comportement actuel inchangé). */
+     même libellé `competence`, et ayant plus d'un palier de difficulté réel
+     (rien à faire progresser sinon — le toggle progressif/ouvert agit sur la
+     progression LevelSelect du moteur, pas sur la pertinence pédagogique par
+     niveau scolaire). `paliers` (nombre réel de paliers du moteur) est
+     distinct de `levels` (niveaux scolaires pédagogiques, utilisé par le
+     bulletin/les badges/le catalogue) — voir exercise-data.js. Les exercices
+     "autonomes" (EXERCISE_CATALOG_AUTONOMOUS) n'ont pas de champ `paliers`
+     accessible ici : ils ne sont pas listés dans cette section (limite
+     connue, sans impact — leur niveau_mode reste 'progressif' par défaut,
+     comportement actuel inchangé). */
   function buildCompetenceTree() {
     if (_competenceTreeCache) return _competenceTreeCache;
     const byDomaine = {};
 
     Object.keys(EXERCISE_DATA).forEach(slug => {
       const ex = EXERCISE_DATA[slug];
-      if (!ex.levels || ex.levels.length < 2) return;
+      if (!ex.paliers || ex.paliers < 2) return;
       if (!byDomaine[ex.domaine]) byDomaine[ex.domaine] = {};
       if (!byDomaine[ex.domaine][ex.competence]) byDomaine[ex.domaine][ex.competence] = [];
       byDomaine[ex.domaine][ex.competence].push(slug);
