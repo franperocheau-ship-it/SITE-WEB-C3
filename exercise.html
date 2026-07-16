@@ -12,7 +12,8 @@
   <script src="js/results.js"></script>
   <script src="js/guided-access.js?v=1"></script>
   <script src="js/niveau-mode.js?v=1"></script>
-  <script src="js/level-select.js?v=2"></script>
+  <script src="js/level-unlock.js?v=1"></script>
+  <script src="js/level-select.js?v=3"></script>
   <script src="exercise-data.js?v=20"></script>
   <style>
     /* ── Exercise container (narrows content to readable width) ── */
@@ -6143,7 +6144,15 @@
       /* Enregistrement du résultat pour les élèves connectés */
       const slug = new URLSearchParams(window.location.search).get('slug');
       const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
-      const activeLevel = pfiSelectedLevel || accordLevel || apcodLevel || fracLevel || rfLevel || nlLevel || nbEntierLevel || cmpLevel || encadrLevel || decompLevel || fpLevel || null;
+      /* apcodLevel/fracLevel/rfLevel/nlLevel/cmpLevel sont des entiers de
+         difficulté (diffMap) internes au type, sans rapport avec l'id
+         LevelSelect (CM1/CM2/6e) — voir sessionLevelList/sessionLevelIdx,
+         déjà tenus à jour par onSelectLevel pour ces 5 types, seule source
+         fiable de l'id réel pour l'enregistrement Supabase. */
+      const sessionLevelIdTypes = ['accord-participe-cod', 'lire-fraction', 'representer-fraction', 'placer-fraction-droite', 'comparer-fractions'];
+      const activeLevel = pfiSelectedLevel || accordLevel
+        || (sessionLevelIdTypes.includes(currentType) ? sessionLevelList[sessionLevelIdx] : null)
+        || nbEntierLevel || encadrLevel || decompLevel || fpLevel || null;
       saveExerciseResult({
         exerciseSlug: slug,
         subject,
@@ -8125,7 +8134,7 @@
         subject,
         category,
         exerciseType: 'encadrer-fraction',
-        level:        encadrLevel,
+        level:        sessionLevelList[sessionLevelIdx],
         score,
         total,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null

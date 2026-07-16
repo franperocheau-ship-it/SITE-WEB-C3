@@ -92,8 +92,9 @@ const LevelSelect = (() => {
        renderSelectScreen(). Sans js/niveau-mode.js chargé sur la page, reste
        'progressif' indéfiniment : aucune rupture pour les pages qui ne
        l'incluent pas encore. */
-    let _niveauMode         = 'progressif';
-    let _niveauModeResolved = false;
+    let _niveauMode          = 'progressif';
+    let _niveauModeResolved  = false;
+    let _resultsUnlockResolved = false;
 
     function isUnlocked(index) {
       if (_niveauMode === 'ouvert') return true;
@@ -152,27 +153,47 @@ const LevelSelect = (() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /* Rendu immédiat avec l'état connu ('progressif' tant que non résolu) —
-       jamais de flash vide ni de dépendance à l'ordre d'affichage du
-       conteneur choisi par la page appelante. Résolution du réglage en
-       arrière-plan, au plus une fois par instance ; un seul re-rendu possible
-       et uniquement dans le sens verrouillé → déverrouillé (jamais l'inverse
-       : un élève ne doit jamais voir un niveau se reverrouiller sous ses
-       yeux). Sans js/niveau-mode.js chargé, _niveauModeResolved reste false
-       mais _niveauMode reste 'progressif' pour toujours — comportement
-       identique à avant cette fonctionnalité. */
+    /* Rendu immédiat avec l'état connu (sessionStorage, 'progressif' tant que
+       non résolu) — jamais de flash vide ni de dépendance à l'ordre
+       d'affichage du conteneur choisi par la page appelante. Deux résolutions
+       en arrière-plan, chacune au plus une fois par instance et indépendante
+       l'une de l'autre (js/niveau-mode.js pour le réglage progressif/ouvert,
+       js/level-unlock.js pour les niveaux déjà validés dans Supabase) ; dans
+       les deux cas, au plus un re-rendu et uniquement dans le sens
+       verrouillé → déverrouillé (jamais l'inverse : un élève ne doit jamais
+       voir un niveau se reverrouiller sous ses yeux). Sans l'un des deux
+       fichiers chargés sur la page, la résolution correspondante reste
+       simplement non déclenchée — comportement identique à avant cette
+       fonctionnalité. */
     function renderSelectScreen() {
       renderSelectScreenSync();
 
-      if (_niveauModeResolved || typeof lfmNiveauMode === 'undefined') return;
-      _niveauModeResolved = true;
+      if (!_niveauModeResolved && typeof lfmNiveauMode !== 'undefined') {
+        _niveauModeResolved = true;
+        lfmNiveauMode.get(exerciseKey).then(mode => {
+          if (mode === 'ouvert' && _niveauMode !== 'ouvert') {
+            _niveauMode = 'ouvert';
+            renderSelectScreenSync();
+          }
+        }).catch(() => {});
+      }
 
-      lfmNiveauMode.get(exerciseKey).then(mode => {
-        if (mode === 'ouvert' && _niveauMode !== 'ouvert') {
-          _niveauMode = 'ouvert';
-          renderSelectScreenSync();
-        }
-      }).catch(() => {});
+      /* Requête indépendante et parallèle à celle de lfmNiveauMode ci-dessus
+         (pas de séquencement, pour ne pas retarder l'une par l'autre) : si le
+         mode finit par résoudre en 'ouvert', on renonce simplement au
+         re-rendu ici plutôt que d'annuler la requête déjà partie. */
+      if (!_resultsUnlockResolved && typeof lfmLevelUnlock !== 'undefined') {
+        _resultsUnlockResolved = true;
+        lfmLevelUnlock.get(exerciseKey, levels.map(l => l.id), threshold).then(fromDb => {
+          if (_niveauMode === 'ouvert' || fromDb.length === 0) return;
+          const current = getValidated(exerciseKey);
+          const merged  = [...new Set([...current, ...fromDb])];
+          if (merged.length !== current.length) {
+            setValidated(exerciseKey, merged);
+            renderSelectScreenSync();
+          }
+        }).catch(() => {});
+      }
     }
 
     /**

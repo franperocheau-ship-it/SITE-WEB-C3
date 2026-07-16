@@ -71,6 +71,7 @@ CREATE TABLE public.exercise_results (
   id             UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
   student_id     UUID         NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   exercise_slug  TEXT         NOT NULL,
+  exercise_title TEXT,
   subject        TEXT         NOT NULL CHECK (subject IN ('français', 'mathématiques')),
   category       TEXT         NOT NULL,
   exercise_type  TEXT,
