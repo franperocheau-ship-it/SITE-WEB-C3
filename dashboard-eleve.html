@@ -5,9 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Espace élève — Lycée Français de Madrid</title>
   <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="laurels.css?v=1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
+  <script src="exercise-data.js?v=20"></script>
+  <script src="js/exercise-catalog.js?v=6"></script>
+  <script src="js/laurels.js?v=1"></script>
   <style>
     .dash-wrap {
       min-height: calc(100vh - 88px - 74px);
@@ -525,6 +529,9 @@
       <!-- ── Tab 2 : Mes résultats ── -->
       <div id="tab-resultats" class="dash-tab-pane" style="display:none">
 
+      <!-- Lauriers (couronne, rang, badges de domaine) -->
+      <div id="laurels-root"></div>
+
       <!-- Statistiques globales -->
       <div class="dash-stats" id="dash-stats" style="display:none">
         <div class="dash-stat">
@@ -607,6 +614,12 @@
     /* ── Tabs ─────────────────────────────────────────────────────────────── */
     const TAB_KEY = 'dash-active-tab';
 
+    /* Profil courant, mémorisé pour permettre un refetch de l'onglet
+       "Mes résultats" (résultats + lauriers) sans recharger toute la page —
+       voir refreshResultsTab() plus bas. */
+    let _profile   = null;
+    let _classMeta = null;
+
     function activateTab(tabName) {
       document.querySelectorAll('.dash-tab').forEach(btn => {
         btn.classList.toggle('dash-tab--active', btn.dataset.tab === tabName);
@@ -615,6 +628,10 @@
         pane.style.display = (pane.id === 'tab-' + tabName) ? '' : 'none';
       });
       sessionStorage.setItem(TAB_KEY, tabName);
+
+      /* Données à jour à chaque retour sur l'onglet (ex: après avoir terminé
+         un exercice) plutôt qu'un calcul figé au chargement initial. */
+      if (tabName === 'resultats' && _profile) refreshResultsTab();
     }
 
     document.querySelectorAll('.dash-tab').forEach(btn => {
@@ -754,10 +771,30 @@
       document.getElementById('section-recent').style.display = '';
     }
 
+    /* ── Rechargement de l'onglet "Mes résultats" (résultats + lauriers) ─────
+       Appelé au chargement initial, à chaque activation de l'onglet et à la
+       restauration de la page depuis le bfcache (retour navigateur après un
+       exercice) — sans ça, ces données ne seraient calculées qu'une fois, au
+       tout premier chargement de la page. */
+    async function refreshResultsTab() {
+      if (!_profile) return;
+
+      const { data: results, error: resultsErr } = await window.lfmDb
+        .from('exercise_results')
+        .select('*')
+        .order('completed_at', { ascending: false });
+
+      console.log('[DEBUG] exercise_results récupérés :', results?.length, '| erreur :', resultsErr?.message);
+
+      renderDashboard(_profile, results || [], _classMeta);
+      initLaurels(_profile.id);
+    }
+
     /* ── Initialisation ────────────────────────────────────────────────────── */
     (async () => {
       const profile = await lfmAuth.requireRole('eleve');
       if (!profile) return;
+      _profile = profile;
 
       /* Déconnexion */
       document.getElementById('dash-logout-btn').addEventListener('click', () => {
@@ -766,7 +803,6 @@
       });
 
       /* Info de classe (optionnel, peut être absent) */
-      let classMeta = null;
       try {
         const { data } = await window.lfmDb
           .from('class_memberships')
@@ -774,7 +810,7 @@
           .limit(1)
           .maybeSingle();
         if (data?.classes) {
-          classMeta = {
+          _classMeta = {
             className:   data.classes.name,
             level:       data.classes.level,
             teacherName: data.classes.teacher?.display_name || null
@@ -782,16 +818,16 @@
         }
       } catch (_) { /* pas encore inscrit dans une classe */ }
 
-      /* Résultats de l'élève (tri du plus récent au plus ancien) */
-      const { data: results, error: resultsErr } = await window.lfmDb
-        .from('exercise_results')
-        .select('*')
-        .order('completed_at', { ascending: false });
-
-      console.log('[DEBUG] exercise_results récupérés :', results?.length, '| erreur :', resultsErr?.message);
-
-      renderDashboard(profile, results || [], classMeta);
+      await refreshResultsTab();
     })();
+
+    /* Page restaurée depuis le bfcache (bouton Précédent) : les scripts ne
+       sont pas rejoués, donc sans ce handler la couronne et les stats
+       resteraient figées sur leur état d'avant l'exercice qui vient d'être
+       terminé. */
+    window.addEventListener('pageshow', e => {
+      if (e.persisted) refreshResultsTab();
+    });
   </script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */

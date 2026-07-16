@@ -1,0 +1,201 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   laurels.css — Gamification "lauriers" du tableau de bord élève.
+   Toutes les références aux tokens globaux de styles.css (--card-bg,
+   --border, --blue, --text, --muted, --shadow-sm, --font-display, ...)
+   ont une valeur de repli, comme dans level-select.css.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.laurel-section {
+  background: var(--card-bg, #ffffff);
+  border-radius: var(--radius-card, 20px);
+  box-shadow: var(--shadow-sm, 0 4px 16px rgba(16,43,106,0.06));
+  padding: 28px 28px 32px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* ── Couronne SVG ─────────────────────────────────────────────────────── */
+
+.laurel-crown-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.laurel-crown-svg {
+  width: 200px;
+  height: 200px;
+  max-width: 60vw;
+}
+
+.laurel-crown-count {
+  font-family: var(--font-display, 'Fredoka', sans-serif);
+  font-size: 22px;
+  font-weight: 800;
+  fill: var(--blue, #1A2D6B);
+}
+
+.laurel-crown-svg--golden .laurel-crown-count {
+  fill: #F5A623;
+}
+
+.laurel-leaf-breakdown {
+  font-size: 12px;
+  color: var(--muted, #5F6368);
+}
+
+.laurel-crown-counter {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted, #5F6368);
+  background: var(--bg, #F8FAFC);
+  border-radius: 100px;
+  padding: 4px 14px;
+}
+
+.laurel-leaf {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.laurel-leaf--filled {
+  opacity: 0;
+  transform: scale(0.4);
+}
+
+.laurel-leaf--filled.laurel-leaf--animate {
+  animation-name: laurelLeafPop;
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(.34,1.56,.64,1);
+  animation-fill-mode: forwards;
+}
+
+/* Feuille nouvelle ou surclassée depuis la dernière visite : le "pop" habituel,
+   suivi d'un flash de brillance (délai de départ fourni en ligne par JS). */
+.laurel-leaf--shine.laurel-leaf--animate {
+  animation-name: laurelLeafPop, laurelShine;
+  animation-duration: 420ms, 1500ms;
+  animation-timing-function: cubic-bezier(.34,1.56,.64,1), ease-in-out;
+  animation-fill-mode: forwards, none;
+}
+
+@keyframes laurelLeafPop {
+  0%   { opacity: 0; transform: scale(0.4); }
+  60%  { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes laurelShine {
+  0%   { filter: drop-shadow(0 0 0 transparent) brightness(1); }
+  25%  { filter: drop-shadow(0 0 9px #FFD97A) brightness(1.5); }
+  50%  { filter: drop-shadow(0 0 3px #FFD97A) brightness(1.1); }
+  75%  { filter: drop-shadow(0 0 9px #FFD97A) brightness(1.5); }
+  100% { filter: drop-shadow(0 0 0 transparent) brightness(1); }
+}
+
+/* ── Rang ──────────────────────────────────────────────────────────────── */
+
+.laurel-rank-block {
+  max-width: 320px;
+  margin: 0 auto 26px;
+}
+
+.laurel-rank {
+  font-family: var(--font-display, 'Fredoka', sans-serif);
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  margin-bottom: 10px;
+}
+
+.laurel-rank-progress-bg {
+  height: 8px;
+  background: var(--border, #E8EDF3);
+  border-radius: 100px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.laurel-rank-progress-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 600ms cubic-bezier(.4,0,.2,1);
+}
+
+.laurel-rank-next {
+  font-size: 12px;
+  color: var(--muted, #5F6368);
+}
+
+.laurel-rank-max {
+  font-size: 12px;
+  font-weight: 700;
+  color: #F5A623;
+}
+
+/* ── Badges de domaine ────────────────────────────────────────────────── */
+
+.laurel-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  text-align: left;
+}
+
+.laurel-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding: 16px 10px;
+  border-radius: 14px;
+  border: 1.5px solid var(--border, #E8EDF3);
+  background: var(--bg, #F8FAFC);
+}
+
+.laurel-badge-icon {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.laurel-badge-label {
+  font-family: var(--font-display, 'Fredoka', sans-serif);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--text, #1E2532);
+}
+
+.laurel-badge-count {
+  font-size: 11px;
+  color: var(--muted, #5F6368);
+}
+
+.laurel-badge--locked {
+  opacity: 0.5;
+}
+
+.laurel-badge--bronze {
+  border-color: #C97A3D;
+  background: linear-gradient(180deg, #FBEEE3 0%, #F8FAFC 100%);
+}
+.laurel-badge--bronze .laurel-badge-label { color: #A9612B; }
+
+.laurel-badge--argent {
+  border-color: #A9B2BE;
+  background: linear-gradient(180deg, #EEF1F4 0%, #F8FAFC 100%);
+}
+.laurel-badge--argent .laurel-badge-label { color: #6B7480; }
+
+.laurel-badge--or {
+  border-color: #F5A623;
+  background: linear-gradient(180deg, #FDF3DD 0%, #F8FAFC 100%);
+}
+.laurel-badge--or .laurel-badge-label { color: #B4780F; }
+
+@media (max-width: 600px) {
+  .laurel-section { padding: 22px 18px 26px; }
+  .laurel-badges-grid { grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); }
+}
