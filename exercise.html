@@ -4454,8 +4454,17 @@
     let accordLevel      = null; /* accord-ecrit      : niveau sélectionné */
     let accordLevelSelect = null; /* accord-ecrit     : instance LevelSelect */
     let apcodLevel       = null; /* accord-participe-cod : niveau sélectionné */
+    let apcodLevelSelect  = null; /* accord-participe-cod : instance LevelSelect */
     let decompLevel      = null; /* decomposer-fraction : niveau sélectionné */
+    let decompLevelSelect = null; /* decomposer-fraction : instance LevelSelect */
     let fpLevel           = null; /* fractions-problemes : niveau sélectionné */
+    let fpLevelSelect      = null; /* fractions-problemes : instance LevelSelect */
+    let fracLevelSelect     = null; /* lire-fraction : instance LevelSelect */
+    let rfLevelSelect       = null; /* representer-fraction : instance LevelSelect */
+    let nlLevelSelect       = null; /* placer-fraction-droite : instance LevelSelect */
+    let cmpLevelSelect      = null; /* comparer-fractions : instance LevelSelect */
+    let encadrLevelSelect   = null; /* encadrer-fraction : instance LevelSelect */
+    let nbEntierLevelSelect = null; /* nombre-entier : instance LevelSelect */
 
     /* Suivi générique du niveau courant (tous exercices à niveaux) */
     let sessionLevelList   = [];   /* liste ordonnée des valeurs de niveau */
@@ -4706,6 +4715,458 @@
       accordLevelSelect.renderSelectScreen();
     }
 
+    function showLireFractionLevelSelect() {
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels  = sessionData.levels || ["CM1", "CM2"];
+      const descs   = {
+        "CM1": "Fractions simples avec petits nombres",
+        "CM2": "Fractions variées, y compris supérieures à 1"
+      };
+      const diffMap = { "CM1": 1, "CM2": 2 };
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      fracLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          fracLevel = diffMap[l];
+          const filtered = sessionData.bank.filter(it => it.difficulty === fracLevel);
+          questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
+          currentIndex = 0;
+          score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(l);
+          sessionLevelLoader = (lv) => {
+            fracLevel = diffMap[lv];
+            const fq = sessionData.bank.filter(it => it.difficulty === fracLevel);
+            questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+            fracLevelSelect.renderBadges(lv);
+          };
+          document.getElementById('q-total').textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          fracLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      fracLevelSelect.renderSelectScreen();
+    }
+
+    function showRepresenterFractionLevelSelect() {
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels  = sessionData.levels || ["CM1", "CM2"];
+      const descs   = {
+        "CM1": "Fraction simple — la bande est partagée selon le dénominateur",
+        "CM2": "Partage différent — introduction aux fractions équivalentes"
+      };
+      const diffMap = { "CM1": 1, "CM2": 2 };
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      rfLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          rfLevel = diffMap[l];
+          const filtered = sessionData.bank.filter(it => it.level === rfLevel);
+          questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
+          currentIndex = 0;
+          score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(l);
+          sessionLevelLoader = (lv) => {
+            rfLevel = diffMap[lv];
+            const fq = sessionData.bank.filter(it => it.level === rfLevel);
+            questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+            rfLevelSelect.renderBadges(lv);
+          };
+          document.getElementById('q-total').textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          rfLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      rfLevelSelect.renderSelectScreen();
+    }
+
+    function showPlacerFractionDroiteLevelSelect() {
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels  = sessionData.levels || ["CM1", "CM2"];
+      const descs   = {
+        "CM1": "Fractions inférieures à 1",
+        "CM2": "Fractions supérieures à 1"
+      };
+      const diffMap = { "CM1": 1, "CM2": 2 };
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      nlLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          nlLevel = diffMap[l];
+          const filtered = sessionData.bank.filter(it => it.level === nlLevel);
+          questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
+          currentIndex = 0;
+          score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(l);
+          sessionLevelLoader = (lv) => {
+            nlLevel = diffMap[lv];
+            const fq = sessionData.bank.filter(it => it.level === nlLevel);
+            questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+            nlLevelSelect.renderBadges(lv);
+          };
+          document.getElementById('q-total').textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          nlLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      nlLevelSelect.renderSelectScreen();
+    }
+
+    function showComparerFractionsLevelSelect() {
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels  = sessionData.levels || ["CM1", "CM2", "6e"];
+      const descs   = {
+        "CM1": "Même dénominateur — compare les parts coloriées",
+        "CM2": "Dénominateurs différents — compare les aires visuellement",
+        "6e":  "Fractions < 1 et > 1 — place-les sur une droite graduée"
+      };
+      const diffMap = { "CM1": 1, "CM2": 2, "6e": 3 };
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      cmpLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          cmpLevel = diffMap[l];
+          const filtered = sessionData.bank.filter(it => it.level === cmpLevel);
+          questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
+          currentIndex = 0;
+          score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(l);
+          sessionLevelLoader = (lv) => {
+            cmpLevel = diffMap[lv];
+            const fq = sessionData.bank.filter(it => it.level === cmpLevel);
+            questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+            cmpLevelSelect.renderBadges(lv);
+          };
+          document.getElementById('q-total').textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          cmpLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      cmpLevelSelect.renderSelectScreen();
+    }
+
+    function showEncadrerFractionLevelSelect() {
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels  = sessionData.levels || ["CM1", "CM2"];
+      const descs   = {
+        "CM1": "Avec droite graduée pour t'aider",
+        "CM2": "Par le calcul, sans droite graduée"
+      };
+      const diffMap = { "CM1": 1, "CM2": 2 };
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      encadrLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          encadrLevel = diffMap[l];
+          const filtered = sessionData.bank.filter(it => it.difficulty === encadrLevel);
+          questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
+          currentIndex = 0;
+          score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(l);
+          sessionLevelLoader = (lv) => {
+            encadrLevel = diffMap[lv];
+            const fq = sessionData.bank.filter(it => it.difficulty === encadrLevel);
+            questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+            encadrLevelSelect.renderBadges(lv);
+          };
+          document.getElementById('q-total').textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          encadrLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      encadrLevelSelect.renderSelectScreen();
+    }
+
+    function showNombreEntierLevelSelect() {
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels  = sessionData.levels || ["CM1", "CM2"];
+      const descs   = {
+        "CM1": "Nombres jusqu'à 999 999",
+        "CM2": "Nombres jusqu'à 999 999 999"
+      };
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      nbEntierLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          nbEntierLevel = l;
+          const filtered = sessionData.bank.filter(it => it.level === nbEntierLevel);
+          questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
+          currentIndex = 0;
+          score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(l);
+          sessionLevelLoader = (lv) => {
+            nbEntierLevel = lv;
+            const fq = sessionData.bank.filter(it => it.level === nbEntierLevel);
+            questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+            nbEntierLevelSelect.renderBadges(lv);
+          };
+          document.getElementById('q-total').textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          nbEntierLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      nbEntierLevelSelect.renderSelectScreen();
+    }
+
+    function showDecomposerFractionLevelSelect() {
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels  = sessionData.levels || ["CM1", "CM2", "6e"];
+      const descs   = {
+        "CM1": "Choisis la bonne décomposition",
+        "CM2": "Trouve la partie entière et le numérateur",
+        "6e":  "Écris la décomposition complète"
+      };
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      decompLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          decompLevel = l;
+          const filtered = sessionData.bank.filter(it => it.level === decompLevel);
+          questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
+          currentIndex = 0;
+          score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(l);
+          sessionLevelLoader = (lv) => {
+            decompLevel = lv;
+            const fq = sessionData.bank.filter(it => it.level === decompLevel);
+            questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+            decompLevelSelect.renderBadges(lv);
+          };
+          document.getElementById('q-total').textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          decompLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      decompLevelSelect.renderSelectScreen();
+    }
+
+    function showFractionsProblemesLevelSelect() {
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels  = sessionData.levels || ["CM1", "CM2", "6e"];
+      const descs   = {
+        "CM1": "Lis l'énoncé et choisis la bonne fraction",
+        "CM2": "Calcule une fraction d'une quantité",
+        "6e":  "Résous un problème à étapes"
+      };
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      fpLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          fpLevel = l;
+          const filtered = sessionData.bank.filter(it => it.level === fpLevel);
+          questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
+          currentIndex = 0;
+          score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(l);
+          sessionLevelLoader = (lv) => {
+            fpLevel = lv;
+            const fq = sessionData.bank.filter(it => it.level === fpLevel);
+            questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+            fpLevelSelect.renderBadges(lv);
+          };
+          document.getElementById('q-total').textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          fpLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      fpLevelSelect.renderSelectScreen();
+    }
+
+    /* accord-participe-cod : même banque de phrases aux deux niveaux — seul le
+       mode d'interaction change (Niveau 1 = CM2 : identification du COD guidée
+       avant d'écrire le participe ; Niveau 2 = 6e : analyse directe, sans étape
+       guidée). Ordre confirmé conforme à exercise-data.js (levels: ["CM2","6e"]). */
+    function showAccordParticipeCodLevelSelect() {
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels  = sessionData.levels || ["CM2", "6e"];
+      const descs   = {
+        "CM2": "Identifie d'abord le COD, puis écris le participe accordé",
+        "6e":  "Analyse seul(e) et écris directement le participe"
+      };
+      const diffMap = { "CM2": 1, "6e": 2 };
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      apcodLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          apcodLevel = diffMap[l];
+          questions = shuffle(sessionData.bank).slice(0, sessionData.questionsPerSession);
+          currentIndex = 0;
+          score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(l);
+          sessionLevelLoader = (lv) => {
+            apcodLevel = diffMap[lv];
+            questions  = shuffle(sessionData.bank).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+            apcodLevelSelect.renderBadges(lv);
+          };
+          document.getElementById('q-total').textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          apcodLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      apcodLevelSelect.renderSelectScreen();
+    }
+
     function startSessionWithType(type) {
       currentType = type;
       sessionStartTime = Date.now();
@@ -4891,6 +5352,51 @@
       /* accord-ecrit : ask for level, then filter bank by difficulty */
       if (currentType === "accord-ecrit" && !accordLevel) {
         showAccordLevelSelect();
+        return;
+      }
+
+      if (currentType === "lire-fraction" && fracLevel === null) {
+        showLireFractionLevelSelect();
+        return;
+      }
+
+      if (currentType === "representer-fraction" && rfLevel === null) {
+        showRepresenterFractionLevelSelect();
+        return;
+      }
+
+      if (currentType === "placer-fraction-droite" && nlLevel === null) {
+        showPlacerFractionDroiteLevelSelect();
+        return;
+      }
+
+      if (currentType === "comparer-fractions" && cmpLevel === null) {
+        showComparerFractionsLevelSelect();
+        return;
+      }
+
+      if (currentType === "encadrer-fraction" && encadrLevel === null) {
+        showEncadrerFractionLevelSelect();
+        return;
+      }
+
+      if (currentType === "nombre-entier" && nbEntierLevel === null) {
+        showNombreEntierLevelSelect();
+        return;
+      }
+
+      if (currentType === "decomposer-fraction" && decompLevel === null) {
+        showDecomposerFractionLevelSelect();
+        return;
+      }
+
+      if (currentType === "fractions-problemes" && fpLevel === null) {
+        showFractionsProblemesLevelSelect();
+        return;
+      }
+
+      if (currentType === "accord-participe-cod" && apcodLevel === null) {
+        showAccordParticipeCodLevelSelect();
         return;
       }
 
@@ -5470,7 +5976,12 @@
 
       const hasMulti   = sessionLevelIdx >= 0 && sessionLevelList.length > 1;
       const isLast     = sessionLevelIdx >= sessionLevelList.length - 1;
-      const lockedType = currentType === 'produire-3-formes' || currentType === 'accord-ecrit';
+      const lockedType = [
+        'produire-3-formes', 'accord-ecrit',
+        'lire-fraction', 'representer-fraction', 'placer-fraction-droite',
+        'comparer-fractions', 'encadrer-fraction', 'nombre-entier',
+        'decomposer-fraction', 'fractions-problemes', 'accord-participe-cod'
+      ].includes(currentType);
       const canProgress = !lockedType || pct >= 80;
 
       if (hasMulti && !isLast && canProgress) {
@@ -5520,6 +6031,15 @@
           document.getElementById('results-screen').classList.add('ex-hidden');
           if (currentType === 'produire-3-formes') showLevelSelect();
           else if (currentType === 'accord-ecrit') showAccordLevelSelect();
+          else if (currentType === 'lire-fraction') showLireFractionLevelSelect();
+          else if (currentType === 'representer-fraction') showRepresenterFractionLevelSelect();
+          else if (currentType === 'placer-fraction-droite') showPlacerFractionDroiteLevelSelect();
+          else if (currentType === 'comparer-fractions') showComparerFractionsLevelSelect();
+          else if (currentType === 'encadrer-fraction') showEncadrerFractionLevelSelect();
+          else if (currentType === 'nombre-entier') showNombreEntierLevelSelect();
+          else if (currentType === 'decomposer-fraction') showDecomposerFractionLevelSelect();
+          else if (currentType === 'fractions-problemes') showFractionsProblemesLevelSelect();
+          else if (currentType === 'accord-participe-cod') showAccordParticipeCodLevelSelect();
         });
 
       } else if (hasMulti && isLast) {
@@ -5584,6 +6104,37 @@
       }
       if (currentType === 'accord-ecrit' && accordLevel && accordLevelSelect) {
         accordLevelSelect.completeLevel(accordLevel, score, total);
+      }
+      /* Les six premiers types ci-dessous conservent en interne la valeur
+         historique (entier) du niveau — l'identifiant LevelSelect (CM1/CM2/6e)
+         attendu par completeLevel() est retrouvé via sessionLevelList/Idx,
+         déjà tenus à jour par onSelectLevel et le bouton "Niveau suivant". */
+      if (currentType === 'lire-fraction' && fracLevel !== null && fracLevelSelect) {
+        fracLevelSelect.completeLevel(sessionLevelList[sessionLevelIdx], score, total);
+      }
+      if (currentType === 'representer-fraction' && rfLevel !== null && rfLevelSelect) {
+        rfLevelSelect.completeLevel(sessionLevelList[sessionLevelIdx], score, total);
+      }
+      if (currentType === 'placer-fraction-droite' && nlLevel !== null && nlLevelSelect) {
+        nlLevelSelect.completeLevel(sessionLevelList[sessionLevelIdx], score, total);
+      }
+      if (currentType === 'comparer-fractions' && cmpLevel !== null && cmpLevelSelect) {
+        cmpLevelSelect.completeLevel(sessionLevelList[sessionLevelIdx], score, total);
+      }
+      if (currentType === 'encadrer-fraction' && encadrLevel !== null && encadrLevelSelect) {
+        encadrLevelSelect.completeLevel(sessionLevelList[sessionLevelIdx], score, total);
+      }
+      if (currentType === 'accord-participe-cod' && apcodLevel !== null && apcodLevelSelect) {
+        apcodLevelSelect.completeLevel(sessionLevelList[sessionLevelIdx], score, total);
+      }
+      if (currentType === 'nombre-entier' && nbEntierLevel && nbEntierLevelSelect) {
+        nbEntierLevelSelect.completeLevel(nbEntierLevel, score, total);
+      }
+      if (currentType === 'decomposer-fraction' && decompLevel && decompLevelSelect) {
+        decompLevelSelect.completeLevel(decompLevel, score, total);
+      }
+      if (currentType === 'fractions-problemes' && fpLevel && fpLevelSelect) {
+        fpLevelSelect.completeLevel(fpLevel, score, total);
       }
 
       _setupResultsScreen(pct);
@@ -6540,57 +7091,6 @@
     /* ── Renderer principal ──────────────────────────────────────── */
 
     function renderLireFraction(card, q) {
-      /* — Sélecteur de niveau au premier appel — */
-      if (fracLevel === null && currentIndex === 0) {
-        card.innerHTML = `
-          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
-            Quel niveau veux-tu pratiquer ?
-          </p>
-          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
-            <button class="ex-type-card" data-level="1">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 1</span>
-                <span class="ex-type-desc">Fractions simples avec petits nombres</span>
-              </div>
-            </button>
-            <button class="ex-type-card" data-level="2">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 2</span>
-                <span class="ex-type-desc">Fractions variées, y compris supérieures à 1</span>
-              </div>
-            </button>
-          </div>
-        `;
-        document.getElementById('ex-bar-fill').style.width = '0%';
-        card.querySelectorAll('.ex-type-card').forEach(btn =>
-          btn.addEventListener('click', () => {
-            fracLevel = parseInt(btn.dataset.level, 10);
-            questions = shuffle(sessionData.bank.filter(it => it.difficulty === fracLevel))
-                          .slice(0, sessionData.questionsPerSession);
-            document.getElementById('q-total').textContent = questions.length;
-            sessionLevelList   = [1, 2];
-            sessionLevelLabels = ['Niveau 1', 'Niveau 2'];
-            sessionLevelIdx    = fracLevel - 1;
-            sessionLevelLoader = (lv) => {
-              fracLevel = lv;
-              questions = shuffle(sessionData.bank.filter(it => it.difficulty === lv))
-                            .slice(0, sessionData.questionsPerSession);
-              document.getElementById('q-total').textContent = questions.length;
-              document.getElementById('ex-bar-fill').style.width = '0%';
-              currentIndex = 0;
-              score        = 0;
-              showQuestion(0);
-            };
-            currentIndex = 0;
-            score = 0;
-            showQuestion(0);
-          })
-        );
-        return;
-      }
-
       /* — Rendu de la question — */
       card.innerHTML = `
         <p class="ex-question-label">Quelle fraction de la figure est coloriée ?</p>
@@ -6670,57 +7170,6 @@
     }
 
     function renderRepresenterFraction(card, q) {
-      /* — Sélecteur de niveau au premier appel — */
-      if (rfLevel === null && currentIndex === 0) {
-        card.innerHTML = `
-          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
-            Quel niveau veux-tu pratiquer ?
-          </p>
-          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
-            <button class="ex-type-card" data-level="1">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 1</span>
-                <span class="ex-type-desc">Fraction simple — la bande est partagée selon le dénominateur</span>
-              </div>
-            </button>
-            <button class="ex-type-card" data-level="2">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 2</span>
-                <span class="ex-type-desc">Partage différent — introduction aux fractions équivalentes</span>
-              </div>
-            </button>
-          </div>
-        `;
-        document.getElementById('ex-bar-fill').style.width = '0%';
-        card.querySelectorAll('.ex-type-card').forEach(btn =>
-          btn.addEventListener('click', () => {
-            rfLevel   = parseInt(btn.dataset.level, 10);
-            questions = shuffle(sessionData.bank.filter(it => it.level === rfLevel))
-                          .slice(0, sessionData.questionsPerSession);
-            document.getElementById('q-total').textContent = questions.length;
-            sessionLevelList   = [1, 2];
-            sessionLevelLabels = ['Niveau 1', 'Niveau 2'];
-            sessionLevelIdx    = rfLevel - 1;
-            sessionLevelLoader = (lv) => {
-              rfLevel   = lv;
-              questions = shuffle(sessionData.bank.filter(it => it.level === lv))
-                            .slice(0, sessionData.questionsPerSession);
-              document.getElementById('q-total').textContent = questions.length;
-              document.getElementById('ex-bar-fill').style.width = '0%';
-              currentIndex = 0;
-              score        = 0;
-              showQuestion(0);
-            };
-            currentIndex = 0;
-            score        = 0;
-            showQuestion(0);
-          })
-        );
-        return;
-      }
-
       const { numerator, denominator } = q;
       const isLevel2      = q.level === 2;
       const partsPerStrip = isLevel2 ? q.partitions : denominator;
@@ -6834,57 +7283,6 @@
     let nlLevel = null;
 
     function renderPlacerFractionDroite(card, q) {
-      /* — Sélecteur de niveau au premier appel — */
-      if (nlLevel === null && currentIndex === 0) {
-        card.innerHTML = `
-          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
-            Quel niveau veux-tu pratiquer ?
-          </p>
-          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
-            <button class="ex-type-card" data-level="1">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 1</span>
-                <span class="ex-type-desc">Fractions inférieures à 1</span>
-              </div>
-            </button>
-            <button class="ex-type-card" data-level="2">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 2</span>
-                <span class="ex-type-desc">Fractions supérieures à 1</span>
-              </div>
-            </button>
-          </div>
-        `;
-        document.getElementById('ex-bar-fill').style.width = '0%';
-        card.querySelectorAll('.ex-type-card').forEach(btn =>
-          btn.addEventListener('click', () => {
-            nlLevel = parseInt(btn.dataset.level, 10);
-            questions = shuffle(sessionData.bank.filter(it => it.level === nlLevel))
-                          .slice(0, sessionData.questionsPerSession);
-            document.getElementById('q-total').textContent = questions.length;
-            sessionLevelList   = [1, 2];
-            sessionLevelLabels = ['Niveau 1', 'Niveau 2'];
-            sessionLevelIdx    = nlLevel - 1;
-            sessionLevelLoader = (lv) => {
-              nlLevel   = lv;
-              questions = shuffle(sessionData.bank.filter(it => it.level === lv))
-                            .slice(0, sessionData.questionsPerSession);
-              document.getElementById('q-total').textContent = questions.length;
-              document.getElementById('ex-bar-fill').style.width = '0%';
-              currentIndex = 0;
-              score        = 0;
-              showQuestion(0);
-            };
-            currentIndex = 0;
-            score = 0;
-            showQuestion(0);
-          })
-        );
-        return;
-      }
-
       const { numerator, denominator } = q;
       const maxUnits       = nlLevel === 1 ? 1 : Math.ceil(numerator / denominator);
       const totalIntervals = maxUnits * denominator;
@@ -7071,65 +7469,6 @@
     }
 
     function renderComparerFractions(card, q) {
-
-      /* ─ Sélecteur de niveau ─ */
-      if (cmpLevel === null && currentIndex === 0) {
-        card.innerHTML = `
-          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
-            Quel niveau veux-tu pratiquer ?
-          </p>
-          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
-            <button class="ex-type-card" data-level="1">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 1</span>
-                <span class="ex-type-desc">Même dénominateur — compare les parts coloriées</span>
-              </div>
-            </button>
-            <button class="ex-type-card" data-level="2">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 2</span>
-                <span class="ex-type-desc">Dénominateurs différents — compare les aires visuellement</span>
-              </div>
-            </button>
-            <button class="ex-type-card" data-level="3">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-6e" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 3</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 3</span>
-                <span class="ex-type-desc">Fractions &lt; 1 et &gt; 1 — place-les sur une droite graduée</span>
-              </div>
-            </button>
-          </div>
-        `;
-        document.getElementById('ex-bar-fill').style.width = '0%';
-        card.querySelectorAll('.ex-type-card').forEach(btn =>
-          btn.addEventListener('click', () => {
-            cmpLevel  = parseInt(btn.dataset.level, 10);
-            questions = shuffle(sessionData.bank.filter(it => it.level === cmpLevel))
-                          .slice(0, sessionData.questionsPerSession);
-            document.getElementById('q-total').textContent = questions.length;
-            sessionLevelList   = [1, 2, 3];
-            sessionLevelLabels = ['Niveau 1', 'Niveau 2', 'Niveau 3'];
-            sessionLevelIdx    = cmpLevel - 1;
-            sessionLevelLoader = (lv) => {
-              cmpLevel  = lv;
-              questions = shuffle(sessionData.bank.filter(it => it.level === lv))
-                            .slice(0, sessionData.questionsPerSession);
-              document.getElementById('q-total').textContent = questions.length;
-              document.getElementById('ex-bar-fill').style.width = '0%';
-              currentIndex = 0;
-              score        = 0;
-              showQuestion(0);
-            };
-            currentIndex = 0;
-            score        = 0;
-            showQuestion(0);
-          })
-        );
-        return;
-      }
-
       if (cmpLevel === 3) { renderComparerFractionsNL(card, q); return; }
 
       const { left, right, answer } = q;
@@ -7528,55 +7867,6 @@
 
     /* ── Level selector + router ─────────────────────────────────────── */
     function renderEncadrerFraction(card, q) {
-      if (encadrLevel === null && currentIndex === 0) {
-        card.innerHTML = `
-          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
-            Quel niveau veux-tu pratiquer ?
-          </p>
-          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
-            <button class="ex-type-card" data-level="1">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 1</span>
-                <span class="ex-type-desc">Avec droite graduée pour t'aider</span>
-              </div>
-            </button>
-            <button class="ex-type-card" data-level="2">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 2</span>
-                <span class="ex-type-desc">Par le calcul, sans droite graduée</span>
-              </div>
-            </button>
-          </div>
-        `;
-        document.getElementById('ex-bar-fill').style.width = '0%';
-        card.querySelectorAll('.ex-type-card').forEach(btn =>
-          btn.addEventListener('click', () => {
-            encadrLevel = parseInt(btn.dataset.level, 10);
-            questions   = shuffle(sessionData.bank.filter(it => it.difficulty === encadrLevel))
-                            .slice(0, sessionData.questionsPerSession);
-            document.getElementById('q-total').textContent = questions.length;
-            sessionLevelList   = [1, 2];
-            sessionLevelLabels = ['Niveau 1', 'Niveau 2'];
-            sessionLevelIdx    = encadrLevel - 1;
-            sessionLevelLoader = (lv) => {
-              encadrLevel = lv;
-              questions   = shuffle(sessionData.bank.filter(it => it.difficulty === lv))
-                              .slice(0, sessionData.questionsPerSession);
-              document.getElementById('q-total').textContent = questions.length;
-              document.getElementById('ex-bar-fill').style.width = '0%';
-              currentIndex = 0;
-              score        = 0;
-              showQuestion(0);
-            };
-            currentIndex = 0;
-            score        = 0;
-            showQuestion(0);
-          })
-        );
-        return;
-      }
       if (encadrLevel === 1) {
         _renderEncadrAvecDroite(card, q);
       } else {
@@ -7867,56 +8157,6 @@
     }
 
     function renderNombreEntier(card, q) {
-      if (nbEntierLevel === null && currentIndex === 0) {
-        card.innerHTML = `
-          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
-            Quel niveau veux-tu pratiquer ?
-          </p>
-          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
-            <button class="ex-type-card" data-level="CM1">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 1</span>
-                <span class="ex-type-desc">Nombres jusqu'à 999 999</span>
-              </div>
-            </button>
-            <button class="ex-type-card" data-level="CM2">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 2</span>
-                <span class="ex-type-desc">Nombres jusqu'à 999 999 999</span>
-              </div>
-            </button>
-          </div>
-        `;
-        document.getElementById('ex-bar-fill').style.width = '0%';
-        card.querySelectorAll('.ex-type-card').forEach(btn =>
-          btn.addEventListener('click', () => {
-            nbEntierLevel = btn.dataset.level;
-            questions = shuffle(sessionData.bank.filter(it => it.level === nbEntierLevel))
-                          .slice(0, sessionData.questionsPerSession);
-            document.getElementById('q-total').textContent = questions.length;
-            sessionLevelList   = ['CM1', 'CM2'];
-            sessionLevelLabels = ['Niveau 1', 'Niveau 2'];
-            sessionLevelIdx    = ['CM1', 'CM2'].indexOf(nbEntierLevel);
-            sessionLevelLoader = (lv) => {
-              nbEntierLevel = lv;
-              questions = shuffle(sessionData.bank.filter(it => it.level === lv))
-                            .slice(0, sessionData.questionsPerSession);
-              document.getElementById('q-total').textContent = questions.length;
-              document.getElementById('ex-bar-fill').style.width = '0%';
-              currentIndex = 0;
-              score        = 0;
-              showQuestion(0);
-            };
-            currentIndex = 0;
-            score = 0;
-            showQuestion(0);
-          })
-        );
-        return;
-      }
-
       if (q.inputMode === 'qcm') {
         renderNombreEntierQCM(card, q);
       } else {
@@ -8023,63 +8263,6 @@
     }
 
     function renderDecomposerFraction(card, q) {
-      if (decompLevel === null && currentIndex === 0) {
-        card.innerHTML = `
-          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
-            Quel niveau veux-tu pratiquer ?
-          </p>
-          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
-            <button class="ex-type-card" data-level="CM1">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 1</span>
-                <span class="ex-type-desc">Choisis la bonne décomposition</span>
-              </div>
-            </button>
-            <button class="ex-type-card" data-level="CM2">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 2</span>
-                <span class="ex-type-desc">Trouve la partie entière et le numérateur</span>
-              </div>
-            </button>
-            <button class="ex-type-card" data-level="6e">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-6e" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 3</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 3</span>
-                <span class="ex-type-desc">Écris la décomposition complète</span>
-              </div>
-            </button>
-          </div>
-        `;
-        document.getElementById('ex-bar-fill').style.width = '0%';
-        card.querySelectorAll('.ex-type-card').forEach(btn =>
-          btn.addEventListener('click', () => {
-            decompLevel = btn.dataset.level;
-            questions = shuffle(sessionData.bank.filter(it => it.level === decompLevel))
-                          .slice(0, sessionData.questionsPerSession);
-            document.getElementById('q-total').textContent = questions.length;
-            sessionLevelList   = ['CM1', 'CM2', '6e'];
-            sessionLevelLabels = ['Niveau 1', 'Niveau 2', 'Niveau 3'];
-            sessionLevelIdx    = sessionLevelList.indexOf(decompLevel);
-            sessionLevelLoader = (lv) => {
-              decompLevel = lv;
-              questions = shuffle(sessionData.bank.filter(it => it.level === lv))
-                            .slice(0, sessionData.questionsPerSession);
-              document.getElementById('q-total').textContent = questions.length;
-              document.getElementById('ex-bar-fill').style.width = '0%';
-              currentIndex = 0;
-              score        = 0;
-              showQuestion(0);
-            };
-            currentIndex = 0;
-            score = 0;
-            showQuestion(0);
-          })
-        );
-        return;
-      }
-
       if (q.inputMode === 'qcm') {
         renderDecompQCM(card, q);
       } else if (q.inputMode === 'fill-two') {
@@ -8504,63 +8687,6 @@
 
     /* ── Dispatcher de niveau ─────────────────────────────────────────────── */
     function renderFractionsProblemes(card, q) {
-      if (fpLevel === null && currentIndex === 0) {
-        card.innerHTML = `
-          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
-            Quel niveau veux-tu pratiquer ?
-          </p>
-          <div class="ex-type-grid" style="max-width:480px;margin:0 auto">
-            <button class="ex-type-card" data-level="CM1">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 1</span>
-                <span class="ex-type-desc">Lis l'énoncé et choisis la bonne fraction</span>
-              </div>
-            </button>
-            <button class="ex-type-card" data-level="CM2">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 2</span>
-                <span class="ex-type-desc">Calcule une fraction d'une quantité</span>
-              </div>
-            </button>
-            <button class="ex-type-card" data-level="6e">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-6e" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 3</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 3</span>
-                <span class="ex-type-desc">Résous un problème à étapes</span>
-              </div>
-            </button>
-          </div>
-        `;
-        document.getElementById('ex-bar-fill').style.width = '0%';
-        card.querySelectorAll('.ex-type-card').forEach(btn =>
-          btn.addEventListener('click', () => {
-            fpLevel = btn.dataset.level;
-            questions = shuffle(sessionData.bank.filter(it => it.level === fpLevel))
-                          .slice(0, sessionData.questionsPerSession);
-            document.getElementById('q-total').textContent = questions.length;
-            sessionLevelList   = ['CM1', 'CM2', '6e'];
-            sessionLevelLabels = ['Niveau 1', 'Niveau 2', 'Niveau 3'];
-            sessionLevelIdx    = sessionLevelList.indexOf(fpLevel);
-            sessionLevelLoader = (lv) => {
-              fpLevel = lv;
-              questions = shuffle(sessionData.bank.filter(it => it.level === lv))
-                            .slice(0, sessionData.questionsPerSession);
-              document.getElementById('q-total').textContent = questions.length;
-              document.getElementById('ex-bar-fill').style.width = '0%';
-              currentIndex = 0;
-              score        = 0;
-              showQuestion(0);
-            };
-            currentIndex = 0;
-            score = 0;
-            showQuestion(0);
-          })
-        );
-        return;
-      }
-
       if (q.inputMode === 'qcm') {
         fpRenderQcm(card, q);
       } else if (q.inputMode === 'free-text') {
@@ -9388,6 +9514,21 @@
     /* ════════════════════════════════════════════════════════════════════════
        TYPE : vocabu-bilingue
        Trois niveaux déverrouillables — Associe / Choisis / Écris
+
+       TODO / DETTE TECHNIQUE (constaté lors de l'audit LevelSelect, exclu de
+       cette migration) :
+         1. Aucune entrée exercise-data.js n'utilise `type: "vocabu-bilingue"`
+            — ce code est actuellement injoignable par un élève. À vérifier
+            avant tout nettoyage : peut-être un mécanisme d'assignation du
+            type que cet audit n'a pas trouvé.
+         2. Déverrouillage en localStorage (vb_<slug>_maxLevel), hors
+            convention du site (sessionStorage partout ailleurs, cf.
+            js/level-select.js).
+         3. vbCompleteLevel() débloque le niveau suivant inconditionnellement
+            (`if (lv < 3) vbSetMaxLevel(lv + 1)`), sans vérifier un seuil de
+            80 % — contrairement à tous les autres exercices à niveaux.
+       À traiter (migration vers LevelSelect + niveau_mode) ou supprimer si
+       confirmé mort, dans un futur nettoyage.
        ════════════════════════════════════════════════════════════════════════ */
 
     let vbState = null;
@@ -9981,53 +10122,6 @@
     ────────────────────────────────────────────────────────────────────────── */
 
     function renderAccordParticipeCod(card, q) {
-      if (apcodLevel === null) {
-        card.innerHTML = `
-          <p style="text-align:center;font-size:15px;color:var(--muted);font-weight:500;margin-bottom:24px">
-            Quel niveau veux-tu pratiquer ?
-          </p>
-          <div class="ex-type-grid" style="max-width:520px;margin:0 auto">
-            <button class="ex-type-card" data-level="1">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm1" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 1</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 1</span>
-                <span class="ex-type-desc">Identifie d'abord le COD, puis écris le participe accordé</span>
-              </div>
-            </button>
-            <button class="ex-type-card" data-level="2">
-              <span class="ex-type-icon" style="width:auto;flex-shrink:0"><span class="badge badge-cm2" style="font-size:13px;padding:4px 12px;white-space:nowrap">Niveau 2</span></span>
-              <div>
-                <span class="ex-type-name">Niveau 2</span>
-                <span class="ex-type-desc">Analyse seul(e) et écris directement le participe</span>
-              </div>
-            </button>
-          </div>
-        `;
-        document.getElementById('ex-bar-fill').style.width = '0%';
-        card.querySelectorAll('.ex-type-card').forEach(btn =>
-          btn.addEventListener('click', () => {
-            apcodLevel = parseInt(btn.dataset.level, 10);
-            questions  = shuffle(sessionData.bank).slice(0, sessionData.questionsPerSession);
-            document.getElementById('q-total').textContent = questions.length;
-            sessionLevelList   = [1, 2];
-            sessionLevelLabels = ['Niveau 1', 'Niveau 2'];
-            sessionLevelIdx    = apcodLevel - 1;
-            sessionLevelLoader = (lv) => {
-              apcodLevel = lv;
-              questions  = shuffle(sessionData.bank).slice(0, sessionData.questionsPerSession);
-              document.getElementById('q-total').textContent = questions.length;
-              document.getElementById('ex-bar-fill').style.width = '0%';
-              currentIndex = 0;
-              score        = 0;
-              showQuestion(0);
-            };
-            currentIndex = 0;
-            score        = 0;
-            showQuestion(0);
-          })
-        );
-        return;
-      }
       if (apcodLevel === 1) {
         _renderApcodNiveau1(card, q);
       } else {

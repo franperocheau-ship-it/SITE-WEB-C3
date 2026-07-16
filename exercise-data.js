@@ -2196,7 +2196,7 @@ const EXERCISE_DATA = {
     domaine:    "Mathématiques",
     competence: "Fractions — Représenter",
     type: "representer-fraction",
-    levels: ["CM1"],
+    levels: ["CM1", "CM2"],
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
@@ -2242,7 +2242,7 @@ const EXERCISE_DATA = {
     domaine:    "Mathématiques",
     competence: "Fractions — Lire et écrire",
     type: "lire-fraction",
-    levels: ["CM1"],
+    levels: ["CM1", "CM2"],
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
@@ -2555,7 +2555,7 @@ const EXERCISE_DATA = {
     domaine:    "Mathématiques",
     competence: "Fractions — Droite graduée",
     type: "placer-fraction-droite",
-    levels: ["CM2"],
+    levels: ["CM1", "CM2"],
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
@@ -3232,7 +3232,7 @@ const EXERCISE_DATA = {
     title: "Encadrer une fraction entre deux entiers consécutifs",
     domaine:    "Mathématiques",
     competence: "Fractions — Encadrer",
-    levels: ["CM1", "CM2", "6e"],
+    levels: ["CM1", "CM2"],
     type: "encadrer-fraction",
     questionsPerSession: 6,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
