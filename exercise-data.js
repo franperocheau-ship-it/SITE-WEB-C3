@@ -292,217 +292,149 @@ const EXERCISE_DATA = {
 
   /* ── ─────────────────────────────────────────────────────────────────────── */
 
+  /* ══════════════════════════════════════════════════════════════════════════
+     Type : etre-present-niveaux
+     Niveau 1 : QCM (5) + associer sujet↔forme (5) — sujets = pronoms
+     Niveau 2 : saisie libre, pronom donné
+     Niveau 3 : saisie libre, sujet = groupe nominal (pas de pronom)
+     Progression verrouillée : seuil 80 %, persistance sessionStorage.
+  ══════════════════════════════════════════════════════════════════════════ */
+
   "conjuguer-etre-present": {
     title: "Conjuguer le verbe être au présent",
     domaine:    "Français",
     competence: "Conjugaison — Être au présent",
-    verb: "être",
-    levels: ["CM1", "CM2", "6e"],
-    paliers: 1, /* nombre réel de paliers du moteur */
-    exerciseTypes: ["fill-blank", "multiple-choice", "matching", "find-error", "conjugation-table", "guess-subject", "word-order"],
+    type:       "etre-present-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
-    /* ── fill-blank & multiple-choice ── */
-    bank: [
-      { subject: "je",    sentence: "Je ___ content.",                answer: "suis",   choices: ["suis",   "est",    "sommes", "êtes"],   difficulty: 1 },
-      { subject: "je",    sentence: "Je ___ à l'école.",              answer: "suis",   choices: ["suis",   "est",    "es",     "êtes"],   difficulty: 1 },
-      { subject: "je",    sentence: "Je ___ prêt.",                   answer: "suis",   choices: ["suis",   "est",    "sommes", "sont"],   difficulty: 1 },
-      { subject: "tu",    sentence: "Tu ___ gentil.",                 answer: "es",     choices: ["es",     "est",    "suis",   "êtes"],   difficulty: 1 },
-      { subject: "tu",    sentence: "Tu ___ en retard.",              answer: "es",     choices: ["es",     "est",    "suis",   "êtes"],   difficulty: 1 },
-      { subject: "tu",    sentence: "Tu ___ mon ami.",                answer: "es",     choices: ["es",     "est",    "suis",   "êtes"],   difficulty: 1 },
-      { subject: "il",    sentence: "Il ___ grand.",                  answer: "est",    choices: ["est",    "es",     "suis",   "sont"],   difficulty: 1 },
-      { subject: "elle",  sentence: "Elle ___ fatiguée.",             answer: "est",    choices: ["est",    "es",     "suis",   "sommes"], difficulty: 1 },
-      { subject: "on",    sentence: "On ___ dehors.",                 answer: "est",    choices: ["est",    "sont",   "êtes",   "suis"],   difficulty: 2 },
-      { subject: "nous",  sentence: "Nous ___ contents.",             answer: "sommes", choices: ["sommes", "êtes",   "sont",   "est"],    difficulty: 2 },
-      { subject: "nous",  sentence: "Nous ___ en classe.",            answer: "sommes", choices: ["sommes", "êtes",   "sont",   "est"],    difficulty: 2 },
-      { subject: "nous",  sentence: "Nous ___ amis.",                 answer: "sommes", choices: ["sommes", "êtes",   "sont",   "est"],    difficulty: 2 },
-      { subject: "vous",  sentence: "Vous ___ prêts.",                answer: "êtes",   choices: ["êtes",   "sommes", "est",    "sont"],   difficulty: 2 },
-      { subject: "vous",  sentence: "Vous ___ en avance.",            answer: "êtes",   choices: ["êtes",   "sommes", "est",    "sont"],   difficulty: 2 },
-      { subject: "vous",  sentence: "Vous ___ les bienvenus.",        answer: "êtes",   choices: ["êtes",   "sommes", "est",    "sont"],   difficulty: 2 },
-      { subject: "ils",   sentence: "Ils ___ dehors.",                answer: "sont",   choices: ["sont",   "sommes", "est",    "êtes"],   difficulty: 3 },
-      { subject: "elles", sentence: "Elles ___ contentes.",           answer: "sont",   choices: ["sont",   "sommes", "est",    "êtes"],   difficulty: 3 },
-      { subject: "ils",   sentence: "Ils ___ dans la cour.",          answer: "sont",   choices: ["sont",   "sommes", "est",    "êtes"],   difficulty: 3 },
-      { subject: "il",    sentence: "Le chien ___ malade.",           answer: "est",    choices: ["est",    "es",     "suis",   "sont"],   difficulty: 2 },
-      { subject: "elles", sentence: "Les fleurs ___ belles.",         answer: "sont",   choices: ["sont",   "est",    "êtes",   "sommes"], difficulty: 2 },
-      { subject: "nous",  sentence: "Mon frère et moi ___ contents.", answer: "sommes", choices: ["sommes", "êtes",   "sont",   "est"],    difficulty: 3 },
-      { subject: "vous",  sentence: "Toi et ton ami ___ en retard.",  answer: "êtes",   choices: ["êtes",   "sommes", "sont",   "est"],    difficulty: 3 }
-    ],
-
-    /* ── matching & conjugation-table (6 forms, one per subject) ── */
+    /* ── les 6 formes de référence, utilisées comme distracteurs par le
+       mode "matching" du niveau 1 ── */
     conjugationForms: [
-      { subject: "Je",           answer: "suis",   choices: ["suis",   "es",     "est",  "êtes"]   },
-      { subject: "Tu",           answer: "es",     choices: ["es",     "est",    "suis", "êtes"]   },
-      { subject: "Il / Elle",    answer: "est",    choices: ["est",    "es",     "suis", "sont"]   },
-      { subject: "Nous",         answer: "sommes", choices: ["sommes", "êtes",   "sont", "est"]    },
-      { subject: "Vous",         answer: "êtes",   choices: ["êtes",   "sommes", "est",  "sont"]   },
-      { subject: "Ils / Elles",  answer: "sont",   choices: ["sont",   "sommes", "est",  "êtes"]   }
+      { subject: "Je",          answer: "suis"   },
+      { subject: "Tu",          answer: "es"     },
+      { subject: "Il / Elle",   answer: "est"    },
+      { subject: "Nous",        answer: "sommes" },
+      { subject: "Vous",        answer: "êtes"   },
+      { subject: "Ils / Elles", answer: "sont"   }
     ],
 
-    /* ── guess-subject ── */
-    guessSubjectBank: [
-      { sentence: "_____ est dans la cour.",      answer: "Il",    choices: ["Je",   "Tu",   "Il",   "Nous"] },
-      { sentence: "_____ suis à l'école.",        answer: "Je",    choices: ["Je",   "Tu",   "Il",   "Nous"] },
-      { sentence: "_____ es mon ami.",            answer: "Tu",    choices: ["Je",   "Tu",   "Il",   "Vous"] },
-      { sentence: "_____ sommes en classe.",      answer: "Nous",  choices: ["Je",   "Nous", "Vous", "Ils"]  },
-      { sentence: "_____ êtes en retard.",        answer: "Vous",  choices: ["Tu",   "Nous", "Vous", "Ils"]  },
-      { sentence: "_____ sont dans le jardin.",   answer: "Ils",   choices: ["Il",   "Nous", "Vous", "Ils"]  },
-      { sentence: "_____ est fatiguée.",          answer: "Elle",  choices: ["Je",   "Tu",   "Il",   "Elle"] },
-      { sentence: "_____ êtes très gentils.",     answer: "Vous",  choices: ["Nous", "Vous", "Ils",  "Elles"]},
-      { sentence: "_____ sont heureuses.",        answer: "Elles", choices: ["Il",   "Nous", "Ils",  "Elles"]},
-      { sentence: "_____ sommes dans le parc.",   answer: "Nous",  choices: ["Je",   "Nous", "Vous", "Ils"]  },
-      { sentence: "_____ suis très content.",     answer: "Je",    choices: ["Je",   "Tu",   "Nous", "Vous"] },
-      { sentence: "_____ es en avance.",          answer: "Tu",    choices: ["Je",   "Tu",   "Il",   "Vous"] }
-    ],
+    /* bank : chaque item porte un champ « level » 1-3.
+       Niveau 1 (mode "mcq" ou "matching") : sujets = pronoms personnels.
+       Niveaux 2 et 3 (saisie libre) : q.infinitive + q.sentence + q.answer,
+       comme pour verbes-particuliers-niveaux. Niveau 2 = pronom donné,
+       niveau 3 = sujet non pronominal (groupe nominal). */
+    bank: [
+      /* ── NIVEAU 1 : QCM (5) ── */
+      { level: 1, mode: "mcq", subject: "je",   choices: ["suis", "est", "sommes", "êtes"], answer: "suis"   },
+      { level: 1, mode: "mcq", subject: "tu",   choices: ["es", "est", "suis", "êtes"],      answer: "es"     },
+      { level: 1, mode: "mcq", subject: "il",   choices: ["est", "es", "suis", "sont"],      answer: "est"    },
+      { level: 1, mode: "mcq", subject: "nous", choices: ["sommes", "êtes", "sont", "est"],  answer: "sommes" },
+      { level: 1, mode: "mcq", subject: "vous", choices: ["êtes", "sommes", "est", "sont"],  answer: "êtes"   },
 
-    /* ── find-error ── */
-    findErrorBank: [
-      { sentence: "Nous est dans le salon.",   errorWord: "est",    correction: "Nous sommes dans le salon."   },
-      { sentence: "Je es content.",            errorWord: "es",     correction: "Je suis content."             },
-      { sentence: "Ils est dans la cour.",     errorWord: "est",    correction: "Ils sont dans la cour."       },
-      { sentence: "Vous suis prêts.",          errorWord: "suis",   correction: "Vous êtes prêts."             },
-      { sentence: "Tu sont gentil.",           errorWord: "sont",   correction: "Tu es gentil."                },
-      { sentence: "Elle sommes fatiguée.",     errorWord: "sommes", correction: "Elle est fatiguée."           },
-      { sentence: "Nous êtes en classe.",      errorWord: "êtes",   correction: "Nous sommes en classe."       },
-      { sentence: "Je sommes prêt.",           errorWord: "sommes", correction: "Je suis prêt."                },
-      { sentence: "Ils suis dehors.",          errorWord: "suis",   correction: "Ils sont dehors."             },
-      { sentence: "Tu est mon ami.",           errorWord: "est",    correction: "Tu es mon ami."               },
-      { sentence: "Vous sont rapides.",        errorWord: "sont",   correction: "Vous êtes rapides."           },
-      { sentence: "Elles es contentes.",       errorWord: "es",     correction: "Elles sont contentes."        }
-    ],
+      /* ── NIVEAU 1 : associer sujet ↔ forme (5) ── */
+      { level: 1, mode: "matching", subject: "Elle",  answer: "est"    },
+      { level: 1, mode: "matching", subject: "On",    answer: "est"    },
+      { level: 1, mode: "matching", subject: "Ils",   answer: "sont"   },
+      { level: 1, mode: "matching", subject: "Elles", answer: "sont"   },
+      { level: 1, mode: "matching", subject: "Vous",  answer: "êtes"   },
 
-    /* ── word-order ── */
-    wordOrderBank: [
-      { words: ["je",    "suis",   "fatigué"],           answer: "je suis fatigué."           },
-      { words: ["tu",    "es",     "gentil"],            answer: "tu es gentil."               },
-      { words: ["il",    "est",    "content"],           answer: "il est content."             },
-      { words: ["nous",  "sommes", "prêts"],             answer: "nous sommes prêts."          },
-      { words: ["vous",  "êtes",   "en",    "retard"],   answer: "vous êtes en retard."        },
-      { words: ["ils",   "sont",   "dehors"],            answer: "ils sont dehors."            },
-      { words: ["elle",  "est",    "heureuse"],          answer: "elle est heureuse."          },
-      { words: ["nous",  "sommes", "en",    "classe"],   answer: "nous sommes en classe."      },
-      { words: ["elles", "sont",   "contentes"],         answer: "elles sont contentes."       },
-      { words: ["tu",    "es",     "en",    "avance"],   answer: "tu es en avance."            },
-      { words: ["je",    "suis",   "très",  "content"],  answer: "je suis très content."       },
-      { words: ["vous",  "êtes",   "très",  "gentils"],  answer: "vous êtes très gentils."     }
+      /* ── NIVEAU 2 : saisie libre, pronom donné (10) ── */
+      { level: 2, infinitive: "être", sentence: "Je ________ à l'école.",               answer: "suis"   },
+      { level: 2, infinitive: "être", sentence: "Tu ________ mon ami.",                 answer: "es"     },
+      { level: 2, infinitive: "être", sentence: "Il ________ malade aujourd'hui.",      answer: "est"    },
+      { level: 2, infinitive: "être", sentence: "Elle ________ contente de te voir.",   answer: "est"    },
+      { level: 2, infinitive: "être", sentence: "On ________ en retard.",               answer: "est"    },
+      { level: 2, infinitive: "être", sentence: "Nous ________ en classe de français.", answer: "sommes" },
+      { level: 2, infinitive: "être", sentence: "Vous ________ très gentils avec moi.", answer: "êtes"   },
+      { level: 2, infinitive: "être", sentence: "Ils ________ dans la cour.",           answer: "sont"   },
+      { level: 2, infinitive: "être", sentence: "Elles ________ heureuses de partir.",  answer: "sont"   },
+      { level: 2, infinitive: "être", sentence: "Je ________ prêt pour l'examen.",      answer: "suis"   },
+
+      /* ── NIVEAU 3 : saisie libre, sujet = groupe nominal (10) ── */
+      { level: 3, infinitive: "être", sentence: "Le chat ________ sur le mur.",               answer: "est"    },
+      { level: 3, infinitive: "être", sentence: "Mes parents ________ contents.",             answer: "sont"   },
+      { level: 3, infinitive: "être", sentence: "Léa et moi ________ prêts.",                 answer: "sommes" },
+      { level: 3, infinitive: "être", sentence: "Toi et ton frère ________ en retard.",       answer: "êtes"   },
+      { level: 3, infinitive: "être", sentence: "La maîtresse ________ absente demain.",      answer: "est"    },
+      { level: 3, infinitive: "être", sentence: "Les enfants ________ dans la cour.",         answer: "sont"   },
+      { level: 3, infinitive: "être", sentence: "Mon chien et moi ________ fatigués.",        answer: "sommes" },
+      { level: 3, infinitive: "être", sentence: "Toi et tes amis ________ très bruyants.",    answer: "êtes"   },
+      { level: 3, infinitive: "être", sentence: "Le ballon ________ crevé.",                  answer: "est"    },
+      { level: 3, infinitive: "être", sentence: "Les fleurs du jardin ________ magnifiques.", answer: "sont"   }
     ]
   },
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     Type : premier-groupe-present-niveaux
+     Niveau 1 : QCM (5) + associer sujet↔forme (5) — sujets = pronoms,
+                verbes variés (chanter, jouer, regarder, parler, aimer,
+                danser, marcher, écouter)
+     Niveau 2 : saisie libre, pronom + infinitif donnés
+     Niveau 3 : saisie libre, sujet = groupe nominal (pas de pronom)
+     Uniquement des verbes réguliers du 1er groupe (aucun -ger/-cer/-yer/
+     -eler/-eter : ceux-ci sont couverts par conjuguer-verbes-particuliers-1er-groupe).
+     Progression verrouillée : seuil 80 %, persistance sessionStorage.
+  ══════════════════════════════════════════════════════════════════════════ */
 
   "conjuguer-1er-groupe-present": {
     title: "Conjuguer les verbes réguliers du 1er groupe au présent",
     domaine:    "Français",
     competence: "Conjugaison — 1er groupe au présent",
-    type: "text-input",
-    levels: ["CM1", "CM2", "6e"],
-    paliers: 1, /* nombre réel de paliers du moteur */
-    questionsPerSession: 25,
-    sortByDifficulty: true,
+    type:       "premier-groupe-present-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
+    questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
+    /* bank : chaque item porte un champ « level » 1-3.
+       Niveau 1 (mode "mcq" ou "matching") : sujets = pronoms personnels.
+         mode "mcq" : choices = 4 formes possibles du même verbe.
+         mode "matching" : forms = formes distinctes du verbe (je et il/elle
+         partagent la même forme pour un verbe du 1er groupe régulier, donc
+         5 formes distinctes et non 6 comme pour être/avoir).
+       Niveaux 2 et 3 (saisie libre) : q.infinitive + q.sentence + q.answer.
+       Niveau 2 = pronom donné, niveau 3 = sujet non pronominal (GN). */
     bank: [
-      /* ── chanter ── */
-      { subject: "je",    infinitive: "chanter",    sentence: "Je ________ une chanson.",           answer: "chante",      difficulty: 1 },
-      { subject: "tu",    infinitive: "chanter",    sentence: "Tu ________ très bien.",             answer: "chantes",     difficulty: 1 },
-      { subject: "il",    infinitive: "chanter",    sentence: "Il ________ dans le jardin.",        answer: "chante",      difficulty: 1 },
-      { subject: "elle",  infinitive: "chanter",    sentence: "Elle ________ sous la pluie.",       answer: "chante",      difficulty: 1 },
-      { subject: "nous",  infinitive: "chanter",    sentence: "Nous ________ en chœur.",            answer: "chantons",    difficulty: 2 },
-      { subject: "vous",  infinitive: "chanter",    sentence: "Vous ________ une comptine.",        answer: "chantez",     difficulty: 2 },
-      { subject: "ils",   infinitive: "chanter",    sentence: "Ils ________ à la fête.",            answer: "chantent",    difficulty: 2 },
+      /* ── NIVEAU 1 : QCM (5) ── */
+      { level: 1, mode: "mcq", infinitive: "chanter",  subject: "je",   choices: ["chante", "chantes", "chantons", "chantez"], answer: "chante"  },
+      { level: 1, mode: "mcq", infinitive: "jouer",     subject: "tu",   choices: ["joues", "joue", "jouons", "jouez"],          answer: "joues"   },
+      { level: 1, mode: "mcq", infinitive: "regarder",  subject: "il",   choices: ["regarde", "regardes", "regardons", "regardent"], answer: "regarde" },
+      { level: 1, mode: "mcq", infinitive: "parler",    subject: "nous", choices: ["parlons", "parlez", "parlent", "parle"],     answer: "parlons" },
+      { level: 1, mode: "mcq", infinitive: "aimer",     subject: "vous", choices: ["aimez", "aimons", "aiment", "aime"],         answer: "aimez"   },
 
-      /* ── jouer ── */
-      { subject: "je",    infinitive: "jouer",      sentence: "Je ________ au football.",           answer: "joue",        difficulty: 1 },
-      { subject: "tu",    infinitive: "jouer",      sentence: "Tu ________ dans la cour.",          answer: "joues",       difficulty: 1 },
-      { subject: "elle",  infinitive: "jouer",      sentence: "Elle ________ au tennis.",           answer: "joue",        difficulty: 1 },
-      { subject: "nous",  infinitive: "jouer",      sentence: "Nous ________ ensemble.",            answer: "jouons",      difficulty: 2 },
-      { subject: "vous",  infinitive: "jouer",      sentence: "Vous ________ aux cartes.",          answer: "jouez",       difficulty: 2 },
-      { subject: "elles", infinitive: "jouer",      sentence: "Elles ________ à la marelle.",       answer: "jouent",      difficulty: 2 },
+      /* ── NIVEAU 1 : associer sujet ↔ forme (5) ── */
+      { level: 1, mode: "matching", infinitive: "danser",   subject: "Elle",  forms: ["danse", "danses", "dansons", "dansez", "dansent"],       answer: "danse"   },
+      { level: 1, mode: "matching", infinitive: "marcher",  subject: "Nous",  forms: ["marche", "marches", "marchons", "marchez", "marchent"],   answer: "marchons" },
+      { level: 1, mode: "matching", infinitive: "écouter",  subject: "Vous",  forms: ["écoute", "écoutes", "écoutons", "écoutez", "écoutent"],   answer: "écoutez" },
+      { level: 1, mode: "matching", infinitive: "aimer",    subject: "Ils",   forms: ["aime", "aimes", "aimons", "aimez", "aiment"],             answer: "aiment"  },
+      { level: 1, mode: "matching", infinitive: "jouer",    subject: "Tu",    forms: ["joue", "joues", "jouons", "jouez", "jouent"],             answer: "joues"   },
 
-      /* ── parler ── */
-      { subject: "je",    infinitive: "parler",     sentence: "Je ________ à mon ami.",             answer: "parle",       difficulty: 1 },
-      { subject: "tu",    infinitive: "parler",     sentence: "Tu ________ trop fort.",             answer: "parles",      difficulty: 1 },
-      { subject: "il",    infinitive: "parler",     sentence: "Il ________ avec la maîtresse.",     answer: "parle",       difficulty: 1 },
-      { subject: "nous",  infinitive: "parler",     sentence: "Nous ________ en français.",         answer: "parlons",     difficulty: 2 },
-      { subject: "vous",  infinitive: "parler",     sentence: "Vous ________ entre vous.",          answer: "parlez",      difficulty: 2 },
-      { subject: "ils",   infinitive: "parler",     sentence: "Ils ________ de leur voyage.",       answer: "parlent",     difficulty: 2 },
+      /* ── NIVEAU 2 : saisie libre, pronom donné (10) ── */
+      { level: 2, infinitive: "chanter",  sentence: "Je ________ une chanson.",       answer: "chante"    },
+      { level: 2, infinitive: "regarder", sentence: "Tu ________ la télévision.",     answer: "regardes"  },
+      { level: 2, infinitive: "parler",   sentence: "Il ________ avec son ami.",      answer: "parle"     },
+      { level: 2, infinitive: "danser",   sentence: "Elle ________ dans le salon.",   answer: "danse"     },
+      { level: 2, infinitive: "jouer",    sentence: "On ________ dans le jardin.",    answer: "joue"      },
+      { level: 2, infinitive: "aimer",    sentence: "Nous ________ les vacances.",    answer: "aimons"    },
+      { level: 2, infinitive: "marcher",  sentence: "Vous ________ vite.",            answer: "marchez"   },
+      { level: 2, infinitive: "écouter",  sentence: "Ils ________ la maîtresse.",     answer: "écoutent"  },
+      { level: 2, infinitive: "chanter",  sentence: "Elles ________ en chœur.",       answer: "chantent"  },
+      { level: 2, infinitive: "jouer",    sentence: "Tu ________ au ballon.",         answer: "joues"     },
 
-      /* ── regarder ── */
-      { subject: "je",    infinitive: "regarder",   sentence: "Je ________ la télévision.",         answer: "regarde",     difficulty: 1 },
-      { subject: "tu",    infinitive: "regarder",   sentence: "Tu ________ par la fenêtre.",        answer: "regardes",    difficulty: 1 },
-      { subject: "elle",  infinitive: "regarder",   sentence: "Elle ________ les nuages.",          answer: "regarde",     difficulty: 1 },
-      { subject: "nous",  infinitive: "regarder",   sentence: "Nous ________ un film.",             answer: "regardons",   difficulty: 2 },
-      { subject: "vous",  infinitive: "regarder",   sentence: "Vous ________ le tableau.",          answer: "regardez",    difficulty: 2 },
-      { subject: "ils",   infinitive: "regarder",   sentence: "Ils ________ le spectacle.",         answer: "regardent",   difficulty: 2 },
-
-      /* ── aimer ── */
-      { subject: "j'",    infinitive: "aimer",      sentence: "J'________ le chocolat.",            answer: "aime",        difficulty: 1 },
-      { subject: "tu",    infinitive: "aimer",      sentence: "Tu ________ les animaux.",           answer: "aimes",       difficulty: 1 },
-      { subject: "il",    infinitive: "aimer",      sentence: "Il ________ la musique.",            answer: "aime",        difficulty: 1 },
-      { subject: "nous",  infinitive: "aimer",      sentence: "Nous ________ les vacances.",        answer: "aimons",      difficulty: 2 },
-      { subject: "vous",  infinitive: "aimer",      sentence: "Vous ________ la nature.",           answer: "aimez",       difficulty: 2 },
-      { subject: "elles", infinitive: "aimer",      sentence: "Elles ________ danser.",             answer: "aiment",      difficulty: 2 },
-
-      /* ── marcher ── */
-      { subject: "je",    infinitive: "marcher",    sentence: "Je ________ vers l'école.",          answer: "marche",      difficulty: 1 },
-      { subject: "tu",    infinitive: "marcher",    sentence: "Tu ________ vite.",                  answer: "marches",     difficulty: 1 },
-      { subject: "il",    infinitive: "marcher",    sentence: "Il ________ dans la rue.",           answer: "marche",      difficulty: 1 },
-      { subject: "nous",  infinitive: "marcher",    sentence: "Nous ________ dans la forêt.",       answer: "marchons",    difficulty: 2 },
-      { subject: "ils",   infinitive: "marcher",    sentence: "Ils ________ en silence.",           answer: "marchent",    difficulty: 2 },
-
-      /* ── danser ── */
-      { subject: "je",    infinitive: "danser",     sentence: "Je ________ dans le salon.",         answer: "danse",       difficulty: 1 },
-      { subject: "tu",    infinitive: "danser",     sentence: "Tu ________ avec ta sœur.",          answer: "danses",      difficulty: 1 },
-      { subject: "elle",  infinitive: "danser",     sentence: "Elle ________ sur la scène.",        answer: "danse",       difficulty: 2 },
-      { subject: "ils",   infinitive: "danser",     sentence: "Ils ________ au bal.",               answer: "dansent",     difficulty: 2 },
-
-      /* ── écouter ── */
-      { subject: "j'",    infinitive: "écouter",    sentence: "J'________ de la musique.",          answer: "écoute",      difficulty: 1 },
-      { subject: "tu",    infinitive: "écouter",    sentence: "Tu ________ attentivement.",         answer: "écoutes",     difficulty: 1 },
-      { subject: "nous",  infinitive: "écouter",    sentence: "Nous ________ la radio.",            answer: "écoutons",    difficulty: 2 },
-      { subject: "vous",  infinitive: "écouter",    sentence: "Vous ________ la maîtresse.",        answer: "écoutez",     difficulty: 2 },
-
-      /* ── travailler ── */
-      { subject: "je",    infinitive: "travailler", sentence: "Je ________ bien à l'école.",        answer: "travaille",   difficulty: 2 },
-      { subject: "tu",    infinitive: "travailler", sentence: "Tu ________ dur.",                   answer: "travailles",  difficulty: 2 },
-      { subject: "nous",  infinitive: "travailler", sentence: "Nous ________ en équipe.",           answer: "travaillons", difficulty: 2 },
-      { subject: "ils",   infinitive: "travailler", sentence: "Ils ________ ensemble.",             answer: "travaillent", difficulty: 3 },
-
-      /* ── dessiner ── */
-      { subject: "je",    infinitive: "dessiner",   sentence: "Je ________ un dragon.",             answer: "dessine",     difficulty: 2 },
-      { subject: "tu",    infinitive: "dessiner",   sentence: "Tu ________ très bien.",             answer: "dessines",    difficulty: 2 },
-      { subject: "elle",  infinitive: "dessiner",   sentence: "Elle ________ un paysage.",          answer: "dessine",     difficulty: 2 },
-      { subject: "nous",  infinitive: "dessiner",   sentence: "Nous ________ des animaux.",         answer: "dessinons",   difficulty: 3 },
-
-      /* ── cuisiner ── */
-      { subject: "je",    infinitive: "cuisiner",   sentence: "Je ________ un gâteau.",             answer: "cuisine",     difficulty: 2 },
-      { subject: "vous",  infinitive: "cuisiner",   sentence: "Vous ________ avec votre maman.",    answer: "cuisinez",    difficulty: 2 },
-      { subject: "ils",   infinitive: "cuisiner",   sentence: "Ils ________ le repas.",             answer: "cuisinent",   difficulty: 3 },
-
-      /* ── habiter ── */
-      { subject: "j'",    infinitive: "habiter",    sentence: "J'________ à Madrid.",               answer: "habite",      difficulty: 1 },
-      { subject: "tu",    infinitive: "habiter",    sentence: "Tu ________ près du parc.",          answer: "habites",     difficulty: 1 },
-      { subject: "il",    infinitive: "habiter",    sentence: "Il ________ dans une maison.",       answer: "habite",      difficulty: 1 },
-      { subject: "nous",  infinitive: "habiter",    sentence: "Nous ________ en ville.",            answer: "habitons",    difficulty: 2 },
-
-      /* ── chercher ── */
-      { subject: "je",    infinitive: "chercher",   sentence: "Je ________ mon stylo.",             answer: "cherche",     difficulty: 2 },
-      { subject: "tu",    infinitive: "chercher",   sentence: "Tu ________ tes affaires.",          answer: "cherches",    difficulty: 2 },
-      { subject: "ils",   infinitive: "chercher",   sentence: "Ils ________ la sortie.",            answer: "cherchent",   difficulty: 3 },
-
-      /* ── couper ── */
-      { subject: "je",    infinitive: "couper",     sentence: "Je ________ le pain.",               answer: "coupe",       difficulty: 2 },
-      { subject: "tu",    infinitive: "couper",     sentence: "Tu ________ les légumes.",           answer: "coupes",      difficulty: 2 },
-      { subject: "nous",  infinitive: "couper",     sentence: "Nous ________ le papier.",           answer: "coupons",     difficulty: 3 },
-
-      /* ── porter ── */
-      { subject: "je",    infinitive: "porter",     sentence: "Je ________ mon sac.",               answer: "porte",       difficulty: 2 },
-      { subject: "tu",    infinitive: "porter",     sentence: "Tu ________ un chapeau.",            answer: "portes",      difficulty: 2 },
-      { subject: "elle",  infinitive: "porter",     sentence: "Elle ________ une robe.",            answer: "porte",       difficulty: 2 },
-      { subject: "ils",   infinitive: "porter",     sentence: "Ils ________ des lunettes.",         answer: "portent",     difficulty: 3 },
-
-      /* ── fermer ── */
-      { subject: "je",    infinitive: "fermer",     sentence: "Je ________ la fenêtre.",            answer: "ferme",       difficulty: 2 },
-      { subject: "tu",    infinitive: "fermer",     sentence: "Tu ________ la porte.",              answer: "fermes",      difficulty: 2 },
-      { subject: "nous",  infinitive: "fermer",     sentence: "Nous ________ les cahiers.",         answer: "fermons",     difficulty: 3 }
+      /* ── NIVEAU 3 : saisie libre, sujet = groupe nominal (10) ── */
+      { level: 3, infinitive: "écouter",  sentence: "Les élèves ________ la maîtresse.",            answer: "écoutent" },
+      { level: 3, infinitive: "jouer",    sentence: "Mon frère et moi ________ au foot.",           answer: "jouons"   },
+      { level: 3, infinitive: "préparer", sentence: "La sorcière ________ une potion.",              answer: "prépare"  },
+      { level: 3, infinitive: "chanter",  sentence: "Les oiseaux ________ dans les arbres.",         answer: "chantent" },
+      { level: 3, infinitive: "regarder", sentence: "Le chat ________ par la fenêtre.",              answer: "regarde"  },
+      { level: 3, infinitive: "marcher",  sentence: "Toi et ta sœur ________ vite.",                 answer: "marchez"  },
+      { level: 3, infinitive: "danser",   sentence: "Léa et moi ________ ensemble.",                 answer: "dansons"  },
+      { level: 3, infinitive: "aimer",    sentence: "Mes parents ________ le jardinage.",            answer: "aiment"   },
+      { level: 3, infinitive: "parler",   sentence: "Toi et tes amis ________ trop fort.",           answer: "parlez"   },
+      { level: 3, infinitive: "cuisiner", sentence: "La maîtresse ________ un gâteau pour la classe.", answer: "cuisine" }
     ]
   },
 
@@ -1163,99 +1095,78 @@ const EXERCISE_DATA = {
     ]
   },
 
+  /* ══════════════════════════════════════════════════════════════════════════
+     Type : avoir-present-niveaux
+     Niveau 1 : QCM (5) + associer sujet↔forme (5) — sujets = pronoms
+     Niveau 2 : saisie libre, pronom donné
+     Niveau 3 : saisie libre, sujet = groupe nominal (pas de pronom)
+     Progression verrouillée : seuil 80 %, persistance sessionStorage.
+  ══════════════════════════════════════════════════════════════════════════ */
+
   "conjuguer-avoir-present": {
     title: "Conjuguer le verbe avoir au présent",
     domaine:    "Français",
     competence: "Conjugaison — Avoir au présent",
-    verb: "avoir",
-    levels: ["CM1", "CM2", "6e"],
-    paliers: 1, /* nombre réel de paliers du moteur */
-    exerciseTypes: ["fill-blank", "multiple-choice", "matching", "find-error", "conjugation-table", "guess-subject", "word-order"],
+    type:       "avoir-present-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
-    /* ── fill-blank & multiple-choice ── */
-    bank: [
-      { subject: "je",    sentence: "J'___ faim.",                    answer: "ai",    choices: ["ai",   "as",    "a",    "avons"],  difficulty: 1 },
-      { subject: "je",    sentence: "J'___ un chien.",                answer: "ai",    choices: ["ai",   "as",    "a",    "ont"],    difficulty: 1 },
-      { subject: "je",    sentence: "J'___ dix ans.",                 answer: "ai",    choices: ["ai",   "as",    "a",    "avez"],   difficulty: 1 },
-      { subject: "tu",    sentence: "Tu ___ de la chance.",           answer: "as",    choices: ["as",   "ai",    "a",    "avez"],   difficulty: 1 },
-      { subject: "tu",    sentence: "Tu ___ un vélo.",                answer: "as",    choices: ["as",   "ai",    "a",    "ont"],    difficulty: 1 },
-      { subject: "tu",    sentence: "Tu ___ soif.",                   answer: "as",    choices: ["as",   "ai",    "a",    "avons"],  difficulty: 1 },
-      { subject: "il",    sentence: "Il ___ peur.",                   answer: "a",     choices: ["a",    "as",    "ai",   "ont"],    difficulty: 1 },
-      { subject: "elle",  sentence: "Elle ___ froid.",                answer: "a",     choices: ["a",    "as",    "ai",   "avons"],  difficulty: 1 },
-      { subject: "on",    sentence: "On ___ le temps.",               answer: "a",     choices: ["a",    "ont",   "avez", "as"],     difficulty: 2 },
-      { subject: "nous",  sentence: "Nous ___ un chat.",              answer: "avons", choices: ["avons","avez",  "ont",  "a"],      difficulty: 2 },
-      { subject: "nous",  sentence: "Nous ___ faim.",                 answer: "avons", choices: ["avons","avez",  "ont",  "a"],      difficulty: 2 },
-      { subject: "nous",  sentence: "Nous ___ de la chance.",         answer: "avons", choices: ["avons","avez",  "ont",  "as"],     difficulty: 2 },
-      { subject: "vous",  sentence: "Vous ___ raison.",               answer: "avez",  choices: ["avez", "avons", "ont",  "a"],      difficulty: 2 },
-      { subject: "vous",  sentence: "Vous ___ un frère.",             answer: "avez",  choices: ["avez", "avons", "ont",  "a"],      difficulty: 2 },
-      { subject: "vous",  sentence: "Vous ___ de la chance.",         answer: "avez",  choices: ["avez", "avons", "ont",  "as"],     difficulty: 2 },
-      { subject: "ils",   sentence: "Ils ___ tort.",                  answer: "ont",   choices: ["ont",  "avons", "avez", "a"],      difficulty: 3 },
-      { subject: "elles", sentence: "Elles ___ froid.",               answer: "ont",   choices: ["ont",  "avons", "avez", "a"],      difficulty: 3 },
-      { subject: "ils",   sentence: "Ils ___ deux chiens.",           answer: "ont",   choices: ["ont",  "avons", "avez", "a"],      difficulty: 3 },
-      { subject: "il",    sentence: "Le chat ___ faim.",              answer: "a",     choices: ["a",    "as",    "ai",   "ont"],    difficulty: 2 },
-      { subject: "elles", sentence: "Les élèves ___ de la chance.",   answer: "ont",   choices: ["ont",  "a",     "avez", "avons"],  difficulty: 2 },
-      { subject: "nous",  sentence: "Ma sœur et moi ___ un vélo.",   answer: "avons", choices: ["avons","avez",  "ont",  "a"],      difficulty: 3 },
-      { subject: "vous",  sentence: "Toi et ton ami ___ de la chance.",answer: "avez", choices: ["avez", "avons", "ont",  "a"],      difficulty: 3 }
-    ],
-
-    /* ── matching & conjugation-table ── */
+    /* ── les 6 formes de référence, utilisées comme distracteurs par le
+       mode "matching" du niveau 1. Sujet "J'" (et non "Je") : avoir commence
+       par une voyelle, l'élision est donc correcte ici (contrairement à être). ── */
     conjugationForms: [
-      { subject: "J'",           answer: "ai",    choices: ["ai",   "as",    "a",    "avez"]   },
-      { subject: "Tu",           answer: "as",    choices: ["as",   "ai",    "a",    "avons"]  },
-      { subject: "Il / Elle",    answer: "a",     choices: ["a",    "as",    "ai",   "ont"]    },
-      { subject: "Nous",         answer: "avons", choices: ["avons","avez",  "ont",  "a"]      },
-      { subject: "Vous",         answer: "avez",  choices: ["avez", "avons", "a",    "ont"]    },
-      { subject: "Ils / Elles",  answer: "ont",   choices: ["ont",  "avons", "avez", "a"]      }
+      { subject: "J'",          answer: "ai"    },
+      { subject: "Tu",          answer: "as"    },
+      { subject: "Il / Elle",   answer: "a"     },
+      { subject: "Nous",        answer: "avons" },
+      { subject: "Vous",        answer: "avez"  },
+      { subject: "Ils / Elles", answer: "ont"   }
     ],
 
-    /* ── guess-subject ── */
-    guessSubjectBank: [
-      { sentence: "_____ a faim.",               answer: "Il",    choices: ["Je",    "Tu",    "Il",    "Nous"]  },
-      { sentence: "_____ ai soif.",              answer: "Je",    choices: ["Je",    "Tu",    "Il",    "Nous"]  },
-      { sentence: "_____ as un chien.",          answer: "Tu",    choices: ["Je",    "Tu",    "Il",    "Vous"]  },
-      { sentence: "_____ avons raison.",         answer: "Nous",  choices: ["Je",    "Nous",  "Vous",  "Ils"]   },
-      { sentence: "_____ avez tort.",            answer: "Vous",  choices: ["Tu",    "Nous",  "Vous",  "Ils"]   },
-      { sentence: "_____ ont de la chance.",     answer: "Ils",   choices: ["Il",    "Nous",  "Vous",  "Ils"]   },
-      { sentence: "_____ a froid.",              answer: "Elle",  choices: ["Je",    "Tu",    "Il",    "Elle"]  },
-      { sentence: "_____ avez deux chats.",      answer: "Vous",  choices: ["Nous",  "Vous",  "Ils",   "Elles"] },
-      { sentence: "_____ ont peur.",             answer: "Elles", choices: ["Il",    "Nous",  "Ils",   "Elles"] },
-      { sentence: "_____ avons un vélo.",        answer: "Nous",  choices: ["Je",    "Nous",  "Vous",  "Ils"]   },
-      { sentence: "_____ ai dix ans.",           answer: "Je",    choices: ["Je",    "Tu",    "Nous",  "Vous"]  },
-      { sentence: "_____ as de la chance.",      answer: "Tu",    choices: ["Je",    "Tu",    "Il",    "Vous"]  }
-    ],
+    /* bank : chaque item porte un champ « level » 1-3.
+       Niveau 1 (mode "mcq" ou "matching") : sujets = pronoms personnels.
+       Niveaux 2 et 3 (saisie libre) : q.infinitive + q.sentence + q.answer.
+       Niveau 2 = pronom donné, niveau 3 = sujet non pronominal (GN). */
+    bank: [
+      /* ── NIVEAU 1 : QCM (5) ── */
+      { level: 1, mode: "mcq", subject: "je",   choices: ["ai", "as", "a", "avons"],  answer: "ai"    },
+      { level: 1, mode: "mcq", subject: "tu",   choices: ["as", "ai", "a", "avez"],   answer: "as"    },
+      { level: 1, mode: "mcq", subject: "il",   choices: ["a", "as", "ai", "ont"],    answer: "a"     },
+      { level: 1, mode: "mcq", subject: "nous", choices: ["avons", "avez", "ont", "a"], answer: "avons" },
+      { level: 1, mode: "mcq", subject: "vous", choices: ["avez", "avons", "ont", "a"], answer: "avez"  },
 
-    /* ── find-error ── */
-    findErrorBank: [
-      { sentence: "Nous a un chien.",          errorWord: "a",     correction: "Nous avons un chien."          },
-      { sentence: "J'as faim.",                errorWord: "J'as",  correction: "J'ai faim."                    },
-      { sentence: "Ils a tort.",               errorWord: "a",     correction: "Ils ont tort."                 },
-      { sentence: "Vous ai raison.",           errorWord: "ai",    correction: "Vous avez raison."             },
-      { sentence: "Tu ont de la chance.",      errorWord: "ont",   correction: "Tu as de la chance."           },
-      { sentence: "Elle avons froid.",         errorWord: "avons", correction: "Elle a froid."                 },
-      { sentence: "Nous avez un vélo.",        errorWord: "avez",  correction: "Nous avons un vélo."           },
-      { sentence: "J'avons dix ans.",          errorWord: "J'avons", correction: "J'ai dix ans."               },
-      { sentence: "Ils ai tort.",              errorWord: "ai",    correction: "Ils ont tort."                 },
-      { sentence: "Tu a soif.",               errorWord: "a",     correction: "Tu as soif."                   },
-      { sentence: "Vous ont raison.",          errorWord: "ont",   correction: "Vous avez raison."             },
-      { sentence: "Elles as peur.",            errorWord: "as",    correction: "Elles ont peur."               }
-    ],
+      /* ── NIVEAU 1 : associer sujet ↔ forme (5) ── */
+      { level: 1, mode: "matching", subject: "Elle",  answer: "a"    },
+      { level: 1, mode: "matching", subject: "On",    answer: "a"    },
+      { level: 1, mode: "matching", subject: "Ils",   answer: "ont"  },
+      { level: 1, mode: "matching", subject: "Elles", answer: "ont"  },
+      { level: 1, mode: "matching", subject: "Vous",  answer: "avez" },
 
-    /* ── word-order ── */
-    wordOrderBank: [
-      { words: ["tu",    "as",    "très",  "faim"],       answer: "tu as très faim."            },
-      { words: ["tu",    "as",    "soif"],              answer: "tu as soif."                  },
-      { words: ["il",    "a",     "peur"],              answer: "il a peur."                   },
-      { words: ["nous",  "avons", "un",    "chien"],    answer: "nous avons un chien."         },
-      { words: ["vous",  "avez",  "raison"],            answer: "vous avez raison."            },
-      { words: ["ils",   "ont",   "tort"],              answer: "ils ont tort."                },
-      { words: ["elle",  "a",     "froid"],             answer: "elle a froid."                },
-      { words: ["nous",  "avons", "de",    "la",  "chance"], answer: "nous avons de la chance." },
-      { words: ["elles", "ont",   "peur"],              answer: "elles ont peur."              },
-      { words: ["tu",    "as",    "de",    "la",  "chance"], answer: "tu as de la chance."     },
-      { words: ["il",    "a",     "dix",   "ans"],       answer: "il a dix ans."               },
-      { words: ["vous",  "avez",  "un",    "chat"],     answer: "vous avez un chat."           }
+      /* ── NIVEAU 2 : saisie libre, pronom donné (10) ── */
+      { level: 2, infinitive: "avoir", sentence: "J'________ faim.",                    answer: "ai"    },
+      { level: 2, infinitive: "avoir", sentence: "Tu ________ un vélo.",                answer: "as"    },
+      { level: 2, infinitive: "avoir", sentence: "Il ________ peur du noir.",           answer: "a"     },
+      { level: 2, infinitive: "avoir", sentence: "Elle ________ froid ce matin.",       answer: "a"     },
+      { level: 2, infinitive: "avoir", sentence: "On ________ de la chance.",           answer: "a"     },
+      { level: 2, infinitive: "avoir", sentence: "Nous ________ un chat à la maison.",  answer: "avons" },
+      { level: 2, infinitive: "avoir", sentence: "Vous ________ raison.",               answer: "avez"  },
+      { level: 2, infinitive: "avoir", sentence: "Ils ________ deux chiens.",           answer: "ont"   },
+      { level: 2, infinitive: "avoir", sentence: "Elles ________ soif après le sport.", answer: "ont"   },
+      { level: 2, infinitive: "avoir", sentence: "Elle ________ un beau vélo rouge.",   answer: "a"     },
+
+      /* ── NIVEAU 3 : saisie libre, sujet = groupe nominal (10) ── */
+      { level: 3, infinitive: "avoir", sentence: "Mes voisins ________ un chien.",           answer: "ont"   },
+      { level: 3, infinitive: "avoir", sentence: "La maîtresse ________ raison.",             answer: "a"     },
+      { level: 3, infinitive: "avoir", sentence: "Paul et moi ________ faim.",                answer: "avons" },
+      { level: 3, infinitive: "avoir", sentence: "Le chat ________ soif.",                    answer: "a"     },
+      { level: 3, infinitive: "avoir", sentence: "Toi et ta sœur ________ de la chance.",     answer: "avez"  },
+      { level: 3, infinitive: "avoir", sentence: "Les élèves ________ beaucoup de devoirs.",  answer: "ont"   },
+      { level: 3, infinitive: "avoir", sentence: "Mon frère et moi ________ un vélo neuf.",   answer: "avons" },
+      { level: 3, infinitive: "avoir", sentence: "Toi et tes amis ________ raison.",          answer: "avez"  },
+      { level: 3, infinitive: "avoir", sentence: "Le vieux chien ________ peur de l'orage.",  answer: "a"     },
+      { level: 3, infinitive: "avoir", sentence: "Mes cousines ________ un chat.",            answer: "ont"   }
     ]
   },
 

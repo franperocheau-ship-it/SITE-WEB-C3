@@ -5242,6 +5242,15 @@
       } else if (currentType === "verbes-particuliers-niveaux") {
         cvpInitSession();
         return;
+      } else if (currentType === "etre-present-niveaux") {
+        cepInitSession();
+        return;
+      } else if (currentType === "avoir-present-niveaux") {
+        capInitSession();
+        return;
+      } else if (currentType === "premier-groupe-present-niveaux") {
+        c1gInitSession();
+        return;
       } else if (currentType === "change-sujet-niveaux") {
         csjInitSession();
         return;
@@ -5500,6 +5509,12 @@
         /* session managed by ctInitSession — no-op here */
       } else if (currentType === "verbes-particuliers-niveaux") {
         /* session managed by cvpInitSession — no-op here */
+      } else if (currentType === "etre-present-niveaux") {
+        /* session managed by cepInitSession — no-op here */
+      } else if (currentType === "avoir-present-niveaux") {
+        /* session managed by capInitSession — no-op here */
+      } else if (currentType === "premier-groupe-present-niveaux") {
+        /* session managed by c1gInitSession — no-op here */
       } else if (currentType === "decomposer-nombre-entier-niveaux") {
         /* session managed by dniInitSession — no-op here */
       } else if (currentType === "composer-nombre-entier-niveaux") {
@@ -16751,6 +16766,801 @@
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
         exerciseType: 'verbes-particuliers-niveaux',
+        level:        'Niveau ' + level,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : etre-present-niveaux — « Conjuguer le verbe être au présent »
+       Niveau 1 : QCM + associer sujet↔forme (sujets pronoms), mode par item
+       Niveau 2 : saisie libre, pronom donné
+       Niveau 3 : saisie libre, sujet = groupe nominal (pas de pronom)
+       3 niveaux déverrouillables à 80 %. Un seul essai par question.
+       ════════════════════════════════════════════════════════════════════════ */
+
+    const CEP_SEUIL = 0.8;
+
+    const CEP_LV_DEFS = [
+      { lv: 1, desc: 'QCM et association : trouve la bonne forme' },
+      { lv: 2, desc: 'Écris la forme du verbe avec le pronom donné' },
+      { lv: 3, desc: 'Écris la forme du verbe avec un autre sujet' }
+    ];
+
+    let cepState = null;
+    let cepLevelSelect = null;
+
+    function cepBackToSelectScreen() {
+      cepState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    /* ── Init : réinitialise et affiche le sélecteur de niveau ──────────── */
+    function cepInitSession() {
+      cepState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      cepLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: CEP_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: CEP_SEUIL,
+        onSelectLevel: (lv) => cepStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: cepBackToSelectScreen
+      });
+      cepLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function cepStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const pool = shuffle((sessionData.bank || []).filter(item => item.level === lv));
+      const qs   = pool.slice(0, sessionData.questionsPerSession || 10);
+      cepState   = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+      document.getElementById('q-total').textContent = qs.length;
+
+      cepLevelSelect.renderBadges(lv);
+      cepRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Affiche une question — dispatche sur q.mode (niveau 1) ou saisie
+       libre (niveaux 2/3) ───────────────────────────────────────────────── */
+    function cepRenderQuestion(card) {
+      const { questions, idx, total } = cepState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if (q.mode === 'mcq')           cepRenderMcq(card, q);
+      else if (q.mode === 'matching') cepRenderMatching(card, q);
+      else                             cepRenderTextInput(card, q);
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        cepState.idx++;
+        if (cepState.idx >= cepState.questions.length) cepShowLevelResults();
+        else cepRenderQuestion(document.getElementById('ex-card'));
+      });
+    }
+
+    function cepRenderMcq(card, q) {
+      const { idx, total } = cepState;
+      card.innerHTML = `
+        <p class="ex-question-label">Quelle est la forme du verbe <em>être</em> avec ce sujet ?</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="cep-choices"></div>
+        <div class="ex-feedback-area" id="cep-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('cep-choices');
+      grid.innerHTML = shuffle(q.choices).map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => cepHandleChoice(btn, q))
+      );
+    }
+
+    function cepRenderMatching(card, q) {
+      const { idx, total } = cepState;
+      const allForms = (sessionData.conjugationForms || []).map(f => f.answer);
+      card.innerHTML = `
+        <p class="ex-question-label">Associe ce sujet à la bonne forme du verbe <em>être</em>.</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="cep-choices"></div>
+        <div class="ex-feedback-area" id="cep-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('cep-choices');
+      grid.innerHTML = shuffle(allForms).map(f => `<button class="ex-choice" data-value="${f}">${f}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => cepHandleChoice(btn, q))
+      );
+    }
+
+    function cepHandleChoice(btn, q) {
+      document.querySelectorAll('#cep-choices .ex-choice').forEach(b => b.disabled = true);
+      const isRight = btn.dataset.value === q.answer;
+      document.querySelectorAll('#cep-choices .ex-choice').forEach(b => {
+        if (b.dataset.value === q.answer) b.classList.add('is-correct');
+      });
+      if (!isRight) btn.classList.add('is-wrong');
+      if (isRight) {
+        cepState.score++;
+        document.getElementById('cep-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+      } else {
+        document.getElementById('cep-fb').innerHTML = `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne forme.<br>
+            Avec « <strong>${q.subject}</strong> » : <strong>${q.answer}</strong>.
+          </div>
+        `;
+      }
+      document.getElementById('next-btn').classList.remove('ex-hidden');
+    }
+
+    function cepRenderTextInput(card, q) {
+      const { idx, total } = cepState;
+      card.innerHTML = `
+        <p class="ex-question-label">Conjugue le verbe suivant dans la phrase.</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="cep-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="cep-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="cep-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const input  = document.getElementById('cep-input');
+      const valBtn = document.getElementById('cep-val-btn');
+      setTimeout(() => input.focus(), 50);
+
+      function submit() {
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          cepState.score++;
+          document.getElementById('cep-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+        } else {
+          document.getElementById('cep-fb').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.answer}</strong>
+            </div>
+          `;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+
+      valBtn.addEventListener('click', submit);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    }
+
+    /* ── Résultats de fin de niveau ───────────────────────────────────────── */
+    function cepShowLevelResults() {
+      const { level, score: lvScore, total } = cepState;
+      const { passed, pct, isLast } = cepLevelSelect.completeLevel(level, lvScore, total);
+      const pctPct = Math.round(pct * 100);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-conjugaison.html';
+      const backLabel = `← Retour à ${sessionData.backLink?.label || 'la Conjugaison'}`;
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const backToSelectBtn = cepLevelSelect.backToSelectButtonHTML();
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises la conjugaison du verbe être au présent !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cep-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cep-next-btn">Niveau ${level + 1} →</button>
+          <button class="ex-btn-secondary" id="cep-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * CEP_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour débloquer le niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cep-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
+
+      document.getElementById('cep-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cepStartLevel(cepState.level);
+      });
+      document.getElementById('cep-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cepStartLevel(level + 1);
+      });
+      document.getElementById('cep-restart-btn')?.addEventListener('click', () => {
+        cepLevelSelect.reset();
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cepInitSession();
+      });
+      cepLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'etre-present-niveaux',
+        level:        'Niveau ' + level,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : avoir-present-niveaux — « Conjuguer le verbe avoir au présent »
+       Niveau 1 : QCM + associer sujet↔forme (sujets pronoms), mode par item
+       Niveau 2 : saisie libre, pronom donné
+       Niveau 3 : saisie libre, sujet = groupe nominal (pas de pronom)
+       3 niveaux déverrouillables à 80 %. Un seul essai par question.
+       ════════════════════════════════════════════════════════════════════════ */
+
+    const CAP_SEUIL = 0.8;
+
+    const CAP_LV_DEFS = [
+      { lv: 1, desc: 'QCM et association : trouve la bonne forme' },
+      { lv: 2, desc: 'Écris la forme du verbe avec le pronom donné' },
+      { lv: 3, desc: 'Écris la forme du verbe avec un autre sujet' }
+    ];
+
+    let capState = null;
+    let capLevelSelect = null;
+
+    function capBackToSelectScreen() {
+      capState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    /* ── Init : réinitialise et affiche le sélecteur de niveau ──────────── */
+    function capInitSession() {
+      capState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      capLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: CAP_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: CAP_SEUIL,
+        onSelectLevel: (lv) => capStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: capBackToSelectScreen
+      });
+      capLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function capStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const pool = shuffle((sessionData.bank || []).filter(item => item.level === lv));
+      const qs   = pool.slice(0, sessionData.questionsPerSession || 10);
+      capState   = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+      document.getElementById('q-total').textContent = qs.length;
+
+      capLevelSelect.renderBadges(lv);
+      capRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Affiche une question — dispatche sur q.mode (niveau 1) ou saisie
+       libre (niveaux 2/3) ───────────────────────────────────────────────── */
+    function capRenderQuestion(card) {
+      const { questions, idx, total } = capState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if (q.mode === 'mcq')           capRenderMcq(card, q);
+      else if (q.mode === 'matching') capRenderMatching(card, q);
+      else                             capRenderTextInput(card, q);
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        capState.idx++;
+        if (capState.idx >= capState.questions.length) capShowLevelResults();
+        else capRenderQuestion(document.getElementById('ex-card'));
+      });
+    }
+
+    function capRenderMcq(card, q) {
+      const { idx, total } = capState;
+      card.innerHTML = `
+        <p class="ex-question-label">Quelle est la forme du verbe <em>avoir</em> avec ce sujet ?</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="cap-choices"></div>
+        <div class="ex-feedback-area" id="cap-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('cap-choices');
+      grid.innerHTML = shuffle(q.choices).map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => capHandleChoice(btn, q))
+      );
+    }
+
+    function capRenderMatching(card, q) {
+      const { idx, total } = capState;
+      const allForms = (sessionData.conjugationForms || []).map(f => f.answer);
+      card.innerHTML = `
+        <p class="ex-question-label">Associe ce sujet à la bonne forme du verbe <em>avoir</em>.</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="cap-choices"></div>
+        <div class="ex-feedback-area" id="cap-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('cap-choices');
+      grid.innerHTML = shuffle(allForms).map(f => `<button class="ex-choice" data-value="${f}">${f}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => capHandleChoice(btn, q))
+      );
+    }
+
+    function capHandleChoice(btn, q) {
+      document.querySelectorAll('#cap-choices .ex-choice').forEach(b => b.disabled = true);
+      const isRight = btn.dataset.value === q.answer;
+      document.querySelectorAll('#cap-choices .ex-choice').forEach(b => {
+        if (b.dataset.value === q.answer) b.classList.add('is-correct');
+      });
+      if (!isRight) btn.classList.add('is-wrong');
+      if (isRight) {
+        capState.score++;
+        document.getElementById('cap-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+      } else {
+        document.getElementById('cap-fb').innerHTML = `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne forme.<br>
+            Avec « <strong>${q.subject}</strong> » : <strong>${q.answer}</strong>.
+          </div>
+        `;
+      }
+      document.getElementById('next-btn').classList.remove('ex-hidden');
+    }
+
+    function capRenderTextInput(card, q) {
+      const { idx, total } = capState;
+      card.innerHTML = `
+        <p class="ex-question-label">Conjugue le verbe suivant dans la phrase.</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="cap-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="cap-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="cap-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const input  = document.getElementById('cap-input');
+      const valBtn = document.getElementById('cap-val-btn');
+      setTimeout(() => input.focus(), 50);
+
+      function submit() {
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          capState.score++;
+          document.getElementById('cap-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+        } else {
+          document.getElementById('cap-fb').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.answer}</strong>
+            </div>
+          `;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+
+      valBtn.addEventListener('click', submit);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    }
+
+    /* ── Résultats de fin de niveau ───────────────────────────────────────── */
+    function capShowLevelResults() {
+      const { level, score: lvScore, total } = capState;
+      const { passed, pct, isLast } = capLevelSelect.completeLevel(level, lvScore, total);
+      const pctPct = Math.round(pct * 100);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-conjugaison.html';
+      const backLabel = `← Retour à ${sessionData.backLink?.label || 'la Conjugaison'}`;
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const backToSelectBtn = capLevelSelect.backToSelectButtonHTML();
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises la conjugaison du verbe avoir au présent !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cap-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cap-next-btn">Niveau ${level + 1} →</button>
+          <button class="ex-btn-secondary" id="cap-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * CAP_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour débloquer le niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cap-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
+
+      document.getElementById('cap-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        capStartLevel(capState.level);
+      });
+      document.getElementById('cap-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        capStartLevel(level + 1);
+      });
+      document.getElementById('cap-restart-btn')?.addEventListener('click', () => {
+        capLevelSelect.reset();
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        capInitSession();
+      });
+      capLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'avoir-present-niveaux',
+        level:        'Niveau ' + level,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : premier-groupe-present-niveaux — « Conjuguer les verbes réguliers
+       du 1er groupe au présent »
+       Niveau 1 : QCM + associer sujet↔forme (sujets pronoms, verbes variés),
+                  mode par item — matching pioche dans q.forms (formes propres
+                  à l'item, pas une table partagée : le verbe change à chaque
+                  question, contrairement à être/avoir)
+       Niveau 2 : saisie libre, pronom donné
+       Niveau 3 : saisie libre, sujet = groupe nominal (pas de pronom)
+       3 niveaux déverrouillables à 80 %. Un seul essai par question.
+       ════════════════════════════════════════════════════════════════════════ */
+
+    const C1G_SEUIL = 0.8;
+
+    const C1G_LV_DEFS = [
+      { lv: 1, desc: 'QCM et association : trouve la bonne forme' },
+      { lv: 2, desc: 'Écris la forme du verbe avec le pronom donné' },
+      { lv: 3, desc: 'Écris la forme du verbe avec un autre sujet' }
+    ];
+
+    let c1gState = null;
+    let c1gLevelSelect = null;
+
+    function c1gBackToSelectScreen() {
+      c1gState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    /* ── Init : réinitialise et affiche le sélecteur de niveau ──────────── */
+    function c1gInitSession() {
+      c1gState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      c1gLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: C1G_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: C1G_SEUIL,
+        onSelectLevel: (lv) => c1gStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: c1gBackToSelectScreen
+      });
+      c1gLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function c1gStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const pool = shuffle((sessionData.bank || []).filter(item => item.level === lv));
+      const qs   = pool.slice(0, sessionData.questionsPerSession || 10);
+      c1gState   = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+      document.getElementById('q-total').textContent = qs.length;
+
+      c1gLevelSelect.renderBadges(lv);
+      c1gRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Affiche une question — dispatche sur q.mode (niveau 1) ou saisie
+       libre (niveaux 2/3) ───────────────────────────────────────────────── */
+    function c1gRenderQuestion(card) {
+      const { questions, idx, total } = c1gState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if (q.mode === 'mcq')           c1gRenderMcq(card, q);
+      else if (q.mode === 'matching') c1gRenderMatching(card, q);
+      else                             c1gRenderTextInput(card, q);
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        c1gState.idx++;
+        if (c1gState.idx >= c1gState.questions.length) c1gShowLevelResults();
+        else c1gRenderQuestion(document.getElementById('ex-card'));
+      });
+    }
+
+    function c1gRenderMcq(card, q) {
+      const { idx, total } = c1gState;
+      card.innerHTML = `
+        <p class="ex-question-label">Quelle est la forme du verbe <em>${q.infinitive}</em> avec ce sujet ?</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="c1g-choices"></div>
+        <div class="ex-feedback-area" id="c1g-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('c1g-choices');
+      grid.innerHTML = shuffle(q.choices).map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => c1gHandleChoice(btn, q))
+      );
+    }
+
+    function c1gRenderMatching(card, q) {
+      const { idx, total } = c1gState;
+      card.innerHTML = `
+        <p class="ex-question-label">Associe ce sujet à la bonne forme du verbe <em>${q.infinitive}</em>.</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="c1g-choices"></div>
+        <div class="ex-feedback-area" id="c1g-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('c1g-choices');
+      grid.innerHTML = shuffle(q.forms).map(f => `<button class="ex-choice" data-value="${f}">${f}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => c1gHandleChoice(btn, q))
+      );
+    }
+
+    function c1gHandleChoice(btn, q) {
+      document.querySelectorAll('#c1g-choices .ex-choice').forEach(b => b.disabled = true);
+      const isRight = btn.dataset.value === q.answer;
+      document.querySelectorAll('#c1g-choices .ex-choice').forEach(b => {
+        if (b.dataset.value === q.answer) b.classList.add('is-correct');
+      });
+      if (!isRight) btn.classList.add('is-wrong');
+      if (isRight) {
+        c1gState.score++;
+        document.getElementById('c1g-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+      } else {
+        document.getElementById('c1g-fb').innerHTML = `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne forme.<br>
+            Avec « <strong>${q.subject}</strong> » : <strong>${q.answer}</strong>.
+          </div>
+        `;
+      }
+      document.getElementById('next-btn').classList.remove('ex-hidden');
+    }
+
+    function c1gRenderTextInput(card, q) {
+      const { idx, total } = c1gState;
+      card.innerHTML = `
+        <p class="ex-question-label">Conjugue le verbe suivant dans la phrase.</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="c1g-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="c1g-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="c1g-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const input  = document.getElementById('c1g-input');
+      const valBtn = document.getElementById('c1g-val-btn');
+      setTimeout(() => input.focus(), 50);
+
+      function submit() {
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          c1gState.score++;
+          document.getElementById('c1g-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+        } else {
+          document.getElementById('c1g-fb').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.answer}</strong>
+            </div>
+          `;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+
+      valBtn.addEventListener('click', submit);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    }
+
+    /* ── Résultats de fin de niveau ───────────────────────────────────────── */
+    function c1gShowLevelResults() {
+      const { level, score: lvScore, total } = c1gState;
+      const { passed, pct, isLast } = c1gLevelSelect.completeLevel(level, lvScore, total);
+      const pctPct = Math.round(pct * 100);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-conjugaison.html';
+      const backLabel = `← Retour à ${sessionData.backLink?.label || 'la Conjugaison'}`;
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const backToSelectBtn = c1gLevelSelect.backToSelectButtonHTML();
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises la conjugaison des verbes réguliers du 1er groupe !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="c1g-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="c1g-next-btn">Niveau ${level + 1} →</button>
+          <button class="ex-btn-secondary" id="c1g-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * C1G_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour débloquer le niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="c1g-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
+
+      document.getElementById('c1g-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        c1gStartLevel(c1gState.level);
+      });
+      document.getElementById('c1g-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        c1gStartLevel(level + 1);
+      });
+      document.getElementById('c1g-restart-btn')?.addEventListener('click', () => {
+        c1gLevelSelect.reset();
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        c1gInitSession();
+      });
+      c1gLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'premier-groupe-present-niveaux',
         level:        'Niveau ' + level,
         score:        lvScore,
         total,
