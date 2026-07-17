@@ -4,12 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Résultats — Espace enseignant — LFM</title>
-  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="styles.css?v=11">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/teacher.js?v=1"></script>
+  <script src="js/teacher.js?v=2"></script>
+  <script src="js/teacher-analytics.js?v=2"></script>
+  <link rel="stylesheet" href="laurels.css?v=2">
+  <script src="js/laurels.js?v=2"></script>
   <style>
     /* ── Layout ──────────────────────────────────────────────────────────────── */
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
@@ -316,12 +319,17 @@
     .print-header, .print-footer { display: none; }
 
     @media print {
-      .header, footer, nav.breadcrumb, .main-tabs, .nav-footer, .view-tabs,
-      #export-class-btn, #print-bilan-btn, #view-classes, #view-student,
-      #view-loading, #panel-eleves, .class-info-bar > div:last-child { display: none !important; }
+      body:not(.printing-bulletin) .header, body:not(.printing-bulletin) footer,
+      body:not(.printing-bulletin) nav.breadcrumb, body:not(.printing-bulletin) .main-tabs,
+      body:not(.printing-bulletin) .nav-footer, body:not(.printing-bulletin) .view-tabs,
+      body:not(.printing-bulletin) #export-class-btn, body:not(.printing-bulletin) #print-bilan-btn,
+      body:not(.printing-bulletin) #view-classes, body:not(.printing-bulletin) #view-student,
+      body:not(.printing-bulletin) #view-loading, body:not(.printing-bulletin) #panel-eleves,
+      body:not(.printing-bulletin) #panel-overview,
+      body:not(.printing-bulletin) .class-info-bar > div:last-child { display: none !important; }
 
-      .dash-wrap    { padding: 0; background: #fff; min-height: unset; }
-      .dash-content { max-width: 100%; padding: 0; }
+      body:not(.printing-bulletin) .dash-wrap    { padding: 0; background: #fff; min-height: unset; }
+      body:not(.printing-bulletin) .dash-content { max-width: 100%; padding: 0; }
 
       .print-header { display: block !important; margin-bottom: 20px; }
       .print-footer { display: block !important; margin-top: 24px;
@@ -341,6 +349,237 @@
         padding: 5px 8px; background: #fff !important;
       }
       .score-pill { background: #fff !important; color: #000 !important; border: 1px solid #999; }
+    }
+
+    /* ── Vue d'ensemble (classe) ─────────────────────────────────────────────── */
+    .stats-row-4 {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 12px; margin-bottom: 20px;
+    }
+    .stat-card.stat-alert .stat-value { color: var(--red); }
+    .overview-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;
+    }
+    .overview-card {
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm); padding: 20px 22px;
+    }
+    .overview-card-title {
+      font-size: 12px; font-weight: 700; color: var(--blue);
+      letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 14px;
+    }
+    .comp-bar-row { margin-bottom: 12px; }
+    .comp-bar-row:last-child { margin-bottom: 0; }
+    .comp-bar-label {
+      display: flex; justify-content: space-between; gap: 8px;
+      font-size: 12.5px; color: var(--text); margin-bottom: 4px;
+    }
+    .comp-bar-label .n { color: var(--muted); font-size: 11px; white-space: nowrap; }
+    .comp-bar-track { background: var(--bg); border-radius: 100px; height: 8px; overflow: hidden; }
+    .comp-bar-fill { height: 100%; border-radius: 100px; }
+    .comp-bar-fill.up   { background: #1DBFA0; }
+    .comp-bar-fill.down { background: #E0765C; }
+
+    .heatmap-row {
+      display: grid; grid-template-columns: 1.4fr 0.8fr 0.9fr 1.2fr;
+      align-items: center; gap: 10px; padding: 10px 0;
+      border-bottom: 1px solid var(--border); font-size: 13px;
+    }
+    .heatmap-row:last-child { border-bottom: none; }
+    .heatmap-domaine { font-weight: 700; color: var(--blue); }
+    .heatmap-pastille {
+      display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 12.5px;
+    }
+    .heatmap-pastille .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .heatmap-dot-good { background: #1DBFA0; }
+    .heatmap-dot-mid  { background: #F5A623; }
+    .heatmap-dot-low  { background: #E0765C; }
+    .heatmap-progress-track { background: var(--bg); border-radius: 100px; height: 6px; overflow: hidden; }
+    .heatmap-progress-fill { height: 100%; border-radius: 100px; background: var(--blue); }
+
+    .empty-inline { color: var(--muted); font-size: 13px; padding: 8px 0; }
+
+    /* ── Fiche élève : rang lauriers + compétences à consolider ─────────────── */
+    .student-rank-line {
+      display: flex; align-items: center; gap: 10px; margin-top: 6px; flex-wrap: wrap;
+    }
+    .student-rank-line .laurel-rank { font-size: 13px; font-weight: 800; }
+    .student-rank-line .laurel-rank-progress-bg { width: 120px; height: 6px; }
+    .student-rank-line .laurel-rank-next { font-size: 11.5px; }
+
+    .consolider-list { display: flex; flex-direction: column; gap: 10px; }
+    .consolider-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 12px 14px; border-radius: 12px; background: rgba(224,118,92,0.07);
+      border-left: 3px solid #E0765C;
+    }
+    .consolider-item .ci-comp { font-weight: 700; font-size: 13.5px; color: var(--text); }
+    .consolider-item .ci-meta { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+    .consolider-item .ci-flag { font-size: 10.5px; font-weight: 700; color: #E0765C; }
+
+    /* ── Jauges de niveau (3 segments) ───────────────────────────────────────── */
+    .jauge-domaine { margin-bottom: 18px; }
+    .jauge-domaine:last-child { margin-bottom: 0; }
+    .jauge-domaine-title { font-weight: 800; font-size: 14px; color: var(--blue); margin-bottom: 10px; }
+    .jauge-segments { display: flex; gap: 6px; }
+    .jauge-segment { flex: 1; text-align: center; }
+    .jauge-segment-bar {
+      height: 14px; border-radius: 7px; background: #E7ECF3;
+      position: relative; overflow: hidden; margin-bottom: 6px;
+    }
+    .jauge-segment-bar.atteint       { background: var(--blue); }
+    .jauge-segment-bar.en-cours      {
+      background: repeating-linear-gradient(45deg, var(--blue), var(--blue) 5px, #C7D0E2 5px, #C7D0E2 10px);
+      opacity: 0.75;
+    }
+    .jauge-segment-bar.non-travaille { background: #E7ECF3; }
+    .jauge-segment-bar.non-concerne  { background: #F1F3F7; }
+    .jauge-segment-label { font-size: 11px; font-weight: 700; color: var(--muted); }
+    .jauge-segment-status { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
+
+    /* ── Courbe d'activité 8 semaines ─────────────────────────────────────────── */
+    .activity-bars { display: flex; align-items: flex-end; gap: 6px; height: 90px; }
+    .activity-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+    .activity-bar { width: 100%; max-width: 26px; background: var(--blue); border-radius: 4px 4px 0 0; min-height: 2px; }
+    .activity-bar-label { font-size: 9.5px; color: var(--muted); }
+
+    /* ── Modale bulletin (motif repris de classes-enseignant.html) ──────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(16,43,106,0.35);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200; padding: 20px;
+    }
+    .modal {
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-md); width: 100%; max-width: 480px;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px; border-bottom: 1px solid var(--border);
+    }
+    .modal-title { font-weight: 800; font-size: 17px; color: var(--blue); }
+    .modal-close {
+      background: none; border: none; font-size: 22px; color: var(--muted);
+      cursor: pointer; line-height: 1; padding: 4px;
+    }
+    .modal-close:hover { color: var(--red); background: rgba(214,40,57,0.07); border-radius: 6px; }
+    .modal-body { padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 16px; }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; padding-top: 4px; }
+    .form-label { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px; display: block; }
+    .form-input, .form-textarea {
+      width: 100%; padding: 10px 12px; border-radius: 10px;
+      border: 1.5px solid var(--border); font-family: inherit; font-size: 13.5px;
+      background: var(--bg); color: var(--text);
+    }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .preset-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .date-row { display: flex; gap: 10px; }
+    .date-row > div { flex: 1; }
+
+    /* ── Bulletin imprimé — refonte : une page A4, lisible par un parent
+       en 10 secondes. Couleurs volontairement en dur (pas de var(--...))
+       car ce contenu doit rester identique quel que soit le thème de la
+       page qui l'héberge. ──────────────────────────────────────────────── */
+    #bulletin-print-root { display: none; }
+    .bulletin-page { font-family: 'Nunito Sans', system-ui, sans-serif; color: #1E2532; }
+
+    /* 1. En-tête */
+    .bulletin-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 16px; padding-bottom: 10px; margin-bottom: 16px;
+      border-bottom: 3px solid #F5A623;
+    }
+    .bulletin-brand-name { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 21pt; color: #1A2D6B; line-height: 1; }
+    .bulletin-brand-sub  { font-size: 9.5pt; color: #5F6368; margin-top: 4px; }
+    .bulletin-header-right { text-align: right; font-size: 10pt; color: #333; line-height: 1.55; }
+    .bulletin-header-right .bh-name   { font-weight: 800; font-size: 13pt; color: #1A2D6B; }
+    .bulletin-header-right .bh-period { color: #5F6368; }
+
+    /* 2. Trois chiffres clés */
+    .bulletin-stats { display: flex; gap: 10px; margin-bottom: 18px; }
+    .bulletin-stat {
+      flex: 1; background: #F4F6FB; border-radius: 10px; padding: 10px 12px; text-align: center;
+    }
+    .bulletin-stat .bs-value { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 18pt; color: #1A2D6B; }
+    .bulletin-stat .bs-label { font-size: 8pt; color: #5F6368; text-transform: uppercase; letter-spacing: .04em; margin-top: 3px; }
+
+    /* 3. Jauges de niveau — élément central */
+    .bulletin-jauges-title {
+      font-size: 10.5pt; font-weight: 800; color: #1A2D6B;
+      text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px;
+    }
+    .bulletin-jauges { margin-bottom: 18px; }
+    .bulletin-jauge-row { display: flex; align-items: stretch; gap: 10px; margin-bottom: 7px; }
+    .bulletin-jauge-row .bj-domaine {
+      width: 120px; flex-shrink: 0; font-size: 9.5pt; font-weight: 700;
+      color: #333; display: flex; align-items: center;
+    }
+    .bj-segments { flex: 1; display: flex; }
+    .bj-segment {
+      flex: 1; text-align: center; padding: 6px 4px;
+      background: #EEF0F4; color: #8A93A3;
+      border-top: 1px solid #fff; border-bottom: 1px solid #fff;
+    }
+    .bj-segment + .bj-segment { border-left: 1px solid #fff; }
+    .bj-segment:first-child { border-radius: 6px 0 0 6px; }
+    .bj-segment:last-child  { border-radius: 0 6px 6px 0; }
+    .bj-segment .bj-seg-level  { display: block; font-size: 7.5pt; font-weight: 800; letter-spacing: .03em; }
+    .bj-segment .bj-seg-status { display: block; font-size: 8pt; font-weight: 700; margin-top: 1px; }
+    .bj-segment.atteint       { background: #1A2D6B; color: #fff; }
+    .bj-segment.en-cours      { background: #DCF5EF; color: #0F6E56; border-top-color: #1DBFA0; border-bottom-color: #1DBFA0; }
+    .bj-segment.non-travaille { background: #EEF0F4; color: #8A93A3; }
+
+    /* 4. Points forts / à consolider */
+    .bulletin-boxes { display: flex; gap: 12px; margin-bottom: 16px; }
+    .bulletin-box { flex: 1; border-radius: 10px; padding: 12px 14px; }
+    .bulletin-box.box-forts      { background: #F0FBF8; color: #0F6E56; }
+    .bulletin-box.box-consolider { background: #FDF4F0; color: #993C1D; }
+    .bulletin-box h5 { font-size: 9pt; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 7px; font-weight: 800; }
+    .bulletin-box ul { margin: 0; padding-left: 16px; font-size: 9.5pt; line-height: 1.55; }
+
+    /* 5. Observations */
+    .bulletin-observations {
+      border: 1px solid #E8EDF3; border-radius: 10px; padding: 10px 14px;
+      margin-bottom: 16px;
+    }
+    .bulletin-observations .bo-label {
+      font-size: 8pt; text-transform: uppercase; letter-spacing: .04em;
+      color: #5F6368; font-weight: 800; margin-bottom: 4px;
+    }
+    .bulletin-observations .bo-text { font-size: 9.5pt; font-style: italic; color: #444; white-space: pre-wrap; }
+
+    /* 6. Pied de page */
+    .bulletin-footer {
+      font-size: 7.5pt; color: #9AA3B2; text-align: center;
+      border-top: 1px solid #E8EDF3; padding-top: 8px;
+    }
+
+    /* Repli si beaucoup de domaines (catalogue futur) : tout doit tenir sur
+       une page — on réduit uniformément tailles et espacements. */
+    .bulletin-page.bulletin-compact { font-size: 90%; }
+    .bulletin-page.bulletin-compact .bulletin-jauge-row { margin-bottom: 4px; }
+    .bulletin-page.bulletin-compact .bulletin-stat .bs-value { font-size: 15pt; }
+
+    body.printing-bulletin #bulletin-print-root { display: block !important; }
+    @media print {
+      @page { size: A4 portrait; margin: 15mm; }
+      body.printing-bulletin, body.printing-bulletin #bulletin-print-root,
+      body.printing-bulletin .bulletin-stat, body.printing-bulletin .bj-segment,
+      body.printing-bulletin .bulletin-box {
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      body.printing-bulletin .header, body.printing-bulletin footer,
+      body.printing-bulletin nav.breadcrumb, body.printing-bulletin .main-tabs,
+      body.printing-bulletin .student-header, body.printing-bulletin .stats-row-3,
+      body.printing-bulletin .charts-row, body.printing-bulletin #student-bilan,
+      body.printing-bulletin #student-consolider, body.printing-bulletin #student-jauges,
+      body.printing-bulletin #student-activity, body.printing-bulletin .nav-footer,
+      body.printing-bulletin .navbar, body.printing-bulletin .modal-overlay {
+        display: none !important;
+      }
+      body.printing-bulletin .dash-wrap    { padding: 0; background: #fff; min-height: unset; }
+      body.printing-bulletin .dash-content { max-width: 100%; padding: 0; }
     }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -432,12 +671,18 @@
 
         <!-- Onglets -->
         <div class="view-tabs">
-          <button class="tab-btn active" id="tab-btn-eleves" onclick="switchClassTab('eleves')">Élèves</button>
+          <button class="tab-btn active" id="tab-btn-overview" onclick="switchClassTab('overview')">Vue d'ensemble</button>
+          <button class="tab-btn" id="tab-btn-eleves" onclick="switchClassTab('eleves')">Élèves</button>
           <button class="tab-btn" id="tab-btn-bilan" onclick="switchClassTab('bilan')">Par compétence</button>
         </div>
 
+        <!-- Panneau Vue d'ensemble -->
+        <div id="panel-overview">
+          <div id="overview-content"><div class="view-loading">Chargement…</div></div>
+        </div>
+
         <!-- Panneau Élèves -->
-        <div id="panel-eleves">
+        <div id="panel-eleves" style="display:none">
           <div class="table-wrap">
             <table class="result-table">
               <thead>
@@ -485,9 +730,14 @@
           <div class="student-header-info">
             <div class="student-header-name" id="student-header-name">—</div>
             <div class="student-header-meta" id="student-header-meta">—</div>
+            <div class="student-rank-line" id="student-rank-line"></div>
           </div>
-          <button class="btn btn-ghost btn-sm" id="print-student-btn" style="margin-left:auto;display:none"
-            onclick="printStudentBilan()">📄 Synthèse PDF</button>
+          <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-outline btn-sm" id="bulletin-btn" style="display:none"
+              onclick="openBulletinModal()">📋 Générer le bulletin</button>
+            <button class="btn btn-ghost btn-sm" id="print-student-btn" style="display:none"
+              onclick="printStudentBilan()">📄 Synthèse PDF</button>
+          </div>
         </div>
 
         <div class="stats-row-3" id="student-stats-row"></div>
@@ -503,13 +753,72 @@
           </div>
         </div>
 
-        <!-- Bilan par compétence (remplace l'historique) -->
+        <!-- Compétences à consolider -->
+        <div class="overview-card" id="student-consolider" style="margin-bottom:20px;display:none">
+          <div class="overview-card-title">Compétences à consolider</div>
+          <div class="consolider-list" id="consolider-list"></div>
+        </div>
+
+        <!-- Jauges de niveau par domaine -->
+        <div class="overview-card" id="student-jauges" style="margin-bottom:20px;display:none">
+          <div class="overview-card-title">Jauges de niveau par domaine</div>
+          <div id="jauges-content"></div>
+        </div>
+
+        <!-- Courbe d'activité (8 dernières semaines) -->
+        <div class="overview-card" id="student-activity" style="margin-bottom:20px;display:none">
+          <div class="overview-card-title">Activité — 8 dernières semaines</div>
+          <div class="activity-bars" id="activity-bars"></div>
+        </div>
+
+        <!-- Bilan par compétence (détail) -->
         <div id="student-bilan" style="margin-top:4px">
           <div class="view-loading">Chargement du bilan…</div>
         </div>
 
         <div class="nav-footer" id="student-nav-footer"></div>
       </div>
+
+      <!-- ── Modale bulletin ────────────────────────────────────────────────── -->
+      <div class="modal-overlay" id="bulletin-modal-overlay" style="display:none">
+        <div class="modal">
+          <div class="modal-header">
+            <h2 class="modal-title">Générer le bulletin</h2>
+            <button class="modal-close" onclick="closeBulletinModal()" aria-label="Fermer">×</button>
+          </div>
+          <div class="modal-body">
+            <div>
+              <label class="form-label">Période</label>
+              <div class="preset-row">
+                <button type="button" class="btn btn-outline btn-sm" onclick="applyBulletinPreset('s1')">Semestre 1</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="applyBulletinPreset('s2')">Semestre 2</button>
+              </div>
+              <div class="date-row">
+                <div>
+                  <label class="form-label">Du</label>
+                  <input type="date" class="form-input" id="bulletin-date-start">
+                </div>
+                <div>
+                  <label class="form-label">Au</label>
+                  <input type="date" class="form-input" id="bulletin-date-end">
+                </div>
+              </div>
+            </div>
+            <div>
+              <label class="form-label">Observations de l'enseignant</label>
+              <textarea class="form-textarea" id="bulletin-observations"
+                placeholder="Remarques facultatives, non enregistrées — saisies au moment de la génération."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer" style="padding:0 24px 24px">
+            <button class="btn btn-ghost btn-sm" onclick="closeBulletinModal()">Annuler</button>
+            <button class="btn btn-outline btn-sm" onclick="generateBulletin()">📄 Générer et imprimer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Contenu imprimé du bulletin (rempli dynamiquement) ───────────────── -->
+      <div id="bulletin-print-root"></div>
 
     </div>
   </div>
@@ -546,6 +855,11 @@
   let _charts         = {};
   let _bilanLoaded    = false;
   let _bilanClassId   = null;
+  let _overviewLoaded   = false;
+  let _overviewClassId  = null;
+  let _catalogMap        = null;   // lfmAnalytics.buildCatalogMap(), une fois exercise-data.js chargé
+  let _studentProfile     = null;  // dernier profil calculé (fiche élève courante), réutilisé par le bulletin
+  let _studentRows         = [];   // dernières lignes brutes de l'élève courant (pour filtrage par période)
 
   /* ── Métadonnées exercices (domaine + compétence + titre) ─────────────────── */
   /* TODO (nettoyage futur, hors Lot D) : EXERCISE_META duplique manuellement
@@ -633,6 +947,46 @@
      titre lisible enregistré sur le résultat lui-même (exercise_title). */
   const UNKNOWN_META = { domaine: 'Autres', competence: 'Exercice retiré du catalogue' };
 
+  /* ── Chargement paresseux d'exercise-data.js (Vue d'ensemble + fiche élève
+     enrichie uniquement — même motif que pilotage-enseignant.html /
+     remediations-enseignant.html) ────────────────────────────────────────── */
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload  = () => resolve();
+      script.onerror = () => reject(new Error(`Impossible de charger ${src}.`));
+      document.head.appendChild(script);
+    });
+  }
+  /* Diagnostic (Problème 1, point 2) : signale les exercise_slug enregistrés
+     dans exercise_results qui ne correspondent à aucune clé d'EXERCISE_DATA
+     (exercice renommé/retiré du catalogue depuis) — ces lignes tombent dans
+     UNKNOWN_META ('Autres') côté teacher-analytics.js et disparaissent
+     silencieusement du bulletin, qui ne boucle que sur Français/Mathématiques.
+     Une seule fois par jeu de données, pas à chaque rendu. */
+  function logUnmatchedCatalogSlugs(rows, catalogMap) {
+    const unmatched = new Map();
+    rows.forEach(r => {
+      if (!catalogMap[r.exercise_slug]) unmatched.set(r.exercise_slug, r.exercise_title || '(sans titre)');
+    });
+    if (unmatched.size > 0) {
+      console.warn('[LFM] exercise_slug absents du catalogue exercise-data.js (' + unmatched.size + ') :',
+        Array.from(unmatched.entries()).map(([slug, title]) => `${slug} — "${title}"`));
+    }
+  }
+
+  let _catalogAssetsPromise = null;
+  function loadCatalogAssets() {
+    if (_catalogMap) return Promise.resolve();
+    if (typeof EXERCISE_DATA !== 'undefined') { _catalogMap = lfmAnalytics.buildCatalogMap(); return Promise.resolve(); }
+    if (_catalogAssetsPromise) return _catalogAssetsPromise;
+    _catalogAssetsPromise = loadScript('exercise-data.js?v=21')
+      .then(() => { _catalogMap = lfmAnalytics.buildCatalogMap(); })
+      .catch(err => { _catalogAssetsPromise = null; throw err; });
+    return _catalogAssetsPromise;
+  }
+
   /* ═══════════════════════════════════════════════════════════════════════════
      INIT
   ═══════════════════════════════════════════════════════════════════════════ */
@@ -655,16 +1009,135 @@
      ONGLETS CLASSE (Élèves / Par compétence)
   ═══════════════════════════════════════════════════════════════════════════ */
   async function switchClassTab(tab) {
+    document.getElementById('tab-btn-overview').classList.toggle('active', tab === 'overview');
     document.getElementById('tab-btn-eleves').classList.toggle('active', tab === 'eleves');
     document.getElementById('tab-btn-bilan').classList.toggle('active',  tab === 'bilan');
-    document.getElementById('panel-eleves').style.display = tab === 'eleves' ? '' : 'none';
-    document.getElementById('panel-bilan').style.display  = tab === 'bilan'  ? '' : 'none';
+    document.getElementById('panel-overview').style.display = tab === 'overview' ? '' : 'none';
+    document.getElementById('panel-eleves').style.display   = tab === 'eleves'   ? '' : 'none';
+    document.getElementById('panel-bilan').style.display    = tab === 'bilan'    ? '' : 'none';
     document.getElementById('print-bilan-btn').style.display = tab === 'bilan' ? '' : 'none';
 
+    const classId = new URLSearchParams(window.location.search).get('class');
     if (tab === 'bilan') {
-      const classId = new URLSearchParams(window.location.search).get('class');
       await renderCompetences(classId);
+    } else if (tab === 'overview') {
+      await renderOverview(classId);
     }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     VUE D'ENSEMBLE (classe)
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function renderOverview(classId) {
+    if (_overviewLoaded && _overviewClassId === classId) return;
+    _overviewLoaded  = false;
+    _overviewClassId = classId;
+
+    const container = document.getElementById('overview-content');
+    container.innerHTML = '<div class="view-loading">Chargement…</div>';
+
+    try {
+      await loadCatalogAssets();
+      const { students, results } = await lfmTeacher.getClassResultsRaw(classId);
+
+      if (results.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Aucun résultat enregistré pour cette classe.</div></div>';
+        _overviewLoaded = true;
+        return;
+      }
+
+      const ov = lfmAnalytics.computeClassOverview(results, students, _catalogMap);
+      container.innerHTML = renderOverviewHtml(ov);
+      _overviewLoaded = true;
+    } catch (e) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Erreur lors du chargement de la vue d\'ensemble.</div></div>';
+      console.warn('[LFM] renderOverview:', e.message);
+    }
+  }
+
+  function renderOverviewHtml(ov) {
+    const b = ov.bandeau;
+    let html = `<div class="stats-row-4">
+      <div class="stat-card">
+        <div class="stat-label">Actifs (7 derniers jours)</div>
+        <div class="stat-value">${b.activeStudents7d}<span class="stat-unit">/ ${b.enrolledCount}</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Exercices (semaine / total)</div>
+        <div class="stat-value" style="font-size:24px">${b.exercisesWeek} <span class="stat-unit">/ ${b.exercisesTotal}</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Score moyen classe</div>
+        <div class="stat-value">${b.classAvg !== null ? b.classAvg : '—'}<span class="stat-unit">${b.classAvg !== null ? '%' : ''}</span></div>
+      </div>
+      <div class="stat-card ${b.staleStudents14d > 0 ? 'stat-alert' : ''}">
+        <div class="stat-label">Sans activité (14j+)</div>
+        <div class="stat-value">${b.staleStudents14d}</div>
+      </div>
+    </div>`;
+
+    const compBar = (c, cls) => `
+      <div class="comp-bar-row">
+        <div class="comp-bar-label"><span>${escHtml(c.competence)}</span><span class="n">${c.avgPct}% · ${c.studentCount} élève${c.studentCount > 1 ? 's' : ''}</span></div>
+        <div class="comp-bar-track"><div class="comp-bar-fill ${cls}" style="width:${c.avgPct}%"></div></div>
+      </div>`;
+
+    html += `<div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-card-title">Compétences les mieux réussies</div>
+        ${ov.top5.length ? ov.top5.map(c => compBar(c, 'up')).join('') : '<div class="empty-inline">Pas assez de données (min. 5 élèves par compétence).</div>'}
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-title">Compétences les moins réussies</div>
+        ${ov.bottom5.length ? ov.bottom5.map(c => compBar(c, 'down')).join('') : '<div class="empty-inline">Pas assez de données (min. 5 élèves par compétence).</div>'}
+      </div>
+    </div>`;
+
+    html += `<div class="overview-card" style="margin-bottom:20px">
+      <div class="overview-card-title">Exercices en difficulté</div>`;
+    if (ov.exList.length === 0) {
+      html += '<div class="empty-inline">Pas assez de données (min. 5 élèves par exercice).</div>';
+    } else {
+      html += `<div class="table-wrap" style="border-radius:8px">
+        <table class="result-table">
+          <thead><tr><th>Exercice</th><th>Domaine</th><th>Score moyen</th><th>Réussite ≥80%</th><th>Tentatives</th></tr></thead>
+          <tbody>${ov.exList.map(e => {
+            const t = e.title.charAt(0).toUpperCase() + e.title.slice(1);
+            const pillCls = e.avgPct >= 70 ? 'score-high' : e.avgPct >= 50 ? 'score-mid' : 'score-low';
+            return `<tr style="cursor:pointer" onclick="window.open('exercise.html?slug=${encodeURIComponent(e.slug)}','_blank')">
+              <td style="font-weight:600">${escHtml(t)}</td>
+              <td style="color:var(--muted);font-size:13px">${escHtml(e.domaine)}</td>
+              <td><span class="score-pill ${pillCls}">${e.avgPct}%</span></td>
+              <td>${e.successRate}%</td>
+              <td style="color:var(--muted)">${e.attempts}</td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>`;
+    }
+    html += `</div>`;
+
+    html += `<div class="overview-card">
+      <div class="overview-card-title">Heatmap domaines × activité</div>`;
+    if (ov.heatmap.length === 0) {
+      html += '<div class="empty-inline">Aucune donnée.</div>';
+    } else {
+      html += ov.heatmap.map(h => {
+        const dotCls = h.avgPct >= 80 ? 'heatmap-dot-good' : h.avgPct >= 60 ? 'heatmap-dot-mid' : 'heatmap-dot-low';
+        return `<div class="heatmap-row">
+          <div class="heatmap-domaine">${escHtml(h.domaine)}</div>
+          <div>${h.exerciseCount} exercice${h.exerciseCount > 1 ? 's' : ''}</div>
+          <div class="heatmap-pastille"><span class="dot ${dotCls}"></span>${h.avgPct}%</div>
+          <div>
+            <div class="heatmap-progress-track"><div class="heatmap-progress-fill" style="width:${h.studentPct}%"></div></div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px">${h.studentPct}% des élèves</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    html += `</div>`;
+
+    return html;
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -1073,12 +1546,16 @@
      VUE B — ÉLÈVES D'UNE CLASSE
   ═══════════════════════════════════════════════════════════════════════════ */
   async function renderStudents(classId) {
-    /* Réinitialiser les onglets et le cache bilan à chaque nouvelle classe */
-    _bilanLoaded = false;
-    document.getElementById('tab-btn-eleves').classList.add('active');
+    /* Réinitialiser les onglets et les caches à chaque nouvelle classe —
+       « Vue d'ensemble » redevient l'onglet par défaut à l'ouverture. */
+    _bilanLoaded    = false;
+    _overviewLoaded = false;
+    document.getElementById('tab-btn-overview').classList.add('active');
+    document.getElementById('tab-btn-eleves').classList.remove('active');
     document.getElementById('tab-btn-bilan').classList.remove('active');
-    document.getElementById('panel-eleves').style.display  = '';
-    document.getElementById('panel-bilan').style.display   = 'none';
+    document.getElementById('panel-overview').style.display = '';
+    document.getElementById('panel-eleves').style.display   = 'none';
+    document.getElementById('panel-bilan').style.display    = 'none';
     document.getElementById('print-bilan-btn').style.display = 'none';
     document.getElementById('bilan-subject-tabs').style.display = 'none';
     document.getElementById('bilan-content').innerHTML =
@@ -1131,6 +1608,7 @@
                sname:encodeURIComponent('${escJs(s.display_name)}'),
                cname:encodeURIComponent('${escJs(cname || '')}'),
                clevel:'${escJs(clevel || '')}',
+               cyear:encodeURIComponent('${escJs(cyear || '')}'),
                class:'${classId}'
              })">Voir la fiche →</button>`
           : `<span style="font-size:11px;color:var(--muted)">Pas de compte</span>`;
@@ -1142,6 +1620,7 @@
                sname:encodeURIComponent('${escJs(s.display_name)}'),
                cname:encodeURIComponent('${escJs(cname || '')}'),
                clevel:'${escJs(clevel || '')}',
+               cyear:encodeURIComponent('${escJs(cyear || '')}'),
                class:'${classId}'
              })"` : ''}>
               <div class="student-avatar-sm">${initial}</div>
@@ -1157,6 +1636,7 @@
     }
 
     document.getElementById('view-students').style.display = '';
+    renderOverview(classId);
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -1188,13 +1668,15 @@
     renderLineChart(stats?.chartData || []);
     renderDoughnutChart(stats?.subjects || []);
     renderStudentBilan(s.auth_user_id);
+    renderStudentProfile(s.auth_user_id);
 
     const p = new URLSearchParams(window.location.search);
     document.getElementById('student-nav-footer').innerHTML = `
       <button class="btn btn-ghost btn-sm" onclick="navigate({
         view:'eleves', class:'${p.get('class') || ''}',
         cname:encodeURIComponent('${escJs(s.class_name || '')}'),
-        clevel:'${escJs(s.class_level || '')}'
+        clevel:'${escJs(s.class_level || '')}',
+        cyear:encodeURIComponent('${escJs(p.get('cyear') || _currentClass?.school_year || '')}')
       })">← Retour à la classe</button>`;
 
     document.getElementById('view-student').style.display = '';
@@ -1298,6 +1780,268 @@
         }
       }
     });
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     PROFIL ÉLÈVE ENRICHI — rang lauriers, compétences à consolider,
+     jauges de niveau, courbe d'activité (alimente aussi le bulletin)
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function renderStudentProfile(authUserId) {
+    _studentProfile = null;
+    _studentRows    = [];
+    document.getElementById('student-rank-line').innerHTML = '';
+    document.getElementById('bulletin-btn').style.display = 'none';
+    ['student-consolider', 'student-jauges', 'student-activity'].forEach(id => {
+      document.getElementById(id).style.display = 'none';
+    });
+
+    try {
+      await loadCatalogAssets();
+      const rows = await lfmTeacher.getStudentResultsRaw(authUserId);
+      _studentRows = rows;
+      if (rows.length === 0) return;
+      logUnmatchedCatalogSlugs(rows, _catalogMap);
+
+      const profile = lfmAnalytics.computeStudentProfile(rows, _catalogMap);
+      _studentProfile = profile;
+
+      /* Rang lauriers (réutilise laurels.js) */
+      const { current } = computeLaurelRank(profile.totalReussis);
+      document.getElementById('student-rank-line').innerHTML = `
+        <span class="laurel-rank" style="color:${current.color}">🏵 ${escHtml(current.name)}</span>
+        <span style="font-size:12px;color:var(--muted)">${profile.totalReussis} exercice${profile.totalReussis > 1 ? 's' : ''} réussi${profile.totalReussis > 1 ? 's' : ''} (≥80%)</span>`;
+
+      renderConsoliderList(profile.consolider);
+      renderJauges(profile.jauges);
+      renderActivityBars(profile.weekly);
+
+      document.getElementById('bulletin-btn').style.display = '';
+    } catch (e) {
+      console.warn('[LFM] renderStudentProfile:', e.message);
+    }
+  }
+
+  function renderConsoliderList(consolider) {
+    const el = document.getElementById('student-consolider');
+    if (!consolider || consolider.length === 0) { el.style.display = 'none'; return; }
+    el.style.display = '';
+    document.getElementById('consolider-list').innerHTML = consolider.map(c => `
+      <div class="consolider-item">
+        <div>
+          <div class="ci-comp">${escHtml(c.competence)}</div>
+          <div class="ci-meta">${escHtml(c.domaine)} · moyenne ${c.avgPct}%${c.hasRepeatedFailure ? ' · <span class="ci-flag">échecs répétés</span>' : ''}</div>
+        </div>
+        <a class="btn btn-outline btn-sm" href="exercise.html?slug=${encodeURIComponent(c.exampleSlug)}" target="_blank">Revoir →</a>
+      </div>`).join('');
+  }
+
+  const JAUGE_STATUS_LABEL = {
+    'atteint':       'atteint',
+    'en-cours':      "en cours d'acquisition",
+    'non-travaille': 'non travaillé',
+    'non-concerne':  'non concerné'
+  };
+
+  function renderJauges(jauges) {
+    const el = document.getElementById('student-jauges');
+    const domaines = Object.keys(jauges || {}).filter(d => jauges[d].some(seg => seg.status !== 'non-concerne'));
+    if (domaines.length === 0) { el.style.display = 'none'; return; }
+    el.style.display = '';
+    document.getElementById('jauges-content').innerHTML = domaines.map(domaine => `
+      <div class="jauge-domaine">
+        <div class="jauge-domaine-title">${escHtml(domaine)}</div>
+        <div class="jauge-segments">
+          ${jauges[domaine].map(seg => `
+            <div class="jauge-segment">
+              <div class="jauge-segment-bar ${seg.status}"></div>
+              <div class="jauge-segment-label">${escHtml(seg.level)}</div>
+              <div class="jauge-segment-status">${JAUGE_STATUS_LABEL[seg.status]}</div>
+            </div>`).join('')}
+        </div>
+      </div>`).join('');
+  }
+
+  function renderActivityBars(weekly) {
+    const el = document.getElementById('student-activity');
+    if (!weekly || weekly.every(w => w.count === 0)) { el.style.display = 'none'; return; }
+    el.style.display = '';
+    const max = Math.max(1, ...weekly.map(w => w.count));
+    document.getElementById('activity-bars').innerHTML = weekly.map((w, i) => `
+      <div class="activity-bar-wrap">
+        <div class="activity-bar" style="height:${Math.round((w.count / max) * 100)}%" title="${w.count} exercice${w.count > 1 ? 's' : ''}"></div>
+        <div class="activity-bar-label">${i === 7 ? "cette sem." : `S-${7 - i}`}</div>
+      </div>`).join('');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     BULLETIN PDF SEMESTRIEL
+  ═══════════════════════════════════════════════════════════════════════════ */
+  /* ── Année de rentrée pour les presets de période ─────────────────────────
+     BUG CORRIGÉ : cyear n'est jamais transmis à la vue 'eleve' (navigate()
+     ne le passe pas), donc un repli sur new Date().getFullYear() donnait une
+     date de départ (1er septembre de l'année CIVILE courante) postérieure à
+     aujourd'hui dès qu'on est entre janvier et août — periodRows était alors
+     systématiquement vide. On utilise _currentClass (fiable : posé à la vue
+     'eleves' précédente et jamais réinitialisé) en priorité, puis l'URL, puis
+     un repli qui reste toujours dans le passé (mois courant → année de
+     rentrée en cours si sept-déc, sinon année précédente). */
+  function resolveSchoolYearStart() {
+    const p = new URLSearchParams(window.location.search);
+    const cyear = decodeURIComponent(p.get('cyear') || '') || _currentClass?.school_year || '';
+    const match = cyear.match(/\d{4}/);
+    if (match) return parseInt(match[0], 10);
+    const now = new Date();
+    return now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+  }
+
+  function openBulletinModal() {
+    const startYear = resolveSchoolYearStart();
+    document.getElementById('bulletin-date-start').value = `${startYear}-09-01`;
+    document.getElementById('bulletin-date-end').value   = new Date().toISOString().slice(0, 10);
+    document.getElementById('bulletin-observations').value = '';
+    document.getElementById('bulletin-modal-overlay').style.display = 'flex';
+  }
+
+  function closeBulletinModal() {
+    document.getElementById('bulletin-modal-overlay').style.display = 'none';
+  }
+
+  function applyBulletinPreset(preset) {
+    const startYear = resolveSchoolYearStart();
+    if (preset === 's1') {
+      document.getElementById('bulletin-date-start').value = `${startYear}-09-01`;
+      document.getElementById('bulletin-date-end').value   = `${startYear + 1}-01-31`;
+    } else {
+      document.getElementById('bulletin-date-start').value = `${startYear + 1}-02-01`;
+      document.getElementById('bulletin-date-end').value   = `${startYear + 1}-07-15`;
+    }
+  }
+
+  function generateBulletin() {
+    const startVal = document.getElementById('bulletin-date-start').value;
+    const endVal   = document.getElementById('bulletin-date-end').value;
+    const observations = document.getElementById('bulletin-observations').value.trim();
+    if (!startVal || !endVal) { alert('Merci de renseigner une période.'); return; }
+
+    const start = new Date(startVal + 'T00:00:00');
+    const end   = new Date(endVal + 'T23:59:59');
+    const periodRows = _studentRows.filter(r => {
+      const d = new Date(r.completed_at);
+      return d >= start && d <= end;
+    });
+
+    if (periodRows.length === 0) {
+      alert("Aucun exercice réalisé sur cette période — impossible de générer le bulletin.");
+      return;
+    }
+    logUnmatchedCatalogSlugs(periodRows, _catalogMap);
+
+    const profile        = lfmAnalytics.computeStudentProfile(periodRows, _catalogMap);
+    const distinctPeriod = lfmAnalytics.dedupeBestBySlug(periodRows).length;
+    const reussiteRate   = distinctPeriod > 0 ? Math.round((profile.totalReussis / distinctPeriod) * 100) : 0;
+    /* Rang lauriers = statut ACTUEL de l'élève (cumul de tout son historique),
+       pas limité à la période du bulletin — c'est un cumul, pas une mesure
+       de période. _studentProfile est calculé sur l'historique complet dans
+       renderStudentProfile(). */
+    const rankAllTime = computeLaurelRank(_studentProfile ? _studentProfile.totalReussis : 0).current;
+
+    const name  = document.getElementById('student-header-name').textContent;
+    const meta  = document.getElementById('student-header-meta').textContent;
+    const periodLabel = `Du ${start.toLocaleDateString('fr-FR')} au ${end.toLocaleDateString('fr-FR')}`;
+    const today = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+    /* Ne montrer que les domaines pour lesquels le catalogue a effectivement
+       des exercices à ce niveau (au moins un segment avec un dénominateur
+       non nul), sinon une ligne "— / — / —" vide n'apporte rien au parent. */
+    const domaines = lfmAnalytics.DOMAIN_ORDER.filter(d => (profile.jauges[d] || []).some(seg => seg.denom > 0));
+    const compactCls = domaines.length > 8 ? ' bulletin-compact' : '';
+
+    let jaugesHtml = '';
+    domaines.forEach(domaine => {
+      const segs = profile.jauges[domaine] || [];
+      jaugesHtml += `<div class="bulletin-jauge-row">
+        <div class="bj-domaine">${escHtml(domaine)}</div>
+        <div class="bj-segments">
+          ${segs.map(seg => {
+            /* Le bulletin n'a que 3 états visuels — "non concerné" (denom=0,
+               cas rare une fois le filtre ci-dessus appliqué) est absorbé
+               dans "non travaillé" plutôt que d'ajouter un 4e état. */
+            const status = seg.status === 'non-concerne' ? 'non-travaille' : seg.status;
+            const label  = status === 'atteint' ? 'atteint' : status === 'en-cours' ? 'en cours' : '—';
+            return `<div class="bj-segment ${status}">
+              <span class="bj-seg-level">${escHtml(seg.level)}</span>
+              <span class="bj-seg-status">${label}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    });
+
+    const fortsHtml = profile.reussies.slice(0, 4).map(c => `<li>${escHtml(c.competence)}</li>`).join('')
+      || '<li>Pas encore de compétence consolidée sur cette période.</li>';
+    const consoliderHtml = profile.consolider.slice(0, 4).map(c => `<li>${escHtml(c.competence)}</li>`).join('')
+      || '<li>Aucune compétence prioritaire identifiée sur cette période.</li>';
+
+    const html = `<div class="bulletin-page${compactCls}">
+      <div class="bulletin-header">
+        <div>
+          <div class="bulletin-brand-name">Proficiamus</div>
+          <div class="bulletin-brand-sub">Bulletin de compétences — cycle 3</div>
+        </div>
+        <div class="bulletin-header-right">
+          <div class="bh-name">${escHtml(name)}</div>
+          <div>${escHtml(meta)}</div>
+          <div class="bh-period">${periodLabel}</div>
+        </div>
+      </div>
+
+      <div class="bulletin-stats">
+        <div class="bulletin-stat">
+          <div class="bs-value">${periodRows.length}</div>
+          <div class="bs-label">Exercices réalisés</div>
+        </div>
+        <div class="bulletin-stat">
+          <div class="bs-value">${reussiteRate}%</div>
+          <div class="bs-label">Taux de réussite</div>
+        </div>
+        <div class="bulletin-stat">
+          <div class="bs-value" style="color:${rankAllTime.color}">${escHtml(rankAllTime.name)}</div>
+          <div class="bs-label">Rang actuel</div>
+        </div>
+      </div>
+
+      <div class="bulletin-jauges">
+        <div class="bulletin-jauges-title">Niveaux atteints par domaine</div>
+        ${jaugesHtml || '<div style="font-size:9.5pt;color:#888">Pas assez de données sur cette période.</div>'}
+      </div>
+
+      <div class="bulletin-boxes">
+        <div class="bulletin-box box-forts">
+          <h5>Points forts</h5>
+          <ul>${fortsHtml}</ul>
+        </div>
+        <div class="bulletin-box box-consolider">
+          <h5>À consolider</h5>
+          <ul>${consoliderHtml}</ul>
+        </div>
+      </div>
+
+      ${observations ? `<div class="bulletin-observations">
+        <div class="bo-label">Observations de l'enseignant</div>
+        <div class="bo-text">${escHtml(observations)}</div>
+      </div>` : ''}
+
+      <div class="bulletin-footer">
+        proficiamus.eu &nbsp;·&nbsp; Généré le ${today} &nbsp;·&nbsp;
+        Niveau 1 = attendus CM1 · Niveau 2 = CM2 · Niveau 3 = 6e
+      </div>
+    </div>`;
+
+    document.getElementById('bulletin-print-root').innerHTML = html;
+    closeBulletinModal();
+    document.body.classList.add('printing-bulletin');
+    window.print();
+    document.body.classList.remove('printing-bulletin');
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════

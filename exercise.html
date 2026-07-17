@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Exercice — Français — Lycée Français de Madrid</title>
-  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="styles.css?v=11">
   <link rel="stylesheet" href="level-select.css?v=1">
+  <link rel="stylesheet" href="breadcrumb.css?v=1">
+  <script src="js/breadcrumb.js?v=1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
@@ -1153,10 +1155,12 @@
     /* ── Responsive ─────────────────────────────────────────── */
     @media (max-width: 1024px) {
       .page-content { padding: 0 40px; }
+      .navbar__inner { padding: 0 40px; }
     }
 
     @media (max-width: 768px) {
       .page-content { padding: 0 24px; }
+      .navbar__inner { padding: 0 24px; }
     }
 
     @media (max-width: 600px) {
@@ -4466,6 +4470,12 @@
     let cmpLevelSelect      = null; /* comparer-fractions : instance LevelSelect */
     let encadrLevelSelect   = null; /* encadrer-fraction : instance LevelSelect */
     let nbEntierLevelSelect = null; /* nombre-entier : instance LevelSelect */
+    let probaChancesLevel       = null; /* probabilite-chances : niveau sélectionné (id "niveauN") */
+    let probaChancesLevelSelect = null; /* probabilite-chances : instance LevelSelect */
+    let probaIssuesLevel        = null; /* probabilite-issues  : niveau sélectionné (id "niveauN") */
+    let probaIssuesLevelSelect  = null; /* probabilite-issues  : instance LevelSelect */
+    let probaNombreLevel        = null; /* probabilite-nombre  : niveau sélectionné (id "niveauN") */
+    let probaNombreLevelSelect  = null; /* probabilite-nombre  : instance LevelSelect */
 
     /* Suivi générique du niveau courant (tous exercices à niveaux) */
     let sessionLevelList   = [];   /* liste ordonnée des valeurs de niveau */
@@ -4479,7 +4489,12 @@
     let fdgdLevelSelect = null;
     let fdtnLevelSelect = null;
 
-    const LEVEL_LABELS = { "CM1": "Niveau 1", "CM2": "Niveau 2", "6e": "Niveau 3" };
+    const LEVEL_LABELS = {
+      "CM1": "Niveau 1", "CM2": "Niveau 2", "6e": "Niveau 3",
+      /* Ids génériques "niveauN" (Probabilités, et tout futur type dont les
+         3 niveaux internes ne correspondent pas à une progression CM1→6e) */
+      "niveau1": "Niveau 1", "niveau2": "Niveau 2", "niveau3": "Niveau 3"
+    };
 
     const SUCCESS = ["✅ Bravo !", "✨ Très bien !", "🌟 Exact !"];
 
@@ -4497,10 +4512,17 @@
     /* ── Init ─────────────────────────────────────────────────────────────── */
 
     async function init() {
+      /* Rendu immédiat (catégorie/titre pas encore connus, dépendent du slug
+         résolu ci-dessous) pour garantir un retour "Mon espace" toujours
+         disponible, y compris sur les chemins d'erreur (slug invalide,
+         accès non autorisé). Complété via setCategory()/setCurrent(). */
+      Breadcrumb.render({ current: 'Chargement…' });
+
       const params = new URLSearchParams(window.location.search);
       const slug   = params.get("slug");
 
       if (!slug || !EXERCISE_DATA[slug]) {
+        Breadcrumb.setCurrent('Exercice introuvable');
         document.getElementById("exercise-screen").innerHTML =
           "<p style='text-align:center;padding:64px 24px;color:var(--muted);font-size:15px'>" +
           "Exercice introuvable.</p>";
@@ -4514,6 +4536,7 @@
         ? await lfmGuidedAccess.isAllowed(slug)
         : true;
       if (!allowed) {
+        Breadcrumb.setCurrent('Exercice non disponible');
         document.getElementById("exercise-screen").innerHTML =
           "<div style='text-align:center;padding:64px 24px'>" +
           "<p style='font-size:40px;margin-bottom:12px'>🔒</p>" +
@@ -4528,6 +4551,8 @@
       /* Page metadata */
       document.title = sessionData.title + " — Conjugaison — LFM";
       document.getElementById("ex-page-title").textContent = sessionData.title;
+      Breadcrumb.setCategory(sessionData.backLink);
+      Breadcrumb.setCurrent(sessionData.title);
 
       /* Back link */
       const backEl = document.getElementById("ex-back-link");
@@ -4566,6 +4591,9 @@
       apcodLevel       = null;
       decompLevel      = null;
       fpLevel           = null;
+      probaChancesLevel = null;
+      probaIssuesLevel  = null;
+      probaNombreLevel  = null;
       sessionLevelList   = [];
       sessionLevelLabels = [];
       sessionLevelIdx    = -1;
@@ -5168,6 +5196,164 @@
       apcodLevelSelect.renderSelectScreen();
     }
 
+    /* ── Type : probabilite-chances / probabilite-issues / probabilite-nombre
+       Ids de niveau génériques "niveau1/2/3" (pas CM1/CM2/6e) : chaque
+       compétence Probabilités correspond à une seule pastille CM1/CM2/6e sur
+       la page de catégorie (pastille gérée séparément, hors EXERCISE_DATA),
+       alors que ses 3 niveaux internes sont une simple progression de
+       difficulté au sein de cette pastille. Voir LEVEL_LABELS. Filtrage de
+       banque par `it.level` (valeur = id du niveau), comme nombre-entier. ── */
+
+    function showProbaChancesLevelSelect() {
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels = sessionData.levels || ["niveau1", "niveau2", "niveau3"];
+      const descs  = {
+        "niveau1": "Billes et cubes dans un sac",
+        "niveau2": "Pièce et dé équilibrés",
+        "niveau3": "Urne de formes et jeu de cartes"
+      };
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      probaChancesLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          probaChancesLevel = l;
+          const filtered = sessionData.bank.filter(it => it.level === probaChancesLevel);
+          questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
+          currentIndex = 0;
+          score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(l);
+          sessionLevelLoader = (lv) => {
+            probaChancesLevel = lv;
+            const fq = sessionData.bank.filter(it => it.level === probaChancesLevel);
+            questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+            probaChancesLevelSelect.renderBadges(lv);
+          };
+          document.getElementById('q-total').textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          probaChancesLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      probaChancesLevelSelect.renderSelectScreen();
+    }
+
+    function showProbaIssuesLevelSelect() {
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels = sessionData.levels || ["niveau1", "niveau2", "niveau3"];
+      const descs  = {
+        "niveau1": "Lister les issues possibles",
+        "niveau2": "Dénombrer les issues favorables",
+        "niveau3": "Situations combinées"
+      };
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      probaIssuesLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          probaIssuesLevel = l;
+          const filtered = sessionData.bank.filter(it => it.level === probaIssuesLevel);
+          questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
+          currentIndex = 0;
+          score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(l);
+          sessionLevelLoader = (lv) => {
+            probaIssuesLevel = lv;
+            const fq = sessionData.bank.filter(it => it.level === probaIssuesLevel);
+            questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+            probaIssuesLevelSelect.renderBadges(lv);
+          };
+          document.getElementById('q-total').textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          probaIssuesLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      probaIssuesLevelSelect.renderSelectScreen();
+    }
+
+    function showProbaNombreLevelSelect() {
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels = sessionData.levels || ["niveau1", "niveau2", "niveau3"];
+      const descs  = {
+        "niveau1": "Placer des événements sur une échelle de 0 à 1",
+        "niveau2": "Écrire une probabilité (fraction, décimal, pourcentage)",
+        "niveau3": "Conversions et approche fréquentiste"
+      };
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      probaNombreLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          probaNombreLevel = l;
+          const filtered = sessionData.bank.filter(it => it.level === probaNombreLevel);
+          questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
+          currentIndex = 0;
+          score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(l);
+          sessionLevelLoader = (lv) => {
+            probaNombreLevel = lv;
+            const fq = sessionData.bank.filter(it => it.level === probaNombreLevel);
+            questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+            probaNombreLevelSelect.renderBadges(lv);
+          };
+          document.getElementById('q-total').textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          probaNombreLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      probaNombreLevelSelect.renderSelectScreen();
+    }
+
     function startSessionWithType(type) {
       currentType = type;
       sessionStartTime = Date.now();
@@ -5410,6 +5596,21 @@
         return;
       }
 
+      if (currentType === "probabilite-chances" && probaChancesLevel === null) {
+        showProbaChancesLevelSelect();
+        return;
+      }
+
+      if (currentType === "probabilite-issues" && probaIssuesLevel === null) {
+        showProbaIssuesLevelSelect();
+        return;
+      }
+
+      if (currentType === "probabilite-nombre" && probaNombreLevel === null) {
+        showProbaNombreLevelSelect();
+        return;
+      }
+
       document.getElementById("results-screen").classList.add("ex-hidden");
       document.getElementById("exercise-screen").classList.remove("ex-hidden");
 
@@ -5457,6 +5658,12 @@
         renderChoixEtiquette(card, q);
       } else if (currentType === "classification-etapes") {
         renderClassificationEtapes(card, q);
+      } else if (currentType === "probabilite-chances") {
+        renderChoixEtiquette(card, q);
+      } else if (currentType === "probabilite-issues") {
+        renderClassificationEtapes(card, q);
+      } else if (currentType === "probabilite-nombre") {
+        renderMotsCliquables(card, q);
       } else if (currentType === "lire-fraction") {
         renderLireFraction(card, q);
       } else if (currentType === "representer-fraction") {
@@ -5996,7 +6203,8 @@
         'produire-3-formes', 'accord-ecrit',
         'lire-fraction', 'representer-fraction', 'placer-fraction-droite',
         'comparer-fractions', 'encadrer-fraction', 'nombre-entier',
-        'decomposer-fraction', 'fractions-problemes', 'accord-participe-cod'
+        'decomposer-fraction', 'fractions-problemes', 'accord-participe-cod',
+        'probabilite-chances', 'probabilite-issues', 'probabilite-nombre'
       ].includes(currentType);
       const canProgress = !lockedType || pct >= 80;
 
@@ -6056,6 +6264,9 @@
           else if (currentType === 'decomposer-fraction') showDecomposerFractionLevelSelect();
           else if (currentType === 'fractions-problemes') showFractionsProblemesLevelSelect();
           else if (currentType === 'accord-participe-cod') showAccordParticipeCodLevelSelect();
+          else if (currentType === 'probabilite-chances') showProbaChancesLevelSelect();
+          else if (currentType === 'probabilite-issues') showProbaIssuesLevelSelect();
+          else if (currentType === 'probabilite-nombre') showProbaNombreLevelSelect();
         });
 
       } else if (hasMulti && isLast) {
@@ -6152,6 +6363,15 @@
       if (currentType === 'fractions-problemes' && fpLevel && fpLevelSelect) {
         fpLevelSelect.completeLevel(fpLevel, score, total);
       }
+      if (currentType === 'probabilite-chances' && probaChancesLevel && probaChancesLevelSelect) {
+        probaChancesLevelSelect.completeLevel(probaChancesLevel, score, total);
+      }
+      if (currentType === 'probabilite-issues' && probaIssuesLevel && probaIssuesLevelSelect) {
+        probaIssuesLevelSelect.completeLevel(probaIssuesLevel, score, total);
+      }
+      if (currentType === 'probabilite-nombre' && probaNombreLevel && probaNombreLevelSelect) {
+        probaNombreLevelSelect.completeLevel(probaNombreLevel, score, total);
+      }
 
       _setupResultsScreen(pct);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -6167,7 +6387,8 @@
       const sessionLevelIdTypes = ['accord-participe-cod', 'lire-fraction', 'representer-fraction', 'placer-fraction-droite', 'comparer-fractions'];
       const activeLevel = pfiSelectedLevel || accordLevel
         || (sessionLevelIdTypes.includes(currentType) ? sessionLevelList[sessionLevelIdx] : null)
-        || nbEntierLevel || encadrLevel || decompLevel || fpLevel || null;
+        || nbEntierLevel || encadrLevel || decompLevel || fpLevel
+        || probaChancesLevel || probaIssuesLevel || probaNombreLevel || null;
       saveExerciseResult({
         exerciseSlug: slug,
         subject,
@@ -6940,7 +7161,7 @@
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
 
-      const selected1   = new Set();
+      const selected1   = new Set(); // Set de boutons (pas de valeurs clean) — cf. renderMotsCliquables
       let step1Correct  = false;
 
       const wordsEl = document.getElementById("ce-words");
@@ -6954,11 +7175,11 @@
 
         btn.addEventListener("click", () => {
           if (btn.disabled) return;
-          if (selected1.has(clean)) {
-            selected1.delete(clean);
+          if (selected1.has(btn)) {
+            selected1.delete(btn);
             btn.classList.remove("is-selected");
           } else {
-            selected1.add(clean);
+            selected1.add(btn);
             btn.classList.add("is-selected");
           }
         });
@@ -6972,7 +7193,7 @@
         wordsEl.querySelectorAll(".ex-word-btn").forEach(btn => {
           const clean      = btn.dataset.clean;
           const isTarget   = targets.has(clean);
-          const wasSelected = selected1.has(clean);
+          const wasSelected = selected1.has(btn);
           btn.disabled = true;
           btn.classList.remove("is-selected");
 

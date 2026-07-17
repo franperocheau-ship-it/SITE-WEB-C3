@@ -1,0 +1,90 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Composant partagé — Fil d'Ariane élève
+   Utilisé par js/breadcrumb.js. Barre sticky positionnée juste sous la
+   navbar fixe (top: 50px — voir `body:has(.navbar) { padding-top: 50px }`
+   dans styles.css). Toutes les références aux tokens globaux de styles.css
+   (--border, --muted, --font-display, --color-brand-navy,
+   --color-brand-gold, ...) ont une valeur de repli : le composant s'affiche
+   correctement même sur une page qui ne charge pas styles.css.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.bc-bar {
+  position: sticky;
+  top: 50px;
+  z-index: 900;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border, #E8EDF3);
+}
+
+.bc-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 10px 64px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bc-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #1DBFA0;
+  color: #ffffff;
+  font-family: var(--font-display, 'Fredoka', sans-serif);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 6px 16px;
+  border-radius: 100px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 180ms, transform 180ms;
+}
+
+.bc-home:hover {
+  background: #17a58a;
+  transform: translateY(-1px);
+}
+
+.bc-sep {
+  color: var(--muted, #5F6368);
+  opacity: 0.55;
+  font-size: 14px;
+}
+
+.bc-link {
+  color: var(--color-brand-navy, #1A2D6B);
+  font-family: var(--font-display, 'Fredoka', sans-serif);
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 180ms;
+}
+
+.bc-link:hover {
+  color: var(--color-brand-gold, #F5A623);
+  text-decoration: underline;
+}
+
+.bc-current {
+  color: var(--color-brand-navy, #1A2D6B);
+  font-family: var(--font-display, 'Fredoka', sans-serif);
+  font-weight: 700;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 420px;
+}
+
+@media (max-width: 768px) {
+  .bc-inner    { padding: 8px 24px; }
+  .bc-current  { max-width: 200px; }
+}
+
+@media (max-width: 480px) {
+  .bc-home-label { display: none; }
+  .bc-current    { max-width: 120px; }
+}

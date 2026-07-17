@@ -275,7 +275,7 @@ const lfmAnalytics = (() => {
         const ratio = denom > 0 ? achieved.size / denom : 0;
         const status = denom === 0 ? 'non-concerne'
           : ratio >= 0.7 ? 'atteint'
-          : ratio >= 0.3 ? 'en-cours'
+          : ratio >= 0.15 ? 'en-cours' /* TEMP test seuil : 0.3 → 0.15, à revenir en arrière après validation visuelle */
           : 'non-travaille';
         return { level, ratio, status, denom, achieved: achieved.size };
       });

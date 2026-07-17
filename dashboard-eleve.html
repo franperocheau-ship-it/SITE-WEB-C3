@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Espace élève — Lycée Français de Madrid</title>
-  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="styles.css?v=11">
   <link rel="stylesheet" href="laurels.css?v=2">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/guided-access.js?v=1"></script>
   <script src="exercise-data.js?v=21"></script>
   <script src="js/exercise-catalog.js?v=6"></script>
   <script src="js/laurels.js?v=2"></script>
@@ -239,38 +240,6 @@
     .dot-francais      { background: var(--blue); }
     .dot-mathematiques { background: var(--red); }
 
-    /* ── Mini chart (évolution) ── */
-    .chart-bars {
-      display: flex;
-      align-items: flex-end;
-      gap: 6px;
-      height: 64px;
-      padding-bottom: 4px;
-    }
-
-    .chart-bar-wrap {
-      flex: 1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .chart-bar {
-      width: 100%;
-      border-radius: 4px 4px 0 0;
-      min-height: 3px;
-      transition: height 600ms ease;
-    }
-
-    .chart-bar-val {
-      font-size: 9px;
-      font-weight: 700;
-      color: var(--muted);
-    }
-
     /* ── Empty state ── */
     .dash-empty {
       text-align: center;
@@ -401,9 +370,23 @@
     .subject-card--ma { border-top-color: #F5A623; }
     .subject-card--ma:hover { box-shadow: 0 8px 32px rgba(245,166,35,0.20); }
 
+    .subject-card--guide { border-top-color: #603AAA; }
+    .subject-card--guide:hover { box-shadow: 0 8px 32px rgba(96,58,170,0.20); }
+
     .subject-card__icon { display: flex; align-items: center; justify-content: center; }
 
     .subject-card__icon img { width: 64px; height: 64px; object-fit: contain; }
+
+    /* Illustration circulaire (carte "Mes exercices") */
+    .subject-card--guide .subject-card__icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #603AAA;
+      overflow: hidden;
+    }
+
+    .subject-card--guide .subject-card__icon img { width: 100%; height: 100%; object-fit: cover; }
 
     .subject-card__title {
       font-size: 20px;
@@ -413,6 +396,7 @@
 
     .subject-card--fr .subject-card__title { color: var(--blue); }
     .subject-card--ma .subject-card__title { color: #7a4f00; }
+    .subject-card--guide .subject-card__title { color: #603AAA; }
 
     .subject-card__desc {
       font-size: 13px;
@@ -431,6 +415,9 @@
 
     .subject-card--fr .subject-card__cta { background: var(--blue); color: #fff; }
     .subject-card--ma .subject-card__cta { background: #F5A623; color: #6b420a; }
+    .subject-card--guide .subject-card__cta { background: #603AAA; color: #fff; }
+
+    .subject-cards-grid--guided { grid-template-columns: repeat(3, 1fr); }
 
     @media (max-width: 600px) {
       .dash-header  { padding: 20px; }
@@ -550,12 +537,6 @@
         <div id="subjects-content"></div>
       </div>
 
-      <!-- Évolution récente -->
-      <div class="dash-section" id="section-chart" style="display:none">
-        <div class="dash-section-title">Évolution récente</div>
-        <div class="chart-bars" id="chart-bars"></div>
-      </div>
-
       <!-- Derniers exercices -->
       <div class="dash-section" id="section-recent" style="display:none">
         <div class="dash-section-title">Derniers exercices</div>
@@ -638,7 +619,13 @@
       btn.addEventListener('click', () => activateTab(btn.dataset.tab));
     });
 
-    activateTab(sessionStorage.getItem(TAB_KEY) || 'exercices');
+    /* Le paramètre ?tab= (utilisé par le fil d'Ariane, "🏠 Mon espace")
+       prime sur le dernier onglet mémorisé : sans ça, un élève resté sur
+       "Mes résultats" lors de sa dernière visite du dashboard atterrirait
+       sur ce même onglet en cliquant "Mon espace" depuis un exercice, au
+       lieu de l'onglet "Faire des exercices" attendu. */
+    const _tabParam = new URLSearchParams(window.location.search).get('tab');
+    activateTab(_tabParam || sessionStorage.getItem(TAB_KEY) || 'exercices');
 
     /* ── Formatage de date ─────────────────────────────────────────────────── */
     function formatDate(iso) {
@@ -656,12 +643,6 @@
       if (pct >= 80) return 'badge-good';
       if (pct >= 50) return 'badge-ok';
       return 'badge-low';
-    }
-
-    function barColor(pct) {
-      if (pct >= 80) return '#16a34a';
-      if (pct >= 50) return '#d97706';
-      return '#d62839';
     }
 
     /* ── Label lisible pour un exercice_slug ───────────────────────────────── */
@@ -730,22 +711,6 @@
       document.getElementById('subjects-content').innerHTML = subjectHtml;
       document.getElementById('section-subjects').style.display = '';
 
-      /* ── Graphique d'évolution (10 derniers) ── */
-      const chartData = results.slice(0, 10).reverse();
-      if (chartData.length >= 2) {
-        const barsHtml = chartData.map(r => {
-          const pct = parseFloat(r.pct);
-          const h   = Math.max(8, Math.round(pct * 0.6)); /* max ~60px pour 100% */
-          return `
-            <div class="chart-bar-wrap">
-              <span class="chart-bar-val">${Math.round(pct)}</span>
-              <div class="chart-bar" style="height:${h}px;background:${barColor(pct)}"></div>
-            </div>`;
-        }).join('');
-        document.getElementById('chart-bars').innerHTML = barsHtml;
-        document.getElementById('section-chart').style.display = '';
-      }
-
       /* ── Derniers exercices ── */
       const recent = results.slice(0, 5);
       const recentHtml = recent.map(r => {
@@ -790,11 +755,38 @@
       initLaurels(_profile.id);
     }
 
+    /* ── Carte "Mes exercices" (mode guidé uniquement) ───────────────────────
+       En mode libre (ou en cas d'échec de get_my_guided_access), la carte
+       n'est pas ajoutée au DOM. */
+    async function maybeRenderGuidedCard() {
+      if (typeof lfmGuidedAccess === 'undefined') return;
+      const access = await lfmGuidedAccess.get();
+      if (access.mode !== 'guide') return;
+
+      const grid = document.querySelector('.subject-cards-grid');
+      grid.classList.add('subject-cards-grid--guided');
+
+      const card = document.createElement('a');
+      card.href = 'exercices-prioritaires.html';
+      card.className = 'subject-card subject-card--guide';
+      card.innerHTML = `
+        <div class="subject-card__icon">
+          <img src="assets/prof.png?v=1" alt="Mes exercices">
+        </div>
+        <div class="subject-card__title">Mes exercices</div>
+        <div class="subject-card__desc">Sélectionnés par ton professeur</div>
+        <div class="subject-card__cta">Choisir un exercice →</div>
+      `;
+      grid.insertBefore(card, grid.firstChild);
+    }
+
     /* ── Initialisation ────────────────────────────────────────────────────── */
     (async () => {
       const profile = await lfmAuth.requireRole('eleve');
       if (!profile) return;
       _profile = profile;
+
+      maybeRenderGuidedCard();
 
       /* Déconnexion */
       document.getElementById('dash-logout-btn').addEventListener('click', () => {

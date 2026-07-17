@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes exercices — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css?v=11">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/guided-access.js?v=1"></script>
+  <script src="exercise-data.js?v=21"></script>
+  <style>
+    /* ── En-tête (illustration circulaire, cf. dashboard-eleve.html) ── */
+    .page-header-icon-circle {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: #603AAA;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+
+    .page-header-icon-circle img { width: 100%; height: 100%; object-fit: cover; }
+
+    .page-title-rule--guide { background: #603AAA; }
+
+    /* ── Sections par matière ── */
+    .priority-section { margin-bottom: 40px; }
+
+    .priority-section-title {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .priority-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .priority-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 16px 20px;
+      text-decoration: none;
+      transition: transform 150ms, box-shadow 150ms;
+    }
+
+    .priority-item:hover { transform: translateX(4px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+
+    .priority-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .priority-dot--francais      { background: var(--blue); }
+    .priority-dot--mathematiques { background: #F5A623; }
+
+    .priority-title { font-size: 14px; font-weight: 700; color: var(--text); }
+
+    .priority-arrow { margin-left: auto; color: var(--muted); font-size: 14px; }
+
+    /* ── État vide ── */
+    .empty-state {
+      text-align: center;
+      padding: 56px 24px;
+      color: var(--muted);
+      font-size: 15px;
+      display: none;
+    }
+
+    .empty-state.visible { display: block; }
+
+    #priority-container { display: none; }
+    #priority-container.visible { display: block; }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <!-- NAVBAR-PROFICIAMUS-CSS -->
+  <style>
+  /* ─── Navbar Proficiamus (extrait d'index.html) ─── */
+  body{padding-top:50px;}
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+  .navbar__inner{max-width:1400px;margin:0 auto;padding:0 64px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+  .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+  .navbar__brand img{height:34px;width:auto;}
+  .navbar__brand-text{display:flex;flex-direction:column;}
+  .navbar__name{font-size:18px;font-weight:800;line-height:1;letter-spacing:1px;}
+  .navbar__tagline{font-size:12px;font-style:italic;font-weight:700;color:#102B6A;margin-top:2px;}
+  .navbar__nav{display:flex;align-items:center;gap:24px;}
+  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-size:14px;font-weight:700;transition:color .2s;}
+  .navbar__nav a:hover{color:#1B4EBF;}
+  .navbar__nav a.active{color:#2D9C3C;border-bottom:2px solid #2D9C3C;padding-bottom:2px;}
+  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;}
+  .navbar__nav .btn-login{color:#fff!important;}
+  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+  .btn-login:hover{background:#0b1e4d;}
+  @media(max-width:768px){.navbar__inner{padding:0 24px;}.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <!-- MAIN -->
+  <div class="page-wrap">
+    <div class="page-content">
+
+      <a href="dashboard-eleve.html" class="back-link">← Espace élève</a>
+
+      <div class="page-header">
+        <div class="page-header-icon">
+          <div class="page-header-icon-circle">
+            <img src="assets/prof.png?v=1" alt="Mes exercices">
+          </div>
+        </div>
+        <h1 class="page-title">MES EXERCICES</h1>
+        <div class="page-title-rule page-title-rule--guide"></div>
+        <p class="page-subtitle">Sélectionnés par ton professeur</p>
+      </div>
+
+      <div id="priority-container">
+        <div class="priority-section" id="section-francais" style="display:none">
+          <div class="priority-section-title">Français</div>
+          <div class="priority-list" id="list-francais"></div>
+        </div>
+
+        <div class="priority-section" id="section-mathematiques" style="display:none">
+          <div class="priority-section-title">Mathématiques</div>
+          <div class="priority-list" id="list-mathematiques"></div>
+        </div>
+      </div>
+
+      <div class="empty-state" id="empty-state">
+        Ton professeur n'a pas encore ouvert d'exercices.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau – LFM &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="js/menu.js"></script>
+  <script>
+    /* ── Rendu de la liste, groupée par matière, ordre du catalogue ─────────── */
+    function renderPriorityList(activeSlugs) {
+      const lists = {
+        'Français':      document.getElementById('list-francais'),
+        'Mathématiques':  document.getElementById('list-mathematiques')
+      };
+      const sections = {
+        'Français':      document.getElementById('section-francais'),
+        'Mathématiques':  document.getElementById('section-mathematiques')
+      };
+
+      let found = 0;
+      const seen = new Set();
+
+      for (const slug of Object.keys(EXERCISE_DATA)) {
+        if (!activeSlugs.has(slug)) continue;
+        seen.add(slug);
+
+        const ex   = EXERCISE_DATA[slug];
+        const subj = ex.domaine === 'Mathématiques' ? 'Mathématiques' : 'Français';
+        const dotCls = subj === 'Mathématiques' ? 'priority-dot--mathematiques' : 'priority-dot--francais';
+
+        const item = document.createElement('a');
+        item.href = `exercise.html?slug=${encodeURIComponent(slug)}`;
+        item.className = 'priority-item';
+        item.innerHTML = `
+          <span class="priority-dot ${dotCls}"></span>
+          <span class="priority-title">${ex.title}</span>
+          <span class="priority-arrow">→</span>
+        `;
+        lists[subj].appendChild(item);
+        sections[subj].style.display = '';
+        found++;
+      }
+
+      for (const slug of activeSlugs) {
+        if (!seen.has(slug)) {
+          console.warn('[exercices-prioritaires] exercise_id absent de EXERCISE_DATA :', slug);
+        }
+      }
+
+      if (found > 0) {
+        document.getElementById('priority-container').classList.add('visible');
+      } else {
+        document.getElementById('empty-state').classList.add('visible');
+      }
+    }
+
+    /* ── Initialisation : accès réservé au mode guidé ────────────────────────
+       Élève en mode libre ou visiteur non connecté → renvoyé vers l'espace
+       élève plutôt que bloqué ici (cf. repli "libre" de lfmGuidedAccess). */
+    (async () => {
+      const session = await lfmAuth.getSession();
+      if (!session) { window.location.href = 'dashboard-eleve.html'; return; }
+
+      const profile = await lfmAuth.getProfile();
+      if (!profile || profile.role !== 'eleve') { window.location.href = 'dashboard-eleve.html'; return; }
+
+      const access = await lfmGuidedAccess.get();
+      if (access.mode !== 'guide') { window.location.href = 'dashboard-eleve.html'; return; }
+
+      renderPriorityList(access.activeSlugs);
+    })();
+  </script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

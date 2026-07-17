@@ -566,6 +566,45 @@ const lfmTeacher = (() => {
     return { students, bestByStudent };
   }
 
+  /* ── Résultats bruts d'une classe (Vue d'ensemble — module Résultats) ───────
+     Pagination par pages de 1000 lignes tant que la page est pleine, pour ne
+     pas tronquer silencieusement une classe volumineuse (30 élèves × 100+
+     résultats peut dépasser la limite implicite de 1000 de PostgREST). */
+  async function getClassResultsRaw(classId) {
+    const students = await getStudents(classId);
+    const authIds  = students.filter(s => s.auth_user_id).map(s => s.auth_user_id);
+    if (authIds.length === 0) return { students, results: [] };
+
+    const PAGE = 1000;
+    let offset  = 0;
+    let results = [];
+    while (true) {
+      const { data, error } = await db
+        .from('exercise_results')
+        .select('student_id, exercise_slug, exercise_title, level, score, total, pct, completed_at')
+        .in('student_id', authIds)
+        .order('completed_at', { ascending: false })
+        .range(offset, offset + PAGE - 1);
+      if (error) throw error;
+      results = results.concat(data || []);
+      if (!data || data.length < PAGE) break;
+      offset += PAGE;
+    }
+    return { students, results };
+  }
+
+  /* ── Résultats bruts d'un élève (fiche élève enrichie + bulletin) ─────────── */
+  async function getStudentResultsRaw(authUserId) {
+    const { data, error } = await db
+      .from('exercise_results')
+      .select('exercise_slug, exercise_title, level, score, total, pct, completed_at')
+      .eq('student_id', authUserId)
+      .order('completed_at', { ascending: false })
+      .limit(2000);
+    if (error) throw error;
+    return data || [];
+  }
+
   /* ── Résultats d'un élève ────────────────────────────────────────────────── */
 
   async function getStudentResults(authUserId, limit = 1000) {
@@ -613,11 +652,27 @@ const lfmTeacher = (() => {
       ? subjects.reduce((a, b) => a.avg >= b.avg ? a : b).subject
       : null;
 
-    // Dernières sessions pour le graphique (ordre chronologique)
-    const chartData = rows.slice(0, 15).reverse().map(r => ({
-      label: new Date(r.completed_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
-      pct:   parseFloat(r.pct)
-    }));
+    // Graphique d'évolution : un point par jour civil (heure locale, pas UTC —
+    // cohérent avec l'affichage `toLocaleDateString` du reste du site), moyenne
+    // de pct sur toutes les tentatives de ce jour. Les 15 derniers jours ayant
+    // une activité réelle, ordre chronologique ; pas de point à 0 pour les
+    // jours sans tentative (pas d'interpolation).
+    const byDay = new Map();
+    rows.forEach(r => {
+      const d   = new Date(r.completed_at);
+      const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      if (!byDay.has(key)) byDay.set(key, { date: d, sum: 0, count: 0 });
+      const agg = byDay.get(key);
+      agg.sum += parseFloat(r.pct);
+      agg.count++;
+    });
+    const chartData = Array.from(byDay.values())
+      .sort((a, b) => a.date - b.date)
+      .slice(-15)
+      .map(agg => ({
+        label: agg.date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
+        pct:   Math.round(agg.sum / agg.count)
+      }));
 
     return { total, avgPct, bestSubject, subjects, chartData, recent: rows.slice(0, 20) };
   }
@@ -673,7 +728,7 @@ const lfmTeacher = (() => {
     getClasses, createClass, updateClass, updateClassAccessMode, deleteClass,
     getStudents, getAllStudents, createStudent, createStudentsBulk, updateStudent,
     deleteStudent, moveStudent, resetStudentPassword,
-    getClassResults, getStudentResults, getStudentStats,
+    getClassResults, getClassResultsRaw, getStudentResults, getStudentResultsRaw, getStudentStats,
     getActiveExercises, addActiveExercise, removeActiveExercise,
     addActiveExercisesBulk, removeActiveExercisesBulk,
     getGroups, createGroup, updateGroup, deleteGroup, assignStudentToGroup,

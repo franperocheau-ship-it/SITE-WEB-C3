@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nombres entiers — Mathématiques — Lycée Français de Madrid</title>
+  <title>Probabilités — Mathématiques — Lycée Français de Madrid</title>
   <link rel="stylesheet" href="styles.css?v=12">
   <link rel="stylesheet" href="breadcrumb.css?v=1">
   <script src="js/breadcrumb.js?v=1"></script>
@@ -390,15 +390,15 @@
   <div class="page-wrap">
     <div class="page-content">
 
-      <script>Breadcrumb.render({ current: 'Nombres entiers' });</script>
+      <script>Breadcrumb.render({ current: 'Probabilités' });</script>
 
       <a href="mathématiques.html" class="back-link">← Mathématiques</a>
 
       <div class="page-header">
         <div class="page-header-icon">
-          <img src="assets/nombres-entiers.png" alt="Nombres entiers" />
+          <img src="assets/probabilites.png" alt="Probabilités" />
         </div>
-        <h1 class="page-title">NOMBRES ENTIERS</h1>
+        <h1 class="page-title">PROBABILITÉS</h1>
         <div class="page-title-rule"></div>
         <p class="page-subtitle">Choisis une notion à travailler.</p>
       </div>
@@ -459,78 +459,41 @@
 </footer>
 
   <script>
-    /* ── Data ──────────────────────────────────────────────────────────────── */
+    /* ── Data ──────────────────────────────────────────────────────────────────
+       Comme sur les autres pages de catégorie (ex. mathématiques-fractions) :
+       logique spiralaire du programme — une compétence introduite à un niveau
+       reste travaillée aux niveaux suivants. `entryLevel` est le niveau
+       d'entrée de la compétence ; les pastilles affichées sont la cascade de
+       ce niveau jusqu'à 6e (voir expandLevels ci-dessous, identique aux
+       autres pages). Sans rapport avec les ids internes niveau1/niveau2/
+       niveau3 du LevelSelect (exercise-data.js), qui restent une simple
+       progression de difficulté à l'intérieur de chaque compétence.
+    ────────────────────────────────────────────────────────────────────── */
     const SECTIONS = [
       {
-        id: "lire-ecrire",
-        emoji: "🔢",
-        title: "Lire et écrire les nombres",
+        id: "probabilites",
+        emoji: "🎲",
+        title: "Probabilités",
         subSections: [
           {
             label: null,
             skills: [
-              { title: "Écrire un nombre entier en chiffres",                               slug: "ecrire-nombre-entier-chiffres",          levels: ["CM1"] },
-              { title: "Écrire un nombre entier en lettres",                                slug: "ecrire-nombre-entier-lettres",           levels: ["CM1"] },
-              { title: "Passer de l'écriture en lettres à l'écriture chiffrée",             slug: "passer-lettres-chiffree",               levels: ["CM1"] },
-              { title: "Identifier la valeur d'un chiffre selon sa position",               slug: "identifier-valeur-chiffre-position",     levels: ["CM1"] },
-              { title: "Décomposer un nombre entier",                                       slug: "decomposer-nombre-entier",               levels: ["CM1", "CM2", "6e"] },
-              { title: "Composer un nombre à partir de sa décomposition",                   slug: "composer-nombre-entier",                levels: ["CM1", "CM2", "6e"] },
-            ]
-          }
-        ]
-      },
-      {
-        id: "comparer-ranger",
-        emoji: "⚖️",
-        title: "Comparer et ranger",
-        subSections: [
-          {
-            label: null,
-            skills: [
-              { title: "Comparer deux nombres entiers",                                     slug: "comparer-nombres-entiers",              levels: ["CM1", "CM2", "6e"] },
-              { title: "Ranger des nombres entiers",                                         slug: "ranger-nombres-entiers",                 levels: ["CM1", "CM2", "6e"] },
-              { title: "Encadrer un nombre entier",                                         slug: "encadrer-nombre-entier",                 levels: ["CM1", "CM2", "6e"] },
-            ]
-          }
-        ]
-      },
-      {
-        id: "representer",
-        emoji: "📍",
-        title: "Représenter les nombres",
-        subSections: [
-          {
-            label: null,
-            skills: [
-              { title: "Placer un nombre sur une droite graduée",                           slug: "droite-graduee-nombres-entiers",          levels: ["CM1", "CM2", "6e"] },
-            ]
-          }
-        ]
-      },
-      {
-        id: "approcher",
-        emoji: "🎯",
-        title: "Approcher un nombre",
-        subSections: [
-          {
-            label: null,
-            skills: [
-              { title: "Arrondir un nombre entier",                                          slug: "arrondir-nombre-entier",                 levels: ["CM1", "CM2", "6e"] },
-              { title: "Choisir l'arrondi adapté à la situation",                           slug: "arrondi-adapte-probleme",               levels: ["CM1", "CM2", "6e"] },
+              { title: "Utiliser l'expression « a chances sur b »",         slug: "probabilite-chances", entryLevel: "CM1" },
+              { title: "Dénombrer les issues possibles et favorables",      slug: "probabilite-issues",  entryLevel: "CM2" },
+              { title: "Exprimer la probabilité comme un nombre",           slug: "probabilite-nombre",  entryLevel: "6e"  },
             ]
           }
         ]
       }
     ];
 
-    /* ── Level inheritance: CM1 → CM1+CM2+6e, CM2 → CM2+6e, 6e → 6e ─────── */
-    function expandLevels(levels) {
+    /* ── Level inheritance: CM1→[CM1,CM2,6e]  CM2→[CM2,6e]  6e→[6e] ────────── */
+    function expandLevels(entryLevel) {
       const order = ["CM1", "CM2", "6e"];
-      const minIdx = Math.min(...levels.map(l => order.indexOf(l)));
-      return order.slice(minIdx);
+      return order.slice(order.indexOf(entryLevel));
     }
 
-    /* ── Badge rendering ───────────────────────────────────────────────────── */
+    /* ── Badge rendering ────────────────────────────────────────────────── */
     function renderBadges(levels) {
       return levels.map(level => {
         const cls = level === "CM1" ? "badge-cm1" : level === "CM2" ? "badge-cm2" : "badge-6e";
@@ -540,22 +503,14 @@
 
     /* Slugs qui ont une page d'exercice active */
     const EXERCISE_SLUGS = new Set([
-      "ecrire-nombre-entier-chiffres",
-      "ecrire-nombre-entier-lettres",
-      "identifier-valeur-chiffre-position",
-      "decomposer-nombre-entier",
-      "composer-nombre-entier",
-      "comparer-nombres-entiers",
-      "ranger-nombres-entiers",
-      "encadrer-nombre-entier",
-      "droite-graduee-nombres-entiers",
-      "arrondir-nombre-entier",
-      "arrondi-adapte-probleme"
+      "probabilite-chances",
+      "probabilite-issues",
+      "probabilite-nombre"
     ]);
 
     /* ── Skill card rendering ──────────────────────────────────────────────── */
     function renderSkillCard(skill, sectionId) {
-      const displayLevels = expandLevels(skill.levels);
+      const displayLevels = expandLevels(skill.entryLevel);
       const inCatalog     = EXERCISE_SLUGS.has(skill.slug);
       const isBlocked     = inCatalog && typeof lfmGuidedAccess !== 'undefined' && !lfmGuidedAccess.isAllowedSync(skill.slug);
       const hasExercise   = inCatalog && !isBlocked;

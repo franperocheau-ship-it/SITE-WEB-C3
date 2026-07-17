@@ -4,11 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grammaire — Français — Lycée Français de Madrid</title>
-  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="breadcrumb.css?v=1">
+  <script src="js/breadcrumb.js?v=1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/guided-access.js?v=1"></script>
+  <script src="exercise-data.js?v=21"></script>
+  <script src="js/skill-badges.js?v=1"></script>
   <style>
     /* ── Filter bar ─────────────────────────────────────────── */
     .filter-bar {
@@ -245,7 +249,7 @@
   /* ─── Navbar Proficiamus (extrait d'index.html) ─── */
   body{padding-top:50px;}
   .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
-  .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+  .navbar__inner{max-width:1400px;margin:0 auto;padding:0 64px;width:100%;display:flex;align-items:center;justify-content:space-between;}
   .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
   .navbar__brand img{height:34px;width:auto;}
   .navbar__brand-text{display:flex;flex-direction:column;}
@@ -259,7 +263,7 @@
   .navbar__nav .btn-login{color:#fff!important;}
   .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
   .btn-login:hover{background:#0b1e4d;}
-  @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+  @media(max-width:768px){.navbar__inner{padding:0 24px;}.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
   </style>
 </head>
 <body>
@@ -282,6 +286,8 @@
   <!-- MAIN -->
   <div class="page-wrap">
     <div class="page-content">
+
+      <script>Breadcrumb.render({ current: 'Grammaire' });</script>
 
       <a href="français.html" class="back-link">← Français</a>
 
@@ -551,6 +557,7 @@
         <a class="skill-card${lockedClass}"
            href="${href}"
            data-slug="${skill.slug}"
+           ${inCatalog ? `data-exercise-slug="${guidedExerciseId(skill)}"` : ""}
            data-levels="${skill.levels.join(",")}"
            data-title="${skill.title.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}"
            data-section="${sectionId}"
@@ -600,6 +607,7 @@
       document.getElementById("skills-container").innerHTML =
         SECTIONS.map(renderSection).join("");
       bindEvents();
+      if (typeof applySkillValidationBadges === 'function') applySkillValidationBadges();
     }
 
     /* ── Toggle section collapse ───────────────────────────────────────────── */
