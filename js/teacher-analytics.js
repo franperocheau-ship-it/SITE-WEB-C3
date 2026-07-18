@@ -23,28 +23,95 @@ const lfmAnalytics = (() => {
     title: null, levels: []
   };
 
+  /* Anciens slugs fusionnés en exercices progressifs (Lot 6, commit 3675639,
+     2026-07-15) : les résultats historiques enregistrés sous ces slugs n'ont
+     plus de correspondance directe dans EXERCISE_DATA. On les fait pointer
+     vers le domaine/compétence du nouvel exercice pour ne pas les perdre
+     dans "Autres" — mais sans reprendre ses levels/paliers (numérotation
+     incompatible avec l'ancien format flat/mono-niveau), donc ces lignes ne
+     contribuent pas aux jauges. */
+  const LEGACY_SLUG_ALIASES = {
+    'identifier-phrase-declarative':         'identifier-type-phrase',
+    'identifier-phrase-interrogative':       'identifier-type-phrase',
+    'identifier-phrase-imperative':          'identifier-type-phrase',
+    'identifier-phrase-exclamative':         'identifier-type-phrase',
+    'identifier-phrase-negative':            'identifier-type-phrase',
+    'transformer-declarative-interrogative': 'transformer-phrase',
+    'transformer-affirmative-negative':      'transformer-phrase',
+    'identifier-article-defini':             'articles-definis',
+    'articles-definis-choix':                'articles-definis',
+    'articles-definis-completer':            'articles-definis',
+    'identifier-article-indefini':           'articles-indefinis',
+    'articles-indefinis-premiere-rencontre': 'articles-indefinis',
+    'identifier-determinant-possessif':      'determinants-possessifs',
+    'possessifs-dans-phrases':               'determinants-possessifs',
+  };
+
+  /* Pages d'exercices autonomes (hors moteur exercise.html / catalogue
+     EXERCISE_DATA) dont l'exercise_slug n'a jamais existé dans le
+     catalogue — donc jamais résolu par catalogMap ni par
+     LEGACY_SLUG_ALIASES (qui ne fait que renommer un ancien slug de
+     catalogue vers un nouveau). Slugs fixes (exact) et préfixes
+     dynamiques (un slug par mot × par niveau, ex. ortho-son-sont-n2,
+     lex-xxx-n1 sur les pages ortho-distinguer-*.html / français-lexique.html
+     — voir grep "saveExerciseResult" *.html). */
+  const STANDALONE_META = {
+    exact: {
+      'identifier-verbe-conjugue':           { domaine: 'Français',      competence: 'Conjugaison — Identifier le verbe conjugué' },
+      'ecrire-fraction-sous-forme-decimale': { domaine: 'Mathématiques', competence: 'Nombres décimaux — Écrire une fraction sous forme décimale' },
+      'ecrire-decimal-sous-forme-fraction':  { domaine: 'Mathématiques', competence: 'Nombres décimaux — Écrire un décimal sous forme de fraction' },
+    },
+    prefixes: [
+      { prefix: 'ortho-', meta: { domaine: 'Français', competence: 'Orthographe — Homophones grammaticaux' } },
+      { prefix: 'lex-',   meta: { domaine: 'Français', competence: 'Vocabulaire' } },
+    ],
+  };
+
+  function standaloneMetaFor(slug) {
+    if (STANDALONE_META.exact[slug]) return STANDALONE_META.exact[slug];
+    const rule = STANDALONE_META.prefixes.find(r => slug.startsWith(r.prefix));
+    return rule ? rule.meta : null;
+  }
+
+  function splitCompetence(competence) {
+    const sep = competence.indexOf(' — ');
+    return {
+      sousDomaine: sep >= 0 ? competence.slice(0, sep)  : competence,
+      compLabel:   sep >= 0 ? competence.slice(sep + 3) : competence,
+    };
+  }
+
   /* ── Catalogue : slug → {domaine, competence, sousDomaine, compLabel, title, levels} ── */
   function buildCatalogMap() {
     const map = {};
     if (typeof EXERCISE_DATA === 'undefined') return map;
     Object.keys(EXERCISE_DATA).forEach(slug => {
-      const ex  = EXERCISE_DATA[slug];
-      const sep = ex.competence.indexOf(' — ');
+      const ex = EXERCISE_DATA[slug];
       map[slug] = {
-        domaine:     ex.domaine,
-        competence:  ex.competence,
-        sousDomaine: sep >= 0 ? ex.competence.slice(0, sep)  : ex.competence,
-        compLabel:   sep >= 0 ? ex.competence.slice(sep + 3) : ex.competence,
-        title:       ex.title || null,
-        levels:      ex.levels || [],
-        paliers:     ex.paliers
+        domaine:    ex.domaine,
+        competence: ex.competence,
+        ...splitCompetence(ex.competence),
+        title:      ex.title || null,
+        levels:     ex.levels || [],
+        paliers:    ex.paliers
       };
     });
     return map;
   }
 
   function metaFor(catalogMap, slug) {
-    return catalogMap[slug] || UNKNOWN_META;
+    if (catalogMap[slug]) return catalogMap[slug];
+    const aliasTarget = LEGACY_SLUG_ALIASES[slug] && catalogMap[LEGACY_SLUG_ALIASES[slug]];
+    if (aliasTarget) return { ...aliasTarget, levels: [], paliers: undefined };
+    const standalone = standaloneMetaFor(slug);
+    if (standalone) {
+      return {
+        domaine: standalone.domaine, competence: standalone.competence,
+        ...splitCompetence(standalone.competence),
+        title: null, levels: []
+      };
+    }
+    return UNKNOWN_META;
   }
 
   /* ── Dédoublonnage : meilleur pct par (élève × exercice) ─────────────────── */
@@ -118,6 +185,74 @@ const lfmAnalytics = (() => {
     return Array.from(map.values());
   }
 
+  /* ── Taux de réussite par sous-domaine (jauges — classe et élève) ─────────
+     Même méthodologie que les taux généraux : dédoublonnage par meilleur
+     score (élève × exercice), moyenne simple des pct sur le sous-domaine.
+     Retourne une Map "Domaine||SousDomaine" → { domaine, sousDomaine, avgPct }. */
+  function computeSousDomaineRates(rows, catalogMap) {
+    const best = dedupeBestBySlug(rows);
+    const agg = new Map();
+    best.forEach(r => {
+      const meta = metaFor(catalogMap, r.exercise_slug);
+      const key  = meta.domaine + '||' + meta.sousDomaine;
+      if (!agg.has(key)) agg.set(key, { domaine: meta.domaine, sousDomaine: meta.sousDomaine, sum: 0, count: 0 });
+      const a = agg.get(key);
+      a.sum += r.pct; a.count++;
+    });
+    const out = new Map();
+    agg.forEach((a, key) => out.set(key, { domaine: a.domaine, sousDomaine: a.sousDomaine, avgPct: Math.round(a.sum / a.count) }));
+    return out;
+  }
+
+  /* ── État par niveau (non travaillé / en cours / atteint) pour un ensemble
+     d'exercices catalogue sélectionné par `matchSlug(meta)` — factorisé pour
+     être utilisé à la fois pour la jauge domaine (jauges) et pour chaque
+     jauge sous-domaine (sousDomaineJauges, voir computeStudentProfile).
+     Dénominateur = exercices catalogue avec `levels` déclarés correspondant
+     au filtre ; numérateur = meilleur score ≥80% au niveau scolaire résolu
+     (voir resolveNiveau). */
+  function computeNiveauJauge(bestByNiveau, catalogMap, matchSlug) {
+    const expectedByLevel = {};
+    JAUGE_LEVELS.forEach(level => { expectedByLevel[level] = []; });
+    Object.keys(catalogMap).forEach(slug => {
+      const m = catalogMap[slug];
+      if (!matchSlug(m)) return;
+      (m.levels || []).forEach(level => {
+        if (expectedByLevel[level]) expectedByLevel[level].push(slug);
+      });
+    });
+
+    return JAUGE_LEVELS.map(level => {
+      const matching = bestByNiveau.filter(r =>
+        r.niveau === level && catalogMap[r.exercise_slug] && matchSlug(catalogMap[r.exercise_slug]));
+      const achieved  = new Set(matching.filter(r => r.pct >= SUCCESS_THRESHOLD).map(r => r.exercise_slug));
+      const attempted = new Set(matching.map(r => r.exercise_slug));
+      const denom = expectedByLevel[level].length;
+      const ratio = denom > 0 ? achieved.size / denom : 0;
+      /* "en cours" dès la 1ère tentative enregistrée, même sans réussite ≥80% —
+         "non travaillé" seulement en l'absence totale d'exercice fait à ce
+         niveau (voir discussion Objectif jauges sous-domaine, 2026-07-18). */
+      const status = denom === 0 ? 'non-concerne'
+        : ratio >= 0.7 ? 'atteint'
+        : (ratio >= 0.15 || attempted.size > 0) ? 'en-cours' /* TEMP test seuil : 0.3 → 0.15, à revenir en arrière après validation visuelle */
+        : 'non-travaille';
+      return { level, ratio, status, denom, achieved: achieved.size, attempted: attempted.size };
+    });
+  }
+
+  /* ── Nombre d'exercices distincts travaillés (même source/filtre que
+     computeNiveauJauge : bestByNiveau + catalogMap) — pour l'affichage
+     "N exercices" à côté du nom de sous-domaine, cohérent avec ce qui
+     alimente les segments plutôt qu'un comptage plus large (metaFor). */
+  function countExercisesTravailles(bestByNiveau, catalogMap, matchSlug) {
+    const slugs = new Set(
+      bestByNiveau
+        .filter(r => catalogMap[r.exercise_slug] && matchSlug(catalogMap[r.exercise_slug]))
+        .map(r => r.exercise_slug)
+    );
+    return slugs.size;
+  }
+
   /* ═══════════════════════════════════════════════════════════════════════════
      VUE CLASSE
   ═══════════════════════════════════════════════════════════════════════════ */
@@ -157,6 +292,21 @@ const lfmAnalytics = (() => {
       ? Math.round(perStudentAvgs.reduce((a, b) => a + b, 0) / perStudentAvgs.length)
       : null;
 
+    /* Même méthodologie que classAvg, restreinte à un domaine — moyenne des
+       moyennes par élève, pas moyenne brute. */
+    function classAvgForDomaine(domaine) {
+      const sums = new Map(), counts = new Map();
+      best.forEach(r => {
+        if (metaFor(catalogMap, r.exercise_slug).domaine !== domaine) return;
+        sums.set(r.student_id,   (sums.get(r.student_id)   || 0) + r.pct);
+        counts.set(r.student_id, (counts.get(r.student_id) || 0) + 1);
+      });
+      const avgs = Array.from(sums.keys()).map(sid => sums.get(sid) / counts.get(sid));
+      return avgs.length ? Math.round(avgs.reduce((a, b) => a + b, 0) / avgs.length) : null;
+    }
+    const classAvgFrancais = classAvgForDomaine('Français');
+    const classAvgMaths    = classAvgForDomaine('Mathématiques');
+
     /* ── Compétences (top 5 / bottom 5) ─────────────────────────────────────
        Seuil de 5 élèves appliqué aux deux classements pour éviter qu'une
        compétence travaillée par un seul élève ne fausse le résultat. */
@@ -179,64 +329,43 @@ const lfmAnalytics = (() => {
     const top5    = [...compList].sort((a, b) => b.avgPct - a.avgPct).slice(0, 5);
     const bottom5 = [...compList].sort((a, b) => a.avgPct - b.avgPct).slice(0, 5);
 
-    /* ── Exercices en difficulté ─────────────────────────────────────────────
-       score moyen / taux de réussite calculés sur les meilleurs scores
-       (mesure de maîtrise) ; "tentatives" reste le compte brut (volume de
-       pratique réel, avant maîtrise). */
-    const slugRawCount = new Map();
-    rows.forEach(r => slugRawCount.set(r.exercise_slug, (slugRawCount.get(r.exercise_slug) || 0) + 1));
-
-    const exAgg = new Map();
-    best.forEach(r => {
-      if (!exAgg.has(r.exercise_slug)) exAgg.set(r.exercise_slug, { sum: 0, count: 0, students: new Set(), success: 0 });
-      const agg = exAgg.get(r.exercise_slug);
-      agg.sum += r.pct; agg.count++; agg.students.add(r.student_id);
-      if (r.pct >= SUCCESS_THRESHOLD) agg.success++;
-    });
-    const exList = Array.from(exAgg.entries())
-      .filter(([, agg]) => agg.students.size >= MIN_STUDENTS_COMP)
-      .map(([slug, agg]) => {
-        const meta = metaFor(catalogMap, slug);
-        return {
-          slug,
-          title: meta.title || slug.replace(/-/g, ' '),
-          domaine: meta.domaine,
-          avgPct: Math.round(agg.sum / agg.count),
-          successRate: Math.round((agg.success / agg.count) * 100),
-          attempts: slugRawCount.get(slug) || agg.count
-        };
-      })
-      .sort((a, b) => a.avgPct - b.avgPct)
-      .slice(0, 8);
-
-    /* ── Heatmap domaines × activité ─────────────────────────────────────── */
-    const domAgg = new Map();
-    best.forEach(r => {
-      const meta = metaFor(catalogMap, r.exercise_slug);
-      if (!domAgg.has(meta.domaine)) domAgg.set(meta.domaine, { sum: 0, count: 0, students: new Set() });
-      const agg = domAgg.get(meta.domaine);
-      agg.sum += r.pct; agg.count++; agg.students.add(r.student_id);
-    });
-    const domRawCount = new Map();
+    /* ── Élèves en réussite / à attention particulière ────────────────────
+       Score composite = 50% taux de réussite global + 50% proportion de
+       compétences acquises (1 − compétences à consolider / compétences
+       travaillées, voir computeStudentProfile). Seuil d'activité minimal
+       pour être classé : un élève avec 1-2 résultats fausserait le
+       classement (moyenne non représentative). */
+    const MIN_ATTEMPTS_RANKING = 10;
+    const rowsByStudent = new Map();
     rows.forEach(r => {
-      const meta = metaFor(catalogMap, r.exercise_slug);
-      domRawCount.set(meta.domaine, (domRawCount.get(meta.domaine) || 0) + 1);
+      if (!rowsByStudent.has(r.student_id)) rowsByStudent.set(r.student_id, []);
+      rowsByStudent.get(r.student_id).push(r);
     });
-    const domaineKeys = DOMAIN_ORDER.filter(d => domAgg.has(d));
-    Array.from(domAgg.keys()).forEach(d => { if (!domaineKeys.includes(d)) domaineKeys.push(d); });
-    const heatmap = domaineKeys.map(domaine => {
-      const agg = domAgg.get(domaine);
-      return {
-        domaine,
-        exerciseCount: domRawCount.get(domaine) || 0,
-        avgPct: Math.round(agg.sum / agg.count),
-        studentPct: enrolledCount ? Math.round((agg.students.size / enrolledCount) * 100) : 0
-      };
+    const studentNames = new Map(students.map(s => [s.auth_user_id, s.display_name]));
+    const ranked = [];
+    rowsByStudent.forEach((studentRows, studentId) => {
+      if (studentRows.length < MIN_ATTEMPTS_RANKING) return;
+      const profile = computeStudentProfile(studentRows, catalogMap);
+      if (profile.rates.general === null || profile.totalCompetences === 0) return;
+      const notAcquiredRate = profile.consolider.length / profile.totalCompetences;
+      const compositeScore  = Math.round(0.5 * profile.rates.general + 0.5 * (100 * (1 - notAcquiredRate)));
+      ranked.push({
+        studentId,
+        name: studentNames.get(studentId) || '?',
+        avgPct: profile.rates.general,
+        notAcquiredCount: profile.consolider.length,
+        compositeScore
+      });
     });
+    const topStudents    = [...ranked].sort((a, b) => b.compositeScore - a.compositeScore).slice(0, 5);
+    const bottomStudents = [...ranked].sort((a, b) => a.compositeScore - b.compositeScore).slice(0, 5);
 
     return {
-      bandeau: { activeStudents7d, exercisesWeek, exercisesTotal, classAvg, staleStudents14d, enrolledCount },
-      top5, bottom5, exList, heatmap
+      bandeau: {
+        activeStudents7d, exercisesWeek, exercisesTotal, staleStudents14d, enrolledCount,
+        classAvg, classAvgFrancais, classAvgMaths
+      },
+      top5, bottom5, topStudents, bottomStudents
     };
   }
 
@@ -255,31 +384,26 @@ const lfmAnalytics = (() => {
        catalogue ou sans `levels` déclaré ne comptent dans aucun segment. */
     const jauges = {};
     DOMAIN_ORDER.forEach(domaine => {
-      const expectedByLevel = {};
-      JAUGE_LEVELS.forEach(level => { expectedByLevel[level] = []; });
-      Object.keys(catalogMap).forEach(slug => {
-        const m = catalogMap[slug];
-        if (m.domaine !== domaine) return;
-        (m.levels || []).forEach(level => {
-          if (expectedByLevel[level]) expectedByLevel[level].push(slug);
-        });
-      });
+      jauges[domaine] = computeNiveauJauge(bestByNiveau, catalogMap, m => m.domaine === domaine);
+    });
 
-      jauges[domaine] = JAUGE_LEVELS.map(level => {
-        const achieved = new Set(
-          bestByNiveau
-            .filter(r => r.niveau === level && r.pct >= SUCCESS_THRESHOLD && catalogMap[r.exercise_slug]?.domaine === domaine)
-            .map(r => r.exercise_slug)
-        );
-        const denom = expectedByLevel[level].length;
-        const ratio = denom > 0 ? achieved.size / denom : 0;
-        const status = denom === 0 ? 'non-concerne'
-          : ratio >= 0.7 ? 'atteint'
-          : ratio >= 0.15 ? 'en-cours' /* TEMP test seuil : 0.3 → 0.15, à revenir en arrière après validation visuelle */
-          : 'non-travaille';
-        return { level, ratio, status, denom, achieved: achieved.size };
+    /* ── Jauges de niveau par sous-domaine ─────────────────────────────────
+       Même logique que jauges (computeNiveauJauge), filtrée en plus sur le
+       sous-domaine. La liste des sous-domaines à calculer vient de
+       computeSousDomaineRates (ce que l'élève a réellement travaillé) —
+       pas du catalogue entier, pour ne pas afficher de jauge vide pour un
+       sous-domaine jamais abordé. */
+    const sousDomaineJauges = {};
+    computeSousDomaineRates(rows, catalogMap).forEach(({ domaine, sousDomaine }) => {
+      if (!sousDomaineJauges[domaine]) sousDomaineJauges[domaine] = [];
+      const matchFn = m => m.domaine === domaine && m.sousDomaine === sousDomaine;
+      sousDomaineJauges[domaine].push({
+        sousDomaine,
+        exerciseCount: countExercisesTravailles(bestByNiveau, catalogMap, matchFn),
+        segments: computeNiveauJauge(bestByNiveau, catalogMap, matchFn)
       });
     });
+    Object.values(sousDomaineJauges).forEach(list => list.sort((a, b) => a.sousDomaine.localeCompare(b.sousDomaine, 'fr')));
 
     /* ── Compétences à consolider / réussies ──────────────────────────────
        Consolider : moyenne <60% OU échec répété (≥2 tentatives sur un même
@@ -320,6 +444,15 @@ const lfmAnalytics = (() => {
     consolider.sort((a, b) => (b.hasRepeatedFailure - a.hasRepeatedFailure) || (a.avgPct - b.avgPct));
     reussies.sort((a, b) => b.avgPct - a.avgPct);
 
+    /* ── Taux de réussite général / par matière ───────────────────────────
+       Moyenne simple des meilleurs scores (un seul élève : pas de biais
+       "élève très actif" à corriger, contrairement à la classe). */
+    const generalAvg  = best.length ? Math.round(best.reduce((s, r) => s + r.pct, 0) / best.length) : null;
+    const francaisBest = best.filter(r => metaFor(catalogMap, r.exercise_slug).domaine === 'Français');
+    const mathsBest     = best.filter(r => metaFor(catalogMap, r.exercise_slug).domaine === 'Mathématiques');
+    const francaisAvg = francaisBest.length ? Math.round(francaisBest.reduce((s, r) => s + r.pct, 0) / francaisBest.length) : null;
+    const mathsAvg    = mathsBest.length ? Math.round(mathsBest.reduce((s, r) => s + r.pct, 0) / mathsBest.length) : null;
+
     /* ── Courbe d'activité : 8 fenêtres glissantes de 7 jours ─────────────── */
     const now = Date.now();
     const weekly = Array.from({ length: 8 }, (_, i) => ({ index: i, count: 0 }));
@@ -341,15 +474,17 @@ const lfmAnalytics = (() => {
     });
 
     return {
-      jauges, consolider, reussies, weekly, domSynthese,
+      jauges, sousDomaineJauges, consolider, reussies, weekly, domSynthese,
       totalReussis: best.filter(r => r.pct >= SUCCESS_THRESHOLD).length,
-      totalExercices: rows.length
+      totalExercices: rows.length,
+      totalCompetences: compAgg.size,
+      rates: { general: generalAvg, francais: francaisAvg, maths: mathsAvg }
     };
   }
 
   return {
     SUCCESS_THRESHOLD, JAUGE_LEVELS, DOMAIN_ORDER,
-    buildCatalogMap, dedupeBestBySlug,
+    buildCatalogMap, dedupeBestBySlug, computeSousDomaineRates,
     computeClassOverview, computeStudentProfile
   };
 })();

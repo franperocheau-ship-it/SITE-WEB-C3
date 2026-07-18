@@ -581,7 +581,7 @@ const lfmTeacher = (() => {
     while (true) {
       const { data, error } = await db
         .from('exercise_results')
-        .select('student_id, exercise_slug, exercise_title, level, score, total, pct, completed_at')
+        .select('student_id, exercise_slug, exercise_title, exercise_type, level, score, total, pct, completed_at')
         .in('student_id', authIds)
         .order('completed_at', { ascending: false })
         .range(offset, offset + PAGE - 1);
@@ -597,7 +597,7 @@ const lfmTeacher = (() => {
   async function getStudentResultsRaw(authUserId) {
     const { data, error } = await db
       .from('exercise_results')
-      .select('exercise_slug, exercise_title, level, score, total, pct, completed_at')
+      .select('exercise_slug, exercise_title, exercise_type, level, score, total, pct, completed_at')
       .eq('student_id', authUserId)
       .order('completed_at', { ascending: false })
       .limit(2000);

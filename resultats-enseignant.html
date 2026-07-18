@@ -6,11 +6,11 @@
   <title>Résultats — Espace enseignant — LFM</title>
   <link rel="stylesheet" href="styles.css?v=11">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=2"></script>
   <script src="js/teacher-analytics.js?v=2"></script>
+  <script src="js/level-badge.js?v=1"></script>
   <link rel="stylesheet" href="laurels.css?v=2">
   <script src="js/laurels.js?v=2"></script>
   <style>
@@ -214,21 +214,6 @@
     }
     .stat-unit { font-size: 14px; font-weight: 600; color: var(--muted); margin-left: 4px; }
 
-    /* Charts */
-    .charts-row {
-      display: grid; grid-template-columns: 2fr 1fr;
-      gap: 16px; margin-bottom: 20px;
-    }
-    .chart-card {
-      background: var(--card-bg); border-radius: var(--radius-card);
-      box-shadow: var(--shadow-sm); padding: 22px 24px;
-    }
-    .chart-card-title {
-      font-size: 12px; font-weight: 700; color: var(--blue);
-      letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 16px;
-    }
-    .chart-wrap { position: relative; }
-
     /* History table */
     .history-card {
       background: var(--card-bg); border-radius: var(--radius-card);
@@ -261,12 +246,11 @@
     }
 
     @media (max-width: 600px) {
-      .stats-row-3    { grid-template-columns: 1fr 1fr; }
-      .charts-row     { grid-template-columns: 1fr; }
+      .stats-row-3, .stats-row-4 { grid-template-columns: 1fr 1fr; }
       .result-table td, .result-table th { padding: 10px 12px; }
     }
     @media (max-width: 400px) {
-      .stats-row-3    { grid-template-columns: 1fr; }
+      .stats-row-3, .stats-row-4 { grid-template-columns: 1fr; }
     }
 
     /* ── Tabs ───────────────────────────────────────────────────────────────── */
@@ -380,24 +364,47 @@
     .comp-bar-fill.up   { background: #1DBFA0; }
     .comp-bar-fill.down { background: #E0765C; }
 
-    .heatmap-row {
-      display: grid; grid-template-columns: 1.4fr 0.8fr 0.9fr 1.2fr;
-      align-items: center; gap: 10px; padding: 10px 0;
-      border-bottom: 1px solid var(--border); font-size: 13px;
-    }
-    .heatmap-row:last-child { border-bottom: none; }
-    .heatmap-domaine { font-weight: 700; color: var(--blue); }
-    .heatmap-pastille {
-      display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 12.5px;
-    }
-    .heatmap-pastille .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-    .heatmap-dot-good { background: #1DBFA0; }
-    .heatmap-dot-mid  { background: #F5A623; }
-    .heatmap-dot-low  { background: #E0765C; }
-    .heatmap-progress-track { background: var(--bg); border-radius: 100px; height: 6px; overflow: hidden; }
-    .heatmap-progress-fill { height: 100%; border-radius: 100px; background: var(--blue); }
-
     .empty-inline { color: var(--muted); font-size: 13px; padding: 8px 0; }
+
+    /* ── Élèves en réussite / à attention particulière ───────────────────────── */
+    .student-rank-list { display: flex; flex-direction: column; gap: 8px; }
+    .student-rank-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 10px; cursor: pointer;
+      transition: background 150ms;
+    }
+    .student-rank-row:hover { background: rgba(16,43,106,0.04); }
+    .student-rank-num {
+      width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; background: var(--bg); color: var(--muted);
+    }
+    .student-rank-name { flex: 1; font-weight: 600; font-size: 13.5px; color: var(--text); }
+    .student-rank-meta { font-size: 11.5px; color: var(--muted); }
+    .student-rank-pct { font-weight: 700; font-size: 13px; }
+
+    /* ── Jauge de taux de réussite par sous-domaine ──────────────────────────── */
+    .subdom-gauge-row { margin-bottom: 10px; }
+    .subdom-gauge-row:last-child { margin-bottom: 0; }
+    .subdom-gauge-label {
+      display: flex; justify-content: space-between; gap: 8px;
+      font-size: 12.5px; font-weight: 600; color: var(--text); margin-bottom: 4px;
+    }
+    .subdom-gauge-label .n { color: var(--muted); font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .subdom-gauge-track { background: var(--bg); border-radius: 100px; height: 8px; overflow: hidden; }
+    .subdom-gauge-fill { height: 100%; border-radius: 100px; background: var(--blue); }
+
+    /* ── Sous-domaine repliable (Bilan par compétence) ───────────────────────── */
+    .bilan-sous-domaine-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px 6px; cursor: pointer; user-select: none;
+    }
+    .bilan-sous-domaine-header:hover .bilan-sous-domaine-title { color: var(--blue); }
+    .bilan-sous-domaine-header .bilan-sous-domaine-title { padding: 0; flex: 1; }
+    .bilan-sous-domaine-header .subdom-gauge-row { flex: 1; margin-bottom: 0; }
+    .bilan-sous-domaine-chevron { color: var(--muted); font-size: 14px; transition: transform 200ms; flex-shrink: 0; }
+    .bilan-sous-domaine.closed .bilan-sous-domaine-chevron { transform: rotate(-90deg); }
+    .bilan-sous-domaine.closed .bilan-competence { display: none; }
 
     /* ── Fiche élève : rang lauriers + compétences à consolider ─────────────── */
     .student-rank-line {
@@ -420,7 +427,12 @@
     /* ── Jauges de niveau (3 segments) ───────────────────────────────────────── */
     .jauge-domaine { margin-bottom: 18px; }
     .jauge-domaine:last-child { margin-bottom: 0; }
-    .jauge-domaine-title { font-weight: 800; font-size: 14px; color: var(--blue); margin-bottom: 10px; }
+    .jauge-domaine-title {
+      display: inline-block;
+      font-weight: 800; font-size: 14px; color: #fff; margin-bottom: 10px;
+      text-transform: uppercase; letter-spacing: 0.03em;
+      background: var(--blue); padding: 4px 12px; border-radius: 6px;
+    }
     .jauge-segments { display: flex; gap: 6px; }
     .jauge-segment { flex: 1; text-align: center; }
     .jauge-segment-bar {
@@ -434,48 +446,36 @@
     }
     .jauge-segment-bar.non-travaille { background: #E7ECF3; }
     .jauge-segment-bar.non-concerne  { background: #F1F3F7; }
+
+    /* Jauges sous-domaine : même composant, palette turquoise pour se
+       distinguer du navy réservé à la jauge générale du domaine. */
+    .jauge-sousdomaine-block .jauge-segment-bar.atteint  { background: #1DBFA0; }
+    .jauge-sousdomaine-block .jauge-segment-bar.en-cours {
+      background: repeating-linear-gradient(45deg, #1DBFA0, #1DBFA0 5px, #C2ECE0 5px, #C2ECE0 10px);
+      opacity: 0.75;
+    }
     .jauge-segment-label { font-size: 11px; font-weight: 700; color: var(--muted); }
     .jauge-segment-status { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
 
-    /* ── Courbe d'activité 8 semaines ─────────────────────────────────────────── */
-    .activity-bars { display: flex; align-items: flex-end; gap: 6px; height: 90px; }
-    .activity-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
-    .activity-bar { width: 100%; max-width: 26px; background: var(--blue); border-radius: 4px 4px 0 0; min-height: 2px; }
-    .activity-bar-label { font-size: 9.5px; color: var(--muted); }
+    /* Jauges de niveau par sous-domaine — hiérarchie en arborescence : un seul
+       séparateur au-dessus du groupe, puis un connecteur vertical + retrait +
+       typo plus légère pour chaque sous-domaine (le domaine reste seul en
+       navy gras, inchangé). */
+    .jauge-sousdomaines { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .jauge-sousdomaine-block {
+      padding-left: 20px; margin-bottom: 12px;
+      border-left: 2px solid #E0E4F0;
+    }
+    .jauge-sousdomaine-block:last-child { margin-bottom: 0; }
+    .jauge-sousdomaine-title {
+      display: flex; align-items: center; gap: 6px;
+      font-weight: 600; font-size: 12px; color: var(--text); margin-bottom: 8px;
+    }
+    .jauge-sousdomaine-title::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: #1DBFA0; flex-shrink: 0;
+    }
 
-    /* ── Modale bulletin (motif repris de classes-enseignant.html) ──────────── */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(16,43,106,0.35);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 200; padding: 20px;
-    }
-    .modal {
-      background: var(--card-bg); border-radius: var(--radius-card);
-      box-shadow: var(--shadow-md); width: 100%; max-width: 480px;
-      max-height: 90vh; overflow-y: auto;
-    }
-    .modal-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 20px 24px; border-bottom: 1px solid var(--border);
-    }
-    .modal-title { font-weight: 800; font-size: 17px; color: var(--blue); }
-    .modal-close {
-      background: none; border: none; font-size: 22px; color: var(--muted);
-      cursor: pointer; line-height: 1; padding: 4px;
-    }
-    .modal-close:hover { color: var(--red); background: rgba(214,40,57,0.07); border-radius: 6px; }
-    .modal-body { padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 16px; }
-    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; padding-top: 4px; }
-    .form-label { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px; display: block; }
-    .form-input, .form-textarea {
-      width: 100%; padding: 10px 12px; border-radius: 10px;
-      border: 1.5px solid var(--border); font-family: inherit; font-size: 13.5px;
-      background: var(--bg); color: var(--text);
-    }
-    .form-textarea { resize: vertical; min-height: 80px; }
-    .preset-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-    .date-row { display: flex; gap: 10px; }
-    .date-row > div { flex: 1; }
 
     /* ── Bulletin imprimé — refonte : une page A4, lisible par un parent
        en 10 secondes. Couleurs volontairement en dur (pas de var(--...))
@@ -538,28 +538,18 @@
     .bulletin-box h5 { font-size: 9pt; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 7px; font-weight: 800; }
     .bulletin-box ul { margin: 0; padding-left: 16px; font-size: 9.5pt; line-height: 1.55; }
 
-    /* 5. Observations */
-    .bulletin-observations {
-      border: 1px solid #E8EDF3; border-radius: 10px; padding: 10px 14px;
-      margin-bottom: 16px;
-    }
-    .bulletin-observations .bo-label {
-      font-size: 8pt; text-transform: uppercase; letter-spacing: .04em;
-      color: #5F6368; font-weight: 800; margin-bottom: 4px;
-    }
-    .bulletin-observations .bo-text { font-size: 9.5pt; font-style: italic; color: #444; white-space: pre-wrap; }
-
-    /* 6. Pied de page */
+    /* 5. Pied de page */
     .bulletin-footer {
       font-size: 7.5pt; color: #9AA3B2; text-align: center;
       border-top: 1px solid #E8EDF3; padding-top: 8px;
     }
 
-    /* Repli si beaucoup de domaines (catalogue futur) : tout doit tenir sur
-       une page — on réduit uniformément tailles et espacements. */
-    .bulletin-page.bulletin-compact { font-size: 90%; }
-    .bulletin-page.bulletin-compact .bulletin-jauge-row { margin-bottom: 4px; }
-    .bulletin-page.bulletin-compact .bulletin-stat .bs-value { font-size: 15pt; }
+    /* Sous-domaine : ligne indentée et plus discrète que le domaine parent */
+    .bulletin-jauge-row--sub { margin-left: 16px; }
+    .bulletin-jauge-row--sub .bj-domaine { font-weight: 600; font-size: 8.5pt; color: #5F6368; width: 104px; }
+    .bulletin-jauge-row, .bulletin-boxes, .bulletin-laurels { break-inside: avoid; }
+    .bulletin-jauges--break { break-before: page; }
+    .bulletin-laurels { text-align: center; margin-bottom: 18px; }
 
     body.printing-bulletin #bulletin-print-root { display: block !important; }
     @media print {
@@ -571,11 +561,11 @@
       }
       body.printing-bulletin .header, body.printing-bulletin footer,
       body.printing-bulletin nav.breadcrumb, body.printing-bulletin .main-tabs,
-      body.printing-bulletin .student-header, body.printing-bulletin .stats-row-3,
-      body.printing-bulletin .charts-row, body.printing-bulletin #student-bilan,
-      body.printing-bulletin #student-consolider, body.printing-bulletin #student-jauges,
-      body.printing-bulletin #student-activity, body.printing-bulletin .nav-footer,
-      body.printing-bulletin .navbar, body.printing-bulletin .modal-overlay {
+      body.printing-bulletin .student-header, body.printing-bulletin .stats-row-4,
+      body.printing-bulletin #laurels-root, body.printing-bulletin #student-bilan,
+      body.printing-bulletin #student-consolider, body.printing-bulletin #student-reussies,
+      body.printing-bulletin #student-jauges, body.printing-bulletin .nav-footer,
+      body.printing-bulletin .navbar {
         display: none !important;
       }
       body.printing-bulletin .dash-wrap    { padding: 0; background: #fff; min-height: unset; }
@@ -733,30 +723,28 @@
             <div class="student-rank-line" id="student-rank-line"></div>
           </div>
           <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-outline btn-sm" id="bulletin-btn" style="display:none"
-              onclick="openBulletinModal()">📋 Générer le bulletin</button>
             <button class="btn btn-ghost btn-sm" id="print-student-btn" style="display:none"
               onclick="printStudentBilan()">📄 Synthèse PDF</button>
           </div>
         </div>
 
-        <div class="stats-row-3" id="student-stats-row"></div>
+        <!-- Couronne de lauriers (même composant que côté élève) — layout
+             2 colonnes propre à cette page, voir .laurel-context-teacher
+             dans laurels.css -->
+        <div id="laurels-root" class="laurel-context-teacher"></div>
 
-        <div class="charts-row">
-          <div class="chart-card">
-            <div class="chart-card-title">Évolution des scores</div>
-            <div class="chart-wrap" style="height:200px"><canvas id="chart-line"></canvas></div>
-          </div>
-          <div class="chart-card">
-            <div class="chart-card-title">Par matière</div>
-            <div class="chart-wrap" style="height:200px"><canvas id="chart-donut"></canvas></div>
-          </div>
-        </div>
+        <div class="stats-row-4" id="student-stats-row"></div>
 
-        <!-- Compétences à consolider -->
-        <div class="overview-card" id="student-consolider" style="margin-bottom:20px;display:none">
-          <div class="overview-card-title">Compétences à consolider</div>
-          <div class="consolider-list" id="consolider-list"></div>
+        <!-- Compétences à consolider / réussies -->
+        <div class="overview-grid" style="margin-bottom:20px">
+          <div class="overview-card" id="student-consolider" style="display:none">
+            <div class="overview-card-title">Compétences à consolider</div>
+            <div class="consolider-list" id="consolider-list"></div>
+          </div>
+          <div class="overview-card" id="student-reussies" style="display:none">
+            <div class="overview-card-title">Compétences réussies</div>
+            <div class="consolider-list" id="reussies-list"></div>
+          </div>
         </div>
 
         <!-- Jauges de niveau par domaine -->
@@ -765,59 +753,18 @@
           <div id="jauges-content"></div>
         </div>
 
-        <!-- Courbe d'activité (8 dernières semaines) -->
-        <div class="overview-card" id="student-activity" style="margin-bottom:20px;display:none">
-          <div class="overview-card-title">Activité — 8 dernières semaines</div>
-          <div class="activity-bars" id="activity-bars"></div>
-        </div>
-
         <!-- Bilan par compétence (détail) -->
-        <div id="student-bilan" style="margin-top:4px">
-          <div class="view-loading">Chargement du bilan…</div>
+        <div style="margin-top:4px">
+          <div class="overview-card-title">Bilan par compétences</div>
+          <div id="student-bilan">
+            <div class="view-loading">Chargement du bilan…</div>
+          </div>
         </div>
 
         <div class="nav-footer" id="student-nav-footer"></div>
       </div>
 
-      <!-- ── Modale bulletin ────────────────────────────────────────────────── -->
-      <div class="modal-overlay" id="bulletin-modal-overlay" style="display:none">
-        <div class="modal">
-          <div class="modal-header">
-            <h2 class="modal-title">Générer le bulletin</h2>
-            <button class="modal-close" onclick="closeBulletinModal()" aria-label="Fermer">×</button>
-          </div>
-          <div class="modal-body">
-            <div>
-              <label class="form-label">Période</label>
-              <div class="preset-row">
-                <button type="button" class="btn btn-outline btn-sm" onclick="applyBulletinPreset('s1')">Semestre 1</button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="applyBulletinPreset('s2')">Semestre 2</button>
-              </div>
-              <div class="date-row">
-                <div>
-                  <label class="form-label">Du</label>
-                  <input type="date" class="form-input" id="bulletin-date-start">
-                </div>
-                <div>
-                  <label class="form-label">Au</label>
-                  <input type="date" class="form-input" id="bulletin-date-end">
-                </div>
-              </div>
-            </div>
-            <div>
-              <label class="form-label">Observations de l'enseignant</label>
-              <textarea class="form-textarea" id="bulletin-observations"
-                placeholder="Remarques facultatives, non enregistrées — saisies au moment de la génération."></textarea>
-            </div>
-          </div>
-          <div class="modal-footer" style="padding:0 24px 24px">
-            <button class="btn btn-ghost btn-sm" onclick="closeBulletinModal()">Annuler</button>
-            <button class="btn btn-outline btn-sm" onclick="generateBulletin()">📄 Générer et imprimer</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── Contenu imprimé du bulletin (rempli dynamiquement) ───────────────── -->
+      <!-- ── Contenu imprimé de la synthèse (rempli dynamiquement) ───────────── -->
       <div id="bulletin-print-root"></div>
 
     </div>
@@ -852,7 +799,6 @@
   let _classes        = [];
   let _currentClass   = null;   // { id, name, level, school_year, student_count }
   let _currentStudent = null;   // { auth_user_id, display_name, class_name }
-  let _charts         = {};
   let _bilanLoaded    = false;
   let _bilanClassId   = null;
   let _overviewLoaded   = false;
@@ -1047,7 +993,7 @@
       }
 
       const ov = lfmAnalytics.computeClassOverview(results, students, _catalogMap);
-      container.innerHTML = renderOverviewHtml(ov);
+      container.innerHTML = renderOverviewHtml(ov, classId);
       _overviewLoaded = true;
     } catch (e) {
       container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Erreur lors du chargement de la vue d\'ensemble.</div></div>';
@@ -1055,9 +1001,30 @@
     }
   }
 
-  function renderOverviewHtml(ov) {
+  function renderOverviewHtml(ov, classId) {
     const b = ov.bandeau;
-    let html = `<div class="stats-row-4">
+    const p      = new URLSearchParams(window.location.search);
+    const cname  = p.get('cname')  || '';
+    const clevel = p.get('clevel') || '';
+    const cyear  = p.get('cyear')  || '';
+    const rateVal = v => v !== null ? v : '—';
+    const rateUnit = v => v !== null ? '%' : '';
+    let html = `<div class="stats-row-3" style="margin-bottom:12px">
+      <div class="stat-card">
+        <div class="stat-label">Taux de réussite général</div>
+        <div class="stat-value">${rateVal(b.classAvg)}<span class="stat-unit">${rateUnit(b.classAvg)}</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Taux de réussite français</div>
+        <div class="stat-value">${rateVal(b.classAvgFrancais)}<span class="stat-unit">${rateUnit(b.classAvgFrancais)}</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Taux de réussite maths</div>
+        <div class="stat-value">${rateVal(b.classAvgMaths)}<span class="stat-unit">${rateUnit(b.classAvgMaths)}</span></div>
+      </div>
+    </div>`;
+
+    html += `<div class="stats-row-3">
       <div class="stat-card">
         <div class="stat-label">Actifs (7 derniers jours)</div>
         <div class="stat-value">${b.activeStudents7d}<span class="stat-unit">/ ${b.enrolledCount}</span></div>
@@ -1066,13 +1033,37 @@
         <div class="stat-label">Exercices (semaine / total)</div>
         <div class="stat-value" style="font-size:24px">${b.exercisesWeek} <span class="stat-unit">/ ${b.exercisesTotal}</span></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Score moyen classe</div>
-        <div class="stat-value">${b.classAvg !== null ? b.classAvg : '—'}<span class="stat-unit">${b.classAvg !== null ? '%' : ''}</span></div>
-      </div>
       <div class="stat-card ${b.staleStudents14d > 0 ? 'stat-alert' : ''}">
         <div class="stat-label">Sans activité (14j+)</div>
         <div class="stat-value">${b.staleStudents14d}</div>
+      </div>
+    </div>`;
+
+    const studentRankRow = (s, i) => `
+      <div class="student-rank-row" onclick="navigate({
+        view:'eleve', student:'${escJs(s.studentId)}',
+        sname:encodeURIComponent('${escJs(s.name)}'),
+        cname:'${cname}', clevel:'${escJs(clevel)}', cyear:'${cyear}',
+        class:'${classId}'
+      })">
+        <div class="student-rank-num">${i + 1}</div>
+        <div>
+          <div class="student-rank-name">${escHtml(s.name)}</div>
+          <div class="student-rank-meta">${s.notAcquiredCount} compétence${s.notAcquiredCount > 1 ? 's' : ''} à consolider</div>
+        </div>
+        <div class="student-rank-pct" style="color:${s.avgPct >= 70 ? '#15803d' : s.avgPct >= 50 ? '#a16207' : 'var(--red)'}">${s.avgPct}%</div>
+      </div>`;
+
+    html += `<div class="overview-grid">
+      <div class="overview-card">
+        <div class="overview-card-title">Élèves en réussite</div>
+        ${ov.topStudents.length ? `<div class="student-rank-list">${ov.topStudents.map(studentRankRow).join('')}</div>`
+          : '<div class="empty-inline">Pas assez de données (min. 10 exercices par élève).</div>'}
+      </div>
+      <div class="overview-card">
+        <div class="overview-card-title">Élèves à attention particulière</div>
+        ${ov.bottomStudents.length ? `<div class="student-rank-list">${ov.bottomStudents.map(studentRankRow).join('')}</div>`
+          : '<div class="empty-inline">Pas assez de données (min. 10 exercices par élève).</div>'}
       </div>
     </div>`;
 
@@ -1092,50 +1083,6 @@
         ${ov.bottom5.length ? ov.bottom5.map(c => compBar(c, 'down')).join('') : '<div class="empty-inline">Pas assez de données (min. 5 élèves par compétence).</div>'}
       </div>
     </div>`;
-
-    html += `<div class="overview-card" style="margin-bottom:20px">
-      <div class="overview-card-title">Exercices en difficulté</div>`;
-    if (ov.exList.length === 0) {
-      html += '<div class="empty-inline">Pas assez de données (min. 5 élèves par exercice).</div>';
-    } else {
-      html += `<div class="table-wrap" style="border-radius:8px">
-        <table class="result-table">
-          <thead><tr><th>Exercice</th><th>Domaine</th><th>Score moyen</th><th>Réussite ≥80%</th><th>Tentatives</th></tr></thead>
-          <tbody>${ov.exList.map(e => {
-            const t = e.title.charAt(0).toUpperCase() + e.title.slice(1);
-            const pillCls = e.avgPct >= 70 ? 'score-high' : e.avgPct >= 50 ? 'score-mid' : 'score-low';
-            return `<tr style="cursor:pointer" onclick="window.open('exercise.html?slug=${encodeURIComponent(e.slug)}','_blank')">
-              <td style="font-weight:600">${escHtml(t)}</td>
-              <td style="color:var(--muted);font-size:13px">${escHtml(e.domaine)}</td>
-              <td><span class="score-pill ${pillCls}">${e.avgPct}%</span></td>
-              <td>${e.successRate}%</td>
-              <td style="color:var(--muted)">${e.attempts}</td>
-            </tr>`;
-          }).join('')}</tbody>
-        </table>
-      </div>`;
-    }
-    html += `</div>`;
-
-    html += `<div class="overview-card">
-      <div class="overview-card-title">Heatmap domaines × activité</div>`;
-    if (ov.heatmap.length === 0) {
-      html += '<div class="empty-inline">Aucune donnée.</div>';
-    } else {
-      html += ov.heatmap.map(h => {
-        const dotCls = h.avgPct >= 80 ? 'heatmap-dot-good' : h.avgPct >= 60 ? 'heatmap-dot-mid' : 'heatmap-dot-low';
-        return `<div class="heatmap-row">
-          <div class="heatmap-domaine">${escHtml(h.domaine)}</div>
-          <div>${h.exerciseCount} exercice${h.exerciseCount > 1 ? 's' : ''}</div>
-          <div class="heatmap-pastille"><span class="dot ${dotCls}"></span>${h.avgPct}%</div>
-          <div>
-            <div class="heatmap-progress-track"><div class="heatmap-progress-fill" style="width:${h.studentPct}%"></div></div>
-            <div style="font-size:11px;color:var(--muted);margin-top:3px">${h.studentPct}% des élèves</div>
-          </div>
-        </div>`;
-      }).join('');
-    }
-    html += `</div>`;
 
     return html;
   }
@@ -1164,7 +1111,7 @@
 
       const { data, error } = await window.lfmDb
         .from('exercise_results')
-        .select('student_id, exercise_slug, exercise_title, level, score, total, pct, completed_at')
+        .select('student_id, exercise_slug, exercise_title, exercise_type, level, score, total, pct, completed_at')
         .in('student_id', authIds)
         .order('completed_at', { ascending: false });
 
@@ -1183,8 +1130,12 @@
         return;
       }
 
+      /* Jauges de taux de réussite par sous-domaine (même calcul que les taux
+         généraux/français/maths — meilleur score par élève × exercice) */
+      await loadCatalogAssets();
+      const sousDomaineRates = lfmAnalytics.computeSousDomaineRates(data, _catalogMap);
+
       /* Grouper domaine → compétence → niveau */
-      const LEVEL_ORDER  = ['CE2', 'CM1', 'CM2', '6e'];
       const DOMAIN_ORDER = ['Français', 'Mathématiques'];
       const byDomaine    = {};
 
@@ -1203,7 +1154,7 @@
         if (!byDomaine[domaine][sousDomaine][compLabel])           byDomaine[domaine][sousDomaine][compLabel] = {};
         if (!byDomaine[domaine][sousDomaine][compLabel][level])    byDomaine[domaine][sousDomaine][compLabel][level] = [];
         byDomaine[domaine][sousDomaine][compLabel][level].push({
-          name: studentName, exTitle,
+          name: studentName, exTitle, exerciseType: r.exercise_type,
           score: r.score, total: r.total,
           pct: parseFloat(r.pct), date: r.completed_at
         });
@@ -1232,8 +1183,18 @@
           <div class="bilan-domaine-body">`;
 
         Object.entries(sousDomaineMap).forEach(([sousDomaine, comps]) => {
-          html += `<div class="bilan-sous-domaine">
-            <div class="bilan-sous-domaine-title">${escHtml(sousDomaine)}</div>`;
+          const rate = sousDomaineRates.get(domaine + '||' + sousDomaine);
+          const gaugeHtml = rate ? `
+            <div class="subdom-gauge-row">
+              <div class="subdom-gauge-label"><span>${escHtml(sousDomaine)}</span><span class="n">${rate.avgPct}%</span></div>
+              <div class="subdom-gauge-track"><div class="subdom-gauge-fill" style="width:${rate.avgPct}%"></div></div>
+            </div>` : `<div class="bilan-sous-domaine-title" style="padding:0">${escHtml(sousDomaine)}</div>`;
+
+          html += `<div class="bilan-sous-domaine" data-sous-domaine="${escHtml(sousDomaine)}">
+            <div class="bilan-sous-domaine-header" onclick="toggleSousDomaine(this)">
+              ${gaugeHtml}
+              <span class="bilan-sous-domaine-chevron">▾</span>
+            </div>`;
 
           Object.entries(comps).forEach(([compLabel, levels]) => {
             const compKey = encodeURIComponent(domaine + '||' + sousDomaine + '||' + compLabel);
@@ -1244,16 +1205,17 @@
                   onclick="printCompetence(this)">📄 PDF</button>
               </div>`;
 
+            const levelIndex = level => lfmLevelBadge.resolveIndex(level === '—' ? null : level, levels[level][0]?.exerciseType);
             const sortedLevels = Object.keys(levels).sort((a, b) => {
-              const ia = LEVEL_ORDER.indexOf(a), ib = LEVEL_ORDER.indexOf(b);
-              return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+              const ia = levelIndex(a), ib = levelIndex(b);
+              return (ia == null ? 99 : ia) - (ib == null ? 99 : ib);
             });
 
             sortedLevels.forEach(level => {
-              const items    = levels[level];
-              const levelCls = { CM1: 'badge-cm1', CM2: 'badge-cm2', '6e': 'badge-6e' }[level] || 'badge-cm1';
+              const items      = levels[level];
+              const levelBadge = lfmLevelBadge.html(level === '—' ? null : level, items[0]?.exerciseType);
               html += `<div class="bilan-level-block">
-                <span class="badge ${levelCls}" style="margin-bottom:8px;display:inline-block">${escHtml(level)}</span>
+                <span style="margin-bottom:8px;display:inline-block">${levelBadge || `<span class="badge" style="background:var(--border);color:var(--muted)">${escHtml(level)}</span>`}</span>
                 <div class="table-wrap" style="border-radius:8px">
                   <table class="result-table">
                     <thead><tr>
@@ -1305,6 +1267,10 @@
     header.closest('.bilan-domaine').classList.toggle('closed');
   }
 
+  function toggleSousDomaine(header) {
+    header.closest('.bilan-sous-domaine').classList.toggle('closed');
+  }
+
   function filterBilanByDomaine(domaine) {
     sessionStorage.setItem('bilan-domaine-filter', domaine);
     document.getElementById('bilan-tab-fr').classList.toggle('active',   domaine === 'Français');
@@ -1320,6 +1286,7 @@
   function printBilan() {
     /* Ouvrir tous les accordéons fermés */
     document.querySelectorAll('.bilan-domaine.closed').forEach(d => d.classList.remove('closed'));
+    document.querySelectorAll('.bilan-sous-domaine.closed').forEach(d => d.classList.remove('closed'));
     /* Afficher tous les domaines (filtre désactivé pour impression) */
     document.querySelectorAll('#bilan-content .bilan-domaine').forEach(d => d.style.display = '');
     /* Remplir l'en-tête */
@@ -1339,8 +1306,7 @@
   function printCompetence(btn) {
     const block      = btn.closest('.bilan-competence');
     const compLabel  = block.querySelector('.bilan-competence-title span').textContent.trim();
-    const sousDom    = block.closest('.bilan-sous-domaine')
-                            ?.querySelector('.bilan-sous-domaine-title')?.textContent.trim() || '';
+    const sousDom    = block.closest('.bilan-sous-domaine')?.dataset.sousDomaine || '';
     const competence = sousDom ? `${sousDom} — ${compLabel}` : compLabel;
     const domaine    = block.closest('.bilan-domaine')
                            .querySelector('.bilan-domaine-title').textContent.trim();
@@ -1501,8 +1467,7 @@
       html += '<span class="bc-current">Résultats</span>';
     } else {
       html += ancestors.map(a => {
-        const qs = new URLSearchParams(a.params).toString();
-        return `<button class="bc-btn" onclick="navigate(${JSON.stringify(a.params)})">${escHtml(a.label)}</button>`;
+        return `<button class="bc-btn" onclick="navigate(${escHtml(JSON.stringify(a.params))})">${escHtml(a.label)}</button>`;
       }).join(sep);
       html += sep + '<span class="bc-current">' + escHtml(current || '') + '</span>';
     }
@@ -1664,11 +1629,10 @@
       console.warn('[LFM] getStudentStats :', e.message);
     }
 
-    renderStudentStats(stats);
-    renderLineChart(stats?.chartData || []);
-    renderDoughnutChart(stats?.subjects || []);
+    initLaurels(s.auth_user_id);
     renderStudentBilan(s.auth_user_id);
-    renderStudentProfile(s.auth_user_id);
+    await renderStudentProfile(s.auth_user_id);
+    renderStudentStats(stats, _studentProfile);
 
     const p = new URLSearchParams(window.location.search);
     document.getElementById('student-nav-footer').innerHTML = `
@@ -1682,7 +1646,7 @@
     document.getElementById('view-student').style.display = '';
   }
 
-  function renderStudentStats(stats) {
+  function renderStudentStats(stats, profile) {
     const row = document.getElementById('student-stats-row');
     if (!stats || stats.total === 0) {
       row.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
@@ -1691,95 +1655,25 @@
       </div>`;
       return;
     }
-    const bestLabel = stats.bestSubject === 'français'     ? 'Français'
-                    : stats.bestSubject === 'mathématiques' ? 'Maths'
-                    : stats.bestSubject || '—';
+    const rates = profile?.rates || { general: null, francais: null, maths: null };
+    const fmt = v => v !== null && v !== undefined ? `${v}<span class="stat-unit">%</span>` : '—';
     row.innerHTML = `
       <div class="stat-card">
         <div class="stat-label">Exercices réalisés</div>
         <div class="stat-value">${stats.total}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Moyenne générale</div>
-        <div class="stat-value">${stats.avgPct !== null ? stats.avgPct : '—'}<span class="stat-unit">${stats.avgPct !== null ? '%' : ''}</span></div>
+        <div class="stat-label">Taux de réussite général</div>
+        <div class="stat-value">${fmt(rates.general)}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Meilleure matière</div>
-        <div class="stat-value" style="font-size:20px;margin-top:4px">${escHtml(bestLabel)}</div>
+        <div class="stat-label">Taux de réussite français</div>
+        <div class="stat-value">${fmt(rates.francais)}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Taux de réussite maths</div>
+        <div class="stat-value">${fmt(rates.maths)}</div>
       </div>`;
-  }
-
-  function renderLineChart(chartData) {
-    destroyChart('line');
-    const canvas = document.getElementById('chart-line');
-    if (chartData.length === 0) {
-      canvas.parentElement.innerHTML = '<div class="empty-state" style="padding:32px 0">Pas encore de données.</div>';
-      return;
-    }
-    _charts.line = new Chart(canvas, {
-      type: 'line',
-      data: {
-        labels: chartData.map(d => d.label),
-        datasets: [{
-          data: chartData.map(d => d.pct),
-          borderColor: '#102B6A',
-          backgroundColor: 'rgba(16,43,106,0.07)',
-          tension: 0.35,
-          fill: true,
-          pointBackgroundColor: '#102B6A',
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2,
-          pointRadius: 5,
-          pointHoverRadius: 7
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        scales: {
-          y: { min: 0, max: 100,
-               ticks: { callback: v => v + '%', font: { size: 11 }, maxTicksLimit: 6 },
-               grid: { color: 'rgba(0,0,0,0.05)' } },
-          x: { ticks: { font: { size: 11 } }, grid: { display: false } }
-        },
-        plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: ctx => ' ' + ctx.raw + '%' } }
-        }
-      }
-    });
-  }
-
-  function renderDoughnutChart(subjects) {
-    destroyChart('donut');
-    const canvas = document.getElementById('chart-donut');
-    if (subjects.length === 0) {
-      canvas.parentElement.innerHTML = '<div class="empty-state" style="padding:32px 0">Pas encore de données.</div>';
-      return;
-    }
-    const COLORS = { 'français': '#102B6A', 'mathématiques': '#D62839' };
-    _charts.donut = new Chart(canvas, {
-      type: 'doughnut',
-      data: {
-        labels: subjects.map(s => s.subject === 'français' ? 'Français' : 'Maths'),
-        datasets: [{
-          data: subjects.map(s => s.count),
-          backgroundColor: subjects.map(s => COLORS[s.subject] || '#888'),
-          borderWidth: 3, borderColor: '#fff'
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false, cutout: '58%',
-        plugins: {
-          legend: { position: 'bottom', labels: { padding: 14, font: { size: 12 } } },
-          tooltip: { callbacks: {
-            label: ctx => {
-              const s = subjects[ctx.dataIndex];
-              return ' ' + ctx.raw + ' ex. — moy. ' + s.avg + '%';
-            }
-          }}
-        }
-      }
-    });
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -1790,8 +1684,8 @@
     _studentProfile = null;
     _studentRows    = [];
     document.getElementById('student-rank-line').innerHTML = '';
-    document.getElementById('bulletin-btn').style.display = 'none';
-    ['student-consolider', 'student-jauges', 'student-activity'].forEach(id => {
+    document.getElementById('print-student-btn').style.display = 'none';
+    ['student-consolider', 'student-reussies', 'student-jauges'].forEach(id => {
       document.getElementById(id).style.display = 'none';
     });
 
@@ -1812,10 +1706,10 @@
         <span style="font-size:12px;color:var(--muted)">${profile.totalReussis} exercice${profile.totalReussis > 1 ? 's' : ''} réussi${profile.totalReussis > 1 ? 's' : ''} (≥80%)</span>`;
 
       renderConsoliderList(profile.consolider);
-      renderJauges(profile.jauges);
-      renderActivityBars(profile.weekly);
+      renderReussiesList(profile.reussies);
+      renderJauges(profile.jauges, profile.sousDomaineJauges);
 
-      document.getElementById('bulletin-btn').style.display = '';
+      document.getElementById('print-student-btn').style.display = '';
     } catch (e) {
       console.warn('[LFM] renderStudentProfile:', e.message);
     }
@@ -1825,13 +1719,26 @@
     const el = document.getElementById('student-consolider');
     if (!consolider || consolider.length === 0) { el.style.display = 'none'; return; }
     el.style.display = '';
-    document.getElementById('consolider-list').innerHTML = consolider.map(c => `
+    document.getElementById('consolider-list').innerHTML = consolider.slice(0, 5).map(c => `
       <div class="consolider-item">
         <div>
           <div class="ci-comp">${escHtml(c.competence)}</div>
           <div class="ci-meta">${escHtml(c.domaine)} · moyenne ${c.avgPct}%${c.hasRepeatedFailure ? ' · <span class="ci-flag">échecs répétés</span>' : ''}</div>
         </div>
         <a class="btn btn-outline btn-sm" href="exercise.html?slug=${encodeURIComponent(c.exampleSlug)}" target="_blank">Revoir →</a>
+      </div>`).join('');
+  }
+
+  function renderReussiesList(reussies) {
+    const el = document.getElementById('student-reussies');
+    if (!reussies || reussies.length === 0) { el.style.display = 'none'; return; }
+    el.style.display = '';
+    document.getElementById('reussies-list').innerHTML = reussies.slice(0, 5).map(c => `
+      <div class="consolider-item" style="background:rgba(29,191,160,0.07);border-left-color:#1DBFA0">
+        <div>
+          <div class="ci-comp">${escHtml(c.competence)}</div>
+          <div class="ci-meta">${escHtml(c.domaine)} · moyenne ${c.avgPct}%</div>
+        </div>
       </div>`).join('');
   }
 
@@ -1842,194 +1749,146 @@
     'non-concerne':  'non concerné'
   };
 
-  function renderJauges(jauges) {
+  function renderNiveauSegments(segments) {
+    return `<div class="jauge-segments">
+      ${segments.map(seg => `
+        <div class="jauge-segment">
+          <div class="jauge-segment-bar ${seg.status}"></div>
+          <div class="jauge-segment-label">${escHtml(seg.level)}</div>
+          <div class="jauge-segment-status">${JAUGE_STATUS_LABEL[seg.status]}</div>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  function renderJauges(jauges, sousDomaineJauges) {
     const el = document.getElementById('student-jauges');
     const domaines = Object.keys(jauges || {}).filter(d => jauges[d].some(seg => seg.status !== 'non-concerne'));
     if (domaines.length === 0) { el.style.display = 'none'; return; }
     el.style.display = '';
-    document.getElementById('jauges-content').innerHTML = domaines.map(domaine => `
-      <div class="jauge-domaine">
-        <div class="jauge-domaine-title">${escHtml(domaine)}</div>
-        <div class="jauge-segments">
-          ${jauges[domaine].map(seg => `
-            <div class="jauge-segment">
-              <div class="jauge-segment-bar ${seg.status}"></div>
-              <div class="jauge-segment-label">${escHtml(seg.level)}</div>
-              <div class="jauge-segment-status">${JAUGE_STATUS_LABEL[seg.status]}</div>
-            </div>`).join('')}
-        </div>
-      </div>`).join('');
-  }
 
-  function renderActivityBars(weekly) {
-    const el = document.getElementById('student-activity');
-    if (!weekly || weekly.every(w => w.count === 0)) { el.style.display = 'none'; return; }
-    el.style.display = '';
-    const max = Math.max(1, ...weekly.map(w => w.count));
-    document.getElementById('activity-bars').innerHTML = weekly.map((w, i) => `
-      <div class="activity-bar-wrap">
-        <div class="activity-bar" style="height:${Math.round((w.count / max) * 100)}%" title="${w.count} exercice${w.count > 1 ? 's' : ''}"></div>
-        <div class="activity-bar-label">${i === 7 ? "cette sem." : `S-${7 - i}`}</div>
-      </div>`).join('');
+    document.getElementById('jauges-content').innerHTML = domaines.map(domaine => {
+      const subJauges = (sousDomaineJauges?.[domaine] || [])
+        .filter(sd => sd.segments.some(seg => seg.status !== 'non-concerne'));
+
+      const subJaugesHtml = subJauges.length ? `<div class="jauge-sousdomaines">${
+        subJauges.map(sd => `
+          <div class="jauge-sousdomaine-block">
+            <div class="jauge-sousdomaine-title">${escHtml(sd.sousDomaine)} · ${sd.exerciseCount} exercice${sd.exerciseCount > 1 ? 's' : ''}</div>
+            ${renderNiveauSegments(sd.segments)}
+          </div>`).join('')
+      }</div>` : '';
+
+      return `<div class="jauge-domaine">
+        <div class="jauge-domaine-title">${escHtml(domaine)}</div>
+        ${renderNiveauSegments(jauges[domaine])}
+        ${subJaugesHtml}
+      </div>`;
+    }).join('');
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
-     BULLETIN PDF SEMESTRIEL
+     SYNTHÈSE PDF — reflet imprimable de la fiche élève à l'écran (identité,
+     taux, couronne de lauriers, réussies/consolider, jauges domaine +
+     sous-domaine). Aucune requête ni recalcul : entièrement dérivé de
+     _studentProfile (déjà calculé par renderStudentProfile) et du DOM déjà
+     rendu (#laurels-root, cloné tel quel — pas de logique lauriers dupliquée).
   ═══════════════════════════════════════════════════════════════════════════ */
-  /* ── Année de rentrée pour les presets de période ─────────────────────────
-     BUG CORRIGÉ : cyear n'est jamais transmis à la vue 'eleve' (navigate()
-     ne le passe pas), donc un repli sur new Date().getFullYear() donnait une
-     date de départ (1er septembre de l'année CIVILE courante) postérieure à
-     aujourd'hui dès qu'on est entre janvier et août — periodRows était alors
-     systématiquement vide. On utilise _currentClass (fiable : posé à la vue
-     'eleves' précédente et jamais réinitialisé) en priorité, puis l'URL, puis
-     un repli qui reste toujours dans le passé (mois courant → année de
-     rentrée en cours si sept-déc, sinon année précédente). */
-  function resolveSchoolYearStart() {
-    const p = new URLSearchParams(window.location.search);
-    const cyear = decodeURIComponent(p.get('cyear') || '') || _currentClass?.school_year || '';
-    const match = cyear.match(/\d{4}/);
-    if (match) return parseInt(match[0], 10);
-    const now = new Date();
-    return now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
-  }
-
-  function openBulletinModal() {
-    const startYear = resolveSchoolYearStart();
-    document.getElementById('bulletin-date-start').value = `${startYear}-09-01`;
-    document.getElementById('bulletin-date-end').value   = new Date().toISOString().slice(0, 10);
-    document.getElementById('bulletin-observations').value = '';
-    document.getElementById('bulletin-modal-overlay').style.display = 'flex';
-  }
-
-  function closeBulletinModal() {
-    document.getElementById('bulletin-modal-overlay').style.display = 'none';
-  }
-
-  function applyBulletinPreset(preset) {
-    const startYear = resolveSchoolYearStart();
-    if (preset === 's1') {
-      document.getElementById('bulletin-date-start').value = `${startYear}-09-01`;
-      document.getElementById('bulletin-date-end').value   = `${startYear + 1}-01-31`;
-    } else {
-      document.getElementById('bulletin-date-start').value = `${startYear + 1}-02-01`;
-      document.getElementById('bulletin-date-end').value   = `${startYear + 1}-07-15`;
-    }
-  }
-
-  function generateBulletin() {
-    const startVal = document.getElementById('bulletin-date-start').value;
-    const endVal   = document.getElementById('bulletin-date-end').value;
-    const observations = document.getElementById('bulletin-observations').value.trim();
-    if (!startVal || !endVal) { alert('Merci de renseigner une période.'); return; }
-
-    const start = new Date(startVal + 'T00:00:00');
-    const end   = new Date(endVal + 'T23:59:59');
-    const periodRows = _studentRows.filter(r => {
-      const d = new Date(r.completed_at);
-      return d >= start && d <= end;
-    });
-
-    if (periodRows.length === 0) {
-      alert("Aucun exercice réalisé sur cette période — impossible de générer le bulletin.");
-      return;
-    }
-    logUnmatchedCatalogSlugs(periodRows, _catalogMap);
-
-    const profile        = lfmAnalytics.computeStudentProfile(periodRows, _catalogMap);
-    const distinctPeriod = lfmAnalytics.dedupeBestBySlug(periodRows).length;
-    const reussiteRate   = distinctPeriod > 0 ? Math.round((profile.totalReussis / distinctPeriod) * 100) : 0;
-    /* Rang lauriers = statut ACTUEL de l'élève (cumul de tout son historique),
-       pas limité à la période du bulletin — c'est un cumul, pas une mesure
-       de période. _studentProfile est calculé sur l'historique complet dans
-       renderStudentProfile(). */
-    const rankAllTime = computeLaurelRank(_studentProfile ? _studentProfile.totalReussis : 0).current;
+  function printStudentBilan() {
+    if (!_studentProfile) return;
+    const profile = _studentProfile;
 
     const name  = document.getElementById('student-header-name').textContent;
     const meta  = document.getElementById('student-header-meta').textContent;
-    const periodLabel = `Du ${start.toLocaleDateString('fr-FR')} au ${end.toLocaleDateString('fr-FR')}`;
     const today = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
 
-    /* Ne montrer que les domaines pour lesquels le catalogue a effectivement
-       des exercices à ce niveau (au moins un segment avec un dénominateur
-       non nul), sinon une ligne "— / — / —" vide n'apporte rien au parent. */
-    const domaines = lfmAnalytics.DOMAIN_ORDER.filter(d => (profile.jauges[d] || []).some(seg => seg.denom > 0));
-    const compactCls = domaines.length > 8 ? ' bulletin-compact' : '';
+    const rates    = profile.rates || {};
+    const fmtRate  = v => (v !== null && v !== undefined) ? v + '%' : '—';
 
+    /* Couronne : clone du DOM déjà rendu, aucun recalcul de la logique lauriers */
+    const laurelsSrc  = document.getElementById('laurels-root');
+    const laurelsHtml = laurelsSrc && laurelsSrc.innerHTML.trim() ? laurelsSrc.innerHTML : '';
+
+    const listItem = c => `<li><strong>${escHtml(c.competence)}</strong> — ${escHtml(c.domaine)} · ${c.avgPct}%</li>`;
+    const consoliderHtml = (profile.consolider || []).slice(0, 5).map(listItem).join('')
+      || '<li>Aucune compétence à consolider identifiée.</li>';
+    const reussiesHtml = (profile.reussies || []).slice(0, 5).map(listItem).join('')
+      || '<li>Pas encore de compétence réussie.</li>';
+
+    const segHtml = segs => `<div class="bj-segments">
+      ${segs.map(seg => {
+        /* Même repli à 3 états visuels que l'ancien bulletin — "non concerné"
+           (denom=0) absorbé dans "non travaillé" plutôt qu'un 4e état. */
+        const status = seg.status === 'non-concerne' ? 'non-travaille' : seg.status;
+        const label  = status === 'atteint' ? 'atteint' : status === 'en-cours' ? 'en cours' : '—';
+        return `<div class="bj-segment ${status}">
+          <span class="bj-seg-level">${escHtml(seg.level)}</span>
+          <span class="bj-seg-status">${label}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+    const domaines = lfmAnalytics.DOMAIN_ORDER.filter(d => (profile.jauges[d] || []).some(seg => seg.denom > 0));
     let jaugesHtml = '';
     domaines.forEach(domaine => {
-      const segs = profile.jauges[domaine] || [];
       jaugesHtml += `<div class="bulletin-jauge-row">
         <div class="bj-domaine">${escHtml(domaine)}</div>
-        <div class="bj-segments">
-          ${segs.map(seg => {
-            /* Le bulletin n'a que 3 états visuels — "non concerné" (denom=0,
-               cas rare une fois le filtre ci-dessus appliqué) est absorbé
-               dans "non travaillé" plutôt que d'ajouter un 4e état. */
-            const status = seg.status === 'non-concerne' ? 'non-travaille' : seg.status;
-            const label  = status === 'atteint' ? 'atteint' : status === 'en-cours' ? 'en cours' : '—';
-            return `<div class="bj-segment ${status}">
-              <span class="bj-seg-level">${escHtml(seg.level)}</span>
-              <span class="bj-seg-status">${label}</span>
-            </div>`;
-          }).join('')}
-        </div>
+        ${segHtml(profile.jauges[domaine] || [])}
       </div>`;
+      (profile.sousDomaineJauges?.[domaine] || [])
+        .filter(sd => sd.segments.some(seg => seg.status !== 'non-concerne'))
+        .forEach(sd => {
+          jaugesHtml += `<div class="bulletin-jauge-row bulletin-jauge-row--sub">
+            <div class="bj-domaine">${escHtml(sd.sousDomaine)}</div>
+            ${segHtml(sd.segments)}
+          </div>`;
+        });
     });
 
-    const fortsHtml = profile.reussies.slice(0, 4).map(c => `<li>${escHtml(c.competence)}</li>`).join('')
-      || '<li>Pas encore de compétence consolidée sur cette période.</li>';
-    const consoliderHtml = profile.consolider.slice(0, 4).map(c => `<li>${escHtml(c.competence)}</li>`).join('')
-      || '<li>Aucune compétence prioritaire identifiée sur cette période.</li>';
-
-    const html = `<div class="bulletin-page${compactCls}">
+    const html = `<div class="bulletin-page">
       <div class="bulletin-header">
         <div>
           <div class="bulletin-brand-name">Proficiamus</div>
-          <div class="bulletin-brand-sub">Bulletin de compétences — cycle 3</div>
+          <div class="bulletin-brand-sub">Synthèse de résultats — cycle 3</div>
         </div>
         <div class="bulletin-header-right">
           <div class="bh-name">${escHtml(name)}</div>
           <div>${escHtml(meta)}</div>
-          <div class="bh-period">${periodLabel}</div>
+          <div class="bh-period">Généré le ${today}</div>
         </div>
       </div>
 
       <div class="bulletin-stats">
         <div class="bulletin-stat">
-          <div class="bs-value">${periodRows.length}</div>
-          <div class="bs-label">Exercices réalisés</div>
+          <div class="bs-value">${fmtRate(rates.general)}</div>
+          <div class="bs-label">Taux général</div>
         </div>
         <div class="bulletin-stat">
-          <div class="bs-value">${reussiteRate}%</div>
-          <div class="bs-label">Taux de réussite</div>
+          <div class="bs-value">${fmtRate(rates.francais)}</div>
+          <div class="bs-label">Taux français</div>
         </div>
         <div class="bulletin-stat">
-          <div class="bs-value" style="color:${rankAllTime.color}">${escHtml(rankAllTime.name)}</div>
-          <div class="bs-label">Rang actuel</div>
+          <div class="bs-value">${fmtRate(rates.maths)}</div>
+          <div class="bs-label">Taux maths</div>
         </div>
       </div>
 
-      <div class="bulletin-jauges">
-        <div class="bulletin-jauges-title">Niveaux atteints par domaine</div>
-        ${jaugesHtml || '<div style="font-size:9.5pt;color:#888">Pas assez de données sur cette période.</div>'}
-      </div>
+      ${laurelsHtml ? `<div class="bulletin-laurels">${laurelsHtml}</div>` : ''}
 
       <div class="bulletin-boxes">
-        <div class="bulletin-box box-forts">
-          <h5>Points forts</h5>
-          <ul>${fortsHtml}</ul>
-        </div>
         <div class="bulletin-box box-consolider">
           <h5>À consolider</h5>
           <ul>${consoliderHtml}</ul>
         </div>
+        <div class="bulletin-box box-forts">
+          <h5>Compétences réussies</h5>
+          <ul>${reussiesHtml}</ul>
+        </div>
       </div>
 
-      ${observations ? `<div class="bulletin-observations">
-        <div class="bo-label">Observations de l'enseignant</div>
-        <div class="bo-text">${escHtml(observations)}</div>
-      </div>` : ''}
+      <div class="bulletin-jauges bulletin-jauges--break">
+        <div class="bulletin-jauges-title">Jauges de niveau par domaine et sous-domaine</div>
+        ${jaugesHtml || '<div style="font-size:9.5pt;color:#888">Pas assez de données.</div>'}
+      </div>
 
       <div class="bulletin-footer">
         proficiamus.eu &nbsp;·&nbsp; Généré le ${today} &nbsp;·&nbsp;
@@ -2038,7 +1897,6 @@
     </div>`;
 
     document.getElementById('bulletin-print-root').innerHTML = html;
-    closeBulletinModal();
     document.body.classList.add('printing-bulletin');
     window.print();
     document.body.classList.remove('printing-bulletin');
@@ -2050,12 +1908,11 @@
   async function renderStudentBilan(authUserId) {
     const container = document.getElementById('student-bilan');
     container.innerHTML = '<div class="view-loading">Chargement du bilan…</div>';
-    document.getElementById('print-student-btn').style.display = 'none';
 
     try {
       const { data, error } = await window.lfmDb
         .from('exercise_results')
-        .select('exercise_slug, exercise_title, level, score, total, pct, completed_at')
+        .select('exercise_slug, exercise_title, exercise_type, level, score, total, pct, completed_at')
         .eq('student_id', authUserId)
         .order('completed_at', { ascending: false });
 
@@ -2074,7 +1931,6 @@
       }
 
       /* Grouper domaine → sous-domaine → compétence → niveau */
-      const LEVEL_ORDER  = ['CE2', 'CM1', 'CM2', '6e'];
       const DOMAIN_ORDER = ['Français', 'Mathématiques'];
       const byDomaine    = {};
 
@@ -2092,7 +1948,7 @@
         if (!byDomaine[domaine][sousDomaine][compLabel])           byDomaine[domaine][sousDomaine][compLabel] = {};
         if (!byDomaine[domaine][sousDomaine][compLabel][level])    byDomaine[domaine][sousDomaine][compLabel][level] = [];
         byDomaine[domaine][sousDomaine][compLabel][level].push({
-          exTitle, score: r.score, total: r.total,
+          exTitle, exerciseType: r.exercise_type, score: r.score, total: r.total,
           pct: parseFloat(r.pct), date: r.completed_at
         });
       }
@@ -2110,7 +1966,7 @@
             m + Object.values(lvls).reduce((k, arr) => k + arr.length, 0), 0), 0);
         const icon = DOMAIN_ICONS[domaine] || '📖';
 
-        html += `<div class="bilan-domaine">
+        html += `<div class="bilan-domaine closed">
           <div class="bilan-domaine-header" onclick="toggleDomaine(this)">
             <span class="bilan-domaine-title">${icon} ${escHtml(domaine)}</span>
             <span class="bilan-domaine-count">${totalEx} exercice${totalEx > 1 ? 's' : ''}</span>
@@ -2119,23 +1975,31 @@
           <div class="bilan-domaine-body">`;
 
         Object.entries(sousDomaineMap).forEach(([sousDomaine, comps]) => {
-          html += `<div class="bilan-sous-domaine">
-            <div class="bilan-sous-domaine-title">${escHtml(sousDomaine)}</div>`;
+          const sdCount = Object.values(comps).reduce((m, lvls) =>
+            m + Object.values(lvls).reduce((k, arr) => k + arr.length, 0), 0);
+
+          html += `<div class="bilan-sous-domaine closed" data-sous-domaine="${escHtml(sousDomaine)}">
+            <div class="bilan-sous-domaine-header" onclick="toggleSousDomaine(this)">
+              <span class="bilan-sous-domaine-title">${escHtml(sousDomaine)}</span>
+              <span class="bilan-domaine-count">${sdCount} exercice${sdCount > 1 ? 's' : ''}</span>
+              <span class="bilan-sous-domaine-chevron">▾</span>
+            </div>`;
 
           Object.entries(comps).forEach(([compLabel, levels]) => {
             html += `<div class="bilan-competence">
               <div class="bilan-competence-title">${escHtml(compLabel)}</div>`;
 
+            const levelIndex = level => lfmLevelBadge.resolveIndex(level === '—' ? null : level, levels[level][0]?.exerciseType);
             const sortedLevels = Object.keys(levels).sort((a, b) => {
-              const ia = LEVEL_ORDER.indexOf(a), ib = LEVEL_ORDER.indexOf(b);
-              return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+              const ia = levelIndex(a), ib = levelIndex(b);
+              return (ia == null ? 99 : ia) - (ib == null ? 99 : ib);
             });
 
             sortedLevels.forEach(level => {
-              const items    = levels[level];
-              const levelCls = { CM1: 'badge-cm1', CM2: 'badge-cm2', '6e': 'badge-6e' }[level] || 'badge-cm1';
+              const items      = levels[level];
+              const levelBadge = lfmLevelBadge.html(level === '—' ? null : level, items[0]?.exerciseType);
               html += `<div class="bilan-level-block">
-                <span class="badge ${levelCls}" style="margin-bottom:8px;display:inline-block">${escHtml(level)}</span>
+                <span style="margin-bottom:8px;display:inline-block">${levelBadge || `<span class="badge" style="background:var(--border);color:var(--muted)">${escHtml(level)}</span>`}</span>
                 <div class="table-wrap" style="border-radius:8px">
                   <table class="result-table">
                     <thead><tr>
@@ -2170,113 +2034,11 @@
       });
 
       container.innerHTML = html;
-      document.getElementById('print-student-btn').style.display = '';
 
     } catch (e) {
       container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Erreur lors du chargement du bilan.</div></div>';
       console.warn('[LFM] renderStudentBilan:', e.message);
     }
-  }
-
-  /* ── Synthèse PDF élève ─────────────────────────────────────────────────── */
-  function printStudentBilan() {
-    document.querySelectorAll('#student-bilan .bilan-domaine.closed')
-      .forEach(d => d.classList.remove('closed'));
-
-    const name  = document.getElementById('student-header-name').textContent;
-    const meta  = document.getElementById('student-header-meta').textContent;
-    const today = new Date().toLocaleDateString('fr-FR',
-      { day: '2-digit', month: 'long', year: 'numeric' });
-
-    /* Construire le HTML des blocs compétence depuis le DOM */
-    let bodyHtml = '';
-    document.querySelectorAll('#student-bilan .bilan-domaine').forEach(dom => {
-      const domaineTitle = dom.querySelector('.bilan-domaine-title')?.textContent.trim() || '';
-      bodyHtml += `<h2 style="font-size:14pt;color:#102B6A;margin:20px 0 6px;
-        border-bottom:2px solid #102B6A;padding-bottom:4px">${domaineTitle}</h2>`;
-
-      dom.querySelectorAll('.bilan-sous-domaine').forEach(sd => {
-        const sdTitle = sd.querySelector('.bilan-sous-domaine-title')?.textContent.trim() || '';
-        bodyHtml += `<h3 style="font-size:11pt;color:#102B6A;margin:14px 0 4px;
-          font-weight:800;text-transform:uppercase;letter-spacing:.05em;font-size:9pt">${sdTitle}</h3>`;
-
-      sd.querySelectorAll('.bilan-competence').forEach(comp => {
-        const compTitle = comp.querySelector('.bilan-competence-title')?.textContent.trim() || '';
-        bodyHtml += `<h4 style="font-size:11pt;color:#333;margin:10px 0 6px;font-weight:700">${compTitle}</h4>`;
-
-        comp.querySelectorAll('.bilan-level-block').forEach(lb => {
-          const badgeEl  = lb.querySelector('.badge');
-          const badgeTxt = badgeEl?.textContent.trim() || '';
-          const badgeCls = badgeEl?.className.replace('badge', '').trim() || '';
-
-          let rows = '';
-          lb.querySelectorAll('tbody tr').forEach(tr => {
-            const cells = tr.querySelectorAll('td');
-            if (cells.length < 4) return;
-            const pct    = cells[2].querySelector('.score-pill')?.textContent.trim() || '';
-            const pctVal = parseFloat(pct);
-            const color  = pctVal >= 70 ? '#15803d' : pctVal >= 50 ? '#a16207' : '#D62839';
-            rows += `<tr>
-              <td>${cells[0].textContent.trim()}</td>
-              <td>${cells[1].textContent.trim()}</td>
-              <td><span style="color:${color};font-weight:700">${pct}</span></td>
-              <td style="color:#555">${cells[3].textContent.trim()}</td>
-            </tr>`;
-          });
-
-          bodyHtml += `<p style="margin:4px 0 2px">
-            <span class="badge ${badgeCls}">${badgeTxt}</span></p>
-            <table><thead><tr>
-              <th>Exercice</th><th>Score</th><th>Résultat</th><th>Date</th>
-            </tr></thead><tbody>${rows}</tbody></table>`;
-        });
-      });
-      });  /* fin sd.querySelectorAll */
-    });
-
-    const w = window.open('', '_blank');
-    w.document.write(`<!DOCTYPE html>
-<html lang="fr"><head>
-  <meta charset="UTF-8">
-  <title>Synthèse — ${name} — LFM</title>
-  <style>
-    body  { font-family: system-ui, sans-serif; margin: 28px; color: #000; font-size: 11pt; }
-    h1    { font-size: 16pt; color: #102B6A; margin: 0 0 2px; }
-    .meta { font-size: 10pt; color: #555; margin-bottom: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-    th    { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing:.06em;
-            border: 1px solid #333; padding: 5px 8px; background: #f0f4f8; text-align: left; }
-    td    { font-size: 10pt; border: 1px solid #ccc; padding: 5px 8px; }
-    .badge       { display:inline-block; padding:2px 9px; border-radius:4px; font-size:10pt; font-weight:700; }
-    footer { margin-top:24px; font-size:9pt; color:#666; border-top:1px solid #ccc; padding-top:6px; }
-    @media print { body { margin: 12px; } }
-  </style>
-</head><body>
-  <h1>Synthèse — ${escHtml(name)}</h1>
-  <div class="meta">${escHtml(meta)} &nbsp;·&nbsp; Imprimé le ${today}</div>
-  ${bodyHtml}
-  <footer>
-  <div class="footer__inner">
-    <p class="footer__text">
-      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
-      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
-    </p>
-    <p class="footer__credit">© 2026 François Pérocheau – LFM &nbsp;•&nbsp;
-      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
-         target="_blank" rel="license noopener noreferrer">
-        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
-            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
-            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
-            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
-            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
-          </span>
-      </a>
-      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
-  </div>
-</footer>
-  <script>window.onload = () => setTimeout(() => window.print(), 250);<\/script>
-</body></html>`);
-    w.document.close();
   }
 
   function renderHistory(recent) {
@@ -2309,10 +2071,6 @@
   /* ═══════════════════════════════════════════════════════════════════════════
      UTILITAIRES
   ═══════════════════════════════════════════════════════════════════════════ */
-  function destroyChart(key) {
-    if (_charts[key]) { _charts[key].destroy(); delete _charts[key]; }
-  }
-
   function escHtml(str) {
     return String(str)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;')

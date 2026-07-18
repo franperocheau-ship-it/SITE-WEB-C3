@@ -206,3 +206,32 @@
   .laurel-section { padding: 22px 18px 26px; }
   .laurel-badges-grid { grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); }
 }
+
+/* ── Variante "fiche élève enseignant" (resultats-enseignant.html) ────────
+   Couronne + rang à gauche, grille de badges à droite, pour réduire
+   l'espace vertical. Scopée via .laurel-context-teacher, posée uniquement
+   sur #laurels-root côté enseignant — le rendu par défaut côté élève
+   ("Mes résultats") n'est pas concerné, aucun changement dans js/laurels.js
+   (les 3 enfants directs de .laurel-section existent déjà, ils sont juste
+   assignés à des zones de grille nommées ici). ───────────────────────────── */
+#laurels-root.laurel-context-teacher .laurel-section {
+  display: grid;
+  grid-template-columns: minmax(200px, 320px) 1fr;
+  grid-template-areas:
+    "crown  badges"
+    "rank   badges";
+  column-gap: 28px;
+  align-items: start;
+  text-align: left;
+}
+#laurels-root.laurel-context-teacher .laurel-crown-wrap { grid-area: crown; }
+#laurels-root.laurel-context-teacher .laurel-rank-block { grid-area: rank; }
+#laurels-root.laurel-context-teacher .laurel-badges-grid { grid-area: badges; align-self: center; }
+
+@media (max-width: 700px) {
+  #laurels-root.laurel-context-teacher .laurel-section {
+    display: block;
+    text-align: center;
+  }
+  #laurels-root.laurel-context-teacher .laurel-badges-grid { text-align: left; }
+}

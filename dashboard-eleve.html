@@ -13,6 +13,7 @@
   <script src="exercise-data.js?v=21"></script>
   <script src="js/exercise-catalog.js?v=6"></script>
   <script src="js/laurels.js?v=2"></script>
+  <script src="js/level-badge.js?v=1"></script>
   <style>
     .dash-wrap {
       min-height: calc(100vh - 88px - 74px);
@@ -139,39 +140,48 @@
       margin-bottom: 20px;
     }
 
-    /* ── Subject bars ── */
-    .subject-row {
+    /* ── Competence bars (points forts / à consolider) ── */
+    .competence-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .competence-row {
       margin-bottom: 16px;
     }
 
-    .subject-row:last-child { margin-bottom: 0; }
+    .competence-row:last-child { margin-bottom: 0; }
 
-    .subject-row-top {
+    .competence-row-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 12px;
       margin-bottom: 7px;
     }
 
-    .subject-name {
+    .competence-name {
       font-size: 14px;
       font-weight: 700;
       color: var(--text);
     }
 
-    .subject-meta {
+    .competence-meta {
       font-size: 12px;
+      font-weight: 700;
       color: var(--muted);
+      flex-shrink: 0;
     }
 
-    .subject-bar-bg {
+    .competence-bar-bg {
       height: 10px;
       background: var(--border);
       border-radius: 100px;
       overflow: hidden;
     }
 
-    .subject-bar-fill {
+    .competence-bar-fill {
       height: 100%;
       border-radius: 100px;
       transition: width 600ms cubic-bezier(.4,0,.2,1);
@@ -423,6 +433,7 @@
       .dash-header  { padding: 20px; }
       .dash-section { padding: 20px; }
       .subject-cards-grid { grid-template-columns: 1fr; }
+      .competence-cols { grid-template-columns: 1fr; }
       .dash-tab { font-size: 13px; padding: 10px 12px; }
     }
   </style>
@@ -526,15 +537,30 @@
           <div class="dash-stat-value" id="stat-total">0</div>
         </div>
         <div class="dash-stat">
-          <div class="dash-stat-label">Taux de réussite moyen</div>
+          <div class="dash-stat-label">Taux de réussite général</div>
           <div class="dash-stat-value" id="stat-avg">—<span class="dash-stat-unit"></span></div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-label">Taux de réussite en français</div>
+          <div class="dash-stat-value" id="stat-avg-francais">—<span class="dash-stat-unit"></span></div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-label">Taux de réussite en maths</div>
+          <div class="dash-stat-value" id="stat-avg-maths">—<span class="dash-stat-unit"></span></div>
         </div>
       </div>
 
-      <!-- Progression par matière -->
-      <div class="dash-section" id="section-subjects" style="display:none">
-        <div class="dash-section-title">Progression par matière</div>
-        <div id="subjects-content"></div>
+      <!-- Points forts / à consolider -->
+      <div class="competence-cols">
+        <div class="dash-section" id="section-strengths" style="display:none">
+          <div class="dash-section-title">Mes points forts</div>
+          <div id="strengths-content"></div>
+        </div>
+
+        <div class="dash-section" id="section-weaknesses" style="display:none">
+          <div class="dash-section-title">À consolider en priorité</div>
+          <div id="weaknesses-content"></div>
+        </div>
       </div>
 
       <!-- Derniers exercices -->
@@ -653,6 +679,72 @@
         .slice(0, 48);
     }
 
+    /* ── Table de correspondance slug → compétence/domaine ───────────────────
+       La colonne `category` de exercise_results n'est pas fiable (saveExerciseResult
+       l'enregistre à 'général' la plupart du temps) : la compétence réelle vient
+       du catalogue, comme pour les badges de laurels (voir buildLaurelNotionMap
+       dans js/laurels.js). Ici on garde le nom de compétence complet (pas juste
+       le préfixe de notion) pour un regroupement plus fin. ───────────────────── */
+    function buildCompetenceMap() {
+      const map = new Map();
+
+      if (typeof EXERCISE_DATA !== 'undefined') {
+        Object.keys(EXERCISE_DATA).forEach(slug => {
+          const ex = EXERCISE_DATA[slug];
+          map.set(slug, { competence: ex.competence, domaine: ex.domaine });
+        });
+      }
+
+      if (typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined') {
+        EXERCISE_CATALOG_AUTONOMOUS.forEach(({ slug, title, category, subCategory }) => {
+          if (!map.has(slug)) {
+            map.set(slug, { competence: subCategory + ' — ' + title, domaine: category });
+          }
+        });
+      }
+
+      return map;
+    }
+
+    /* ── Taux de réussite moyen par compétence, à partir des résultats ──────── */
+    function computeCompetenceStats(results) {
+      const competenceMap = buildCompetenceMap();
+      const byCompetence = new Map();
+
+      for (const r of results) {
+        const info = competenceMap.get(r.exercise_slug);
+        if (!info) continue; /* slug hors catalogue : ignoré, comme pour les badges */
+
+        let entry = byCompetence.get(info.competence);
+        if (!entry) {
+          entry = { competence: info.competence, domaine: info.domaine, count: 0, sumPct: 0 };
+          byCompetence.set(info.competence, entry);
+        }
+        entry.count++;
+        entry.sumPct += parseFloat(r.pct);
+      }
+
+      return Array.from(byCompetence.values()).map(e => ({
+        ...e,
+        avg: Math.round(e.sumPct / e.count)
+      }));
+    }
+
+    /* ── Rendu d'une ligne de compétence (barre colorée selon le domaine) ────── */
+    function renderCompetenceRow(entry) {
+      const barCls = entry.domaine === 'Mathématiques' ? 'bar-mathematiques' : 'bar-francais';
+      return `
+        <div class="competence-row">
+          <div class="competence-row-top">
+            <span class="competence-name">${entry.competence}</span>
+            <span class="competence-meta">${entry.avg} %</span>
+          </div>
+          <div class="competence-bar-bg">
+            <div class="competence-bar-fill ${barCls}" style="width:${entry.avg}%"></div>
+          </div>
+        </div>`;
+    }
+
     /* ── Rendu du dashboard ────────────────────────────────────────────────── */
     function renderDashboard(profile, results, classMeta) {
       /* En-tête */
@@ -679,37 +771,32 @@
         avgPct + '<span class="dash-stat-unit">%</span>';
       document.getElementById('dash-stats').style.display = '';
 
-      /* ── Progression par matière ── */
-      const bySubject = {};
-      for (const r of results) {
-        const k = r.subject;
-        if (!bySubject[k]) bySubject[k] = { count: 0, sumPct: 0 };
-        bySubject[k].count++;
-        bySubject[k].sumPct += parseFloat(r.pct);
-      }
+      /* ── Taux de réussite moyen par matière (colonne `subject`, fiable) ── */
+      ['français', 'mathématiques'].forEach(subj => {
+        const subjResults = results.filter(r => r.subject === subj);
+        const el = document.getElementById(subj === 'français' ? 'stat-avg-francais' : 'stat-avg-maths');
+        if (subjResults.length === 0) {
+          el.innerHTML = '—';
+          return;
+        }
+        const subjAvg = Math.round(subjResults.reduce((s, r) => s + parseFloat(r.pct), 0) / subjResults.length);
+        el.innerHTML = subjAvg + '<span class="dash-stat-unit">%</span>';
+      });
 
-      const SUBJECT_LABELS = {
-        'français':       { label: 'Français',       cls: 'bar-francais' },
-        'mathématiques':  { label: 'Mathématiques',  cls: 'bar-mathematiques' }
-      };
+      /* ── Points forts / à consolider (top 5 et bottom 5 compétences) ── */
+      const competenceStats = computeCompetenceStats(results);
+      const strengths  = [...competenceStats].sort((a, b) => b.avg - a.avg).slice(0, 5);
+      const weaknesses = [...competenceStats].sort((a, b) => a.avg - b.avg).slice(0, 5);
 
-      const subjectHtml = Object.entries(bySubject).map(([key, data]) => {
-        const avg  = Math.round(data.sumPct / data.count);
-        const meta = SUBJECT_LABELS[key] || { label: key, cls: 'bar-francais' };
-        return `
-          <div class="subject-row">
-            <div class="subject-row-top">
-              <span class="subject-name">${meta.label}</span>
-              <span class="subject-meta">${data.count} exercice${data.count > 1 ? 's' : ''} · ${avg} %</span>
-            </div>
-            <div class="subject-bar-bg">
-              <div class="subject-bar-fill ${meta.cls}" style="width:${avg}%"></div>
-            </div>
-          </div>`;
-      }).join('');
+      document.getElementById('strengths-content').innerHTML = strengths.length
+        ? strengths.map(renderCompetenceRow).join('')
+        : '<div class="dash-empty" style="padding:8px 0;">Pas encore de résultat.</div>';
+      document.getElementById('section-strengths').style.display = '';
 
-      document.getElementById('subjects-content').innerHTML = subjectHtml;
-      document.getElementById('section-subjects').style.display = '';
+      document.getElementById('weaknesses-content').innerHTML = weaknesses.length
+        ? weaknesses.map(renderCompetenceRow).join('')
+        : '<div class="dash-empty" style="padding:8px 0;">Pas encore de résultat.</div>';
+      document.getElementById('section-weaknesses').style.display = '';
 
       /* ── Derniers exercices ── */
       const recent = results.slice(0, 5);
@@ -721,12 +808,13 @@
           ? r.category.replace(/-/g, ' ')
             .replace(/\b\w/g, c => c.toUpperCase())
           : '';
+        const levelBadge = lfmLevelBadge.html(r.level, r.exercise_type);
         return `
           <div class="recent-item">
             <div class="recent-score-badge ${badgeCls}">${Math.round(pct)} %</div>
             <div class="recent-info">
               <div class="recent-title">${slugLabel(r.exercise_slug)}</div>
-              <div class="recent-meta">${catLabel ? catLabel + ' · ' : ''}${formatDate(r.completed_at)}</div>
+              <div class="recent-meta">${catLabel ? catLabel + ' · ' : ''}${formatDate(r.completed_at)}${levelBadge ? ' &nbsp;' + levelBadge : ''}</div>
             </div>
             <div class="recent-subject-dot ${dotCls}"></div>
           </div>`;

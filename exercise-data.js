@@ -564,186 +564,149 @@ const EXERCISE_DATA = {
     ]
   },
 
+  /* ══════════════════════════════════════════════════════════════════════════
+     Type : deuxieme-groupe-present-niveaux
+     Niveau 1 : QCM (5) + associer sujet↔forme (5) — sujets = pronoms,
+                verbes variés (finir, choisir, grandir, réussir, obéir,
+                remplir, rougir)
+     Niveau 2 : saisie libre, pronom + infinitif donnés — insiste sur la
+                marque du pluriel en -iss- (nous/vous/ils/elles)
+     Niveau 3 : saisie libre, sujet = groupe nominal (pas de pronom)
+     Uniquement de vrais verbes du 2e groupe (infixe -iss- au pluriel) —
+     exclus les faux amis en -ir du 3e groupe (partir, dormir, courir,
+     ouvrir...), couverts ailleurs.
+     Progression verrouillée : seuil 80 %, persistance sessionStorage.
+  ══════════════════════════════════════════════════════════════════════════ */
+
   "conjuguer-2e-groupe-present": {
     title: "Conjuguer les verbes du 2e groupe au présent",
     domaine:    "Français",
     competence: "Conjugaison — 2e groupe au présent",
-    type: "text-input",
-    levels: ["CM1", "CM2", "6e"],
-    paliers: 1, /* nombre réel de paliers du moteur */
-    questionsPerSession: 25,
-    sortByDifficulty: true,
+    type:       "deuxieme-groupe-present-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
+    questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
+    /* bank : chaque item porte un champ « level » 1-3.
+       Niveau 1 (mode "mcq" ou "matching") : sujets = pronoms personnels.
+         mode "mcq" : choices = 4 formes possibles du même verbe.
+         mode "matching" : forms = formes distinctes du verbe (je et tu
+         partagent la même forme pour un verbe du 2e groupe, donc 5 formes
+         distinctes et non 6 — contrairement au 1er groupe où c'est je et
+         il/elle qui fusionnent).
+       Niveaux 2 et 3 (saisie libre) : q.infinitive + q.sentence + q.answer.
+       Niveau 2 = pronom donné, niveau 3 = sujet non pronominal (GN). */
     bank: [
-      /* ── finir ── */
-      { subject: "je",    infinitive: "finir",     sentence: "Je ________ mon travail.",              answer: "finis",        difficulty: 1 },
-      { subject: "tu",    infinitive: "finir",     sentence: "Tu ________ l'exercice.",               answer: "finis",        difficulty: 1 },
-      { subject: "il",    infinitive: "finir",     sentence: "Il ________ son repas.",                answer: "finit",        difficulty: 1 },
-      { subject: "nous",  infinitive: "finir",     sentence: "Nous ________ la leçon.",               answer: "finissons",    difficulty: 2 },
-      { subject: "vous",  infinitive: "finir",     sentence: "Vous ________ à quelle heure ?",        answer: "finissez",     difficulty: 2 },
-      { subject: "ils",   infinitive: "finir",     sentence: "Ils ________ leurs devoirs.",           answer: "finissent",    difficulty: 2 },
+      /* ── NIVEAU 1 : QCM (5) ── */
+      { level: 1, mode: "mcq", infinitive: "finir",    subject: "je",   choices: ["finis", "finit", "finissons", "finissez"], answer: "finis" },
+      { level: 1, mode: "mcq", infinitive: "choisir",  subject: "tu",   choices: ["choisis", "choisit", "choisissons", "choisissez"], answer: "choisis" },
+      { level: 1, mode: "mcq", infinitive: "grandir",  subject: "il",   choices: ["grandit", "grandis", "grandissons", "grandissent"], answer: "grandit" },
+      { level: 1, mode: "mcq", infinitive: "réussir",  subject: "nous", choices: ["réussissons", "réussissez", "réussissent", "réussit"], answer: "réussissons" },
+      { level: 1, mode: "mcq", infinitive: "obéir",    subject: "vous", choices: ["obéissez", "obéissons", "obéissent", "obéit"], answer: "obéissez" },
 
-      /* ── choisir ── */
-      { subject: "je",    infinitive: "choisir",   sentence: "Je ________ un livre.",                 answer: "choisis",      difficulty: 1 },
-      { subject: "tu",    infinitive: "choisir",   sentence: "Tu ________ ta couleur préférée.",      answer: "choisis",      difficulty: 1 },
-      { subject: "elle",  infinitive: "choisir",   sentence: "Elle ________ un dessert.",             answer: "choisit",      difficulty: 1 },
-      { subject: "nous",  infinitive: "choisir",   sentence: "Nous ________ notre équipe.",           answer: "choisissons",  difficulty: 2 },
-      { subject: "vous",  infinitive: "choisir",   sentence: "Vous ________ votre place.",            answer: "choisissez",   difficulty: 2 },
-      { subject: "ils",   infinitive: "choisir",   sentence: "Ils ________ leurs vêtements.",         answer: "choisissent",  difficulty: 2 },
+      /* ── NIVEAU 1 : associer sujet ↔ forme (5) ── */
+      { level: 1, mode: "matching", infinitive: "remplir",  subject: "Elle",  forms: ["remplis", "remplit", "remplissons", "remplissez", "remplissent"], answer: "remplit" },
+      { level: 1, mode: "matching", infinitive: "rougir",   subject: "Ils",   forms: ["rougis", "rougit", "rougissons", "rougissez", "rougissent"],       answer: "rougissent" },
+      { level: 1, mode: "matching", infinitive: "finir",    subject: "Vous",  forms: ["finis", "finit", "finissons", "finissez", "finissent"],            answer: "finissez" },
+      { level: 1, mode: "matching", infinitive: "choisir",  subject: "Elles", forms: ["choisis", "choisit", "choisissons", "choisissez", "choisissent"],  answer: "choisissent" },
+      { level: 1, mode: "matching", infinitive: "grandir",  subject: "On",    forms: ["grandis", "grandit", "grandissons", "grandissez", "grandissent"],  answer: "grandit" },
 
-      /* ── rougir ── */
-      { subject: "je",    infinitive: "rougir",    sentence: "Je ________ de honte.",                 answer: "rougis",       difficulty: 1 },
-      { subject: "tu",    infinitive: "rougir",    sentence: "Tu ________ quand tu mens.",            answer: "rougis",       difficulty: 1 },
-      { subject: "il",    infinitive: "rougir",    sentence: "Il ________ de timidité.",              answer: "rougit",       difficulty: 1 },
-      { subject: "nous",  infinitive: "rougir",    sentence: "Nous ________ au soleil.",              answer: "rougissons",   difficulty: 2 },
-      { subject: "ils",   infinitive: "rougir",    sentence: "Ils ________ de plaisir.",              answer: "rougissent",   difficulty: 2 },
+      /* ── NIVEAU 2 : saisie libre, pronom donné (10) ── */
+      { level: 2, infinitive: "finir",    sentence: "Je ________ mon travail.",              answer: "finis"       },
+      { level: 2, infinitive: "choisir",  sentence: "Tu ________ ta couleur préférée.",      answer: "choisis"     },
+      { level: 2, infinitive: "grandir",  sentence: "Il ________ chaque année.",             answer: "grandit"     },
+      { level: 2, infinitive: "réussir",  sentence: "Elle ________ sa recette.",             answer: "réussit"     },
+      { level: 2, infinitive: "obéir",    sentence: "On ________ toujours aux règles.",      answer: "obéit"       },
+      { level: 2, infinitive: "finir",    sentence: "Nous ________ la leçon.",               answer: "finissons"   },
+      { level: 2, infinitive: "choisir",  sentence: "Vous ________ votre place.",            answer: "choisissez"  },
+      { level: 2, infinitive: "grandir",  sentence: "Ils ________ comme des champignons.",   answer: "grandissent" },
+      { level: 2, infinitive: "rougir",   sentence: "Elles ________ de plaisir.",            answer: "rougissent"  },
+      { level: 2, infinitive: "remplir",  sentence: "Tu ________ ton verre d'eau.",          answer: "remplis"     },
 
-      /* ── grandir ── */
-      { subject: "je",    infinitive: "grandir",   sentence: "Je ________ chaque année.",             answer: "grandis",      difficulty: 1 },
-      { subject: "tu",    infinitive: "grandir",   sentence: "Tu ________ très vite.",                answer: "grandis",      difficulty: 1 },
-      { subject: "elle",  infinitive: "grandir",   sentence: "Elle ________ de cinq centimètres.",    answer: "grandit",      difficulty: 1 },
-      { subject: "nous",  infinitive: "grandir",   sentence: "Nous ________ ensemble.",               answer: "grandissons",  difficulty: 2 },
-      { subject: "ils",   infinitive: "grandir",   sentence: "Ils ________ comme des champignons.",   answer: "grandissent",  difficulty: 2 },
-
-      /* ── obéir ── */
-      { subject: "je",    infinitive: "obéir",     sentence: "J'________ à mes parents.",             answer: "obéis",        difficulty: 1 },
-      { subject: "tu",    infinitive: "obéir",     sentence: "Tu ________ aux règles.",               answer: "obéis",        difficulty: 1 },
-      { subject: "il",    infinitive: "obéir",     sentence: "Il ________ toujours.",                 answer: "obéit",        difficulty: 1 },
-      { subject: "nous",  infinitive: "obéir",     sentence: "Nous ________ à la maîtresse.",         answer: "obéissons",    difficulty: 2 },
-      { subject: "vous",  infinitive: "obéir",     sentence: "Vous ________ bien.",                   answer: "obéissez",     difficulty: 2 },
-      { subject: "ils",   infinitive: "obéir",     sentence: "Ils ________ sans discuter.",           answer: "obéissent",    difficulty: 2 },
-
-      /* ── réussir ── */
-      { subject: "je",    infinitive: "réussir",   sentence: "Je ________ mon exercice.",             answer: "réussis",      difficulty: 1 },
-      { subject: "tu",    infinitive: "réussir",   sentence: "Tu ________ toujours tes tests.",       answer: "réussis",      difficulty: 1 },
-      { subject: "elle",  infinitive: "réussir",   sentence: "Elle ________ sa recette.",             answer: "réussit",      difficulty: 1 },
-      { subject: "nous",  infinitive: "réussir",   sentence: "Nous ________ à travailler ensemble.",  answer: "réussissons",  difficulty: 2 },
-      { subject: "ils",   infinitive: "réussir",   sentence: "Ils ________ leur projet.",             answer: "réussissent",  difficulty: 2 },
-
-      /* ── nourrir ── */
-      { subject: "je",    infinitive: "nourrir",   sentence: "Je ________ mon poisson.",              answer: "nourris",      difficulty: 1 },
-      { subject: "nous",  infinitive: "nourrir",   sentence: "Nous ________ les animaux.",            answer: "nourrissons",  difficulty: 2 },
-      { subject: "ils",   infinitive: "nourrir",   sentence: "Ils ________ leur chat.",               answer: "nourrissent",  difficulty: 2 },
-
-      /* ── bâtir ── */
-      { subject: "je",    infinitive: "bâtir",     sentence: "Je ________ une cabane.",               answer: "bâtis",        difficulty: 2 },
-      { subject: "nous",  infinitive: "bâtir",     sentence: "Nous ________ une maison.",             answer: "bâtissons",    difficulty: 2 },
-      { subject: "ils",   infinitive: "bâtir",     sentence: "Ils ________ un mur.",                  answer: "bâtissent",    difficulty: 2 },
-
-      /* ── salir ── */
-      { subject: "tu",    infinitive: "salir",     sentence: "Tu ________ ta chemise.",               answer: "salis",        difficulty: 1 },
-      { subject: "il",    infinitive: "salir",     sentence: "Il ________ le sol.",                   answer: "salit",        difficulty: 1 },
-      { subject: "nous",  infinitive: "salir",     sentence: "Nous ________ nos chaussures.",         answer: "salissons",    difficulty: 2 },
-      { subject: "ils",   infinitive: "salir",     sentence: "Ils ________ tout.",                    answer: "salissent",    difficulty: 2 },
-
-      /* ── pâlir ── */
-      { subject: "il",    infinitive: "pâlir",     sentence: "Il ________ de peur.",                  answer: "pâlit",        difficulty: 2 },
-      { subject: "nous",  infinitive: "pâlir",     sentence: "Nous ________ à cette nouvelle.",       answer: "pâlissons",    difficulty: 3 },
-
-      /* ── maigrir ── */
-      { subject: "elle",  infinitive: "maigrir",   sentence: "Elle ________ en mangeant moins.",      answer: "maigrit",      difficulty: 2 },
-      { subject: "nous",  infinitive: "maigrir",   sentence: "Nous ________ pendant l'été.",          answer: "maigrissons",  difficulty: 3 },
-
-      /* ── grossir ── */
-      { subject: "tu",    infinitive: "grossir",   sentence: "Tu ________ un peu.",                   answer: "grossis",      difficulty: 2 },
-      { subject: "ils",   infinitive: "grossir",   sentence: "Ils ________ pendant l'hiver.",         answer: "grossissent",  difficulty: 2 },
-
-      /* ── avertir ── */
-      { subject: "je",    infinitive: "avertir",   sentence: "Je ________ mes amis.",                 answer: "avertis",      difficulty: 2 },
-      { subject: "nous",  infinitive: "avertir",   sentence: "Nous ________ la classe.",              answer: "avertissons",  difficulty: 3 },
-
-      /* ── réfléchir ── */
-      { subject: "je",    infinitive: "réfléchir", sentence: "Je ________ avant de répondre.",        answer: "réfléchis",    difficulty: 2 },
-      { subject: "tu",    infinitive: "réfléchir", sentence: "Tu ________ à la question.",            answer: "réfléchis",    difficulty: 2 },
-      { subject: "elle",  infinitive: "réfléchir", sentence: "Elle ________ longuement.",             answer: "réfléchit",    difficulty: 2 },
-      { subject: "nous",  infinitive: "réfléchir", sentence: "Nous ________ ensemble.",               answer: "réfléchissons",difficulty: 3 },
-      { subject: "ils",   infinitive: "réfléchir", sentence: "Ils ________ au problème.",             answer: "réfléchissent",difficulty: 3 }
+      /* ── NIVEAU 3 : saisie libre, sujet = groupe nominal (10) ── */
+      { level: 3, infinitive: "grandir",    sentence: "Les fleurs ________ au printemps.",              answer: "grandissent" },
+      { level: 3, infinitive: "choisir",    sentence: "Ma sœur et moi ________ un livre.",              answer: "choisissons" },
+      { level: 3, infinitive: "réussir",    sentence: "Le chevalier ________ sa mission.",              answer: "réussit"     },
+      { level: 3, infinitive: "finir",      sentence: "Les élèves ________ leur exercice.",             answer: "finissent"   },
+      { level: 3, infinitive: "obéir",      sentence: "Le chien ________ à son maître.",                answer: "obéit"       },
+      { level: 3, infinitive: "remplir",    sentence: "Toi et ton frère ________ les verres.",          answer: "remplissez"  },
+      { level: 3, infinitive: "rougir",     sentence: "La petite fille ________ de timidité.",          answer: "rougit"      },
+      { level: 3, infinitive: "grandir",    sentence: "Mes cousins ________ très vite.",                answer: "grandissent" },
+      { level: 3, infinitive: "choisir",    sentence: "Toi et tes amis ________ un jeu.",               answer: "choisissez"  },
+      { level: 3, infinitive: "réfléchir",  sentence: "La maîtresse ________ à la meilleure solution.", answer: "réfléchit"   }
     ]
   },
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     Type : troisieme-groupe-present-niveaux
+     Niveau 1 : QCM (5) + associer sujet↔forme (5) — sujets = pronoms.
+     Niveau 2 : saisie libre, pronom + infinitif donnés — cible les pièges
+                classiques (vous faites/dites, ils vont/font, tu peux/veux
+                en -x, il prend sans -t supplémentaire).
+     Niveau 3 : saisie libre, sujet = groupe nominal (pas de pronom).
+     Seuls 8 verbes autorisés (tous représentés sur les 3 niveaux) :
+     faire, aller, dire, venir, pouvoir, voir, vouloir, prendre.
+     Progression verrouillée : seuil 80 %, persistance sessionStorage.
+  ══════════════════════════════════════════════════════════════════════════ */
 
   "conjuguer-3e-groupe-present": {
     title: "Conjuguer les verbes fréquents du 3e groupe au présent",
     domaine:    "Français",
     competence: "Conjugaison — 3e groupe au présent",
-    type: "text-input",
-    levels: ["CM1", "CM2", "6e"],
-    paliers: 1, /* nombre réel de paliers du moteur */
-    questionsPerSession: 25,
-    sortByDifficulty: true,
+    type:       "troisieme-groupe-present-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
+    questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
+    /* bank : chaque item porte un champ « level » 1-3.
+       Niveau 1 (mode "mcq" ou "matching") : sujets = pronoms personnels.
+         mode "mcq" : choices = 4 formes possibles du même verbe.
+         mode "matching" : forms = formes distinctes du verbe. Pour la
+         plupart de ces verbes, je et tu partagent la même forme (5 formes
+         distinctes) — SAUF aller, entièrement irrégulier (vais/vas/va/
+         allons/allez/vont), dont les 6 formes sont toutes distinctes.
+       Niveaux 2 et 3 (saisie libre) : q.infinitive + q.sentence + q.answer.
+       Niveau 2 = pronom donné, niveau 3 = sujet non pronominal (GN). */
     bank: [
-      /* ── FAIRE ── */
-      { subject: "je",    infinitive: "faire",   sentence: "Je ________ mes devoirs.",               answer: "fais",     difficulty: 1 },
-      { subject: "tu",    infinitive: "faire",   sentence: "Tu ________ du sport.",                  answer: "fais",     difficulty: 1 },
-      { subject: "il",    infinitive: "faire",   sentence: "Il ________ beau aujourd'hui.",          answer: "fait",     difficulty: 1 },
-      { subject: "nous",  infinitive: "faire",   sentence: "Nous ________ une promenade.",           answer: "faisons",  difficulty: 2 },
-      { subject: "vous",  infinitive: "faire",   sentence: "Vous ________ de la peinture.",          answer: "faites",   difficulty: 3 },
-      { subject: "ils",   infinitive: "faire",   sentence: "Ils ________ la cuisine.",               answer: "font",     difficulty: 2 },
-      { subject: "elle",  infinitive: "faire",   sentence: "Elle ________ du vélo.",                 answer: "fait",     difficulty: 1 },
-      { subject: "elles", infinitive: "faire",   sentence: "Elles ________ du bruit.",               answer: "font",     difficulty: 2 },
+      /* ── NIVEAU 1 : QCM (5) ── */
+      { level: 1, mode: "mcq", infinitive: "faire",   subject: "je",   choices: ["fais", "fait", "faisons", "faites"], answer: "fais" },
+      { level: 1, mode: "mcq", infinitive: "aller",   subject: "tu",   choices: ["vas", "va", "allons", "allez"], answer: "vas" },
+      { level: 1, mode: "mcq", infinitive: "dire",    subject: "il",   choices: ["dit", "dis", "disons", "dites"], answer: "dit" },
+      { level: 1, mode: "mcq", infinitive: "pouvoir", subject: "nous", choices: ["pouvons", "pouvez", "peuvent", "peut"], answer: "pouvons" },
+      { level: 1, mode: "mcq", infinitive: "vouloir", subject: "vous", choices: ["voulez", "voulons", "veulent", "veut"], answer: "voulez" },
 
-      /* ── ALLER ── */
-      { subject: "je",    infinitive: "aller",   sentence: "Je ________ à l'école.",                 answer: "vais",     difficulty: 2 },
-      { subject: "tu",    infinitive: "aller",   sentence: "Tu ________ au parc.",                   answer: "vas",      difficulty: 2 },
-      { subject: "il",    infinitive: "aller",   sentence: "Il ________ chez son ami.",              answer: "va",       difficulty: 2 },
-      { subject: "nous",  infinitive: "aller",   sentence: "Nous ________ au cinéma.",               answer: "allons",   difficulty: 2 },
-      { subject: "vous",  infinitive: "aller",   sentence: "Vous ________ à la piscine.",            answer: "allez",    difficulty: 2 },
-      { subject: "ils",   infinitive: "aller",   sentence: "Ils ________ au marché.",                answer: "vont",     difficulty: 2 },
-      { subject: "elle",  infinitive: "aller",   sentence: "Elle ________ à la bibliothèque.",       answer: "va",       difficulty: 2 },
+      /* ── NIVEAU 1 : associer sujet ↔ forme (5) ── */
+      { level: 1, mode: "matching", infinitive: "venir",   subject: "Elle",  forms: ["viens", "vient", "venons", "venez", "viennent"], answer: "vient" },
+      { level: 1, mode: "matching", infinitive: "voir",    subject: "Ils",   forms: ["vois", "voit", "voyons", "voyez", "voient"],       answer: "voient" },
+      { level: 1, mode: "matching", infinitive: "prendre", subject: "Vous",  forms: ["prends", "prend", "prenons", "prenez", "prennent"], answer: "prenez" },
+      { level: 1, mode: "matching", infinitive: "faire",   subject: "Elles", forms: ["fais", "fait", "faisons", "faites", "font"],        answer: "font" },
+      { level: 1, mode: "matching", infinitive: "aller",   subject: "On",    forms: ["vais", "vas", "va", "allons", "allez", "vont"],     answer: "va" },
 
-      /* ── DIRE ── */
-      { subject: "je",    infinitive: "dire",    sentence: "Je ________ la vérité.",                 answer: "dis",      difficulty: 1 },
-      { subject: "tu",    infinitive: "dire",    sentence: "Tu ________ toujours oui.",              answer: "dis",      difficulty: 1 },
-      { subject: "il",    infinitive: "dire",    sentence: "Il ________ merci.",                     answer: "dit",      difficulty: 1 },
-      { subject: "nous",  infinitive: "dire",    sentence: "Nous ________ bonjour.",                 answer: "disons",   difficulty: 2 },
-      { subject: "vous",  infinitive: "dire",    sentence: "Vous ________ n'importe quoi.",          answer: "dites",    difficulty: 3 },
-      { subject: "ils",   infinitive: "dire",    sentence: "Ils ________ qu'il va pleuvoir.",        answer: "disent",   difficulty: 2 },
+      /* ── NIVEAU 2 : saisie libre, pronom donné (10) ── */
+      { level: 2, infinitive: "faire",   sentence: "Je ________ mes devoirs.",       answer: "fais"    },
+      { level: 2, infinitive: "pouvoir", sentence: "Tu ________ venir avec nous ?",  answer: "peux"    },
+      { level: 2, infinitive: "vouloir", sentence: "Tu ________ jouer avec moi ?",   answer: "veux"    },
+      { level: 2, infinitive: "prendre", sentence: "Il ________ son goûter.",        answer: "prend"   },
+      { level: 2, infinitive: "dire",    sentence: "Elle ________ la vérité.",       answer: "dit"     },
+      { level: 2, infinitive: "venir",   sentence: "Nous ________ à l'école à pied.",answer: "venons"  },
+      { level: 2, infinitive: "faire",   sentence: "Vous ________ du sport ?",       answer: "faites"  },
+      { level: 2, infinitive: "dire",    sentence: "Vous ________ toujours merci.",  answer: "dites"   },
+      { level: 2, infinitive: "aller",   sentence: "Ils ________ à la piscine.",     answer: "vont"    },
+      { level: 2, infinitive: "faire",   sentence: "Ils ________ leurs devoirs ensemble.", answer: "font" },
 
-      /* ── VENIR ── */
-      { subject: "je",    infinitive: "venir",   sentence: "Je ________ te voir demain.",            answer: "viens",    difficulty: 2 },
-      { subject: "tu",    infinitive: "venir",   sentence: "Tu ________ avec nous ?",                answer: "viens",    difficulty: 2 },
-      { subject: "il",    infinitive: "venir",   sentence: "Il ________ de Madrid.",                 answer: "vient",    difficulty: 2 },
-      { subject: "nous",  infinitive: "venir",   sentence: "Nous ________ à la fête.",               answer: "venons",   difficulty: 2 },
-      { subject: "vous",  infinitive: "venir",   sentence: "Vous ________ ce soir ?",                answer: "venez",    difficulty: 2 },
-      { subject: "ils",   infinitive: "venir",   sentence: "Ils ________ en train.",                 answer: "viennent", difficulty: 3 },
-      { subject: "elle",  infinitive: "venir",   sentence: "Elle ________ en classe.",               answer: "vient",    difficulty: 2 },
-
-      /* ── POUVOIR ── */
-      { subject: "je",    infinitive: "pouvoir", sentence: "Je ________ t'aider.",                   answer: "peux",     difficulty: 2 },
-      { subject: "tu",    infinitive: "pouvoir", sentence: "Tu ________ venir ce soir.",             answer: "peux",     difficulty: 2 },
-      { subject: "il",    infinitive: "pouvoir", sentence: "Il ________ courir vite.",               answer: "peut",     difficulty: 2 },
-      { subject: "nous",  infinitive: "pouvoir", sentence: "Nous ________ commencer.",               answer: "pouvons",  difficulty: 2 },
-      { subject: "vous",  infinitive: "pouvoir", sentence: "Vous ________ sortir.",                  answer: "pouvez",   difficulty: 2 },
-      { subject: "ils",   infinitive: "pouvoir", sentence: "Ils ________ jouer dehors.",             answer: "peuvent",  difficulty: 3 },
-
-      /* ── VOIR ── */
-      { subject: "je",    infinitive: "voir",    sentence: "Je ________ la mer.",                    answer: "vois",     difficulty: 1 },
-      { subject: "tu",    infinitive: "voir",    sentence: "Tu ________ le tableau ?",               answer: "vois",     difficulty: 1 },
-      { subject: "il",    infinitive: "voir",    sentence: "Il ________ ses amis le week-end.",      answer: "voit",     difficulty: 1 },
-      { subject: "nous",  infinitive: "voir",    sentence: "Nous ________ un film.",                 answer: "voyons",   difficulty: 2 },
-      { subject: "vous",  infinitive: "voir",    sentence: "Vous ________ le problème ?",            answer: "voyez",    difficulty: 2 },
-      { subject: "ils",   infinitive: "voir",    sentence: "Ils ________ le match à la télé.",       answer: "voient",   difficulty: 3 },
-      { subject: "elle",  infinitive: "voir",    sentence: "Elle ________ mal sans ses lunettes.",   answer: "voit",     difficulty: 1 },
-
-      /* ── VOULOIR ── */
-      { subject: "je",    infinitive: "vouloir", sentence: "Je ________ un gâteau.",                 answer: "veux",     difficulty: 2 },
-      { subject: "tu",    infinitive: "vouloir", sentence: "Tu ________ jouer ?",                    answer: "veux",     difficulty: 2 },
-      { subject: "il",    infinitive: "vouloir", sentence: "Il ________ dormir.",                    answer: "veut",     difficulty: 2 },
-      { subject: "nous",  infinitive: "vouloir", sentence: "Nous ________ partir en voyage.",        answer: "voulons",  difficulty: 2 },
-      { subject: "vous",  infinitive: "vouloir", sentence: "Vous ________ du chocolat ?",            answer: "voulez",   difficulty: 2 },
-      { subject: "ils",   infinitive: "vouloir", sentence: "Ils ________ gagner.",                   answer: "veulent",  difficulty: 3 },
-      { subject: "elle",  infinitive: "vouloir", sentence: "Elle ________ une nouvelle poupée.",     answer: "veut",     difficulty: 2 },
-
-      /* ── PRENDRE ── */
-      { subject: "je",    infinitive: "prendre", sentence: "Je ________ mon cartable.",              answer: "prends",   difficulty: 1 },
-      { subject: "tu",    infinitive: "prendre", sentence: "Tu ________ le bus.",                    answer: "prends",   difficulty: 1 },
-      { subject: "il",    infinitive: "prendre", sentence: "Il ________ son petit-déjeuner.",        answer: "prend",    difficulty: 2 },
-      { subject: "nous",  infinitive: "prendre", sentence: "Nous ________ le train.",                answer: "prenons",  difficulty: 2 },
-      { subject: "vous",  infinitive: "prendre", sentence: "Vous ________ quelle route ?",           answer: "prenez",   difficulty: 2 },
-      { subject: "ils",   infinitive: "prendre", sentence: "Ils ________ leurs affaires.",           answer: "prennent", difficulty: 3 },
-      { subject: "elle",  infinitive: "prendre", sentence: "Elle ________ un livre.",                answer: "prend",    difficulty: 2 }
+      /* ── NIVEAU 3 : saisie libre, sujet = groupe nominal (10) ── */
+      { level: 3, infinitive: "aller",    sentence: "Les enfants ________ à la piscine.",        answer: "vont"     },
+      { level: 3, infinitive: "faire",    sentence: "Mon voisin ________ du vélo.",               answer: "fait"     },
+      { level: 3, infinitive: "prendre",  sentence: "Léa et moi ________ le bus.",                answer: "prenons"  },
+      { level: 3, infinitive: "dire",     sentence: "La maîtresse ________ bonjour.",             answer: "dit"      },
+      { level: 3, infinitive: "voir",     sentence: "Le chat ________ une souris.",                answer: "voit"     },
+      { level: 3, infinitive: "pouvoir",  sentence: "Toi et ton frère ________ venir ce soir.",    answer: "pouvez"   },
+      { level: 3, infinitive: "vouloir",  sentence: "Mes parents ________ partir en vacances.",    answer: "veulent"  },
+      { level: 3, infinitive: "venir",    sentence: "Les élèves ________ de la piscine.",          answer: "viennent" },
+      { level: 3, infinitive: "voir",     sentence: "Toi et tes amis ________ le spectacle.",      answer: "voyez"    },
+      { level: 3, infinitive: "faire",    sentence: "Les hirondelles ________ un long voyage.",    answer: "font"     }
     ]
   },
 
