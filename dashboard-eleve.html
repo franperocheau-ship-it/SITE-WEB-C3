@@ -6,6 +6,7 @@
   <title>Espace élève — Lycée Français de Madrid</title>
   <link rel="stylesheet" href="styles.css?v=11">
   <link rel="stylesheet" href="laurels.css?v=2">
+  <link rel="stylesheet" href="css/jogging.css?v=1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
@@ -14,6 +15,8 @@
   <script src="js/exercise-catalog.js?v=6"></script>
   <script src="js/laurels.js?v=2"></script>
   <script src="js/level-badge.js?v=1"></script>
+  <script src="js/jogging-data.js?v=1"></script>
+  <script src="js/jogging-student-space.js?v=1"></script>
   <style>
     .dash-wrap {
       min-height: calc(100vh - 88px - 74px);
@@ -497,6 +500,7 @@
       <div class="dash-tabs">
         <button class="dash-tab dash-tab--active" data-tab="exercices">🎯 Faire des exercices</button>
         <button class="dash-tab" data-tab="resultats">📊 Mes résultats</button>
+        <button class="dash-tab" data-tab="joggings">✍️ Mes joggings d'écriture</button>
       </div>
 
       <!-- ── Tab 1 : Faire des exercices ── -->
@@ -586,6 +590,46 @@
 
       </div><!-- /tab-resultats -->
 
+      <!-- ── Tab 3 : Mes joggings d'écriture ── -->
+      <div id="tab-joggings" class="dash-tab-pane" style="display:none">
+
+      <!-- Mon bilan -->
+      <div class="dash-stats" id="jog-stats" style="display:none">
+        <div class="dash-stat">
+          <div class="dash-stat-label">Joggings réalisés</div>
+          <div class="dash-stat-value" id="jog-stat-total">0</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-label">Feux verts obtenus</div>
+          <div class="dash-stat-value" id="jog-stat-verts">0</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-label">Dernier jogging</div>
+          <div class="dash-stat-value" id="jog-stat-dernier" style="font-size:16px;">—</div>
+        </div>
+      </div>
+
+      <div class="dash-section" id="jog-encouragement-section" style="display:none">
+        <div id="jog-encouragement-msg" style="font-size:14px;font-weight:700;color:var(--blue);text-align:center;"></div>
+      </div>
+
+      <!-- Mon historique -->
+      <div class="dash-section" id="jog-historique-section" style="display:none">
+        <div class="dash-section-title">Mon historique</div>
+        <div id="jog-historique-list"></div>
+      </div>
+
+      <!-- État vide (aucun jogging pour l'instant) -->
+      <div class="dash-section" id="jog-empty-section" style="display:none">
+        <div class="dash-empty">
+          <div class="dash-empty-icon">✍️</div>
+          <strong>Aucun jogging pour l'instant.</strong><br>
+          Rends-toi dans Français → Rédaction pour commencer !
+        </div>
+      </div>
+
+      </div><!-- /tab-joggings -->
+
       <!-- Actions -->
       <div class="dash-actions">
         <a href="index.html" class="dash-back-link">← Retour aux exercices</a>
@@ -639,6 +683,7 @@
       /* Données à jour à chaque retour sur l'onglet (ex: après avoir terminé
          un exercice) plutôt qu'un calcul figé au chargement initial. */
       if (tabName === 'resultats' && _profile) refreshResultsTab();
+      if (tabName === 'joggings' && _profile) JoggingStudentSpace.render(_profile.id);
     }
 
     document.querySelectorAll('.dash-tab').forEach(btn => {
