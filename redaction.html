@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rédaction — Français — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="breadcrumb.css?v=1">
+  <link rel="stylesheet" href="level-select.css?v=1">
+  <link rel="stylesheet" href="css/jogging.css?v=1">
+  <script src="js/breadcrumb.js?v=1"></script>
+  <script src="js/jogging-data.js?v=1"></script>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <!-- MAIN -->
+  <div class="page-wrap">
+    <div class="page-content">
+
+      <script>Breadcrumb.render({ current: 'Rédaction' });</script>
+
+      <a href="français.html" class="back-link">← Français</a>
+
+      <div class="page-header">
+        <div class="page-header-icon" style="font-size:56px;line-height:1;">✍️</div>
+        <h1 class="page-title">RÉDACTION</h1>
+        <div class="page-title-rule"></div>
+        <p class="page-subtitle">Choisis un jogging d'écriture. Fais passer tous les feux au vert !</p>
+      </div>
+
+      <div class="jog-cards-grid" id="jog-cards-grid"></div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau – LFM &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/menu.js"></script>
+
+  <script>
+    const TEMPS_CLASS = {
+      "Présent":        "jog-temps--present",
+      "Imparfait":      "jog-temps--imparfait",
+      "Passé composé":  "jog-temps--passe-compose",
+      "Futur":          "jog-temps--futur"
+    };
+
+    function renderJoggingCard(jog) {
+      return `
+        <a class="jog-card" href="jogging.html?id=${jog.id}">
+          <div class="jog-card-illustration">✍️</div>
+          <div class="jog-card-badges">
+            <span class="ls-pastille" style="--ls-color:var(--ls-color-${jog.niveau})">Niveau ${jog.niveau}</span>
+            <span class="jog-temps ${TEMPS_CLASS[jog.tempsImpose] || ''}">${jog.tempsImpose}</span>
+          </div>
+          <div class="jog-card-title">${jog.title}</div>
+          <div class="jog-card-competence">${jog.competence}</div>
+          <div class="jog-card-duree">⏱ ${jog.duree} min</div>
+          <span class="jog-card-btn">Commencer →</span>
+        </a>
+      `;
+    }
+
+    document.getElementById('jog-cards-grid').innerHTML =
+      JOGGING_LIST.map(renderJoggingCard).join('');
+  </script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

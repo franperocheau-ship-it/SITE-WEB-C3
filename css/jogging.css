@@ -1,0 +1,444 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   css/jogging.css — Module Rédaction (Phase 1)
+   Chargé uniquement sur redaction.html et jogging.html, avec ?v= pour le
+   cache-busting (piège connu, §1.1).
+
+   Les styles de cartes/boutons du reste du site ne sont pas centralisés
+   dans un composant partagé (voir §1.2 du cahier des charges) : les valeurs
+   visuelles de .skill-card et .ex-validate-btn sont recopiées ici tel quel.
+   Les pastilles de niveau (level-select.css) et les badges (laurels.css)
+   sont, eux, bien centralisés — ils sont importés directement par les pages
+   du module, pas recopiés.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── Pastille "temps de conjugaison imposé" ──────────────────────────────
+   4 couleurs déclinées de la charte, distinctes des couleurs de niveau
+   (teal/bleu/or) pour éviter toute confusion entre les deux pastilles d'une
+   même carte (§1.1 / §5.1). Réutilisées partout dans le module. */
+.jog-temps {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  color: #ffffff;
+  white-space: nowrap;
+}
+.jog-temps--present        { background: #7C5CBF; }
+.jog-temps--imparfait      { background: #E0765C; }
+.jog-temps--passe-compose  { background: #D62839; }
+.jog-temps--futur          { background: #1A2D6B; }
+
+/* ─── Catalogue (redaction.html) : grille des 15 cartes ───────────────── */
+.jog-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 768px) { .jog-cards-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .jog-cards-grid { grid-template-columns: 1fr; } }
+
+/* Carte jogging — valeurs visuelles recopiées de .skill-card (styles.css
+   n'en centralise que la position:relative de base). */
+.jog-card {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-decoration: none;
+  transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms;
+  position: relative;
+}
+.jog-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(16,43,106,0.18);
+}
+
+.jog-card-illustration {
+  width: 100%;
+  height: 64px;
+  border-radius: 10px;
+  background: rgba(16,43,106,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+}
+
+.jog-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.jog-card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.jog-card-competence {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.jog-card-duree {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* Bouton "Commencer" — valeurs recopiées de .ex-validate-btn */
+.jog-card-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: var(--blue);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 9px 16px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  margin-top: 4px;
+  transition: background 200ms, transform 200ms;
+}
+.jog-card-btn:hover {
+  background: #0d2255;
+  transform: translateY(-1px);
+}
+
+/* Rendre toute la carte cliquable quand le bouton est un <a> */
+.jog-card a.jog-card-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+/* ─── Écran du jogging (jogging.html) ─────────────────────────────────── */
+
+.jog-intro-consigne {
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: 18px;
+}
+
+.jog-intro-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.jog-intro-duree {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* Bandeau de version : V1 → V2 → V3 */
+.jog-version-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 4px 0 20px;
+}
+.jog-version-step {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  border: 2px solid var(--border);
+  color: var(--muted);
+  background: var(--card-bg);
+  transition: background 250ms, border-color 250ms, color 250ms;
+}
+.jog-version-step--done   { background: var(--blue); border-color: var(--blue); color: #fff; }
+.jog-version-step--active { border-color: var(--blue); color: var(--blue); }
+.jog-version-sep {
+  width: 22px;
+  height: 2px;
+  background: var(--border);
+}
+.jog-version-label {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* Éditeur */
+.jog-textarea {
+  width: 100%;
+  min-height: 260px;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--card-bg);
+  resize: vertical;
+  transition: border-color 200ms, box-shadow 200ms;
+}
+.jog-textarea:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(16,43,106,0.08);
+}
+.jog-textarea:disabled { cursor: default; opacity: 0.75; }
+
+.jog-wordcount {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: right;
+  margin: 6px 2px 16px;
+}
+.jog-wordcount.is-warning { color: var(--red); font-weight: 700; }
+
+.jog-autosave-status {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: right;
+  margin: -12px 2px 14px;
+  min-height: 14px;
+}
+
+/* Bouton "Corriger mon texte" — pleine largeur, valeurs recopiées de
+   .ex-validate-btn (variante pleine largeur type .ct-val-btn). */
+.jog-validate-btn {
+  display: block;
+  width: 100%;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 24px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: background 200ms, transform 200ms;
+}
+.jog-validate-btn:hover:not(:disabled) { background: #0d2255; transform: translateY(-1px); }
+.jog-validate-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* Transition brève éditeur → correction (§3.11 : Grammalecte est quasi
+   instantané, plus besoin d'un écran d'attente à message). */
+.jog-fade-out { animation: jog-fade-out 300ms ease forwards; }
+.jog-fade-in  { animation: jog-fade-in 400ms ease; }
+@keyframes jog-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes jog-fade-in  { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Message d'erreur rassurant */
+.jog-error-box {
+  text-align: center;
+  padding: 32px 24px;
+  background: rgba(214,40,57,0.05);
+  border: 1.5px solid rgba(214,40,57,0.2);
+  border-radius: 14px;
+}
+.jog-error-text {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+/* ─── Écran de correction ──────────────────────────────────────────────── */
+
+.jog-correction-text {
+  position: relative;
+  line-height: 1.85;
+  font-size: 15px;
+  color: var(--text);
+  padding: 18px 20px;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+}
+
+.jog-highlight {
+  border-radius: 4px;
+  padding: 0 2px;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+.jog-highlight[data-code="C"] { background: rgba(16,43,106,0.12); color: #102B6A; }
+.jog-highlight[data-code="H"] { background: rgba(29,191,160,0.14); color: #0E7A66; }
+.jog-highlight[data-code="A"] { background: rgba(214,40,57,0.12); color: #B21E30; }
+.jog-highlight[data-code="M"] { background: rgba(245,166,35,0.16); color: #8A5A0E; }
+.jog-highlight[data-code="P"] { background: rgba(74,144,217,0.16); color: #2A5F92; }
+.jog-highlight[data-code="O"] { background: rgba(224,118,92,0.16); color: #A0492F; }
+.jog-highlight[data-code="N"] { background: rgba(124,92,191,0.16); color: #5A3F8F; }
+.jog-highlight[data-code="S"] { background: rgba(16,43,106,0.10); color: #102B6A; }
+
+.jog-bubble {
+  position: absolute;
+  z-index: 20;
+  max-width: 260px;
+  background: var(--blue);
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  box-shadow: var(--shadow-md);
+}
+.jog-bubble-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  margin-bottom: 4px;
+  color: #F5A623;
+}
+
+/* Tableau Code Champion — pleine largeur, sous le texte, jamais en colonne */
+.jog-feux-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin: 22px 0 10px;
+}
+/* Une seule ligne, toujours — se lit comme "CHAMPIONS". Les tuiles
+   rétrécissent jusqu'à leur largeur minimale avant de déclencher un
+   défilement horizontal (jamais de passage à la ligne). */
+.jog-feux-grid {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch;
+}
+.jog-feu-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex: 1 1 0;
+  min-width: 38px;
+  padding: 8px 3px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  cursor: default;
+  transition: background 400ms ease, border-color 400ms ease, transform 400ms ease;
+}
+/* N (Néant) : toujours en attente d'une évaluation manuelle enseignante en
+   Phase 1 (jogging_enrichments, Phase 2) — bordure pointillée + curseur pour
+   le distinguer de I, qui lui n'aura jamais de sens à cliquer. */
+.jog-feu-cell--manual {
+  border-style: dashed;
+  cursor: pointer;
+}
+.jog-feu-cell.jog-feu-anim { animation: jog-feu-pop 400ms ease; }
+@keyframes jog-feu-pop {
+  0%   { transform: scale(0.85); opacity: 0.4; }
+  60%  { transform: scale(1.12); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.jog-feu-cell--vert   { background: rgba(22,163,74,0.10);  border-color: rgba(22,163,74,0.35); }
+.jog-feu-cell--orange { background: rgba(245,166,35,0.14); border-color: rgba(245,166,35,0.4); }
+.jog-feu-cell--rouge  { background: rgba(214,40,57,0.10);  border-color: rgba(214,40,57,0.35); }
+.jog-feu-cell--blanc  { background: rgba(0,0,0,0.02);      border-color: var(--border); opacity: 0.6; }
+
+.jog-feu-letter {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  color: var(--muted);
+}
+.jog-feu-icon { font-size: 17px; line-height: 1; }
+.jog-feu-cell--vert   .jog-feu-icon { color: #16a34a; }
+.jog-feu-cell--orange .jog-feu-icon { color: #b8760f; }
+.jog-feu-cell--rouge  .jog-feu-icon { color: #D62839; }
+.jog-feu-cell--blanc  .jog-feu-icon { color: var(--muted); }
+
+/* Légende contextuelle par lettre (survol desktop / tap mobile) — même
+   charte que la bulle d'explication des erreurs surlignées (.jog-bubble). */
+.jog-feu-tooltip {
+  position: fixed;
+  z-index: 30;
+  max-width: 220px;
+  background: var(--blue);
+  color: #fff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.45;
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+}
+.jog-feu-tooltip-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  margin-bottom: 3px;
+  color: #F5A623;
+}
+
+.jog-mission {
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--blue);
+  margin-top: 22px;
+}
+.jog-progress-msg {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.jog-actions {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.jog-final-message {
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--blue);
+}
