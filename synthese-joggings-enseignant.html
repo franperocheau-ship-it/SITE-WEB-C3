@@ -131,6 +131,13 @@
     .stat-value { font-size: 32px; font-weight: 900; color: var(--blue); line-height: 1; }
     .stat-unit { font-size: 14px; font-weight: 600; color: var(--muted); margin-left: 4px; }
 
+    /* ── Vue Statistiques (Phase 3, §5.7.5) ─────────────────────────────────── */
+    .jog-stats-card { background: var(--card-bg); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); padding: 20px 22px; margin-bottom: 16px; }
+    .jog-stats-block-title {
+      font-family: var(--font-display); font-weight: 800; font-size: 13px;
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px;
+    }
+
     /* Cartes de joggings + zone de reformulation (réutilise .jog-histo-* de
        css/jogging.css pour l'historique, complété ici pour la partie propre
        à l'enseignant : reformulation, commentaire, sélecteur N, publication) */
@@ -165,6 +172,33 @@
     .jog-publish-row label { margin: 0; font-size: 12.5px; font-weight: 600; color: var(--text); }
     .jog-reform-actions { margin-top: 14px; display: flex; align-items: center; gap: 12px; }
     .jog-reform-saved { font-size: 12px; color: #15803d; font-weight: 600; }
+
+    /* ── Gérer mes joggings (Phase 4, §5.8) — réutilise .jog-teacher-reform/
+       .jog-n-selector ci-dessus pour le formulaire de personnalisation. ──── */
+    .jog-gerer-field-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
+    .jog-gerer-field-row label { margin: 0; }
+    .jog-gerer-field-row:first-child { margin-top: 0; }
+    .jog-teacher-reform input[type="text"],
+    .jog-teacher-reform input[type="number"],
+    .jog-teacher-reform select {
+      width: 100%; font-family: inherit; font-size: 13px; color: var(--text);
+      border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 12px;
+      background: var(--card-bg);
+    }
+    .jog-teacher-reform input[type="text"]:focus,
+    .jog-teacher-reform input[type="number"]:focus,
+    .jog-teacher-reform select:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(16,43,106,0.08); }
+    .jog-gerer-reset-btn {
+      flex-shrink: 0; border: none; background: none; color: var(--blue);
+      font-family: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; padding: 2px 0;
+    }
+    .jog-gerer-reset-btn:hover { text-decoration: underline; }
+    .jog-gerer-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 100px; margin-right: 4px;
+    }
+    .jog-gerer-badge--custom { background: rgba(16,43,106,0.08); color: var(--blue); }
+    .jog-gerer-badge--locked { background: rgba(214,40,57,0.1); color: var(--red); }
 
     /* ── États vides / chargement ─────────────────────────────────────────────── */
     .empty-state { text-align: center; padding: 56px 24px; color: var(--muted); }
@@ -336,6 +370,10 @@
       <div id="view-classe" style="display:none">
         <div class="section-header">
           <h1 class="section-title">Synthèse des joggings d'écriture</h1>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-outline btn-sm" onclick="openStats()">📊 Statistiques de la classe</button>
+            <button class="btn btn-outline btn-sm" onclick="openGerer()">⚙️ Gérer mes joggings</button>
+          </div>
         </div>
 
         <div class="jog-filters">
@@ -383,6 +421,39 @@
         <div class="stats-row-3" id="jog-student-stats"></div>
 
         <div id="jog-student-joggings"></div>
+
+        <div class="nav-footer">
+          <button class="btn btn-ghost btn-sm" onclick="showView('classe')">← Retour à la vue classe</button>
+        </div>
+      </div>
+
+      <!-- ── Statistiques (scope : classe sélectionnée dans le filtre) ──────── -->
+      <div id="view-stats" style="display:none">
+        <div class="section-header">
+          <h1 class="section-title">Statistiques — <span id="jog-stats-classname">—</span></h1>
+        </div>
+
+        <div id="jog-stats-body"><div class="view-loading">Chargement…</div></div>
+
+        <div class="nav-footer">
+          <button class="btn btn-ghost btn-sm" onclick="showView('classe')">← Retour à la vue classe</button>
+        </div>
+      </div>
+
+      <!-- ── Gérer mes joggings (Phase 4, §5.7 point 5 / §5.8) ───────────────── -->
+      <div id="view-gerer" style="display:none">
+        <div class="section-header">
+          <h1 class="section-title">Gérer mes joggings</h1>
+        </div>
+
+        <div class="jog-filters" id="jog-gerer-class-filter" style="display:none">
+          <div class="jog-filter-field">
+            <label for="jog-gerer-class-select">Classe</label>
+            <select id="jog-gerer-class-select"></select>
+          </div>
+        </div>
+
+        <div id="jog-gerer-list"><div class="view-loading">Chargement…</div></div>
 
         <div class="nav-footer">
           <button class="btn btn-ghost btn-sm" onclick="showView('classe')">← Retour à la vue classe</button>
@@ -437,6 +508,10 @@
   let _sortAsc = true;
   let _currentStudent = null; // { auth_user_id, display_name, class_id }
   let _currentStudentJoggings = []; // [{session, versions, enrichment}]
+  let _teacherProfile = null;
+  let _gererClassId = null;
+  let _gererMode = 'libre';
+  let _gererSettings = new Map(); // jogging_id -> ligne jogging_class_settings
 
   /* ═══════════════════════════════════════════════════════════════════════════
      UTILITAIRES
@@ -476,6 +551,8 @@
     document.getElementById('view-loading').style.display = 'none';
     document.getElementById('view-classe').style.display = name === 'classe' ? '' : 'none';
     document.getElementById('view-eleve').style.display  = name === 'eleve'  ? '' : 'none';
+    document.getElementById('view-stats').style.display  = name === 'stats'  ? '' : 'none';
+    document.getElementById('view-gerer').style.display  = name === 'gerer'  ? '' : 'none';
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -582,6 +659,342 @@
           <tbody>${bodyRows}</tbody>
         </table>
       </div>`;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     STATISTIQUES (Phase 3, §5.7.5) — scope : classe sélectionnée dans le
+     filtre de la vue classe. Tout est agrégé côté front à partir des
+     sessions/versions déjà chargées, aucun appel externe.
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function openStats() {
+    if (!_currentClassId) { alert("Choisis d'abord une classe dans le filtre de la vue classe."); return; }
+    const cls = _classes.find(c => c.id === _currentClassId);
+    document.getElementById('jog-stats-classname').textContent = cls ? `${cls.name} (${cls.level})` : '—';
+    document.getElementById('jog-stats-body').innerHTML = '<div class="view-loading">Chargement…</div>';
+    showView('stats');
+
+    try {
+      const stats = await lfmJoggingTeacher.getClassStatistics(_currentClassId);
+      renderStats(stats);
+    } catch (e) {
+      document.getElementById('jog-stats-body').innerHTML =
+        `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Impossible de charger les statistiques (${escHtml(e.message)}).</div></div>`;
+    }
+  }
+
+  function renderStats(stats) {
+    const body = document.getElementById('jog-stats-body');
+    if (stats.completedCount === 0) {
+      body.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">Pas encore assez de joggings terminés dans cette classe pour calculer des statistiques.</div></div>';
+      return;
+    }
+
+    const progressionLabel = stats.averageProgression !== null
+      ? `${stats.averageProgression >= 0 ? '+' : ''}${stats.averageProgression.toFixed(1)}`
+      : '—';
+
+    const maxErrCount = stats.errorFrequency.length ? stats.errorFrequency[0].count : 0;
+    const errorsHtml = stats.errorFrequency.length
+      ? stats.errorFrequency.slice(0, 7).map(e => {
+          const pct = maxErrCount ? Math.round((e.count / maxErrCount) * 100) : 0;
+          return `
+            <div class="jog-evo-repart-row">
+              <div class="jog-evo-repart-label">${e.code} · ${escHtml(CODE_LABELS[e.code] || e.code)}</div>
+              <div class="jog-evo-repart-bar-bg"><div class="jog-evo-repart-bar-fill" style="width:${pct}%;background:#D62839;"></div></div>
+              <div class="jog-evo-repart-count">${e.count}</div>
+            </div>`;
+        }).join('')
+      : '<div style="font-size:13px;color:var(--muted)">Aucune erreur détectée pour l\'instant.</div>';
+
+    const rankedCriteres = stats.criteres.filter(c => c.evaluated > 0).sort((a, b) => b.rate - a.rate);
+    const criteresHtml = rankedCriteres.length
+      ? rankedCriteres.map(c => {
+          const pct = Math.round(c.rate * 100);
+          return `
+            <div class="jog-evo-repart-row">
+              <div class="jog-evo-repart-label">${c.code} · ${escHtml(CODE_LABELS[c.code])}</div>
+              <div class="jog-evo-repart-bar-bg"><div class="jog-evo-repart-bar-fill" style="width:${pct}%"></div></div>
+              <div class="jog-evo-repart-count">${pct}%</div>
+            </div>`;
+        }).join('')
+      : '<div style="font-size:13px;color:var(--muted)">Pas encore assez de données.</div>';
+
+    const mostMastered = rankedCriteres.length ? rankedCriteres[0] : null;
+    const mostFragile  = rankedCriteres.length ? rankedCriteres[rankedCriteres.length - 1] : null;
+
+    body.innerHTML = `
+      <div class="stats-row-3">
+        <div class="stat-card">
+          <div class="stat-label">Joggings terminés</div>
+          <div class="stat-value">${stats.completedCount}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Progression moyenne</div>
+          <div class="stat-value">${progressionLabel}<span class="stat-unit"> feux</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Élèves</div>
+          <div class="stat-value">${stats.studentCount}</div>
+        </div>
+      </div>
+
+      <div class="jog-stats-card">
+        <div class="jog-stats-block-title">Erreurs les plus fréquentes (toutes versions)</div>
+        ${errorsHtml}
+      </div>
+
+      <div class="jog-stats-card">
+        <div class="jog-stats-block-title">Critères — du mieux maîtrisé au plus fragile</div>
+        ${criteresHtml}
+        ${mostMastered && mostFragile ? `
+          <div style="margin-top:14px;font-size:13px;color:var(--muted);">
+            Critère le mieux maîtrisé : <strong style="color:var(--text)">${escHtml(CODE_LABELS[mostMastered.code])}</strong> ·
+            Critère le plus fragile : <strong style="color:var(--text)">${escHtml(CODE_LABELS[mostFragile.code])}</strong>
+          </div>` : ''}
+      </div>`;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     GÉRER MES JOGGINGS (Phase 4, §5.7 point 5 / §5.8) — personnalisation par
+     classe (titre/consigne/temps imposé/niveau/durée/compétence) et
+     verrouillage en parcours guidé. Tout est écrit directement en base
+     (RLS), aucun appel externe.
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function openGerer() {
+    if (_classes.length === 0) return;
+
+    const filterWrap = document.getElementById('jog-gerer-class-filter');
+    if (_classes.length > 1) {
+      filterWrap.style.display = '';
+      const sel = document.getElementById('jog-gerer-class-select');
+      if (!sel.dataset.populated) {
+        sel.innerHTML = _classes.map(c => `<option value="${c.id}">${escHtml(c.name)} (${escHtml(c.level)})</option>`).join('');
+        sel.addEventListener('change', () => loadGererClass(sel.value));
+        sel.dataset.populated = 'true';
+      }
+      _gererClassId = _gererClassId || sel.value || _classes[0].id;
+      sel.value = _gererClassId;
+    } else {
+      filterWrap.style.display = 'none';
+      _gererClassId = _classes[0].id;
+    }
+
+    showView('gerer');
+    await loadGererClass(_gererClassId);
+  }
+
+  async function loadGererClass(classId) {
+    _gererClassId = classId;
+    const cls = _classes.find(c => c.id === classId);
+    _gererMode = cls ? (cls.mode_acces || 'libre') : 'libre';
+
+    document.getElementById('jog-gerer-list').innerHTML = '<div class="view-loading">Chargement…</div>';
+    try {
+      _gererSettings = await lfmJoggingTeacher.getClassSettings(classId);
+    } catch (e) {
+      document.getElementById('jog-gerer-list').innerHTML =
+        `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Impossible de charger les réglages (${escHtml(e.message)}).</div></div>`;
+      return;
+    }
+    renderGererList();
+  }
+
+  function joggingIsCustom(row) {
+    return !!row && ['titre', 'consigne', 'temps_impose', 'niveau', 'duree_estimee', 'competence']
+      .some(f => row[f] != null);
+  }
+
+  function renderGererMeta(jog, row) {
+    const badges = [];
+    if (joggingIsCustom(row)) badges.push('<span class="jog-gerer-badge jog-gerer-badge--custom">✎ Personnalisé</span>');
+    if (_gererMode === 'guide' && row && row.locked === true) badges.push('<span class="jog-gerer-badge jog-gerer-badge--locked">🔒 Verrouillé</span>');
+    return badges.join('') || '<span style="color:var(--muted);font-size:12px;">Réglages par défaut</span>';
+  }
+
+  function renderGererList() {
+    const list = (typeof JOGGING_LIST !== 'undefined') ? JOGGING_LIST : [];
+    document.getElementById('jog-gerer-list').innerHTML = list.map((jog, idx) => renderGererCard(jog, idx)).join('');
+    bindGererEvents();
+  }
+
+  function renderGererCard(jog, idx) {
+    const row = _gererSettings.get(jog.id) || null;
+    const effTitre = row && row.titre != null ? row.titre : jog.title;
+    const detailId = 'jog-gerer-detail-' + idx;
+
+    return `
+      <div class="jog-histo-card" data-jogging-id="${jog.id}">
+        <div class="jog-histo-card-top" data-toggle="${detailId}">
+          <div>
+            <div class="jog-histo-title">${jog.numero}. ${escHtml(effTitre)}</div>
+            <div class="jog-histo-meta" id="jog-gerer-meta-${idx}">${renderGererMeta(jog, row)}</div>
+          </div>
+          <span class="jog-histo-chevron">▾</span>
+        </div>
+        <div class="jog-histo-detail" id="${detailId}" style="display:none">
+          ${renderGererForm(jog, row, idx)}
+        </div>
+      </div>`;
+  }
+
+  function renderGererForm(jog, row, idx) {
+    const isCustom = (field) => row && row[field] != null;
+    const defaultTempsValue = TEMPS_IMPOSE_VALUE_BY_LABEL[jog.tempsImpose] || 'present';
+    const currentTempsValue = isCustom('temps_impose') ? row.temps_impose : defaultTempsValue;
+    const tempsOptionsHtml = TEMPS_IMPOSE_OPTIONS.map(o =>
+      `<option value="${o.value}" ${o.value === currentTempsValue ? 'selected' : ''}>${o.label}</option>`
+    ).join('');
+    const currentNiveau = isCustom('niveau') ? row.niveau : jog.niveau;
+    const niveauOptionsHtml = [1, 2, 3].map(n =>
+      `<option value="${n}" ${n === currentNiveau ? 'selected' : ''}>Niveau ${n}</option>`
+    ).join('');
+    const locked = !!(row && row.locked === true);
+
+    return `
+      <div class="jog-teacher-reform">
+        <div class="jog-teacher-reform-title">⚙️ Personnalisation pour cette classe</div>
+
+        <div class="jog-gerer-field-row">
+          <label>Titre</label>
+          <button type="button" class="jog-gerer-reset-btn" data-reset data-field="titre" data-default="${escHtml(jog.title)}">↺ Réinitialiser</button>
+        </div>
+        <input type="text" data-field="titre" data-custom="${isCustom('titre')}" value="${escHtml(isCustom('titre') ? row.titre : jog.title)}">
+
+        <div class="jog-gerer-field-row">
+          <label>Consigne</label>
+          <button type="button" class="jog-gerer-reset-btn" data-reset data-field="consigne" data-default="${escHtml(jog.consigne)}">↺ Réinitialiser</button>
+        </div>
+        <textarea data-field="consigne" data-custom="${isCustom('consigne')}" style="min-height:80px;">${escHtml(isCustom('consigne') ? row.consigne : jog.consigne)}</textarea>
+
+        <div class="jog-gerer-field-row">
+          <label>Temps de conjugaison imposé</label>
+          <button type="button" class="jog-gerer-reset-btn" data-reset data-field="temps_impose" data-default="${defaultTempsValue}">↺ Réinitialiser</button>
+        </div>
+        <select data-field="temps_impose" data-custom="${isCustom('temps_impose')}">${tempsOptionsHtml}</select>
+
+        <div class="jog-gerer-field-row">
+          <label>Niveau</label>
+          <button type="button" class="jog-gerer-reset-btn" data-reset data-field="niveau" data-default="${jog.niveau}">↺ Réinitialiser</button>
+        </div>
+        <select data-field="niveau" data-custom="${isCustom('niveau')}">${niveauOptionsHtml}</select>
+
+        <div class="jog-gerer-field-row">
+          <label>Durée estimée (minutes)</label>
+          <button type="button" class="jog-gerer-reset-btn" data-reset data-field="duree_estimee" data-default="${jog.duree}">↺ Réinitialiser</button>
+        </div>
+        <input type="number" min="1" max="120" data-field="duree_estimee" data-custom="${isCustom('duree_estimee')}" value="${isCustom('duree_estimee') ? row.duree_estimee : jog.duree}">
+
+        <div class="jog-gerer-field-row">
+          <label>Compétence</label>
+          <button type="button" class="jog-gerer-reset-btn" data-reset data-field="competence" data-default="${escHtml(jog.competence)}">↺ Réinitialiser</button>
+        </div>
+        <input type="text" data-field="competence" data-custom="${isCustom('competence')}" value="${escHtml(isCustom('competence') ? row.competence : jog.competence)}">
+
+        ${_gererMode === 'guide' ? `
+          <label style="margin-top:10px;display:block;">État pour cette classe (parcours guidé)</label>
+          <div class="jog-n-selector">
+            <button type="button" class="jog-n-btn" data-lock-btn data-value="true"  data-active="${locked}">🔒 Verrouillé</button>
+            <button type="button" class="jog-n-btn" data-lock-btn data-value="false" data-active="${!locked}">✅ Actif</button>
+          </div>
+        ` : ''}
+
+        <div class="jog-reform-actions">
+          <button type="button" class="btn btn-primary btn-sm" data-save-gerer="${jog.id}" data-idx="${idx}">Enregistrer</button>
+          <span class="jog-reform-saved" id="jog-gerer-saved-${idx}" style="display:none">Enregistré ✓</span>
+        </div>
+      </div>`;
+  }
+
+  function bindGererEvents() {
+    document.querySelectorAll('#jog-gerer-list .jog-histo-card-top').forEach(top => {
+      top.addEventListener('click', () => {
+        const el = document.getElementById(top.dataset.toggle);
+        if (!el) return;
+        const isOpen = el.style.display !== 'none';
+        el.style.display = isOpen ? 'none' : '';
+        const chevron = top.querySelector('.jog-histo-chevron');
+        if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+      });
+    });
+
+    document.querySelectorAll('#jog-gerer-list [data-reset]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const container = btn.closest('.jog-teacher-reform');
+        const el = container.querySelector(`[data-field="${btn.dataset.field}"]`);
+        if (!el) return;
+        el.value = btn.dataset.default;
+        el.dataset.custom = 'false';
+      });
+    });
+
+    document.querySelectorAll('#jog-gerer-list .jog-teacher-reform [data-field]').forEach(el => {
+      const markCustom = () => { el.dataset.custom = 'true'; };
+      el.addEventListener('input', markCustom);
+      el.addEventListener('change', markCustom);
+    });
+
+    document.querySelectorAll('#jog-gerer-list [data-lock-btn]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const group = btn.closest('.jog-n-selector');
+        group.querySelectorAll('[data-lock-btn]').forEach(b => b.dataset.active = 'false');
+        btn.dataset.active = 'true';
+      });
+    });
+
+    document.querySelectorAll('#jog-gerer-list [data-save-gerer]').forEach(btn => {
+      btn.addEventListener('click', () => saveGererForm(btn.dataset.saveGerer, btn.dataset.idx));
+    });
+  }
+
+  async function saveGererForm(joggingId, idx) {
+    const btn = document.querySelector(`#jog-gerer-list [data-save-gerer="${joggingId}"]`);
+    const container = btn.closest('.jog-teacher-reform');
+
+    const readField = (field, isNumber) => {
+      const el = container.querySelector(`[data-field="${field}"]`);
+      if (!el || el.dataset.custom !== 'true') return null;
+      const raw = el.value.trim();
+      if (raw === '') return null;
+      return isNumber ? parseInt(raw, 10) : raw;
+    };
+
+    const fields = {
+      titre: readField('titre'),
+      consigne: readField('consigne'),
+      temps_impose: readField('temps_impose'),
+      niveau: readField('niveau', true),
+      duree_estimee: readField('duree_estimee', true),
+      competence: readField('competence')
+    };
+
+    const lockGroup = container.querySelector('.jog-n-selector');
+    if (lockGroup) {
+      const activeBtn = lockGroup.querySelector('[data-active="true"]');
+      fields.locked = activeBtn ? activeBtn.dataset.value === 'true' : false;
+    }
+
+    btn.disabled = true;
+    try {
+      const saved = await lfmJoggingTeacher.saveClassSettings(
+        _gererClassId, joggingId, fields, _teacherProfile ? _teacherProfile.id : null
+      );
+      if (saved) _gererSettings.set(joggingId, saved);
+      else _gererSettings.delete(joggingId);
+
+      const jog = (typeof JOGGING_DATA !== 'undefined') ? JOGGING_DATA[joggingId] : null;
+      const metaEl = document.getElementById('jog-gerer-meta-' + idx);
+      if (metaEl && jog) metaEl.innerHTML = renderGererMeta(jog, saved);
+
+      const savedLabel = document.getElementById('jog-gerer-saved-' + idx);
+      if (savedLabel) {
+        savedLabel.style.display = '';
+        setTimeout(() => { savedLabel.style.display = 'none'; }, 3000);
+      }
+    } catch (e) {
+      alert("Impossible d'enregistrer : " + e.message);
+    } finally {
+      btn.disabled = false;
+    }
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -932,6 +1345,7 @@
   (async () => {
     const profile = await lfmAuth.requireRole('enseignant');
     if (!profile) return;
+    _teacherProfile = profile;
 
     try {
       _classes = await lfmTeacher.getClasses();

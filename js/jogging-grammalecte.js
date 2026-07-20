@@ -27,20 +27,70 @@
    • M — Majuscules : maj (majuscule en début de phrase/après un point —
      règles les plus fréquentes en cycle 3), minis.
    • P — Ponctuation : virg (virgules manquantes), poncfin (ponctuation
-     finale manquante — désactivée par défaut chez Grammalecte, réactivée
-     explicitement dans gc-worker.js), esp/tab/nbsp/unit (espacement).
-   • O — Orthographe : tu (traits d'union), mapos, loc, mc, num (orthographe
+     finale manquante), esp/tab/nbsp/unit (espacement). Ces 5 options sont
+     désactivées par défaut chez Grammalecte ; réactivées explicitement dans
+     gc-worker.js (audit du 2026-07-20 : elles étaient listées ici comme
+     couvrant P, mais jamais réellement activées — correction ci-dessous).
+   • O — Orthographe : tu (traits d'union), mapos (apostrophe manquante
+     après l/d/s/n/c/j/m/t/ç), loc, mc (mots composés), num (orthographe
      lexicale/grammaticale au sens large) + tout mot absent du dictionnaire
      (vérification orthographique séparée du moteur de règles, voir
-     analyzeText ci-dessous).
+     analyzeText ci-dessous). mapos et mc sont désactivées par défaut chez
+     Grammalecte ; réactivées explicitement dans gc-worker.js (même audit).
    • S — Son : eleu (élisions et tournures dysphoniques — la seule famille
-     Grammalecte vraiment centrée sur "comment ça sonne").
+     Grammalecte vraiment centrée sur "comment ça sonne"). Attention : une
+     confusion homophonique comme « c'est »/« s'est » relève en réalité de
+     "conf" (donc H) chez Grammalecte, pas de "eleu" — aucune règle du moteur
+     ne couvre spécifiquement ce cas précis (vérifié empiriquement, aucun
+     faux réglage possible ici, limite du moteur à base de règles).
 
    Non mappées (aucun critère, jamais montrées à l'élève) : apos (préférence
    typographique, pas une erreur), eepi, nf, liga, chim, ocr (beaucoup de
    faux positifs, déconseillée par Grammalecte lui-même), date, idrule,
    html/latex/md, bs, pleo, neg, redon1, redon2 (style — désactivées par
    défaut et hors du champ d'un premier jet de cycle 3).
+
+   ── Filet de sécurité sType "notype" (audit du 2026-07-20) ────────────────
+   Certaines règles de confusion bien réelles (ex. « ils son fatigués ») sont
+   rattachées par Grammalecte à un groupe de règles "toujours actif" (sans
+   option associée) et ressortent avec sType: "notype" au lieu de leur vraie
+   famille — alors que ce même groupe "notype" contient aussi des règles hors
+   sujet (répétitions de mots, formatage des grands nombres, écriture
+   épicène…) qu'on ne veut surtout pas montrer à l'élève. resolveCode()
+   ci-dessous retente, dans ce cas seulement, une extraction de la famille
+   depuis le préfixe du sRuleId (convention "g<n>__<famille>_...") avant
+   d'abandonner — cela récupère les vraies règles de confusion sans jamais
+   laisser passer les règles de style/mise en forme (leur sRuleId ne suit
+   pas cette convention de préfixe).
+
+   ── Limites connues du moteur (pas des bugs de configuration) ─────────────
+   Vérifié empiriquement (voir procédure de test manuel) :
+   - Majuscule en tout début de texte (aucune phrase précédente) et
+     majuscule des noms propres non répertoriés (ex. « paris » pour
+     « Paris ») : non couvertes par Grammalecte, qui n'a pas de lexique de
+     noms propres génériques. Sans impact réel ici : les joggings font
+     20-300 mots (donc plusieurs phrases), et la règle de majuscule en
+     début de paragraphe se déclenche dès qu'il y a une 2e phrase.
+   - Ponctuation finale d'un paragraphe d'UNE seule phrase : non vérifiée
+     par design Grammalecte (évite de signaler des titres/fragments) —
+     même remarque, sans impact réel vu la longueur minimale imposée.
+   - Cohérence sémantique d'un temps verbal avec un repère temporel
+     (« hier je mange », « demain déjà ») et absence de ponctuation dédiée
+     au discours rapporté (dialogue sans tiret/guillemets) : nécessitent une
+     compréhension du sens, hors de portée d'un correcteur à base de règles
+     — pas corrigible sans IA générative, donc explicitement hors périmètre
+     du module (§1.2 : zéro IA).
+   - Un mot mal orthographié qui correspond PAR HASARD à un autre mot valide
+     du dictionnaire n'est jamais détecté (ni par le correcteur orthogra-
+     phique, ni par une règle de confusion dédiée si elle n'existe pas).
+     Vérifié empiriquement (audit du 2026-07-20) sur « Ensuit » (pour
+     « Ensuite ») : « ensuit » est une forme conjuguée réelle du verbe rare
+     « (s')ensuivre » (« il s'ensuit que… »), donc un mot valide pour le
+     dictionnaire. La seule règle `conf` qui s'en approche (g2__conf_s_
+     ensuivre, déjà active par défaut) cible la confusion « s'ensuit »
+     employé comme locution pour « ensuite », pas ce cas précis — elle ne
+     se déclenche pas non plus ici (testé). Même statut que S1 (c'est/s'est)
+     dans l'audit précédent : limite du moteur, pas un réglage manquant.
 
    I (toujours ⚪) et N (Néant, laissé à l'enseignant) ne viennent jamais de
    Grammalecte — voir js/jogging-engine.js.
@@ -66,6 +116,25 @@ const JoggingGrammalecte = (() => {
   };
 
   const AUTO_CODES = ['C', 'H', 'A', 'M', 'P', 'O', 'S'];
+
+  // Certaines règles Grammalecte renvoient sType: "notype" au lieu de leur
+  // vraie famille : ce sont des règles rattachées à un groupe "toujours actif"
+  // (sans option associée, ex. détection de doublons, écriture épicène,
+  // formatage des grands nombres — jamais pertinentes pour nos 7 critères),
+  // MAIS ce même groupe contient aussi de vraies règles de confusion (ex.
+  // g2__conf_ils_non_verbe, qui détecte « ils son fatigués ») dont le nom de
+  // règle garde la vraie famille en préfixe. Filet de sécurité vérifié
+  // empiriquement (audit Grammalecte, cf. procédure de test) : si sType est
+  // absent du mapping, on retente avec la famille extraite du sRuleId
+  // (convention "g<n>__<famille>_..."), pour ne pas perdre ces cas réels.
+  const RULE_ID_FAMILY_RE = /^g\d*__([a-zàâéèêëîïôùûç]+)_/;
+
+  function resolveCode(sType, sRuleId) {
+    if (FAMILY_TO_CODE[sType]) return FAMILY_TO_CODE[sType];
+    const m = sRuleId && RULE_ID_FAMILY_RE.exec(sRuleId);
+    if (m && FAMILY_TO_CODE[m[1]]) return FAMILY_TO_CODE[m[1]];
+    return null;
+  }
 
   let worker = null;
   let workerReady = null; // Promise
@@ -149,7 +218,7 @@ const JoggingGrammalecte = (() => {
     const erreurs = [];
 
     for (const oErr of (result.aGrammErr || [])) {
-      const code = FAMILY_TO_CODE[oErr.sType];
+      const code = resolveCode(oErr.sType, oErr.sRuleId);
       if (!code) continue; // famille non retenue pour Code Champion (voir en-tête)
       erreurs.push(normalizeErreur(
         code, oErr.sType, oErr.sRuleId, oErr.nStart, oErr.nEnd,

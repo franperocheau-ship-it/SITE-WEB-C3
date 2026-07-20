@@ -129,6 +129,26 @@
   inset: 0;
 }
 
+/* Jogging verrouillé par l'enseignant (parcours guidé, Phase 4, §5.8) :
+   reste visible mais grisé et non cliquable — jamais caché. */
+.jog-card--locked {
+  opacity: 0.55;
+  cursor: default;
+}
+.jog-card--locked:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--border);
+}
+.jog-card-btn--locked {
+  background: var(--muted);
+  cursor: default;
+}
+.jog-card-btn--locked:hover {
+  background: var(--muted);
+  transform: none;
+}
+
 /* ─── Écran du jogging (jogging.html) ─────────────────────────────────── */
 
 .jog-intro-consigne {
@@ -521,3 +541,162 @@
 .jog-feu-dot--blanc  { background: rgba(0,0,0,0.02);      border-color: var(--border);         color: var(--muted); opacity: 0.7; }
 /* Colonne N : bordure pointillée pour rappeler l'évaluation manuelle. */
 .jog-feu-dot--manual { border-style: dashed; }
+
+/* ─── Mes progrès (dashboard-eleve.html, Phase 3) — grands feux cliquables,
+   un par critère Code Champion, mêmes couleurs que .jog-feu-cell mais plus
+   grands pour être facilement cliqués/tapés. ─────────────────────────────── */
+.jog-progres-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.jog-progres-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 8px;
+  border-radius: 14px;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  font: inherit;
+  transition: transform 150ms ease, border-color 150ms ease;
+}
+.jog-progres-tile:hover,
+.jog-progres-tile:focus-visible { transform: translateY(-2px); outline: none; }
+.jog-progres-tile--active { border-width: 2.5px; box-shadow: 0 0 0 3px rgba(26,45,107,0.12); }
+.jog-progres-tile--vert   { background: rgba(22,163,74,0.10);  border-color: rgba(22,163,74,0.4); }
+.jog-progres-tile--orange { background: rgba(245,166,35,0.14); border-color: rgba(245,166,35,0.45); }
+.jog-progres-tile--rouge  { background: rgba(214,40,57,0.10);  border-color: rgba(214,40,57,0.4); }
+.jog-progres-tile--blanc  { background: rgba(0,0,0,0.02);      border-color: var(--border); opacity: 0.65; }
+.jog-progres-tile-letter { font-family: var(--font-display, 'Fredoka', sans-serif); font-weight: 800; font-size: 20px; }
+.jog-progres-tile-icon { font-size: 18px; line-height: 1; }
+
+.jog-progres-panel {
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  background: var(--bg);
+  margin-bottom: 16px;
+}
+.jog-progres-panel-title { font-family: var(--font-display, 'Fredoka', sans-serif); font-weight: 700; font-size: 16px; color: var(--text); margin-bottom: 12px; }
+.jog-progres-block { margin-bottom: 12px; }
+.jog-progres-block:last-child { margin-bottom: 0; }
+.jog-progres-block-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-bottom: 3px; }
+.jog-progres-block-text { font-size: 14px; line-height: 1.55; color: var(--text); }
+.jog-progres-block--reussi  .jog-progres-block-label { color: #16a34a; }
+.jog-progres-block--difficile .jog-progres-block-label { color: #b8760f; }
+.jog-progres-block--conseil .jog-progres-block-label { color: var(--blue); }
+.jog-progres-block--defi    .jog-progres-block-label { color: #7C5CBF; }
+
+/* ─── Mon objectif (Phase 3) ───────────────────────────────────────────── */
+.jog-objectif-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(26,45,107,0.08), rgba(124,92,191,0.08));
+  border: 1.5px solid var(--border);
+}
+.jog-objectif-icon { font-size: 28px; flex-shrink: 0; }
+.jog-objectif-text { font-size: 14px; font-weight: 700; color: var(--text); }
+
+/* ─── Mon évolution (Phase 3) — mini barres verticales (feux verts par
+   jogging) et barres horizontales (répartition par critère), même patron
+   que .jog-bp-bar-bg/.jog-bp-bar-fill du bilan imprimé enseignant. ──────── */
+.jog-evo-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 100px;
+  padding: 8px 4px 0;
+  overflow-x: auto;
+}
+.jog-evo-bar-col { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 22px; }
+.jog-evo-bar { width: 14px; border-radius: 4px 4px 0 0; background: var(--blue); min-height: 2px; }
+.jog-evo-bar-label { font-size: 9px; color: var(--muted); margin-top: 4px; }
+
+.jog-evo-repart-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+.jog-evo-repart-label { width: 90px; flex-shrink: 0; color: var(--muted); font-weight: 700; }
+.jog-evo-repart-bar-bg { flex: 1; height: 10px; background: rgba(0,0,0,0.05); border-radius: 5px; overflow: hidden; }
+.jog-evo-repart-bar-fill { height: 100%; background: #16a34a; border-radius: 5px; }
+.jog-evo-repart-count { width: 34px; text-align: right; flex-shrink: 0; color: var(--muted); }
+
+/* ─── Mon carnet d'auteur (Phase 3) ────────────────────────────────────── */
+.jog-carnet-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  margin-bottom: 10px;
+}
+.jog-carnet-card-title { font-weight: 700; font-size: 14px; color: var(--text); }
+.jog-carnet-card-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.jog-carnet-remove-btn {
+  border: 1.5px solid var(--border);
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--red);
+  cursor: pointer;
+}
+.jog-carnet-add-btn {
+  border: 1.5px solid var(--blue);
+  background: rgba(26,45,107,0.06);
+  color: var(--blue);
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.jog-carnet-add-btn:disabled { opacity: 0.6; cursor: default; }
+.jog-carnet-print-btn {
+  border: none;
+  background: var(--blue);
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* Export "petit livre" PDF du carnet d'auteur — même mécanique que le
+   bulletin enseignant (synthese-joggings-enseignant.html) : racine masquée
+   basculée en display:block par une classe sur <body>, tout le reste caché
+   pendant l'impression. */
+#jog-carnet-print-root { display: none; }
+.jog-carnet-page { font-family: 'Nunito Sans', system-ui, sans-serif; color: #1E2532; }
+.jog-carnet-cover { text-align: center; padding-top: 120pt; page-break-after: always; }
+.jog-carnet-cover-title { font-family: 'Fredoka', sans-serif; font-weight: 800; font-size: 24pt; color: #1A2D6B; margin-bottom: 10pt; }
+.jog-carnet-cover-sub { font-size: 12pt; color: #5F6368; }
+.jog-carnet-entry { margin-bottom: 24pt; page-break-inside: avoid; }
+.jog-carnet-entry-title { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 13pt; color: #1A2D6B; margin-bottom: 6pt; }
+.jog-carnet-entry-meta { font-size: 8.5pt; color: #9AA3B2; margin-bottom: 8pt; }
+.jog-carnet-entry-text { font-size: 10.5pt; line-height: 1.7; white-space: pre-wrap; }
+
+body.printing-jog-carnet #jog-carnet-print-root { display: block !important; }
+
+@media print {
+  body.printing-jog-carnet, body.printing-jog-carnet #jog-carnet-print-root {
+    display: block !important; position: static !important; inset: auto !important;
+  }
+  body.printing-jog-carnet .navbar, body.printing-jog-carnet footer,
+  body.printing-jog-carnet .dash-header, body.printing-jog-carnet .dash-tabs,
+  body.printing-jog-carnet .dash-tab-pane, body.printing-jog-carnet .dash-actions {
+    display: none !important;
+  }
+  body.printing-jog-carnet .dash-wrap    { padding: 0; background: #fff; min-height: unset; }
+  body.printing-jog-carnet .dash-content { max-width: 100%; padding: 0; }
+}

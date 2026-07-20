@@ -71,6 +71,9 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/guided-access.js?v=1"></script>
+  <script src="js/jogging-class-settings.js?v=1"></script>
   <script src="js/menu.js"></script>
 
   <script>
@@ -81,24 +84,62 @@
       "Futur":          "jog-temps--futur"
     };
 
-    function renderJoggingCard(jog) {
-      return `
-        <a class="jog-card" href="jogging.html?id=${jog.id}">
-          <div class="jog-card-illustration">✍️</div>
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    /* jog.title/competence peuvent venir d'une personnalisation enseignante
+       (Phase 4, §5.8) : échappés avant insertion dans le DOM (jog.duree/
+       niveau sont numériques, jog.tempsImpose est restreint aux 4 libellés
+       de TEMPS_CLASS — sans risque). */
+    function renderJoggingCard(jog, locked) {
+      const badges = `
           <div class="jog-card-badges">
             <span class="ls-pastille" style="--ls-color:var(--ls-color-${jog.niveau})">Niveau ${jog.niveau}</span>
             <span class="jog-temps ${TEMPS_CLASS[jog.tempsImpose] || ''}">${jog.tempsImpose}</span>
+          </div>`;
+
+      if (locked) {
+        return `
+          <div class="jog-card jog-card--locked" aria-disabled="true">
+            <div class="jog-card-illustration">✍️</div>
+            ${badges}
+            <div class="jog-card-title">${escapeHtml(jog.title)}</div>
+            <div class="jog-card-competence">${escapeHtml(jog.competence)}</div>
+            <div class="jog-card-duree">⏱ ${jog.duree} min</div>
+            <span class="jog-card-btn jog-card-btn--locked">🔒 Pas encore disponible</span>
           </div>
-          <div class="jog-card-title">${jog.title}</div>
-          <div class="jog-card-competence">${jog.competence}</div>
+        `;
+      }
+
+      return `
+        <a class="jog-card" href="jogging.html?id=${jog.id}">
+          <div class="jog-card-illustration">✍️</div>
+          ${badges}
+          <div class="jog-card-title">${escapeHtml(jog.title)}</div>
+          <div class="jog-card-competence">${escapeHtml(jog.competence)}</div>
           <div class="jog-card-duree">⏱ ${jog.duree} min</div>
           <span class="jog-card-btn">Commencer →</span>
         </a>
       `;
     }
 
-    document.getElementById('jog-cards-grid').innerHTML =
-      JOGGING_LIST.map(renderJoggingCard).join('');
+    (async function renderCatalogue() {
+      let items = null;
+      try {
+        if (typeof JoggingClassSettings !== 'undefined') {
+          items = await JoggingClassSettings.resolveAll();
+        }
+      } catch (e) {
+        // repli : catalogue par défaut ci-dessous
+      }
+      if (!items) items = JOGGING_LIST.map(jog => ({ jogging: jog, locked: false }));
+
+      document.getElementById('jog-cards-grid').innerHTML =
+        items.map(({ jogging, locked }) => renderJoggingCard(jogging, locked)).join('');
+    })();
   </script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */

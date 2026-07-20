@@ -16,6 +16,7 @@
   <script src="js/laurels.js?v=2"></script>
   <script src="js/level-badge.js?v=1"></script>
   <script src="js/jogging-data.js?v=1"></script>
+  <script src="js/jogging-badges.js?v=1"></script>
   <script src="js/jogging-student-space.js?v=1"></script>
   <style>
     .dash-wrap {
@@ -613,10 +614,45 @@
         <div id="jog-encouragement-msg" style="font-size:14px;font-weight:700;color:var(--blue);text-align:center;"></div>
       </div>
 
+      <!-- Mes progrès -->
+      <div class="dash-section" id="jog-progres-section" style="display:none">
+        <div class="dash-section-title">Mes progrès</div>
+        <div id="jog-progres-grid" class="jog-progres-grid"></div>
+        <div id="jog-progres-panel" class="jog-progres-panel"></div>
+      </div>
+
       <!-- Mon historique -->
       <div class="dash-section" id="jog-historique-section" style="display:none">
         <div class="dash-section-title">Mon historique</div>
         <div id="jog-historique-list"></div>
+      </div>
+
+      <!-- Mes réussites -->
+      <div class="dash-section" id="jog-reussites-section">
+        <div class="dash-section-title">Mes réussites</div>
+        <div id="jog-reussites-grid" class="laurel-badges-grid"></div>
+      </div>
+
+      <!-- Mon évolution -->
+      <div class="dash-section" id="jog-evolution-section" style="display:none">
+        <div class="dash-section-title">Mon évolution</div>
+        <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px;">Feux verts par jogging</div>
+        <div id="jog-evo-bars" class="jog-evo-bars"></div>
+        <div style="font-size:12px;color:var(--muted);font-weight:700;margin:14px 0 8px;">Répartition par critère</div>
+        <div id="jog-evo-repart"></div>
+      </div>
+
+      <!-- Mon objectif -->
+      <div class="dash-section" id="jog-objectif-section" style="display:none">
+        <div class="dash-section-title">Mon objectif</div>
+        <div id="jog-objectif-box" class="jog-objectif-box"></div>
+      </div>
+
+      <!-- Mon carnet d'auteur -->
+      <div class="dash-section" id="jog-carnet-section">
+        <div class="dash-section-title">Mon carnet d'auteur</div>
+        <div id="jog-carnet-list"></div>
+        <button type="button" id="jog-carnet-print-btn" class="jog-carnet-print-btn" style="display:none">📖 Générer mon petit livre PDF</button>
       </div>
 
       <!-- État vide (aucun jogging pour l'instant) -->
@@ -629,6 +665,8 @@
       </div>
 
       </div><!-- /tab-joggings -->
+
+      <div id="jog-carnet-print-root"></div>
 
       <!-- Actions -->
       <div class="dash-actions">

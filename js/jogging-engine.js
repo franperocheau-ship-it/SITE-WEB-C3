@@ -212,6 +212,12 @@ async function onValidateClick() {
     sessionRow.all_green = allGreenAuto;
     sessionRow.current_version = sessionUpdate.current_version || sessionRow.current_version;
 
+    if (isFinal) {
+      // Attribution des badges rejouée à partir des données déjà en base ;
+      // ne bloque jamais la transition vers l'écran de correction (§5.6.4).
+      syncBadgesAfterCompletion(sessionRow.student_id);
+    }
+
     // Transition brève éditeur → correction (§3.11 : Grammalecte est quasi
     // instantané, plus besoin d'un écran d'attente à message).
     const editorEl = document.getElementById('jog-state-editor');
@@ -232,6 +238,64 @@ async function onValidateClick() {
     submitting = false;
     document.getElementById('jog-validate-btn').disabled = false;
   }
+}
+
+/* ── Badges (Phase 3, §5.6.4) ─────────────────────────────────────────────── */
+
+/* Rejoue l'attribution des badges à partir de l'historique complet des
+   sessions terminées de l'élève, comme js/jogging-student-space.js pour
+   « Mes réussites ». Silencieux : en cas d'échec, l'attribution sera
+   simplement retentée à la prochaine session terminée. */
+async function syncBadgesAfterCompletion(studentId) {
+  if (typeof JoggingBadges === 'undefined') return;
+  try {
+    const { data: sessions } = await window.lfmDb
+      .from('jogging_sessions')
+      .select('id, created_at')
+      .eq('student_id', studentId)
+      .eq('status', 'completed')
+      .limit(2000);
+    const completed = sessions || [];
+    if (completed.length === 0) return;
+
+    const { data: versions } = await window.lfmDb
+      .from('jogging_versions')
+      .select('session_id, version_number, feu_c, feu_h, feu_a, feu_m, feu_p, feu_o, feu_n, feu_i, feu_s')
+      .in('session_id', completed.map(s => s.id))
+      .order('version_number', { ascending: true })
+      .limit(2000);
+
+    const lastVersionBySession = new Map();
+    (versions || []).forEach(v => lastVersionBySession.set(v.session_id, v));
+
+    await JoggingBadges.syncBadges(studentId, completed, lastVersionBySession);
+  } catch (err) {
+    // silencieux — voir commentaire ci-dessus
+  }
+}
+
+/* ── Carnet d'auteur (Phase 3, §5.6.7) ────────────────────────────────────── */
+
+function markCarnetAdded(btn) {
+  btn.textContent = '✓ Ajouté à ton carnet';
+  btn.disabled = true;
+}
+
+function setupCarnetButton() {
+  const btn = document.getElementById('jog-carnet-add-btn');
+  if (!btn || !sessionRow) return;
+
+  window.lfmDb.from('jogging_carnet').select('session_id')
+    .eq('session_id', sessionRow.id).eq('student_id', sessionRow.student_id).maybeSingle()
+    .then(({ data }) => { if (data) markCarnetAdded(btn); });
+
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    const { error } = await window.lfmDb.from('jogging_carnet')
+      .insert({ student_id: sessionRow.student_id, session_id: sessionRow.id });
+    if (!error) markCarnetAdded(btn);
+    else btn.disabled = false;
+  });
 }
 
 /* ── Surlignage par positions fiables (§3.7 : pas de repli nécessaire) ──────── */
@@ -381,9 +445,13 @@ function renderCorrectionScreen(text, correction, isFinal, feux) {
     actionsEl.innerHTML = `
       <div style="text-align:center;width:100%;">
         <div class="jog-final-message">🎉 Jogging terminé !</div>
-        <a href="redaction.html" class="btn-secondary" style="margin-top:12px;display:inline-flex;">← Retour au catalogue</a>
+        <button type="button" id="jog-carnet-add-btn" class="jog-carnet-add-btn" style="margin-top:12px;">⭐ Ajouter à mon carnet</button>
+        <div style="margin-top:12px;">
+          <a href="redaction.html" class="btn-secondary" style="display:inline-flex;">← Retour au catalogue</a>
+        </div>
       </div>
     `;
+    setupCarnetButton();
   } else {
     actionsEl.innerHTML = `<button class="btn-secondary" id="jog-rewrite-btn">✍️ Réécrire ma version suivante</button>`;
     document.getElementById('jog-rewrite-btn').addEventListener('click', () => showEditorState());
@@ -413,17 +481,13 @@ async function showCompletedState() {
 
 (async function init() {
   const id = new URLSearchParams(window.location.search).get('id');
-  jogging = id ? JOGGING_DATA[id] : null;
+  const baseJogging = id ? JOGGING_DATA[id] : null;
 
-  if (!jogging) {
+  if (!baseJogging) {
     Breadcrumb.setCurrent('Jogging introuvable');
     document.getElementById('jog-state-loading').textContent = "Ce jogging n'existe pas.";
     return;
   }
-
-  renderHeader(jogging);
-  Breadcrumb.setCategory({ href: 'redaction.html', label: 'Rédaction' });
-  Breadcrumb.setCurrent(jogging.title);
 
   // Précharge le moteur/dictionnaire Grammalecte dès l'arrivée sur la page,
   // en parallèle de l'auth et de la session, pour que la 1re correction de
@@ -432,6 +496,38 @@ async function showCompletedState() {
 
   const profile = await lfmAuth.requireRole('eleve');
   if (!profile) return;
+
+  // Personnalisation par classe + verrouillage en parcours guidé (Phase 4,
+  // §5.8). Le blocage réel contre un accès direct par URL est garanti côté
+  // RLS (is_jogging_locked_for_student) ; ce contrôle client évite juste
+  // d'afficher l'éditeur avant l'échec d'écriture.
+  let resolved = null;
+  try {
+    if (typeof JoggingClassSettings !== 'undefined') {
+      resolved = await JoggingClassSettings.resolve(baseJogging.id);
+    }
+  } catch (e) {
+    // repli : catalogue par défaut, jamais verrouillé
+  }
+  jogging = resolved ? resolved.jogging : baseJogging;
+
+  if (resolved && resolved.locked) {
+    Breadcrumb.setCategory({ href: 'redaction.html', label: 'Rédaction' });
+    Breadcrumb.setCurrent('Jogging non disponible');
+    document.title = "Jogging non disponible — Rédaction — Lycée Français de Madrid";
+    document.getElementById('jog-state-loading').innerHTML =
+      "<div style='text-align:center;padding:40px 0'>" +
+      "<p style='font-size:40px;margin-bottom:12px'>🔒</p>" +
+      "<p style='font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px'>Ce jogging n'est pas encore disponible</p>" +
+      "<p style='font-size:14px;color:var(--muted)'>Ton enseignant l'activera plus tard.<br>" +
+      "<a href='redaction.html' style='color:var(--blue);font-weight:700;'>← Retour au catalogue</a></p>" +
+      "</div>";
+    return;
+  }
+
+  renderHeader(jogging);
+  Breadcrumb.setCategory({ href: 'redaction.html', label: 'Rédaction' });
+  Breadcrumb.setCurrent(jogging.title);
 
   const { data: existing } = await window.lfmDb
     .from('jogging_sessions')
