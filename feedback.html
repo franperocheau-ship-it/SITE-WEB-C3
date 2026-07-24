@@ -347,10 +347,9 @@
       display: none;
       margin-top: 14px;
       gap: 10px;
-      align-items: flex-end;
+      align-items: center;
     }
     .admin-login-box.is-open { display: flex; }
-    .admin-login-box .auth-field { flex: 1; }
 
     .admin-active-bar {
       display: none;
@@ -510,11 +509,10 @@
         <button class="admin-zone-toggle" id="admin-toggle-link">⚙ Administration</button>
 
         <div class="admin-login-box" id="admin-login-box">
-          <div class="auth-field">
-            <label class="auth-label" for="admin-pwd">Mot de passe administrateur</label>
-            <input class="auth-input" id="admin-pwd" type="password" placeholder="••••••••">
-          </div>
-          <button class="auth-submit" id="admin-login-btn" style="width:auto;white-space:nowrap;">Activer</button>
+          <p style="margin:0;font-size:13px;color:var(--muted);">
+            Connecte-toi avec ton compte administrateur pour gérer les signalements.
+          </p>
+          <a class="auth-submit" href="auth.html?role=admin" style="width:auto;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">Se connecter</a>
         </div>
 
         <div class="admin-active-bar" id="admin-active-bar">
@@ -549,6 +547,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/menu.js"></script>
   <script>
     /* ─────────────────────────────────────────────────────────────────────
@@ -557,8 +556,10 @@
        (window.lfmDb), comme toutes les autres pages du site, sur la table
        "feedback" décrite ci-dessous.
 
-       SQL à exécuter dans l'éditeur SQL de Supabase pour créer la table
-       et les policies RLS :
+       SQL utilisé pour créer la table et les policies RLS (table créée à la
+       main dans l'éditeur SQL de Supabase — voir aussi
+       supabase/migrations/20260724150000_fix_feedback_admin_rls.sql pour le
+       correctif qui a resserré update/delete) :
 
        create table public.feedback (
          id         uuid primary key default gen_random_uuid(),
@@ -582,23 +583,14 @@
          on public.feedback for insert
          with check (true);
 
-       create policy "feedback_update_public"
-         on public.feedback for update
-         using (true)
-         with check (true);
-
-       create policy "feedback_delete_public"
-         on public.feedback for delete
-         using (true);
+       -- update/delete réservés aux admins (public.my_role() = 'admin') :
+       -- voir supabase/migrations/20260724150000_fix_feedback_admin_rls.sql
        ───────────────────────────────────────────────────────────────────── */
-
-    /* Mot de passe admin stocké en dur — à changer avant mise en production */
-    const ADMIN_PASSWORD = 'lfm-admin-2026';
 
     let currentType   = 'bug';
     let currentFilter  = 'all';
     let feedbackItems  = [];
-    let isAdmin        = sessionStorage.getItem('lfm_feedback_admin') === '1';
+    let isAdmin        = false;
 
     /* ── Onglets bug / idée ──────────────────────────────────────────────── */
     document.querySelectorAll('#type-tabs .auth-tab').forEach(tab => {
@@ -779,6 +771,9 @@
     }
 
     /* ── Connexion / déconnexion administrateur ────────────────────────── */
+    /* isAdmin ne pilote plus que l'affichage : la vraie autorisation est
+       appliquée côté base par les policies RLS feedback_update_admin /
+       feedback_delete_admin (my_role() = 'admin'). */
     function refreshAdminUI() {
       document.getElementById('admin-login-box').classList.remove('is-open');
       document.getElementById('admin-active-bar').classList.toggle('is-visible', isAdmin);
@@ -786,32 +781,30 @@
       renderList();
     }
 
+    async function checkAdminSession() {
+      try {
+        const profile = await lfmAuth.getProfile();
+        isAdmin = profile?.role === 'admin' && profile?.status !== 'pending' && profile?.status !== 'rejected';
+      } catch (err) {
+        console.error('[LFM] Erreur vérification session admin:', err);
+        isAdmin = false;
+      }
+      refreshAdminUI();
+    }
+
     document.getElementById('admin-toggle-link').addEventListener('click', () => {
       document.getElementById('admin-login-box').classList.toggle('is-open');
     });
 
-    document.getElementById('admin-login-btn').addEventListener('click', () => {
-      const pwd = document.getElementById('admin-pwd').value;
-      if (pwd === ADMIN_PASSWORD) {
-        isAdmin = true;
-        sessionStorage.setItem('lfm_feedback_admin', '1');
-        document.getElementById('admin-pwd').value = '';
-        refreshAdminUI();
-      } else {
-        alert('Mot de passe incorrect.');
-      }
-    });
-
     document.getElementById('admin-logout-btn').addEventListener('click', () => {
-      isAdmin = false;
-      sessionStorage.removeItem('lfm_feedback_admin');
-      refreshAdminUI();
+      lfmAuth.signOut();
     });
 
     /* ── Initialisation ─────────────────────────────────────────────────── */
     updateFormForType();
     refreshAdminUI();
     loadFeedback();
+    checkAdminSession();
   </script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */
