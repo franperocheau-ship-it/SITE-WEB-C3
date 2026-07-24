@@ -445,7 +445,7 @@ function renderCorrectionScreen(text, correction, isFinal, feux) {
     actionsEl.innerHTML = `
       <div style="text-align:center;width:100%;">
         <div class="jog-final-message">🎉 Jogging terminé !</div>
-        <button type="button" id="jog-carnet-add-btn" class="jog-carnet-add-btn" style="margin-top:12px;">⭐ Ajouter à mon carnet</button>
+        <button type="button" id="jog-carnet-add-btn" class="jog-btn-outline" style="margin-top:12px;">⭐ Ajouter à mon carnet</button>
         <div style="margin-top:12px;">
           <a href="redaction.html" class="btn-secondary" style="display:inline-flex;">← Retour au catalogue</a>
         </div>
