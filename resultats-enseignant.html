@@ -808,88 +808,7 @@
   let _studentProfile     = null;  // dernier profil calculé (fiche élève courante), réutilisé par le bulletin
   let _studentRows         = [];   // dernières lignes brutes de l'élève courant (pour filtrage par période)
 
-  /* ── Métadonnées exercices (domaine + compétence + titre) ─────────────────── */
-  /* TODO (nettoyage futur, hors Lot D) : EXERCISE_META duplique manuellement
-     une partie de ce qui existe déjà dans exercise-data.js (domaine +
-     competence par exercise_slug), avec un risque de dérive si l'un des deux
-     est mis à jour sans l'autre. pilotage-enseignant.html et
-     remediations-enseignant.html importent exercise-data.js directement
-     plutôt que de dupliquer — cette page pourrait faire de même (lazy-load,
-     comme les deux autres) pour supprimer cette copie. Non fait ici : cela
-     dépasse le périmètre du Lot D et touche une fonctionnalité (bilan par
-     compétence) qui n'est pas dans ce chantier. */
-  const EXERCISE_META = {
-    // Français — Conjugaison
-    "retrouver-infinitif-verbe-conjugue":       { domaine:"Français", competence:"Conjugaison — Identifier l'infinitif et le groupe",      title:"Retrouver l'infinitif d'un verbe conjugué puis son groupe" },
-    "identifier-verbe-conjugue":                { domaine:"Français", competence:"Conjugaison — Identifier le verbe conjugué",              title:"Identifier le verbe conjugué" },
-    "identifier-auxiliaire":                    { domaine:"Français", competence:"Conjugaison — Auxiliaires être / avoir",                  title:"Identifier l'auxiliaire" },
-    "retrouver-infinitif-passe-compose":        { domaine:"Français", competence:"Conjugaison — Passé composé",                            title:"Retrouver l'infinitif d'un verbe au passé composé" },
-    "conjuguer-etre-present":                   { domaine:"Français", competence:"Conjugaison — Être au présent",                          title:"Conjuguer le verbe être au présent" },
-    "conjuguer-avoir-present":                  { domaine:"Français", competence:"Conjugaison — Avoir au présent",                         title:"Conjuguer le verbe avoir au présent" },
-    "conjuguer-1er-groupe-present":             { domaine:"Français", competence:"Conjugaison — 1er groupe au présent",                    title:"Conjuguer les verbes réguliers du 1er groupe au présent" },
-    "conjuguer-verbes-particuliers-1er-groupe": { domaine:"Français", competence:"Conjugaison — Verbes particuliers du 1er groupe",        title:"Conjuguer les verbes particuliers du 1er groupe au présent" },
-    "conjuguer-2e-groupe-present":              { domaine:"Français", competence:"Conjugaison — 2e groupe au présent",                     title:"Conjuguer les verbes du 2e groupe au présent" },
-    "conjuguer-3e-groupe-present":              { domaine:"Français", competence:"Conjugaison — 3e groupe au présent",                     title:"Conjuguer les verbes fréquents du 3e groupe au présent" },
-    "conjuguer-imparfait":                      { domaine:"Français", competence:"Conjugaison — Imparfait",                                title:"Conjuguer à l'imparfait" },
-    "conjuguer-futur":                          { domaine:"Français", competence:"Conjugaison — Futur simple",                             title:"Conjuguer au futur" },
-    "conjuguer-passe-simple":                   { domaine:"Français", competence:"Conjugaison — Passé simple",                             title:"Conjuguer des verbes au passé simple" },
-    "conjuguer-plus-que-parfait":               { domaine:"Français", competence:"Conjugaison — Plus-que-parfait",                         title:"Conjuguer au plus-que-parfait" },
-    "conjuguer-imperatif-present":              { domaine:"Français", competence:"Conjugaison — Impératif présent",                        title:"Conjuguer à l'impératif présent" },
-    "conjuguer-conditionnel-present":           { domaine:"Français", competence:"Conjugaison — Conditionnel présent",                     title:"Conjuguer au conditionnel présent" },
-    "conjuguer-faire":                          { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : FAIRE",               title:"Conjuguer le verbe FAIRE" },
-    "conjuguer-aller":                          { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : ALLER",               title:"Conjuguer le verbe ALLER" },
-    "conjuguer-dire":                           { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : DIRE",                title:"Conjuguer le verbe DIRE" },
-    "conjuguer-venir":                          { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : VENIR",               title:"Conjuguer le verbe VENIR" },
-    "conjuguer-pouvoir":                        { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : POUVOIR",             title:"Conjuguer le verbe POUVOIR" },
-    "conjuguer-voir":                           { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : VOIR",                title:"Conjuguer le verbe VOIR" },
-    "conjuguer-vouloir":                        { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : VOULOIR",             title:"Conjuguer le verbe VOULOIR" },
-    "conjuguer-prendre":                        { domaine:"Français", competence:"Conjugaison — Verbes irréguliers : PRENDRE",             title:"Conjuguer le verbe PRENDRE" },
-    // Français — Grammaire
-    "identifier-phrase-declarative":            { domaine:"Français", competence:"Grammaire — Types de phrases : déclarative",             title:"Identifier une phrase déclarative" },
-    "transformer-declarative-interrogative":    { domaine:"Français", competence:"Grammaire — Types de phrases : interrogative",           title:"Transformer une phrase déclarative en phrase interrogative" },
-    "transformer-affirmative-negative":         { domaine:"Français", competence:"Grammaire — Types de phrases : négative",               title:"Transformer une phrase affirmative en phrase négative" },
-    "identifier-phrase-interrogative":          { domaine:"Français", competence:"Grammaire — Types de phrases : interrogative",           title:"Identifier une phrase interrogative" },
-    "identifier-phrase-imperative":             { domaine:"Français", competence:"Grammaire — Types de phrases : impérative",             title:"Identifier une phrase impérative" },
-    "identifier-phrase-negative":               { domaine:"Français", competence:"Grammaire — Types de phrases : négative",               title:"Identifier une phrase négative" },
-    "identifier-phrase-exclamative":            { domaine:"Français", competence:"Grammaire — Types de phrases : exclamative",            title:"Identifier une phrase exclamative" },
-    "identifier-article-defini":                { domaine:"Français", competence:"Grammaire — Déterminants : articles définis",           title:"Identifier les articles définis" },
-    "articles-definis-choix":                   { domaine:"Français", competence:"Grammaire — Déterminants : articles définis",           title:"Choisir l'article défini — le / la / les / l'" },
-    "articles-definis-completer":               { domaine:"Français", competence:"Grammaire — Déterminants : articles définis",           title:"Compléter avec l'article défini — Le printemps" },
-    "identifier-article-indefini":              { domaine:"Français", competence:"Grammaire — Déterminants : articles indéfinis",         title:"Identifier les articles indéfinis" },
-    "articles-indefinis-premiere-rencontre":    { domaine:"Français", competence:"Grammaire — Déterminants : articles indéfinis",         title:"Articles indéfinis — Première et deuxième mention" },
-    "identifier-determinant-demonstratif":      { domaine:"Français", competence:"Grammaire — Déterminants démonstratifs",                title:"Identifier un déterminant démonstratif" },
-    "identifier-determinant-possessif":         { domaine:"Français", competence:"Grammaire — Déterminants possessifs",                   title:"Identifier les déterminants possessifs" },
-    "possessifs-dans-phrases":                  { domaine:"Français", competence:"Grammaire — Déterminants possessifs",                   title:"Repérer les déterminants possessifs dans une phrase" },
-    "identifier-adjectif":                      { domaine:"Français", competence:"Grammaire — L'adjectif",                               title:"Identifier les adjectifs" },
-    "identifier-adverbe-frequent":              { domaine:"Français", competence:"Grammaire — L'adverbe",                                title:"Identifier les adverbes" },
-    "identifier-nom-phrase":                    { domaine:"Français", competence:"Grammaire — Le nom",                                   title:"Identifier les noms dans une phrase" },
-    "distinguer-phrase-simple-complexe":        { domaine:"Français", competence:"Grammaire — Phrase simple et complexe",                 title:"Distinguer phrase simple et phrase complexe" },
-    "phrases-connecteurs":                      { domaine:"Français", competence:"Grammaire — Connecteurs et conjonctions",               title:"Relier deux phrases avec la bonne conjonction" },
-    "produire-formes-interrogatives":           { domaine:"Français", competence:"Grammaire — Formes de phrases interrogatives",          title:"Produire différentes formes de phrases interrogatives" },
-    "accord-verbe-sujet-inverse":               { domaine:"Français", competence:"Grammaire — Accord sujet-verbe inversé",               title:"Accorder le verbe avec un sujet inversé" },
-    "differencier-epithete-attribut":           { domaine:"Français", competence:"Grammaire — Épithète et attribut du sujet",            title:"Différencier l'adjectif épithète et l'attribut du sujet" },
-    "distinguer-epithete-complement-nom":       { domaine:"Français", competence:"Grammaire — Épithète et complément du nom",            title:"Distinguer l'adjectif épithète et le complément du nom" },
-    "distinguer-pronom-sujet-complement":       { domaine:"Français", competence:"Grammaire — Pronoms personnels",                        title:"Distinguer le pronom personnel sujet et le pronom personnel complément" },
-    "remplacer-gn-sujet-pronom":                { domaine:"Français", competence:"Grammaire — Pronoms personnels",                        title:"Remplacer un groupe nominal sujet par un pronom personnel sujet" },
-    // Français — Orthographe
-    "ortho-accorder-determinant-nom":           { domaine:"Français", competence:"Orthographe — Accord déterminant/nom",                 title:"Accorder le déterminant avec le nom" },
-    "ortho-accorder-adjectif-nom":              { domaine:"Français", competence:"Orthographe — Accord adjectif/nom",                    title:"Accorder l'adjectif avec le nom" },
-    "ortho-accorder-participe-passe-cod":       { domaine:"Français", competence:"Orthographe — Accord participe passé (COD)",           title:"Accorder le participe passé avec le COD" },
-    // Mathématiques — Fractions
-    "representer-fraction":                     { domaine:"Mathématiques", competence:"Fractions — Représenter",                          title:"Représenter une fraction" },
-    "lire-fraction":                            { domaine:"Mathématiques", competence:"Fractions — Lire et écrire",                       title:"Lire une fraction" },
-    "decomposer-fraction-partie-entiere":       { domaine:"Mathématiques", competence:"Fractions — Décomposer",                           title:"Décomposer une fraction (partie entière + fraction)" },
-    "utiliser-fractions-problemes":             { domaine:"Mathématiques", competence:"Fractions — Problèmes",                            title:"Utiliser les fractions dans des problèmes" },
-    "placer-fraction-droite-graduee":           { domaine:"Mathématiques", competence:"Fractions — Droite graduée",                       title:"Placer une fraction sur une droite graduée" },
-    "encadrer-fraction":                        { domaine:"Mathématiques", competence:"Fractions — Encadrer",                             title:"Encadrer une fraction entre deux entiers consécutifs" },
-    "comparer-fractions":                       { domaine:"Mathématiques", competence:"Fractions — Comparer",                             title:"Comparer deux fractions" },
-    // Mathématiques — Nombres entiers
-    "ecrire-nombre-entier-chiffres":            { domaine:"Mathématiques", competence:"Nombres entiers — Écriture chiffrée",              title:"Écrire un nombre en chiffres" },
-    "ecrire-nombre-entier-lettres":             { domaine:"Mathématiques", competence:"Nombres entiers — Écriture en lettres",            title:"Écrire un nombre en lettres" },
-    "identifier-valeur-chiffre-position":       { domaine:"Mathématiques", competence:"Nombres entiers — Valeur positionnelle",           title:"Identifier la valeur d'un chiffre selon sa position" },
-  };
-
-  /* Repli pour un exercise_slug absent de EXERCISE_META (exercice retiré du
+  /* Repli pour un exercise_slug absent de _catalogMap (exercice retiré du
      catalogue depuis) : la ligne reste affichée, groupée à part, avec le
      titre lisible enregistré sur le résultat lui-même (exercise_title). */
   const UNKNOWN_META = { domaine: 'Autres', competence: 'Exercice retiré du catalogue' };
@@ -1141,7 +1060,7 @@
       const byDomaine    = {};
 
       for (const r of latest) {
-        const meta = EXERCISE_META[r.exercise_slug] || UNKNOWN_META;
+        const meta = _catalogMap[r.exercise_slug] || UNKNOWN_META;
         const { domaine, competence } = meta;
         const sep         = competence.indexOf(' — ');
         const sousDomaine = sep >= 0 ? competence.slice(0, sep)      : competence;
@@ -1947,7 +1866,7 @@
       const byDomaine    = {};
 
       for (const r of latest) {
-        const meta = EXERCISE_META[r.exercise_slug] || UNKNOWN_META;
+        const meta = _catalogMap[r.exercise_slug] || UNKNOWN_META;
         const { domaine, competence } = meta;
         const sep         = competence.indexOf(' — ');
         const sousDomaine = sep >= 0 ? competence.slice(0, sep)  : competence;
