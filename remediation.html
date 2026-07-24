@@ -202,6 +202,7 @@
   </div>
 </footer>
 
+  <script src="js/utils.js"></script>
   <script src="js/menu.js"></script>
   <script>
   /* Vue enseignant uniquement pour l'instant (Lot D). Le volet élève
@@ -211,14 +212,6 @@
      simple ; ne pas anticiper sa structure tant qu'il n'est pas spécifié. */
 
   let _competence = null;
-
-  function esc(str) {
-    return String(str ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
 
   function renderSection(key, containerId) {
     const entry = REMEDIATION_DATA[_competence];
@@ -230,9 +223,9 @@
     }
     container.innerHTML = items.map(it => `
       <div class="remed-item">
-        <div class="remed-item-title">${esc(it.titre)}</div>
-        <p class="remed-item-desc">${esc(it.description)}</p>
-        ${it.lien ? `<a href="${esc(it.lien)}" target="_blank" rel="noopener noreferrer" class="remed-item-link">🔗 Ouvrir la ressource</a>` : ''}
+        <div class="remed-item-title">${escHtml(it.titre)}</div>
+        <p class="remed-item-desc">${escHtml(it.description)}</p>
+        ${it.lien ? `<a href="${escHtml(it.lien)}" target="_blank" rel="noopener noreferrer" class="remed-item-link">🔗 Ouvrir la ressource</a>` : ''}
       </div>
     `).join('');
   }
