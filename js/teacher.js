@@ -537,8 +537,6 @@ const lfmTeacher = (() => {
         .select('student_id, pct, completed_at')
         .in('student_id', authIds);
 
-      console.log('[DEBUG] getClassResults exercise_results :', data?.length, '| authIds count :', authIds.length);
-
       (data || []).forEach(r => {
         if (!statsMap[r.student_id]) {
           statsMap[r.student_id] = { count: 0, sum: 0, last: null };
@@ -650,8 +648,6 @@ const lfmTeacher = (() => {
       .select('subject, pct, score, total, exercise_slug, category, completed_at, duration_secs')
       .eq('student_id', authUserId)
       .order('completed_at', { ascending: false });
-
-    console.log('[DEBUG] getStudentStats exercise_results :', data?.length, '| authUserId :', authUserId, '| erreur :', error?.message);
 
     if (error) throw error;
     const rows = data || [];
