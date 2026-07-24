@@ -500,27 +500,6 @@
   color: var(--blue);
   margin-bottom: 6px;
 }
-.jog-histo-enrichment {
-  margin-top: 14px;
-  padding: 14px 16px;
-  background: rgba(245,166,35,0.08);
-  border: 1.5px solid rgba(245,166,35,0.3);
-  border-radius: 12px;
-}
-.jog-histo-enrichment-title {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 12px;
-  color: #8A5A0E;
-  margin-bottom: 8px;
-}
-.jog-histo-comment {
-  font-size: 13px;
-  color: var(--text);
-  font-style: italic;
-  margin-top: 8px;
-}
-
 /* ─── Vue classe enseignant (synthese-joggings-enseignant.html) — feu
    compact en cellule de tableau (mêmes couleurs que .jog-feu-cell) ──────── */
 .jog-feu-dot {
