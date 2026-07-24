@@ -1424,36 +1424,47 @@
     ['view-loading','view-classes','view-students','view-student'].forEach(id => {
       document.getElementById(id).style.display = 'none';
     });
-    document.getElementById('view-loading').style.display = '';
+    const loadingEl = document.getElementById('view-loading');
+    loadingEl.textContent = 'Chargement…';
+    loadingEl.style.display = '';
 
-    if (view === 'classes') {
-      updateBreadcrumb([]);
-      renderClasses();
-    } else if (view === 'eleves') {
-      const classId = p.get('class');
-      _currentClass = _classes.find(c => c.id === classId) || null;
-      updateBreadcrumb([
-        { label: 'Résultats', params: { view: 'classes' } }
-      ], _currentClass?.name || 'Classe');
-      await renderStudents(classId);
-    } else if (view === 'eleve') {
-      _currentStudent = {
-        auth_user_id: p.get('student'),
-        display_name: decodeURIComponent(p.get('sname') || 'Élève'),
-        class_name:   decodeURIComponent(p.get('cname') || ''),
-        class_level:  p.get('clevel') || ''
-      };
-      const classId = p.get('class');
-      updateBreadcrumb([
-        { label: 'Résultats', params: { view: 'classes' } },
-        { label: _currentClass?.name || decodeURIComponent(p.get('cname') || 'Classe'),
-          params: { view: 'eleves', class: classId,
-                    cname: p.get('cname'), clevel: p.get('clevel'), cyear: p.get('cyear') } }
-      ], _currentStudent.display_name);
-      await renderStudentDetail();
+    try {
+      if (view === 'classes') {
+        updateBreadcrumb([]);
+        renderClasses();
+      } else if (view === 'eleves') {
+        const classId = p.get('class');
+        _currentClass = _classes.find(c => c.id === classId) || null;
+        updateBreadcrumb([
+          { label: 'Résultats', params: { view: 'classes' } }
+        ], _currentClass?.name || 'Classe');
+        await renderStudents(classId);
+      } else if (view === 'eleve') {
+        _currentStudent = {
+          auth_user_id: p.get('student'),
+          display_name: decodeURIComponent(p.get('sname') || 'Élève'),
+          class_name:   decodeURIComponent(p.get('cname') || ''),
+          class_level:  p.get('clevel') || ''
+        };
+        const classId = p.get('class');
+        updateBreadcrumb([
+          { label: 'Résultats', params: { view: 'classes' } },
+          { label: _currentClass?.name || decodeURIComponent(p.get('cname') || 'Classe'),
+            params: { view: 'eleves', class: classId,
+                      cname: p.get('cname'), clevel: p.get('clevel'), cyear: p.get('cyear') } }
+        ], _currentStudent.display_name);
+        await renderStudentDetail();
+      }
+    } catch (err) {
+      // Sans ce filet, une erreur ici (Supabase/RLS, donnée malformée) laissait
+      // l'écran bloqué sur "Chargement…" indéfiniment — indiscernable pour
+      // l'enseignant d'un clic de fil d'Ariane qui "ne fait rien".
+      console.error('[LFM] applyView:', err);
+      loadingEl.textContent = 'Une erreur est survenue pendant le chargement. Réessaie, ou reviens en arrière.';
+      return;
     }
 
-    document.getElementById('view-loading').style.display = 'none';
+    loadingEl.style.display = 'none';
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -1630,8 +1641,8 @@
       console.warn('[LFM] getStudentStats :', e.message);
     }
 
-    initLaurels(s.auth_user_id);
-    renderStudentBilan(s.auth_user_id);
+    initLaurels(s.auth_user_id).catch(e => console.warn('[LFM] initLaurels:', e.message));
+    renderStudentBilan(s.auth_user_id).catch(e => console.warn('[LFM] renderStudentBilan:', e.message));
     await renderStudentProfile(s.auth_user_id);
     renderStudentStats(stats, _studentProfile);
 
