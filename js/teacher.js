@@ -487,6 +487,23 @@ const lfmTeacher = (() => {
     return data;
   }
 
+  /* ── Rattrapage : (re)créer le compte auth.users d'un élève existant qui
+     n'en a pas (échec silencieux de _createStudentAuth à la création) ────── */
+  async function retryStudentAuth(studentId) {
+    const { data: student, error: selErr } = await db
+      .from('students').select('username, password, display_name, auth_user_id').eq('id', studentId).single();
+    if (selErr) throw selErr;
+    if (student.auth_user_id) return student.auth_user_id; // déjà en place
+
+    const authUserId = await _createStudentAuth(student.username, student.password, student.display_name);
+
+    const { error: updErr } = await db
+      .from('students').update({ auth_user_id: authUserId }).eq('id', studentId);
+    if (updErr) throw updErr;
+
+    return authUserId;
+  }
+
   async function updateStudent(id, updates) {
     const { data, error } = await db.from('students').update(updates).eq('id', id).select().single();
     if (error) throw error;
@@ -736,7 +753,7 @@ const lfmTeacher = (() => {
   return {
     getClasses, createClass, updateClass, updateClassAccessMode, deleteClass,
     getStudents, getAllStudents, createStudent, createStudentsBulk, updateStudent,
-    deleteStudent, moveStudent, resetStudentPassword,
+    deleteStudent, moveStudent, resetStudentPassword, retryStudentAuth,
     getClassResults, getClassResultsRaw, getStudentResults, getStudentResultsRaw, getStudentStats,
     getActiveExercises, addActiveExercise, removeActiveExercise,
     addActiveExercisesBulk, removeActiveExercisesBulk,

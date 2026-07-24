@@ -284,6 +284,18 @@
       white-space: nowrap;
       cursor: help;
     }
+    .no-auth-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      background: rgba(220,38,38,0.10);
+      border: 1px solid rgba(220,38,38,0.35);
+      color: #B91C1C;
+      border-radius: 100px;
+      padding: 2px 9px;
+      font-size: 10.5px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: help;
+    }
 
     /* ── Lien vers le pilotage des exercices (déménagé, Lot C) ──────────────── */
     .pilotage-link-card {
@@ -1223,7 +1235,13 @@
 
     tbody.innerHTML = _students.map(s => `
       <tr>
-        <td class="td-name">${esc(s.display_name)}</td>
+        <td class="td-name">
+          ${esc(s.display_name)}
+          ${!s.auth_user_id ? `
+            <span class="no-auth-badge" id="no-auth-badge-${s.id}" title="La création du compte de connexion a échoué : cet élève ne peut pas se connecter tant qu'il n'a pas été recréé.">⚠️ Compte à créer</span>
+            <button type="button" class="btn btn-ghost btn-sm btn-icon" data-action="retry-auth" data-sid="${s.id}" title="Créer le compte de connexion">🔧</button>
+          ` : ''}
+        </td>
         <td><span class="td-cred">${esc(s.username)}</span></td>
         <td><span class="td-cred" id="pwd-${s.id}">${esc(s.password)}</span></td>
         <td>
@@ -1288,7 +1306,25 @@
     if (action === 'move')        openModalMove(student);
     if (action === 'delete')      confirmDeleteById('student', id, student.display_name);
     if (action === 'reset-perso') await resetPersoList(student, btn);
+    if (action === 'retry-auth')  await retryStudentAuth(student, btn);
   });
+
+  /* Rattrapage : la création du compte auth.users à l'inscription peut
+     échouer silencieusement (js/teacher.js, createStudent) — l'élève reste
+     inséré avec auth_user_id null et ne peut pas se connecter tant que ce
+     bouton n'a pas été utilisé. */
+  async function retryStudentAuth(student, btn) {
+    btn.disabled = true;
+    try {
+      const authUserId = await lfmTeacher.retryStudentAuth(student.id);
+      student.auth_user_id = authUserId;
+      renderDetailStudents();
+      showToast('Compte de connexion créé pour ' + student.display_name);
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+      btn.disabled = false;
+    }
+  }
 
   /* Correctif UX (bug groupe vs liste perso) : réinitialisation directe de la
      liste personnalisée d'un élève depuis le tableau, sans passer par
