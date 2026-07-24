@@ -428,6 +428,7 @@ const lfmTeacher = (() => {
 
     // Mettre à jour le compte Supabase Auth via l'Edge Function
     if (student.auth_user_id) {
+      let authSyncOk = false;
       try {
         const { data: { session } } = await db.auth.getSession();
         const res = await fetch(
@@ -441,12 +442,20 @@ const lfmTeacher = (() => {
             body: JSON.stringify({ auth_user_id: student.auth_user_id, new_password: newPassword })
           }
         );
-        if (!res.ok) {
+        if (res.ok) {
+          authSyncOk = true;
+        } else {
           const txt = await res.text();
           console.warn('[LFM] reset-student-password Edge Function:', txt);
         }
       } catch (err) {
         console.warn('[LFM] reset-student-password fetch:', err.message);
+      }
+      // Ne jamais renvoyer un mot de passe comme "prêt à communiquer" si le
+      // compte de connexion réel n'a pas été resynchronisé : l'élève ne
+      // pourrait plus se connecter, sans qu'aucune erreur n'ait été visible.
+      if (!authSyncOk) {
+        throw new Error('Le mot de passe a été enregistré, mais la synchronisation avec le compte de connexion a échoué. Réessaie dans un instant avant de communiquer un nouveau mot de passe à l\'élève.');
       }
     }
 
