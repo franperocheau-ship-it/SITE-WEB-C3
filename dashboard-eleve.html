@@ -921,7 +921,7 @@
         .select('*')
         .order('completed_at', { ascending: false });
 
-      console.log('[DEBUG] exercise_results récupérés :', results?.length, '| erreur :', resultsErr?.message);
+      if (resultsErr) console.warn('[LFM] refreshResultsTab:', resultsErr.message);
 
       renderDashboard(_profile, results || [], _classMeta);
       initLaurels(_profile.id);
