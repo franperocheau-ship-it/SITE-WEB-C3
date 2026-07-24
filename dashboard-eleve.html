@@ -734,7 +734,8 @@
        sur ce même onglet en cliquant "Mon espace" depuis un exercice, au
        lieu de l'onglet "Faire des exercices" attendu. */
     const _tabParam = new URLSearchParams(window.location.search).get('tab');
-    activateTab(_tabParam || sessionStorage.getItem(TAB_KEY) || 'exercices');
+    const _initialTab = _tabParam || sessionStorage.getItem(TAB_KEY) || 'exercices';
+    activateTab(_initialTab);
 
     /* ── Formatage de date ─────────────────────────────────────────────────── */
     function formatDate(iso) {
@@ -982,6 +983,10 @@
       } catch (_) { /* pas encore inscrit dans une classe */ }
 
       await refreshResultsTab();
+      /* activateTab() a tourné avant que _profile ne soit chargé : si
+         "joggings" est l'onglet actif (mémorisé en sessionStorage ou via
+         ?tab=), son rendu initial a été sauté faute de profil disponible. */
+      if (_initialTab === 'joggings') JoggingStudentSpace.render(_profile.id);
     })();
 
     /* Page restaurée depuis le bfcache (bouton Précédent) : les scripts ne
