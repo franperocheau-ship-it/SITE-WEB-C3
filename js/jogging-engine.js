@@ -39,7 +39,7 @@ const FEU_LEGEND = {
   P: { label: "Ponctuation", desc: "Bien ponctuer ses phrases." },
   I: { label: "Illisible",   desc: "Non utilisé pour les textes saisis." },
   O: { label: "Orthographe", desc: "Bien écrire chaque mot." },
-  N: { label: "Néant",       desc: "Non utilisé pour le moment." },
+  N: { label: "Néant",       desc: "Résolu sur ta feuille de premier jet, avec ton enseignant." },
   S: { label: "Son",         desc: "Bien choisir entre des mots qui se ressemblent à l'oral." }
 };
 
@@ -53,6 +53,9 @@ let sessionRow      = null;
 let draftDirty       = false;
 let submitting        = false;
 let prevErrorCount = null;
+let studentName     = null;
+let lastVersionText  = null;
+let lastVersionFeux  = null;
 
 /* ── Utilitaires ──────────────────────────────────────────────────────────── */
 
@@ -150,6 +153,19 @@ function bindEditorEvents() {
     JoggingGrammalecte.preload();
     showEditorState();
   });
+
+  // Générateur de premier jet (Phase 2bis, §5.5) : disponible dès qu'une
+  // version existe, utilise toujours la dernière version soumise.
+  document.getElementById('jog-print-btn').addEventListener('click', () => {
+    if (typeof JoggingPrint === 'undefined' || !lastVersionText) return;
+    JoggingPrint.generate({
+      studentName,
+      joggingTitle: jogging.title,
+      consigne: jogging.consigne,
+      text: lastVersionText,
+      feux: lastVersionFeux
+    });
+  });
 }
 
 /* ── Soumission ────────────────────────────────────────────────────────────── */
@@ -180,7 +196,7 @@ async function onValidateClick() {
     const feuColumns = {};
     for (const c of JoggingGrammalecte.AUTO_CODES) feuColumns[`feu_${c.toLowerCase()}`] = feux[c];
     feuColumns.feu_i = 'blanc';
-    feuColumns.feu_n = 'blanc'; // en attente de l'enseignant (Phase 2)
+    feuColumns.feu_n = 'blanc'; // non automatisable, résolu sur papier (§5.5), jamais reporté dans l'app
 
     const correction = { grammalecteVersion, erreurs, feux };
 
@@ -384,6 +400,19 @@ function showFeuTooltip(anchorEl) {
   tooltip.style.top = top + 'px';
 }
 
+/* Tant qu'il reste des tuiles hors champ, une flèche collée au bord droit
+   (.jog-feux-scroll-hint, cf. css/jogging.css) signale qu'on peut glisser —
+   sans ça, une tuile qui déborde n'a aucun indice visuel de son existence
+   (bug S coupée, corrigé ici). Mesuré au rendu ET recalculé au
+   redimensionnement (défilement possible seulement au-delà d'1px de
+   tolérance d'arrondi). */
+function updateFeuxScrollHint() {
+  const grid = document.getElementById('jog-feux-grid');
+  if (!grid) return;
+  const scrollable = grid.scrollWidth > grid.clientWidth + 1;
+  grid.classList.toggle('jog-feux-grid--scrollable', scrollable);
+}
+
 function renderFeuxGrid(feux) {
   const html = FEU_ORDER.map(letter => {
     let state = 'blanc';
@@ -396,7 +425,7 @@ function renderFeuxGrid(feux) {
         <span class="jog-feu-icon">${picto}</span>
       </div>
     `;
-  }).join('');
+  }).join('') + '<div class="jog-feux-scroll-hint" aria-hidden="true">›</div>';
   const grid = document.getElementById('jog-feux-grid');
   grid.innerHTML = html;
 
@@ -410,11 +439,18 @@ function renderFeuxGrid(feux) {
       showFeuTooltip(cell);
     });
   });
+
+  updateFeuxScrollHint();
 }
+
+window.addEventListener('resize', updateFeuxScrollHint);
 
 /* ── Écran de correction ──────────────────────────────────────────────────── */
 
 function renderCorrectionScreen(text, correction, isFinal, feux) {
+  lastVersionText = text;
+  lastVersionFeux = feux;
+
   const { html, erreurs } = highlightText(text, correction.erreurs || []);
 
   const textEl = document.getElementById('jog-correction-text');
@@ -461,12 +497,21 @@ function renderCorrectionScreen(text, correction, isFinal, feux) {
 /* ── Session déjà terminée (revisite) : dernière version en lecture seule ──── */
 
 async function showCompletedState() {
-  const { data: versions } = await window.lfmDb
+  const { data: versions, error } = await window.lfmDb
     .from('jogging_versions')
     .select('text, correction')
     .eq('session_id', sessionRow.id)
     .order('version_number', { ascending: false })
     .limit(1);
+
+  if (error) {
+    // Sans ce contrôle, un échec réseau transitoire ici faisait retomber
+    // silencieusement un jogging déjà terminé sur l'écran d'édition, comme
+    // s'il n'avait jamais été commencé.
+    document.getElementById('jog-state-loading').textContent = 'Impossible de charger ce jogging. Réessaie dans un instant.';
+    showState('loading');
+    return;
+  }
 
   const last = versions && versions[0];
   if (last) {
@@ -496,6 +541,7 @@ async function showCompletedState() {
 
   const profile = await lfmAuth.requireRole('eleve');
   if (!profile) return;
+  studentName = profile.display_name;
 
   // Personnalisation par classe + verrouillage en parcours guidé (Phase 4,
   // §5.8). Le blocage réel contre un accès direct par URL est garanti côté

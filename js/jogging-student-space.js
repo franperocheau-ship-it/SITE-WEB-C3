@@ -100,7 +100,7 @@ const JoggingStudentSpace = (() => {
     return `Continue comme ça, tu as déjà terminé ${totalCompleted} jogging${totalCompleted > 1 ? 's' : ''} !`;
   }
 
-  function renderHistoriqueCard(session, versions, enrichment) {
+  function renderHistoriqueCard(session, versions, idx) {
     const jog = (typeof JOGGING_DATA !== 'undefined') ? JOGGING_DATA[session.jogging_id] : null;
     const title = jog ? jog.title : session.jogging_id;
     const last = versions[versions.length - 1];
@@ -117,13 +117,10 @@ const JoggingStudentSpace = (() => {
         ${renderFeuxMini(feuxFromVersion(v))}
       </div>`).join('');
 
-    const enrichHtml = (enrichment && enrichment.published && (enrichment.teacher_text || enrichment.teacher_comment))
-      ? `
-        <div class="jog-histo-enrichment">
-          <div class="jog-histo-enrichment-title">📝 Reformulation et commentaire de ton enseignant</div>
-          ${enrichment.teacher_text ? `<div class="jog-correction-text">${escapeHtml(enrichment.teacher_text)}</div>` : ''}
-          ${enrichment.teacher_comment ? `<div class="jog-histo-comment">${escapeHtml(enrichment.teacher_comment)}</div>` : ''}
-        </div>` : '';
+    // Générateur de premier jet (Phase 2bis, §5.6.3) : régénère la feuille
+    // à partir de la dernière version, accessible depuis l'historique.
+    const printHtml = (last && jog) ? `
+      <button type="button" class="jog-btn-outline" data-print-jogging="${idx}">🖨️ Générer ma feuille de premier jet</button>` : '';
 
     return `
       <div class="jog-histo-card">
@@ -136,7 +133,7 @@ const JoggingStudentSpace = (() => {
         </div>
         <div class="jog-histo-detail" id="${detailId}" style="display:none">
           ${versionsHtml}
-          ${enrichHtml}
+          ${printHtml}
         </div>
       </div>`;
   }
@@ -150,6 +147,26 @@ const JoggingStudentSpace = (() => {
         el.style.display = isOpen ? 'none' : '';
         const chevron = top.querySelector('.jog-histo-chevron');
         if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+      });
+    });
+  }
+
+  /* Générateur de premier jet (Phase 2bis, §5.6.3) : un bouton par carte
+     d'historique, données déjà résolues au moment du rendu (voir render()). */
+  function bindPrintButtons(container, printData) {
+    container.querySelectorAll('[data-print-jogging]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const data = printData[Number(btn.dataset.printJogging)];
+        if (!data || typeof JoggingPrint === 'undefined') return;
+        const nameEl = document.getElementById('dash-name');
+        JoggingPrint.generate({
+          studentName: nameEl ? nameEl.textContent : '',
+          joggingTitle: data.joggingTitle,
+          consigne: data.consigne,
+          text: data.text,
+          feux: data.feux
+        });
       });
     });
   }
@@ -396,12 +413,9 @@ const JoggingStudentSpace = (() => {
 
     const sessionIds = safeSessions.map(s => s.id);
     const sessionsById = new Map(safeSessions.map(s => [s.id, s]));
-    const [{ data: versions }, { data: enrichments }] = await Promise.all([
-      window.lfmDb.from('jogging_versions').select('*')
-        .in('session_id', sessionIds).order('version_number', { ascending: true }).limit(2000),
-      window.lfmDb.from('jogging_enrichments').select('*')
-        .in('session_id', sessionIds).limit(2000)
-    ]);
+    const { data: versions, error: versionsErr } = await window.lfmDb.from('jogging_versions').select('*')
+      .in('session_id', sessionIds).order('version_number', { ascending: true }).limit(2000);
+    if (versionsErr) console.warn('[LFM] JoggingStudentSpace.render (versions):', versionsErr.message);
 
     const versionsBySession = new Map();
     (versions || []).forEach(v => {
@@ -410,8 +424,6 @@ const JoggingStudentSpace = (() => {
     });
     const lastVersionBySession = new Map();
     versionsBySession.forEach((vs, sessionId) => lastVersionBySession.set(sessionId, vs[vs.length - 1]));
-    const enrichBySession = new Map();
-    (enrichments || []).forEach(e => enrichBySession.set(e.session_id, e));
 
     /* ── Mon bilan ── */
     const completed = safeSessions.filter(s => s.status === 'completed');
@@ -434,10 +446,17 @@ const JoggingStudentSpace = (() => {
     renderProgres(completed, lastVersionBySession);
 
     /* ── Mon historique ── */
-    histoList.innerHTML = safeSessions.map(s =>
-      renderHistoriqueCard(s, versionsBySession.get(s.id) || [], enrichBySession.get(s.id))
+    const printData = safeSessions.map(s => {
+      const jog = (typeof JOGGING_DATA !== 'undefined') ? JOGGING_DATA[s.jogging_id] : null;
+      const last = lastVersionBySession.get(s.id);
+      if (!jog || !last) return null;
+      return { joggingTitle: jog.title, consigne: jog.consigne, text: last.text, feux: feuxFromVersion(last) };
+    });
+    histoList.innerHTML = safeSessions.map((s, idx) =>
+      renderHistoriqueCard(s, versionsBySession.get(s.id) || [], idx)
     ).join('');
     bindToggles(histoList);
+    bindPrintButtons(histoList, printData);
     histoSection.style.display = '';
 
     /* ── Mes réussites ── */

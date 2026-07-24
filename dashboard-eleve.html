@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="styles.css?v=11">
   <link rel="stylesheet" href="laurels.css?v=2">
   <link rel="stylesheet" href="css/jogging.css?v=1">
+  <link rel="stylesheet" href="css/jogging-print.css?v=1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
@@ -17,6 +18,7 @@
   <script src="js/level-badge.js?v=1"></script>
   <script src="js/jogging-data.js?v=1"></script>
   <script src="js/jogging-badges.js?v=1"></script>
+  <script src="js/jogging-print.js?v=1"></script>
   <script src="js/jogging-student-space.js?v=1"></script>
   <style>
     .dash-wrap {
@@ -667,6 +669,9 @@
       </div><!-- /tab-joggings -->
 
       <div id="jog-carnet-print-root"></div>
+
+      <!-- Racine imprimée du premier jet (Phase 2bis, §5.5 — cachée à l'écran) -->
+      <div id="jog-print-root"></div>
 
       <!-- Actions -->
       <div class="dash-actions">

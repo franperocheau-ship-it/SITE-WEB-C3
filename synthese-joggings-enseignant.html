@@ -6,12 +6,14 @@
   <title>Joggings d'écriture — Espace enseignant — LFM</title>
   <link rel="stylesheet" href="styles.css?v=12">
   <link rel="stylesheet" href="css/jogging.css?v=1">
+  <link rel="stylesheet" href="css/jogging-print.css?v=1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=2"></script>
   <script src="js/jogging-data.js?v=1"></script>
   <script src="js/jogging-teacher.js?v=1"></script>
+  <script src="js/jogging-print.js?v=1"></script>
   <style>
     /* ── Layout (copié de resultats-enseignant.html, §1.2 : pas de composant
        partagé — fichier séparé, cf. décision §1.2 point 2) ────────────────── */
@@ -43,6 +45,40 @@
     }
     .main-tab.is-active { background: var(--blue); color: #fff; }
     .main-tab:hover:not(.is-active) { background: rgba(16,43,106,0.06); color: var(--blue); }
+
+    /* ── Sous-navigation en 3 onglets de cette page (Phase 2quater, §5.7) —
+       mécanisme ?tab= comme dashboard-eleve.html, pas le pattern interne
+       sans URL de resultats-enseignant.html. Style calqué sur .dash-tabs/
+       .dash-tab de dashboard-eleve.html pour rester dans la charte. ────── */
+    .jog-tabs {
+      display: flex; gap: 4px; flex-wrap: wrap;
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm); padding: 8px; margin-bottom: 24px;
+    }
+    .jog-tab {
+      flex: 1; min-width: 180px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px 16px; border: none; border-radius: 12px;
+      font-family: inherit; font-size: 13.5px; font-weight: 700;
+      cursor: pointer; background: none; color: var(--muted);
+      transition: background 180ms, color 180ms;
+    }
+    .jog-tab:hover { background: var(--bg); color: var(--text); }
+    .jog-tab--active { background: var(--blue); color: #fff; }
+    .jog-tab--active:hover { background: #0d2255; }
+
+    /* ── Message préventif générateur de premier jet (Phase 2bis, §5.5) ───────
+       Ton informatif (pas un avertissement) mais nettement visible : fond
+       distinct de la charte (dominante bleue partout ailleurs sur cette
+       page), grande icône, en haut de page — on ne doit pas pouvoir passer
+       à côté. */
+    .jog-teacher-intro {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: #FFF6E8; border: 1.5px solid #F0C987;
+      border-radius: 14px; padding: 16px 20px; margin-bottom: 22px;
+      font-size: 13.5px; line-height: 1.6; color: #6B4A1E;
+    }
+    .jog-teacher-intro-icon { font-size: 30px; line-height: 1; flex-shrink: 0; }
 
     /* ── Section header / boutons ────────────────────────────────────────────── */
     .section-header {
@@ -138,9 +174,11 @@
       letter-spacing: 0.04em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px;
     }
 
-    /* Cartes de joggings + zone de reformulation (réutilise .jog-histo-* de
-       css/jogging.css pour l'historique, complété ici pour la partie propre
-       à l'enseignant : reformulation, commentaire, sélecteur N, publication) */
+    /* Cartes de joggings (réutilise .jog-histo-* de css/jogging.css pour
+       l'historique). .jog-teacher-reform / .jog-n-selector : formulaire de
+       personnalisation « Gérer mes joggings » (Phase 4, §5.8) — la zone de
+       reformulation numérique de la Phase 2 est retirée en Phase 2bis
+       (remplacée par le générateur de premier jet imprimable, §5.5). */
     .jog-teacher-reform {
       margin-top: 14px; padding: 16px; border-radius: 12px;
       background: rgba(16,43,106,0.03); border: 1.5px solid var(--border);
@@ -164,12 +202,6 @@
       cursor: pointer; color: var(--muted); transition: border-color 150ms, background 150ms;
     }
     .jog-n-btn[data-active="true"] { border-width: 2px; }
-    .jog-n-btn[data-color="vert"][data-active="true"]   { background: rgba(22,163,74,0.12);  border-color: #16a34a; color: #16a34a; }
-    .jog-n-btn[data-color="orange"][data-active="true"] { background: rgba(245,166,35,0.16); border-color: #b8760f; color: #b8760f; }
-    .jog-n-btn[data-color="rouge"][data-active="true"]  { background: rgba(214,40,57,0.12);  border-color: #D62839; color: #D62839; }
-    .jog-publish-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
-    .jog-publish-row input { width: 16px; height: 16px; }
-    .jog-publish-row label { margin: 0; font-size: 12.5px; font-weight: 600; color: var(--text); }
     .jog-reform-actions { margin-top: 14px; display: flex; align-items: center; gap: 12px; }
     .jog-reform-saved { font-size: 12px; color: #15803d; font-weight: 600; }
 
@@ -248,6 +280,7 @@
     .jog-bulletin-feu.orange { background: #FFF6E8; color: #8A5A0E; }
     .jog-bulletin-feu.rouge  { background: #FDF0F1; color: #992A38; }
     .jog-bulletin-feu.blanc  { background: #F4F5F7; color: #8A93A3; }
+    .jog-bulletin-feu.manual { border: 1.5px dashed #C4CAD6; }
 
     .jog-bulletin-progress { margin-bottom: 18px; }
     .jog-bp-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 8pt; }
@@ -274,11 +307,6 @@
     .jog-bulletin-version-block .v-label { font-weight: 800; font-size: 8.5pt; color: #1A2D6B; margin-bottom: 4px; }
     .jog-bulletin-version-block .v-text { font-size: 8.5pt; line-height: 1.5; white-space: pre-wrap; }
 
-    .jog-bulletin-reformulation { background: #FFF8ED; border: 1px solid #F5DDB0; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; break-inside: avoid; }
-    .jog-bulletin-reformulation h5 { font-size: 9pt; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 7px; font-weight: 800; color: #8A5A0E; }
-    .jog-bulletin-reformulation .rf-text { font-size: 9pt; line-height: 1.5; white-space: pre-wrap; margin-bottom: 8px; }
-    .jog-bulletin-reformulation .rf-comment { font-size: 9pt; font-style: italic; }
-
     .jog-bulletin-conclusion { font-size: 9.5pt; line-height: 1.6; margin-bottom: 16px; }
 
     .jog-bulletin-footer { display: flex; justify-content: space-between; gap: 12px; font-size: 7.5pt; color: #9AA3B2; border-top: 1px solid #E8EDF3; padding-top: 8px; }
@@ -297,6 +325,7 @@
       }
       body.printing-jog-bilan .navbar, body.printing-jog-bilan footer,
       body.printing-jog-bilan .breadcrumb, body.printing-jog-bilan .main-tabs,
+      body.printing-jog-bilan .jog-teacher-intro, body.printing-jog-bilan #jog-tabs,
       body.printing-jog-bilan .student-header, body.printing-jog-bilan .stats-row-3,
       body.printing-jog-bilan #jog-student-joggings, body.printing-jog-bilan .nav-footer {
         display: none !important;
@@ -363,87 +392,31 @@
         <a class="main-tab is-active" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
       </nav>
 
+      <!-- Message préventif enseignant (Phase 2bis, §5.5) — affiché une fois,
+           pas répété sur chaque fiche élève. -->
+      <div class="jog-teacher-intro">
+        <span class="jog-teacher-intro-icon">💬</span>
+        <div>« Relis-toi », « pense au Code Champion », « saute des lignes pour la correction » — ce générateur de premier jet guide l'élève dans ces réflexes, et prend en charge l'espacement nécessaire à votre correction. Résultat : un premier jet mieux réalisé et plus lisible, qui facilite la réussite du deuxième jet. La correction automatique reste imparfaite, votre vérification reste indispensable.</div>
+      </div>
+
       <!-- Chargement -->
       <div id="view-loading" class="view-loading">Chargement…</div>
 
-      <!-- ── Vue classe ───────────────────────────────────────────────────── -->
-      <div id="view-classe" style="display:none">
+      <!-- Sous-navigation en 3 onglets (Phase 2quater, §5.7) — mécanisme
+           ?tab= (voir jogActivateTab() plus bas), même patron que
+           dashboard-eleve.html. -->
+      <nav class="jog-tabs" id="jog-tabs" aria-label="Navigation joggings d'écriture" style="display:none">
+        <button class="jog-tab" data-jtab="personnaliser">⚙️ Personnaliser mes joggings</button>
+        <button class="jog-tab" data-jtab="imprimer">🖨️ Imprimer les premiers jets</button>
+        <button class="jog-tab" data-jtab="resultats">📊 Résultats des joggings</button>
+      </nav>
+
+      <!-- ── Onglet 1 : Personnaliser mes joggings (Phase 4, §5.7 point 1 /
+           §5.8) — sélecteur de classe, 15 joggings, formulaire de
+           personnalisation, verrouillage en mode guidé. ───────────────────── -->
+      <div id="jtab-personnaliser" class="jog-tab-pane" style="display:none">
         <div class="section-header">
-          <h1 class="section-title">Synthèse des joggings d'écriture</h1>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-outline btn-sm" onclick="openStats()">📊 Statistiques de la classe</button>
-            <button class="btn btn-outline btn-sm" onclick="openGerer()">⚙️ Gérer mes joggings</button>
-          </div>
-        </div>
-
-        <div class="jog-filters">
-          <div class="jog-filter-field">
-            <label for="jog-filter-class">Classe</label>
-            <select id="jog-filter-class"></select>
-          </div>
-          <div class="jog-filter-field">
-            <label for="jog-filter-jogging">Jogging</label>
-            <select id="jog-filter-jogging">
-              <option value="">Tous les joggings (dernier en date)</option>
-            </select>
-          </div>
-          <div class="jog-filter-field">
-            <label for="jog-filter-period">Période</label>
-            <select id="jog-filter-period">
-              <option value="">Toute l'année</option>
-              <option value="30">30 derniers jours</option>
-              <option value="7">7 derniers jours</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="jog-classe-table-wrap">
-          <div class="empty-state">
-            <div class="empty-icon">🏫</div>
-            <div class="empty-text">Aucune classe pour l'instant.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── Fiche élève ──────────────────────────────────────────────────── -->
-      <div id="view-eleve" style="display:none">
-        <div class="student-header">
-          <div class="student-avatar-lg" id="jog-student-avatar">?</div>
-          <div class="student-header-info">
-            <div class="student-header-name" id="jog-student-name">—</div>
-            <div class="student-header-meta" id="jog-student-meta">—</div>
-          </div>
-          <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-ghost btn-sm" id="jog-print-btn" style="display:none" onclick="printStudentJoggingBilan()">📄 Générer le bilan PDF</button>
-          </div>
-        </div>
-
-        <div class="stats-row-3" id="jog-student-stats"></div>
-
-        <div id="jog-student-joggings"></div>
-
-        <div class="nav-footer">
-          <button class="btn btn-ghost btn-sm" onclick="showView('classe')">← Retour à la vue classe</button>
-        </div>
-      </div>
-
-      <!-- ── Statistiques (scope : classe sélectionnée dans le filtre) ──────── -->
-      <div id="view-stats" style="display:none">
-        <div class="section-header">
-          <h1 class="section-title">Statistiques — <span id="jog-stats-classname">—</span></h1>
-        </div>
-
-        <div id="jog-stats-body"><div class="view-loading">Chargement…</div></div>
-
-        <div class="nav-footer">
-          <button class="btn btn-ghost btn-sm" onclick="showView('classe')">← Retour à la vue classe</button>
-        </div>
-      </div>
-
-      <!-- ── Gérer mes joggings (Phase 4, §5.7 point 5 / §5.8) ───────────────── -->
-      <div id="view-gerer" style="display:none">
-        <div class="section-header">
-          <h1 class="section-title">Gérer mes joggings</h1>
+          <h1 class="section-title">Personnaliser mes joggings</h1>
         </div>
 
         <div class="jog-filters" id="jog-gerer-class-filter" style="display:none">
@@ -454,14 +427,121 @@
         </div>
 
         <div id="jog-gerer-list"><div class="view-loading">Chargement…</div></div>
+      </div>
 
-        <div class="nav-footer">
-          <button class="btn btn-ghost btn-sm" onclick="showView('classe')">← Retour à la vue classe</button>
+      <!-- ── Onglet 2 : Imprimer les premiers jets de mes élèves (Phase 2ter,
+           §5.9) — sélecteur classe + jogging, impression groupée en un seul
+           PDF via js/jogging-print.js (JoggingPrint.generateBatch). ───────── -->
+      <div id="jtab-imprimer" class="jog-tab-pane" style="display:none">
+        <div class="section-header">
+          <h1 class="section-title">Imprimer les premiers jets de mes élèves</h1>
         </div>
+
+        <div class="jog-filters">
+          <div class="jog-filter-field">
+            <label for="jog-imprimer-class">Classe</label>
+            <select id="jog-imprimer-class"></select>
+          </div>
+          <div class="jog-filter-field">
+            <label for="jog-imprimer-jogging">Jogging</label>
+            <select id="jog-imprimer-jogging">
+              <option value="">Choisir un jogging</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="jog-imprimer-body">
+          <div class="empty-state">
+            <div class="empty-icon">🖨️</div>
+            <div class="empty-text">Choisis une classe et un jogging pour voir les élèves ayant soumis une version.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Onglet 3 : Résultats des joggings (contenu principal existant —
+           vue classe, fiche élève, statistiques, bilan PDF) ──────────────── -->
+      <div id="jtab-resultats" class="jog-tab-pane" style="display:none">
+
+        <!-- ── Vue classe ─────────────────────────────────────────────────── -->
+        <div id="view-classe" style="display:none">
+          <div class="section-header">
+            <h1 class="section-title">Synthèse des joggings d'écriture</h1>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-outline btn-sm" onclick="openStats()">📊 Statistiques de la classe</button>
+            </div>
+          </div>
+
+          <div class="jog-filters">
+            <div class="jog-filter-field">
+              <label for="jog-filter-class">Classe</label>
+              <select id="jog-filter-class"></select>
+            </div>
+            <div class="jog-filter-field">
+              <label for="jog-filter-jogging">Jogging</label>
+              <select id="jog-filter-jogging">
+                <option value="">Tous les joggings (dernier en date)</option>
+              </select>
+            </div>
+            <div class="jog-filter-field">
+              <label for="jog-filter-period">Période</label>
+              <select id="jog-filter-period">
+                <option value="">Toute l'année</option>
+                <option value="30">30 derniers jours</option>
+                <option value="7">7 derniers jours</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="jog-classe-table-wrap">
+            <div class="empty-state">
+              <div class="empty-icon">🏫</div>
+              <div class="empty-text">Aucune classe pour l'instant.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Fiche élève ────────────────────────────────────────────────── -->
+        <div id="view-eleve" style="display:none">
+          <div class="student-header">
+            <div class="student-avatar-lg" id="jog-student-avatar">?</div>
+            <div class="student-header-info">
+              <div class="student-header-name" id="jog-student-name">—</div>
+              <div class="student-header-meta" id="jog-student-meta">—</div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-ghost btn-sm" id="jog-print-btn" style="display:none" onclick="printStudentJoggingBilan()">📄 Générer le bilan PDF</button>
+            </div>
+          </div>
+
+          <div class="stats-row-3" id="jog-student-stats"></div>
+
+          <div id="jog-student-joggings"></div>
+
+          <div class="nav-footer">
+            <button class="btn btn-ghost btn-sm" onclick="showView('classe')">← Retour à la vue classe</button>
+          </div>
+        </div>
+
+        <!-- ── Statistiques (scope : classe sélectionnée dans le filtre) ───── -->
+        <div id="view-stats" style="display:none">
+          <div class="section-header">
+            <h1 class="section-title">Statistiques — <span id="jog-stats-classname">—</span></h1>
+          </div>
+
+          <div id="jog-stats-body"><div class="view-loading">Chargement…</div></div>
+
+          <div class="nav-footer">
+            <button class="btn btn-ghost btn-sm" onclick="showView('classe')">← Retour à la vue classe</button>
+          </div>
+        </div>
+
       </div>
 
       <!-- Racine imprimée du bilan PDF (cachée à l'écran) -->
       <div id="jog-bulletin-print-root"></div>
+
+      <!-- Racine imprimée du premier jet (Phase 2bis, §5.5 — cachée à l'écran) -->
+      <div id="jog-print-root"></div>
 
     </div>
   </div>
@@ -507,11 +587,13 @@
   let _sortKey = 'name';
   let _sortAsc = true;
   let _currentStudent = null; // { auth_user_id, display_name, class_id }
-  let _currentStudentJoggings = []; // [{session, versions, enrichment}]
+  let _currentStudentJoggings = []; // [{session, versions}]
   let _teacherProfile = null;
   let _gererClassId = null;
   let _gererMode = 'libre';
   let _gererSettings = new Map(); // jogging_id -> ligne jogging_class_settings
+  let _imprimerSubmissions = []; // [{student, session, lastVersion}], onglet 2
+  const JOG_TAB_KEY = 'jog-synthese-active-tab';
 
   /* ═══════════════════════════════════════════════════════════════════════════
      UTILITAIRES
@@ -547,12 +629,37 @@
     return html;
   }
 
+  /* Sous-vues internes à l'onglet 3 "Résultats des joggings" (vue classe /
+     fiche élève / statistiques) — pas de mécanisme ?tab= ici, seulement les
+     3 onglets de haut niveau en ont un (jogActivateTab ci-dessous). */
   function showView(name) {
-    document.getElementById('view-loading').style.display = 'none';
     document.getElementById('view-classe').style.display = name === 'classe' ? '' : 'none';
     document.getElementById('view-eleve').style.display  = name === 'eleve'  ? '' : 'none';
     document.getElementById('view-stats').style.display  = name === 'stats'  ? '' : 'none';
-    document.getElementById('view-gerer').style.display  = name === 'gerer'  ? '' : 'none';
+  }
+
+  /* 3 onglets de haut niveau — mécanisme ?tab= réutilisé de
+     dashboard-eleve.html (respecté au chargement, mémorisé en
+     sessionStorage ensuite ; pas de synchronisation d'URL au clic, comme
+     sur le dashboard élève — §5.7). Chaque onglet recharge ses données à
+     chaque activation plutôt qu'une seule fois au premier chargement. */
+  function jogActivateTab(tabName) {
+    document.querySelectorAll('.jog-tab').forEach(btn => {
+      btn.classList.toggle('jog-tab--active', btn.dataset.jtab === tabName);
+    });
+    document.querySelectorAll('.jog-tab-pane').forEach(pane => {
+      pane.style.display = (pane.id === 'jtab-' + tabName) ? '' : 'none';
+    });
+    sessionStorage.setItem(JOG_TAB_KEY, tabName);
+
+    if (tabName === 'personnaliser') {
+      loadPersonnaliserTab();
+    } else if (tabName === 'imprimer') {
+      loadImprimerList();
+    } else if (tabName === 'resultats') {
+      showView('classe');
+      loadClassOverview();
+    }
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -760,7 +867,10 @@
      verrouillage en parcours guidé. Tout est écrit directement en base
      (RLS), aucun appel externe.
   ═══════════════════════════════════════════════════════════════════════════ */
-  async function openGerer() {
+  /* Chargement de l'onglet 1 "Personnaliser mes joggings" — appelé à
+     chaque activation de l'onglet (jogActivateTab), données toujours à
+     jour plutôt que figées au premier chargement. */
+  async function loadPersonnaliserTab() {
     if (_classes.length === 0) return;
 
     const filterWrap = document.getElementById('jog-gerer-class-filter');
@@ -779,7 +889,6 @@
       _gererClassId = _classes[0].id;
     }
 
-    showView('gerer');
     await loadGererClass(_gererClassId);
   }
 
@@ -998,6 +1107,75 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
+     IMPRIMER LES PREMIERS JETS DE MES ÉLÈVES (Phase 2ter, §5.9) —
+     impression groupée en un seul PDF, un élève après l'autre, pour un
+     jogging donné. Réutilise JoggingPrint.generateBatch() (js/jogging-print.js,
+     Phase 2bis) plutôt que de dupliquer la construction des pages.
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function populateImprimerFilters() {
+    const classSel = document.getElementById('jog-imprimer-class');
+    classSel.innerHTML = _classes.map(c => `<option value="${c.id}">${escHtml(c.name)} (${escHtml(c.level)})</option>`).join('');
+
+    const joggingSel = document.getElementById('jog-imprimer-jogging');
+    const list = (typeof JOGGING_LIST !== 'undefined') ? JOGGING_LIST : [];
+    joggingSel.innerHTML = '<option value="">Choisir un jogging</option>' +
+      list.map(j => `<option value="${j.id}">${j.numero}. ${escHtml(j.title)}</option>`).join('');
+  }
+
+  async function loadImprimerList() {
+    const classId = document.getElementById('jog-imprimer-class').value;
+    const joggingId = document.getElementById('jog-imprimer-jogging').value;
+    const body = document.getElementById('jog-imprimer-body');
+
+    if (!classId || !joggingId) {
+      body.innerHTML = '<div class="empty-state"><div class="empty-icon">🖨️</div><div class="empty-text">Choisis une classe et un jogging pour voir les élèves ayant soumis une version.</div></div>';
+      return;
+    }
+
+    body.innerHTML = '<div class="view-loading">Chargement…</div>';
+    try {
+      _imprimerSubmissions = await lfmJoggingTeacher.getClassJoggingSubmissions(classId, joggingId);
+    } catch (e) {
+      body.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Impossible de charger les données (${escHtml(e.message)}).</div></div>`;
+      return;
+    }
+
+    if (_imprimerSubmissions.length === 0) {
+      body.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Aucun élève de cette classe n\'a encore soumis de version pour ce jogging.</div></div>';
+      return;
+    }
+
+    body.innerHTML = `
+      <div class="jog-stats-card">
+        <div class="jog-stats-block-title">${_imprimerSubmissions.length} élève${_imprimerSubmissions.length > 1 ? 's' : ''} — ordre alphabétique</div>
+        <ul style="margin:0 0 16px;padding-left:20px;font-size:13px;color:var(--text);line-height:1.9;">
+          ${_imprimerSubmissions.map(s => `<li>${escHtml(s.student.display_name)}</li>`).join('')}
+        </ul>
+        <button type="button" class="btn btn-primary btn-sm" onclick="printAllPremiersJets()">🖨️ Imprimer tous les premiers jets</button>
+      </div>`;
+  }
+
+  function printAllPremiersJets() {
+    if (!_imprimerSubmissions.length || typeof JoggingPrint === 'undefined') return;
+    const joggingId = document.getElementById('jog-imprimer-jogging').value;
+    const jog = (typeof JOGGING_DATA !== 'undefined') ? JOGGING_DATA[joggingId] : null;
+
+    const dataList = _imprimerSubmissions.map(s => {
+      const feux = {};
+      ALL_CODES.forEach(c => { feux[c] = s.lastVersion['feu_' + c.toLowerCase()] || 'blanc'; });
+      return {
+        studentName: s.student.display_name,
+        joggingTitle: jog ? jog.title : joggingId,
+        consigne: jog ? jog.consigne : '',
+        text: s.lastVersion.text,
+        feux
+      };
+    });
+
+    JoggingPrint.generateBatch(dataList);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
      FICHE ÉLÈVE
   ═══════════════════════════════════════════════════════════════════════════ */
   async function openStudent(authUserId) {
@@ -1079,29 +1257,21 @@
       });
     });
 
-    container.querySelectorAll('[data-n-btn]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const group = btn.closest('.jog-n-selector');
-        const isActive = btn.dataset.active === 'true';
-        group.querySelectorAll('.jog-n-btn').forEach(b => b.dataset.active = 'false');
-        btn.dataset.active = isActive ? 'false' : 'true';
+    container.querySelectorAll('[data-print-jogging]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        printJoggingPremierJet(btn.dataset.printJogging);
       });
-    });
-
-    container.querySelectorAll('[data-save-enrichment]').forEach(btn => {
-      btn.addEventListener('click', () => saveEnrichmentForm(btn.dataset.saveEnrichment));
     });
   }
 
   function renderJoggingCard(data, idx) {
     const s = data.session;
     const versions = data.versions;
-    const enrichment = data.enrichment;
     const title = joggingTitle(s.jogging_id);
     const last = versions[versions.length - 1];
     const feux = {};
     ALL_CODES.forEach(c => { feux[c] = last ? (last['feu_' + c.toLowerCase()] || 'blanc') : 'blanc'; });
-    if (enrichment) feux.N = enrichment.feu_n || 'blanc';
     const verts = AUTO_CODES.filter(c => feux[c] === 'vert').length;
     const statusLabel = s.status === 'completed' ? `${verts}/7 feux verts` : 'en cours (version ' + s.current_version + ')';
 
@@ -1113,45 +1283,17 @@
         <div class="jog-correction-text" style="margin-bottom:10px;">${highlightVersionText(v.text, (v.correction && v.correction.erreurs) || [])}</div>
         <div class="jog-feux-grid" style="max-width:360px;">${ALL_CODES.map(code => {
           const st = v['feu_' + code.toLowerCase()] || 'blanc';
-          return `<div class="jog-feu-cell jog-feu-cell--${st}"><span class="jog-feu-letter">${code}</span><span class="jog-feu-icon">${FEU_PICTO[st]}</span></div>`;
+          const manualCls = code === 'N' ? ' jog-feu-cell--manual' : '';
+          const title = code === 'N' ? 'Évalué sur papier par l\'enseignant, jamais reporté ici' : `${CODE_LABELS[code]} : ${st}`;
+          return `<div class="jog-feu-cell jog-feu-cell--${st}${manualCls}" title="${escHtml(title)}"><span class="jog-feu-letter">${code}</span><span class="jog-feu-icon">${FEU_PICTO[st]}</span></div>`;
         }).join('')}</div>
       </div>`).join('');
 
-    let reformHtml = '';
-    if (s.status === 'completed') {
-      const defaultText = enrichment ? (enrichment.teacher_text || '') : (last ? last.text : '');
-      const comment = enrichment ? (enrichment.teacher_comment || '') : '';
-      const feuN = enrichment ? (enrichment.feu_n || 'blanc') : 'blanc';
-      const published = enrichment ? enrichment.published !== false : true;
-
-      reformHtml = `
-        <div class="jog-teacher-reform">
-          <div class="jog-teacher-reform-title">📝 Zone de reformulation</div>
-
-          <label for="jog-rf-text-${idx}">Reformulation (texte de l'élève, modifiable)</label>
-          <textarea id="jog-rf-text-${idx}">${escHtml(defaultText)}</textarea>
-
-          <label for="jog-rf-comment-${idx}">Commentaire (prioritaire à l'écran élève et dans le PDF)</label>
-          <textarea id="jog-rf-comment-${idx}" style="min-height:50px;">${escHtml(comment)}</textarea>
-
-          <label>Critère N (Néant — mot manquant)</label>
-          <div class="jog-n-selector" id="jog-rf-n-${idx}">
-            <button type="button" class="jog-n-btn" data-n-btn data-color="vert"   data-active="${feuN === 'vert'}">🟢 Vert</button>
-            <button type="button" class="jog-n-btn" data-n-btn data-color="orange" data-active="${feuN === 'orange'}">🟠 Orange</button>
-            <button type="button" class="jog-n-btn" data-n-btn data-color="rouge"  data-active="${feuN === 'rouge'}">🔴 Rouge</button>
-          </div>
-
-          <div class="jog-publish-row">
-            <input type="checkbox" id="jog-rf-pub-${idx}" ${published ? 'checked' : ''}>
-            <label for="jog-rf-pub-${idx}">Publié (visible par l'élève dès l'enregistrement)</label>
-          </div>
-
-          <div class="jog-reform-actions">
-            <button type="button" class="btn btn-primary btn-sm" data-save-enrichment="${s.id}" data-idx="${idx}">Enregistrer</button>
-            <span class="jog-reform-saved" id="jog-rf-saved-${idx}" style="display:none">Enregistré ✓</span>
-          </div>
-        </div>`;
-    }
+    // Générateur de premier jet (Phase 2bis, §5.7.2) : régénérable par
+    // l'enseignant depuis la fiche élève, à partir de la dernière version.
+    const printHtml = last
+      ? `<button type="button" class="btn btn-outline btn-sm" data-print-jogging="${idx}" style="margin-top:14px;">🖨️ Générer la feuille de premier jet</button>`
+      : '';
 
     return `
       <div class="jog-histo-card">
@@ -1164,35 +1306,28 @@
         </div>
         <div class="jog-histo-detail" id="${detailId}" style="display:none">
           ${versionsHtml}
-          ${reformHtml}
+          ${printHtml}
         </div>
       </div>`;
   }
 
-  async function saveEnrichmentForm(sessionId) {
-    const btn = document.querySelector(`[data-save-enrichment="${sessionId}"]`);
-    const idx = btn.dataset.idx;
-    const text     = document.getElementById(`jog-rf-text-${idx}`).value;
-    const comment   = document.getElementById(`jog-rf-comment-${idx}`).value;
-    const published  = document.getElementById(`jog-rf-pub-${idx}`).checked;
-    const activeNBtn  = document.querySelector(`#jog-rf-n-${idx} .jog-n-btn[data-active="true"]`);
-    const feuN          = activeNBtn ? activeNBtn.dataset.color : 'blanc';
+  function printJoggingPremierJet(idx) {
+    const data = _currentStudentJoggings[Number(idx)];
+    if (!data || typeof JoggingPrint === 'undefined') return;
+    const versions = data.versions;
+    const last = versions[versions.length - 1];
+    if (!last) return;
+    const jog = (typeof JOGGING_DATA !== 'undefined') ? JOGGING_DATA[data.session.jogging_id] : null;
+    const feux = {};
+    ALL_CODES.forEach(c => { feux[c] = last['feu_' + c.toLowerCase()] || 'blanc'; });
 
-    btn.disabled = true;
-    try {
-      const saved = await lfmJoggingTeacher.saveEnrichment(sessionId, {
-        teacher_text: text, teacher_comment: comment, feu_n: feuN, published
-      });
-      const data = _currentStudentJoggings.find(d => d.session.id === sessionId);
-      if (data) data.enrichment = saved;
-      const savedLabel = document.getElementById(`jog-rf-saved-${idx}`);
-      savedLabel.style.display = '';
-      setTimeout(() => { savedLabel.style.display = 'none'; }, 3000);
-    } catch (e) {
-      alert("Impossible d'enregistrer : " + e.message);
-    } finally {
-      btn.disabled = false;
-    }
+    JoggingPrint.generate({
+      studentName: _currentStudent ? _currentStudent.display_name : '',
+      joggingTitle: jog ? jog.title : data.session.jogging_id,
+      consigne: jog ? jog.consigne : '',
+      text: last.text,
+      feux
+    });
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -1211,7 +1346,6 @@
       const last = d.versions[d.versions.length - 1];
       const feux = {};
       ALL_CODES.forEach(c => { feux[c] = last ? (last['feu_' + c.toLowerCase()] || 'blanc') : 'blanc'; });
-      if (d.enrichment) feux.N = d.enrichment.feu_n || 'blanc';
       ALL_CODES.forEach(c => { tally[c][feux[c]] = (tally[c][feux[c]] || 0) + 1; if (c !== 'I' && c !== 'N' && feux[c] === 'vert') totalVerts++; });
     });
     const maxVerts = completed.length * AUTO_CODES.length;
@@ -1220,7 +1354,8 @@
     const feuxTableHtml = ALL_CODES.map(c => {
       const t = tally[c];
       const dominant = ['vert', 'orange', 'rouge', 'blanc'].reduce((best, k) => (t[k] > t[best] ? k : best), 'blanc');
-      return `<div class="jog-bulletin-feu ${dominant}"><span class="jf-letter">${c}</span><span class="jf-icon">${FEU_PICTO[dominant]}</span></div>`;
+      const manualCls = c === 'N' ? ' manual' : '';
+      return `<div class="jog-bulletin-feu ${dominant}${manualCls}"><span class="jf-letter">${c}</span><span class="jf-icon">${FEU_PICTO[dominant]}</span></div>`;
     }).join('');
 
     /* Graphique de progression : feux verts par jogging clos, dans l'ordre chronologique */
@@ -1250,7 +1385,6 @@
     /* Exemple des trois versions : le jogging clos le plus récent */
     const example = [...completed].sort((a, b) => new Date(b.session.created_at) - new Date(a.session.created_at))[0];
     let exampleHtml = '<div style="font-size:9pt;color:#888">Pas encore de jogging terminé à illustrer.</div>';
-    let reformulationHtml = '';
     if (example) {
       exampleHtml = `<div class="jog-bulletin-section-title" style="margin-top:4px;">Exemple : ${escHtml(joggingTitle(example.session.jogging_id))}</div>` +
         example.versions.map(v => `
@@ -1258,16 +1392,6 @@
             <div class="v-label">Version ${v.version_number}</div>
             <div class="v-text">${escHtml(v.text)}</div>
           </div>`).join('');
-
-      const enrich = example.enrichment;
-      if (enrich && (enrich.teacher_text || enrich.teacher_comment)) {
-        reformulationHtml = `
-          <div class="jog-bulletin-reformulation">
-            <h5>Reformulation de l'enseignant</h5>
-            ${enrich.teacher_text ? `<div class="rf-text">${escHtml(enrich.teacher_text)}</div>` : ''}
-            ${enrich.teacher_comment ? `<div class="rf-comment">« ${escHtml(enrich.teacher_comment)} »</div>` : ''}
-          </div>`;
-      }
     }
 
     /* Points forts / axes de progrès — d'après le tableau Code Champion agrégé */
@@ -1278,7 +1402,7 @@
 
     /* Conclusion (gabarit déterministe) */
     const conclusion = completed.length > 0
-      ? `${escHtml(_currentStudent.display_name)} a réalisé ${completed.length} jogging${completed.length > 1 ? 's' : ''} d'écriture, avec un taux de réussite moyen de ${tauxReussite !== null ? tauxReussite + ' %' : '—'} sur les 7 critères automatisables. La suite du travail portera en priorité sur les axes de progrès identifiés ci-dessus, ainsi que sur le critère N (mots manquants), évalué par l'enseignant au fil des relectures.`
+      ? `${escHtml(_currentStudent.display_name)} a réalisé ${completed.length} jogging${completed.length > 1 ? 's' : ''} d'écriture, avec un taux de réussite moyen de ${tauxReussite !== null ? tauxReussite + ' %' : '—'} sur les 7 critères automatisables. La suite du travail portera en priorité sur les axes de progrès identifiés ci-dessus, ainsi que sur le critère N (mots manquants), résolu sur la feuille de premier jet lors de la correction manuscrite.`
       : `${escHtml(_currentStudent.display_name)} n'a pas encore terminé de jogging d'écriture sur la période observée.`;
 
     const html = `<div class="jog-bulletin-page">
@@ -1317,7 +1441,6 @@
       ${historiqueHtml}
 
       ${exampleHtml}
-      ${reformulationHtml}
 
       <div class="jog-bulletin-section-title">Conclusion</div>
       <div class="jog-bulletin-conclusion">${conclusion}</div>
@@ -1354,7 +1477,20 @@
       return;
     }
 
+    document.getElementById('view-loading').style.display = 'none';
+
+    // Écouteurs des 3 onglets (Personnaliser / Imprimer / Résultats) : posés
+    // avant le cas "0 classe" ci-dessous pour que les onglets restent
+    // cliquables même sans classe (seul "Résultats" avait un filet de
+    // secours explicite auparavant, les deux autres restaient inertes).
+    document.querySelectorAll('.jog-tab').forEach(btn => {
+      btn.addEventListener('click', () => jogActivateTab(btn.dataset.jtab));
+    });
+    document.getElementById('jog-tabs').style.display = '';
+
     if (_classes.length === 0) {
+      document.getElementById('jtab-resultats').style.display = '';
+      document.querySelectorAll('.jog-tab').forEach(btn => btn.classList.toggle('jog-tab--active', btn.dataset.jtab === 'resultats'));
       showView('classe');
       document.getElementById('jog-classe-table-wrap').innerHTML =
         '<div class="empty-state"><div class="empty-icon">🏫</div><div class="empty-text">Créez d\'abord une classe dans « Mes classes ».</div></div>';
@@ -1362,12 +1498,19 @@
     }
 
     populateFilters();
+    populateImprimerFilters();
     document.getElementById('jog-filter-class').addEventListener('change', loadClassOverview);
     document.getElementById('jog-filter-jogging').addEventListener('change', loadClassOverview);
     document.getElementById('jog-filter-period').addEventListener('change', loadClassOverview);
+    document.getElementById('jog-imprimer-class').addEventListener('change', loadImprimerList);
+    document.getElementById('jog-imprimer-jogging').addEventListener('change', loadImprimerList);
 
-    showView('classe');
-    await loadClassOverview();
+    /* ?tab= respecté au chargement (ex. lien direct vers un onglet précis),
+       sinon dernier onglet mémorisé, sinon "Résultats des joggings" — le
+       contenu principal historique de cette page, pour ne pas surprendre
+       l'usage existant du lien "✍️ Joggings d'écriture" de la nav. */
+    const tabParam = new URLSearchParams(window.location.search).get('tab');
+    jogActivateTab(tabParam || sessionStorage.getItem(JOG_TAB_KEY) || 'resultats');
   })();
   </script>
 <style>

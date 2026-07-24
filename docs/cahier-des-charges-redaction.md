@@ -54,8 +54,8 @@ Tu veux ajouter à Proficiamus un **générateur de premier jet** : l'élève é
 **La correction automatique** repose sur **Grammalecte**, un correcteur grammatical français open source tournant côté client (coût nul, aucune limite d'échelle). Il couvre fiablement **7 des 9 critères** : O, M, P, C, H, A, S. Le critère **N (Néant — mot manquant)** reste hors de portée d'un outil à base de règles.
 
 **Ce que devient le texte ensuite — le cœur du pivot v2.1 :** il n'y a plus de correction numérique « finale », ni de zone où l'enseignant retape sa reformulation à l'écran. À la place, un bouton génère un **document imprimable en deux pages** :
-- **Page 1** : les résultats du tableau Code Champion, puis le texte de l'élève en gros caractères avec un interligne important, et un espace en dessous — pour que l'enseignant corrige **à la main**, au stylo, sur le papier.
-- **Page 2** : un rappel de la consigne, le nom de l'élève, une grille d'évaluation classique de la rédaction (7 critères usuels × 4 niveaux de maîtrise, §5.5), et des lignes espacées — pour que l'élève **recopie à la main** sa version corrigée.
+- **Page 1** : petit logo Proficiamus en en-tête (pas un gros titre), le texte de l'élève en réglure Seyès avec un **interligne très large** — une ligne d'écriture (texte de l'élève), une ligne vierge réglée laissée pour la correction manuscrite, en alternance — pour que l'enseignant corrige **à la main**, au stylo, directement entre les lignes.
+- **Page 2** : petit logo Proficiamus, titre « 2ème jet », un rappel de la consigne, le nom de l'élève, une grille d'évaluation classique de la rédaction, présentée comme une grille d'évaluation scolaire habituelle (tableau à bordures nettes, en-têtes de colonnes clairs), et des lignes espacées (réglure Seyès) — pour que l'élève **recopie à la main** sa version corrigée.
 
 Le suivi numérique (progression, badges, statistiques) s'appuie uniquement sur les données du premier jet numérique (les 7 feux automatiques) ; il n'y a pas de retour dans l'application après la recopie manuscrite — le circuit se termine sur papier.
 
@@ -155,8 +155,8 @@ V1 → Correction (indices) → V2 → Correction (indices) → V3 → Correctio
 Remplace entièrement la « zone de reformulation numérique » de la Phase 2 initiale (retirée, §7 Phase 2bis).
 
 - **Déclenchement** : bouton « 🖨️ Générer ma feuille de premier jet », accessible côté élève (jogging.html, dès qu'une version existe) et côté enseignant (fiche élève, pour régénérer/imprimer à sa place). Utilise `window.print()` + `css/jogging-print.css`, même mécanique que le bulletin.
-- **Page 1** : nom de l'élève (indispensable une fois imprimé, §4 point 7), résultats du tableau Code Champion (feux avec pictogrammes, lisibles en noir et blanc), puis le texte de la dernière version soumise en **gros caractères, interligne important**, et un **espace libre en dessous** pour les commentaires manuscrits de l'enseignant.
-- **Page 2** : rappel de la consigne, nom de l'élève, une **grille d'évaluation classique de la rédaction** (validée — 7 critères usuels de production écrite cycle 3, chacun sur 4 niveaux de maîtrise : non acquis / en cours d'acquisition / satisfaisant / très satisfaisant, une case à cocher par niveau) :
+- **Page 1** : petit logo Proficiamus en en-tête (pas un gros titre — réutiliser le logo déjà présent dans le bilan PDF existant, pour cohérence), nom de l'élève, résultats du tableau Code Champion (feux avec pictogrammes, lisibles en noir et blanc), puis le texte de la dernière version soumise imprimé en **réglure Seyès avec un interligne TRÈS large** : une ligne d'écriture (le texte de l'élève), une **ligne vierge réglée laissée pour la correction manuscrite de l'enseignant**, en alternance sur tout le texte — pas seulement un « gros interligne » global mais une vraie ligne dédiée à la correction entre chaque ligne écrite.
+- **Page 2** : petit logo Proficiamus, puis le titre **« 2ème jet »** (pas de mention « ma version corrigée » nulle part sur la page), rappel de la consigne, nom de l'élève, une **grille d'évaluation classique de la rédaction** — présentée comme une grille d'évaluation scolaire habituelle (tableau à bordures nettes, en-têtes de colonnes clairs, dans l'esprit des grilles de compétences déjà utilisées à l'école, pas un style web générique), 7 critères usuels de production écrite cycle 3, chacun sur les **4 niveaux de maîtrise officiels LSU** (de gauche à droite : Maîtrise insuffisante / Maîtrise fragile / Maîtrise satisfaisante / Très bonne maîtrise), une case à cocher par niveau :
   1. Respect de la consigne et du sujet
   2. Cohérence et organisation du texte (enchaînement logique des idées)
   3. Richesse et pertinence du vocabulaire
@@ -180,19 +180,26 @@ Remplace entièrement la « zone de reformulation numérique » de la Phase 2 in
 7. **Mon carnet d'auteur** : ajout + export livre PDF (Phase 3).
 
 ### 5.7 Espace enseignant — page « Synthèse des joggings d'écriture » (`synthese-joggings-enseignant.html`)
-1. **Vue classe** : filtres classe / période / jogging, tableau élève × 9 critères en feux, colonne N visuellement distincte (toujours ⚪, résolue sur papier). Triable, filtrable. **Bouton « 🖨️ Imprimer tous les premiers jets »** dès qu'une classe et un jogging sont sélectionnés (§5.9).
+
+**Restructuration en 3 onglets** au clic sur « Joggings d'écriture » depuis la nav principale (mécanisme `?tab=` réutilisé, cohérent avec celui du dashboard élève §1.2 point 2 — pas le pattern interne fragile de `resultats-enseignant.html` qui ne gère pas `?tab=`) :
+
+**Onglet 1 — Personnaliser mes joggings** (contenu de l'ancien point 5, Phase 4) : sélecteur de classe, liste des 15 joggings, formulaire de personnalisation par classe, verrouillage en mode guidé (§5.8).
+
+**Onglet 2 — Imprimer les premiers jets de mes élèves** (Phase 2ter, §5.9) : sélecteur classe + jogging, bouton « 🖨️ Imprimer tous les premiers jets » (impression groupée).
+
+**Onglet 3 — Résultats des joggings** (contenu principal, tel qu'existant avant cette restructuration — **sans** la section « Gérer mes joggings », déplacée dans l'onglet 1) :
+1. **Vue classe** : filtres classe / période / jogging, tableau élève × 9 critères en feux, colonne N visuellement distincte (toujours ⚪, résolue sur papier). Triable, filtrable.
 2. **Fiche élève** : infos générales, progression, historique des joggings avec leurs versions numériques, bouton « 🖨️ Générer ma feuille de premier jet » pour cet élève.
 3. **Statistiques** : erreurs fréquentes, progression moyenne, critères fragiles/maîtrisés, graphiques SQL.
 4. **« Générer le bilan PDF »** : logo, nom, classe, période, bilan général, tableau Code Champion, graphique de progression, historique, exemple de versions, points forts, axes de progrès, conclusion, dernière page « Le mot de l'enseignant ».
-5. **« Gérer mes joggings »** (Phase 4) : personnalisation par classe + verrouillage en parcours guidé (§5.8).
 
-### 5.8 Personnalisation des thèmes et verrouillage en parcours guidé (Phase 4 — livrée)
+### 5.8 Personnalisation des thèmes et verrouillage en parcours guidé (Phase 4 — livrée, désormais Onglet 1 de §5.7)
 - **Personnalisation, par classe** : titre, consigne, temps imposé, niveau, durée, compétence — tous remplaçables, `jogging-data.js` reste la valeur par défaut, bouton « Réinitialiser » par champ.
 - **Verrouillage, en parcours guidé uniquement** (`classes.mode_acces = 'guide'`) : un jogging verrouillé reste **visible mais grisé et non cliquable**.
 - Mécanismes indépendants et combinables.
 
 ### 5.9 Impression groupée pour la classe
-- Dans la vue classe (§5.7 point 1), une fois **classe + jogging** sélectionnés, le bouton « 🖨️ Imprimer tous les premiers jets » génère **un seul fichier PDF** concaténant, pour **chaque élève ayant soumis au moins une version de ce jogging** (peu importe si le cycle numérique est clos), la paire page 1 + page 2 décrite en §5.5.
+- Dans l'**Onglet 2 — Imprimer les premiers jets de mes élèves** (§5.7), une fois **classe + jogging** sélectionnés, le bouton « 🖨️ Imprimer tous les premiers jets » génère **un seul fichier PDF** concaténant, pour **chaque élève ayant soumis au moins une version de ce jogging** (peu importe si le cycle numérique est clos), la paire page 1 + page 2 décrite en §5.5.
 - **Ordre** : alphabétique par `display_name`, pour correspondre à la façon dont un enseignant trie ses copies.
 - **Saut de page entre chaque élève** (CSS print `page-break-after`), pour que l'impression physique tombe proprement, copie par copie.
 - Chaque paire porte le nom de l'élève sur ses deux pages (§5.5) — indispensable une fois la pile imprimée et éventuellement découpée en copies séparées.
@@ -327,8 +334,12 @@ zone de reformulation à l'écran).
 - Test réel : imprimer une feuille, vérifier la lisibilité (taille, interligne, grille, lignes) sur papier physique avant de valider le format définitif (§8).
 
 ### Phase 2ter — Impression groupée pour la classe (§5.9) — À FAIRE
-- Bouton « 🖨️ Imprimer tous les premiers jets » dans la vue classe.
+- Nouvel onglet « Imprimer les premiers jets de mes élèves » (§5.7) avec sélecteur classe + jogging et bouton « 🖨️ Imprimer tous les premiers jets ».
 - Génère un seul PDF, toutes les paires page 1/page 2 des élèves ayant soumis une version, triées alphabétiquement, nom sur chaque page, saut de page entre élèves.
+
+### Phase 2quater — Restructuration en 3 onglets (§5.7) — À FAIRE
+- Réorganise `synthese-joggings-enseignant.html` en 3 onglets (`?tab=`, mécanisme du dashboard élève) : **Personnaliser mes joggings** (contenu Phase 4, déplacé), **Imprimer les premiers jets de mes élèves** (Phase 2ter, déplacé), **Résultats des joggings** (contenu actuel — vue classe, fiche élève, statistiques, bilan PDF — sans la section « Gérer mes joggings », désormais dans l'onglet 1).
+- Peut se faire en même temps que la Phase 2ter (un seul prompt), puisque l'onglet 2 n'existe pas encore indépendamment.
 
 ### Phase 3 — Motivation et progression ✅ livrée
 Mes progrès, Mes réussites, Mon évolution, Mon objectif, Mon carnet d'auteur, statistiques enseignant.

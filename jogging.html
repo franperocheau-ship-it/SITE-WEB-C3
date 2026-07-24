@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="styles.css?v=12">
   <link rel="stylesheet" href="breadcrumb.css?v=1">
   <link rel="stylesheet" href="css/jogging.css?v=1">
+  <link rel="stylesheet" href="css/jogging-print.css?v=1">
   <script src="js/breadcrumb.js?v=1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
@@ -15,6 +16,7 @@
   <script src="js/jogging-grammalecte.js?v=1"></script>
   <script src="js/jogging-messages.js?v=1"></script>
   <script src="js/jogging-badges.js?v=1"></script>
+  <script src="js/jogging-print.js?v=1"></script>
   <script src="js/guided-access.js?v=1"></script>
   <script src="js/jogging-class-settings.js?v=1"></script>
 </head>
@@ -51,6 +53,12 @@
       <div class="jog-intro-meta" id="jog-intro-meta"></div>
       <div class="jog-intro-consigne" id="jog-intro-consigne"></div>
 
+      <!-- Message préventif élève — toujours dans le DOM, indépendant de
+           l'état chargement/éditeur/correction (§5.4). Précédemment logé
+           dans l'écran de correction (display:none tant qu'aucune version
+           n'est soumise) : invisible pour une première rédaction. -->
+      <p class="jog-preventif-msg">💡 Ce correcteur guide ta relecture, mais il n'attrape pas toutes les erreurs. Il t'aide surtout à voir où tu réussis et où travailler encore. Ton enseignant relit et corrige ta feuille ensuite !</p>
+
       <!-- ── État : chargement ── -->
       <div id="jog-state-loading" style="text-align:center;padding:40px 0;color:var(--muted);">
         Chargement…
@@ -79,13 +87,21 @@
         <div class="jog-correction-text" id="jog-correction-text"></div>
 
         <div class="jog-feux-title">Tableau Code Champion</div>
-        <div class="jog-feux-grid" id="jog-feux-grid"></div>
+        <div class="jog-feux-grid-wrap">
+          <div class="jog-feux-grid" id="jog-feux-grid"></div>
+        </div>
 
         <div class="jog-mission">🎯 Mission : fais passer tous les feux au vert !</div>
         <div class="jog-progress-msg" id="jog-progress-msg"></div>
 
         <div class="jog-actions" id="jog-correction-actions"></div>
+
+        <div class="jog-print-section">
+          <button type="button" class="btn-secondary" id="jog-print-btn">🖨️ Générer ma feuille de premier jet</button>
+        </div>
       </div>
+
+      <div id="jog-print-root"></div>
 
     </div>
   </div>

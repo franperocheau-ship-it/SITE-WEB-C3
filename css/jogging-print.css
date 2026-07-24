@@ -1,0 +1,225 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   jogging-print.css — Styles dédiés à l'impression du support de premier
+   jet (§3.16, §5.5 du cahier des charges). Volontairement séparé de
+   css/jogging.css : l'impression a ses propres contraintes de taille de
+   police, d'interlignage et de marges, qui ne sont pas transposables
+   telles quelles depuis l'écran.
+
+   Chargé par jogging.html, dashboard-eleve.html et
+   synthese-joggings-enseignant.html — les trois pages qui peuvent
+   déclencher la génération d'une feuille de premier jet (js/jogging-print.js).
+
+   Mécanique d'impression : #jog-print-root est rempli par
+   js/jogging-print.js puis basculé en display:block via la classe
+   body.printing-jog-premier-jet, tout le reste de la page étant masqué
+   pendant l'impression — même patron que #jog-bulletin-print-root /
+   #jog-carnet-print-root (synthese-joggings-enseignant.html / Phase 3).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+#jog-print-root { display: none; }
+
+.jpr-page {
+  font-family: 'Nunito Sans', system-ui, sans-serif;
+  color: #1E2532;
+}
+
+.jpr-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 2px solid #1A2D6B;
+  padding-bottom: 8pt;
+  margin-bottom: 16pt;
+}
+.jpr-logo { height: 20pt; width: auto; display: block; }
+.jpr-header-sub { font-size: 9.5pt; color: #5F6368; margin-top: 5pt; }
+.jpr-header-name { font-size: 12pt; font-weight: 700; }
+
+/* Tableau Code Champion — pictogrammes + contour (pas seulement une
+   couleur de fond) pour rester lisible en noir et blanc, §3.8/§3.16. */
+.jpr-feux-row { display: flex; gap: 4px; margin-bottom: 20pt; }
+.jpr-feu {
+  flex: 1;
+  text-align: center;
+  border: 1.5pt solid #333;
+  border-radius: 6pt;
+  padding: 5pt 2pt;
+}
+.jpr-feu-letter { display: block; font-weight: 800; font-size: 10pt; }
+.jpr-feu-icon { display: block; font-size: 13pt; margin-top: 2pt; }
+.jpr-feu--vert   { border-color: #16a34a; border-width: 2pt; }
+.jpr-feu--orange { border-color: #b8760f; border-width: 2pt; }
+.jpr-feu--rouge  { border-color: #992a38; border-width: 2pt; }
+.jpr-feu--blanc  { border-color: #999; border-style: dashed; }
+
+/* Texte de la dernière version soumise, en réglure Seyès : une ligne vide
+   réglée après CHAQUE ligne de texte (pas un simple interlignage CSS) —
+   c'est cette ligne vide que l'enseignant utilise pour corriger à la main,
+   directement au-dessus de la ligne concernée (§5.5). Géométrie tenue en
+   phase avec SEYES_TEXT_WIDTH_MM dans js/jogging-print.js (mesure canvas
+   pour le découpage en lignes). */
+.jpr-seyes-text {
+  /* Marge rouge alignée sur le début de la tuile "C" du tableau Code
+     Champion (§ alignement, point 6) : aucun décalage à gauche, le trait
+     rouge démarre au même x que .jpr-feux-row. */
+  margin: 0 0 20pt 0;
+  padding-left: 4mm;
+  border-left: 0.35mm solid #e3a4a4;
+}
+.jpr-seyes-text-line,
+.jpr-seyes-blank-line {
+  height: 9mm;
+  line-height: 9mm;
+  border-bottom: 0.3mm solid #a9c8e8;
+  font-size: 14pt;
+  overflow: hidden;
+}
+.jpr-seyes-blank-line:last-child { border-bottom: none; }
+
+/* Espace libre pour les commentaires manuscrits de l'enseignant. */
+.jpr-comment-space {
+  border: 1.5pt dashed #999;
+  border-radius: 8pt;
+  min-height: 75mm;
+  page-break-inside: avoid;
+}
+.jpr-comment-space::before {
+  content: "Commentaires";
+  display: block;
+  font-size: 8pt;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding: 5pt 10pt;
+}
+
+.jpr-page-break { page-break-before: always; }
+
+.jpr-consigne { font-size: 10.5pt; line-height: 1.55; margin-bottom: 18pt; }
+
+/* Grille d'évaluation cycle 3 (7 critères × 4 niveaux LSU) — un vrai
+   tableau à bordures nettes, dans l'esprit des grilles d'évaluation
+   officielles utilisées à l'école (pas un style web générique).
+   Volontairement compact (≤ 1/4 de la page, cf. procédure de test) : la
+   place gagnée revient aux lignes d'écriture ci-dessous. Chaque critère
+   doit tenir sur une seule ligne — d'où les intitulés raccourcis dans
+   js/jogging-print.js et les colonnes de cases très étroites (une case à
+   cocher n'a pas besoin de largeur). */
+.jpr-eval-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8pt;
+  font-size: 6.8pt;
+  table-layout: fixed;
+}
+.jpr-eval-table th,
+.jpr-eval-table td {
+  border: 0.75pt solid #333;
+  padding: 2pt 3pt;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.jpr-eval-table thead th {
+  background: #EDEDED;
+  font-weight: 700;
+  font-size: 6pt;
+  text-transform: uppercase;
+  letter-spacing: .01em;
+  line-height: 1.2;
+  padding: 3pt 2pt;
+  /* Seules les 7 lignes de critères doivent tenir sur une seule ligne
+     (point 2) — l'en-tête, lui, peut revenir à la ligne plutôt que
+     tronquer le wording LSU officiel avec des points de suspension. */
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+.jpr-eval-table td.jpr-eval-label-cell {
+  text-align: left;
+  font-weight: 600;
+  font-size: 6.8pt;
+  width: 40%;
+}
+.jpr-eval-table th:first-child { width: 40%; }
+.jpr-eval-table td.jpr-eval-box-cell { width: 15%; }
+.jpr-eval-box { display: inline-block; width: 6pt; height: 6pt; border: 1pt solid #333; }
+
+/* Réglure Seyès simplifiée : lignes fines horizontales régulières +
+   marge verticale rouge, pour la recopie manuscrite de la version
+   corrigée (§5.5 — réglure proposée par défaut, ajustable ultérieurement,
+   voir §8 du cahier des charges). */
+.jpr-seyes {
+  /* Marge rouge alignée sur le début du tableau de compétences (§
+     alignement, point 7) : même logique que .jpr-seyes-text ci-dessus. */
+  margin-left: 0;
+  padding-left: 4mm;
+  border-left: 0.35mm solid #e3a4a4;
+}
+.jpr-seyes-line {
+  height: 12mm;
+  border-bottom: 0.3mm solid #a9c8e8;
+}
+.jpr-seyes-line:last-child { border-bottom: none; }
+
+body.printing-jog-premier-jet #jog-print-root { display: block !important; }
+
+@media print {
+  /* Marge basse réduite au minimum imprimable courant : maximise l'espace
+     disponible pour les lignes d'écriture en bas de la page 2 (point 5). */
+  @page { size: A4 portrait; margin: 15mm 15mm 8mm 15mm; }
+
+  body.printing-jog-premier-jet #jog-print-root {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* <body> porte son propre fond (var(--bg)) et un padding-top:50px pour
+     compenser la navbar fixe (styles.css / bloc NAVBAR-PROFICIAMUS-CSS) —
+     ni l'un ni l'autre n'est couvert par le masquage de .navbar ci-dessous
+     (des déclarations indépendantes sur des éléments différents). Sans ce
+     reset, un bandeau vide teinté apparaît en haut de la feuille. */
+  body.printing-jog-premier-jet {
+    padding-top: 0 !important;
+    background: #fff !important;
+  }
+
+  /* Liste blanche plutôt que liste noire : sur les 3 pages hôtes,
+     #jog-print-root est toujours un enfant direct de .page-content /
+     .dash-content, aux côtés du reste de l'interface (navbar, fil
+     d'Ariane, onglets, boutons, listes…). Masquer explicitement chaque
+     élément de cette interface un par un est fragile — un oubli fuite
+     directement sur le papier, ce qui est arrivé avec la barre à 3
+     onglets de synthese-joggings-enseignant.html (Phase 2quater),
+     ajoutée après cette liste et jamais reportée ici. Masquer plutôt
+     TOUT ce qui n'est pas #jog-print-root couvre aussi, sans entretien,
+     tout futur ajout sur ces pages.
+     Exception : .bc-bar (jogging.html) est injectée par js/breadcrumb.js
+     directement en tête de <body> (document.body.insertBefore), donc HORS
+     de .page-content — elle échappe à la règle > ci-dessus et doit être
+     listée explicitement, comme .navbar/footer. Vérifié par audit (fuite
+     réelle constatée sur un vrai rendu imprimé avant cet ajout). */
+  body.printing-jog-premier-jet .navbar,
+  body.printing-jog-premier-jet footer,
+  body.printing-jog-premier-jet .bc-bar,
+  body.printing-jog-premier-jet .page-content > *:not(#jog-print-root),
+  body.printing-jog-premier-jet .dash-content > *:not(#jog-print-root) {
+    display: none !important;
+  }
+
+  body.printing-jog-premier-jet .page-wrap,
+  body.printing-jog-premier-jet .dash-wrap {
+    padding: 0;
+    background: #fff;
+    min-height: unset;
+  }
+  body.printing-jog-premier-jet .page-content,
+  body.printing-jog-premier-jet .dash-content {
+    max-width: 100%;
+    padding: 0;
+  }
+}

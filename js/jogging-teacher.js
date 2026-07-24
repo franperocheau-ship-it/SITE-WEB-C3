@@ -26,8 +26,8 @@ const lfmJoggingTeacher = (() => {
   /**
    * Vue classe : pour chaque élève de la classe, l'état du DERNIER jogging
    * correspondant aux filtres (jogging précis et/ou période récente).
-   * §5.7.1 — colonnes = 9 critères, feu N mis à jour si un enrichissement
-   * existe déjà pour cette session.
+   * §5.7.1 — colonnes = 9 critères ; N reste toujours ⚪ (résolu sur papier,
+   * §5.5, jamais reporté dans l'application depuis la Phase 2bis).
    */
   async function getClassOverview(classId, opts = {}) {
     const { joggingId = null, periodDays = null } = opts;
@@ -55,30 +55,23 @@ const lfmJoggingTeacher = (() => {
 
     const sessionIds = [...lastByStudent.values()].map(s => s.id);
     const versionBySession = new Map();
-    const enrichBySession  = new Map();
     if (sessionIds.length) {
-      const { data: versions } = await db.from('jogging_versions').select('*')
+      const { data: versions, error: versionsErr } = await db.from('jogging_versions').select('*')
         .in('session_id', sessionIds).order('version_number', { ascending: false }).limit(2000);
+      if (versionsErr) throw versionsErr;
       (versions || []).forEach(v => { if (!versionBySession.has(v.session_id)) versionBySession.set(v.session_id, v); });
-
-      const { data: enrich } = await db.from('jogging_enrichments').select('*')
-        .in('session_id', sessionIds).limit(2000);
-      (enrich || []).forEach(e => enrichBySession.set(e.session_id, e));
     }
 
     return students.map(st => {
       const session = lastByStudent.get(st.auth_user_id) || null;
       if (!session) return { student: st, session: null, feux: null };
       const feux = feuxFromVersion(versionBySession.get(session.id));
-      const enrich = enrichBySession.get(session.id);
-      if (enrich) feux.N = enrich.feu_n || 'blanc';
-      return { student: st, session, feux, enrichment: enrich || null };
+      return { student: st, session, feux };
     });
   }
 
   /**
-   * Fiche élève : tous les joggings de l'élève, avec toutes leurs versions
-   * et leur éventuel enrichissement (publié ou non — l'enseignant voit tout).
+   * Fiche élève : tous les joggings de l'élève, avec toutes leurs versions.
    */
   async function getStudentJoggings(authUserId) {
     const { data: sessions, error } = await db.from('jogging_sessions').select('*')
@@ -89,24 +82,19 @@ const lfmJoggingTeacher = (() => {
 
     const sessionIds = (sessions || []).map(s => s.id);
     const versionsBySession = new Map();
-    const enrichBySession   = new Map();
     if (sessionIds.length) {
-      const { data: versions } = await db.from('jogging_versions').select('*')
+      const { data: versions, error: versionsErr } = await db.from('jogging_versions').select('*')
         .in('session_id', sessionIds).order('version_number', { ascending: true }).limit(2000);
+      if (versionsErr) throw versionsErr;
       (versions || []).forEach(v => {
         if (!versionsBySession.has(v.session_id)) versionsBySession.set(v.session_id, []);
         versionsBySession.get(v.session_id).push(v);
       });
-
-      const { data: enrich } = await db.from('jogging_enrichments').select('*')
-        .in('session_id', sessionIds).limit(2000);
-      (enrich || []).forEach(e => enrichBySession.set(e.session_id, e));
     }
 
     return (sessions || []).map(s => ({
       session: s,
-      versions: versionsBySession.get(s.id) || [],
-      enrichment: enrichBySession.get(s.id) || null
+      versions: versionsBySession.get(s.id) || []
     }));
   }
 
@@ -135,8 +123,9 @@ const lfmJoggingTeacher = (() => {
     const sessionIds = allSessions.map(s => s.id);
     const versionsBySession = new Map();
     if (sessionIds.length) {
-      const { data: versions } = await db.from('jogging_versions').select('*')
+      const { data: versions, error: versionsErr } = await db.from('jogging_versions').select('*')
         .in('session_id', sessionIds).order('version_number', { ascending: true }).limit(2000);
+      if (versionsErr) throw versionsErr;
       (versions || []).forEach(v => {
         if (!versionsBySession.has(v.session_id)) versionsBySession.set(v.session_id, []);
         versionsBySession.get(v.session_id).push(v);
@@ -191,24 +180,6 @@ const lfmJoggingTeacher = (() => {
       progressionCount,
       criteres
     };
-  }
-
-  /** Enregistre (crée ou met à jour) la reformulation/évaluation N d'une session. */
-  async function saveEnrichment(sessionId, fields) {
-    const payload = {
-      session_id: sessionId,
-      teacher_text: fields.teacher_text ?? null,
-      teacher_comment: fields.teacher_comment ?? null,
-      feu_n: fields.feu_n || 'blanc',
-      published: fields.published !== false,
-      updated_at: new Date().toISOString()
-    };
-    const { data, error } = await db.from('jogging_enrichments')
-      .upsert(payload, { onConflict: 'session_id' })
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
   }
 
   /**
@@ -267,8 +238,55 @@ const lfmJoggingTeacher = (() => {
     return data;
   }
 
+  /**
+   * Impression groupée (Phase 2ter, §5.9) : pour une classe et un jogging
+   * donnés, un élève par ligne — uniquement ceux ayant soumis au moins une
+   * version de ce jogging (peu importe si le cycle numérique est clos) —
+   * avec la dernière version soumise. Triés par `display_name` (ordre
+   * alphabétique, §5.9) pour correspondre à la façon dont un enseignant
+   * trie ses copies papier.
+   */
+  async function getClassJoggingSubmissions(classId, joggingId) {
+    const students = await lfmTeacher.getStudents(classId);
+    const authIds = students.map(s => s.auth_user_id).filter(Boolean);
+    if (authIds.length === 0) return [];
+
+    const { data: sessions, error } = await db.from('jogging_sessions').select('*')
+      .in('student_id', authIds).eq('jogging_id', joggingId).limit(2000);
+    if (error) throw error;
+    if (!sessions || sessions.length === 0) return [];
+
+    // Une session par élève pour ce jogging (garde la plus récente s'il y
+    // en avait plusieurs — en pratique jogging.html réutilise toujours la
+    // même session pour un couple élève/jogging donné).
+    const sessionByStudent = new Map();
+    sessions.forEach(s => {
+      const existing = sessionByStudent.get(s.student_id);
+      if (!existing || new Date(s.created_at) > new Date(existing.created_at)) sessionByStudent.set(s.student_id, s);
+    });
+
+    const sessionIds = [...sessionByStudent.values()].map(s => s.id);
+    const { data: versions, error: versionsErr } = await db.from('jogging_versions').select('*')
+      .in('session_id', sessionIds).order('version_number', { ascending: false }).limit(2000);
+    if (versionsErr) throw versionsErr;
+    const lastVersionBySession = new Map();
+    (versions || []).forEach(v => { if (!lastVersionBySession.has(v.session_id)) lastVersionBySession.set(v.session_id, v); });
+
+    const results = [];
+    students.forEach(st => {
+      const session = sessionByStudent.get(st.auth_user_id);
+      if (!session) return;
+      const lastVersion = lastVersionBySession.get(session.id);
+      if (!lastVersion) return; // session créée mais aucune version soumise (brouillon vide)
+      results.push({ student: st, session, lastVersion });
+    });
+
+    results.sort((a, b) => (a.student.display_name || '').localeCompare(b.student.display_name || '', 'fr'));
+    return results;
+  }
+
   return {
     AUTO_CODES, ALL_CODES, feuxFromVersion, getClassOverview, getStudentJoggings,
-    getClassStatistics, saveEnrichment, getClassSettings, saveClassSettings
+    getClassStatistics, getClassSettings, saveClassSettings, getClassJoggingSubmissions
   };
 })();

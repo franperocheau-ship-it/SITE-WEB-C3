@@ -358,25 +358,59 @@
 }
 /* Une seule ligne, toujours — se lit comme "CHAMPIONS". Les tuiles
    rétrécissent jusqu'à leur largeur minimale avant de déclencher un
-   défilement horizontal (jamais de passage à la ligne). */
+   défilement horizontal (jamais de passage à la ligne, jamais de tuile
+   coupée sans moyen de la voir : cf. .jog-feux-grid-wrap ci-dessous). */
+.jog-feux-grid-wrap {
+  position: relative;
+}
 .jog-feux-grid {
   display: flex;
-  gap: 5px;
+  gap: 4px;
   width: 100%;
   overflow-x: auto;
   overflow-y: visible;
-  padding-bottom: 2px;
+  padding-bottom: 4px;
   -webkit-overflow-scrolling: touch;
+  /* Barre de défilement volontairement visible (pas le comportement
+     auto-masqué de certains systèmes) : premier indice qu'on peut glisser. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--blue) transparent;
 }
+.jog-feux-grid::-webkit-scrollbar { height: 6px; }
+.jog-feux-grid::-webkit-scrollbar-track { background: transparent; }
+.jog-feux-grid::-webkit-scrollbar-thumb { background: rgba(16,43,106,0.35); border-radius: 10px; }
+
+/* Second indice, plus visible que la barre seule : une flèche collée au
+   bord droit tant qu'il reste des tuiles cachées. Ajoutée/retirée par
+   renderFeuxGrid() (js/jogging-engine.js) selon le dépassement réel mesuré
+   — recalculé aussi au redimensionnement de la fenêtre. */
+.jog-feux-scroll-hint {
+  display: none;
+  position: sticky;
+  right: 0;
+  flex: 0 0 auto;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  margin-left: -20px;
+  background: linear-gradient(to right, transparent, var(--bg) 55%);
+  color: var(--blue);
+  font-weight: 800;
+  font-size: 16px;
+  pointer-events: none;
+}
+.jog-feux-grid--scrollable .jog-feux-scroll-hint { display: flex; }
+
 .jog-feu-cell {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
   flex: 1 1 0;
-  min-width: 38px;
-  padding: 8px 3px;
-  border-radius: 10px;
+  min-width: 29px;
+  padding: 6px 2px;
+  border-radius: 9px;
   background: var(--bg);
   border: 1.5px solid var(--border);
   cursor: default;
@@ -403,10 +437,10 @@
 .jog-feu-letter {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
 }
-.jog-feu-icon { font-size: 17px; line-height: 1; }
+.jog-feu-icon { font-size: 15px; line-height: 1; }
 .jog-feu-cell--vert   .jog-feu-icon { color: #16a34a; }
 .jog-feu-cell--orange .jog-feu-icon { color: #b8760f; }
 .jog-feu-cell--rouge  .jog-feu-icon { color: #D62839; }
@@ -463,6 +497,27 @@
   font-weight: 800;
   font-size: 16px;
   color: var(--blue);
+}
+
+/* Générateur de premier jet (Phase 2bis, §5.5) — bouton, visible dès
+   qu'une version existe (pas seulement en fin de cycle). Le rendu imprimé
+   lui-même est géré par css/jogging-print.css. */
+.jog-print-section {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1.5px dashed var(--border);
+  text-align: center;
+}
+
+/* Message préventif élève — toujours visible, indépendant de l'état de la
+   page (§5.4) : voir jogging.html, juste après la consigne. */
+.jog-preventif-msg {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.5;
+  text-align: center;
+  max-width: 480px;
+  margin: 0 auto 18px;
 }
 
 /* ─── Historique (dashboard-eleve.html, onglet "Mes joggings d'écriture" et
