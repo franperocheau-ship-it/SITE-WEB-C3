@@ -529,7 +529,7 @@ async function showCompletedState() {
   Breadcrumb.setCategory({ href: 'redaction.html', label: 'Rédaction' });
   Breadcrumb.setCurrent(jogging.title);
 
-  const { data: existing } = await window.lfmDb
+  const { data: existing, error: selErr } = await window.lfmDb
     .from('jogging_sessions')
     .select('*')
     .eq('student_id', profile.id)
@@ -537,6 +537,14 @@ async function showCompletedState() {
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
+
+  if (selErr) {
+    // Sans ce contrôle, un échec réseau transitoire ici (existing resterait
+    // undefined même si une session existe déjà) tombait dans la branche de
+    // création ci-dessous et dupliquait la session de l'élève pour ce jogging.
+    document.getElementById('jog-state-loading').textContent = 'Impossible de démarrer ce jogging. Réessaie dans un instant.';
+    return;
+  }
 
   if (existing) {
     sessionRow = existing;
