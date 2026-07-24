@@ -143,19 +143,21 @@ const JoggingBadges = (() => {
 
     const earnedIds = evaluateEarnedBadges(completedSessions, lastVersionBySession);
 
-    const { data: existing } = await window.lfmDb
+    const { data: existing, error: selErr } = await window.lfmDb
       .from('jogging_badges')
       .select('badge_id')
       .eq('student_id', studentId)
       .limit(2000);
+    if (selErr) console.warn('[LFM] syncBadges (select):', selErr.message);
 
     const existingIds = new Set((existing || []).map(r => r.badge_id));
     const newIds = earnedIds.filter(id => !existingIds.has(id));
 
     if (newIds.length > 0) {
-      await window.lfmDb.from('jogging_badges').insert(
+      const { error: insErr } = await window.lfmDb.from('jogging_badges').insert(
         newIds.map(badge_id => ({ student_id: studentId, badge_id }))
       );
+      if (insErr) console.warn('[LFM] syncBadges (insert):', insErr.message);
     }
 
     return earnedIds;
