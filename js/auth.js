@@ -30,7 +30,6 @@ const lfmAuth = (() => {
       console.error('[lfmAuth.signUp] Supabase error:', error.status, error.code, error.message, error);
       throw error;
     }
-    console.log('[lfmAuth.signUp] Success — user:', data?.user?.id, '— identities:', data?.user?.identities?.length);
     return data;
   }
 
