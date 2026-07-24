@@ -34,7 +34,7 @@ const lfmJoggingTeacher = (() => {
 
     const students = await lfmTeacher.getStudents(classId);
     const authIds = students.map(s => s.auth_user_id).filter(Boolean);
-    if (authIds.length === 0) return students.map(s => ({ student: s, session: null, feux: null }));
+    if (authIds.length === 0) return students.map(s => ({ student: s, session: null, feux: null, hasVersion: false }));
 
     let q = db.from('jogging_sessions').select('*')
       .in('student_id', authIds)
@@ -64,9 +64,10 @@ const lfmJoggingTeacher = (() => {
 
     return students.map(st => {
       const session = lastByStudent.get(st.auth_user_id) || null;
-      if (!session) return { student: st, session: null, feux: null };
+      if (!session) return { student: st, session: null, feux: null, hasVersion: false };
+      const hasVersion = versionBySession.has(session.id);
       const feux = feuxFromVersion(versionBySession.get(session.id));
-      return { student: st, session, feux };
+      return { student: st, session, feux, hasVersion };
     });
   }
 

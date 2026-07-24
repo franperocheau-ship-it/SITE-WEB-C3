@@ -746,6 +746,13 @@
       if (!r.session) {
         return `<tr>${nameCell}<td colspan="${ALL_CODES.length}" class="jog-no-session">Aucun jogging</td></tr>`;
       }
+      if (!r.hasVersion) {
+        // Session créée (le jogging a été ouvert) mais aucune version
+        // soumise — brouillon vide ou en cours. Sans cette distinction,
+        // feuxFromVersion(undefined) renvoyait 9 codes à 'blanc', rendus
+        // comme une ligne de 9 tirets indiscernable d'un résultat réel.
+        return `<tr>${nameCell}<td colspan="${ALL_CODES.length}" class="jog-no-session">Brouillon en cours</td></tr>`;
+      }
       const feuCells = ALL_CODES.map(code => {
         const state = r.feux[code] || 'blanc';
         const manualCls = code === 'N' ? ' jog-feu-dot--manual' : '';
