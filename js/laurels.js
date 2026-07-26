@@ -12,11 +12,11 @@ const LAUREL_SUCCESS_THRESHOLD = 80;   /* % minimum pour gagner une feuille */
 const LAUREL_LEAVES_PER_CROWN  = 20;   /* feuilles pour compléter une couronne */
 
 const LAUREL_RANKS = [
-  { name: 'Novicius',     min: 0,   color: '#9AA3B2' },
-  { name: 'Discipulus',   min: 20,  color: '#1DBFA0' },
-  { name: 'Scholasticus', min: 40,  color: '#1A2D6B' },
-  { name: 'Magister',     min: 80,  color: '#7C5CBF' },
-  { name: 'Laureatus',    min: 120, color: '#F5A623' }
+  { name: 'Novicius',     min: 0,   color: '#9AA3B2', fr: 'Novice' },
+  { name: 'Discipulus',   min: 20,  color: '#1DBFA0', fr: 'Disciple' },
+  { name: 'Scholasticus', min: 40,  color: '#1A2D6B', fr: 'Érudit' },
+  { name: 'Magister',     min: 80,  color: '#7C5CBF', fr: 'Maître' },
+  { name: 'Laureatus',    min: 120, color: '#F5A623', fr: 'Lauréat' }
 ];
 
 const LAUREL_BADGE_TIERS = [
@@ -292,7 +292,7 @@ function renderLaurelRank(totalLeaves) {
 
   if (!next) {
     return `
-      <div class="laurel-rank" style="color:${current.color}">${current.name}</div>
+      <div class="laurel-rank" style="color:var(--blue, #1A2D6B)">${current.name}<span class="laurel-rank-fr"> (${current.fr})</span></div>
       <div class="laurel-rank-max">Rang maximum atteint</div>`;
   }
 
@@ -302,7 +302,7 @@ function renderLaurelRank(totalLeaves) {
   const missing = next.min - totalLeaves;
 
   return `
-    <div class="laurel-rank" style="color:${current.color}">${current.name}</div>
+    <div class="laurel-rank" style="color:var(--blue, #1A2D6B)">${current.name}<span class="laurel-rank-fr"> (${current.fr})</span></div>
     <div class="laurel-rank-progress-bg">
       <div class="laurel-rank-progress-fill" style="width:${pct}%;background:${current.color}"></div>
     </div>

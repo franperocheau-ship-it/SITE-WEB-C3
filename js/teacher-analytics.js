@@ -240,6 +240,29 @@ const lfmAnalytics = (() => {
     });
   }
 
+  /* ── Agrégation par compétence : moyenne + volume ─────────────────────────
+     Factorisé pour être utilisé à la fois par computeClassOverview (vue
+     classe) et computeCompetenceStats (vue plateforme, admin) — même forme
+     { domaine, competence, avgPct, attemptCount, studentCount } par
+     compétence, à partir de `best` (dédoublonné élève × exercice). */
+  function aggregateByCompetence(best, catalogMap) {
+    const compAgg = new Map();
+    best.forEach(r => {
+      const meta = metaFor(catalogMap, r.exercise_slug);
+      const key  = meta.domaine + '||' + meta.sousDomaine + '||' + meta.compLabel;
+      if (!compAgg.has(key)) compAgg.set(key, { meta, sum: 0, count: 0, students: new Set() });
+      const agg = compAgg.get(key);
+      agg.sum += r.pct; agg.count++; agg.students.add(r.student_id);
+    });
+    return Array.from(compAgg.values()).map(agg => ({
+      domaine: agg.meta.domaine,
+      competence: agg.meta.competence,
+      avgPct: Math.round(agg.sum / agg.count),
+      attemptCount: agg.count,
+      studentCount: agg.students.size
+    }));
+  }
+
   /* ── Nombre d'exercices distincts travaillés (même source/filtre que
      computeNiveauJauge : bestByNiveau + catalogMap) — pour l'affichage
      "N exercices" à côté du nom de sous-domaine, cohérent avec ce qui
@@ -310,22 +333,8 @@ const lfmAnalytics = (() => {
     /* ── Compétences (top 5 / bottom 5) ─────────────────────────────────────
        Seuil de 5 élèves appliqué aux deux classements pour éviter qu'une
        compétence travaillée par un seul élève ne fausse le résultat. */
-    const compAgg = new Map();
-    best.forEach(r => {
-      const meta = metaFor(catalogMap, r.exercise_slug);
-      const key  = meta.domaine + '||' + meta.sousDomaine + '||' + meta.compLabel;
-      if (!compAgg.has(key)) compAgg.set(key, { meta, sum: 0, count: 0, students: new Set() });
-      const agg = compAgg.get(key);
-      agg.sum += r.pct; agg.count++; agg.students.add(r.student_id);
-    });
-    const compList = Array.from(compAgg.values())
-      .filter(agg => agg.students.size >= MIN_STUDENTS_COMP)
-      .map(agg => ({
-        domaine: agg.meta.domaine,
-        competence: agg.meta.competence,
-        avgPct: Math.round(agg.sum / agg.count),
-        studentCount: agg.students.size
-      }));
+    const compList = aggregateByCompetence(best, catalogMap)
+      .filter(c => c.studentCount >= MIN_STUDENTS_COMP);
     const top5    = [...compList].sort((a, b) => b.avgPct - a.avgPct).slice(0, 5);
     const bottom5 = [...compList].sort((a, b) => a.avgPct - b.avgPct).slice(0, 5);
 
@@ -482,9 +491,26 @@ const lfmAnalytics = (() => {
     };
   }
 
+  /* ═══════════════════════════════════════════════════════════════════════════
+     VUE PLATEFORME (admin — agrégats toutes classes confondues, aucune
+     donnée par élève : mêmes seuils que la vue classe, voir aggregateByCompetence)
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function computeCompetenceStats(rows, catalogMap) {
+    const best     = dedupeBestBySlug(rows);
+    const compList = aggregateByCompetence(best, catalogMap)
+      .filter(c => c.studentCount >= MIN_STUDENTS_COMP);
+
+    return {
+      topReussite:    [...compList].sort((a, b) => b.avgPct - a.avgPct).slice(0, 5),
+      bottomReussite: [...compList].sort((a, b) => a.avgPct - b.avgPct).slice(0, 5),
+      mostWorked:     [...compList].sort((a, b) => b.studentCount - a.studentCount).slice(0, 5),
+      leastWorked:    [...compList].sort((a, b) => a.studentCount - b.studentCount).slice(0, 5)
+    };
+  }
+
   return {
-    SUCCESS_THRESHOLD, JAUGE_LEVELS, DOMAIN_ORDER,
+    SUCCESS_THRESHOLD, JAUGE_LEVELS, DOMAIN_ORDER, MIN_STUDENTS_COMP,
     buildCatalogMap, dedupeBestBySlug, computeSousDomaineRates,
-    computeClassOverview, computeStudentProfile
+    computeClassOverview, computeStudentProfile, computeCompetenceStats
   };
 })();

@@ -117,6 +117,14 @@
   margin-bottom: 10px;
 }
 
+.laurel-rank-fr {
+  font-weight: 600;
+  font-style: italic;
+  font-size: 0.7em;
+  letter-spacing: 0;
+  opacity: 0.6;
+}
+
 .laurel-rank-progress-bg {
   height: 8px;
   background: var(--border, #E8EDF3);

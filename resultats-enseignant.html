@@ -479,8 +479,8 @@
       gap: 16px; padding-bottom: 10px; margin-bottom: 16px;
       border-bottom: 3px solid #F5A623;
     }
-    .bulletin-brand-name { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 21pt; color: #1A2D6B; line-height: 1; }
-    .bulletin-brand-sub  { font-size: 9.5pt; color: #5F6368; margin-top: 4px; }
+    .bulletin-logo        { height: 26pt; width: auto; display: block; }
+    .bulletin-brand-sub  { font-size: 9.5pt; color: #5F6368; margin-top: 6px; }
     .bulletin-header-right { text-align: right; font-size: 10pt; color: #333; line-height: 1.55; }
     .bulletin-header-right .bh-name   { font-weight: 800; font-size: 13pt; color: #1A2D6B; }
     .bulletin-header-right .bh-period { color: #5F6368; }
@@ -493,33 +493,25 @@
     .bulletin-stat .bs-value { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 18pt; color: #1A2D6B; }
     .bulletin-stat .bs-label { font-size: 8pt; color: #5F6368; text-transform: uppercase; letter-spacing: .04em; margin-top: 3px; }
 
-    /* 3. Jauges de niveau — élément central */
-    .bulletin-jauges-title {
-      font-size: 10.5pt; font-weight: 800; color: #1A2D6B;
-      text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px;
+    /* 3. Couronne de lauriers — bloc compact une ligne (clone de #laurels-root :
+       couronne SVG réduite + bloc rang, sans la grille de badges) */
+    .bulletin-laurels-compact {
+      display: flex; align-items: center; gap: 16px;
+      border: 1px solid #E8EDF3; border-radius: 10px;
+      padding: 12px 16px; margin-bottom: 16px;
     }
-    .bulletin-jauges { margin-bottom: 18px; }
-    .bulletin-jauge-row { display: flex; align-items: stretch; gap: 10px; margin-bottom: 7px; }
-    .bulletin-jauge-row .bj-domaine {
-      width: 120px; flex-shrink: 0; font-size: 9.5pt; font-weight: 700;
-      color: #333; display: flex; align-items: center;
-    }
-    .bj-segments { flex: 1; display: flex; }
-    .bj-segment {
-      flex: 1; text-align: center; padding: 6px 4px;
-      background: #EEF0F4; color: #8A93A3;
-      border-top: 1px solid #fff; border-bottom: 1px solid #fff;
-    }
-    .bj-segment + .bj-segment { border-left: 1px solid #fff; }
-    .bj-segment:first-child { border-radius: 6px 0 0 6px; }
-    .bj-segment:last-child  { border-radius: 0 6px 6px 0; }
-    .bj-segment .bj-seg-level  { display: block; font-size: 7.5pt; font-weight: 800; letter-spacing: .03em; }
-    .bj-segment .bj-seg-status { display: block; font-size: 8pt; font-weight: 700; margin-top: 1px; }
-    .bj-segment.atteint       { background: #1A2D6B; color: #fff; }
-    .bj-segment.en-cours      { background: #DCF5EF; color: #0F6E56; border-top-color: #1DBFA0; border-bottom-color: #1DBFA0; }
-    .bj-segment.non-travaille { background: #EEF0F4; color: #8A93A3; }
+    .blc-crown { flex-shrink: 0; }
+    .blc-crown .laurel-crown-wrap { margin-bottom: 0; gap: 2px; }
+    .blc-crown .laurel-crown-svg { width: 64px; height: 64px; }
+    .blc-crown .laurel-leaf-breakdown { font-size: 7.5pt; white-space: nowrap; }
+    .blc-info { flex: 1; text-align: left; }
+    .blc-info .laurel-rank-block { max-width: none; margin: 0; }
+    .blc-info .laurel-rank { font-size: 13pt; margin-bottom: 5px; }
+    .blc-info .laurel-rank-progress-bg { height: 6px; margin-bottom: 5px; }
+    .blc-info .laurel-rank-next,
+    .blc-info .laurel-rank-max { font-size: 8.5pt; }
 
-    /* 4. Points forts / à consolider */
+    /* 4. Compétences réussies / à consolider */
     .bulletin-boxes { display: flex; gap: 12px; margin-bottom: 16px; }
     .bulletin-box { flex: 1; border-radius: 10px; padding: 12px 14px; }
     .bulletin-box.box-forts      { background: #F0FBF8; color: #0F6E56; }
@@ -527,24 +519,44 @@
     .bulletin-box h5 { font-size: 9pt; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 7px; font-weight: 800; }
     .bulletin-box ul { margin: 0; padding-left: 16px; font-size: 9.5pt; line-height: 1.55; }
 
-    /* 5. Pied de page */
+    /* 5. Jauges de niveau — tableau compact par domaine/sous-domaine */
+    .bulletin-jauges-title {
+      font-size: 10.5pt; font-weight: 800; color: #1A2D6B;
+      text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px;
+    }
+    .bulletin-jauges { margin-bottom: 18px; }
+    .bj-table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+    .bj-table thead { display: table-header-group; }
+    .bj-table th {
+      font-size: 7.5pt; font-weight: 800; color: #8A93A3;
+      text-transform: uppercase; letter-spacing: .04em;
+      padding: 4px 6px; text-align: center; border-bottom: 1.5px solid #E8EDF3;
+    }
+    .bj-table th:first-child { text-align: left; }
+    .bj-table tr { break-inside: avoid; }
+    .bj-table td { padding: 5px 6px; text-align: center; border-bottom: 1px solid #F0F2F6; }
+    .bj-table td:first-child { text-align: left; }
+    .bjt-domaine td:first-child { font-weight: 800; color: #1A2D6B; }
+    .bjt-sous td:first-child { padding-left: 20px; font-weight: 500; color: #5F6368; font-size: 8.5pt; }
+    .bjt-pastille { display: inline-block; width: 11px; height: 11px; border-radius: 50%; }
+    .bjt-pastille.atteint       { background: #1DBFA0; }
+    .bjt-pastille.en-cours      { background: #F5A623; }
+    .bjt-pastille.non-travaille { background: #D9DEE7; }
+
+    /* 6. Pied de page */
     .bulletin-footer {
-      font-size: 7.5pt; color: #9AA3B2; text-align: center;
+      display: flex; justify-content: space-between; gap: 12px;
+      font-size: 7.5pt; color: #9AA3B2;
       border-top: 1px solid #E8EDF3; padding-top: 8px;
     }
 
-    /* Sous-domaine : ligne indentée et plus discrète que le domaine parent */
-    .bulletin-jauge-row--sub { margin-left: 16px; }
-    .bulletin-jauge-row--sub .bj-domaine { font-weight: 600; font-size: 8.5pt; color: #5F6368; width: 104px; }
-    .bulletin-jauge-row, .bulletin-boxes, .bulletin-laurels { break-inside: avoid; }
-    .bulletin-jauges--break { break-before: page; }
-    .bulletin-laurels { text-align: center; margin-bottom: 18px; }
+    .bulletin-laurels-compact, .bulletin-boxes { break-inside: avoid; }
 
     body.printing-bulletin #bulletin-print-root { display: block !important; }
     @media print {
       @page { size: A4 portrait; margin: 15mm; }
       body.printing-bulletin, body.printing-bulletin #bulletin-print-root,
-      body.printing-bulletin .bulletin-stat, body.printing-bulletin .bj-segment,
+      body.printing-bulletin .bulletin-stat, body.printing-bulletin .bjt-pastille,
       body.printing-bulletin .bulletin-box {
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
@@ -725,15 +737,15 @@
 
         <div class="stats-row-4" id="student-stats-row"></div>
 
-        <!-- Compétences à consolider / réussies -->
+        <!-- Compétences réussies / à consolider -->
         <div class="overview-grid" style="margin-bottom:20px">
-          <div class="overview-card" id="student-consolider" style="display:none">
-            <div class="overview-card-title">Compétences à consolider</div>
-            <div class="consolider-list" id="consolider-list"></div>
-          </div>
           <div class="overview-card" id="student-reussies" style="display:none">
             <div class="overview-card-title">Compétences réussies</div>
             <div class="consolider-list" id="reussies-list"></div>
+          </div>
+          <div class="overview-card" id="student-consolider" style="display:none">
+            <div class="overview-card-title">Compétences à consolider</div>
+            <div class="consolider-list" id="consolider-list"></div>
           </div>
         </div>
 
@@ -1732,51 +1744,69 @@
     const rates    = profile.rates || {};
     const fmtRate  = v => (v !== null && v !== undefined) ? v + '%' : '—';
 
-    /* Couronne : clone du DOM déjà rendu, aucun recalcul de la logique lauriers */
-    const laurelsSrc  = document.getElementById('laurels-root');
-    const laurelsHtml = laurelsSrc && laurelsSrc.innerHTML.trim() ? laurelsSrc.innerHTML : '';
+    /* Couronne : clone des fragments déjà rendus dans #laurels-root (couronne
+       SVG + bloc rang), sans la grille de badges. Aucun recalcul de la logique
+       lauriers — seule la notation "X/20" est retirée/reformulée, à partir des
+       nombres déjà affichés (.laurel-leaf-breakdown) et de la constante
+       LAUREL_LEAVES_PER_CROWN déjà chargée (js/laurels.js). */
+    const laurelsSrc = document.getElementById('laurels-root');
+    let laurelsCompactHtml = '';
+    const crownWrapSrc = laurelsSrc?.querySelector('.laurel-crown-wrap');
+    const rankBlockSrc = laurelsSrc?.querySelector('.laurel-rank-block');
+    if (crownWrapSrc && rankBlockSrc) {
+      const crownWrap = crownWrapSrc.cloneNode(true);
+      crownWrap.querySelector('.laurel-crown-count')?.remove();
+      const breakdownEl = crownWrap.querySelector('.laurel-leaf-breakdown');
+      const breakdownText = breakdownEl ? breakdownEl.textContent : '';
+      const totalMatch = breakdownText.match(/(\d+)\s*feuille/);
+      const goldMatch  = breakdownText.match(/dont\s*(\d+)\s*dorée/);
+      if (breakdownEl && totalMatch) {
+        const total = totalMatch[1];
+        const goldTxt = goldMatch ? `, dont ${goldMatch[1]} dorée${goldMatch[1] > 1 ? 's' : ''}` : '';
+        breakdownEl.textContent = `${total} feuille${total > 1 ? 's' : ''} sur ${LAUREL_LEAVES_PER_CROWN}${goldTxt}`;
+      }
+      laurelsCompactHtml = `<div class="bulletin-laurels-compact">
+        <div class="blc-crown">${crownWrap.outerHTML}</div>
+        <div class="blc-info">${rankBlockSrc.outerHTML}</div>
+      </div>`;
+    }
 
     const listItem = c => `<li><strong>${escHtml(c.competence)}</strong> — ${escHtml(c.domaine)} · ${c.avgPct}%</li>`;
-    const consoliderHtml = (profile.consolider || []).slice(0, 5).map(listItem).join('')
-      || '<li>Aucune compétence à consolider identifiée.</li>';
     const reussiesHtml = (profile.reussies || []).slice(0, 5).map(listItem).join('')
       || '<li>Pas encore de compétence réussie.</li>';
+    const consoliderHtml = (profile.consolider || []).slice(0, 5).map(listItem).join('')
+      || '<li>Aucune compétence à consolider identifiée.</li>';
 
-    const segHtml = segs => `<div class="bj-segments">
-      ${segs.map(seg => {
-        /* Même repli à 3 états visuels que l'ancien bulletin — "non concerné"
-           (denom=0) absorbé dans "non travaillé" plutôt qu'un 4e état. */
-        const status = seg.status === 'non-concerne' ? 'non-travaille' : seg.status;
-        const label  = status === 'atteint' ? 'atteint' : status === 'en-cours' ? 'en cours' : '—';
-        return `<div class="bj-segment ${status}">
-          <span class="bj-seg-level">${escHtml(seg.level)}</span>
-          <span class="bj-seg-status">${label}</span>
-        </div>`;
-      }).join('')}
-    </div>`;
+    /* Tableau compact des jauges : une ligne par domaine/sous-domaine, une
+       pastille colorée par niveau (mêmes couleurs sémantiques que l'écran :
+       teal = atteint, ambre = en cours, gris clair = non travaillé/concerné). */
+    const pastilleCls = status => status === 'atteint' ? 'atteint' : status === 'en-cours' ? 'en-cours' : 'non-travaille';
+    const statusLabel = status => status === 'atteint' ? 'atteint' : status === 'en-cours' ? 'en cours' : status === 'non-concerne' ? 'non concerné' : 'non travaillé';
+    const jaugeRow = (label, segs, cls) => `<tr class="${cls}">
+      <td>${label}</td>
+      ${segs.map(seg => `<td><span class="bjt-pastille ${pastilleCls(seg.status)}" title="${escHtml(seg.level)} — ${statusLabel(seg.status)}"></span></td>`).join('')}
+    </tr>`;
 
     const domaines = lfmAnalytics.DOMAIN_ORDER.filter(d => (profile.jauges[d] || []).some(seg => seg.denom > 0));
-    let jaugesHtml = '';
+    let jaugesRows = '';
     domaines.forEach(domaine => {
-      jaugesHtml += `<div class="bulletin-jauge-row">
-        <div class="bj-domaine">${escHtml(domaine)}</div>
-        ${segHtml(profile.jauges[domaine] || [])}
-      </div>`;
+      jaugesRows += jaugeRow(escHtml(domaine), profile.jauges[domaine] || [], 'bjt-domaine');
       (profile.sousDomaineJauges?.[domaine] || [])
         .filter(sd => sd.segments.some(seg => seg.status !== 'non-concerne'))
         .forEach(sd => {
-          jaugesHtml += `<div class="bulletin-jauge-row bulletin-jauge-row--sub">
-            <div class="bj-domaine">${escHtml(sd.sousDomaine)}</div>
-            ${segHtml(sd.segments)}
-          </div>`;
+          jaugesRows += jaugeRow(`${escHtml(sd.sousDomaine)} · ${sd.exerciseCount} ex.`, sd.segments, 'bjt-sous');
         });
     });
+    const jaugesHtml = jaugesRows ? `<table class="bj-table">
+        <thead><tr><th>Compétence</th><th>CM1</th><th>CM2</th><th>6e</th></tr></thead>
+        <tbody>${jaugesRows}</tbody>
+      </table>` : '<div style="font-size:9.5pt;color:#888">Pas assez de données.</div>';
 
     const html = `<div class="bulletin-page">
       <div class="bulletin-header">
         <div>
-          <div class="bulletin-brand-name">Proficiamus</div>
-          <div class="bulletin-brand-sub">Synthèse de résultats — cycle 3</div>
+          <img src="assets/proficiamuspetit.png?v=9" alt="Proficiamus" class="bulletin-logo">
+          <div class="bulletin-brand-sub">Bilan de compétences — cycle 3</div>
         </div>
         <div class="bulletin-header-right">
           <div class="bh-name">${escHtml(name)}</div>
@@ -1800,27 +1830,27 @@
         </div>
       </div>
 
-      ${laurelsHtml ? `<div class="bulletin-laurels">${laurelsHtml}</div>` : ''}
+      ${laurelsCompactHtml}
 
       <div class="bulletin-boxes">
-        <div class="bulletin-box box-consolider">
-          <h5>À consolider</h5>
-          <ul>${consoliderHtml}</ul>
-        </div>
         <div class="bulletin-box box-forts">
           <h5>Compétences réussies</h5>
           <ul>${reussiesHtml}</ul>
         </div>
+        <div class="bulletin-box box-consolider">
+          <h5>À consolider en priorité</h5>
+          <ul>${consoliderHtml}</ul>
+        </div>
       </div>
 
-      <div class="bulletin-jauges bulletin-jauges--break">
+      <div class="bulletin-jauges">
         <div class="bulletin-jauges-title">Jauges de niveau par domaine et sous-domaine</div>
-        ${jaugesHtml || '<div style="font-size:9.5pt;color:#888">Pas assez de données.</div>'}
+        ${jaugesHtml}
       </div>
 
       <div class="bulletin-footer">
-        proficiamus.eu &nbsp;·&nbsp; Généré le ${today} &nbsp;·&nbsp;
-        Niveau 1 = attendus CM1 · Niveau 2 = CM2 · Niveau 3 = 6e
+        <span>proficiamus.eu</span>
+        <span>Niveau 1 = attendus CM1 · Niveau 2 = CM2 · Niveau 3 = 6e</span>
       </div>
     </div>`;
 
