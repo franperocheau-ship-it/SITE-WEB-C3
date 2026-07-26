@@ -10,6 +10,7 @@
   <script src="js/auth.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/admin.js"></script>
+  <script src="js/teacher-analytics.js?v=2"></script>
   <style>
     .dash-wrap {
       min-height: calc(100vh - 88px - 74px);
@@ -265,6 +266,33 @@
     .badge-idea { background: rgba(16,43,106,0.09); color: var(--blue); border: 1px solid rgba(16,43,106,0.2); }
     .badge-done { background: #16a34a; color: #fff; }
 
+    /* ── Compétences (plateforme) ────────────────────────────────────────────── */
+    .comp-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;
+    }
+    .comp-card {
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm); padding: 20px 22px;
+    }
+    .comp-card-title {
+      font-size: 12px; font-weight: 700; color: var(--blue);
+      letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 14px;
+    }
+    .comp-bar-row { margin-bottom: 12px; }
+    .comp-bar-row:last-child { margin-bottom: 0; }
+    .comp-bar-label {
+      display: flex; justify-content: space-between; gap: 8px;
+      font-size: 12.5px; color: var(--text); margin-bottom: 4px;
+    }
+    .comp-bar-label .n { color: var(--muted); font-size: 11px; white-space: nowrap; }
+    .comp-bar-track { background: var(--bg); border-radius: 100px; height: 8px; overflow: hidden; }
+    .comp-bar-fill { height: 100%; border-radius: 100px; }
+    .comp-bar-fill.up   { background: #1DBFA0; }
+    .comp-bar-fill.down { background: #E0765C; }
+    .comp-bar-fill.neutral { background: #F5A623; }
+    .empty-inline { color: var(--muted); font-size: 13px; padding: 8px 0; }
+    @media (max-width: 700px) { .comp-grid { grid-template-columns: 1fr; } }
+
     /* Toast */
     .toast {
       position: fixed; bottom: 28px; left: 50%;
@@ -392,6 +420,16 @@
           </div>
         </div>
         <div id="classes-body">
+          <div class="tbl-loading">Chargement…</div>
+        </div>
+      </div>
+
+      <!-- Section : Compétences (plateforme, agrégats toutes classes) -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-card-title">Compétences — plateforme</div>
+        </div>
+        <div id="comp-stats-body" style="padding:20px 24px">
           <div class="tbl-loading">Chargement…</div>
         </div>
       </div>
@@ -923,6 +961,77 @@
       }
     }
     await loadFeedbackAdmin();
+
+    /* ── Compétences (plateforme) ─────────────────────────────────────────── */
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload  = () => resolve();
+        script.onerror = () => reject(new Error(`Impossible de charger ${src}.`));
+        document.head.appendChild(script);
+      });
+    }
+
+    async function loadCompetenceStats() {
+      const body = document.getElementById('comp-stats-body');
+      try {
+        /* Requis par la migration data/*.js (commit 2b83da7) : remplace l'ancien
+           loadScript('exercise-data.js?v=21'). À conserver si loadCompetenceStats
+           est commitée ou reversée séparément de ce commit de migration. */
+        await Promise.all([
+          'data/conjugaison.js?v=1',
+          'data/grammaire.js?v=1',
+          'data/orthographe.js?v=1',
+          'data/nombres-entiers.js?v=1',
+          'data/fractions.js?v=1',
+          'data/nombres-decimaux.js?v=1',
+          'data/probabilites.js?v=1'
+        ].map(loadScript));
+        const catalogMap = lfmAnalytics.buildCatalogMap();
+        const results     = await lfmAdmin.getAllResultsRaw();
+
+        if (results.length === 0) {
+          body.innerHTML = '<div class="tbl-empty">Aucun résultat enregistré.</div>';
+          return;
+        }
+
+        const stats = lfmAnalytics.computeCompetenceStats(results, catalogMap);
+        const compBar = (c, cls) => `
+          <div class="comp-bar-row">
+            <div class="comp-bar-label"><span>${escHtml(c.competence)}</span><span class="n">${c.avgPct}% · ${c.studentCount} élève${c.studentCount > 1 ? 's' : ''}</span></div>
+            <div class="comp-bar-track"><div class="comp-bar-fill ${cls}" style="width:${c.avgPct}%"></div></div>
+          </div>`;
+        const workedBar = (c, cls, maxCount) => `
+          <div class="comp-bar-row">
+            <div class="comp-bar-label"><span>${escHtml(c.competence)}</span><span class="n">${c.studentCount} élève${c.studentCount > 1 ? 's' : ''} · ${c.attemptCount} tentative${c.attemptCount > 1 ? 's' : ''}</span></div>
+            <div class="comp-bar-track"><div class="comp-bar-fill ${cls}" style="width:${Math.round(c.attemptCount / maxCount * 100)}%"></div></div>
+          </div>`;
+        const emptyMsg = `<div class="empty-inline">Pas assez de données (min. ${lfmAnalytics.MIN_STUDENTS_COMP} élèves par compétence).</div>`;
+
+        body.innerHTML = `<div class="comp-grid">
+          <div class="comp-card">
+            <div class="comp-card-title">Compétences les mieux réussies</div>
+            ${stats.topReussite.length ? stats.topReussite.map(c => compBar(c, 'up')).join('') : emptyMsg}
+          </div>
+          <div class="comp-card">
+            <div class="comp-card-title">Compétences les moins réussies</div>
+            ${stats.bottomReussite.length ? stats.bottomReussite.map(c => compBar(c, 'down')).join('') : emptyMsg}
+          </div>
+          <div class="comp-card">
+            <div class="comp-card-title">Compétences les plus travaillées</div>
+            ${stats.mostWorked.length ? stats.mostWorked.map(c => workedBar(c, 'neutral', Math.max(...stats.mostWorked.map(x => x.attemptCount)))).join('') : emptyMsg}
+          </div>
+          <div class="comp-card">
+            <div class="comp-card-title">Compétences les moins travaillées</div>
+            ${stats.leastWorked.length ? stats.leastWorked.map(c => workedBar(c, 'neutral', Math.max(...stats.leastWorked.map(x => x.attemptCount)))).join('') : emptyMsg}
+          </div>
+        </div>`;
+      } catch (e) {
+        body.innerHTML = `<div class="tbl-empty" style="color:var(--red)">Erreur : ${escHtml(e.message)}</div>`;
+      }
+    }
+    await loadCompetenceStats();
 
     document.getElementById('feedback-body').addEventListener('click', async e => {
       const btn = e.target.closest('.btn-teacher-del');

@@ -126,6 +126,28 @@ const lfmAdmin = (() => {
     }));
   }
 
+  /* ── Résultats bruts, toutes classes confondues ───────────────────────────
+     Réservé admin : la policy RLS "results_all_admin" donne un accès complet
+     à exercise_results, donc pas de filtre .in(student_id) ici contrairement
+     à lfmTeacher.getClassResultsRaw (scopé à une classe). */
+  async function getAllResultsRaw() {
+    const PAGE = 1000;
+    let offset  = 0;
+    let results = [];
+    while (true) {
+      const { data, error } = await db
+        .from('exercise_results')
+        .select('student_id, exercise_slug, pct')
+        .order('completed_at', { ascending: false })
+        .range(offset, offset + PAGE - 1);
+      if (error) throw error;
+      results = results.concat(data || []);
+      if (!data || data.length < PAGE) break;
+      offset += PAGE;
+    }
+    return results;
+  }
+
   /* ── Export global CSV ───────────────────────────────────────────────────── */
   async function exportAllStudents() {
     const { data, error } = await db
@@ -154,6 +176,6 @@ const lfmAdmin = (() => {
     getGlobalStats,
     getPendingTeachers, approveTeacher, rejectTeacher,
     getTeachers, getAllClasses, getClassesWithStats, exportAllStudents,
-    deleteTeacher, deleteClasses
+    deleteTeacher, deleteClasses, getAllResultsRaw
   };
 })();
