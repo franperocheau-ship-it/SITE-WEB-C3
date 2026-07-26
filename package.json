@@ -1,0 +1,13 @@
+{
+  "name": "proficiamus-lfm-c3",
+  "private": true,
+  "description": "Site Cycle 3 (LFM) — vanilla HTML/CSS/JS, sans étape de build. package.json présent uniquement pour outiller ESLint.",
+  "scripts": {
+    "lint": "eslint js data"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "eslint": "^9.19.0",
+    "globals": "^15.14.0"
+  }
+}
