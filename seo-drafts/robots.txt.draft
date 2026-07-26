@@ -1,0 +1,40 @@
+# BROUILLON — NE PAS ACTIVER.
+# Ce fichier n'est PAS un robots.txt actif : le nom se termine en .draft pour
+# qu'aucun serveur/CDN ne le serve jamais comme /robots.txt, même par
+# accident (ex. un futur "git push" pour une raison sans rapport).
+#
+# Le jour du lancement du référencement (voir SEO-TODO.md) :
+#   1. Renommer ce fichier en robots.txt (à la racine du repo).
+#   2. Décommenter la ligne Sitemap: ci-dessous une fois sitemap.xml activé.
+#   3. Revérifier la liste Disallow — une page ajoutée depuis l'audit initial
+#      (espace enseignant/admin, outil de debug) doit y être ajoutée aussi.
+
+User-agent: *
+
+# Espaces authentifiés (aucun contrôle d'accès serveur : ces pages sont
+# techniquement publiques en HTTP, seul le JS redirige si non connecté —
+# à exclure explicitement de l'indexation).
+Disallow: /dashboard-admin.html
+Disallow: /dashboard-eleve.html
+Disallow: /dashboard-enseignant.html
+Disallow: /classes-enseignant.html
+Disallow: /pilotage-enseignant.html
+Disallow: /remediation.html
+Disallow: /remediations-enseignant.html
+Disallow: /resultats-enseignant.html
+Disallow: /synthese-joggings-enseignant.html
+Disallow: /exercices-prioritaires.html
+Disallow: /feedback.html
+Disallow: /auth.html
+
+# Outil de debug interne — candidat à la suppression pure et simple,
+# voir SEO-TODO.md.
+Disallow: /test-connexion.html
+
+# Pages dynamiques pilotées par paramètre d'URL (?slug=, ?id=) : titre
+# statique générique, contenu injecté en JS — à pré-rendre avant
+# d'envisager leur indexation individuelle (voir SEO-TODO.md).
+Disallow: /exercise.html
+Disallow: /jogging.html
+
+# Sitemap: https://proficiamus.eu/sitemap.xml

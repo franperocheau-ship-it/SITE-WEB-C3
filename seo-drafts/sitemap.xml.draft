@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  BROUILLON — NE PAS ACTIVER.
+  Ce fichier n'est PAS un sitemap actif : le nom se termine en .draft pour
+  qu'aucun serveur/CDN ne le serve jamais comme /sitemap.xml, même par
+  accident (ex. un futur "git push" pour une raison sans rapport).
+
+  Le jour du lancement du référencement (voir SEO-TODO.md) :
+    1. Renommer ce fichier en sitemap.xml (à la racine du repo).
+    2. Vérifier/compléter les balises <lastmod> avec de vraies dates.
+    3. Ajouter la ligne "Sitemap:" dans robots.txt (actuellement commentée
+       dans seo-drafts/robots.txt.draft).
+    4. Soumettre l'URL dans Google Search Console.
+
+  Liste : les 33 pages publiques "stables" identifiées lors de l'audit du
+  [date de l'audit]. Volontairement exclus : exercise.html et jogging.html
+  (contenu piloté par un paramètre d'URL, titre statique générique — à
+  traiter séparément, voir SEO-TODO.md), et toutes les pages
+  privées/authentifiées (dashboards, espace enseignant/admin,
+  test-connexion.html).
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://proficiamus.eu/</loc></url>
+  <url><loc>https://proficiamus.eu/apropos.html</loc></url>
+  <url><loc>https://proficiamus.eu/visiteur.html</loc></url>
+  <url><loc>https://proficiamus.eu/mentions-legales.html</loc></url>
+
+  <url><loc>https://proficiamus.eu/français.html</loc></url>
+  <url><loc>https://proficiamus.eu/français-conjugaison.html</loc></url>
+  <url><loc>https://proficiamus.eu/français-grammaire.html</loc></url>
+  <url><loc>https://proficiamus.eu/français-lexique.html</loc></url>
+  <url><loc>https://proficiamus.eu/français-orthographe.html</loc></url>
+  <url><loc>https://proficiamus.eu/ortho-distinguer-a-a.html</loc></url>
+  <url><loc>https://proficiamus.eu/ortho-distinguer-ce-se.html</loc></url>
+  <url><loc>https://proficiamus.eu/ortho-distinguer-ces-ses-cest-sest.html</loc></url>
+  <url><loc>https://proficiamus.eu/ortho-distinguer-et-est.html</loc></url>
+  <url><loc>https://proficiamus.eu/ortho-distinguer-leur-leurs.html</loc></url>
+  <url><loc>https://proficiamus.eu/ortho-distinguer-on-ont.html</loc></url>
+  <url><loc>https://proficiamus.eu/ortho-distinguer-ou-ou.html</loc></url>
+  <url><loc>https://proficiamus.eu/ortho-distinguer-quel-quelle-quels-quelles.html</loc></url>
+  <url><loc>https://proficiamus.eu/ortho-distinguer-son-sont.html</loc></url>
+  <url><loc>https://proficiamus.eu/ortho-distinguer-tout-tous-toute-toutes.html</loc></url>
+  <url><loc>https://proficiamus.eu/redaction.html</loc></url>
+
+  <url><loc>https://proficiamus.eu/mathématiques.html</loc></url>
+  <url><loc>https://proficiamus.eu/mathématiques-fractions.html</loc></url>
+  <url><loc>https://proficiamus.eu/mathématiques-grandeurs-et-mesures.html</loc></url>
+  <url><loc>https://proficiamus.eu/mathématiques-nombres-decimaux.html</loc></url>
+  <url><loc>https://proficiamus.eu/mathématiques-nombres-entiers.html</loc></url>
+  <url><loc>https://proficiamus.eu/mathématiques-probabilites.html</loc></url>
+  <url><loc>https://proficiamus.eu/maths-fractions-droite.html</loc></url>
+  <url><loc>https://proficiamus.eu/ecrire-decimal-fraction.html</loc></url>
+  <url><loc>https://proficiamus.eu/ecrire-fraction-decimale.html</loc></url>
+  <url><loc>https://proficiamus.eu/algebre.html</loc></url>
+  <url><loc>https://proficiamus.eu/algebre-symboles-mysteres.html</loc></url>
+  <url><loc>https://proficiamus.eu/algebre-systemes-equations.html</loc></url>
+
+  <url><loc>https://proficiamus.eu/informatique.html</loc></url>
+</urlset>
