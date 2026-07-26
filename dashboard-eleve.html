@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="laurels.css?v=2">
   <link rel="stylesheet" href="css/jogging.css?v=1">
   <link rel="stylesheet" href="css/jogging-print.css?v=1">
+  <link rel="stylesheet" href="css/dictees.css?v=1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
@@ -19,7 +20,9 @@
   <script src="js/jogging-data.js?v=1"></script>
   <script src="js/jogging-badges.js?v=1"></script>
   <script src="js/jogging-print.js?v=1"></script>
+  <script src="js/dictees-badges.js?v=1"></script>
   <script src="js/jogging-student-space.js?v=1"></script>
+  <script src="js/dictees-student-space.js?v=1"></script>
   <style>
     .dash-wrap {
       min-height: calc(100vh - 88px - 74px);
@@ -504,6 +507,7 @@
         <button class="dash-tab dash-tab--active" data-tab="exercices">🎯 Faire des exercices</button>
         <button class="dash-tab" data-tab="resultats">📊 Mes résultats</button>
         <button class="dash-tab" data-tab="joggings">✍️ Mes joggings d'écriture</button>
+        <button class="dash-tab" data-tab="dictees">📖 Mes dictées préparées</button>
       </div>
 
       <!-- ── Tab 1 : Faire des exercices ── -->
@@ -668,6 +672,50 @@
 
       </div><!-- /tab-joggings -->
 
+      <!-- ── Tab 4 : Mes dictées préparées ── espace séparé du carnet
+           joggings ci-dessus : badges, stats et évolution propres au
+           module, jamais fusionnés avec ceux des joggings d'écriture. ── -->
+      <div id="tab-dictees" class="dash-tab-pane" style="display:none">
+
+        <div class="dash-stats" id="dic-dash-stats" style="display:none">
+          <div class="dash-stat">
+            <div class="dash-stat-label">Dictées complétées</div>
+            <div class="dash-stat-value" id="dic-stat-completees">0</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-label">Mots justes du 1er coup</div>
+            <div class="dash-stat-value" id="dic-stat-premier-coup">0%</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-label">Dictées sans faute</div>
+            <div class="dash-stat-value" id="dic-stat-sans-faute">0</div>
+          </div>
+        </div>
+
+        <!-- Mon évolution -->
+        <div class="dash-section" id="dic-dash-evolution-section" style="display:none">
+          <div class="dash-section-title">Mon évolution</div>
+          <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px;">Taux de réussite du premier coup, par dictée (capsule sonore)</div>
+          <div id="dic-evo-bars" class="dic-evo-bars"></div>
+        </div>
+
+        <!-- Mes badges -->
+        <div class="dash-section" id="dic-dash-badges-section">
+          <div class="dash-section-title">Mes badges</div>
+          <div id="dic-dash-badges-grid" class="laurel-badges-grid"></div>
+        </div>
+
+        <!-- État vide -->
+        <div class="dash-section" id="dic-dash-empty-section" style="display:none">
+          <div class="dash-empty">
+            <div class="dash-empty-icon">📖</div>
+            <strong>Aucune dictée préparée pour l'instant.</strong><br>
+            Rends-toi dans Français → Orthographe pour en commencer une !
+          </div>
+        </div>
+
+      </div><!-- /tab-dictees -->
+
       <div id="jog-carnet-print-root"></div>
 
       <!-- Racine imprimée du premier jet (Phase 2bis, §5.5 — cachée à l'écran) -->
@@ -727,6 +775,7 @@
          un exercice) plutôt qu'un calcul figé au chargement initial. */
       if (tabName === 'resultats' && _profile) refreshResultsTab();
       if (tabName === 'joggings' && _profile) JoggingStudentSpace.render(_profile.id);
+      if (tabName === 'dictees' && _profile) DicteesStudentSpace.render(_profile.id);
     }
 
     document.querySelectorAll('.dash-tab').forEach(btn => {

@@ -15,11 +15,13 @@
   <!-- SEO: og:description et og:image à compléter avant le lancement (voir SEO-TODO.md) -->
   <link rel="stylesheet" href="styles.css?v=12">
   <link rel="stylesheet" href="breadcrumb.css?v=1">
+  <link rel="stylesheet" href="css/dictees.css?v=1">
   <script src="js/breadcrumb.js?v=1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/guided-access.js?v=1"></script>
+  <script src="js/dictees-colors.js?v=1"></script>
   <script src="data/index.js?v=1"></script>
   <script src="js/skill-badges.js?v=1"></script>
   <style>
@@ -291,6 +293,17 @@
         <p class="page-subtitle">Choisis une notion à travailler.</p>
       </div>
 
+      <!-- Dictées préparées (créées par l'enseignant pour la classe de l'élève) -->
+      <div class="skill-section" id="dic-section" style="display:none;margin-bottom:20px;">
+        <div class="section-header" style="cursor:default;">
+          <span class="section-emoji">📖</span>
+          <span class="section-title">Dictées préparées</span>
+        </div>
+        <div class="section-content">
+          <div class="dic-cards-grid" id="dic-cards-grid"></div>
+        </div>
+      </div>
+
       <!-- Filter bar -->
       <div class="filter-bar">
         <div class="search-wrap">
@@ -526,6 +539,55 @@
       `;
     }
 
+    /* ── Dictées préparées ─────────────────────────────────────────────────
+       Contrairement aux notions ci-dessus (catalogue statique SECTIONS), les
+       dictées sont entièrement créées par l'enseignant pour sa classe — pas
+       de badge de niveau ici (le niveau ne s'applique qu'aux mots, dans
+       l'exercice), seulement les pastilles de points grammaticaux (couleur
+       déterministe, js/dictees-colors.js). Section masquée si l'élève n'est
+       pas connecté, n'a pas de classe, ou si sa classe n'a aucune dictée. */
+    function renderDicteeCard(dictee) {
+      const badges = (dictee.points_grammaticaux || []).map(p =>
+        `<span class="dic-point-pastille" style="--dic-color:${DicteesColors.colorFor(p)}">${escapeHtml(p)}</span>`
+      ).join('');
+      return `
+        <a class="dic-card" href="dictee.html?id=${dictee.id}">
+          <div class="dic-card-illustration">📖</div>
+          <div class="dic-card-badges">${badges}</div>
+          <div class="dic-card-title">${escapeHtml(dictee.titre)}</div>
+          <span class="dic-card-btn">Commencer →</span>
+        </a>
+      `;
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    async function loadDictees() {
+      if (!window.lfmDb || typeof lfmAuth === 'undefined') return;
+      try {
+        const session = await lfmAuth.getSession();
+        if (!session) return;
+
+        const { data: student } = await window.lfmDb
+          .from('students').select('class_id').eq('auth_user_id', session.user.id).single();
+        if (!student || !student.class_id) return;
+
+        const { data: dictees, error } = await window.lfmDb
+          .from('dictees').select('*').eq('class_id', student.class_id)
+          .order('created_at', { ascending: false });
+        if (error || !dictees || dictees.length === 0) return;
+
+        document.getElementById('dic-cards-grid').innerHTML = dictees.map(renderDicteeCard).join('');
+        document.getElementById('dic-section').style.display = '';
+      } catch (e) {
+        // Repli silencieux : la section reste masquée (§ pas de blocage sur erreur réseau)
+      }
+    }
+
     /* ── Init ──────────────────────────────────────────────────────────────── */
     async function init() {
       if (typeof lfmGuidedAccess !== 'undefined') await lfmGuidedAccess.get();
@@ -533,6 +595,7 @@
         SECTIONS.map(renderSection).join("");
       bindEvents();
       if (typeof applySkillValidationBadges === 'function') applySkillValidationBadges();
+      loadDictees();
     }
 
     /* ── Toggle section collapse ───────────────────────────────────────────── */

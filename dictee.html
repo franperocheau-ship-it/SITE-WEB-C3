@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dictée préparée — Orthographe — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="breadcrumb.css?v=1">
+  <link rel="stylesheet" href="level-select.css?v=1">
+  <link rel="stylesheet" href="css/dictees.css?v=1">
+  <script src="js/breadcrumb.js?v=1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dictees-speech.js?v=1"></script>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <!-- MAIN -->
+  <div class="page-wrap">
+    <div class="page-content" style="max-width:640px;">
+
+      <script>Breadcrumb.render({ current: 'Chargement…' });</script>
+
+      <a href="français-orthographe.html" class="back-link">← Orthographe</a>
+
+      <div class="page-header" style="padding:20px 0 24px;">
+        <h1 class="page-title" id="dic-title" style="font-size:1.5rem;">…</h1>
+        <div class="page-title-rule"></div>
+      </div>
+
+      <div class="dic-step-banner" id="dic-step-banner"></div>
+
+      <!-- ── État : chargement ── -->
+      <div id="dic-state-loading" style="text-align:center;padding:40px 0;color:var(--muted);">
+        Chargement…
+      </div>
+
+      <!-- ── État : choix libre du niveau (à chaque nouvelle dictée) ── -->
+      <div id="dic-state-niveau-choice" style="display:none">
+        <p class="dic-niveau-choice-intro">Choisis le niveau que tu veux travailler pour cette dictée.</p>
+        <div class="dic-niveau-choice-grid" id="dic-niveau-choice-grid"></div>
+      </div>
+
+      <!-- ── État : exercice en cours ── -->
+      <div id="dic-state-exercise" style="display:none">
+        <div class="dic-intro-consigne" id="dic-intro-consigne"></div>
+        <div id="dic-item"></div>
+      </div>
+
+      <!-- ── État : résultats (fin d'exercice 1 ou 2) ── -->
+      <div id="dic-state-results" style="display:none">
+        <div class="dic-final-message" id="dic-final-message"></div>
+        <div class="dic-final-detail" id="dic-final-detail"></div>
+        <div class="dic-actions" id="dic-final-actions"></div>
+      </div>
+
+      <!-- ── État : erreur ── -->
+      <div id="dic-state-error" style="display:none;text-align:center;padding:40px 0;">
+        <p style="color:var(--muted);margin-bottom:14px;">Impossible de charger cette dictée.</p>
+        <a href="français-orthographe.html" class="btn-secondary">← Retour à l'Orthographe</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau – LFM &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="js/menu.js"></script>
+  <script src="js/dictees-engine.js?v=1"></script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>
