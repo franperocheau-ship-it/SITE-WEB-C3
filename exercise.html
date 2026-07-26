@@ -5443,6 +5443,9 @@
       } else if (currentType === "troisieme-groupe-present-niveaux") {
         c3gInitSession();
         return;
+      } else if (currentType === "imparfait-groupes-niveaux") {
+        cimpInitSession();
+        return;
       } else if (currentType === "change-sujet-niveaux") {
         csjInitSession();
         return;
@@ -5732,6 +5735,8 @@
         /* session managed by c2gInitSession — no-op here */
       } else if (currentType === "troisieme-groupe-present-niveaux") {
         /* session managed by c3gInitSession — no-op here */
+      } else if (currentType === "imparfait-groupes-niveaux") {
+        /* session managed by cimpInitSession — no-op here */
       } else if (currentType === "decomposer-nombre-entier-niveaux") {
         /* session managed by dniInitSession — no-op here */
       } else if (currentType === "composer-nombre-entier-niveaux") {
@@ -18326,6 +18331,354 @@
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
         exerciseType: 'troisieme-groupe-present-niveaux',
+        level:        'Niveau ' + level,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : imparfait-groupes-niveaux — « Conjuguer à l'imparfait »
+       Niveau 1 : QCM + associer sujet↔forme (sujets pronoms, verbes variés),
+                  mode par item — QCM avec distracteurs homophones erronés
+       Niveau 2 : uniquement des verbes en -ir — choix binaire avec/sans -iss-
+                  (motif step1/step2 déjà utilisé par accord-participe-cod et
+                  être-ou-avoir, pas une nouvelle interaction) puis saisie
+       Niveau 3 : saisie libre, sujet = groupe nominal, groupes mélangés
+       3 niveaux déverrouillables à 80 %. Un seul essai par question.
+       ════════════════════════════════════════════════════════════════════════ */
+
+    const CIMP_SEUIL = 0.8;
+
+    const CIMP_LV_DEFS = [
+      { lv: 1, desc: 'QCM et association : trouve la bonne forme' },
+      { lv: 2, desc: 'Verbes en -ir : avec ou sans -iss- ?' },
+      { lv: 3, desc: 'Écris la forme du verbe avec un autre sujet' }
+    ];
+
+    let cimpState = null;
+    let cimpLevelSelect = null;
+
+    function cimpBackToSelectScreen() {
+      cimpState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    /* ── Init : réinitialise et affiche le sélecteur de niveau ──────────── */
+    function cimpInitSession() {
+      cimpState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      cimpLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: CIMP_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: CIMP_SEUIL,
+        onSelectLevel: (lv) => cimpStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: cimpBackToSelectScreen
+      });
+      cimpLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function cimpStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const pool = shuffle((sessionData.bank || []).filter(item => item.level === lv));
+      const qs   = pool.slice(0, sessionData.questionsPerSession || 10);
+      cimpState  = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+      document.getElementById('q-total').textContent = qs.length;
+
+      cimpLevelSelect.renderBadges(lv);
+      cimpRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Affiche une question — dispatche sur le niveau + q.mode ─────────── */
+    function cimpRenderQuestion(card) {
+      const { questions, idx, total, level } = cimpState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if (level === 1 && q.mode === 'mcq')           cimpRenderMcq(card, q);
+      else if (level === 1 && q.mode === 'matching') cimpRenderMatching(card, q);
+      else if (level === 2)                          cimpRenderIssChoice(card, q);
+      else                                             cimpRenderTextInput(card, q);
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        cimpState.idx++;
+        if (cimpState.idx >= cimpState.questions.length) cimpShowLevelResults();
+        else cimpRenderQuestion(document.getElementById('ex-card'));
+      });
+    }
+
+    function cimpRenderMcq(card, q) {
+      const { idx, total } = cimpState;
+      card.innerHTML = `
+        <p class="ex-question-label">Quelle est la forme du verbe <em>${q.infinitive}</em> à l'imparfait avec ce sujet ?</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="cimp-choices"></div>
+        <div class="ex-feedback-area" id="cimp-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('cimp-choices');
+      grid.innerHTML = shuffle(q.choices).map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => cimpHandleChoice(btn, q))
+      );
+    }
+
+    function cimpRenderMatching(card, q) {
+      const { idx, total } = cimpState;
+      card.innerHTML = `
+        <p class="ex-question-label">Associe ce sujet à la bonne forme du verbe <em>${q.infinitive}</em> à l'imparfait.</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="cimp-choices"></div>
+        <div class="ex-feedback-area" id="cimp-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('cimp-choices');
+      grid.innerHTML = shuffle(q.forms).map(f => `<button class="ex-choice" data-value="${f}">${f}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => cimpHandleChoice(btn, q))
+      );
+    }
+
+    function cimpHandleChoice(btn, q) {
+      document.querySelectorAll('#cimp-choices .ex-choice').forEach(b => b.disabled = true);
+      const isRight = btn.dataset.value === q.answer;
+      document.querySelectorAll('#cimp-choices .ex-choice').forEach(b => {
+        if (b.dataset.value === q.answer) b.classList.add('is-correct');
+      });
+      if (!isRight) btn.classList.add('is-wrong');
+      if (isRight) {
+        cimpState.score++;
+        document.getElementById('cimp-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+      } else {
+        document.getElementById('cimp-fb').innerHTML = `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne forme.<br>
+            Avec « <strong>${q.subject}</strong> » : <strong>${q.answer}</strong>.
+          </div>
+        `;
+      }
+      document.getElementById('next-btn').classList.remove('ex-hidden');
+    }
+
+    /* ── Niveau 2 : choix avec/sans -iss- (step1) puis saisie (step2) ────── */
+    function cimpRenderIssChoice(card, q) {
+      const { idx, total } = cimpState;
+      let step1Correct = false;
+
+      card.innerHTML = `
+        <p class="ex-question-label">Ce verbe en <em>-ir</em> a-t-il un infixe <strong>-iss-</strong> à l'imparfait ?</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div id="cimp-step1">
+          <div class="ex-group-row" id="cimp-iss-btns">
+            <button class="ex-group-btn" data-iss="true">Avec -iss-</button>
+            <button class="ex-group-btn" data-iss="false">Sans -iss-</button>
+          </div>
+          <div class="ex-feedback-area" id="cimp-fb1"></div>
+        </div>
+        <div id="cimp-step2" class="ex-hidden">
+          <div class="ex-step2-divider"></div>
+          <p class="ex-question-label">Conjugue maintenant le verbe dans la phrase.</p>
+          <div class="ex-sentence-display">${q.sentence}</div>
+          <div class="ex-input-row">
+            <input type="text" class="ex-text-input" id="cimp-input"
+                   autocomplete="off" autocorrect="off" autocapitalize="off"
+                   spellcheck="false" placeholder="Ta réponse…">
+            <button class="ex-validate-btn" id="cimp-val-btn">Valider</button>
+          </div>
+          <div class="ex-feedback-area" id="cimp-fb2"></div>
+        </div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+
+      card.querySelectorAll('#cimp-iss-btns .ex-group-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          card.querySelectorAll('#cimp-iss-btns .ex-group-btn').forEach(b => b.disabled = true);
+          const chosenIss = btn.dataset.iss === 'true';
+          step1Correct = chosenIss === q.hasIss;
+
+          card.querySelectorAll('#cimp-iss-btns .ex-group-btn').forEach(b => {
+            if ((b.dataset.iss === 'true') === q.hasIss) b.classList.add('is-correct');
+          });
+          if (!step1Correct) btn.classList.add('is-wrong');
+
+          document.getElementById('cimp-fb1').innerHTML = step1Correct
+            ? `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`
+            : `<div class="ex-feedback-wrong">❌ « ${q.infinitive} » est un verbe ${q.hasIss ? 'avec' : 'sans'} -iss- à l'imparfait.</div>`;
+
+          setTimeout(() => {
+            document.getElementById('cimp-step2').classList.remove('ex-hidden');
+            document.getElementById('cimp-step2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            setTimeout(() => document.getElementById('cimp-input')?.focus(), 80);
+          }, 650);
+        });
+      });
+
+      function submit() {
+        const input  = document.getElementById('cimp-input');
+        const valBtn = document.getElementById('cimp-val-btn');
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          if (step1Correct) cimpState.score++;
+          const extra = step1Correct ? '' : '<br><small style="font-size:12px">Pense à bien identifier le groupe du verbe d\'abord !</small>';
+          document.getElementById('cimp-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}${extra}</div>`;
+        } else {
+          document.getElementById('cimp-fb2').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.answer}</strong>
+            </div>
+          `;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+
+      document.getElementById('cimp-val-btn').addEventListener('click', submit);
+      document.getElementById('cimp-input').addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    }
+
+    function cimpRenderTextInput(card, q) {
+      const { idx, total } = cimpState;
+      card.innerHTML = `
+        <p class="ex-question-label">Conjugue le verbe suivant à l'imparfait.</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="cimp-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="cimp-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="cimp-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const input  = document.getElementById('cimp-input');
+      const valBtn = document.getElementById('cimp-val-btn');
+      setTimeout(() => input.focus(), 50);
+
+      function submit() {
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          cimpState.score++;
+          document.getElementById('cimp-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+        } else {
+          document.getElementById('cimp-fb').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.answer}</strong>
+            </div>
+          `;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+
+      valBtn.addEventListener('click', submit);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    }
+
+    /* ── Résultats de fin de niveau ───────────────────────────────────────── */
+    function cimpShowLevelResults() {
+      const { level, score: lvScore, total } = cimpState;
+      const { passed, pct, isLast } = cimpLevelSelect.completeLevel(level, lvScore, total);
+      const pctPct = Math.round(pct * 100);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-conjugaison.html';
+      const backLabel = `← Retour à ${sessionData.backLink?.label || 'la Conjugaison'}`;
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const backToSelectBtn = cimpLevelSelect.backToSelectButtonHTML();
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises la conjugaison à l'imparfait !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cimp-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cimp-next-btn">Niveau ${level + 1} →</button>
+          <button class="ex-btn-secondary" id="cimp-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * CIMP_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour débloquer le niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cimp-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
+
+      document.getElementById('cimp-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cimpStartLevel(cimpState.level);
+      });
+      document.getElementById('cimp-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cimpStartLevel(level + 1);
+      });
+      document.getElementById('cimp-restart-btn')?.addEventListener('click', () => {
+        cimpLevelSelect.reset();
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cimpInitSession();
+      });
+      cimpLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'imparfait-groupes-niveaux',
         level:        'Niveau ' + level,
         score:        lvScore,
         total,
