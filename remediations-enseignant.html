@@ -327,8 +327,17 @@
       return Promise.resolve();
     }
     if (_assetsPromise) return _assetsPromise;
+    const DOMAIN_DATA_FILES = [
+      'data/conjugaison.js?v=1',
+      'data/grammaire.js?v=1',
+      'data/orthographe.js?v=1',
+      'data/nombres-entiers.js?v=1',
+      'data/fractions.js?v=1',
+      'data/nombres-decimaux.js?v=1',
+      'data/probabilites.js?v=1'
+    ];
     _assetsPromise = Promise.all([
-      typeof EXERCISE_DATA      !== 'undefined' ? null : loadScript('exercise-data.js?v=21'),
+      typeof EXERCISE_DATA      !== 'undefined' ? null : Promise.all(DOMAIN_DATA_FILES.map(loadScript)),
       typeof REMEDIATION_DATA   !== 'undefined' ? null : loadScript('js/remediation-data.js?v=1')
     ]).then(() => checkRemediationDataOrphans())
       .catch(err => { _assetsPromise = null; throw err; });

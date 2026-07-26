@@ -690,8 +690,17 @@
   function loadExerciseAssets() {
     if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined') return Promise.resolve();
     if (_exerciseAssetsPromise) return _exerciseAssetsPromise;
+    const DOMAIN_DATA_FILES = [
+      'data/conjugaison.js?v=1',
+      'data/grammaire.js?v=1',
+      'data/orthographe.js?v=1',
+      'data/nombres-entiers.js?v=1',
+      'data/fractions.js?v=1',
+      'data/nombres-decimaux.js?v=1',
+      'data/probabilites.js?v=1'
+    ];
     _exerciseAssetsPromise = Promise.all([
-      typeof EXERCISE_DATA               !== 'undefined' ? null : loadScript('exercise-data.js?v=21'),
+      typeof EXERCISE_DATA               !== 'undefined' ? null : Promise.all(DOMAIN_DATA_FILES.map(loadScript)),
       typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined' ? null : loadScript('js/exercise-catalog.js?v=6')
     ]).catch(err => { _exerciseAssetsPromise = null; throw err; });
     return _exerciseAssetsPromise;
