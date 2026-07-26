@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dictées préparées — Espace enseignant — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="css/dictees.css?v=1">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/teacher.js?v=2"></script>
+  <script src="js/dictees-teacher.js?v=1"></script>
+  <script src="js/dictees-colors.js?v=1"></script>
+  <style>
+    .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
+    .dash-content { max-width: 900px; margin: 0 auto; }
+
+    .breadcrumb {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 24px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
+    }
+    .breadcrumb a { color: var(--blue); text-decoration: none; font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .bc-sep { color: var(--border); user-select: none; }
+    .bc-current { font-weight: 600; color: var(--text); }
+
+    .main-tabs {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      background: var(--card-bg); border-radius: 14px; box-shadow: var(--shadow-sm);
+      padding: 5px; margin-bottom: 20px; width: fit-content;
+    }
+    .main-tab {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: 10px;
+      font-family: inherit; font-size: 13px; font-weight: 700;
+      color: var(--muted); text-decoration: none;
+      transition: background 180ms, color 180ms;
+    }
+    .main-tab.is-active { background: var(--blue); color: #fff; }
+    .main-tab:hover:not(.is-active) { background: rgba(16,43,106,0.06); color: var(--blue); }
+
+    .section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+    .section-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text); }
+
+    /* ── Sous-navigation (Mes dictées / Statistiques) — calquée sur .jog-tabs
+       de synthese-joggings-enseignant.html, css/jogging.css non chargé ici. */
+    .jog-tabs {
+      display: flex; gap: 4px; flex-wrap: wrap;
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm); padding: 8px; margin-bottom: 24px;
+    }
+    .jog-tab {
+      flex: 1; min-width: 160px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px 16px; border: none; border-radius: 12px;
+      font-family: inherit; font-size: 13.5px; font-weight: 700;
+      cursor: pointer; background: none; color: var(--muted);
+      transition: background 180ms, color 180ms;
+    }
+    .jog-tab:hover { background: var(--bg); color: var(--text); }
+    .jog-tab--active { background: var(--blue); color: #fff; }
+    .jog-tab--active:hover { background: #0d2255; }
+
+    /* ── Statistiques — composants recopiés de resultats-enseignant.html
+       (.overview-card / .comp-bar-* / .student-rank-*), même charte. ────── */
+    .overview-card { background: var(--card-bg); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); padding: 20px 22px; }
+    .overview-card-title { font-size: 12px; font-weight: 700; color: var(--blue); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 14px; }
+    .comp-bar-row { margin-bottom: 12px; }
+    .comp-bar-row:last-child { margin-bottom: 0; }
+    .comp-bar-label { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--text); margin-bottom: 4px; }
+    .comp-bar-label .n { color: var(--muted); font-size: 11px; white-space: nowrap; }
+    .comp-bar-track { background: var(--bg); border-radius: 100px; height: 8px; overflow: hidden; }
+    .comp-bar-fill { height: 100%; border-radius: 100px; }
+    .comp-bar-fill.up   { background: #1DBFA0; }
+    .comp-bar-fill.down { background: #E0765C; }
+    .empty-inline { color: var(--muted); font-size: 13px; padding: 8px 0; }
+    .student-rank-list { display: flex; flex-direction: column; gap: 8px; }
+    .student-rank-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; }
+    .student-rank-num { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; background: var(--bg); color: var(--muted); }
+    .student-rank-name { flex: 1; font-weight: 600; font-size: 13.5px; color: var(--text); }
+    .student-rank-meta { font-size: 11.5px; color: var(--muted); }
+    .student-rank-pct { font-weight: 700; font-size: 13px; }
+    .dic-stat-table-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; margin-bottom: 8px; }
+    .dic-stat-table-title { flex: 1; font-weight: 700; font-size: 13.5px; color: var(--text); }
+    .dic-stat-pill { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 100px; white-space: nowrap; }
+    .dic-stat-pill--good { background: rgba(29,191,160,0.12); color: #0E7A66; }
+    .dic-stat-pill--ok   { background: rgba(245,166,35,0.14); color: #8A5A0E; }
+    .dic-stat-pill--low  { background: rgba(214,40,57,0.10); color: var(--red); }
+    .dic-stat-pill--neutral { background: rgba(16,43,106,0.06); color: var(--blue); }
+
+    .dic-field { margin-bottom: 6px; }
+    .dic-filter-field label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+    select.dic-select {
+      border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 12px;
+      font-family: inherit; font-size: 14px; color: var(--text); background: var(--card-bg); min-width: 220px;
+    }
+
+    .dic-teacher-card {
+      background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 14px;
+      padding: 16px 18px; margin-bottom: 12px;
+    }
+    .dic-teacher-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .dic-teacher-card-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 8px; }
+    .dic-teacher-card-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .dic-teacher-card-meta { font-size: 12px; color: var(--muted); }
+    .dic-teacher-card-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    .dic-btn {
+      border: none; border-radius: 10px; padding: 9px 16px; font-family: inherit;
+      font-size: 13px; font-weight: 700; cursor: pointer; transition: background 180ms, transform 180ms;
+    }
+    .dic-btn-primary { background: var(--blue); color: #fff; }
+    .dic-btn-primary:hover { background: #0d2255; }
+    .dic-btn-outline { background: rgba(26,45,107,0.06); color: var(--blue); border: 1.5px solid rgba(26,45,107,0.2); }
+    .dic-btn-outline:hover { background: rgba(26,45,107,0.12); }
+    .dic-btn-danger { background: rgba(214,40,57,0.08); color: var(--red); border: 1.5px solid rgba(214,40,57,0.25); }
+    .dic-btn-danger:hover { background: rgba(214,40,57,0.16); }
+    .dic-btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    .dic-form-card { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 14px; padding: 22px 24px; margin-bottom: 20px; }
+    .dic-form-title { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--blue); margin-bottom: 16px; }
+    .dic-form-label { display: block; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; margin-top: 16px; }
+    .dic-form-label:first-child { margin-top: 0; }
+    .dic-form-hint { font-size: 12px; color: var(--muted); margin-top: 4px; margin-bottom: 0; }
+    .dic-form-input, .dic-form-textarea {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px;
+      font-family: inherit; font-size: 14px; color: var(--text); background: var(--bg);
+      outline: none; transition: border-color 200ms; box-sizing: border-box;
+    }
+    .dic-form-input:focus, .dic-form-textarea:focus { border-color: var(--blue); }
+    .dic-form-textarea { min-height: 80px; resize: vertical; }
+
+    .dic-preview-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; min-height: 24px; }
+
+    .dic-mots-list { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .dic-mot-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; }
+    .dic-mot-content { flex: 1; font-size: 14px; color: var(--text); }
+    .dic-mot-niveau-select {
+      border: 1.5px solid var(--border); border-radius: 100px; padding: 5px 12px;
+      font-family: var(--font-display); font-size: 12px; font-weight: 800; color: #fff; cursor: pointer;
+    }
+    /* La pilule fermée est blanche sur fond coloré (background posé en inline
+       via NIVEAU_VAR), mais le menu déroulant natif reste blanc : sans ces
+       règles, ses <option> hériteraient le blanc du select et deviendraient
+       illisibles sur ce fond blanc. */
+    .dic-mot-niveau-select option { color: var(--text); background: #fff; font-weight: 600; }
+
+    .dic-form-actions { display: flex; gap: 10px; margin-top: 22px; }
+    .dic-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <div class="dash-wrap">
+    <div class="dash-content">
+
+      <nav class="breadcrumb" aria-label="Fil d'Ariane">
+        <a href="dashboard-enseignant.html">Espace enseignant</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-current">Dictées préparées</span>
+      </nav>
+
+      <nav class="main-tabs" aria-label="Navigation espace enseignant">
+        <a class="main-tab" href="classes-enseignant.html">🏫 Mes classes</a>
+        <a class="main-tab" href="pilotage-enseignant.html">🎯 Pilotage des compétences</a>
+        <a class="main-tab" href="resultats-enseignant.html">📊 Résultats</a>
+        <a class="main-tab" href="remediations-enseignant.html">🧩 Remédiations</a>
+        <a class="main-tab" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
+        <a class="main-tab is-active" href="dictees-enseignant.html">📖 Dictées préparées</a>
+      </nav>
+
+      <div class="section-header">
+        <h1 class="section-title">Dictées préparées</h1>
+      </div>
+
+      <div class="dic-filter-field" style="margin-bottom:20px;">
+        <label for="dic-class-select">Classe</label>
+        <select id="dic-class-select" class="dic-select"></select>
+      </div>
+
+      <nav class="jog-tabs" aria-label="Navigation dictées préparées">
+        <button class="jog-tab" data-dtab="mes-dictees">📖 Mes dictées</button>
+        <button class="jog-tab" data-dtab="statistiques">📊 Statistiques</button>
+      </nav>
+
+      <!-- ── Onglet 1 : Mes dictées ── -->
+      <div id="dtab-mes-dictees" class="jog-tab-pane" style="display:none">
+        <div class="section-header">
+          <div></div>
+          <button type="button" class="dic-btn dic-btn-primary" id="dic-new-btn">+ Nouvelle dictée</button>
+        </div>
+
+        <!-- ── Formulaire de création/édition ── -->
+        <div id="dic-form-card" class="dic-form-card" style="display:none">
+          <div class="dic-form-title" id="dic-form-title">Nouvelle dictée</div>
+
+          <label class="dic-form-label" for="dic-form-titre">Titre</label>
+          <input type="text" id="dic-form-titre" class="dic-form-input" placeholder="Ex. La rentrée des classes">
+
+          <label class="dic-form-label" for="dic-form-points">Points grammaticaux travaillés</label>
+          <textarea id="dic-form-points" class="dic-form-textarea" style="min-height:50px;"
+            placeholder="Séparés par des points-virgules : Accord sujet-verbe ; Homophones a/à"></textarea>
+          <p class="dic-form-hint">Chaque point grammatical reçoit automatiquement une couleur de pastille (toujours la même pour un même libellé).</p>
+          <div class="dic-preview-badges" id="dic-points-preview"></div>
+
+          <label class="dic-form-label" for="dic-form-mots">Mots ou groupes de mots difficiles</label>
+          <textarea id="dic-form-mots" class="dic-form-textarea"
+            placeholder="Séparés par des points-virgules : un aéroport ; les enfants jouaient ; malheureusement"></textarea>
+          <p class="dic-form-hint">Un niveau de difficulté (1, 2 ou 3) est assigné à chaque mot ci-dessous, pour différencier selon les besoins des élèves. La dictée elle-même n'affiche aucun badge de niveau.</p>
+          <div class="dic-mots-list" id="dic-mots-list"></div>
+
+          <div class="dic-form-actions">
+            <button type="button" class="dic-btn dic-btn-primary" id="dic-save-btn">Enregistrer</button>
+            <button type="button" class="dic-btn dic-btn-outline" id="dic-cancel-btn">Annuler</button>
+          </div>
+        </div>
+
+        <!-- ── Liste des dictées de la classe ── -->
+        <div id="dic-list"><div class="dic-empty">Chargement…</div></div>
+      </div>
+
+      <!-- ── Onglet 2 : Statistiques ── -->
+      <div id="dtab-statistiques" class="jog-tab-pane" style="display:none">
+        <div id="dic-stats-body"><div class="dic-empty">Chargement…</div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau – LFM &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="js/menu.js"></script>
+  <script>
+    let _teacherProfile = null;
+    let _classes = [];
+    let _currentClassId = null;
+    let _dictees = [];
+    let _editingId = null;
+    let _formMots = []; // [{ contenu, niveau }] — état du formulaire en cours
+    let _activeDTab = 'mes-dictees';
+
+    /* var(--ls-color-N) (level-select.css) n'est pas chargé sur cette page —
+       la variable était alors non définie, le fond du select restait
+       transparent et son texte (couleur blanche forcée) devenait invisible.
+       On référence directement les tokens de styles.css (toujours chargés),
+       dont --ls-color-N n'est de toute façon qu'un alias. */
+    const NIVEAU_VAR = { 1: 'var(--color-niveau-cm1)', 2: 'var(--color-niveau-cm2)', 3: 'var(--color-niveau-6e)' };
+
+    function escHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function parseList(raw) {
+      return (raw || '').split(';').map(s => s.trim()).filter(Boolean);
+    }
+
+    /* ── Points grammaticaux : aperçu des pastilles ── */
+    function renderPointsPreview() {
+      const points = parseList(document.getElementById('dic-form-points').value);
+      document.getElementById('dic-points-preview').innerHTML = points.map(p =>
+        `<span class="dic-point-pastille" style="--dic-color:${DicteesColors.colorFor(p)}">${escHtml(p)}</span>`
+      ).join('');
+    }
+
+    /* ── Mots difficiles : reparse en conservant le niveau des mots déjà connus ── */
+    function reparseMots() {
+      const raw = parseList(document.getElementById('dic-form-mots').value);
+      const previousByContent = new Map(_formMots.map(m => [m.contenu.toLowerCase(), m.niveau]));
+      _formMots = raw.map(contenu => ({
+        contenu,
+        niveau: previousByContent.get(contenu.toLowerCase()) || 1
+      }));
+      renderMotsList();
+    }
+
+    function renderMotsList() {
+      const list = document.getElementById('dic-mots-list');
+      if (_formMots.length === 0) { list.innerHTML = ''; return; }
+      list.innerHTML = _formMots.map((m, i) => `
+        <div class="dic-mot-row">
+          <div class="dic-mot-content">${escHtml(m.contenu)}</div>
+          <select class="dic-mot-niveau-select" data-mot-idx="${i}" style="background:${NIVEAU_VAR[m.niveau]}">
+            <option value="1" ${m.niveau === 1 ? 'selected' : ''}>Niveau 1</option>
+            <option value="2" ${m.niveau === 2 ? 'selected' : ''}>Niveau 2</option>
+            <option value="3" ${m.niveau === 3 ? 'selected' : ''}>Niveau 3</option>
+          </select>
+        </div>
+      `).join('');
+      list.querySelectorAll('.dic-mot-niveau-select').forEach(sel => {
+        sel.addEventListener('change', () => {
+          const idx = parseInt(sel.dataset.motIdx, 10);
+          _formMots[idx].niveau = parseInt(sel.value, 10);
+          sel.style.background = NIVEAU_VAR[_formMots[idx].niveau];
+        });
+      });
+    }
+
+    /* ── Formulaire ── */
+    function openForm(dictee, mots) {
+      _editingId = dictee ? dictee.id : null;
+      document.getElementById('dic-form-title').textContent = dictee ? 'Modifier la dictée' : 'Nouvelle dictée';
+      document.getElementById('dic-form-titre').value = dictee ? dictee.titre : '';
+      document.getElementById('dic-form-points').value = dictee ? dictee.points_grammaticaux.join(' ; ') : '';
+      document.getElementById('dic-form-mots').value = mots ? mots.map(m => m.contenu).join(' ; ') : '';
+      _formMots = mots ? mots.map(m => ({ contenu: m.contenu, niveau: m.niveau })) : [];
+      renderPointsPreview();
+      renderMotsList();
+      document.getElementById('dic-form-card').style.display = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeForm() {
+      document.getElementById('dic-form-card').style.display = 'none';
+      _editingId = null;
+      _formMots = [];
+    }
+
+    async function saveForm() {
+      const titre = document.getElementById('dic-form-titre').value.trim();
+      const points = parseList(document.getElementById('dic-form-points').value);
+      if (!titre) { alert('Le titre est obligatoire.'); return; }
+      if (_formMots.length === 0) { alert('Ajoute au moins un mot difficile.'); return; }
+
+      const saveBtn = document.getElementById('dic-save-btn');
+      saveBtn.disabled = true;
+      try {
+        if (_editingId) {
+          await lfmDicteesTeacher.updateDictee(_editingId, titre, points, _formMots);
+        } else {
+          await lfmDicteesTeacher.createDictee(_currentClassId, _teacherProfile.id, titre, points, _formMots);
+        }
+        closeForm();
+        await loadDictees();
+      } catch (e) {
+        alert('Erreur : ' + e.message);
+      } finally {
+        saveBtn.disabled = false;
+      }
+    }
+
+    /* ── Liste ── */
+    function renderList() {
+      const wrap = document.getElementById('dic-list');
+      if (_dictees.length === 0) {
+        wrap.innerHTML = '<div class="dic-empty">Aucune dictée préparée pour cette classe pour l\'instant.</div>';
+        return;
+      }
+      wrap.innerHTML = _dictees.map(d => `
+        <div class="dic-teacher-card">
+          <div class="dic-teacher-card-top">
+            <div>
+              <div class="dic-teacher-card-title">${escHtml(d.titre)}</div>
+              <div class="dic-teacher-card-badges">
+                ${(d.points_grammaticaux || []).map(p =>
+                  `<span class="dic-point-pastille" style="--dic-color:${DicteesColors.colorFor(p)}">${escHtml(p)}</span>`
+                ).join('')}
+              </div>
+              <div class="dic-teacher-card-meta">${d.mot_count} mot${d.mot_count !== 1 ? 's' : ''} difficile${d.mot_count !== 1 ? 's' : ''}</div>
+            </div>
+            <div class="dic-teacher-card-actions">
+              <button type="button" class="dic-btn dic-btn-outline dic-btn-sm" data-edit="${d.id}">Modifier</button>
+              <button type="button" class="dic-btn dic-btn-danger dic-btn-sm" data-delete="${d.id}">Supprimer</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      wrap.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', async () => {
+        const { dictee, mots } = await lfmDicteesTeacher.getDictee(btn.dataset.edit);
+        openForm(dictee, mots);
+      }));
+      wrap.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', async () => {
+        if (!confirm('Supprimer définitivement cette dictée ?')) return;
+        await lfmDicteesTeacher.deleteDictee(btn.dataset.delete);
+        await loadDictees();
+      }));
+    }
+
+    async function loadDictees() {
+      if (!_currentClassId) return;
+      document.getElementById('dic-list').innerHTML = '<div class="dic-empty">Chargement…</div>';
+      _dictees = await lfmDicteesTeacher.getClassDictees(_currentClassId);
+      renderList();
+    }
+
+    /* ── Init ── */
+    async function init() {
+      _teacherProfile = await lfmAuth.requireRole('enseignant');
+      if (!_teacherProfile) return;
+
+      _classes = await lfmTeacher.getClasses();
+      const classSel = document.getElementById('dic-class-select');
+      if (_classes.length === 0) {
+        document.getElementById('dic-list').innerHTML = '<div class="dic-empty">Crée d\'abord une classe dans « Mes classes ».</div>';
+        return;
+      }
+      classSel.innerHTML = _classes.map(c => `<option value="${c.id}">${escHtml(c.name)} (${escHtml(c.level)})</option>`).join('');
+      _currentClassId = _classes[0].id;
+      classSel.addEventListener('change', () => {
+        _currentClassId = classSel.value;
+        closeForm();
+        reloadActiveTab();
+      });
+
+      document.getElementById('dic-new-btn').addEventListener('click', () => openForm(null, null));
+      document.getElementById('dic-cancel-btn').addEventListener('click', closeForm);
+      document.getElementById('dic-save-btn').addEventListener('click', saveForm);
+      document.getElementById('dic-form-points').addEventListener('input', renderPointsPreview);
+      document.getElementById('dic-form-mots').addEventListener('input', reparseMots);
+
+      document.querySelectorAll('.jog-tab').forEach(btn =>
+        btn.addEventListener('click', () => dicActivateTab(btn.dataset.dtab))
+      );
+      dicActivateTab('mes-dictees');
+    }
+
+    /* ── Onglets Mes dictées / Statistiques ──────────────────────────────── */
+    function dicActivateTab(tabName) {
+      _activeDTab = tabName;
+      document.querySelectorAll('.jog-tab').forEach(btn => {
+        btn.classList.toggle('jog-tab--active', btn.dataset.dtab === tabName);
+      });
+      document.querySelectorAll('.jog-tab-pane').forEach(pane => {
+        pane.style.display = (pane.id === 'dtab-' + tabName) ? '' : 'none';
+      });
+      reloadActiveTab();
+    }
+
+    function reloadActiveTab() {
+      if (_activeDTab === 'mes-dictees') loadDictees();
+      else if (_activeDTab === 'statistiques') loadStats();
+    }
+
+    /* ── Statistiques ─────────────────────────────────────────────────────
+       Calculées à la volée à chaque affichage (pas de table précalculée) —
+       voir lfmDicteesTeacher.getClassDicteeStats(). */
+    function pillClassFor(pct) {
+      if (pct >= 80) return 'dic-stat-pill--good';
+      if (pct >= 50) return 'dic-stat-pill--ok';
+      return 'dic-stat-pill--low';
+    }
+
+    function renderStats(stats) {
+      const body = document.getElementById('dic-stats-body');
+
+      const perDicteeHtml = stats.perDictee.length ? stats.perDictee.map(d => `
+        <div class="dic-stat-table-row">
+          <div class="dic-stat-table-title">${escHtml(d.titre)}</div>
+          <span class="dic-stat-pill ${d.ex1AvgPct === null ? 'dic-stat-pill--neutral' : pillClassFor(d.ex1AvgPct)}">
+            ${d.ex1AvgPct === null ? 'Ex.1 : pas encore fait' : `Ex.1 : ${d.ex1AvgPct}% de réussite`}
+          </span>
+          <span class="dic-stat-pill dic-stat-pill--neutral">
+            ${d.ex2AttemptsPerWord === null ? 'Ex.2 : pas encore fait' : `Ex.2 : ≈${d.ex2AttemptsPerWord} tentative${d.ex2AttemptsPerWord !== 1 ? 's' : ''}/mot`}
+          </span>
+        </div>
+      `).join('') : '<div class="empty-inline">Aucune dictée pour cette classe.</div>';
+
+      const missedHtml = stats.mostMissed.length ? stats.mostMissed.map(m => `
+        <div class="comp-bar-row">
+          <div class="comp-bar-label"><span>${escHtml(m.contenu)}</span><span class="n">${m.count} raté${m.count !== 1 ? 's' : ''}</span></div>
+          <div class="comp-bar-track"><div class="comp-bar-fill down" style="width:${Math.min(100, m.count * 20)}%"></div></div>
+        </div>
+      `).join('') : '<div class="empty-inline">Pas encore de mot raté.</div>';
+
+      const watchHtml = stats.studentsToWatch.length ? stats.studentsToWatch.map((s, i) => `
+        <div class="student-rank-row">
+          <div class="student-rank-num">${i + 1}</div>
+          <div>
+            <div class="student-rank-name">${escHtml(s.student.display_name)}</div>
+            <div class="student-rank-meta">${s.completedCount} dictée${s.completedCount !== 1 ? 's' : ''} complétée${s.completedCount !== 1 ? 's' : ''}</div>
+          </div>
+          <div class="student-rank-pct" style="color:${s.avgPct === null ? 'var(--muted)' : s.avgPct >= 50 ? '#a16207' : 'var(--red)'}">${s.avgPct === null ? '—' : s.avgPct + '%'}</div>
+        </div>
+      `).join('') : '<div class="empty-inline">Aucun élève à signaler pour l\'instant.</div>';
+
+      body.innerHTML = `
+        <div class="overview-card" style="margin-bottom:20px;">
+          <div class="overview-card-title">Par dictée</div>
+          ${perDicteeHtml}
+        </div>
+        <div class="overview-card" style="margin-bottom:20px;">
+          <div class="overview-card-title">Mots les plus ratés</div>
+          ${missedHtml}
+        </div>
+        <div class="overview-card">
+          <div class="overview-card-title">Élèves à suivre</div>
+          <div class="student-rank-list">${watchHtml}</div>
+        </div>
+      `;
+    }
+
+    async function loadStats() {
+      if (!_currentClassId) return;
+      document.getElementById('dic-stats-body').innerHTML = '<div class="dic-empty">Chargement…</div>';
+      try {
+        const stats = await lfmDicteesTeacher.getClassDicteeStats(_currentClassId);
+        renderStats(stats);
+      } catch (e) {
+        document.getElementById('dic-stats-body').innerHTML = `<div class="dic-empty">Erreur : ${escHtml(e.message)}</div>`;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
