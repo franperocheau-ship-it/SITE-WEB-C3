@@ -386,6 +386,33 @@ const lfmAnalytics = (() => {
     const best        = dedupeBestBySlug(rows);
     const bestByNiveau = dedupeBestByNiveau(rows, catalogMap);
 
+    /* ── Détail par niveau scolaire (CM1/CM2/6e) pour chaque compétence ────
+       Réutilise bestByNiveau (déjà calculé pour les jauges) plutôt que de
+       relire les rows brutes ; chaque niveau reste indépendant (moyenne des
+       meilleurs pct des exercices résolus à ce niveau pour cette
+       compétence), sans déduction depuis un niveau supérieur. Alimente à la
+       fois consolider/reussies (champ `levels`) et l'arborescence des jauges
+       sous-domaine (champ `competences`, voir plus bas). */
+    const niveauAggByComp = new Map();
+    bestByNiveau.forEach(r => {
+      const meta = metaFor(catalogMap, r.exercise_slug);
+      const key  = meta.domaine + '||' + meta.sousDomaine + '||' + meta.compLabel;
+      if (!niveauAggByComp.has(key)) niveauAggByComp.set(key, { meta, byLevel: {} });
+      const byLevel = niveauAggByComp.get(key).byLevel;
+      if (!byLevel[r.niveau]) byLevel[r.niveau] = { sum: 0, count: 0 };
+      byLevel[r.niveau].sum += r.pct;
+      byLevel[r.niveau].count++;
+    });
+    function levelsPctFor(key) {
+      const byLevel = (niveauAggByComp.get(key) || {}).byLevel || {};
+      const out = {};
+      JAUGE_LEVELS.forEach(level => {
+        const agg = byLevel[level];
+        out[level] = agg ? Math.round(agg.sum / agg.count) : null;
+      });
+      return out;
+    }
+
     /* ── Jauges de niveau par domaine ─────────────────────────────────────
        Dénominateur = exercices du catalogue pour ce domaine × niveau.
        Numérateur = combien de ces exercices ont un meilleur score ≥80% au
@@ -406,10 +433,25 @@ const lfmAnalytics = (() => {
     computeSousDomaineRates(rows, catalogMap).forEach(({ domaine, sousDomaine }) => {
       if (!sousDomaineJauges[domaine]) sousDomaineJauges[domaine] = [];
       const matchFn = m => m.domaine === domaine && m.sousDomaine === sousDomaine;
+      /* Compétences de ce sous-domaine effectivement travaillées (au moins
+         un niveau résolu dans bestByNiveau) — pour le détail par pastilles
+         du bulletin, une ligne par compétence sous chaque sous-domaine. */
+      const competences = [];
+      niveauAggByComp.forEach((entry, key) => {
+        if (entry.meta.domaine === domaine && entry.meta.sousDomaine === sousDomaine) {
+          competences.push({
+            compLabel: entry.meta.compLabel,
+            competence: entry.meta.competence,
+            levels: levelsPctFor(key)
+          });
+        }
+      });
+      competences.sort((a, b) => a.compLabel.localeCompare(b.compLabel, 'fr'));
       sousDomaineJauges[domaine].push({
         sousDomaine,
         exerciseCount: countExercisesTravailles(bestByNiveau, catalogMap, matchFn),
-        segments: computeNiveauJauge(bestByNiveau, catalogMap, matchFn)
+        segments: computeNiveauJauge(bestByNiveau, catalogMap, matchFn),
+        competences
       });
     });
     Object.values(sousDomaineJauges).forEach(list => list.sort((a, b) => a.sousDomaine.localeCompare(b.sousDomaine, 'fr')));
@@ -434,7 +476,7 @@ const lfmAnalytics = (() => {
 
     const consolider = [];
     const reussies    = [];
-    compAgg.forEach(agg => {
+    compAgg.forEach((agg, key) => {
       const avgPct = agg.sum / agg.count;
       const hasRepeatedFailure = agg.slugs.some(slug => {
         const attempts = attemptsBySlug.get(slug) || [];
@@ -445,7 +487,8 @@ const lfmAnalytics = (() => {
         competence: agg.meta.competence,
         avgPct: Math.round(avgPct),
         hasRepeatedFailure,
-        exampleSlug: agg.slugs[0]
+        exampleSlug: agg.slugs[0],
+        levels: levelsPctFor(key)
       };
       if (avgPct < 60 || hasRepeatedFailure) consolider.push(entry);
       else if (avgPct >= SUCCESS_THRESHOLD) reussies.push(entry);

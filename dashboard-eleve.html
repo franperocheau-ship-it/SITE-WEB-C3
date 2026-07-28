@@ -9,14 +9,16 @@
   <link rel="stylesheet" href="css/jogging.css?v=1">
   <link rel="stylesheet" href="css/jogging-print.css?v=1">
   <link rel="stylesheet" href="css/dictees.css?v=1">
+  <link rel="stylesheet" href="css/niveau-pastilles.css?v=1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/guided-access.js?v=1"></script>
   <script src="data/index.js?v=1"></script>
   <script src="js/exercise-catalog.js?v=6"></script>
+  <script src="js/teacher-analytics.js?v=2"></script>
+  <script src="js/niveau-pastilles.js?v=1"></script>
   <script src="js/laurels.js?v=2"></script>
-  <script src="js/level-badge.js?v=1"></script>
   <script src="js/jogging-data.js?v=1"></script>
   <script src="js/jogging-badges.js?v=1"></script>
   <script src="js/jogging-print.js?v=1"></script>
@@ -201,65 +203,9 @@
     .bar-francais      { background: linear-gradient(90deg, var(--blue) 0%, #1b4db0 100%); }
     .bar-mathematiques { background: linear-gradient(90deg, var(--red) 0%, #c0162a 100%); }
 
-    /* ── Recent exercises ── */
-    .recent-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .recent-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 13px 16px;
-      background: var(--bg);
-      border-radius: 12px;
-      border: 1px solid var(--border);
-    }
-
-    .recent-score-badge {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 800;
-      flex-shrink: 0;
-    }
-
-    .badge-good  { background: rgba(22,163,74,0.12);  color: #15803d; }
-    .badge-ok    { background: rgba(234,179,8,0.12);  color: #92400e; }
-    .badge-low   { background: rgba(214,40,57,0.10);  color: var(--red); }
-
-    .recent-info { flex: 1; min-width: 0; }
-
-    .recent-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .recent-meta {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .recent-subject-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .dot-francais      { background: var(--blue); }
-    .dot-mathematiques { background: var(--red); }
+    /* ── Bilan par compétences (pastilles) — composant partagé avec la fiche
+       élève enseignant / synthèse PDF, voir css/niveau-pastilles.css. */
+    #niveaux-content { overflow-x: auto; }
 
     /* ── Empty state ── */
     .dash-empty {
@@ -580,10 +526,12 @@
           </div>
         </div>
 
-        <!-- Derniers exercices -->
-        <div class="dash-section" id="section-recent" style="display:none">
-          <div class="dash-section-title">Derniers exercices</div>
-          <div class="recent-list" id="recent-list"></div>
+        <!-- Bilan par compétences — arborescence Domaine > Sous-domaine >
+             Compétence en pastilles, même composant que la fiche élève côté
+             enseignant et la synthèse PDF (voir js/niveau-pastilles.js). -->
+        <div class="dash-section" id="section-niveaux" style="display:none">
+          <div class="dash-section-title">Bilan par compétences</div>
+          <div id="niveaux-content"></div>
         </div>
 
         <!-- État vide (premier usage) -->
@@ -772,6 +720,7 @@
     let _classMeta = null;
     let _currentResSub = sessionStorage.getItem(RES_SUB_KEY) || 'general';
     let _resNavBar = null;
+    let _catalogMap = null; /* lfmAnalytics.buildCatalogMap(), mémorisé — voir renderDashboard() */
 
     function activateTab(tabName) {
       document.querySelectorAll('.dash-tab').forEach(btn => {
@@ -839,32 +788,6 @@
     document.getElementById('res-sub-joggings').style.display = _currentResSub === 'joggings' ? '' : 'none';
     document.getElementById('res-sub-dictees').style.display  = _currentResSub === 'dictees'  ? '' : 'none';
     renderResultsNav();
-
-    /* ── Formatage de date ─────────────────────────────────────────────────── */
-    function formatDate(iso) {
-      const d = new Date(iso);
-      const now = new Date();
-      const diff = Math.floor((now - d) / 86400000);
-      if (diff === 0) return "Aujourd'hui";
-      if (diff === 1) return "Hier";
-      if (diff < 7)  return "Il y a " + diff + " jours";
-      return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-    }
-
-    /* ── Couleur de barre selon le score ───────────────────────────────────── */
-    function scoreBadgeClass(pct) {
-      if (pct >= 80) return 'badge-good';
-      if (pct >= 50) return 'badge-ok';
-      return 'badge-low';
-    }
-
-    /* ── Label lisible pour un exercice_slug ───────────────────────────────── */
-    function slugLabel(slug) {
-      return (slug || '—')
-        .replace(/-/g, ' ')
-        .replace(/\b\w/g, c => c.toUpperCase())
-        .slice(0, 48);
-    }
 
     /* ── Table de correspondance slug → compétence/domaine ───────────────────
        La colonne `category` de exercise_results n'est pas fiable (saveExerciseResult
@@ -985,30 +908,17 @@
         : '<div class="dash-empty" style="padding:8px 0;">Pas encore de résultat.</div>';
       document.getElementById('section-weaknesses').style.display = '';
 
-      /* ── Derniers exercices ── */
-      const recent = results.slice(0, 5);
-      const recentHtml = recent.map(r => {
-        const pct      = parseFloat(r.pct);
-        const badgeCls = scoreBadgeClass(pct);
-        const dotCls   = r.subject === 'mathématiques' ? 'dot-mathematiques' : 'dot-francais';
-        const catLabel = r.category
-          ? r.category.replace(/-/g, ' ')
-            .replace(/\b\w/g, c => c.toUpperCase())
-          : '';
-        const levelBadge = lfmLevelBadge.html(r.level, r.exercise_type);
-        return `
-          <div class="recent-item">
-            <div class="recent-score-badge ${badgeCls}">${Math.round(pct)} %</div>
-            <div class="recent-info">
-              <div class="recent-title">${slugLabel(r.exercise_slug)}</div>
-              <div class="recent-meta">${catLabel ? catLabel + ' · ' : ''}${formatDate(r.completed_at)}${levelBadge ? ' &nbsp;' + levelBadge : ''}</div>
-            </div>
-            <div class="recent-subject-dot ${dotCls}"></div>
-          </div>`;
-      }).join('');
-
-      document.getElementById('recent-list').innerHTML = recentHtml;
-      document.getElementById('section-recent').style.display = '';
+      /* ── Bilan par compétences (pastilles) ── même composant que la fiche
+         élève côté enseignant et la synthèse PDF, voir js/niveau-pastilles.js.
+         computeStudentProfile() attend les lignes exercise_results brutes
+         (non dédupliquées, elle s'en charge) + le catalogue EXERCISE_DATA. */
+      if (!_catalogMap) _catalogMap = lfmAnalytics.buildCatalogMap();
+      const niveauProfile = lfmAnalytics.computeStudentProfile(results, _catalogMap);
+      const niveauHtml = lfmNiveauPastilles.renderTable(niveauProfile);
+      if (niveauHtml) {
+        document.getElementById('niveaux-content').innerHTML = niveauHtml;
+        document.getElementById('section-niveaux').style.display = '';
+      }
     }
 
     /* ── Rechargement de l'onglet "Mes résultats" (résultats + lauriers) ─────

@@ -1,0 +1,34 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   niveau-pastilles.css — Styles du "Bilan par compétences" partagé (voir
+   js/niveau-pastilles.js). Tailles pensées pour l'écran ; la synthèse PDF de
+   resultats-enseignant.html surcharge ces tailles en pt pour tenir sur une
+   page A4 imprimée (voir .bulletin-jauges .bj-table dans cette page).
+
+   Couleurs volontairement en dur (pas de var(--...)) : ce composant doit
+   rester identique quel que soit le thème de la page hôte (utilisé aussi
+   dans la synthèse imprimée, qui ne suit jamais le thème écran).
+   ───────────────────────────────────────────────────────────────────────────── */
+.bj-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.bj-table thead { display: table-header-group; }
+.bj-table th {
+  font-size: 10px; font-weight: 800; color: #8A93A3;
+  text-transform: uppercase; letter-spacing: .04em;
+  padding: 4px 6px; text-align: center; border-bottom: 1.5px solid #E8EDF3;
+}
+.bj-table th:first-child { text-align: left; }
+.bj-table tr { break-inside: avoid; }
+.bj-table td { padding: 5px 6px; text-align: center; border-bottom: 1px solid #F0F2F6; }
+.bj-table td:first-child { text-align: left; }
+.bjt-domaine td:first-child { font-weight: 800; color: #1A2D6B; }
+.bjt-sous td:first-child { padding-left: 20px; font-weight: 500; color: #5F6368; font-size: 12px; }
+.bjt-pastille { display: inline-block; width: 13px; height: 13px; border-radius: 50%; }
+.bjt-pastille.atteint       { background: #1DBFA0; }
+.bjt-pastille.en-cours      { background: #F5A623; }
+.bjt-pastille.non-travaille { background: #D9DEE7; }
+.bjt-comp td:first-child { padding-left: 32px; font-weight: 400; color: #5F6368; font-size: 11.5px; }
+.bcp-pastille {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 26px; height: 17px; padding: 0 3px; border-radius: 8px;
+  font-size: 9.5px; font-weight: 800; color: #fff;
+}
+.bcp-pastille.bcp-empty { min-width: 13px; width: 13px; height: 13px; padding: 0; border-radius: 50%; background: #D9DEE7; }

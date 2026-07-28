@@ -5,11 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Résultats — Espace enseignant — LFM</title>
   <link rel="stylesheet" href="styles.css?v=11">
+  <link rel="stylesheet" href="css/niveau-pastilles.css?v=1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=2"></script>
   <script src="js/teacher-analytics.js?v=2"></script>
+  <script src="js/niveau-pastilles.js?v=1"></script>
   <script src="js/level-badge.js?v=1"></script>
   <script src="js/bilan-nav.js?v=1"></script>
   <link rel="stylesheet" href="laurels.css?v=2">
@@ -448,58 +450,10 @@
     .consolider-item .ci-meta { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
     .consolider-item .ci-flag { font-size: 10.5px; font-weight: 700; color: #E0765C; }
 
-    /* ── Jauges de niveau (3 segments) ───────────────────────────────────────── */
-    .jauge-domaine { margin-bottom: 18px; }
-    .jauge-domaine:last-child { margin-bottom: 0; }
-    .jauge-domaine-title {
-      display: inline-block;
-      font-weight: 800; font-size: 14px; color: #fff; margin-bottom: 10px;
-      text-transform: uppercase; letter-spacing: 0.03em;
-      background: var(--blue); padding: 4px 12px; border-radius: 6px;
-    }
-    .jauge-segments { display: flex; gap: 6px; }
-    .jauge-segment { flex: 1; text-align: center; }
-    .jauge-segment-bar {
-      height: 14px; border-radius: 7px; background: #E7ECF3;
-      position: relative; overflow: hidden; margin-bottom: 6px;
-    }
-    .jauge-segment-bar.atteint       { background: var(--blue); }
-    .jauge-segment-bar.en-cours      {
-      background: repeating-linear-gradient(45deg, var(--blue), var(--blue) 5px, #C7D0E2 5px, #C7D0E2 10px);
-      opacity: 0.75;
-    }
-    .jauge-segment-bar.non-travaille { background: #E7ECF3; }
-    .jauge-segment-bar.non-concerne  { background: #F1F3F7; }
-
-    /* Jauges sous-domaine : même composant, palette turquoise pour se
-       distinguer du navy réservé à la jauge générale du domaine. */
-    .jauge-sousdomaine-block .jauge-segment-bar.atteint  { background: #1DBFA0; }
-    .jauge-sousdomaine-block .jauge-segment-bar.en-cours {
-      background: repeating-linear-gradient(45deg, #1DBFA0, #1DBFA0 5px, #C2ECE0 5px, #C2ECE0 10px);
-      opacity: 0.75;
-    }
-    .jauge-segment-label { font-size: 11px; font-weight: 700; color: var(--muted); }
-    .jauge-segment-status { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
-
-    /* Jauges de niveau par sous-domaine — hiérarchie en arborescence : un seul
-       séparateur au-dessus du groupe, puis un connecteur vertical + retrait +
-       typo plus légère pour chaque sous-domaine (le domaine reste seul en
-       navy gras, inchangé). */
-    .jauge-sousdomaines { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
-    .jauge-sousdomaine-block {
-      padding-left: 20px; margin-bottom: 12px;
-      border-left: 2px solid #E0E4F0;
-    }
-    .jauge-sousdomaine-block:last-child { margin-bottom: 0; }
-    .jauge-sousdomaine-title {
-      display: flex; align-items: center; gap: 6px;
-      font-weight: 600; font-size: 12px; color: var(--text); margin-bottom: 8px;
-    }
-    .jauge-sousdomaine-title::before {
-      content: ''; width: 6px; height: 6px; border-radius: 50%;
-      background: #1DBFA0; flex-shrink: 0;
-    }
-
+    /* ── Bilan par compétences (pastilles) — composant partagé écran + PDF +
+       dashboard élève, voir css/niveau-pastilles.css et js/niveau-pastilles.js.
+       Tailles par défaut = écran ; la synthèse imprimée ci-dessous surcharge
+       en pt (voir .bulletin-jauges .bj-table). ─────────────────────────────── */
 
     /* ── Bulletin imprimé — refonte : une page A4, lisible par un parent
        en 10 secondes. Couleurs volontairement en dur (pas de var(--...))
@@ -554,29 +508,21 @@
     .bulletin-box h5 { font-size: 9pt; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 7px; font-weight: 800; }
     .bulletin-box ul { margin: 0; padding-left: 16px; font-size: 9.5pt; line-height: 1.55; }
 
-    /* 5. Jauges de niveau — tableau compact par domaine/sous-domaine */
+    /* 5. Jauges de niveau — tableau compact par domaine/sous-domaine. Base
+       .bj-table/.bjt-*/.bcp-pastille dans css/niveau-pastilles.css (tailles
+       écran) ; surcharge ici en pt pour tenir sur une page A4 imprimée. */
     .bulletin-jauges-title {
       font-size: 10.5pt; font-weight: 800; color: #1A2D6B;
       text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px;
     }
     .bulletin-jauges { margin-bottom: 18px; }
-    .bj-table { width: 100%; border-collapse: collapse; font-size: 9pt; }
-    .bj-table thead { display: table-header-group; }
-    .bj-table th {
-      font-size: 7.5pt; font-weight: 800; color: #8A93A3;
-      text-transform: uppercase; letter-spacing: .04em;
-      padding: 4px 6px; text-align: center; border-bottom: 1.5px solid #E8EDF3;
-    }
-    .bj-table th:first-child { text-align: left; }
-    .bj-table tr { break-inside: avoid; }
-    .bj-table td { padding: 5px 6px; text-align: center; border-bottom: 1px solid #F0F2F6; }
-    .bj-table td:first-child { text-align: left; }
-    .bjt-domaine td:first-child { font-weight: 800; color: #1A2D6B; }
-    .bjt-sous td:first-child { padding-left: 20px; font-weight: 500; color: #5F6368; font-size: 8.5pt; }
-    .bjt-pastille { display: inline-block; width: 11px; height: 11px; border-radius: 50%; }
-    .bjt-pastille.atteint       { background: #1DBFA0; }
-    .bjt-pastille.en-cours      { background: #F5A623; }
-    .bjt-pastille.non-travaille { background: #D9DEE7; }
+    .bulletin-jauges .bj-table { font-size: 9pt; }
+    .bulletin-jauges .bj-table th { font-size: 7.5pt; }
+    .bulletin-jauges .bjt-sous td:first-child { font-size: 8.5pt; }
+    .bulletin-jauges .bjt-pastille { width: 11px; height: 11px; }
+    .bulletin-jauges .bjt-comp td:first-child { font-size: 8pt; }
+    .bulletin-jauges .bcp-pastille { min-width: 22px; height: 14px; padding: 0 3px; border-radius: 7px; font-size: 6.5pt; }
+    .bulletin-jauges .bcp-pastille.bcp-empty { min-width: 11px; width: 11px; height: 11px; }
 
     /* 6. Pied de page */
     .bulletin-footer {
@@ -592,15 +538,16 @@
       @page { size: A4 portrait; margin: 15mm; }
       body.printing-bulletin, body.printing-bulletin #bulletin-print-root,
       body.printing-bulletin .bulletin-stat, body.printing-bulletin .bjt-pastille,
-      body.printing-bulletin .bulletin-box {
+      body.printing-bulletin .bcp-pastille, body.printing-bulletin .bulletin-box {
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
       body.printing-bulletin .header, body.printing-bulletin footer,
-      body.printing-bulletin nav.breadcrumb, body.printing-bulletin .main-tabs,
+      body.printing-bulletin nav.breadcrumb, body.printing-bulletin #breadcrumb,
+      body.printing-bulletin .main-tabs, body.printing-bulletin .rn-bar,
       body.printing-bulletin .student-header, body.printing-bulletin .stats-row-4,
-      body.printing-bulletin #laurels-root, body.printing-bulletin #student-bilan,
+      body.printing-bulletin #laurels-root, body.printing-bulletin #student-niveaux,
       body.printing-bulletin #student-consolider, body.printing-bulletin #student-reussies,
-      body.printing-bulletin #student-jauges, body.printing-bulletin .nav-footer,
+      body.printing-bulletin .nav-footer,
       body.printing-bulletin .navbar {
         display: none !important;
       }
@@ -797,18 +744,12 @@
           </div>
         </div>
 
-        <!-- Jauges de niveau par domaine -->
-        <div class="overview-card" id="student-jauges" style="margin-bottom:20px;display:none">
-          <div class="overview-card-title">Jauges de niveau par domaine</div>
-          <div id="jauges-content"></div>
-        </div>
-
-        <!-- Bilan par compétence (détail) -->
-        <div style="margin-top:4px">
+        <!-- Bilan par compétences — arborescence Domaine > Sous-domaine >
+             Compétence en pastilles, même composant que la synthèse PDF et
+             le dashboard élève (voir js/niveau-pastilles.js). -->
+        <div class="overview-card" id="student-niveaux" style="margin-bottom:20px;display:none">
           <div class="overview-card-title">Bilan par compétences</div>
-          <div id="student-bilan">
-            <div class="view-loading">Chargement du bilan…</div>
-          </div>
+          <div id="niveaux-content"></div>
         </div>
 
         <div class="nav-footer" id="student-nav-footer"></div>
@@ -1531,7 +1472,6 @@
     }
 
     initLaurels(s.auth_user_id).catch(e => console.warn('[LFM] initLaurels:', e.message));
-    renderStudentBilan(s.auth_user_id).catch(e => console.warn('[LFM] renderStudentBilan:', e.message));
     await renderStudentProfile(s.auth_user_id);
     renderStudentStats(stats, _studentProfile);
 
@@ -1586,7 +1526,7 @@
     _studentRows    = [];
     document.getElementById('student-rank-line').innerHTML = '';
     document.getElementById('print-student-btn').style.display = 'none';
-    ['student-consolider', 'student-reussies', 'student-jauges'].forEach(id => {
+    ['student-consolider', 'student-reussies', 'student-niveaux'].forEach(id => {
       document.getElementById(id).style.display = 'none';
     });
 
@@ -1608,7 +1548,7 @@
 
       renderConsoliderList(profile.consolider);
       renderReussiesList(profile.reussies);
-      renderJauges(profile.jauges, profile.sousDomaineJauges);
+      renderStudentNiveaux(profile);
 
       document.getElementById('print-student-btn').style.display = '';
     } catch (e) {
@@ -1643,48 +1583,14 @@
       </div>`).join('');
   }
 
-  const JAUGE_STATUS_LABEL = {
-    'atteint':       'atteint',
-    'en-cours':      "en cours d'acquisition",
-    'non-travaille': 'non travaillé',
-    'non-concerne':  'non concerné'
-  };
-
-  function renderNiveauSegments(segments) {
-    return `<div class="jauge-segments">
-      ${segments.map(seg => `
-        <div class="jauge-segment">
-          <div class="jauge-segment-bar ${seg.status}"></div>
-          <div class="jauge-segment-label">${escHtml(seg.level)}</div>
-          <div class="jauge-segment-status">${JAUGE_STATUS_LABEL[seg.status]}</div>
-        </div>`).join('')}
-    </div>`;
-  }
-
-  function renderJauges(jauges, sousDomaineJauges) {
-    const el = document.getElementById('student-jauges');
-    const domaines = Object.keys(jauges || {}).filter(d => jauges[d].some(seg => seg.status !== 'non-concerne'));
-    if (domaines.length === 0) { el.style.display = 'none'; return; }
+  /* Bilan par compétences (pastilles) — composant partagé écran + PDF +
+     dashboard élève, voir js/niveau-pastilles.js (lfmNiveauPastilles.renderTable). */
+  function renderStudentNiveaux(profile) {
+    const el = document.getElementById('student-niveaux');
+    const html = lfmNiveauPastilles.renderTable(profile);
+    if (!html) { el.style.display = 'none'; return; }
     el.style.display = '';
-
-    document.getElementById('jauges-content').innerHTML = domaines.map(domaine => {
-      const subJauges = (sousDomaineJauges?.[domaine] || [])
-        .filter(sd => sd.segments.some(seg => seg.status !== 'non-concerne'));
-
-      const subJaugesHtml = subJauges.length ? `<div class="jauge-sousdomaines">${
-        subJauges.map(sd => `
-          <div class="jauge-sousdomaine-block">
-            <div class="jauge-sousdomaine-title">${escHtml(sd.sousDomaine)} · ${sd.exerciseCount} exercice${sd.exerciseCount > 1 ? 's' : ''}</div>
-            ${renderNiveauSegments(sd.segments)}
-          </div>`).join('')
-      }</div>` : '';
-
-      return `<div class="jauge-domaine">
-        <div class="jauge-domaine-title">${escHtml(domaine)}</div>
-        ${renderNiveauSegments(jauges[domaine])}
-        ${subJaugesHtml}
-      </div>`;
-    }).join('');
+    document.getElementById('niveaux-content').innerHTML = html;
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -1732,36 +1638,18 @@
       </div>`;
     }
 
-    const listItem = c => `<li><strong>${escHtml(c.competence)}</strong> — ${escHtml(c.domaine)} · ${c.avgPct}%</li>`;
+    const listItem = c => `<li><strong>${escHtml(c.competence)}</strong></li>`;
     const reussiesHtml = (profile.reussies || []).slice(0, 5).map(listItem).join('')
       || '<li>Pas encore de compétence réussie.</li>';
     const consoliderHtml = (profile.consolider || []).slice(0, 5).map(listItem).join('')
       || '<li>Aucune compétence à consolider identifiée.</li>';
 
-    /* Tableau compact des jauges : une ligne par domaine/sous-domaine, une
-       pastille colorée par niveau (mêmes couleurs sémantiques que l'écran :
-       teal = atteint, ambre = en cours, gris clair = non travaillé/concerné). */
-    const pastilleCls = status => status === 'atteint' ? 'atteint' : status === 'en-cours' ? 'en-cours' : 'non-travaille';
-    const statusLabel = status => status === 'atteint' ? 'atteint' : status === 'en-cours' ? 'en cours' : status === 'non-concerne' ? 'non concerné' : 'non travaillé';
-    const jaugeRow = (label, segs, cls) => `<tr class="${cls}">
-      <td>${label}</td>
-      ${segs.map(seg => `<td><span class="bjt-pastille ${pastilleCls(seg.status)}" title="${escHtml(seg.level)} — ${statusLabel(seg.status)}"></span></td>`).join('')}
-    </tr>`;
-
-    const domaines = lfmAnalytics.DOMAIN_ORDER.filter(d => (profile.jauges[d] || []).some(seg => seg.denom > 0));
-    let jaugesRows = '';
-    domaines.forEach(domaine => {
-      jaugesRows += jaugeRow(escHtml(domaine), profile.jauges[domaine] || [], 'bjt-domaine');
-      (profile.sousDomaineJauges?.[domaine] || [])
-        .filter(sd => sd.segments.some(seg => seg.status !== 'non-concerne'))
-        .forEach(sd => {
-          jaugesRows += jaugeRow(`${escHtml(sd.sousDomaine)} · ${sd.exerciseCount} ex.`, sd.segments, 'bjt-sous');
-        });
-    });
-    const jaugesHtml = jaugesRows ? `<table class="bj-table">
-        <thead><tr><th>Compétence</th><th>CM1</th><th>CM2</th><th>6e</th></tr></thead>
-        <tbody>${jaugesRows}</tbody>
-      </table>` : '<div style="font-size:9.5pt;color:#888">Pas assez de données.</div>';
+    /* Tableau compact des jauges + détail par compétence (une ligne par
+       domaine/sous-domaine avec pastille par niveau, puis une ligne par
+       compétence effectivement travaillée sous chaque sous-domaine) — même
+       composant que l'écran, voir js/niveau-pastilles.js. */
+    const jaugesHtml = lfmNiveauPastilles.renderTable(profile)
+      || '<div style="font-size:9.5pt;color:#888">Pas assez de données.</div>';
 
     const html = `<div class="bulletin-page">
       <div class="bulletin-header">
@@ -1819,71 +1707,6 @@
     document.body.classList.add('printing-bulletin');
     window.print();
     document.body.classList.remove('printing-bulletin');
-  }
-
-  /* ═══════════════════════════════════════════════════════════════════════════
-     BILAN PAR COMPÉTENCE — FICHE ÉLÈVE
-  ═══════════════════════════════════════════════════════════════════════════ */
-  async function renderStudentBilan(authUserId) {
-    const container = document.getElementById('student-bilan');
-    container.innerHTML = '<div class="view-loading">Chargement du bilan…</div>';
-
-    try {
-      const { data, error } = await window.lfmDb
-        .from('exercise_results')
-        .select('exercise_slug, exercise_title, exercise_type, level, score, total, pct, completed_at')
-        .eq('student_id', authUserId)
-        .order('completed_at', { ascending: false });
-
-      if (error) throw error;
-
-      /* Garder uniquement le résultat le plus récent par exercice */
-      const seen   = new Set();
-      const latest = [];
-      for (const r of (data || [])) {
-        if (!seen.has(r.exercise_slug)) { seen.add(r.exercise_slug); latest.push(r); }
-      }
-
-      if (latest.length === 0) {
-        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Aucun exercice enregistré.</div></div>';
-        return;
-      }
-
-      /* Grouper domaine → sous-domaine → compétence → niveau */
-      const byDomaine = {};
-
-      for (const r of latest) {
-        const meta = _catalogMap[r.exercise_slug] || UNKNOWN_META;
-        const { domaine, competence } = meta;
-        const sep         = competence.indexOf(' — ');
-        const sousDomaine = sep >= 0 ? competence.slice(0, sep)  : competence;
-        const compLabel   = sep >= 0 ? competence.slice(sep + 3) : competence;
-        const level   = r.level || '—';
-        const exTitle = r.exercise_title || meta.title || r.exercise_slug.replace(/-/g, ' ');
-
-        if (!byDomaine[domaine])                                   byDomaine[domaine] = {};
-        if (!byDomaine[domaine][sousDomaine])                      byDomaine[domaine][sousDomaine] = {};
-        if (!byDomaine[domaine][sousDomaine][compLabel])           byDomaine[domaine][sousDomaine][compLabel] = {};
-        if (!byDomaine[domaine][sousDomaine][compLabel][level])    byDomaine[domaine][sousDomaine][compLabel][level] = [];
-        byDomaine[domaine][sousDomaine][compLabel][level].push({
-          exTitle, exerciseType: r.exercise_type, score: r.score, total: r.total,
-          pct: parseFloat(r.pct), date: r.completed_at
-        });
-      }
-
-      lfmBilanNav.mount(container, {
-        mode: 'eleve',
-        byDomaine,
-        domainOrder: DOMAIN_ORDER,
-        domainIcons: DOMAIN_ICONS,
-        levelBadge: lfmLevelBadge,
-        rememberKey: 'eleve'
-      });
-
-    } catch (e) {
-      container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Erreur lors du chargement du bilan.</div></div>';
-      console.warn('[LFM] renderStudentBilan:', e.message);
-    }
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
