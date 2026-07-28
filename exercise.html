@@ -5446,6 +5446,9 @@
       } else if (currentType === "imparfait-groupes-niveaux") {
         cimpInitSession();
         return;
+      } else if (currentType === "futur-groupes-niveaux") {
+        cfutInitSession();
+        return;
       } else if (currentType === "change-sujet-niveaux") {
         csjInitSession();
         return;
@@ -5737,6 +5740,8 @@
         /* session managed by c3gInitSession — no-op here */
       } else if (currentType === "imparfait-groupes-niveaux") {
         /* session managed by cimpInitSession — no-op here */
+      } else if (currentType === "futur-groupes-niveaux") {
+        /* session managed by cfutInitSession — no-op here */
       } else if (currentType === "decomposer-nombre-entier-niveaux") {
         /* session managed by dniInitSession — no-op here */
       } else if (currentType === "composer-nombre-entier-niveaux") {
@@ -18679,6 +18684,354 @@
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
         exerciseType: 'imparfait-groupes-niveaux',
+        level:        'Niveau ' + level,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : futur-groupes-niveaux — « Conjuguer au futur »
+       Niveau 1 : QCM + associer sujet↔forme (sujets pronoms, verbes réguliers
+                  1er/2e groupe), mode par item — QCM avec confusions de
+                  terminaison/personne
+       Niveau 2 : radical régulier (infinitif) vs irrégulier — choix binaire
+                  (motif step1/step2 déjà utilisé pour l'imparfait) puis saisie
+       Niveau 3 : saisie libre, sujet = groupe nominal, radicaux mélangés
+       3 niveaux déverrouillables à 80 %. Un seul essai par question.
+       ════════════════════════════════════════════════════════════════════════ */
+
+    const CFUT_SEUIL = 0.8;
+
+    const CFUT_LV_DEFS = [
+      { lv: 1, desc: 'QCM et association : trouve la bonne forme' },
+      { lv: 2, desc: 'Radical régulier ou irrégulier ?' },
+      { lv: 3, desc: 'Écris la forme du verbe avec un autre sujet' }
+    ];
+
+    let cfutState = null;
+    let cfutLevelSelect = null;
+
+    function cfutBackToSelectScreen() {
+      cfutState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    /* ── Init : réinitialise et affiche le sélecteur de niveau ──────────── */
+    function cfutInitSession() {
+      cfutState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      cfutLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: CFUT_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: CFUT_SEUIL,
+        onSelectLevel: (lv) => cfutStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: cfutBackToSelectScreen
+      });
+      cfutLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function cfutStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const pool = shuffle((sessionData.bank || []).filter(item => item.level === lv));
+      const qs   = pool.slice(0, sessionData.questionsPerSession || 10);
+      cfutState  = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+      document.getElementById('q-total').textContent = qs.length;
+
+      cfutLevelSelect.renderBadges(lv);
+      cfutRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Affiche une question — dispatche sur le niveau + q.mode ─────────── */
+    function cfutRenderQuestion(card) {
+      const { questions, idx, total, level } = cfutState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if (level === 1 && q.mode === 'mcq')           cfutRenderMcq(card, q);
+      else if (level === 1 && q.mode === 'matching') cfutRenderMatching(card, q);
+      else if (level === 2)                          cfutRenderRadicalChoice(card, q);
+      else                                             cfutRenderTextInput(card, q);
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        cfutState.idx++;
+        if (cfutState.idx >= cfutState.questions.length) cfutShowLevelResults();
+        else cfutRenderQuestion(document.getElementById('ex-card'));
+      });
+    }
+
+    function cfutRenderMcq(card, q) {
+      const { idx, total } = cfutState;
+      card.innerHTML = `
+        <p class="ex-question-label">Quelle est la forme du verbe <em>${q.infinitive}</em> au futur avec ce sujet ?</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="cfut-choices"></div>
+        <div class="ex-feedback-area" id="cfut-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('cfut-choices');
+      grid.innerHTML = shuffle(q.choices).map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => cfutHandleChoice(btn, q))
+      );
+    }
+
+    function cfutRenderMatching(card, q) {
+      const { idx, total } = cfutState;
+      card.innerHTML = `
+        <p class="ex-question-label">Associe ce sujet à la bonne forme du verbe <em>${q.infinitive}</em> au futur.</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="cfut-choices"></div>
+        <div class="ex-feedback-area" id="cfut-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('cfut-choices');
+      grid.innerHTML = shuffle(q.forms).map(f => `<button class="ex-choice" data-value="${f}">${f}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => cfutHandleChoice(btn, q))
+      );
+    }
+
+    function cfutHandleChoice(btn, q) {
+      document.querySelectorAll('#cfut-choices .ex-choice').forEach(b => b.disabled = true);
+      const isRight = btn.dataset.value === q.answer;
+      document.querySelectorAll('#cfut-choices .ex-choice').forEach(b => {
+        if (b.dataset.value === q.answer) b.classList.add('is-correct');
+      });
+      if (!isRight) btn.classList.add('is-wrong');
+      if (isRight) {
+        cfutState.score++;
+        document.getElementById('cfut-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+      } else {
+        document.getElementById('cfut-fb').innerHTML = `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne forme.<br>
+            Avec « <strong>${q.subject}</strong> » : <strong>${q.answer}</strong>.
+          </div>
+        `;
+      }
+      document.getElementById('next-btn').classList.remove('ex-hidden');
+    }
+
+    /* ── Niveau 2 : choix radical régulier/irrégulier (step1) puis saisie (step2) ── */
+    function cfutRenderRadicalChoice(card, q) {
+      const { idx, total } = cfutState;
+      let step1Correct = false;
+
+      card.innerHTML = `
+        <p class="ex-question-label">Ce verbe a-t-il un radical <strong>régulier</strong> (= l'infinitif) au futur ?</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div id="cfut-step1">
+          <div class="ex-group-row" id="cfut-rad-btns">
+            <button class="ex-group-btn" data-reg="true">Radical régulier</button>
+            <button class="ex-group-btn" data-reg="false">Radical irrégulier</button>
+          </div>
+          <div class="ex-feedback-area" id="cfut-fb1"></div>
+        </div>
+        <div id="cfut-step2" class="ex-hidden">
+          <div class="ex-step2-divider"></div>
+          <p class="ex-question-label">Conjugue maintenant le verbe dans la phrase.</p>
+          <div class="ex-sentence-display">${q.sentence}</div>
+          <div class="ex-input-row">
+            <input type="text" class="ex-text-input" id="cfut-input"
+                   autocomplete="off" autocorrect="off" autocapitalize="off"
+                   spellcheck="false" placeholder="Ta réponse…">
+            <button class="ex-validate-btn" id="cfut-val-btn">Valider</button>
+          </div>
+          <div class="ex-feedback-area" id="cfut-fb2"></div>
+        </div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+
+      card.querySelectorAll('#cfut-rad-btns .ex-group-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          card.querySelectorAll('#cfut-rad-btns .ex-group-btn').forEach(b => b.disabled = true);
+          const chosenReg = btn.dataset.reg === 'true';
+          step1Correct = chosenReg === q.regRadical;
+
+          card.querySelectorAll('#cfut-rad-btns .ex-group-btn').forEach(b => {
+            if ((b.dataset.reg === 'true') === q.regRadical) b.classList.add('is-correct');
+          });
+          if (!step1Correct) btn.classList.add('is-wrong');
+
+          document.getElementById('cfut-fb1').innerHTML = step1Correct
+            ? `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`
+            : `<div class="ex-feedback-wrong">❌ « ${q.infinitive} » a un radical ${q.regRadical ? 'régulier' : 'irrégulier'} au futur.</div>`;
+
+          setTimeout(() => {
+            document.getElementById('cfut-step2').classList.remove('ex-hidden');
+            document.getElementById('cfut-step2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            setTimeout(() => document.getElementById('cfut-input')?.focus(), 80);
+          }, 650);
+        });
+      });
+
+      function submit() {
+        const input  = document.getElementById('cfut-input');
+        const valBtn = document.getElementById('cfut-val-btn');
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          if (step1Correct) cfutState.score++;
+          const extra = step1Correct ? '' : '<br><small style="font-size:12px">Pense à bien identifier le radical d\'abord !</small>';
+          document.getElementById('cfut-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}${extra}</div>`;
+        } else {
+          document.getElementById('cfut-fb2').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.answer}</strong>
+            </div>
+          `;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+
+      document.getElementById('cfut-val-btn').addEventListener('click', submit);
+      document.getElementById('cfut-input').addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    }
+
+    function cfutRenderTextInput(card, q) {
+      const { idx, total } = cfutState;
+      card.innerHTML = `
+        <p class="ex-question-label">Conjugue le verbe suivant au futur.</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="cfut-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="cfut-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="cfut-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const input  = document.getElementById('cfut-input');
+      const valBtn = document.getElementById('cfut-val-btn');
+      setTimeout(() => input.focus(), 50);
+
+      function submit() {
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          cfutState.score++;
+          document.getElementById('cfut-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+        } else {
+          document.getElementById('cfut-fb').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.answer}</strong>
+            </div>
+          `;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+
+      valBtn.addEventListener('click', submit);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    }
+
+    /* ── Résultats de fin de niveau ───────────────────────────────────────── */
+    function cfutShowLevelResults() {
+      const { level, score: lvScore, total } = cfutState;
+      const { passed, pct, isLast } = cfutLevelSelect.completeLevel(level, lvScore, total);
+      const pctPct = Math.round(pct * 100);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-conjugaison.html';
+      const backLabel = `← Retour à ${sessionData.backLink?.label || 'la Conjugaison'}`;
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const backToSelectBtn = cfutLevelSelect.backToSelectButtonHTML();
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises la conjugaison au futur !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cfut-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cfut-next-btn">Niveau ${level + 1} →</button>
+          <button class="ex-btn-secondary" id="cfut-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * CFUT_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour débloquer le niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cfut-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
+
+      document.getElementById('cfut-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cfutStartLevel(cfutState.level);
+      });
+      document.getElementById('cfut-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cfutStartLevel(level + 1);
+      });
+      document.getElementById('cfut-restart-btn')?.addEventListener('click', () => {
+        cfutLevelSelect.reset();
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cfutInitSession();
+      });
+      cfutLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'futur-groupes-niveaux',
         level:        'Niveau ' + level,
         score:        lvScore,
         total,

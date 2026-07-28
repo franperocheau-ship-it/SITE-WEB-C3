@@ -730,125 +730,82 @@ Object.assign(window.EXERCISE_DATA, {
     ]
   },
 
+  /* ══════════════════════════════════════════════════════════════════════════
+     Type : futur-groupes-niveaux
+     Niveau 1 : QCM (5) + associer sujet↔forme (5) — sujets = pronoms,
+                verbes réguliers des 1er et 2e groupes. Distracteurs des QCM
+                = terminaisons erronées ou confusions de personne (*tu
+                chantera, *nous chanteront, *je finira).
+     Niveau 2 : SPÉCIFICITÉ — le radical. Choix binaire avant saisie (radical
+                régulier = infinitif complet / radical irrégulier des verbes
+                fréquents) puis saisie libre. Réutilise le motif step1/step2
+                déjà utilisé pour l'imparfait (avec/sans -iss-), pas une
+                nouvelle interaction.
+     Niveau 3 : saisie libre, sujet = groupe nominal, radicaux réguliers et
+                irréguliers mélangés, indicateurs temporels de futur.
+     Progression verrouillée : seuil 80 %, persistance sessionStorage.
+  ══════════════════════════════════════════════════════════════════════════ */
+
   "conjuguer-futur": {
     title: "Conjuguer au futur",
     domaine:    "Français",
     competence: "Conjugaison — Futur simple",
-    type: "futur-niveaux",
-    levels: ["CM1", "CM2", "6e"],
-    paliers: 2, /* nombre réel de paliers du moteur */
+    type:       "futur-groupes-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
-    /* ── Niveau 1 : 4 textes d'identification ─────────────────────────────
-       pqp: true  = verbe au futur simple (cible)
-       pqp: false = distractor (présent ou passé composé)
-    ───────────────────────────────────────────────────────────────────── */
-    identTexts: [
-      /* Texte 1 — Les vacances de Tom */
-      {
-        tokens: [
-          { t: "Cet été, Tom " },
-          { t: "ira", v: true, pqp: true },
-          { t: " en vacances à la mer. Il " },
-          { t: "nagera", v: true, pqp: true },
-          { t: " chaque jour avec ses cousins. Sa famille " },
-          { t: "a loué", v: true, pqp: false },
-          { t: " un appartement près de la plage. Le soir, ils " },
-          { t: "regardent", v: true, pqp: false },
-          { t: " le coucher de soleil. Tom " },
-          { t: "reviendra", v: true, pqp: true },
-          { t: " bronzé et heureux à la rentrée." }
-        ]
-      },
-      /* Texte 2 — La fête d'anniversaire */
-      {
-        tokens: [
-          { t: "Samedi, c'" },
-          { t: "est", v: true, pqp: false },
-          { t: " l'anniversaire de Léa. Ses amis " },
-          { t: "viendront", v: true, pqp: true },
-          { t: " à la fête. Ils " },
-          { t: "ont apporté", v: true, pqp: false },
-          { t: " des cadeaux la semaine dernière. On " },
-          { t: "mangera", v: true, pqp: true },
-          { t: " un gros gâteau au chocolat. Léa " },
-          { t: "soufflera", v: true, pqp: true },
-          { t: " les bougies et " },
-          { t: "fera", v: true, pqp: true },
-          { t: " un vœu." }
-        ]
-      },
-      /* Texte 3 — La rentrée des classes */
-      {
-        tokens: [
-          { t: "La semaine prochaine, ce " },
-          { t: "sera", v: true, pqp: true },
-          { t: " la rentrée. Les élèves " },
-          { t: "retrouveront", v: true, pqp: true },
-          { t: " leurs camarades avec joie. La maîtresse " },
-          { t: "distribue", v: true, pqp: false },
-          { t: " toujours les cahiers le premier jour. Les enfants " },
-          { t: "ont travaillé", v: true, pqp: false },
-          { t: " dur cet été. Ils " },
-          { t: "apprendront", v: true, pqp: true },
-          { t: " plein de choses nouvelles et " },
-          { t: "seront", v: true, pqp: true },
-          { t: " très contents." }
-        ]
-      },
-      /* Texte 4 — Le voyage dans l'espace */
-      {
-        tokens: [
-          { t: "Un jour, les hommes " },
-          { t: "iront", v: true, pqp: true },
-          { t: " sur Mars. Ils " },
-          { t: "construiront", v: true, pqp: true },
-          { t: " des fusées encore plus puissantes. Des astronautes " },
-          { t: "ont étudié", v: true, pqp: false },
-          { t: " ce projet depuis longtemps. La vie là-bas " },
-          { t: "sera", v: true, pqp: true },
-          { t: " difficile mais les scientifiques " },
-          { t: "travaillent", v: true, pqp: false },
-          { t: " sans relâche. Ils " },
-          { t: "réussiront", v: true, pqp: true },
-          { t: " peut-être un jour." }
-        ]
-      }
-    ],
+    /* bank : chaque item porte un champ « level » 1-3.
+       Niveau 1 (mode "mcq" ou "matching") : sujets = pronoms personnels.
+         mode "mcq" : choices = terminaisons erronées / confusions de personne.
+         mode "matching" : forms = les 6 formes du verbe (au futur, les 6
+         personnes sont TOUJOURS distinctes -rai/-ras/-ra/-rons/-rez/-ront,
+         contrairement à l'imparfait où je/tu fusionnent systématiquement).
+       Niveaux 2 et 3 (saisie libre) : q.infinitive + q.sentence + q.answer.
+       Niveau 2 = uniquement des verbes utilisés pour illustrer le radical,
+       avec q.regRadical (true = radical régulier/infinitif, false = radical
+       irrégulier) pour le choix binaire avant saisie. Niveau 3 = sujet non
+       pronominal (GN), radicaux mélangés. */
+    bank: [
+      /* ── NIVEAU 1 : QCM (5) — distracteurs de terminaison/personne ── */
+      { level: 1, mode: "mcq", infinitive: "chanter",  subject: "tu",   choices: ["chanteras", "chantera", "chanteront", "chanterai"], answer: "chanteras" },
+      { level: 1, mode: "mcq", infinitive: "finir",    subject: "je",   choices: ["finirai", "finira", "finiras", "finirons"], answer: "finirai" },
+      { level: 1, mode: "mcq", infinitive: "jouer",    subject: "nous", choices: ["jouerons", "joueront", "jouerez", "jouera"], answer: "jouerons" },
+      { level: 1, mode: "mcq", infinitive: "choisir",  subject: "vous", choices: ["choisirez", "choisirons", "choisiront", "choisira"], answer: "choisirez" },
+      { level: 1, mode: "mcq", infinitive: "regarder", subject: "ils",  choices: ["regarderont", "regarderons", "regardera", "regarderez"], answer: "regarderont" },
 
-    /* ── Niveau 2 : 10 phrases à trous ────────────────────────────────────
-       (infinitif) dans la phrase → affiché comme puce-aide
-       ___ → zone à compléter
-    ───────────────────────────────────────────────────────────────────── */
-    writeBank: [
-      { sentence: "Je (être) ___ médecin plus tard.",               answers: ["serai"],     explication: "Au futur, « je » + être → <strong>serai</strong> (radical irrégulier « ser- »)." },
-      { sentence: "Tu (avoir) ___ un vélo pour Noël.",              answers: ["auras"],     explication: "Au futur, « tu » + avoir → <strong>auras</strong> (radical irrégulier « aur- »)." },
-      { sentence: "Il (chanter) ___ une chanson sur scène.",        answers: ["chantera"],  explication: "Au futur, 1<sup>er</sup> groupe : infinitif + <em>-a</em> → <strong>chantera</strong>." },
-      { sentence: "Nous (finir) ___ nos devoirs avant le dîner.",   answers: ["finirons"],  explication: "Au futur, 2<sup>e</sup> groupe : infinitif + <em>-ons</em> → <strong>finirons</strong>." },
-      { sentence: "Vous (parler) ___ devant toute la classe.",      answers: ["parlerez"],  explication: "Au futur, 1<sup>er</sup> groupe : infinitif + <em>-ez</em> → <strong>parlerez</strong>." },
-      { sentence: "Ils (jouer) ___ au football demain matin.",      answers: ["joueront"],  explication: "Au futur, 1<sup>er</sup> groupe : infinitif + <em>-ont</em> → <strong>joueront</strong>." },
-      { sentence: "Je (faire) ___ mes valises ce soir.",            answers: ["ferai"],     explication: "Au futur, « je » + faire → <strong>ferai</strong> (radical irrégulier « fer- »)." },
-      { sentence: "Elle (aller) ___ mieux demain.",                 answers: ["ira"],       explication: "Au futur, + aller → <strong>ira</strong> (radical irrégulier « ir- »)." },
-      { sentence: "Nous (venir) ___ vous rejoindre samedi.",        answers: ["viendrons"], explication: "Au futur, « nous » + venir → <strong>viendrons</strong> (radical irrégulier « viendr- »)." },
-      { sentence: "Tu (pouvoir) ___ m'aider après l'école ?",       answers: ["pourras"],   explication: "Au futur, « tu » + pouvoir → <strong>pourras</strong> (radical irrégulier « pourr- »)." }
-    ],
+      /* ── NIVEAU 1 : associer sujet ↔ forme (5) ── */
+      { level: 1, mode: "matching", infinitive: "parler",   subject: "Elle",  forms: ["parlerai", "parleras", "parlera", "parlerons", "parlerez", "parleront"], answer: "parlera" },
+      { level: 1, mode: "matching", infinitive: "finir",    subject: "Ils",   forms: ["finirai", "finiras", "finira", "finirons", "finirez", "finiront"], answer: "finiront" },
+      { level: 1, mode: "matching", infinitive: "chanter",  subject: "Vous",  forms: ["chanterai", "chanteras", "chantera", "chanterons", "chanterez", "chanteront"], answer: "chanterez" },
+      { level: 1, mode: "matching", infinitive: "choisir",  subject: "Elles", forms: ["choisirai", "choisiras", "choisira", "choisirons", "choisirez", "choisiront"], answer: "choisiront" },
+      { level: 1, mode: "matching", infinitive: "jouer",    subject: "On",    forms: ["jouerai", "joueras", "jouera", "jouerons", "jouerez", "joueront"], answer: "jouera" },
 
-    niveauxConfig: {
-      rule:             "Futur simple : terminaisons <em>-rai, -ras, -ra, -rons, -rez, -ront</em>",
-      lvDefs: [
-        { lv: 1, icon: '⭐',   label: 'Niveau 1 — Repère le futur',    desc: 'Lis un texte et clique sur les verbes au futur simple' },
-        { lv: 2, icon: '⭐⭐', label: 'Niveau 2 — Conjugue au futur',  desc: 'Complète des phrases en conjuguant le verbe au futur simple' }
-      ],
-      verb1Instruction: "Clique sur les verbes au <strong>futur simple</strong>, puis valide.",
-      verb1NotTarget:   "n'est pas au futur simple",
-      verb1TargetName:  "futur simple",
-      verb1FoundAll:    "Tu as trouvé tous les verbes au futur simple !",
-      verb2Instruction: "Conjugue le verbe au <strong>futur simple</strong>.",
-      lv2NextBtnLabel:  "Niveau 2 — Conjugue →",
-      winMsg:           "Tu maîtrises le futur simple aux deux niveaux !",
-      simpleErrorFeedback: true
-    }
+      /* ── NIVEAU 2 : radical régulier (infinitif) vs irrégulier (10) ── */
+      { level: 2, infinitive: "parler",   sentence: "Je ________ à la maîtresse demain.",           answer: "parlerai",   regRadical: true  },
+      { level: 2, infinitive: "finir",    sentence: "Tu ________ ton livre ce soir.",                answer: "finiras",    regRadical: true  },
+      { level: 2, infinitive: "jouer",    sentence: "Il ________ au ballon avec ses amis.",          answer: "jouera",     regRadical: true  },
+      { level: 2, infinitive: "être",     sentence: "Nous ________ en retard si on ne se dépêche pas.", answer: "serons",  regRadical: false },
+      { level: 2, infinitive: "avoir",    sentence: "Vous ________ une bonne surprise bientôt.",     answer: "aurez",      regRadical: false },
+      { level: 2, infinitive: "crier",    sentence: "Ils ________ de joie en apprenant la nouvelle.", answer: "crieront",  regRadical: true  },
+      { level: 2, infinitive: "aller",    sentence: "Elle ________ mieux dans quelques jours.",      answer: "ira",        regRadical: false },
+      { level: 2, infinitive: "faire",    sentence: "On ________ un gâteau pour son anniversaire.",  answer: "fera",       regRadical: false },
+      { level: 2, infinitive: "venir",    sentence: "Elles ________ nous voir samedi prochain.",     answer: "viendront",  regRadical: false },
+      { level: 2, infinitive: "choisir",  sentence: "Tu ________ ton cadeau toi-même.",              answer: "choisiras",  regRadical: true  },
+
+      /* ── NIVEAU 3 : saisie libre, sujet = groupe nominal, radicaux mélangés (10) ── */
+      { level: 3, infinitive: "aller",    sentence: "Demain, les élèves ________ à la bibliothèque.",              answer: "iront"      },
+      { level: 3, infinitive: "avoir",    sentence: "L'année prochaine, mon frère ________ dix ans.",              answer: "aura"       },
+      { level: 3, infinitive: "être",     sentence: "Ce soir, la lune ________ pleine.",                           answer: "sera"       },
+      { level: 3, infinitive: "venir",    sentence: "Léa et moi ________ te voir bientôt.",                        answer: "viendrons"  },
+      { level: 3, infinitive: "voir",     sentence: "Demain, mes cousins ________ la mer pour la première fois.",  answer: "verront"    },
+      { level: 3, infinitive: "pouvoir",  sentence: "Toi et ton frère ________ venir samedi.",                     answer: "pourrez"    },
+      { level: 3, infinitive: "vouloir",  sentence: "Bientôt, mes parents ________ déménager.",                    answer: "voudront"   },
+      { level: 3, infinitive: "prendre",  sentence: "L'année prochaine, la classe ________ le train pour Paris.",  answer: "prendra"    },
+      { level: 3, infinitive: "chanter",  sentence: "Demain soir, le chœur ________ pour la fête de l'école.",     answer: "chantera"   },
+      { level: 3, infinitive: "grandir",  sentence: "Bientôt, ces petits chatons ________ beaucoup.",              answer: "grandiront" }
+    ]
   },
 
   "conjuguer-passe-simple": {
