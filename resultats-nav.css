@@ -1,0 +1,50 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Composant partagé — Sous-navigation "Résultats"
+   Utilisé par js/resultats-nav.js. Tokens de couleur repliés sur des
+   valeurs par défaut si styles.css n'est pas chargé.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.rn-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.rn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 100px;
+  font-family: var(--font-display, 'Fredoka', sans-serif);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1.5px solid var(--border, #D7DEEA);
+  background: #ffffff;
+  color: var(--muted, #5F6368);
+  transition: background 180ms, color 180ms, border-color 180ms, transform 180ms;
+}
+
+.rn-pill:hover:not(.rn-pill--active) {
+  border-color: var(--color-brand-navy, #1A2D6B);
+  color: var(--color-brand-navy, #1A2D6B);
+  transform: translateY(-1px);
+}
+
+.rn-pill--active {
+  background: var(--color-brand-navy, #1A2D6B);
+  border-color: var(--color-brand-navy, #1A2D6B);
+  color: #ffffff;
+}
+
+.rn-icon {
+  font-size: 15px;
+  line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .rn-pill { padding: 7px 14px; font-size: 12px; }
+}

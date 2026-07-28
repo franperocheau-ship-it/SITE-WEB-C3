@@ -13,6 +13,8 @@
   <script src="js/level-badge.js?v=1"></script>
   <link rel="stylesheet" href="laurels.css?v=2">
   <script src="js/laurels.js?v=2"></script>
+  <link rel="stylesheet" href="resultats-nav.css?v=1">
+  <script src="js/resultats-nav.js?v=1"></script>
   <style>
     /* ── Layout ──────────────────────────────────────────────────────────────── */
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
@@ -635,6 +637,19 @@
         <a class="main-tab" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
         <a class="main-tab" href="dictees-enseignant.html">📖 Dictées préparées</a>
       </nav>
+
+      <!-- Sous-navigation résultats -->
+      <div id="resultats-nav-mount"></div>
+      <script>
+        ResultatsNav.render(document.getElementById('resultats-nav-mount'), {
+          active: 'general',
+          items: {
+            general:  { href: 'resultats-enseignant.html' },
+            joggings: { href: 'resultats-joggings-enseignant.html' },
+            dictees:  { href: 'resultats-dictees-enseignant.html' },
+          }
+        });
+      </script>
 
       <!-- Chargement -->
       <div id="view-loading" class="view-loading">Chargement…</div>

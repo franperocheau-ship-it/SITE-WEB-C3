@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Résultats des joggings — Espace enseignant — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="css/jogging.css?v=1">
+  <link rel="stylesheet" href="css/jogging-print.css?v=1">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/teacher.js?v=2"></script>
+  <script src="js/jogging-data.js?v=1"></script>
+  <script src="js/jogging-teacher.js?v=1"></script>
+  <script src="js/jogging-print.js?v=1"></script>
+  <link rel="stylesheet" href="resultats-nav.css?v=1">
+  <script src="js/resultats-nav.js?v=1"></script>
+  <style>
+    /* ── Layout ──────────────────────────────────────────────────────────────── */
+    .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
+    .dash-content { max-width: 960px; margin: 0 auto; }
+
+    /* ── Breadcrumb ──────────────────────────────────────────────────────────── */
+    .breadcrumb {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 24px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
+    }
+    .breadcrumb a { color: var(--blue); text-decoration: none; font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .bc-sep { color: var(--border); user-select: none; }
+    .bc-current { font-weight: 600; color: var(--text); }
+
+    /* ── Navigation principale (5 onglets espace enseignant) ────────────────── */
+    .main-tabs {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      background: var(--card-bg); border-radius: 14px; box-shadow: var(--shadow-sm);
+      padding: 5px; margin-bottom: 20px; width: fit-content;
+    }
+    .main-tab {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: 10px;
+      font-family: inherit; font-size: 13px; font-weight: 700;
+      color: var(--muted); text-decoration: none;
+      transition: background 180ms, color 180ms;
+    }
+    .main-tab.is-active { background: var(--blue); color: #fff; }
+    .main-tab:hover:not(.is-active) { background: rgba(16,43,106,0.06); color: var(--blue); }
+
+    /* ── Section header / boutons ────────────────────────────────────────────── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; gap: 12px; flex-wrap: wrap;
+    }
+    .section-title { font-weight: 800; font-size: 20px; color: var(--blue); }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 20px; border-radius: 100px;
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none;
+      transition: background 180ms, transform 120ms;
+      text-decoration: none;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-1px); }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover { background: #0d2255; }
+    .btn-outline { background: var(--card-bg); color: var(--blue); border: 1.5px solid rgba(16,43,106,0.2); }
+    .btn-outline:hover { border-color: var(--blue); }
+    .btn-ghost { background: var(--card-bg); color: var(--muted); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--red); color: var(--red); }
+    .btn-sm { padding: 7px 14px; font-size: 12px; }
+    .btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+    /* ── Filtres (Vue classe) ────────────────────────────────────────────────── */
+    .jog-filters {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm); padding: 16px 18px; margin-bottom: 18px;
+    }
+    .jog-filter-field { display: flex; flex-direction: column; gap: 4px; }
+    .jog-filter-field label { font-size: 10.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .jog-filter-field select {
+      font-family: inherit; font-size: 13px; color: var(--text);
+      border: 1.5px solid var(--border); border-radius: 10px; padding: 8px 12px;
+      background: var(--bg); cursor: pointer; min-width: 170px;
+    }
+
+    /* ── Tableau classe ──────────────────────────────────────────────────────── */
+    .table-wrap { background: var(--card-bg); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); overflow: hidden; overflow-x: auto; }
+    .result-table { width: 100%; border-collapse: collapse; }
+    .result-table th {
+      font-size: 10px; font-weight: 700; color: var(--muted);
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 12px 10px; text-align: center;
+      border-bottom: 1px solid var(--border); background: var(--bg);
+      cursor: pointer; user-select: none; white-space: nowrap;
+    }
+    .result-table th:first-child { text-align: left; padding-left: 20px; cursor: pointer; }
+    .result-table th.jog-th-manual { background: repeating-linear-gradient(135deg, var(--bg), var(--bg) 4px, rgba(124,92,191,0.08) 4px, rgba(124,92,191,0.08) 8px); }
+    .result-table td { padding: 10px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border); text-align: center; }
+    .result-table td:first-child { text-align: left; padding-left: 20px; }
+    .result-table tr:last-child td { border-bottom: none; }
+    .result-table tr:hover td { background: rgba(16,43,106,0.02); }
+    .student-name-cell { font-weight: 600; color: var(--blue); cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    .student-name-cell:hover { text-decoration: underline; }
+    .student-avatar-sm {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(16,43,106,0.1); color: var(--blue);
+      font-size: 12px; font-weight: 800;
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .jog-th-sorted::after { content: ' ▾'; }
+    .jog-no-session { color: var(--muted); font-size: 12px; }
+
+    /* ── Fiche élève ──────────────────────────────────────────────────────────── */
+    .student-header {
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm); padding: 24px 28px;
+      margin-bottom: 20px; border-left: 4px solid var(--red);
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    }
+    .student-avatar-lg {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--red); color: #fff; font-weight: 800; font-size: 22px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .student-header-info { flex: 1; min-width: 180px; }
+    .student-header-name { font-weight: 800; font-size: 22px; color: var(--blue); }
+    .student-header-meta { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    .stats-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+    .stat-card { background: var(--card-bg); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); padding: 20px 24px; }
+    .stat-label { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+    .stat-value { font-size: 32px; font-weight: 900; color: var(--blue); line-height: 1; }
+    .stat-unit { font-size: 14px; font-weight: 600; color: var(--muted); margin-left: 4px; }
+
+    /* ── Vue Statistiques ─────────────────────────────────────────────────────── */
+    .jog-stats-card { background: var(--card-bg); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); padding: 20px 22px; margin-bottom: 16px; }
+    .jog-stats-block-title {
+      font-family: var(--font-display); font-weight: 800; font-size: 13px;
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px;
+    }
+
+    /* ── États vides / chargement ─────────────────────────────────────────────── */
+    .empty-state { text-align: center; padding: 56px 24px; color: var(--muted); }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-text { font-size: 15px; }
+    .view-loading { text-align: center; padding: 64px 24px; color: var(--muted); font-size: 15px; }
+    .nav-footer { display: flex; align-items: center; gap: 16px; margin-top: 24px; flex-wrap: wrap; }
+
+    @media (max-width: 700px) {
+      .stats-row-3 { grid-template-columns: 1fr; }
+      .result-table th, .result-table td { padding: 8px 6px; font-size: 12px; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       Bilan PDF joggings — imprimé (window.print(), même mécanique que le
+       bulletin fusionné de resultats-enseignant.html : #root caché à l'écran,
+       affiché uniquement pendant l'impression via body.printing-jog-bilan).
+       Couleurs volontairement en dur (contenu figé, indépendant du thème).
+       ═══════════════════════════════════════════════════════════════════════ */
+    #jog-bulletin-print-root { display: none; }
+    .jog-bulletin-page { font-family: 'Nunito Sans', system-ui, sans-serif; color: #1E2532; }
+
+    .jog-bulletin-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 16px; padding-bottom: 10px; margin-bottom: 16px; border-bottom: 3px solid #F5A623;
+    }
+    .jog-bulletin-logo { height: 26pt; width: auto; display: block; }
+    .jog-bulletin-brand-sub { font-size: 9.5pt; color: #5F6368; margin-top: 6px; }
+    .jog-bulletin-header-right { text-align: right; font-size: 10pt; color: #333; line-height: 1.55; }
+    .jog-bulletin-header-right .bh-name { font-weight: 800; font-size: 13pt; color: #1A2D6B; }
+    .jog-bulletin-header-right .bh-period { color: #5F6368; }
+
+    .jog-bulletin-stats { display: flex; gap: 10px; margin-bottom: 18px; }
+    .jog-bulletin-stat { flex: 1; background: #F4F6FB; border-radius: 10px; padding: 10px 12px; text-align: center; }
+    .jog-bulletin-stat .bs-value { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 18pt; color: #1A2D6B; }
+    .jog-bulletin-stat .bs-label { font-size: 8pt; color: #5F6368; text-transform: uppercase; letter-spacing: .04em; margin-top: 3px; }
+
+    .jog-bulletin-section-title {
+      font-size: 10.5pt; font-weight: 800; color: #1A2D6B;
+      text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px;
+    }
+    .jog-bulletin-feux { display: flex; gap: 4px; margin-bottom: 18px; }
+    .jog-bulletin-feu { flex: 1; text-align: center; border-radius: 8px; padding: 6px 2px; }
+    .jog-bulletin-feu .jf-letter { display: block; font-weight: 800; font-size: 9pt; }
+    .jog-bulletin-feu .jf-icon { display: block; font-size: 11pt; margin-top: 2px; }
+    .jog-bulletin-feu.vert   { background: #EAFBF3; color: #0F6E56; }
+    .jog-bulletin-feu.orange { background: #FFF6E8; color: #8A5A0E; }
+    .jog-bulletin-feu.rouge  { background: #FDF0F1; color: #992A38; }
+    .jog-bulletin-feu.blanc  { background: #F4F5F7; color: #8A93A3; }
+    .jog-bulletin-feu.manual { border: 1.5px dashed #C4CAD6; }
+
+    .jog-bulletin-progress { margin-bottom: 18px; }
+    .jog-bp-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 8pt; }
+    .jog-bp-label { width: 130px; flex-shrink: 0; color: #5F6368; }
+    .jog-bp-bar-bg { flex: 1; height: 8px; background: #E7ECF3; border-radius: 4px; overflow: hidden; }
+    .jog-bp-bar-fill { height: 100%; background: #1A2D6B; border-radius: 4px; }
+    .jog-bp-count { width: 30px; text-align: right; flex-shrink: 0; }
+
+    .jog-bulletin-boxes { display: flex; gap: 12px; margin-bottom: 16px; }
+    .jog-bulletin-box { flex: 1; border-radius: 10px; padding: 12px 14px; }
+    .jog-bulletin-box.box-forts { background: #F0FBF8; color: #0F6E56; }
+    .jog-bulletin-box.box-consolider { background: #FDF4F0; color: #993C1D; }
+    .jog-bulletin-box h5 { font-size: 9pt; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 7px; font-weight: 800; }
+    .jog-bulletin-box p { margin: 0; font-size: 9.5pt; line-height: 1.55; }
+
+    .jog-bulletin-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 18px; }
+    .jog-bulletin-table th {
+      font-size: 7.5pt; font-weight: 800; color: #8A93A3; text-transform: uppercase;
+      letter-spacing: .04em; padding: 4px 6px; text-align: left; border-bottom: 1.5px solid #E8EDF3;
+    }
+    .jog-bulletin-table td { padding: 5px 6px; border-bottom: 1px solid #F0F2F6; }
+
+    .jog-bulletin-version-block { margin-bottom: 10px; border: 1px solid #E8EDF3; border-radius: 8px; padding: 8px 10px; break-inside: avoid; }
+    .jog-bulletin-version-block .v-label { font-weight: 800; font-size: 8.5pt; color: #1A2D6B; margin-bottom: 4px; }
+    .jog-bulletin-version-block .v-text { font-size: 8.5pt; line-height: 1.5; white-space: pre-wrap; }
+
+    .jog-bulletin-conclusion { font-size: 9.5pt; line-height: 1.6; margin-bottom: 16px; }
+
+    .jog-bulletin-footer { display: flex; justify-content: space-between; gap: 12px; font-size: 7.5pt; color: #9AA3B2; border-top: 1px solid #E8EDF3; padding-top: 8px; }
+
+    .jog-bulletin-mot-page { page-break-before: always; padding-top: 60pt; }
+    .jog-bulletin-mot-title { font-size: 15pt; font-weight: 800; color: #1A2D6B; margin-bottom: 24pt; text-align: center; }
+    .jog-bulletin-mot-space { border: 1.5px dashed #C7D0E2; border-radius: 12px; min-height: 480pt; }
+
+    body.printing-jog-bilan #jog-bulletin-print-root { display: block !important; }
+    @media print {
+      @page { size: A4 portrait; margin: 15mm; }
+      body.printing-jog-bilan, body.printing-jog-bilan #jog-bulletin-print-root,
+      body.printing-jog-bilan .jog-bulletin-stat, body.printing-jog-bilan .jog-bulletin-feu,
+      body.printing-jog-bilan .jog-bulletin-box {
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      body.printing-jog-bilan .navbar, body.printing-jog-bilan footer,
+      body.printing-jog-bilan .breadcrumb, body.printing-jog-bilan .main-tabs,
+      body.printing-jog-bilan .rn-bar,
+      body.printing-jog-bilan .student-header, body.printing-jog-bilan .stats-row-3,
+      body.printing-jog-bilan #jog-student-joggings, body.printing-jog-bilan .nav-footer {
+        display: none !important;
+      }
+      body.printing-jog-bilan .dash-wrap    { padding: 0; background: #fff; min-height: unset; }
+      body.printing-jog-bilan .dash-content { max-width: 100%; padding: 0; }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <!-- NAVBAR-PROFICIAMUS-CSS -->
+  <style>
+  /* ─── Navbar Proficiamus (extrait d'index.html) ─── */
+  body{padding-top:50px;}
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+  .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+  .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+  .navbar__brand img{height:34px;width:auto;}
+  .navbar__nav{display:flex;align-items:center;gap:24px;}
+  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-size:14px;font-weight:700;transition:color .2s;}
+  .navbar__nav a:hover{color:#1B4EBF;}
+  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;}
+  .navbar__nav .btn-login{color:#fff!important;}
+  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+  .btn-login:hover{background:#0b1e4d;}
+  @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <!-- CONTENU -->
+  <div class="dash-wrap">
+    <div class="dash-content">
+
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb" aria-label="Fil d'Ariane">
+        <a href="dashboard-enseignant.html">Espace enseignant</a>
+        <span class="bc-sep">›</span>
+        <a href="synthese-joggings-enseignant.html">Joggings d'écriture</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-current">Résultats</span>
+      </nav>
+
+      <!-- Navigation principale (5 onglets) -->
+      <nav class="main-tabs" aria-label="Navigation espace enseignant">
+        <a class="main-tab" href="classes-enseignant.html">🏫 Mes classes</a>
+        <a class="main-tab" href="pilotage-enseignant.html">🎯 Pilotage des compétences</a>
+        <a class="main-tab" href="resultats-enseignant.html">📊 Résultats</a>
+        <a class="main-tab" href="remediations-enseignant.html">🧩 Remédiations</a>
+        <a class="main-tab is-active" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
+        <a class="main-tab" href="dictees-enseignant.html">📖 Dictées préparées</a>
+      </nav>
+
+      <!-- Sous-navigation résultats -->
+      <div id="resultats-nav-mount"></div>
+      <script>
+        ResultatsNav.render(document.getElementById('resultats-nav-mount'), {
+          active: 'joggings',
+          items: {
+            general:  { href: 'resultats-enseignant.html' },
+            joggings: { href: 'resultats-joggings-enseignant.html' },
+            dictees:  { href: 'resultats-dictees-enseignant.html' },
+          }
+        });
+      </script>
+
+      <!-- Chargement -->
+      <div id="view-loading" class="view-loading">Chargement…</div>
+
+      <!-- ── Vue classe ─────────────────────────────────────────────────── -->
+      <div id="view-classe" style="display:none">
+        <div class="section-header">
+          <h1 class="section-title">Synthèse des joggings d'écriture</h1>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-outline btn-sm" onclick="openStats()">📊 Statistiques de la classe</button>
+          </div>
+        </div>
+
+        <div class="jog-filters">
+          <div class="jog-filter-field">
+            <label for="jog-filter-class">Classe</label>
+            <select id="jog-filter-class"></select>
+          </div>
+          <div class="jog-filter-field">
+            <label for="jog-filter-jogging">Jogging</label>
+            <select id="jog-filter-jogging">
+              <option value="">Tous les joggings (dernier en date)</option>
+            </select>
+          </div>
+          <div class="jog-filter-field">
+            <label for="jog-filter-period">Période</label>
+            <select id="jog-filter-period">
+              <option value="">Toute l'année</option>
+              <option value="30">30 derniers jours</option>
+              <option value="7">7 derniers jours</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="jog-classe-table-wrap">
+          <div class="empty-state">
+            <div class="empty-icon">🏫</div>
+            <div class="empty-text">Aucune classe pour l'instant.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Fiche élève ────────────────────────────────────────────────── -->
+      <div id="view-eleve" style="display:none">
+        <div class="student-header">
+          <div class="student-avatar-lg" id="jog-student-avatar">?</div>
+          <div class="student-header-info">
+            <div class="student-header-name" id="jog-student-name">—</div>
+            <div class="student-header-meta" id="jog-student-meta">—</div>
+          </div>
+          <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" id="jog-print-btn" style="display:none" onclick="printStudentJoggingBilan()">📄 Générer le bilan PDF</button>
+          </div>
+        </div>
+
+        <div class="stats-row-3" id="jog-student-stats"></div>
+
+        <div id="jog-student-joggings"></div>
+
+        <div class="nav-footer">
+          <button class="btn btn-ghost btn-sm" onclick="showView('classe')">← Retour à la vue classe</button>
+        </div>
+      </div>
+
+      <!-- ── Statistiques (scope : classe sélectionnée dans le filtre) ───── -->
+      <div id="view-stats" style="display:none">
+        <div class="section-header">
+          <h1 class="section-title">Statistiques — <span id="jog-stats-classname">—</span></h1>
+        </div>
+
+        <div id="jog-stats-body"><div class="view-loading">Chargement…</div></div>
+
+        <div class="nav-footer">
+          <button class="btn btn-ghost btn-sm" onclick="showView('classe')">← Retour à la vue classe</button>
+        </div>
+      </div>
+
+      <!-- Racine imprimée du bilan PDF (cachée à l'écran) -->
+      <div id="jog-bulletin-print-root"></div>
+
+      <!-- Racine imprimée du premier jet (cachée à l'écran) -->
+      <div id="jog-print-root"></div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau – LFM &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="js/menu.js"></script>
+  <script>
+  /* ═══════════════════════════════════════════════════════════════════════════
+     ÉTAT
+  ═══════════════════════════════════════════════════════════════════════════ */
+  const ALL_CODES  = ['C', 'H', 'A', 'M', 'P', 'I', 'O', 'N', 'S'];
+  const AUTO_CODES = ['C', 'H', 'A', 'M', 'P', 'O', 'S'];
+  const FEU_PICTO  = { vert: '✔', orange: '~', rouge: '✖', blanc: '–' };
+  const CODE_LABELS = {
+    C: 'Conjugaison', H: 'Homophones', A: 'Accords', M: 'Majuscules',
+    P: 'Ponctuation', I: 'Illisible', O: 'Orthographe', N: 'Néant', S: 'Son'
+  };
+  const FEU_RANK = { rouge: 0, orange: 1, blanc: 2, vert: 3 };
+
+  let _classes = [];
+  let _currentClassId = null;
+  let _overviewRows = [];
+  let _sortKey = 'name';
+  let _sortAsc = true;
+  let _currentStudent = null; // { auth_user_id, display_name, class_id }
+  let _currentStudentJoggings = []; // [{session, versions}]
+  let _teacherProfile = null;
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     UTILITAIRES
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function escHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '—';
+    return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  function joggingTitle(joggingId) {
+    const jog = (typeof JOGGING_DATA !== 'undefined') ? JOGGING_DATA[joggingId] : null;
+    return jog ? jog.title : joggingId;
+  }
+
+  function highlightVersionText(text, erreurs) {
+    const resolved = [];
+    let lastEnd = -1;
+    (erreurs || []).forEach(e => { if (e.start >= lastEnd) { resolved.push(e); lastEnd = e.end; } });
+    let html = '';
+    let cursor = 0;
+    resolved.forEach(e => {
+      html += escHtml(text.slice(cursor, e.start));
+      html += `<span class="jog-highlight" data-code="${e.code}">${escHtml(text.slice(e.start, e.end))}</span>`;
+      cursor = e.end;
+    });
+    html += escHtml(text.slice(cursor));
+    return html;
+  }
+
+  /* Sous-vues internes (vue classe / fiche élève / statistiques). */
+  function showView(name) {
+    document.getElementById('view-classe').style.display = name === 'classe' ? '' : 'none';
+    document.getElementById('view-eleve').style.display  = name === 'eleve'  ? '' : 'none';
+    document.getElementById('view-stats').style.display  = name === 'stats'  ? '' : 'none';
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     VUE CLASSE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function populateFilters() {
+    const classSel = document.getElementById('jog-filter-class');
+    classSel.innerHTML = _classes.map(c => `<option value="${c.id}">${escHtml(c.name)} (${escHtml(c.level)})</option>`).join('');
+
+    const joggingSel = document.getElementById('jog-filter-jogging');
+    const list = (typeof JOGGING_LIST !== 'undefined') ? JOGGING_LIST : [];
+    joggingSel.innerHTML = '<option value="">Tous les joggings (dernier en date)</option>' +
+      list.map(j => `<option value="${j.id}">${j.numero}. ${escHtml(j.title)}</option>`).join('');
+  }
+
+  async function loadClassOverview() {
+    _currentClassId = document.getElementById('jog-filter-class').value;
+    if (!_currentClassId) return;
+
+    const joggingId  = document.getElementById('jog-filter-jogging').value || null;
+    const periodVal   = document.getElementById('jog-filter-period').value;
+    const periodDays   = periodVal ? parseInt(periodVal, 10) : null;
+
+    const wrap = document.getElementById('jog-classe-table-wrap');
+    wrap.innerHTML = '<div class="view-loading">Chargement…</div>';
+
+    try {
+      _overviewRows = await lfmJoggingTeacher.getClassOverview(_currentClassId, { joggingId, periodDays });
+    } catch (e) {
+      wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Impossible de charger les données (${escHtml(e.message)}).</div></div>`;
+      return;
+    }
+
+    if (_overviewRows.length === 0) {
+      wrap.innerHTML = '<div class="empty-state"><div class="empty-icon">🎒</div><div class="empty-text">Aucun élève dans cette classe.</div></div>';
+      return;
+    }
+
+    renderClassTable();
+  }
+
+  function sortedRows() {
+    const rows = [..._overviewRows];
+    rows.sort((a, b) => {
+      let av, bv;
+      if (_sortKey === 'name') {
+        av = (a.student.display_name || '').toLowerCase();
+        bv = (b.student.display_name || '').toLowerCase();
+      } else {
+        av = a.feux ? (FEU_RANK[a.feux[_sortKey]] ?? -1) : -1;
+        bv = b.feux ? (FEU_RANK[b.feux[_sortKey]] ?? -1) : -1;
+      }
+      if (av < bv) return _sortAsc ? -1 : 1;
+      if (av > bv) return _sortAsc ? 1 : -1;
+      return 0;
+    });
+    return rows;
+  }
+
+  function sortBy(key) {
+    if (_sortKey === key) { _sortAsc = !_sortAsc; } else { _sortKey = key; _sortAsc = true; }
+    renderClassTable();
+  }
+
+  function renderClassTable() {
+    const wrap = document.getElementById('jog-classe-table-wrap');
+    const rows = sortedRows();
+
+    const headerCells = ALL_CODES.map(code => {
+      const sortedCls = _sortKey === code ? ' jog-th-sorted' : '';
+      const manualCls = code === 'N' ? ' jog-th-manual' : '';
+      return `<th class="${manualCls}${sortedCls}" onclick="sortBy('${code}')" title="${escHtml(CODE_LABELS[code])}">${code}</th>`;
+    }).join('');
+
+    const bodyRows = rows.map(r => {
+      const initial = (r.student.display_name || '?')[0].toUpperCase();
+      const nameCell = `
+        <td>
+          <span class="student-name-cell" onclick="openStudent('${r.student.auth_user_id}')">
+            <span class="student-avatar-sm">${initial}</span>
+            ${escHtml(r.student.display_name)}
+          </span>
+        </td>`;
+      if (!r.session) {
+        return `<tr>${nameCell}<td colspan="${ALL_CODES.length}" class="jog-no-session">Aucun jogging</td></tr>`;
+      }
+      if (!r.hasVersion) {
+        return `<tr>${nameCell}<td colspan="${ALL_CODES.length}" class="jog-no-session">Brouillon en cours</td></tr>`;
+      }
+      const feuCells = ALL_CODES.map(code => {
+        const state = r.feux[code] || 'blanc';
+        const manualCls = code === 'N' ? ' jog-feu-dot--manual' : '';
+        return `<td><span class="jog-feu-dot jog-feu-dot--${state}${manualCls}" title="${escHtml(CODE_LABELS[code])} : ${state}">${FEU_PICTO[state]}</span></td>`;
+      }).join('');
+      return `<tr>${nameCell}${feuCells}</tr>`;
+    }).join('');
+
+    wrap.innerHTML = `
+      <div class="table-wrap">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th onclick="sortBy('name')" class="${_sortKey === 'name' ? 'jog-th-sorted' : ''}">Élève</th>
+              ${headerCells}
+            </tr>
+          </thead>
+          <tbody>${bodyRows}</tbody>
+        </table>
+      </div>`;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     STATISTIQUES — scope : classe sélectionnée dans le filtre de la vue
+     classe. Tout est agrégé côté front à partir des sessions/versions déjà
+     chargées, aucun appel externe.
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function openStats() {
+    if (!_currentClassId) { alert("Choisis d'abord une classe dans le filtre de la vue classe."); return; }
+    const cls = _classes.find(c => c.id === _currentClassId);
+    document.getElementById('jog-stats-classname').textContent = cls ? `${cls.name} (${cls.level})` : '—';
+    document.getElementById('jog-stats-body').innerHTML = '<div class="view-loading">Chargement…</div>';
+    showView('stats');
+
+    try {
+      const stats = await lfmJoggingTeacher.getClassStatistics(_currentClassId);
+      renderStats(stats);
+    } catch (e) {
+      document.getElementById('jog-stats-body').innerHTML =
+        `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Impossible de charger les statistiques (${escHtml(e.message)}).</div></div>`;
+    }
+  }
+
+  function renderStats(stats) {
+    const body = document.getElementById('jog-stats-body');
+    if (stats.completedCount === 0) {
+      body.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">Pas encore assez de joggings terminés dans cette classe pour calculer des statistiques.</div></div>';
+      return;
+    }
+
+    const progressionLabel = stats.averageProgression !== null
+      ? `${stats.averageProgression >= 0 ? '+' : ''}${stats.averageProgression.toFixed(1)}`
+      : '—';
+
+    const maxErrCount = stats.errorFrequency.length ? stats.errorFrequency[0].count : 0;
+    const errorsHtml = stats.errorFrequency.length
+      ? stats.errorFrequency.slice(0, 7).map(e => {
+          const pct = maxErrCount ? Math.round((e.count / maxErrCount) * 100) : 0;
+          return `
+            <div class="jog-evo-repart-row">
+              <div class="jog-evo-repart-label">${e.code} · ${escHtml(CODE_LABELS[e.code] || e.code)}</div>
+              <div class="jog-evo-repart-bar-bg"><div class="jog-evo-repart-bar-fill" style="width:${pct}%;background:#D62839;"></div></div>
+              <div class="jog-evo-repart-count">${e.count}</div>
+            </div>`;
+        }).join('')
+      : '<div style="font-size:13px;color:var(--muted)">Aucune erreur détectée pour l\'instant.</div>';
+
+    const rankedCriteres = stats.criteres.filter(c => c.evaluated > 0).sort((a, b) => b.rate - a.rate);
+    const criteresHtml = rankedCriteres.length
+      ? rankedCriteres.map(c => {
+          const pct = Math.round(c.rate * 100);
+          return `
+            <div class="jog-evo-repart-row">
+              <div class="jog-evo-repart-label">${c.code} · ${escHtml(CODE_LABELS[c.code])}</div>
+              <div class="jog-evo-repart-bar-bg"><div class="jog-evo-repart-bar-fill" style="width:${pct}%"></div></div>
+              <div class="jog-evo-repart-count">${pct}%</div>
+            </div>`;
+        }).join('')
+      : '<div style="font-size:13px;color:var(--muted)">Pas encore assez de données.</div>';
+
+    const mostMastered = rankedCriteres.length ? rankedCriteres[0] : null;
+    const mostFragile  = rankedCriteres.length ? rankedCriteres[rankedCriteres.length - 1] : null;
+
+    body.innerHTML = `
+      <div class="stats-row-3">
+        <div class="stat-card">
+          <div class="stat-label">Joggings terminés</div>
+          <div class="stat-value">${stats.completedCount}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Progression moyenne</div>
+          <div class="stat-value">${progressionLabel}<span class="stat-unit"> feux</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Élèves</div>
+          <div class="stat-value">${stats.studentCount}</div>
+        </div>
+      </div>
+
+      <div class="jog-stats-card">
+        <div class="jog-stats-block-title">Erreurs les plus fréquentes (toutes versions)</div>
+        ${errorsHtml}
+      </div>
+
+      <div class="jog-stats-card">
+        <div class="jog-stats-block-title">Critères — du mieux maîtrisé au plus fragile</div>
+        ${criteresHtml}
+        ${mostMastered && mostFragile ? `
+          <div style="margin-top:14px;font-size:13px;color:var(--muted);">
+            Critère le mieux maîtrisé : <strong style="color:var(--text)">${escHtml(CODE_LABELS[mostMastered.code])}</strong> ·
+            Critère le plus fragile : <strong style="color:var(--text)">${escHtml(CODE_LABELS[mostFragile.code])}</strong>
+          </div>` : ''}
+      </div>`;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     FICHE ÉLÈVE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function openStudent(authUserId) {
+    const row = _overviewRows.find(r => r.student.auth_user_id === authUserId);
+    const cls = _classes.find(c => c.id === _currentClassId);
+    _currentStudent = {
+      auth_user_id: authUserId,
+      display_name: row ? row.student.display_name : '—',
+      class_name: cls ? cls.name : '—',
+      class_level: cls ? cls.level : ''
+    };
+
+    document.getElementById('jog-student-avatar').textContent = (_currentStudent.display_name || '?')[0].toUpperCase();
+    document.getElementById('jog-student-name').textContent   = _currentStudent.display_name;
+    document.getElementById('jog-student-meta').textContent   = [_currentStudent.class_level, _currentStudent.class_name].filter(Boolean).join(' · ');
+    document.getElementById('jog-print-btn').style.display = 'none';
+
+    document.getElementById('jog-student-stats').innerHTML = '';
+    document.getElementById('jog-student-joggings').innerHTML = '<div class="view-loading">Chargement…</div>';
+    showView('eleve');
+
+    try {
+      _currentStudentJoggings = await lfmJoggingTeacher.getStudentJoggings(authUserId);
+    } catch (e) {
+      document.getElementById('jog-student-joggings').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">${escHtml(e.message)}</div></div>`;
+      return;
+    }
+
+    renderStudentStats();
+    renderStudentJoggings();
+    if (_currentStudentJoggings.some(d => d.session.status === 'completed')) {
+      document.getElementById('jog-print-btn').style.display = '';
+    }
+  }
+
+  function renderStudentStats() {
+    const data = _currentStudentJoggings;
+    const completed = data.filter(d => d.session.status === 'completed');
+    let totalVerts = 0;
+    completed.forEach(d => {
+      const last = d.versions[d.versions.length - 1];
+      if (last) AUTO_CODES.forEach(c => { if ((last['feu_' + c.toLowerCase()] || 'blanc') === 'vert') totalVerts++; });
+    });
+    const maxVerts = completed.length * AUTO_CODES.length;
+    const tauxReussite = maxVerts > 0 ? Math.round((totalVerts / maxVerts) * 100) : null;
+
+    document.getElementById('jog-student-stats').innerHTML = `
+      <div class="stat-card">
+        <div class="stat-label">Joggings réalisés</div>
+        <div class="stat-value">${completed.length}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Feux verts obtenus</div>
+        <div class="stat-value">${totalVerts}<span class="stat-unit">/ ${maxVerts}</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Taux de réussite</div>
+        <div class="stat-value">${tauxReussite !== null ? tauxReussite : '—'}${tauxReussite !== null ? '<span class="stat-unit">%</span>' : ''}</div>
+      </div>`;
+  }
+
+  function renderStudentJoggings() {
+    const container = document.getElementById('jog-student-joggings');
+    if (_currentStudentJoggings.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">✍️</div><div class="empty-text">Cet élève n\'a pas encore commencé de jogging.</div></div>';
+      return;
+    }
+
+    container.innerHTML = _currentStudentJoggings.map((d, idx) => renderJoggingCard(d, idx)).join('');
+
+    container.querySelectorAll('.jog-histo-card-top').forEach(top => {
+      top.addEventListener('click', () => {
+        const el = document.getElementById(top.dataset.toggle);
+        if (!el) return;
+        const isOpen = el.style.display !== 'none';
+        el.style.display = isOpen ? 'none' : '';
+        const chevron = top.querySelector('.jog-histo-chevron');
+        if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+      });
+    });
+
+    container.querySelectorAll('[data-print-jogging]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        printJoggingPremierJet(btn.dataset.printJogging);
+      });
+    });
+  }
+
+  function renderJoggingCard(data, idx) {
+    const s = data.session;
+    const versions = data.versions;
+    const title = joggingTitle(s.jogging_id);
+    const last = versions[versions.length - 1];
+    const feux = {};
+    ALL_CODES.forEach(c => { feux[c] = last ? (last['feu_' + c.toLowerCase()] || 'blanc') : 'blanc'; });
+    const verts = AUTO_CODES.filter(c => feux[c] === 'vert').length;
+    const statusLabel = s.status === 'completed' ? `${verts}/7 feux verts` : 'en cours (version ' + s.current_version + ')';
+
+    const detailId = 'jog-t-detail-' + idx;
+
+    const versionsHtml = versions.map(v => `
+      <div class="jog-histo-version">
+        <div class="jog-histo-version-label">Version ${v.version_number}</div>
+        <div class="jog-correction-text" style="margin-bottom:10px;">${highlightVersionText(v.text, (v.correction && v.correction.erreurs) || [])}</div>
+        <div class="jog-feux-grid" style="max-width:360px;">${ALL_CODES.map(code => {
+          const st = v['feu_' + code.toLowerCase()] || 'blanc';
+          const manualCls = code === 'N' ? ' jog-feu-cell--manual' : '';
+          const title = code === 'N' ? 'Évalué sur papier par l\'enseignant, jamais reporté ici' : `${CODE_LABELS[code]} : ${st}`;
+          return `<div class="jog-feu-cell jog-feu-cell--${st}${manualCls}" title="${escHtml(title)}"><span class="jog-feu-letter">${code}</span><span class="jog-feu-icon">${FEU_PICTO[st]}</span></div>`;
+        }).join('')}</div>
+      </div>`).join('');
+
+    const printHtml = last
+      ? `<button type="button" class="btn btn-outline btn-sm" data-print-jogging="${idx}" style="margin-top:14px;">🖨️ Générer la feuille de premier jet</button>`
+      : '';
+
+    return `
+      <div class="jog-histo-card">
+        <div class="jog-histo-card-top" data-toggle="${detailId}">
+          <div>
+            <div class="jog-histo-title">${escHtml(title)}</div>
+            <div class="jog-histo-meta">${formatDate(s.created_at)} · ${statusLabel}</div>
+          </div>
+          <span class="jog-histo-chevron">▾</span>
+        </div>
+        <div class="jog-histo-detail" id="${detailId}" style="display:none">
+          ${versionsHtml}
+          ${printHtml}
+        </div>
+      </div>`;
+  }
+
+  function printJoggingPremierJet(idx) {
+    const data = _currentStudentJoggings[Number(idx)];
+    if (!data || typeof JoggingPrint === 'undefined') return;
+    const versions = data.versions;
+    const last = versions[versions.length - 1];
+    if (!last) return;
+    const jog = (typeof JOGGING_DATA !== 'undefined') ? JOGGING_DATA[data.session.jogging_id] : null;
+    const feux = {};
+    ALL_CODES.forEach(c => { feux[c] = last['feu_' + c.toLowerCase()] || 'blanc'; });
+
+    JoggingPrint.generate({
+      studentName: _currentStudent ? _currentStudent.display_name : '',
+      joggingTitle: jog ? jog.title : data.session.jogging_id,
+      consigne: jog ? jog.consigne : '',
+      text: last.text,
+      feux
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     BILAN PDF (même mécanique que le bulletin fusionné)
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function printStudentJoggingBilan() {
+    if (!_currentStudent) return;
+    const today = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+    const completed = _currentStudentJoggings.filter(d => d.session.status === 'completed');
+
+    /* Bilan général */
+    let totalVerts = 0;
+    const tally = {}; // code -> {vert,orange,rouge,blanc}
+    ALL_CODES.forEach(c => tally[c] = { vert: 0, orange: 0, rouge: 0, blanc: 0 });
+    completed.forEach(d => {
+      const last = d.versions[d.versions.length - 1];
+      const feux = {};
+      ALL_CODES.forEach(c => { feux[c] = last ? (last['feu_' + c.toLowerCase()] || 'blanc') : 'blanc'; });
+      ALL_CODES.forEach(c => { tally[c][feux[c]] = (tally[c][feux[c]] || 0) + 1; if (c !== 'I' && c !== 'N' && feux[c] === 'vert') totalVerts++; });
+    });
+    const maxVerts = completed.length * AUTO_CODES.length;
+    const tauxReussite = maxVerts > 0 ? Math.round((totalVerts / maxVerts) * 100) : null;
+
+    const feuxTableHtml = ALL_CODES.map(c => {
+      const t = tally[c];
+      const dominant = ['vert', 'orange', 'rouge', 'blanc'].reduce((best, k) => (t[k] > t[best] ? k : best), 'blanc');
+      const manualCls = c === 'N' ? ' manual' : '';
+      return `<div class="jog-bulletin-feu ${dominant}${manualCls}"><span class="jf-letter">${c}</span><span class="jf-icon">${FEU_PICTO[dominant]}</span></div>`;
+    }).join('');
+
+    /* Graphique de progression : feux verts par jogging clos, dans l'ordre chronologique */
+    const chronoCompleted = [...completed].sort((a, b) => new Date(a.session.created_at) - new Date(b.session.created_at));
+    const progressRows = chronoCompleted.map((d, i) => {
+      const last = d.versions[d.versions.length - 1];
+      const verts = last ? AUTO_CODES.filter(c => (last['feu_' + c.toLowerCase()] || 'blanc') === 'vert').length : 0;
+      const pct = Math.round((verts / AUTO_CODES.length) * 100);
+      return `<div class="jog-bp-row">
+        <div class="jog-bp-label">${i + 1}. ${escHtml(joggingTitle(d.session.jogging_id))}</div>
+        <div class="jog-bp-bar-bg"><div class="jog-bp-bar-fill" style="width:${pct}%"></div></div>
+        <div class="jog-bp-count">${verts}/7</div>
+      </div>`;
+    }).join('') || '<div style="font-size:9pt;color:#888">Pas encore de jogging terminé.</div>';
+
+    /* Historique */
+    const historiqueRows = _currentStudentJoggings.map(d => {
+      const last = d.versions[d.versions.length - 1];
+      const verts = last ? AUTO_CODES.filter(c => (last['feu_' + c.toLowerCase()] || 'blanc') === 'vert').length : 0;
+      const label = d.session.status === 'completed' ? `${verts}/7` : 'en cours';
+      return `<tr><td>${escHtml(joggingTitle(d.session.jogging_id))}</td><td>${formatDate(d.session.created_at)}</td><td>${label}</td></tr>`;
+    }).join('');
+    const historiqueHtml = historiqueRows
+      ? `<table class="jog-bulletin-table"><thead><tr><th>Jogging</th><th>Date</th><th>Résultat</th></tr></thead><tbody>${historiqueRows}</tbody></table>`
+      : '<div style="font-size:9pt;color:#888">Aucun jogging.</div>';
+
+    /* Exemple des trois versions : le jogging clos le plus récent */
+    const example = [...completed].sort((a, b) => new Date(b.session.created_at) - new Date(a.session.created_at))[0];
+    let exampleHtml = '<div style="font-size:9pt;color:#888">Pas encore de jogging terminé à illustrer.</div>';
+    if (example) {
+      exampleHtml = `<div class="jog-bulletin-section-title" style="margin-top:4px;">Exemple : ${escHtml(joggingTitle(example.session.jogging_id))}</div>` +
+        example.versions.map(v => `
+          <div class="jog-bulletin-version-block">
+            <div class="v-label">Version ${v.version_number}</div>
+            <div class="v-text">${escHtml(v.text)}</div>
+          </div>`).join('');
+    }
+
+    /* Points forts / axes de progrès — d'après le tableau Code Champion agrégé */
+    const ranked = AUTO_CODES.map(c => ({ code: c, ...tally[c] }))
+      .filter(t => (t.vert + t.orange + t.rouge + t.blanc) > 0);
+    const forts = [...ranked].sort((a, b) => b.vert - a.vert).slice(0, 3).map(t => `<li><strong>${escHtml(CODE_LABELS[t.code])}</strong> — ${t.vert} fois vert sur ${completed.length}</li>`).join('') || '<li>Pas encore assez de données.</li>';
+    const axes  = [...ranked].sort((a, b) => (b.orange + b.rouge) - (a.orange + a.rouge)).slice(0, 3).map(t => `<li><strong>${escHtml(CODE_LABELS[t.code])}</strong> — ${t.orange + t.rouge} fois à retravailler</li>`).join('') || '<li>Rien à signaler pour l\'instant.</li>';
+
+    /* Conclusion (gabarit déterministe) */
+    const conclusion = completed.length > 0
+      ? `${escHtml(_currentStudent.display_name)} a réalisé ${completed.length} jogging${completed.length > 1 ? 's' : ''} d'écriture, avec un taux de réussite moyen de ${tauxReussite !== null ? tauxReussite + ' %' : '—'} sur les 7 critères automatisables. La suite du travail portera en priorité sur les axes de progrès identifiés ci-dessus, ainsi que sur le critère N (mots manquants), résolu sur la feuille de premier jet lors de la correction manuscrite.`
+      : `${escHtml(_currentStudent.display_name)} n'a pas encore terminé de jogging d'écriture sur la période observée.`;
+
+    const html = `<div class="jog-bulletin-page">
+      <div class="jog-bulletin-header">
+        <div>
+          <img src="assets/proficiamuspetit.png?v=9" alt="Proficiamus" class="jog-bulletin-logo">
+          <div class="jog-bulletin-brand-sub">Bilan des joggings d'écriture — cycle 3</div>
+        </div>
+        <div class="jog-bulletin-header-right">
+          <div class="bh-name">${escHtml(_currentStudent.display_name)}</div>
+          <div>${escHtml([_currentStudent.class_level, _currentStudent.class_name].filter(Boolean).join(' · '))}</div>
+          <div class="bh-period">Généré le ${today}</div>
+        </div>
+      </div>
+
+      <div class="jog-bulletin-stats">
+        <div class="jog-bulletin-stat"><div class="bs-value">${completed.length}</div><div class="bs-label">Joggings terminés</div></div>
+        <div class="jog-bulletin-stat"><div class="bs-value">${totalVerts}</div><div class="bs-label">Feux verts obtenus</div></div>
+        <div class="jog-bulletin-stat"><div class="bs-value">${tauxReussite !== null ? tauxReussite + '%' : '—'}</div><div class="bs-label">Taux de réussite</div></div>
+      </div>
+
+      <div class="jog-bulletin-section-title">Tableau Code Champion (critère dominant sur l'année)</div>
+      <div class="jog-bulletin-feux">${feuxTableHtml}</div>
+
+      <div class="jog-bulletin-progress">
+        <div class="jog-bulletin-section-title">Progression (feux verts par jogging)</div>
+        ${progressRows}
+      </div>
+
+      <div class="jog-bulletin-boxes">
+        <div class="jog-bulletin-box box-forts"><h5>Points forts</h5><ul>${forts}</ul></div>
+        <div class="jog-bulletin-box box-consolider"><h5>Axes de progrès</h5><ul>${axes}</ul></div>
+      </div>
+
+      <div class="jog-bulletin-section-title">Historique</div>
+      ${historiqueHtml}
+
+      ${exampleHtml}
+
+      <div class="jog-bulletin-section-title">Conclusion</div>
+      <div class="jog-bulletin-conclusion">${conclusion}</div>
+
+      <div class="jog-bulletin-footer">
+        <span>proficiamus.eu</span>
+        <span>Module Rédaction — Joggings d'écriture</span>
+      </div>
+    </div>
+
+    <div class="jog-bulletin-page jog-bulletin-mot-page">
+      <div class="jog-bulletin-mot-title">Le mot de l'enseignant</div>
+      <div class="jog-bulletin-mot-space"></div>
+    </div>`;
+
+    document.getElementById('jog-bulletin-print-root').innerHTML = html;
+    document.body.classList.add('printing-jog-bilan');
+    window.print();
+    document.body.classList.remove('printing-jog-bilan');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     INITIALISATION
+  ═══════════════════════════════════════════════════════════════════════════ */
+  (async () => {
+    const profile = await lfmAuth.requireRole('enseignant');
+    if (!profile) return;
+    _teacherProfile = profile;
+
+    try {
+      _classes = await lfmTeacher.getClasses();
+    } catch (e) {
+      document.getElementById('view-loading').textContent = 'Impossible de charger vos classes.';
+      return;
+    }
+
+    document.getElementById('view-loading').style.display = 'none';
+
+    if (_classes.length === 0) {
+      showView('classe');
+      document.getElementById('jog-classe-table-wrap').innerHTML =
+        '<div class="empty-state"><div class="empty-icon">🏫</div><div class="empty-text">Créez d\'abord une classe dans « Mes classes ».</div></div>';
+      return;
+    }
+
+    populateFilters();
+    document.getElementById('jog-filter-class').addEventListener('change', loadClassOverview);
+    document.getElementById('jog-filter-jogging').addEventListener('change', loadClassOverview);
+    document.getElementById('jog-filter-period').addEventListener('change', loadClassOverview);
+
+    showView('classe');
+    loadClassOverview();
+  })();
+  </script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

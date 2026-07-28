@@ -23,6 +23,8 @@
   <script src="js/dictees-badges.js?v=1"></script>
   <script src="js/jogging-student-space.js?v=1"></script>
   <script src="js/dictees-student-space.js?v=1"></script>
+  <link rel="stylesheet" href="resultats-nav.css?v=1">
+  <script src="js/resultats-nav.js?v=1"></script>
   <style>
     .dash-wrap {
       min-height: calc(100vh - 88px - 74px);
@@ -506,8 +508,6 @@
       <div class="dash-tabs">
         <button class="dash-tab dash-tab--active" data-tab="exercices">🎯 Faire des exercices</button>
         <button class="dash-tab" data-tab="resultats">📊 Mes résultats</button>
-        <button class="dash-tab" data-tab="joggings">✍️ Mes joggings d'écriture</button>
-        <button class="dash-tab" data-tab="dictees">📖 Mes dictées préparées</button>
       </div>
 
       <!-- ── Tab 1 : Faire des exercices ── -->
@@ -535,70 +535,76 @@
         </div>
       </div>
 
-      <!-- ── Tab 2 : Mes résultats ── -->
+      <!-- ── Tab 2 : Mes résultats (hub Général / Joggings / Dictées) ── -->
       <div id="tab-resultats" class="dash-tab-pane" style="display:none">
 
-      <!-- Lauriers (couronne, rang, badges de domaine) -->
-      <div id="laurels-root"></div>
+      <!-- Sous-navigation résultats -->
+      <div id="resultats-nav-mount"></div>
 
-      <!-- Statistiques globales -->
-      <div class="dash-stats" id="dash-stats" style="display:none">
-        <div class="dash-stat">
-          <div class="dash-stat-label">Exercices réalisés</div>
-          <div class="dash-stat-value" id="stat-total">0</div>
+      <!-- ── Sous-section : Général ── -->
+      <div id="res-sub-general">
+
+        <!-- Lauriers (couronne, rang, badges de domaine) -->
+        <div id="laurels-root"></div>
+
+        <!-- Statistiques globales -->
+        <div class="dash-stats" id="dash-stats" style="display:none">
+          <div class="dash-stat">
+            <div class="dash-stat-label">Exercices réalisés</div>
+            <div class="dash-stat-value" id="stat-total">0</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-label">Taux de réussite général</div>
+            <div class="dash-stat-value" id="stat-avg">—<span class="dash-stat-unit"></span></div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-label">Taux de réussite en français</div>
+            <div class="dash-stat-value" id="stat-avg-francais">—<span class="dash-stat-unit"></span></div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-label">Taux de réussite en maths</div>
+            <div class="dash-stat-value" id="stat-avg-maths">—<span class="dash-stat-unit"></span></div>
+          </div>
         </div>
-        <div class="dash-stat">
-          <div class="dash-stat-label">Taux de réussite général</div>
-          <div class="dash-stat-value" id="stat-avg">—<span class="dash-stat-unit"></span></div>
-        </div>
-        <div class="dash-stat">
-          <div class="dash-stat-label">Taux de réussite en français</div>
-          <div class="dash-stat-value" id="stat-avg-francais">—<span class="dash-stat-unit"></span></div>
-        </div>
-        <div class="dash-stat">
-          <div class="dash-stat-label">Taux de réussite en maths</div>
-          <div class="dash-stat-value" id="stat-avg-maths">—<span class="dash-stat-unit"></span></div>
-        </div>
-      </div>
 
-      <!-- Points forts / à consolider -->
-      <div class="competence-cols">
-        <div class="dash-section" id="section-strengths" style="display:none">
-          <div class="dash-section-title">Mes points forts</div>
-          <div id="strengths-content"></div>
+        <!-- Points forts / à consolider -->
+        <div class="competence-cols">
+          <div class="dash-section" id="section-strengths" style="display:none">
+            <div class="dash-section-title">Mes points forts</div>
+            <div id="strengths-content"></div>
+          </div>
+
+          <div class="dash-section" id="section-weaknesses" style="display:none">
+            <div class="dash-section-title">À consolider en priorité</div>
+            <div id="weaknesses-content"></div>
+          </div>
         </div>
 
-        <div class="dash-section" id="section-weaknesses" style="display:none">
-          <div class="dash-section-title">À consolider en priorité</div>
-          <div id="weaknesses-content"></div>
+        <!-- Derniers exercices -->
+        <div class="dash-section" id="section-recent" style="display:none">
+          <div class="dash-section-title">Derniers exercices</div>
+          <div class="recent-list" id="recent-list"></div>
         </div>
-      </div>
 
-      <!-- Derniers exercices -->
-      <div class="dash-section" id="section-recent" style="display:none">
-        <div class="dash-section-title">Derniers exercices</div>
-        <div class="recent-list" id="recent-list"></div>
-      </div>
-
-      <!-- État vide (premier usage) -->
-      <div class="dash-section" id="section-empty" style="display:none">
-        <div class="dash-empty">
-          <div class="dash-empty-icon">🚀</div>
-          <strong>C'est parti !</strong><br>
-          Tu n'as pas encore réalisé d'exercice.<br>
-          Lance-toi pour voir ta progression ici.
+        <!-- État vide (premier usage) -->
+        <div class="dash-section" id="section-empty" style="display:none">
+          <div class="dash-empty">
+            <div class="dash-empty-icon">🚀</div>
+            <strong>C'est parti !</strong><br>
+            Tu n'as pas encore réalisé d'exercice.<br>
+            Lance-toi pour voir ta progression ici.
+          </div>
         </div>
-      </div>
 
-      <!-- CTA -->
-      <div class="dash-cta-wrap">
-        <a href="visiteur.html" class="dash-cta">Continuer à m'entraîner →</a>
-      </div>
+        <!-- CTA -->
+        <div class="dash-cta-wrap">
+          <a href="visiteur.html" class="dash-cta">Continuer à m'entraîner →</a>
+        </div>
 
-      </div><!-- /tab-resultats -->
+      </div><!-- /res-sub-general -->
 
-      <!-- ── Tab 3 : Mes joggings d'écriture ── -->
-      <div id="tab-joggings" class="dash-tab-pane" style="display:none">
+      <!-- ── Sous-section : Joggings d'écriture ── -->
+      <div id="res-sub-joggings" style="display:none">
 
       <!-- Mon bilan -->
       <div class="dash-stats" id="jog-stats" style="display:none">
@@ -670,12 +676,12 @@
         </div>
       </div>
 
-      </div><!-- /tab-joggings -->
+      </div><!-- /res-sub-joggings -->
 
-      <!-- ── Tab 4 : Mes dictées préparées ── espace séparé du carnet
+      <!-- ── Sous-section : Dictées préparées ── espace séparé du carnet
            joggings ci-dessus : badges, stats et évolution propres au
            module, jamais fusionnés avec ceux des joggings d'écriture. ── -->
-      <div id="tab-dictees" class="dash-tab-pane" style="display:none">
+      <div id="res-sub-dictees" style="display:none">
 
         <div class="dash-stats" id="dic-dash-stats" style="display:none">
           <div class="dash-stat">
@@ -714,7 +720,9 @@
           </div>
         </div>
 
-      </div><!-- /tab-dictees -->
+      </div><!-- /res-sub-dictees -->
+
+      </div><!-- /tab-resultats -->
 
       <div id="jog-carnet-print-root"></div>
 
@@ -755,12 +763,15 @@
   <script>
     /* ── Tabs ─────────────────────────────────────────────────────────────── */
     const TAB_KEY = 'dash-active-tab';
+    const RES_SUB_KEY = 'dash-resultats-sub';
 
     /* Profil courant, mémorisé pour permettre un refetch de l'onglet
        "Mes résultats" (résultats + lauriers) sans recharger toute la page —
        voir refreshResultsTab() plus bas. */
     let _profile   = null;
     let _classMeta = null;
+    let _currentResSub = sessionStorage.getItem(RES_SUB_KEY) || 'general';
+    let _resNavBar = null;
 
     function activateTab(tabName) {
       document.querySelectorAll('.dash-tab').forEach(btn => {
@@ -773,14 +784,44 @@
 
       /* Données à jour à chaque retour sur l'onglet (ex: après avoir terminé
          un exercice) plutôt qu'un calcul figé au chargement initial. */
-      if (tabName === 'resultats' && _profile) refreshResultsTab();
-      if (tabName === 'joggings' && _profile) JoggingStudentSpace.render(_profile.id);
-      if (tabName === 'dictees' && _profile) DicteesStudentSpace.render(_profile.id);
+      if (tabName === 'resultats' && _profile) activateResultsSub(_currentResSub);
     }
 
     document.querySelectorAll('.dash-tab').forEach(btn => {
       btn.addEventListener('click', () => activateTab(btn.dataset.tab));
     });
+
+    /* ── Hub "Mes résultats" (Général / Joggings / Dictées) ──────────────────
+       Sous-navigation partagée (resultats-nav) qui bascule entre 3 sections
+       internes, sans rechargement de page — mêmes IDs qu'avant la fusion des
+       anciens onglets "Mes joggings d'écriture" / "Mes dictées préparées",
+       donc JoggingStudentSpace.render()/DicteesStudentSpace.render() n'ont
+       pas besoin d'être adaptés. */
+    function renderResultsNav() {
+      const mount = _resNavBar || document.getElementById('resultats-nav-mount');
+      _resNavBar = ResultatsNav.render(mount, {
+        active: _currentResSub,
+        items: {
+          general:  { onClick: () => activateResultsSub('general') },
+          joggings: { onClick: () => activateResultsSub('joggings') },
+          dictees:  { onClick: () => activateResultsSub('dictees') },
+        }
+      });
+    }
+
+    function activateResultsSub(sub) {
+      _currentResSub = sub;
+      sessionStorage.setItem(RES_SUB_KEY, sub);
+      renderResultsNav();
+      document.getElementById('res-sub-general').style.display  = sub === 'general'  ? '' : 'none';
+      document.getElementById('res-sub-joggings').style.display = sub === 'joggings' ? '' : 'none';
+      document.getElementById('res-sub-dictees').style.display  = sub === 'dictees'  ? '' : 'none';
+
+      if (!_profile) return;
+      if (sub === 'general')  refreshResultsTab();
+      if (sub === 'joggings') JoggingStudentSpace.render(_profile.id);
+      if (sub === 'dictees')  DicteesStudentSpace.render(_profile.id);
+    }
 
     /* Le paramètre ?tab= (utilisé par le fil d'Ariane, "🏠 Mon espace")
        prime sur le dernier onglet mémorisé : sans ça, un élève resté sur
@@ -790,6 +831,14 @@
     const _tabParam = new URLSearchParams(window.location.search).get('tab');
     const _initialTab = _tabParam || sessionStorage.getItem(TAB_KEY) || 'exercices';
     activateTab(_initialTab);
+
+    /* Rendu immédiat de la sous-navigation résultats (pastilles) — son
+       contenu dépend de _profile et sera (re)chargé par activateResultsSub()
+       une fois le profil disponible (cf. IIFE d'initialisation plus bas). */
+    document.getElementById('res-sub-general').style.display  = _currentResSub === 'general'  ? '' : 'none';
+    document.getElementById('res-sub-joggings').style.display = _currentResSub === 'joggings' ? '' : 'none';
+    document.getElementById('res-sub-dictees').style.display  = _currentResSub === 'dictees'  ? '' : 'none';
+    renderResultsNav();
 
     /* ── Formatage de date ─────────────────────────────────────────────────── */
     function formatDate(iso) {
@@ -1036,11 +1085,14 @@
         }
       } catch (_) { /* pas encore inscrit dans une classe */ }
 
-      await refreshResultsTab();
-      /* activateTab() a tourné avant que _profile ne soit chargé : si
-         "joggings" est l'onglet actif (mémorisé en sessionStorage ou via
-         ?tab=), son rendu initial a été sauté faute de profil disponible. */
-      if (_initialTab === 'joggings') JoggingStudentSpace.render(_profile.id);
+      /* activateTab()/activateResultsSub() ont tourné avant que _profile ne
+         soit chargé : leur rendu initial a été sauté faute de profil
+         disponible (garde `if (!_profile) return;`). On le déclenche donc
+         ici pour la sous-section résultats actuellement affichée, quel que
+         soit l'onglet principal actif au chargement — comme l'ancien
+         refreshResultsTab() inconditionnel, qui préchargeait toujours "Mes
+         résultats" même si "Faire des exercices" était l'onglet visible. */
+      activateResultsSub(_currentResSub);
     })();
 
     /* Page restaurée depuis le bfcache (bouton Précédent) : les scripts ne
@@ -1048,7 +1100,7 @@
        resteraient figées sur leur état d'avant l'exercice qui vient d'être
        terminé. */
     window.addEventListener('pageshow', e => {
-      if (e.persisted) refreshResultsTab();
+      if (e.persisted) activateResultsSub(_currentResSub);
     });
   </script>
 <style>
