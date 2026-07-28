@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lecture — Français — Lycée Français de Madrid</title>
+  <meta name="description" content="">
+  <!-- SEO: description à rédiger avant le lancement du référencement (voir SEO-TODO.md) -->
+  <link rel="canonical" href="https://proficiamus.eu/français-lecture.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Lecture — Français — Lycée Français de Madrid">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://proficiamus.eu/français-lecture.html">
+  <meta property="og:image" content="">
+  <!-- SEO: og:description et og:image à compléter avant le lancement (voir SEO-TODO.md) -->
+  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="breadcrumb.css?v=1">
+  <script src="js/breadcrumb.js?v=1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/guided-access.js?v=1"></script>
+  <script src="data/index.js?v=1"></script>
+  <script src="js/skill-badges.js?v=1"></script>
+  <style>
+    /* ── Filter bar ─────────────────────────────────────────── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      flex: 1;
+      min-width: 220px;
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--muted);
+    }
+
+    .search-input {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 10px 16px 10px 42px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+
+    .search-input::placeholder { color: var(--muted); }
+
+    .search-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(16,43,106,0.08);
+    }
+
+    .level-filters {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* ── Sections ───────────────────────────────────────────── */
+    .skill-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .skill-section {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: box-shadow 250ms ease;
+    }
+
+    .skill-section.section-hidden { display: none; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 24px;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1.5px solid var(--border);
+      transition: background 200ms;
+    }
+
+    .section-header:hover { background: rgba(16,43,106,0.025); }
+
+    .section-emoji { font-size: 20px; flex-shrink: 0; line-height: 1; }
+
+    .section-title {
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--blue);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      flex: 1;
+    }
+
+    .section-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(16,43,106,0.07);
+      color: var(--blue);
+      font-weight: 700;
+      font-size: 11px;
+      border-radius: 100px;
+      padding: 3px 12px;
+      flex-shrink: 0;
+      transition: background 200ms;
+    }
+
+    .section-toggle {
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      flex-shrink: 0;
+      transition: transform 280ms cubic-bezier(.4,0,.2,1), border-color 200ms;
+    }
+
+    .skill-section.is-collapsed .section-toggle { transform: rotate(-90deg); }
+
+    /* Collapsible body — grid-template-rows trick for smooth animation */
+    .section-body {
+      display: grid;
+      grid-template-rows: 1fr;
+      transition: grid-template-rows 300ms cubic-bezier(.4,0,.2,1);
+    }
+
+    .skill-section.is-collapsed .section-body { grid-template-rows: 0fr; }
+
+    .section-body-inner { overflow: hidden; }
+
+    .section-content { padding: 22px 24px; }
+
+    /* ── Sub-section label ──────────────────────────────────── */
+    .subsection { margin-bottom: 4px; }
+    .subsection:last-child { margin-bottom: 0; }
+
+    .subsection-label {
+      font-weight: 700;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      margin-top: 22px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .subsection:first-child .subsection-label { margin-top: 0; }
+
+    /* ── Skills grid ────────────────────────────────────────── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    /* ── Skill card ─────────────────────────────────────────── */
+    .skill-card {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms;
+    }
+
+    .skill-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(16,43,106,0.18);
+    }
+
+    .skill-card.card-hidden { display: none; }
+    .skill-card-locked { opacity: 0.45; cursor: not-allowed; }
+    .skill-card-locked:hover { transform: none; box-shadow: none; border-color: var(--border); }
+
+    .skill-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .skill-title {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    /* ── Empty states ───────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 56px 24px;
+      color: var(--muted);
+      font-size: 15px;
+      display: none;
+    }
+
+    .empty-state.visible { display: block; }
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .skills-grid { grid-template-columns: repeat(2, 1fr); }
+
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .level-filters { justify-content: center; }
+
+      .section-title { font-size: 11px; }
+    }
+
+    @media (max-width: 480px) {
+      .skills-grid { grid-template-columns: 1fr; }
+
+      .level-filters { flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <!-- NAVBAR-PROFICIAMUS-CSS -->
+  <style>
+  /* ─── Navbar Proficiamus (extrait d'index.html) ─── */
+  body{padding-top:50px;}
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+  .navbar__inner{max-width:1400px;margin:0 auto;padding:0 64px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+  .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+  .navbar__brand img{height:34px;width:auto;}
+  .navbar__brand-text{display:flex;flex-direction:column;}
+  .navbar__name{font-size:18px;font-weight:800;line-height:1;letter-spacing:1px;}
+  .navbar__tagline{font-size:12px;font-style:italic;font-weight:700;color:#102B6A;margin-top:2px;}
+  .navbar__nav{display:flex;align-items:center;gap:24px;}
+  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-size:14px;font-weight:700;transition:color .2s;}
+  .navbar__nav a:hover{color:#1B4EBF;}
+  .navbar__nav a.active{color:#2D9C3C;border-bottom:2px solid #2D9C3C;padding-bottom:2px;}
+  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;}
+  .navbar__nav .btn-login{color:#fff!important;}
+  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+  .btn-login:hover{background:#0b1e4d;}
+  @media(max-width:768px){.navbar__inner{padding:0 24px;}.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <!-- MAIN -->
+  <div class="page-wrap">
+    <div class="page-content">
+
+      <script>Breadcrumb.render({ current: 'Lecture' });</script>
+
+      <a href="français.html" class="back-link">← Français</a>
+
+      <div class="page-header">
+        <div class="page-header-icon" style="font-size:56px;line-height:1;">📖</div>
+        <h1 class="page-title">LECTURE</h1>
+        <div class="page-title-rule"></div>
+        <p class="page-subtitle">Choisis une compétence à travailler.</p>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 20 20" fill="none">
+            <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="2"/>
+            <line x1="12.5" y1="12.5" x2="17" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input
+            type="text"
+            class="search-input"
+            id="search-input"
+            placeholder="Rechercher une compétence..."
+            autocomplete="off"
+            spellcheck="false"
+          >
+        </div>
+        <div class="level-filters">
+          <button class="level-btn active" data-level="all">Tous</button>
+          <button class="level-btn" data-level="CM1">CM1</button>
+          <button class="level-btn" data-level="CM2">CM2</button>
+          <button class="level-btn" data-level="6e">6e</button>
+        </div>
+      </div>
+
+      <!-- Skills container (rendered by JS) -->
+      <div class="skill-sections" id="skills-container"></div>
+
+      <div class="empty-state" id="empty-state">
+        Aucune compétence ne correspond à ta recherche.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau – LFM &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script>
+    /* ── Exercise slugs with available exercises ──────────────────────────── */
+    const EXERCISE_SLUGS = new Set([
+      "comprendre-implicites",
+      "comprendre-mot-contexte"
+    ]);
+
+    /* ── Standalone exercise pages (not using the generic engine) ─────────── */
+    const CUSTOM_HREFS = {};
+
+    /* ── Data ──────────────────────────────────────────────────────────────── */
+    const SECTIONS = [
+      {
+        id: "comprehension",
+        emoji: "📖",
+        title: "Compréhension de lecture",
+        subSections: [
+          {
+            label: null,
+            skills: [
+              { title: "Comprendre les implicites",                                       slug: "comprendre-implicites",     levels: ["CM1","CM2","6e"] },
+              { title: "S'appuyer sur le contexte pour comprendre un mot difficile",       slug: "comprendre-mot-contexte",   levels: ["CM1","CM2","6e"] },
+            ]
+          }
+        ]
+      }
+    ];
+
+    /* ── Badge rendering ───────────────────────────────────────────────────── */
+    function renderBadges(levels) {
+      return levels.map(level => {
+        const cls = level === "CM1" ? "badge-cm1" : level === "CM2" ? "badge-cm2" : "badge-6e";
+        return `<span class="badge ${cls}">${level}</span>`;
+      }).join("");
+    }
+
+    /* Un CUSTOM_HREFS peut rediriger vers "exercise.html?slug=AUTRE-SLUG" (le
+       slug réel dans EXERCISE_DATA/class_active_exercises diffère alors de
+       l'identifiant de compétence skill.slug) — on résout le vrai slug pour
+       vérifier le mode guidé. */
+    function guidedExerciseId(skill) {
+      const custom = CUSTOM_HREFS[skill.slug];
+      if (!custom) return skill.slug;
+      const m = custom.match(/[?&]slug=([^&]+)/);
+      return m ? decodeURIComponent(m[1]) : skill.slug;
+    }
+
+    /* ── Skill card rendering ──────────────────────────────────────────────── */
+    function renderSkillCard(skill, sectionId) {
+      const inCatalog   = EXERCISE_SLUGS.has(skill.slug) || skill.slug in CUSTOM_HREFS;
+      const isBlocked   = inCatalog && typeof lfmGuidedAccess !== 'undefined' && !lfmGuidedAccess.isAllowedSync(guidedExerciseId(skill));
+      const hasExercise = inCatalog && !isBlocked;
+      const href        = hasExercise ? (CUSTOM_HREFS[skill.slug] || `exercise.html?slug=${skill.slug}`) : "#";
+      const onclick     = hasExercise ? "" : `onclick="return false;"`;
+      const lockedClass = isBlocked ? " skill-card-locked" : "";
+      return `
+        <a class="skill-card${lockedClass}"
+           href="${href}"
+           data-slug="${skill.slug}"
+           ${inCatalog ? `data-exercise-slug="${guidedExerciseId(skill)}"` : ""}
+           data-levels="${skill.levels.join(",")}"
+           data-title="${skill.title.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}"
+           data-section="${sectionId}"
+           ${onclick}>
+          <div class="skill-badges">${renderBadges(skill.levels)}</div>
+          <div class="skill-title">${skill.title}${isBlocked ? ' 🔒' : ''}</div>
+        </a>
+      `;
+    }
+
+    /* ── Section rendering ─────────────────────────────────────────────────── */
+    function renderSection(section) {
+      const totalSkills = section.subSections.reduce((n, s) => n + s.skills.length, 0);
+      const label = `${totalSkills} compétence${totalSkills > 1 ? "s" : ""}`;
+
+      const subSectionsHTML = section.subSections.map((sub, subIdx) => {
+        const skillsHTML = sub.skills.map(skill => renderSkillCard(skill, section.id)).join("");
+        const labelHTML  = sub.label ? `<div class="subsection-label">${sub.label}</div>` : "";
+        return `
+          <div class="subsection" data-subsection="${section.id}-${subIdx}">
+            ${labelHTML}
+            <div class="skills-grid">${skillsHTML}</div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="skill-section" data-section-id="${section.id}">
+          <div class="section-header" onclick="toggleSection('${section.id}')">
+            <span class="section-emoji">${section.emoji}</span>
+            <span class="section-title">${section.title}</span>
+            <span class="section-count" data-count-for="${section.id}">${label}</span>
+            <span class="section-toggle">▾</span>
+          </div>
+          <div class="section-body">
+            <div class="section-body-inner">
+              <div class="section-content">${subSectionsHTML}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ── Init ──────────────────────────────────────────────────────────────── */
+    async function init() {
+      if (typeof lfmGuidedAccess !== 'undefined') await lfmGuidedAccess.get();
+      document.getElementById("skills-container").innerHTML =
+        SECTIONS.map(renderSection).join("");
+      bindEvents();
+      if (typeof applySkillValidationBadges === 'function') applySkillValidationBadges();
+    }
+
+    /* ── Toggle section collapse ───────────────────────────────────────────── */
+    function toggleSection(sectionId) {
+      document.querySelector(`[data-section-id="${sectionId}"]`).classList.toggle("is-collapsed");
+    }
+
+    /* ── Filter state ──────────────────────────────────────────────────────── */
+    let activeLevel = "all";
+    let searchQuery  = "";
+
+    function normalize(str) {
+      return str.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    }
+
+    function applyFilters() {
+      const query    = normalize(searchQuery.trim());
+      let anyVisible = false;
+
+      SECTIONS.forEach(section => {
+        const sectionEl = document.querySelector(`[data-section-id="${section.id}"]`);
+        const cards     = sectionEl.querySelectorAll(".skill-card");
+        let sectionVisibleCount = 0;
+
+        cards.forEach(card => {
+          const matchesLevel  = activeLevel === "all" || card.dataset.levels.split(",").includes(activeLevel);
+          const matchesSearch = !query || card.dataset.title.includes(query);
+
+          if (matchesLevel && matchesSearch) {
+            card.classList.remove("card-hidden");
+            sectionVisibleCount++;
+            anyVisible = true;
+          } else {
+            card.classList.add("card-hidden");
+          }
+        });
+
+        /* Hide empty subsections */
+        sectionEl.querySelectorAll(".subsection").forEach(sub => {
+          const visibleInSub = sub.querySelectorAll(".skill-card:not(.card-hidden)").length;
+          sub.style.display  = visibleInSub === 0 ? "none" : "";
+        });
+
+        /* Update count badge */
+        const countEl  = sectionEl.querySelector(`[data-count-for="${section.id}"]`);
+        const total    = section.subSections.reduce((n, s) => n + s.skills.length, 0);
+        countEl.textContent = sectionVisibleCount === total
+          ? `${total} compétence${total > 1 ? "s" : ""}`
+          : `${sectionVisibleCount} / ${total}`;
+
+        /* Show/hide section; auto-expand when searching */
+        if (sectionVisibleCount === 0) {
+          sectionEl.classList.add("section-hidden");
+        } else {
+          sectionEl.classList.remove("section-hidden");
+          if (query) sectionEl.classList.remove("is-collapsed");
+        }
+      });
+
+      document.getElementById("empty-state").classList.toggle("visible", !anyVisible);
+    }
+
+    /* ── Event binding ─────────────────────────────────────────────────────── */
+    function bindEvents() {
+      document.getElementById("search-input").addEventListener("input", e => {
+        searchQuery = e.target.value;
+        applyFilters();
+      });
+
+      document.querySelectorAll(".level-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".level-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          activeLevel = btn.dataset.level;
+          applyFilters();
+        });
+      });
+    }
+
+    init();
+  </script>
+
+  <script src="js/menu.js"></script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

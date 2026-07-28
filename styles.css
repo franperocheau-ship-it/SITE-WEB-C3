@@ -911,6 +911,9 @@ h3 { font-size: 1.2rem; font-weight: 700; }
   line-height: 1.6;
 }
 
+.ex-note ul { margin: 6px 0 0; padding-left: 18px; }
+.ex-note li { margin-bottom: 2px; }
+
 /* ─── Barre de progression ───────────────────────────────────────────────── */
 
 .ex-bar-fill {

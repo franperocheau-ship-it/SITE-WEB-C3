@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Exercice — Français — Lycée Français de Madrid</title>
-  <link rel="stylesheet" href="styles.css?v=11">
+  <link rel="stylesheet" href="styles.css?v=12">
   <link rel="stylesheet" href="level-select.css?v=1">
   <link rel="stylesheet" href="breadcrumb.css?v=1">
   <script src="js/breadcrumb.js?v=1"></script>
@@ -302,6 +302,10 @@
 
     /* ── Feedback ───────────────────────────────────────────── */
     .ex-feedback-area { margin-top: 4px; }
+
+    /* ── Lecture : texte à lire + choix (phrases complètes) ──── */
+    .lec-passage { text-align: left; font-size: 17px; font-weight: 500; line-height: 1.65; }
+    .lec-choices { grid-template-columns: 1fr; }
 
     /* ── Step 2 ─────────────────────────────────────────────── */
     .ex-step2-divider {
@@ -5524,6 +5528,9 @@
       } else if (currentType === "mots-invariables-serie") {
         miInitSession();
         return;
+      } else if (currentType === "comprendre-implicites-niveaux" || currentType === "comprendre-mot-contexte-niveaux") {
+        lecInitSession();
+        return;
       } else {
         bankSource = sessionData.bank;
       }
@@ -5788,6 +5795,8 @@
         /* session managed by fdgdInitSession — no-op here */
       } else if (currentType === "fraction-decimale-tableau-niveaux") {
         /* session managed by fdtnInitSession — no-op here */
+      } else if (currentType === "comprendre-implicites-niveaux" || currentType === "comprendre-mot-contexte-niveaux") {
+        /* session managed by lecInitSession — no-op here */
       } else if (currentType === "accord-participe-cod") {
         renderAccordParticipeCod(card, q);
       }
@@ -28936,6 +28945,211 @@
         level:        'Niveau ' + level,
         score:        s20,
         total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : comprendre-implicites-niveaux / comprendre-mot-contexte-niveaux
+       Lecture — QCM sur un court texte (2-3 phrases) : une question, 3
+       réponses (A/B/C), feedback avec « Indices dans le texte » (2 puces
+       citant les passages qui justifient la bonne réponse). Les deux
+       compétences partagent la même mécanique (texte → question → QCM →
+       indices), seul le contenu (data/lecture.js) diffère.
+       ══════════════════════════════════════════════════════════════════════ */
+
+    let lecLevelSelect = null;
+    let lecSession      = [];
+    let lecIdx          = 0;
+    let lecScore        = 0;
+    let lecLevel        = 1;
+    let lecAnswered     = false;
+
+    const LEC_SEUIL       = 0.8;
+    const LEC_POSITIFS    = ["✅ Bravo !", "✨ Très bien !", "🌟 Exact !", "👏 Bien vu !"];
+    const LEC_LEVEL_DESCS = [
+      'Indices explicites dans le texte',
+      'Indices un peu plus discrets',
+      'Indices indirects, à déduire'
+    ];
+
+    function lecBackToSelectScreen() {
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    function lecInitSession() {
+      lecSession = []; lecIdx = 0; lecScore = 0;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      lecLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: [1, 2, 3].map(lv => ({ id: lv, label: 'Niveau ' + lv, description: LEC_LEVEL_DESCS[lv - 1] })),
+        threshold: LEC_SEUIL,
+        onSelectLevel: lv => lecStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: lecBackToSelectScreen
+      });
+      lecLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function lecStartLevel(lv) {
+      lecLevel   = lv;
+      lecSession = shuffle(sessionData['lvl' + lv]);
+      lecIdx     = 0;
+      lecScore   = 0;
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = lecSession.length;
+      if (lecLevelSelect) lecLevelSelect.renderBadges(lv);
+      lecRenderQuestion();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function lecRenderQuestion() {
+      const q = lecSession[lecIdx];
+      lecAnswered = false;
+      document.getElementById('q-num').textContent = lecIdx + 1;
+      document.getElementById('ex-bar-fill').style.width = (lecIdx / lecSession.length * 100) + '%';
+
+      const card = document.getElementById('ex-card');
+      card.innerHTML = `
+        <div class="ex-sentence-display lec-passage">${q.text}</div>
+        <p class="ex-question-label">${q.question}</p>
+        <div class="ex-choices-grid lec-choices" id="lec-choices">
+          ${q.choices.map((c, i) => `<button type="button" class="ex-choice" id="lec-choice-${i}" onclick="lecValidate(${i})">${c}</button>`).join('')}
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${lecIdx + 1 < lecSession.length ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      document.getElementById('next-btn').addEventListener('click', lecNextQuestion);
+    }
+
+    function lecValidate(idx) {
+      if (lecAnswered) return;
+      lecAnswered = true;
+      const q  = lecSession[lecIdx];
+      const ok = idx === q.correct;
+
+      document.querySelectorAll('#lec-choices .ex-choice').forEach(b => b.disabled = true);
+      document.getElementById(`lec-choice-${q.correct}`).classList.add('is-correct');
+      if (!ok) document.getElementById(`lec-choice-${idx}`).classList.add('is-wrong');
+
+      const hintsHtml = (q.indices && q.indices.length)
+        ? `<div class="ex-note"><strong>Indices dans le texte :</strong><ul>${q.indices.map(h => `<li>${h}</li>`).join('')}</ul></div>`
+        : '';
+
+      if (ok) {
+        lecScore++;
+        document.getElementById('feedback1').innerHTML =
+          `<div class="ex-feedback-correct">${rand(LEC_POSITIFS)}</div>${hintsHtml}`;
+      } else {
+        document.getElementById('feedback1').innerHTML =
+          `<div class="ex-feedback-wrong">❌ Pas tout à fait ! La bonne réponse est en vert.</div>${hintsHtml}`;
+      }
+      document.getElementById('next-btn').classList.remove('ex-hidden');
+    }
+
+    function lecNextQuestion() {
+      lecIdx++;
+      if (lecIdx >= lecSession.length) { lecShowLevelResults(); return; }
+      lecRenderQuestion();
+      document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function lecShowLevelResults() {
+      const level = lecLevel;
+      const total = lecSession.length;
+      const { passed, pct, isLast } = lecLevelSelect.completeLevel(level, lecScore, total);
+      const pctPct = Math.round(pct * 100);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lecScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-lecture.html';
+      const backLabel = `← Retour à la ${sessionData.backLink?.label || 'Lecture'}`;
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const backToSelectBtn = lecLevelSelect.backToSelectButtonHTML();
+
+      let msg, btnsHTML;
+
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises cette compétence de lecture !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="lec-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+          </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="lec-next-btn">Niveau ${level + 1} →</button>
+            <button class="ex-btn-secondary" id="lec-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * LEC_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour passer. On réessaie ?`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="lec-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+          </div>`;
+      }
+
+      document.getElementById('score-msg').textContent = msg;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
+
+      document.getElementById('lec-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        lecStartLevel(level);
+      });
+      document.getElementById('lec-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        lecStartLevel(level + 1);
+      });
+      document.getElementById('lec-restart-btn')?.addEventListener('click', () => {
+        lecLevelSelect.reset();
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        lecInitSession();
+      });
+      lecLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug,
+        subject,
+        category,
+        exerciseType: currentType,
+        level:        'Niveau ' + level,
+        score:        lecScore,
+        total,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
       });
     }

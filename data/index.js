@@ -13,6 +13,7 @@
     "data/conjugaison.js",
     "data/grammaire.js",
     "data/orthographe.js",
+    "data/lecture.js",
     "data/nombres-entiers.js",
     "data/fractions.js",
     "data/nombres-decimaux.js",
