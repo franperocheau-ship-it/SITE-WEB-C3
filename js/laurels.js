@@ -340,7 +340,6 @@ function renderLaurelBadges(bySlug, notionMap) {
       <div class="laurel-badge ${locked ? 'laurel-badge--locked' : 'laurel-badge--' + tier}">
         <div class="laurel-badge-icon">${locked ? '🔒' : '🏅'}</div>
         <div class="laurel-badge-label">${notion}</div>
-        <div class="laurel-badge-count">${count} exercice${count > 1 ? 's' : ''}</div>
       </div>`;
   }).join('');
 

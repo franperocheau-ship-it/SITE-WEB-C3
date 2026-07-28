@@ -61,7 +61,7 @@ const lfmNiveauPastilles = (() => {
       (profile.sousDomaineJauges?.[domaine] || [])
         .filter(sd => sd.segments.some(seg => seg.status !== 'non-concerne'))
         .forEach(sd => {
-          rows += renderRow(`${escHtml(sd.sousDomaine)} · ${sd.exerciseCount} ex.`, sd.segments, 'bjt-sous');
+          rows += renderRow(escHtml(sd.sousDomaine), sd.segments, 'bjt-sous');
           (sd.competences || []).forEach(c => { rows += renderCompetenceRow(c); });
         });
     });

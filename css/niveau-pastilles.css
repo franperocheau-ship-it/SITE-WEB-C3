@@ -20,7 +20,7 @@
 .bj-table td { padding: 5px 6px; text-align: center; border-bottom: 1px solid #F0F2F6; }
 .bj-table td:first-child { text-align: left; }
 .bjt-domaine td:first-child { font-weight: 800; color: #1A2D6B; }
-.bjt-sous td:first-child { padding-left: 20px; font-weight: 500; color: #5F6368; font-size: 12px; }
+.bjt-sous td:first-child { padding-left: 20px; font-weight: 500; color: #5F6368; font-size: 12px; text-decoration: underline; }
 .bjt-pastille { display: inline-block; width: 13px; height: 13px; border-radius: 50%; }
 .bjt-pastille.atteint       { background: #1DBFA0; }
 .bjt-pastille.en-cours      { background: #F5A623; }
