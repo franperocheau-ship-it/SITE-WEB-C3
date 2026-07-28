@@ -62,7 +62,13 @@ const lfmAnalytics = (() => {
       'ecrire-decimal-sous-forme-fraction':  { domaine: 'Mathématiques', competence: 'Nombres décimaux — Écrire un décimal sous forme de fraction' },
     },
     prefixes: [
-      { prefix: 'ortho-', meta: { domaine: 'Français', competence: 'Orthographe — Homophones grammaticaux' } },
+      /* Les 10 pages ortho-distinguer-*.html ont toutes exactement 3 niveaux,
+         affichés avec des badges CM1/CM2/6e à l'écran (vérifié identique sur
+         les 10 fichiers) et enregistrent level: 'Niveau N' — reconnu tel
+         quel par levelToPalierKey. Mapping 1:1 fiable, contrairement à
+         lex-* (data-levels variable selon la compétence, pas de badge
+         CM1/CM2/6e) qui reste donc sans `levels` ci-dessous. */
+      { prefix: 'ortho-', meta: { domaine: 'Français', competence: 'Orthographe — Homophones grammaticaux', levels: ['CM1', 'CM2', '6e'], paliers: 3 } },
       { prefix: 'lex-',   meta: { domaine: 'Français', competence: 'Vocabulaire' } },
     ],
   };
@@ -108,7 +114,7 @@ const lfmAnalytics = (() => {
       return {
         domaine: standalone.domaine, competence: standalone.competence,
         ...splitCompetence(standalone.competence),
-        title: null, levels: []
+        title: null, levels: standalone.levels || [], paliers: standalone.paliers
       };
     }
     return UNKNOWN_META;
@@ -160,7 +166,12 @@ const lfmAnalytics = (() => {
   }
 
   function resolveNiveau(catalogMap, row) {
-    const meta = catalogMap[row.exercise_slug];
+    /* metaFor() (et non catalogMap[slug] direct) pour reconnaître aussi les
+       pages autonomes dont le mapping niveau est fiable (ortho-*, voir
+       STANDALONE_META) — sans rouvrir les cas volontairement exclus
+       (LEGACY_SLUG_ALIASES et les autres standalones renvoient levels: [],
+       donc toujours exclus par le test ci-dessous). */
+    const meta = metaFor(catalogMap, row.exercise_slug);
     if (!meta || !meta.levels || meta.levels.length === 0) return null;
     const paliers = typeof meta.paliers === 'number' && meta.paliers >= 1 ? meta.paliers : 1;
     const palierIdx = parseInt(levelToPalierKey(row.level), 10);
