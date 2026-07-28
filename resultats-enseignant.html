@@ -11,6 +11,7 @@
   <script src="js/teacher.js?v=2"></script>
   <script src="js/teacher-analytics.js?v=2"></script>
   <script src="js/level-badge.js?v=1"></script>
+  <script src="js/bilan-nav.js?v=1"></script>
   <link rel="stylesheet" href="laurels.css?v=2">
   <script src="js/laurels.js?v=2"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=1">
@@ -258,22 +259,19 @@
     }
     .tab-btn.active { background: var(--card-bg); color: var(--blue); box-shadow: var(--shadow-sm); }
 
-    /* ── Bilan par compétence ────────────────────────────────────────────────── */
+    /* ── Bilan par compétence — rendu imprimable uniquement (arbre complet
+       généré par lfmBilanNav.renderFullTreeHtml, voir printBilan()). L'écran
+       utilise la navigation progressive .bnav-* ci-dessous. ─────────────── */
     .bilan-domaine {
       margin-bottom: 20px; background: var(--card-bg);
       border-radius: var(--radius-card); box-shadow: var(--shadow-sm); overflow: hidden;
     }
     .bilan-domaine-header {
       display: flex; align-items: center; gap: 10px;
-      padding: 16px 20px; cursor: pointer; user-select: none;
-      border-bottom: 1px solid var(--border);
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
     }
-    .bilan-domaine-header:hover { background: rgba(16,43,106,0.02); }
     .bilan-domaine-title  { font-weight: 800; font-size: 16px; color: var(--blue); }
     .bilan-domaine-count  { font-size: 12px; color: var(--muted); }
-    .bilan-chevron        { margin-left: auto; color: var(--muted); font-size: 16px; transition: transform 200ms; }
-    .bilan-domaine.closed .bilan-chevron      { transform: rotate(-90deg); }
-    .bilan-domaine.closed .bilan-domaine-body { display: none; }
 
     /* sous-domaine (ex : Conjugaison, Grammaire, Fractions) */
     .bilan-sous-domaine { border-bottom: 1px solid var(--border); }
@@ -290,8 +288,51 @@
     .bilan-level-block { margin-bottom: 14px; }
     .bilan-level-block:last-child { margin-bottom: 0; }
 
+    /* ── Navigation progressive du bilan (lfmBilanNav) ───────────────────────── */
+    .bnav-crumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin-bottom: 16px; font-size: 13px; }
+    .bnav-crumb {
+      color: var(--blue); text-decoration: none; font-weight: 600;
+      cursor: pointer; background: none; border: none;
+      font-family: inherit; font-size: 13px; padding: 0;
+    }
+    .bnav-crumb:hover { text-decoration: underline; }
+    .bnav-crumb-current { font-weight: 600; color: var(--text); }
+    .bnav-sep { color: var(--border); margin: 0 6px; user-select: none; }
+
+    .bnav-row-list {
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm); overflow: hidden;
+    }
+    .bnav-row {
+      display: flex; align-items: center; gap: 10px; width: 100%;
+      padding: 14px 20px; border: none; border-bottom: 1px solid var(--border);
+      background: none; font-family: inherit; text-align: left; cursor: pointer;
+    }
+    .bnav-row:last-child { border-bottom: none; }
+    .bnav-row:hover { background: rgba(16,43,106,0.03); }
+    .bnav-row-label { font-weight: 700; font-size: 14px; color: var(--text); flex: 1; }
+    .bnav-row-meta  { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .bnav-row-arrow { color: var(--muted); font-size: 16px; }
+
+    .bnav-actions { margin-bottom: 12px; }
+
+    .bnav-leaf-list {
+      background: var(--card-bg); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm); overflow: hidden;
+    }
+    .bnav-leaf-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 20px; border-bottom: 1px solid var(--border);
+    }
+    .bnav-leaf-row:last-child { border-bottom: none; }
+    .bnav-leaf-name { font-weight: 600; font-size: 13.5px; color: var(--text); flex: 1; }
+    .bnav-leaf-meta { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+
+    .bnav-leaf-summary { display: flex; align-items: center; gap: 12px; }
+
     /* ── Impression PDF ─────────────────────────────────────────────────────── */
     .print-header, .print-footer { display: none; }
+    #bilan-print-full { display: none; }
 
     @media print {
       body:not(.printing-bulletin) .header, body:not(.printing-bulletin) footer,
@@ -300,7 +341,7 @@
       body:not(.printing-bulletin) #export-class-btn, body:not(.printing-bulletin) #print-bilan-btn,
       body:not(.printing-bulletin) #view-classes, body:not(.printing-bulletin) #view-student,
       body:not(.printing-bulletin) #view-loading, body:not(.printing-bulletin) #panel-eleves,
-      body:not(.printing-bulletin) #panel-overview,
+      body:not(.printing-bulletin) #panel-overview, body:not(.printing-bulletin) #bilan-content,
       body:not(.printing-bulletin) .class-info-bar > div:last-child { display: none !important; }
 
       body:not(.printing-bulletin) .dash-wrap    { padding: 0; background: #fff; min-height: unset; }
@@ -309,11 +350,10 @@
       .print-header { display: block !important; margin-bottom: 20px; }
       .print-footer { display: block !important; margin-top: 24px;
         font-size: 11pt; color: #555; border-top: 1px solid #ccc; padding-top: 8px; }
+      #bilan-print-full { display: block !important; }
 
       .bilan-domaine { box-shadow: none; border: 1px solid #ccc; margin-bottom: 16px; break-inside: avoid; }
-      .bilan-domaine.closed .bilan-domaine-body { display: block !important; }
       .bilan-domaine-header { border-bottom: 1px solid #ccc; }
-      .bilan-chevron        { display: none; }
 
       .bilan-competence { break-inside: avoid; border-bottom: 1px solid #ddd; }
       .bilan-level-block { break-inside: avoid; }
@@ -385,17 +425,10 @@
     .subdom-gauge-track { background: var(--bg); border-radius: 100px; height: 8px; overflow: hidden; }
     .subdom-gauge-fill { height: 100%; border-radius: 100px; background: var(--blue); }
 
-    /* ── Sous-domaine repliable (Bilan par compétence) ───────────────────────── */
-    .bilan-sous-domaine-header {
-      display: flex; align-items: center; gap: 10px;
-      padding: 14px 20px 6px; cursor: pointer; user-select: none;
-    }
-    .bilan-sous-domaine-header:hover .bilan-sous-domaine-title { color: var(--blue); }
+    /* ── En-tête sous-domaine (bilan imprimé, voir renderFullTreeHtml) ───────── */
+    .bilan-sous-domaine-header { display: flex; align-items: center; gap: 10px; padding: 14px 20px 6px; }
     .bilan-sous-domaine-header .bilan-sous-domaine-title { padding: 0; flex: 1; }
     .bilan-sous-domaine-header .subdom-gauge-row { flex: 1; margin-bottom: 0; }
-    .bilan-sous-domaine-chevron { color: var(--muted); font-size: 14px; transition: transform 200ms; flex-shrink: 0; }
-    .bilan-sous-domaine.closed .bilan-sous-domaine-chevron { transform: rotate(-90deg); }
-    .bilan-sous-domaine.closed .bilan-competence { display: none; }
 
     /* ── Fiche élève : rang lauriers + compétences à consolider ─────────────── */
     .student-rank-line {
@@ -715,13 +748,12 @@
             <div style="font-size:13px;color:var(--muted);margin-top:4px" id="print-date"></div>
             <hr style="margin:16px 0;border:none;border-top:2px solid var(--border)">
           </div>
-          <div class="view-tabs" id="bilan-subject-tabs" style="display:none;margin-bottom:16px">
-            <button class="tab-btn active" id="bilan-tab-fr" onclick="filterBilanByDomaine('Français')">📖 Français</button>
-            <button class="tab-btn" id="bilan-tab-math" onclick="filterBilanByDomaine('Mathématiques')">🔢 Mathématiques</button>
-          </div>
           <div id="bilan-content">
             <div class="view-loading">Chargement du bilan…</div>
           </div>
+          <!-- Arbre complet, généré à la volée pour l'impression uniquement
+               (voir printBilan()) — jamais affiché à l'écran. -->
+          <div id="bilan-print-full"></div>
           <!-- Pied de page impression uniquement -->
           <div class="print-footer">© François Pérocheau – LFM</div>
         </div>
@@ -819,11 +851,18 @@
   let _currentStudent = null;   // { auth_user_id, display_name, class_name }
   let _bilanLoaded    = false;
   let _bilanClassId   = null;
+  let _bilanByDomaine       = null;  // dernier arbre groupé (classe), réutilisé par printBilan()/printCompetence()
+  let _bilanSousDomaineRates = null; // idem, pour les jauges du bilan imprimé
   let _overviewLoaded   = false;
   let _overviewClassId  = null;
   let _catalogMap        = null;   // lfmAnalytics.buildCatalogMap(), une fois exercise-data.js chargé
   let _studentProfile     = null;  // dernier profil calculé (fiche élève courante), réutilisé par le bulletin
   let _studentRows         = [];   // dernières lignes brutes de l'élève courant (pour filtrage par période)
+
+  /* Domaines/icônes partagés entre la vue classe et la fiche élève (bilan
+     par compétence, écran ET impression). */
+  const DOMAIN_ORDER = ['Français', 'Mathématiques'];
+  const DOMAIN_ICONS = { Français: '📚', Mathématiques: '📐', Autres: '🗂' };
 
   /* Repli pour un exercise_slug absent de _catalogMap (exercice retiré du
      catalogue depuis) : la ligne reste affichée, groupée à part, avec le
@@ -1081,7 +1120,6 @@
       const sousDomaineRates = lfmAnalytics.computeSousDomaineRates(data, _catalogMap);
 
       /* Grouper domaine → compétence → niveau */
-      const DOMAIN_ORDER = ['Français', 'Mathématiques'];
       const byDomaine    = {};
 
       for (const r of latest) {
@@ -1105,102 +1143,20 @@
         });
       }
 
-      /* Rendu HTML */
-      const domaineKeys = DOMAIN_ORDER.filter(d => byDomaine[d]);
-      Object.keys(byDomaine).forEach(d => { if (!domaineKeys.includes(d)) domaineKeys.push(d); });
+      _bilanByDomaine        = byDomaine;
+      _bilanSousDomaineRates = sousDomaineRates;
 
-      const DOMAIN_ICONS = { Français: '📚', Mathématiques: '📐', Autres: '🗂' };
-      let html = '';
-
-      domaineKeys.forEach(domaine => {
-        const sousDomaineMap = byDomaine[domaine];
-        const totalRows = Object.values(sousDomaineMap).reduce((n, comps) =>
-          n + Object.values(comps).reduce((m, lvls) =>
-            m + Object.values(lvls).reduce((k, arr) => k + arr.length, 0), 0), 0);
-        const icon = DOMAIN_ICONS[domaine] || '📖';
-
-        html += `<div class="bilan-domaine" data-domaine="${escHtml(domaine)}">
-          <div class="bilan-domaine-header" onclick="toggleDomaine(this)">
-            <span class="bilan-domaine-title">${icon} ${escHtml(domaine)}</span>
-            <span class="bilan-domaine-count">${totalRows} résultat${totalRows > 1 ? 's' : ''}</span>
-            <span class="bilan-chevron">▾</span>
-          </div>
-          <div class="bilan-domaine-body">`;
-
-        Object.entries(sousDomaineMap).forEach(([sousDomaine, comps]) => {
-          const rate = sousDomaineRates.get(domaine + '||' + sousDomaine);
-          const gaugeHtml = rate ? `
-            <div class="subdom-gauge-row">
-              <div class="subdom-gauge-label"><span>${escHtml(sousDomaine)}</span><span class="n">${rate.avgPct}%</span></div>
-              <div class="subdom-gauge-track"><div class="subdom-gauge-fill" style="width:${rate.avgPct}%"></div></div>
-            </div>` : `<div class="bilan-sous-domaine-title" style="padding:0">${escHtml(sousDomaine)}</div>`;
-
-          html += `<div class="bilan-sous-domaine" data-sous-domaine="${escHtml(sousDomaine)}">
-            <div class="bilan-sous-domaine-header" onclick="toggleSousDomaine(this)">
-              ${gaugeHtml}
-              <span class="bilan-sous-domaine-chevron">▾</span>
-            </div>`;
-
-          Object.entries(comps).forEach(([compLabel, levels]) => {
-            const compKey = encodeURIComponent(domaine + '||' + sousDomaine + '||' + compLabel);
-            html += `<div class="bilan-competence" data-comp-key="${compKey}">
-              <div class="bilan-competence-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                <span>${escHtml(compLabel)}</span>
-                <button class="btn btn-ghost btn-sm" style="flex-shrink:0;font-size:11px;padding:5px 10px"
-                  onclick="printCompetence(this)">📄 PDF</button>
-              </div>`;
-
-            const levelIndex = level => lfmLevelBadge.resolveIndex(level === '—' ? null : level, levels[level][0]?.exerciseType);
-            const sortedLevels = Object.keys(levels).sort((a, b) => {
-              const ia = levelIndex(a), ib = levelIndex(b);
-              return (ia == null ? 99 : ia) - (ib == null ? 99 : ib);
-            });
-
-            sortedLevels.forEach(level => {
-              const items      = levels[level];
-              const levelBadge = lfmLevelBadge.html(level === '—' ? null : level, items[0]?.exerciseType);
-              html += `<div class="bilan-level-block">
-                <span style="margin-bottom:8px;display:inline-block">${levelBadge || `<span class="badge" style="background:var(--border);color:var(--muted)">${escHtml(level)}</span>`}</span>
-                <div class="table-wrap" style="border-radius:8px">
-                  <table class="result-table">
-                    <thead><tr>
-                      <th>Élève</th><th>Exercice</th><th>Score</th><th>Résultat</th><th>Date</th>
-                    </tr></thead>
-                    <tbody>`;
-
-              items.sort((a, b) => a.name.localeCompare(b.name, 'fr')).forEach(item => {
-                const pillCls = item.pct >= 70 ? 'score-high' : item.pct >= 50 ? 'score-mid' : 'score-low';
-                const date    = new Date(item.date).toLocaleDateString('fr-FR',
-                  { day: '2-digit', month: '2-digit', year: '2-digit' });
-                const t = item.exTitle.charAt(0).toUpperCase() + item.exTitle.slice(1);
-                html += `<tr>
-                  <td style="font-weight:600">${escHtml(item.name)}</td>
-                  <td style="font-size:12px;color:var(--muted);max-width:180px;
-                      overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
-                      title="${escHtml(t)}">${escHtml(t)}</td>
-                  <td>${item.score}/${item.total}</td>
-                  <td><span class="score-pill ${pillCls}">${Math.round(item.pct)}%</span></td>
-                  <td style="color:var(--muted);font-size:13px">${date}</td>
-                </tr>`;
-              });
-
-              html += `</tbody></table></div></div>`;
-            });
-
-            html += `</div>`;  /* bilan-competence */
-          });
-
-          html += `</div>`;  /* bilan-sous-domaine */
-        });
-
-        html += `</div></div>`;  /* bilan-domaine-body + bilan-domaine */
+      lfmBilanNav.mount(container, {
+        mode: 'classe',
+        byDomaine,
+        domainOrder: DOMAIN_ORDER,
+        domainIcons: DOMAIN_ICONS,
+        sousDomaineRates,
+        levelBadge: lfmLevelBadge,
+        rememberKey: 'classe',
+        onPrintCompetence: printCompetence
       });
-
-      container.innerHTML = html;
       _bilanLoaded = true;
-      document.getElementById('bilan-subject-tabs').style.display = '';
-      const savedDomaine = sessionStorage.getItem('bilan-domaine-filter') || 'Français';
-      filterBilanByDomaine(savedDomaine);
 
     } catch (e) {
       container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Erreur lors du chargement du bilan.</div></div>';
@@ -1208,33 +1164,21 @@
     }
   }
 
-  function toggleDomaine(header) {
-    header.closest('.bilan-domaine').classList.toggle('closed');
-  }
-
-  function toggleSousDomaine(header) {
-    header.closest('.bilan-sous-domaine').classList.toggle('closed');
-  }
-
-  function filterBilanByDomaine(domaine) {
-    sessionStorage.setItem('bilan-domaine-filter', domaine);
-    document.getElementById('bilan-tab-fr').classList.toggle('active',   domaine === 'Français');
-    document.getElementById('bilan-tab-math').classList.toggle('active', domaine === 'Mathématiques');
-    document.querySelectorAll('#bilan-content .bilan-domaine').forEach(el => {
-      el.style.display = el.dataset.domaine === domaine ? '' : 'none';
-    });
-  }
-
   /* ═══════════════════════════════════════════════════════════════════════════
      IMPRESSION PDF
   ═══════════════════════════════════════════════════════════════════════════ */
   function printBilan() {
-    /* Ouvrir tous les accordéons fermés */
-    document.querySelectorAll('.bilan-domaine.closed').forEach(d => d.classList.remove('closed'));
-    document.querySelectorAll('.bilan-sous-domaine.closed').forEach(d => d.classList.remove('closed'));
-    /* Afficher tous les domaines (filtre désactivé pour impression) */
-    document.querySelectorAll('#bilan-content .bilan-domaine').forEach(d => d.style.display = '');
-    /* Remplir l'en-tête */
+    /* L'écran n'affiche que l'étape courante de la navigation progressive ;
+       l'impression a besoin de l'arbre complet, généré à la volée à partir
+       des données (jamais affiché) — voir #bilan-print-full et le CSS
+       @media print associé. */
+    document.getElementById('bilan-print-full').innerHTML = lfmBilanNav.renderFullTreeHtml(_bilanByDomaine, {
+      domainOrder: DOMAIN_ORDER,
+      domainIcons: DOMAIN_ICONS,
+      sousDomaineRates: _bilanSousDomaineRates,
+      levelBadge: lfmLevelBadge
+    });
+
     const p     = new URLSearchParams(window.location.search);
     const cname = decodeURIComponent(p.get('cname') || (_currentClass?.name || 'Classe'));
     document.getElementById('print-title').textContent =
@@ -1242,45 +1186,47 @@
     document.getElementById('print-date').textContent =
       `Imprimé le ${new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}`;
     window.print();
-    /* Restaurer le filtre actif après impression */
-    const saved = sessionStorage.getItem('bilan-domaine-filter') || 'Français';
-    filterBilanByDomaine(saved);
   }
 
   /* ── PDF par compétence ────────────────────────────────────────────────── */
-  function printCompetence(btn) {
-    const block      = btn.closest('.bilan-competence');
-    const compLabel  = block.querySelector('.bilan-competence-title span').textContent.trim();
-    const sousDom    = block.closest('.bilan-sous-domaine')?.dataset.sousDomaine || '';
-    const competence = sousDom ? `${sousDom} — ${compLabel}` : compLabel;
-    const domaine    = block.closest('.bilan-domaine')
-                           .querySelector('.bilan-domaine-title').textContent.trim();
+  function printCompetence(path) {
+    const [domaine, sousDomaine, compLabel] = path;
+    const levels = ((_bilanByDomaine[domaine] || {})[sousDomaine] || {})[compLabel];
+    if (!levels) return;
+    const competence = sousDomaine ? `${sousDomaine} — ${compLabel}` : compLabel;
 
     const p     = new URLSearchParams(window.location.search);
     const cname = decodeURIComponent(p.get('cname') || (_currentClass?.name || 'Classe'));
     const today = new Date().toLocaleDateString('fr-FR',
       { day: '2-digit', month: 'long', year: 'numeric' });
 
-    /* Construire les tableaux par niveau à partir du DOM */
+    /* Construire les tableaux par niveau directement à partir des données
+       (plus de scraping DOM : à l'étape "niveaux" de la navigation, seule
+       la compétence choisie est présente dans le DOM). */
     let tablesHtml = '';
-    block.querySelectorAll('.bilan-level-block').forEach(lb => {
-      const badgeEl  = lb.querySelector('.badge');
-      const badgeTxt = badgeEl ? badgeEl.textContent.trim() : '';
-      const badgeCls = badgeEl ? badgeEl.className.replace('badge', '').trim() : '';
+    lfmBilanNav.levelSort(levels, lfmLevelBadge).forEach(level => {
+      const items = levels[level];
+      const badgeHtml = lfmLevelBadge.html(level === '—' ? null : level, items[0]?.exerciseType)
+        || `<span class="badge">${escHtml(level)}</span>`;
+      const tmp = document.createElement('div');
+      tmp.innerHTML = badgeHtml;
+      const badgeEl  = tmp.firstElementChild;
+      const badgeTxt = badgeEl.textContent.trim();
+      const badgeCls = badgeEl.className.replace('badge', '').trim();
 
       let rows = '';
-      lb.querySelectorAll('tbody tr').forEach(tr => {
-        const cells = tr.querySelectorAll('td');
-        if (cells.length < 5) return;
-        const pct     = cells[3].querySelector('.score-pill')?.textContent.trim() || '';
-        const pctVal  = parseFloat(pct);
-        const color   = pctVal >= 70 ? '#15803d' : pctVal >= 50 ? '#a16207' : '#D62839';
+      items.slice().sort((a, b) => a.name.localeCompare(b.name, 'fr')).forEach(item => {
+        const pct   = Math.round(item.pct);
+        const color = pct >= 70 ? '#15803d' : pct >= 50 ? '#a16207' : '#D62839';
+        const date  = new Date(item.date).toLocaleDateString('fr-FR',
+          { day: '2-digit', month: '2-digit', year: '2-digit' });
+        const t = item.exTitle.charAt(0).toUpperCase() + item.exTitle.slice(1);
         rows += `<tr>
-          <td style="font-weight:600">${cells[0].textContent.trim()}</td>
-          <td style="font-size:9pt;color:#555">${cells[1].textContent.trim()}</td>
-          <td>${cells[2].textContent.trim()}</td>
-          <td><span style="color:${color};font-weight:700">${pct}</span></td>
-          <td style="color:#555">${cells[4].textContent.trim()}</td>
+          <td style="font-weight:600">${escHtml(item.name)}</td>
+          <td style="font-size:9pt;color:#555">${escHtml(t)}</td>
+          <td>${item.score}/${item.total}</td>
+          <td><span style="color:${color};font-weight:700">${pct}%</span></td>
+          <td style="color:#555">${date}</td>
         </tr>`;
       });
 
@@ -1478,7 +1424,6 @@
     document.getElementById('panel-eleves').style.display   = 'none';
     document.getElementById('panel-bilan').style.display    = 'none';
     document.getElementById('print-bilan-btn').style.display = 'none';
-    document.getElementById('bilan-subject-tabs').style.display = 'none';
     document.getElementById('bilan-content').innerHTML =
       '<div class="view-loading">Chargement du bilan…</div>';
 
@@ -1905,8 +1850,7 @@
       }
 
       /* Grouper domaine → sous-domaine → compétence → niveau */
-      const DOMAIN_ORDER = ['Français', 'Mathématiques'];
-      const byDomaine    = {};
+      const byDomaine = {};
 
       for (const r of latest) {
         const meta = _catalogMap[r.exercise_slug] || UNKNOWN_META;
@@ -1927,87 +1871,14 @@
         });
       }
 
-      const domaineKeys = DOMAIN_ORDER.filter(d => byDomaine[d]);
-      Object.keys(byDomaine).forEach(d => { if (!domaineKeys.includes(d)) domaineKeys.push(d); });
-
-      const DOMAIN_ICONS = { Français: '📚', Mathématiques: '📐', Autres: '🗂' };
-      let html = '';
-
-      domaineKeys.forEach(domaine => {
-        const sousDomaineMap = byDomaine[domaine];
-        const totalEx = Object.values(sousDomaineMap).reduce((n, comps) =>
-          n + Object.values(comps).reduce((m, lvls) =>
-            m + Object.values(lvls).reduce((k, arr) => k + arr.length, 0), 0), 0);
-        const icon = DOMAIN_ICONS[domaine] || '📖';
-
-        html += `<div class="bilan-domaine closed">
-          <div class="bilan-domaine-header" onclick="toggleDomaine(this)">
-            <span class="bilan-domaine-title">${icon} ${escHtml(domaine)}</span>
-            <span class="bilan-domaine-count">${totalEx} exercice${totalEx > 1 ? 's' : ''}</span>
-            <span class="bilan-chevron">▾</span>
-          </div>
-          <div class="bilan-domaine-body">`;
-
-        Object.entries(sousDomaineMap).forEach(([sousDomaine, comps]) => {
-          const sdCount = Object.values(comps).reduce((m, lvls) =>
-            m + Object.values(lvls).reduce((k, arr) => k + arr.length, 0), 0);
-
-          html += `<div class="bilan-sous-domaine closed" data-sous-domaine="${escHtml(sousDomaine)}">
-            <div class="bilan-sous-domaine-header" onclick="toggleSousDomaine(this)">
-              <span class="bilan-sous-domaine-title">${escHtml(sousDomaine)}</span>
-              <span class="bilan-domaine-count">${sdCount} exercice${sdCount > 1 ? 's' : ''}</span>
-              <span class="bilan-sous-domaine-chevron">▾</span>
-            </div>`;
-
-          Object.entries(comps).forEach(([compLabel, levels]) => {
-            html += `<div class="bilan-competence">
-              <div class="bilan-competence-title">${escHtml(compLabel)}</div>`;
-
-            const levelIndex = level => lfmLevelBadge.resolveIndex(level === '—' ? null : level, levels[level][0]?.exerciseType);
-            const sortedLevels = Object.keys(levels).sort((a, b) => {
-              const ia = levelIndex(a), ib = levelIndex(b);
-              return (ia == null ? 99 : ia) - (ib == null ? 99 : ib);
-            });
-
-            sortedLevels.forEach(level => {
-              const items      = levels[level];
-              const levelBadge = lfmLevelBadge.html(level === '—' ? null : level, items[0]?.exerciseType);
-              html += `<div class="bilan-level-block">
-                <span style="margin-bottom:8px;display:inline-block">${levelBadge || `<span class="badge" style="background:var(--border);color:var(--muted)">${escHtml(level)}</span>`}</span>
-                <div class="table-wrap" style="border-radius:8px">
-                  <table class="result-table">
-                    <thead><tr>
-                      <th>Exercice</th><th>Score</th><th>Résultat</th><th>Date</th>
-                    </tr></thead>
-                    <tbody>`;
-
-              items.forEach(item => {
-                const pillCls = item.pct >= 70 ? 'score-high' : item.pct >= 50 ? 'score-mid' : 'score-low';
-                const date    = new Date(item.date).toLocaleDateString('fr-FR',
-                  { day: '2-digit', month: '2-digit', year: '2-digit' });
-                const t = item.exTitle.charAt(0).toUpperCase() + item.exTitle.slice(1);
-                html += `<tr>
-                  <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
-                      title="${escHtml(t)}">${escHtml(t)}</td>
-                  <td>${item.score}/${item.total}</td>
-                  <td><span class="score-pill ${pillCls}">${Math.round(item.pct)}%</span></td>
-                  <td style="color:var(--muted);font-size:13px">${date}</td>
-                </tr>`;
-              });
-
-              html += `</tbody></table></div></div>`;
-            });
-
-            html += `</div>`;  /* bilan-competence */
-          });
-
-          html += `</div>`;  /* bilan-sous-domaine */
-        });
-
-        html += `</div></div>`;
+      lfmBilanNav.mount(container, {
+        mode: 'eleve',
+        byDomaine,
+        domainOrder: DOMAIN_ORDER,
+        domainIcons: DOMAIN_ICONS,
+        levelBadge: lfmLevelBadge,
+        rememberKey: 'eleve'
       });
-
-      container.innerHTML = html;
 
     } catch (e) {
       container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Erreur lors du chargement du bilan.</div></div>';
