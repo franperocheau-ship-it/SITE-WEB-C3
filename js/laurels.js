@@ -406,10 +406,11 @@ function renderLaurelCrown(earnedList, isGolden, targetRank) {
     : '';
   const breakdownHtml = `<div class="laurel-leaf-breakdown">${laurelLeafBreakdown(earnedList)}</div>`;
 
-  /* Centre de la couronne : tant qu'un rang suivant reste à valider, son
-     badge s'affiche désaturé (pas encore obtenu) à la place du décompte de
-     feuilles. Au rang maximum (pas de rang suivant), on garde l'ancien
-     compteur "X/20". Image manquante (rang pas encore illustré) → masquée
+  /* Centre de la couronne : tant qu'un rang suivant reste à valider, le
+     badge du rang EN COURS s'affiche désaturé (pas encore totalement acquis,
+     couronne en cours de remplissage) à la place du décompte de feuilles.
+     Au rang maximum (pas de rang suivant), on garde l'ancien compteur
+     "X/20". Image manquante (rang pas encore illustré) → masquée
      silencieusement via onerror, pas d'icône cassée.
      Taille calée sur la zone libre au cœur de la couronne (rayon des tiges
      moins la profondeur des feuilles, ry max 22) : ~2.5x l'ancien médaillon,
@@ -420,7 +421,7 @@ function renderLaurelCrown(earnedList, isGolden, targetRank) {
   const centerContent = targetRank
     ? `<image class="laurel-crown-count laurel-crown-target" href="${encodeURI(targetRank.icon)}"
         x="${(center - centerHalf).toFixed(1)}" y="${(center - centerHalf).toFixed(1)}"
-        width="${centerSize}" height="${centerSize}" onerror="this.style.display='none'"><title>Prochain rang à valider : ${targetRank.name}</title></image>`
+        width="${centerSize}" height="${centerSize}" onerror="this.style.display='none'"><title>Rang en cours : ${targetRank.name}</title></image>`
     : `<text x="${center}" y="${center + 6}" text-anchor="middle" class="laurel-crown-count">${filledInCycle}/${LAUREL_LEAVES_PER_CROWN}</text>`;
 
   return `
@@ -438,7 +439,8 @@ function renderLaurelCrown(earnedList, isGolden, targetRank) {
 /* ── Frise des rangs déjà validés (couleur pleine, distincte du badge grisé
    au centre de la couronne qui lui représente le rang PAS ENCORE obtenu) ─── */
 function renderLaurelRanksAchieved(totalLeaves) {
-  const achieved = LAUREL_RANKS.filter(r => totalLeaves >= r.min);
+  const { current } = computeLaurelRank(totalLeaves);
+  const achieved = LAUREL_RANKS.filter(r => r.min < current.min);
   if (achieved.length === 0) return '';
 
   const items = achieved.map(r => `
@@ -620,7 +622,7 @@ async function initLaurels(studentId) {
 
   root.innerHTML = `
     <div class="laurel-section">
-      ${renderLaurelCrown(earnedList, isGolden, next)}
+      ${renderLaurelCrown(earnedList, isGolden, next ? current : null)}
       <div class="laurel-rank-block">
         ${renderLaurelRank(totalLeaves)}
       </div>
