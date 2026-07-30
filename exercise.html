@@ -1440,11 +1440,11 @@
     /* ── Type : classification-etapes ───────────────────────────────────── */
     .ex-classify-step { margin-top: 18px; }
     .ex-classify-step-title {
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.07em;
-      color: rgba(16,43,106,0.45);
+      color: var(--blue);
       margin-bottom: 10px;
     }
 
@@ -2609,66 +2609,6 @@
       .ea-sentence-display { font-size: 17px; padding: 14px 16px; }
       .ea-choice-btn { font-size: 13px; padding: 11px 14px; }
     }
-
-    /* ══════════════════════════════════════════════════════════════════════
-       TYPE : pce-niveaux — Passé composé avec être (accord du participe)
-       ══════════════════════════════════════════════════════════════════════ */
-
-    .pce-clickable-sent {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text);
-      line-height: 2.4;
-      padding: 18px 22px;
-      background: var(--bg);
-      border-radius: 14px;
-      border: 1.5px solid var(--border);
-      margin-bottom: 16px;
-      text-align: center;
-    }
-
-    .pce-word-btn {
-      display: inline-block;
-      cursor: pointer;
-      border: 1.5px solid transparent;
-      border-radius: 8px;
-      padding: 3px 8px;
-      margin: 0 2px;
-      transition: border-color 180ms, background 180ms;
-      font-family: inherit;
-      font-size: inherit;
-      font-weight: inherit;
-      color: inherit;
-      background: none;
-      line-height: inherit;
-    }
-
-    .pce-word-btn:hover:not(:disabled) {
-      border-color: var(--blue);
-      background: rgba(16,43,106,0.06);
-    }
-
-    .pce-word-btn.pce-subject-found {
-      border-color: var(--blue);
-      background: rgba(16,43,106,0.10);
-      color: var(--blue);
-      font-weight: 700;
-    }
-
-    .pce-word-btn:disabled { cursor: default; }
-
-    .pce-blank-span {
-      display: inline-block;
-      border-bottom: 3px solid var(--blue);
-      padding: 0 14px 2px;
-      color: rgba(16,43,106,0.30);
-      font-style: italic;
-      min-width: 80px;
-      text-align: center;
-      margin: 0 4px;
-    }
-
-    .pce-shake { animation: pqpShake 400ms ease; }
 
     /* ══════════════════════════════════════════════════════════════════════
        TYPE : change-temps-niveaux — « Change de temps ! »
@@ -5430,7 +5370,7 @@
       } else if (currentType === "etre-ou-avoir-niveaux") {
         eoaInitSession();
         return;
-      } else if (currentType === "pce-niveaux") {
+      } else if (currentType === "pc-etre-niveaux") {
         pceInitSession();
         return;
       } else if (currentType === "change-temps-niveaux") {
@@ -5672,10 +5612,6 @@
         renderAccordEcrit(card, q);
       } else if (currentType === "text-input") {
         renderTextInput(card, q);
-      } else if (currentType === "auxiliaire-identifier") {
-        renderAuxiliaireIdentifier(card, q);
-      } else if (currentType === "infinitif-passe-compose") {
-        renderInfinitifPasseCompose(card, q);
       } else if (currentType === "produire-3-formes") {
         renderProduire3Formes(card, q);
       } else if (currentType === "mots-cliquables") {
@@ -5736,7 +5672,7 @@
         /* session managed by pcaInitSession — no-op here */
       } else if (currentType === "etre-ou-avoir-niveaux") {
         /* session managed by eoaInitSession — no-op here */
-      } else if (currentType === "pce-niveaux") {
+      } else if (currentType === "pc-etre-niveaux") {
         /* session managed by pceInitSession — no-op here */
       } else if (currentType === "change-temps-niveaux") {
         /* session managed by ctInitSession — no-op here */
@@ -6548,210 +6484,6 @@
         `);
       }
       showNextBtn();
-    }
-
-    /* ── Type: infinitif-passe-compose (2-step) ─────────────────────────────
-       Step 1 — click the past participle in the sentence (word tiles)
-       Step 2 — type the infinitive
-    ────────────────────────────────────────────────────────────────────────── */
-
-    function renderInfinitifPasseCompose(card, q) {
-      let step1Correct = false;
-      const words = q.sentence.replace(/\.$/, '').split(' ');
-
-      card.innerHTML = `
-        <div id="step1">
-          <p class="ex-question-label">Clique sur le participe passé dans cette phrase.</p>
-          <div class="ex-sentence-words" id="ex-word-tiles">
-            ${words.map(w => `<button class="ex-word-btn" data-word="${w}">${w}</button>`).join('')}
-          </div>
-          <div class="ex-feedback-area" id="feedback1"></div>
-        </div>
-        <div id="step2" class="ex-hidden">
-          <div class="ex-step2-divider"></div>
-          <p class="ex-question-label">Quel est l'infinitif de ce verbe ?</p>
-          <div class="ex-verb-display" id="participle-display"></div>
-          <div class="ex-input-row">
-            <input type="text" class="ex-text-input" id="ex-inf-input"
-                   autocomplete="off" autocorrect="off" autocapitalize="off"
-                   spellcheck="false" placeholder="Écris l'infinitif…">
-            <button class="ex-validate-btn" id="ex-inf-validate">Valider</button>
-          </div>
-          <div class="ex-feedback-area" id="feedback2"></div>
-        </div>
-        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
-      `;
-
-      document.querySelectorAll("#ex-word-tiles .ex-word-btn").forEach(btn =>
-        btn.addEventListener("click", () => {
-          document.querySelectorAll("#ex-word-tiles .ex-word-btn").forEach(b => b.disabled = true);
-          const isRight = btn.dataset.word === q.participle;
-          step1Correct = isRight;
-          document.querySelectorAll("#ex-word-tiles .ex-word-btn").forEach(b => {
-            if (b.dataset.word === q.participle) b.classList.add("is-correct");
-          });
-          if (!isRight) btn.classList.add("is-wrong");
-          if (isRight) {
-            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
-          } else {
-            setFeedback("feedback1", `
-              <div class="ex-feedback-wrong">
-                ❌ Le participe passé est <strong>« ${q.participle} »</strong>.
-              </div>
-            `);
-          }
-          document.getElementById("participle-display").textContent = q.participle;
-          setTimeout(() => {
-            document.getElementById("step2").classList.remove("ex-hidden");
-            document.getElementById("step2").scrollIntoView({ behavior: "smooth", block: "nearest" });
-            setTimeout(() => {
-              const inp = document.getElementById("ex-inf-input");
-              if (inp) inp.focus();
-            }, 80);
-          }, 750);
-        })
-      );
-
-      function validateInfinitive() {
-        const input  = document.getElementById("ex-inf-input");
-        const valBtn = document.getElementById("ex-inf-validate");
-        if (!input || !input.value.trim()) return;
-        input.disabled  = true;
-        valBtn.disabled = true;
-        const isRight = normalize(input.value) === normalize(q.infinitive);
-        input.classList.add(isRight ? "is-correct" : "is-wrong");
-        if (step1Correct && isRight) {
-          score++;
-          setFeedback("feedback2", `
-            <div class="ex-feedback-correct">
-              ${rand(SUCCESS)}<br>
-              <strong>${q.participle}</strong> → infinitif : <strong>${q.infinitive}</strong>
-            </div>
-          `);
-        } else if (isRight) {
-          setFeedback("feedback2", `
-            <div class="ex-feedback-correct">
-              ${rand(SUCCESS)}<br>
-              <strong>${q.participle}</strong> → infinitif : <strong>${q.infinitive}</strong>
-            </div>
-          `);
-        } else {
-          setFeedback("feedback2", `
-            <div class="ex-feedback-wrong">
-              ❌ L'infinitif de « <strong>${q.participle}</strong> » est <strong>${q.infinitive}</strong>.
-            </div>
-          `);
-        }
-        showNextBtn();
-      }
-
-      document.getElementById("ex-inf-validate").addEventListener("click", validateInfinitive);
-      document.getElementById("ex-inf-input").addEventListener("keydown", e => {
-        if (e.key === "Enter") validateInfinitive();
-      });
-    }
-
-    /* ── Type: auxiliaire-identifier (2-step) ───────────────────────────────
-       Step 1 — click être or avoir
-       Step 2 — type the correctly conjugated form
-    ────────────────────────────────────────────────────────────────────────── */
-
-    function renderAuxiliaireIdentifier(card, q) {
-      let step1Correct = false;
-
-      card.innerHTML = `
-        <div id="step1">
-          <p class="ex-question-label">Quel auxiliaire utilise-t-on pour former ce passé composé ?</p>
-          <div class="ex-sentence-display">${q.sentence}</div>
-          <div class="ex-group-row" id="aux-buttons">
-            <button class="ex-group-btn" data-aux="être">être</button>
-            <button class="ex-group-btn" data-aux="avoir">avoir</button>
-          </div>
-          <div class="ex-feedback-area" id="feedback1"></div>
-        </div>
-        <div id="step2" class="ex-hidden">
-          <div class="ex-step2-divider"></div>
-          <p class="ex-question-label">Maintenant, écris la bonne forme de l'auxiliaire.</p>
-          <div class="ex-sentence-display">${q.sentence}</div>
-          <div class="ex-input-row">
-            <input type="text" class="ex-text-input" id="ex-aux-input"
-                   autocomplete="off" autocorrect="off" autocapitalize="off"
-                   spellcheck="false" placeholder="Ta réponse…">
-            <button class="ex-validate-btn" id="ex-aux-validate">Valider</button>
-          </div>
-          <div class="ex-feedback-area" id="feedback2"></div>
-        </div>
-        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
-      `;
-
-      document.querySelectorAll("#aux-buttons .ex-group-btn").forEach(btn =>
-        btn.addEventListener("click", () => {
-          document.querySelectorAll("#aux-buttons .ex-group-btn").forEach(b => b.disabled = true);
-          const isRight = btn.dataset.aux === q.auxiliary;
-          step1Correct = isRight;
-          document.querySelectorAll("#aux-buttons .ex-group-btn").forEach(b => {
-            if (b.dataset.aux === q.auxiliary) b.classList.add("is-correct");
-          });
-          if (!isRight) btn.classList.add("is-wrong");
-          if (isRight) {
-            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
-          } else {
-            setFeedback("feedback1", `
-              <div class="ex-feedback-wrong">
-                ❌ Non, on utilise l'auxiliaire <strong>${q.auxiliary}</strong> avec ce verbe.
-              </div>
-            `);
-          }
-          setTimeout(() => {
-            document.getElementById("step2").classList.remove("ex-hidden");
-            document.getElementById("step2").scrollIntoView({ behavior: "smooth", block: "nearest" });
-            setTimeout(() => {
-              const inp = document.getElementById("ex-aux-input");
-              if (inp) inp.focus();
-            }, 80);
-          }, 750);
-        })
-      );
-
-      function validateAuxInput() {
-        const input  = document.getElementById("ex-aux-input");
-        const valBtn = document.getElementById("ex-aux-validate");
-        if (!input || !input.value.trim()) return;
-        input.disabled  = true;
-        valBtn.disabled = true;
-        const isRight = normalize(input.value) === normalize(q.answer);
-        input.classList.add(isRight ? "is-correct" : "is-wrong");
-        const correctSentence = q.sentence.replace("___", q.answer);
-        if (step1Correct && isRight) {
-          score++;
-          setFeedback("feedback2", `
-            <div class="ex-feedback-correct">
-              ${rand(SUCCESS)}<br>
-              <em>« ${correctSentence} »</em>
-            </div>
-          `);
-        } else if (isRight) {
-          setFeedback("feedback2", `
-            <div class="ex-feedback-correct">
-              ${rand(SUCCESS)}<br>
-              <em>« ${correctSentence} »</em>
-            </div>
-          `);
-        } else {
-          setFeedback("feedback2", `
-            <div class="ex-feedback-wrong">
-              ❌ Ce n'est pas la bonne forme.<br>
-              La bonne réponse : <em>« ${correctSentence} »</em>
-            </div>
-          `);
-        }
-        showNextBtn();
-      }
-
-      document.getElementById("ex-aux-validate").addEventListener("click", validateAuxInput);
-      document.getElementById("ex-aux-input").addEventListener("keydown", e => {
-        if (e.key === "Enter") validateAuxInput();
-      });
     }
 
     /* ── Type: transform-interrogative ──────────────────────────────────────── */
@@ -15951,27 +15683,26 @@
     }
 
     /* ══════════════════════════════════════════════════════════════════════════
-       PASSÉ COMPOSÉ AVEC ÊTRE  —  type : pce-niveaux
-       Niveau 1 : 3 étapes guidées (clic sujet → genre/nombre → saisie)
-         Scoring : 3 pts tout premier coup ; 2 pts sujet+genre/nombre ok mais forme fausse ;
-                   1 pt deuxième essai réussi ; 0 sinon.
-       Niveau 2 : saisie directe — 2 pts 1er essai, 1 pt 2e essai, 0 sinon.
-       Seuil de déverrouillage : 80 %.
+       TYPE : pc-etre-niveaux — « Le passé composé avec être »
+       Niveau 1 : raisonnement guidé — clic sur le sujet (mots-cliquables) →
+                  genre/nombre du sujet (classification à 4 choix) → saisie de
+                  la forme accordée (auxiliaire être conjugué + participe).
+       Niveau 2 : écriture directe, sujet pronominal ou GN simple.
+       Niveau 3 : écriture directe, sujet non pronominal exclusivement.
+       3 niveaux déverrouillables à 80 %. Un seul essai par question.
     ══════════════════════════════════════════════════════════════════════════ */
 
-    const PCE_SEUIL    = 0.80;
-    const PCE_POSITIFS = ['Excellent ! 🎉', 'Bravo ! ⭐', 'Parfait ! 🌟', 'Super ! 👏', 'Très bien ! 👍'];
+    const PCE_SEUIL     = 0.80;
+    const PCE_POSITIFS  = ['Excellent ! 🎉', 'Bravo ! ⭐', 'Parfait ! 🌟', 'Super ! 👏', 'Très bien ! 👍'];
+    const PCE_LEVEL_DEFS = [
+      { lv: 1, desc: "Identifie le sujet, son genre et son nombre, puis écris la forme accordée" },
+      { lv: 2, desc: "Écris la forme accordée (sujet pronom ou groupe simple)" },
+      { lv: 3, desc: "Écris la forme accordée avec un sujet non pronominal" }
+    ];
 
     let pceState = null;
     let pceLevelSelect = null;
 
-    function pceBackToSelectScreen() {
-      pceState = null;
-      document.getElementById('results-screen').classList.add('ex-hidden');
-      document.getElementById('exercise-screen').classList.remove('ex-hidden');
-      const prog = document.querySelector('#exercise-screen .ex-progress');
-      if (prog) prog.classList.add('ex-hidden');
-    }
     function pceNorm(str) {
       return str.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[''`´'']/g, "'");
     }
@@ -15982,6 +15713,20 @@
         [a[i], a[j]] = [a[j], a[i]];
       }
       return a;
+    }
+    function pceBuildAgreementFeedback(q) {
+      if (q.gender === 'f' && q.number === 'p') return `Le sujet est féminin pluriel : on ajoute <strong>-es</strong> au participe.`;
+      if (q.gender === 'f' && q.number === 's') return `Le sujet est féminin : on ajoute <strong>-e</strong> au participe.`;
+      if (q.gender === 'm' && q.number === 'p') return `Le sujet est pluriel : on ajoute <strong>-s</strong> au participe.`;
+      return `Le sujet est masculin singulier : le participe ne prend pas de terminaison supplémentaire.`;
+    }
+
+    function pceBackToSelectScreen() {
+      pceState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
     }
 
     /* ── Init session ──────────────────────────────────────────────────────── */
@@ -16000,16 +15745,12 @@
       const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
       pceLevelSelect = LevelSelect.create({
         exerciseKey: slug,
-        levels: [
-          { id: 1, label: 'Raisonnement guidé', description: "Identifier le sujet, son genre et son nombre, puis écrire la forme." },
-          { id: 2, label: 'Écriture directe',    description: "Écris l'auxiliaire conjugué + le participe passé accordé." }
-        ],
+        levels: PCE_LEVEL_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
         threshold: PCE_SEUIL,
-        onSelectLevel: (lv) => pceStartLevel(parseInt(lv, 10)),
+        onSelectLevel: lv => pceStartLevel(parseInt(lv, 10)),
         selectContainer: document.getElementById('ex-card'),
         badgesContainer: document.getElementById('ex-badges'),
-        onBackToSelect: pceBackToSelectScreen,
-        introHTML: `<div class="pqp-rule-chip" style="display:flex;margin:0 auto 20px;max-width:520px">📌 Avec <em>être</em>, le participe passé s'accorde avec le sujet.</div>`
+        onBackToSelect: pceBackToSelectScreen
       });
       pceLevelSelect.renderSelectScreen();
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -16020,32 +15761,29 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
 
-      const bank  = sessionData.bank || [];
-      const n     = sessionData.questionsPerSession || 10;
-      const items = pceShuffle([...bank]).slice(0, n);
+      const bankKey = lv === 1 ? 'level1Bank' : lv === 2 ? 'level2Bank' : 'level3Bank';
+      const bank    = sessionData[bankKey] || [];
+      const n       = sessionData.questionsPerSession || bank.length;
+      const items   = pceShuffle([...bank]).slice(0, n);
 
-      pceState = { lv, items, idx: 0, rawScore: 0, rawMax: 0 };
+      pceState = { lv, items, idx: 0, score: 0, total: items.length };
 
       document.getElementById('q-total').textContent = items.length;
-      if (pceLevelSelect) pceLevelSelect.renderBadges(lv);
+      pceLevelSelect.renderBadges(lv);
       pceRenderQuestion(document.getElementById('ex-card'));
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     /* ── Dispatch niveau ───────────────────────────────────────────────────── */
     function pceRenderQuestion(card) {
-      const { lv, items, idx } = pceState;
-      const item  = items[idx];
-      const total = items.length;
+      const { lv, items, idx, total } = pceState;
+      const q = items[idx];
 
       document.getElementById('q-num').textContent       = idx + 1;
       document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
 
-      if (lv === 1) {
-        pceRenderLevel1(card, item, total);
-      } else {
-        pceRenderLevel2(card, item, total);
-      }
+      if (lv === 1) pceRenderLevel1(card, q);
+      else          pceRenderLevel23(card, q);
     }
 
     /* ── Avance à la question suivante ─────────────────────────────────────── */
@@ -16059,89 +15797,36 @@
       }
     }
 
-    /* ── Feedback d'erreur ciblé ───────────────────────────────────────────── */
-    function pceBuildErrorFeedback(userNorm, item) {
-      const cWords = pceNorm(item.answer).split(' ');
-      const uWords = userNorm.split(' ');
-
-      const cAux = cWords[0];
-      const cPP  = cWords[cWords.length - 1];
-      const uAux = uWords.length >= 2 ? uWords[0] : '';
-      const uPP  = uWords.length >= 2 ? uWords[uWords.length - 1] : uWords[0] || '';
-
-      if (!uAux || uAux !== cAux) {
-        return `Avec <em>être</em>, l'auxiliaire se conjugue : je <em>suis</em> / tu <em>es</em> / il <em>est</em> / nous <em>sommes</em> / vous <em>êtes</em> / ils <em>sont</em>.`;
-      }
-      if (uPP !== cPP) {
-        if (item.gender === 'f' && item.number === 'p') {
-          return `Le sujet est féminin pluriel : on ajoute <strong>-es</strong> au participe (→ <em>${cPP}</em>).`;
-        }
-        if (item.gender === 'f' && item.number === 's') {
-          return `Le sujet est féminin : on ajoute <strong>-e</strong> au participe (→ <em>${cPP}</em>).`;
-        }
-        if (item.gender === 'm' && item.number === 'p') {
-          return `Le sujet est pluriel : on ajoute <strong>-s</strong> au participe (→ <em>${cPP}</em>).`;
-        }
-        return `Avec <em>être</em>, le participe s'accorde avec le sujet : <strong>${item.answer}</strong>.`;
-      }
-      return `La forme attendue est <strong>${item.answer}</strong>.`;
-    }
-
-    /* ── Niveau 1 — raisonnement guidé en 3 étapes ─────────────────────────── */
-    function pceRenderLevel1(card, item, total) {
-      const { idx } = pceState;
-
-      /* Sentence without infinitive for step 1 */
-      const sentL1 = item.sentence.replace(/\s*\([^)]+\)/g, '').replace(/\s+/g, ' ').trim();
-      const tokens = sentL1.split(' ').filter(t => t.length > 0);
-
-      const wordsHtml = tokens.map(t => {
-        if (t === '___') return `<span class="pce-blank-span">___</span>`;
-        if (/[a-zA-ZÀ-ÿ0-9]/.test(t)) {
-          return `<button class="pce-word-btn" data-word="${t.replace(/"/g, '&quot;')}">${t}</button>`;
-        }
-        return `<span style="margin:0 1px">${t}</span>`;
-      }).join(' ');
+    /* ── Niveau 1 — raisonnement guidé : mots-cliquables (sujet) →
+       classification (genre+nombre) → saisie ─────────────────────────────── */
+    function pceRenderLevel1(card, q) {
+      const { idx, total } = pceState;
 
       card.innerHTML = `
         <p class="ex-question-label">Conjugue au <strong>passé composé avec être</strong></p>
-        <div class="pqp-rule-chip">📌 Avec <em>être</em>, le participe passé s'accorde avec le sujet.</div>
-        <div class="pce-clickable-sent" id="pce-sent">${wordsHtml}</div>
 
-        <div id="pce-step1">
-          <div style="display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(16,43,106,0.08);border:2px solid rgba(16,43,106,0.22);border-radius:14px;padding:14px 22px;margin-bottom:16px">
-            <span style="font-size:24px;line-height:1">👆</span>
-            <span style="font-size:16px;font-weight:800;color:var(--blue);letter-spacing:0.01em">Clique sur le sujet dans la phrase</span>
-          </div>
+        <div id="pce-step1" class="ex-classify-step" style="margin-top:6px">
+          <div class="ex-classify-step-title">Étape 1 — Clique sur le sujet de la phrase</div>
+          <div class="ex-verb-display">${q.infinitive}</div>
+          <div class="ex-sentence-words" id="pce-words"></div>
           <div class="ex-feedback-area" id="pce-fb1"></div>
+          <button class="ex-choice" id="pce-val1" style="margin-top:10px;width:100%">Valider l'étape 1</button>
         </div>
 
-        <div id="pce-step2" class="ex-hidden">
-          <div class="ex-step2-divider"></div>
-          <p class="ex-question-label">Quel est le genre du sujet ?</p>
-          <div class="ex-group-row" id="pce-genre-row">
-            <button class="ex-group-btn" data-val="m">MASCULIN</button>
-            <button class="ex-group-btn" data-val="f">FÉMININ</button>
-          </div>
-          <div class="ex-feedback-area" id="pce-fb-genre"></div>
-          <div id="pce-nombre-wrap" class="ex-hidden" style="margin-top:8px">
-            <p class="ex-question-label">Quel est le nombre du sujet ?</p>
-            <div class="ex-group-row" id="pce-nombre-row">
-              <button class="ex-group-btn" data-val="s">SINGULIER</button>
-              <button class="ex-group-btn" data-val="p">PLURIEL</button>
-            </div>
-            <div class="ex-feedback-area" id="pce-fb-nombre"></div>
-          </div>
+        <div id="pce-step2" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title">Étape 2 — Genre et nombre du sujet</div>
+          <div class="ex-choices-grid" id="pce-choices2"></div>
+          <div class="ex-feedback-area" id="pce-fb2"></div>
         </div>
 
         <div id="pce-step3" class="ex-hidden">
           <div class="ex-step2-divider"></div>
-          <p class="ex-question-label">Écris l'auxiliaire <em>être</em> conjugué + le participe passé accordé.</p>
+          <p class="ex-question-label">Étape 3 — Écris l'auxiliaire <em>être</em> conjugué + le participe accordé</p>
           <div class="ex-input-row">
             <input type="text" id="pce-input" class="ex-text-input"
                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                    placeholder="ex : est allée, sont partis…">
-            <button class="ex-validate-btn" id="pce-val-btn">Valider</button>
+            <button class="ex-validate-btn" id="pce-val3">Valider</button>
           </div>
           <div class="ex-feedback-area" id="pce-fb3"></div>
         </div>
@@ -16151,176 +15836,117 @@
         }</button>
       `;
 
-      let step1FirstOk      = true;
-      let step2genreFirstOk = true;
-      let step2nombFirstOk  = true;
-      let step3Attempt      = 0;
+      /* ── Étape 1 : clic sujet (pattern mots-cliquables) ───────────────── */
+      const wordsEl  = document.getElementById('pce-words');
+      const selected = new Set();
+      const fullSet  = new Set(q.subjectWords.map(w => w.toLowerCase()));
+      const coreSet  = new Set([q.subjectCore.toLowerCase()]);
 
-      /* ── Step 1 : clic sujet ─────────────────────────────────────────── */
-      card.querySelectorAll('.pce-word-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const raw  = btn.dataset.word;
-          const core = raw.replace(/^[,.:;!?«»"'()\[\]]+|[,.:;!?«»"'()\[\]]+$/g, '').toLowerCase();
-          const isSubject = item.subjectWords.some(sw =>
-            sw.toLowerCase() === core || sw.toLowerCase() === raw.toLowerCase()
-          );
+      const setsEqual = (a, b) => a.size === b.size && [...a].every(x => b.has(x));
 
-          if (isSubject) {
-            card.querySelectorAll('.pce-word-btn').forEach(b => {
-              const bc = b.dataset.word.replace(/^[,.:;!?«»"'()\[\]]+|[,.:;!?«»"'()\[\]]+$/g, '').toLowerCase();
-              if (item.subjectWords.some(sw => sw.toLowerCase() === bc || sw.toLowerCase() === b.dataset.word.toLowerCase())) {
-                b.classList.add('pce-subject-found');
-              }
-              b.disabled = true;
-            });
-            document.getElementById('pce-fb1').innerHTML =
-              `<div class="ex-feedback-correct">✅ Bien ! <strong>${item.subjectPhrase}</strong> est le sujet. Quel est son genre ?</div>`;
-            setTimeout(() => {
-              const step2 = document.getElementById('pce-step2');
-              if (step2) { step2.classList.remove('ex-hidden'); step2.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
-            }, 420);
-          } else {
-            step1FirstOk = false;
-            btn.classList.add('pce-shake');
-            setTimeout(() => btn.classList.remove('pce-shake'), 450);
-            document.getElementById('pce-fb1').innerHTML =
-              `<div class="ex-feedback-wrong">❌ Ce mot n'est pas le sujet. Cherche qui fait l'action.</div>`;
-          }
-        });
-      });
-
-      /* ── Step 2a : genre ─────────────────────────────────────────────── */
-      card.querySelectorAll('#pce-genre-row .ex-group-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const isRight = btn.dataset.val === item.gender;
-          if (isRight) {
-            card.querySelectorAll('#pce-genre-row .ex-group-btn').forEach(b => {
-              b.disabled = true;
-              if (b.dataset.val === item.gender) b.classList.add('is-correct');
-            });
-            const gLabel = item.gender === 'f' ? 'Féminin' : 'Masculin';
-            document.getElementById('pce-fb-genre').innerHTML =
-              `<div class="ex-feedback-correct">✅ ${gLabel} — c'est exact !</div>`;
-            setTimeout(() => {
-              const wrap = document.getElementById('pce-nombre-wrap');
-              if (wrap) { wrap.classList.remove('ex-hidden'); wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
-            }, 350);
-          } else {
-            step2genreFirstOk = false;
-            btn.classList.add('pce-shake');
-            setTimeout(() => btn.classList.remove('pce-shake'), 450);
-            const correct = item.gender === 'f' ? 'féminin' : 'masculin';
-            document.getElementById('pce-fb-genre').innerHTML =
-              `<div class="ex-feedback-wrong">❌ <strong>${item.subjectPhrase}</strong> est ${correct}.</div>`;
-          }
-        });
-      });
-
-      /* ── Step 2b : nombre ────────────────────────────────────────────── */
-      card.querySelectorAll('#pce-nombre-row .ex-group-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const isRight = btn.dataset.val === item.number;
-          if (isRight) {
-            card.querySelectorAll('#pce-nombre-row .ex-group-btn').forEach(b => {
-              b.disabled = true;
-              if (b.dataset.val === item.number) b.classList.add('is-correct');
-            });
-            const nLabel = item.number === 's' ? 'Singulier' : 'Pluriel';
-            document.getElementById('pce-fb-nombre').innerHTML =
-              `<div class="ex-feedback-correct">✅ ${nLabel} — parfait ! Maintenant écris la forme complète.</div>`;
-            setTimeout(() => {
-              const s3 = document.getElementById('pce-step3');
-              if (s3) {
-                s3.classList.remove('ex-hidden');
-                s3.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                setTimeout(() => document.getElementById('pce-input')?.focus(), 80);
-              }
-            }, 350);
-          } else {
-            step2nombFirstOk = false;
-            btn.classList.add('pce-shake');
-            setTimeout(() => btn.classList.remove('pce-shake'), 450);
-            const correct = item.number === 's' ? 'singulier' : 'pluriel';
-            document.getElementById('pce-fb-nombre').innerHTML =
-              `<div class="ex-feedback-wrong">❌ <strong>${item.subjectPhrase}</strong> est ${correct}.</div>`;
-          }
-        });
-      });
-
-      /* ── Step 3 : saisie de la forme ─────────────────────────────────── */
-      const doValidate3 = () => {
-        const input = document.getElementById('pce-input');
-        const vbtn  = document.getElementById('pce-val-btn');
-        if (!input || input.disabled || !input.value.trim()) return;
-
-        const userNorm    = pceNorm(input.value);
-        const correctNorm = pceNorm(item.answer);
-        const isRight     = userNorm === correctNorm;
-        step3Attempt++;
-
-        const reasoningOk = step1FirstOk && step2genreFirstOk && step2nombFirstOk;
-
-        if (isRight) {
-          input.disabled = true;
-          vbtn.disabled  = true;
-          input.classList.add('is-correct');
-          const pts = (step3Attempt === 1 && reasoningOk) ? 3 : 1;
-          pceState.rawScore += pts;
-          pceState.rawMax   += 3;
-          document.getElementById('pce-fb3').innerHTML =
-            `<div class="ex-feedback-correct">${PCE_POSITIFS[Math.floor(Math.random() * PCE_POSITIFS.length)]}</div>`;
-          document.getElementById('next-btn').classList.remove('ex-hidden');
-        } else {
-          input.classList.add('is-wrong');
-          const errHtml = pceBuildErrorFeedback(userNorm, item);
-
-          if (step3Attempt === 1 && reasoningOk) {
-            /* Raisonnement correct, forme fausse au 1er essai → 2 pts, avance auto */
-            pceState.rawScore += 2;
-            pceState.rawMax   += 3;
-            input.disabled = true;
-            vbtn.disabled  = true;
-            document.getElementById('pce-fb3').innerHTML =
-              `<div class="ex-feedback-wrong">❌ La forme correcte est <strong>${item.answer}</strong>. ${errHtml}</div>`;
-            setTimeout(() => pceAdvance(), 2500);
-          } else if (step3Attempt === 1) {
-            /* Raisonnement imparfait, 1er essai raté → 2e essai autorisé */
-            document.getElementById('pce-fb3').innerHTML =
-              `<div class="ex-feedback-wrong">❌ <strong>${item.answer}</strong>. ${errHtml} Essaie encore.</div>`;
-            setTimeout(() => {
-              input.classList.remove('is-wrong');
-              input.value = '';
-              input.focus();
-            }, 1600);
-          } else {
-            /* 2e essai raté → 0 pt, avance auto */
-            pceState.rawMax += 3;
-            input.disabled = true;
-            vbtn.disabled  = true;
-            document.getElementById('pce-fb3').innerHTML =
-              `<div class="ex-feedback-wrong">❌ La forme correcte est <strong>${item.answer}</strong>. ${errHtml}</div>`;
-            setTimeout(() => pceAdvance(), 2500);
-          }
+      q.sentence.split(/\s+/).forEach(token => {
+        if (token === '________') {
+          const span = document.createElement('span');
+          span.className = 'ex-blank';
+          span.style.cursor = 'default';
+          wordsEl.appendChild(span);
+          return;
         }
-      };
+        const clean = token.replace(/[.,!?;:«»""'']/g, '');
+        if (!clean) return;
+        const btn = document.createElement('button');
+        btn.className = 'ex-word-btn';
+        btn.textContent = token;
+        btn.dataset.clean = clean;
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          if (selected.has(btn)) { selected.delete(btn); btn.classList.remove('is-selected'); }
+          else                   { selected.add(btn);    btn.classList.add('is-selected'); }
+        });
+        wordsEl.appendChild(btn);
+      });
 
-      document.getElementById('pce-val-btn')?.addEventListener('click', doValidate3);
-      document.getElementById('pce-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate3(); });
-      document.getElementById('next-btn')?.addEventListener('click', pceAdvance);
+      document.getElementById('pce-val1').addEventListener('click', () => {
+        const selectedClean = new Set(
+          Array.from(selected).map(b => b.dataset.clean.toLowerCase())
+        );
+        const matchesCore = setsEqual(selectedClean, coreSet);
+        const ok = matchesCore || setsEqual(selectedClean, fullSet);
+        /* Grille de correction : le noyau seul suffit, donc on ne réclame que
+           lui dès qu'il a été cliqué seul ; sinon on affiche le groupe complet. */
+        const targets = matchesCore ? coreSet : fullSet;
+
+        wordsEl.querySelectorAll('.ex-word-btn').forEach(btn => {
+          const isTarget    = targets.has(btn.dataset.clean.toLowerCase());
+          const wasSelected = selected.has(btn);
+          btn.disabled = true;
+          btn.classList.remove('is-selected');
+          if      (isTarget && wasSelected)  btn.classList.add('is-correct');
+          else if (isTarget && !wasSelected) btn.classList.add('is-missed');
+          else if (!isTarget && wasSelected) btn.classList.add('is-wrong');
+        });
+        document.getElementById('pce-val1').disabled = true;
+        document.getElementById('pce-fb1').innerHTML = ok
+          ? `<div class="ex-feedback-correct" style="font-size:13px">✅ <strong>${q.subjectPhrase}</strong> est bien le sujet.</div>`
+          : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Le sujet était <strong>${q.subjectPhrase}</strong> (en vert).</div>`;
+
+        setTimeout(() => {
+          const s2 = document.getElementById('pce-step2');
+          s2.classList.remove('ex-hidden');
+          s2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 500);
+      });
+
+      /* ── Étape 2 : genre + nombre combinés (pattern classification) ──── */
+      const CHOICES2 = [
+        { key: 'm-s', label: 'Masculin singulier' },
+        { key: 'f-s', label: 'Féminin singulier' },
+        { key: 'm-p', label: 'Masculin pluriel' },
+        { key: 'f-p', label: 'Féminin pluriel' }
+      ];
+      const correctKey   = q.gender + '-' + q.number;
+      const correctLabel = CHOICES2.find(c => c.key === correctKey).label;
+      const choices2El   = document.getElementById('pce-choices2');
+
+      pceShuffle(CHOICES2).forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'ex-choice';
+        btn.textContent = c.label;
+        btn.addEventListener('click', () => {
+          choices2El.querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === correctLabel) b.classList.add('is-correct');
+          });
+          const isRight = c.key === correctKey;
+          if (!isRight) btn.classList.add('is-wrong');
+          document.getElementById('pce-fb2').innerHTML = isRight
+            ? `<div class="ex-feedback-correct" style="font-size:13px">✅ Exact ! Maintenant écris la forme complète.</div>`
+            : `<div class="ex-feedback-wrong" style="font-size:13px">❌ ${pceBuildAgreementFeedback(q)}</div>`;
+
+          setTimeout(() => {
+            const s3 = document.getElementById('pce-step3');
+            s3.classList.remove('ex-hidden');
+            s3.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            setTimeout(() => document.getElementById('pce-input')?.focus(), 80);
+          }, 500);
+        });
+        choices2El.appendChild(btn);
+      });
+
+      /* ── Étape 3 : saisie de la forme (pattern standard) ──────────────── */
+      pceWireTextInput(q, 'pce-input', 'pce-val3', 'pce-fb3');
+      document.getElementById('next-btn').addEventListener('click', pceAdvance);
     }
 
-    /* ── Niveau 2 — saisie directe ─────────────────────────────────────────── */
-    function pceRenderLevel2(card, item, total) {
-      const { idx } = pceState;
-
-      const sentDisplay = item.sentence
-        .replace('___', '<span class="pce-blank-span">___</span>')
-        .replace(/\(([^)]+)\)/g, (_, inf) => `<span class="pqp-infinitif-chip">${inf}</span>`);
+    /* ── Niveaux 2 et 3 — écriture directe ──────────────────────────────── */
+    function pceRenderLevel23(card, q) {
+      const { idx, total } = pceState;
+      const sentDisplay = q.sentence.replace('________', '<span class="ex-blank" style="cursor:default"></span>');
 
       card.innerHTML = `
         <p class="ex-question-label">Conjugue au <strong>passé composé avec être</strong></p>
-        <div class="pqp-rule-chip">📌 Avec <em>être</em>, le participe passé s'accorde avec le sujet.</div>
-        <div class="pqp-sentence-display" style="text-align:center">${sentDisplay}</div>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div class="ex-sentence-display">${sentDisplay}</div>
         <div class="ex-input-row">
           <input type="text" id="pce-input" class="ex-text-input"
                  autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
@@ -16333,64 +15959,46 @@
         }</button>
       `;
 
-      const input = document.getElementById('pce-input');
-      const vbtn  = document.getElementById('pce-val-btn');
-      let attempt = 0;
-      setTimeout(() => input.focus(), 60);
+      setTimeout(() => document.getElementById('pce-input')?.focus(), 60);
+      pceWireTextInput(q, 'pce-input', 'pce-val-btn', 'pce-fb');
+      document.getElementById('next-btn').addEventListener('click', pceAdvance);
+    }
+
+    /* ── Saisie de la forme accordée — partagée niveaux 1/2/3 ─────────────
+       Un seul essai : succès → 1 pt + bouton suivant ; échec → réponse
+       affichée puis passage automatique à la question suivante. ────────── */
+    function pceWireTextInput(q, inputId, btnId, fbId) {
+      const input = document.getElementById(inputId);
+      const vbtn  = document.getElementById(btnId);
 
       const doValidate = () => {
         if (!input || input.disabled || !input.value.trim()) return;
-        const userNorm    = pceNorm(input.value);
-        const correctNorm = pceNorm(item.answer);
-        const isRight     = userNorm === correctNorm;
-        attempt++;
+        const isRight = pceNorm(input.value) === pceNorm(q.answer);
+        input.disabled = true;
+        vbtn.disabled  = true;
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
-          const pts = attempt === 1 ? 2 : 1;
-          pceState.rawScore += pts;
-          pceState.rawMax   += 2;
-          input.disabled = true;
-          vbtn.disabled  = true;
-          input.classList.add('is-correct');
-          document.getElementById('pce-fb').innerHTML =
+          pceState.score++;
+          document.getElementById(fbId).innerHTML =
             `<div class="ex-feedback-correct">${PCE_POSITIFS[Math.floor(Math.random() * PCE_POSITIFS.length)]}</div>`;
           document.getElementById('next-btn').classList.remove('ex-hidden');
         } else {
-          const errHtml = pceBuildErrorFeedback(userNorm, item);
-          if (attempt === 1) {
-            input.classList.add('is-wrong');
-            document.getElementById('pce-fb').innerHTML =
-              `<div class="ex-feedback-wrong">❌ <strong>${item.answer}</strong>. ${errHtml} Essaie encore.</div>`;
-            setTimeout(() => {
-              input.classList.remove('is-wrong');
-              input.value = '';
-              input.focus();
-            }, 1600);
-          } else {
-            pceState.rawMax += 2;
-            input.disabled = true;
-            vbtn.disabled  = true;
-            input.classList.add('is-wrong');
-            document.getElementById('pce-fb').innerHTML =
-              `<div class="ex-feedback-wrong">❌ La forme correcte est <strong>${item.answer}</strong>. ${errHtml}</div>`;
-            setTimeout(() => pceAdvance(), 2500);
-          }
+          document.getElementById(fbId).innerHTML =
+            `<div class="ex-feedback-wrong">❌ La forme correcte est <strong>${q.answer}</strong>.</div>`;
+          setTimeout(() => pceAdvance(), 2200);
         }
       };
 
       vbtn.addEventListener('click', doValidate);
       input.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
-      document.getElementById('next-btn').addEventListener('click', pceAdvance);
     }
 
-    /* ── Résultats d'un niveau ─────────────────────────────────────────────── */
+    /* ── Résultats d'un niveau ───────────────────────────────────────────── */
     function pceShowLevelResults() {
-      const { lv, rawScore, rawMax } = pceState;
-      const pct    = rawMax > 0 ? rawScore / rawMax : 0;
-      const s20    = rawMax > 0 ? Math.round(pct * 20) : 0;
+      const { lv, score: lvScore, total } = pceState;
+      const { passed, pct, isLast } = pceLevelSelect.completeLevel(lv, lvScore, total);
       const pctPct = Math.round(pct * 100);
-
-      const { passed, isLast } = pceLevelSelect.completeLevel(lv, rawScore, rawMax);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -16399,34 +16007,32 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
       document.getElementById('score-pct').textContent   = pctPct + ' %';
 
-      const stars     = s20 >= 19 ? '🌟🌟🌟' : s20 >= 16 ? '⭐⭐' : s20 >= 10 ? '⭐' : '';
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
       const backHref  = sessionData.backLink?.href  || 'français-orthographe.html';
       const backLabel = `← Retour à ${sessionData.backLink?.label || 'l\'Orthographe'}`;
       const backToSelectBtn = pceLevelSelect.backToSelectButtonHTML();
 
       let msg, btnsHTML;
       if (passed && isLast) {
-        msg = `${stars} Bravo ! Tu maîtrises le passé composé avec être aux deux niveaux !`;
+        msg = `${stars} Bravo ! Tu maîtrises le passé composé avec être aux trois niveaux !`;
         btnsHTML = `<div class="ex-results-btns">
           <button class="ex-btn-primary" id="pce-restart-btn">Recommencer</button>
           ${backToSelectBtn}
           <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
         </div>`;
       } else if (passed) {
-        msg = `${stars} Niveau ${lv} validé ! 🏆 Le Niveau 2 est débloqué !`;
+        msg = `${stars} Niveau ${lv} validé ! 🏆 Le Niveau ${lv + 1} est débloqué !`;
         btnsHTML = `<div class="ex-results-btns">
-          <button class="ex-btn-primary" id="pce-next-btn">Niveau 2 — Écriture directe →</button>
+          <button class="ex-btn-primary" id="pce-next-btn">Niveau ${lv + 1} →</button>
           <button class="ex-btn-secondary" id="pce-retry-btn">Recommencer ce niveau</button>
           ${backToSelectBtn}
         </div>
         <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
       } else {
-        const needed   = Math.ceil(rawMax * PCE_SEUIL);
-        const neededS20 = Math.round(needed / rawMax * 20);
-        msg = `${stars || '💪'} Pas encore… il faut ${neededS20}/20 pour passer au niveau suivant. On réessaie ?`;
+        msg = `${stars || '💪'} Pas encore… il faut 80 % pour passer au niveau suivant. On réessaie ?`;
         btnsHTML = `<div class="ex-results-btns">
           <button class="ex-btn-primary" id="pce-retry-btn">Recommencer ce niveau</button>
           ${backToSelectBtn}
@@ -16435,7 +16041,8 @@
       }
 
       document.getElementById('score-msg').textContent          = msg;
-      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
 
       document.getElementById('pce-retry-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
@@ -16445,15 +16052,15 @@
       document.getElementById('pce-next-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        pceStartLevel(2);
+        pceStartLevel(lv + 1);
       });
       document.getElementById('pce-restart-btn')?.addEventListener('click', () => {
+        pceLevelSelect.reset();
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        pceLevelSelect.reset();
         pceInitSession();
       });
-      pceLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
+      pceLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -16461,10 +16068,10 @@
       const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
-        exerciseType: 'pce-niveaux',
+        exerciseType: 'pc-etre-niveaux',
         level:        'Niveau ' + lv,
-        score:        s20,
-        total:        20,
+        score:        lvScore,
+        total,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
       });
     }

@@ -113,8 +113,6 @@ const EXERCISE_CATALOG_GROUPS = {
         "conjuguer-futur"
       ] },
       { groupe: "Passé composé", slugs: [
-        "identifier-auxiliaire",
-        "retrouver-infinitif-passe-compose",
         "conjuguer-passe-compose-avoir",
         "etre-ou-avoir"
       ] },

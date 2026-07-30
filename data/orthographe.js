@@ -882,119 +882,77 @@ Object.assign(window.EXERCISE_DATA, {
     title:      "Le passé composé avec être",
     domaine:    "Français",
     competence: "Conjugaison — Passé composé avec être (accord du participe)",
-    type:       "pce-niveaux",
+    type:       "pc-etre-niveaux",
     levels:     ["CM1", "CM2", "6e"],
-    paliers:    2, /* nombre réel de paliers du moteur */
+    paliers:    3, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
     backLink: { href: "français-orthographe.html", label: "l'Orthographe" },
 
-    /* ── Banque commune (14 items) ──────────────────────────────────────
-       sentence      — phrase avec ___ et (infinitif) — utilisée au Niveau 2
-       subjectWords  — mots de la phrase appartenant au GN sujet (cliquables au N1)
+    /* ── Niveau 1 — raisonnement guidé (10 items) ────────────────────────
+       Étape 1 (mots-cliquables) : clique sur le sujet.
+       Étape 2 (classification)  : genre + nombre du sujet, combinés.
+       Étape 3 (saisie)          : auxiliaire être conjugué + participe accordé.
+       subjectWords  — mots de la phrase appartenant au GN sujet (cliquables)
+       subjectCore   — nom noyau du sujet, seul mot qui porte l'accord ;
+                       accepté à l'étape 1 comme alternative au groupe complet
+                       (ex. cliquer seulement "sœur" plutôt que "Ma" + "sœur")
        subjectPhrase — sujet affiché dans les feedbacks
-       gender        — "m" | "f"
-       number        — "s" | "p"
-       answer        — forme attendue : auxiliaire être conjugué + participe accordé
+       gender — "m" | "f"   number — "s" | "p"
+       Mélange pronoms et GN simples pour graduer la difficulté du repérage.
     ─────────────────────────────────────────────────────────────────── */
-    bank: [
-      {
-        sentence:      "Hier, elle ___ (aller) au parc.",
-        subjectWords:  ["elle"],
-        subjectPhrase: "elle",
-        gender: "f", number: "s",
-        answer: "est allée"
-      },
-      {
-        sentence:      "Ils ___ (partir) sans prévenir.",
-        subjectWords:  ["Ils"],
-        subjectPhrase: "ils",
-        gender: "m", number: "p",
-        answer: "sont partis"
-      },
-      {
-        sentence:      "Ma sœur ___ (naître) en décembre.",
-        subjectWords:  ["Ma", "sœur"],
-        subjectPhrase: "ma sœur",
-        gender: "f", number: "s",
-        answer: "est née"
-      },
-      {
-        sentence:      "Les voisines ___ (arriver) ensemble.",
-        subjectWords:  ["Les", "voisines"],
-        subjectPhrase: "les voisines",
-        gender: "f", number: "p",
-        answer: "sont arrivées"
-      },
-      {
-        sentence:      "Les filles ___ (rentrer) à midi.",
-        subjectWords:  ["Les", "filles"],
-        subjectPhrase: "les filles",
-        gender: "f", number: "p",
-        answer: "sont rentrées"
-      },
-      {
-        sentence:      "Il ___ (tomber) dans la cour.",
-        subjectWords:  ["Il"],
-        subjectPhrase: "il",
-        gender: "m", number: "s",
-        answer: "est tombé"
-      },
-      {
-        sentence:      "Elles ___ (venir) nous voir.",
-        subjectWords:  ["Elles"],
-        subjectPhrase: "elles",
-        gender: "f", number: "p",
-        answer: "sont venues"
-      },
-      {
-        sentence:      "La chatte ___ (rester) dehors.",
-        subjectWords:  ["La", "chatte"],
-        subjectPhrase: "la chatte",
-        gender: "f", number: "s",
-        answer: "est restée"
-      },
-      {
-        sentence:      "Mon frère ___ (revenir) de voyage.",
-        subjectWords:  ["Mon", "frère"],
-        subjectPhrase: "mon frère",
-        gender: "m", number: "s",
-        answer: "est revenu"
-      },
-      {
-        sentence:      "Les élèves ___ (sortir) en récréation.",
-        subjectWords:  ["Les", "élèves"],
-        subjectPhrase: "les élèves",
-        gender: "m", number: "p",
-        answer: "sont sortis"
-      },
-      {
-        sentence:      "La touriste ___ (descendre) à Paris.",
-        subjectWords:  ["La", "touriste"],
-        subjectPhrase: "la touriste",
-        gender: "f", number: "s",
-        answer: "est descendue"
-      },
-      {
-        sentence:      "Vous ___ (monter) trop vite.",
-        subjectWords:  ["Vous"],
-        subjectPhrase: "vous",
-        gender: "m", number: "p",
-        answer: "êtes montés"
-      },
-      {
-        sentence:      "La directrice ___ (entrer) dans la classe.",
-        subjectWords:  ["La", "directrice"],
-        subjectPhrase: "la directrice",
-        gender: "f", number: "s",
-        answer: "est entrée"
-      },
-      {
-        sentence:      "Mes parents ___ (partir) en vacances.",
-        subjectWords:  ["Mes", "parents"],
-        subjectPhrase: "mes parents",
-        gender: "m", number: "p",
-        answer: "sont partis"
-      }
+    level1Bank: [
+      { subjectWords: ["elle"],        subjectCore: "elle",   subjectPhrase: "elle",        gender: "f", number: "s",
+        infinitive: "aller",   sentence: "Hier, elle ________ au parc.",        answer: "est allée" },
+      { subjectWords: ["Ils"],         subjectCore: "Ils",    subjectPhrase: "ils",         gender: "m", number: "p",
+        infinitive: "partir",  sentence: "Ils ________ sans prévenir.",         answer: "sont partis" },
+      { subjectWords: ["Il"],          subjectCore: "Il",     subjectPhrase: "il",          gender: "m", number: "s",
+        infinitive: "tomber",  sentence: "Il ________ dans la cour.",           answer: "est tombé" },
+      { subjectWords: ["Elles"],       subjectCore: "Elles",  subjectPhrase: "elles",       gender: "f", number: "p",
+        infinitive: "venir",   sentence: "Elles ________ nous voir.",           answer: "sont venues" },
+      { subjectWords: ["Vous"],        subjectCore: "Vous",   subjectPhrase: "vous",        gender: "m", number: "p",
+        infinitive: "monter",  sentence: "Vous ________ trop vite.",            answer: "êtes montés" },
+      { subjectWords: ["Ma", "sœur"],  subjectCore: "sœur",   subjectPhrase: "ma sœur",     gender: "f", number: "s",
+        infinitive: "naître",  sentence: "Ma sœur ________ en décembre.",       answer: "est née" },
+      { subjectWords: ["Mon", "frère"], subjectCore: "frère", subjectPhrase: "mon frère",  gender: "m", number: "s",
+        infinitive: "revenir", sentence: "Mon frère ________ de voyage.",       answer: "est revenu" },
+      { subjectWords: ["La", "chatte"], subjectCore: "chatte", subjectPhrase: "la chatte",  gender: "f", number: "s",
+        infinitive: "rester",  sentence: "La chatte ________ dehors.",          answer: "est restée" },
+      { subjectWords: ["Les", "filles"], subjectCore: "filles", subjectPhrase: "les filles", gender: "f", number: "p",
+        infinitive: "rentrer", sentence: "Les filles ________ à midi.",        answer: "sont rentrées" },
+      { subjectWords: ["Les", "élèves"], subjectCore: "élèves", subjectPhrase: "les élèves", gender: "m", number: "p",
+        infinitive: "sortir",  sentence: "Les élèves ________ en récréation.",  answer: "sont sortis" }
+    ],
+
+    /* ── Niveau 2 — écriture directe, sujet pronominal ou GN simple (10 items) ── */
+    level2Bank: [
+      { infinitive: "arriver",  sentence: "Les voisines ________ ensemble.",        answer: "sont arrivées" },
+      { infinitive: "descendre", sentence: "La touriste ________ à Paris.",         answer: "est descendue" },
+      { infinitive: "entrer",   sentence: "La directrice ________ dans la classe.", answer: "est entrée" },
+      { infinitive: "partir",   sentence: "Mes parents ________ en vacances.",      answer: "sont partis" },
+      { infinitive: "partir",   sentence: "Elle ________ tôt ce matin.",            answer: "est partie" },
+      { infinitive: "arriver",  sentence: "Nous ________ en retard.",               answer: "sommes arrivés" },
+      { infinitive: "sortir",   sentence: "Le chien ________ dans le jardin.",      answer: "est sorti" },
+      { infinitive: "monter",   sentence: "Les enfants ________ dans le bus.",      answer: "sont montés" },
+      { infinitive: "rester",   sentence: "On ________ à la maison.",              answer: "est resté" },
+      { infinitive: "venir",    sentence: "La maîtresse ________ nous voir hier.",  answer: "est venue" }
+    ],
+
+    /* ── Niveau 3 — sujet non pronominal exclusivement (12 items) ────────
+       Inclut le piège de l'accord mixte : sujet masculin + féminin → masculin.
+    ─────────────────────────────────────────────────────────────────── */
+    level3Bank: [
+      { infinitive: "arriver",   sentence: "Le facteur ________ très tôt ce matin.",              answer: "est arrivé" },
+      { infinitive: "rentrer",   sentence: "La voisine ________ tard hier soir.",                 answer: "est rentrée" },
+      { infinitive: "partir",    sentence: "Les chevaliers ________ au combat à l'aube.",          answer: "sont partis" },
+      { infinitive: "naître",    sentence: "Les jumelles ________ le même jour.",                  answer: "sont nées" },
+      { infinitive: "aller",     sentence: "Mon frère et ma sœur ________ chez leurs grands-parents.", answer: "sont allés" },
+      { infinitive: "tomber",    sentence: "Le vieux chêne ________ pendant la tempête.",          answer: "est tombé" },
+      { infinitive: "venir",     sentence: "Ma tante ________ nous rendre visite dimanche.",       answer: "est venue" },
+      { infinitive: "monter",    sentence: "Les explorateurs ________ au sommet de la montagne.",  answer: "sont montés" },
+      { infinitive: "retourner", sentence: "Les championnes ________ sur le podium.",               answer: "sont retournées" },
+      { infinitive: "entrer",    sentence: "Le roi et la reine ________ dans la salle du trône.",  answer: "sont entrés" },
+      { infinitive: "rester",    sentence: "Ma grand-mère ________ à la maison ce week-end.",      answer: "est restée" },
+      { infinitive: "devenir",   sentence: "Les acteurs ________ célèbres du jour au lendemain.",  answer: "sont devenus" }
     ]
   },
 
