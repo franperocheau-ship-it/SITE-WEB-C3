@@ -16,9 +16,9 @@
 
    - Homophones grammaticaux (ortho-distinguer-*.html, français-orthographe.html)
      → Français / Orthographe (groupe "Homophones", voir EXERCISE_CATALOG_GROUPS)
-   - Lexique (js/lex-comprendre.js, js/lex-construire.js, js/lex-relations.js,
+   - Vocabulaire (js/lex-comprendre.js, js/lex-construire.js, js/lex-relations.js,
      ouverts depuis français-lexique.html)
-     → Français / Lexique
+     → Français / Vocabulaire
    - identifier-verbe-conjugue (francais/grammaire/identifier-verbe-conjugue/)
      → Français / Grammaire
 
@@ -41,27 +41,27 @@ const EXERCISE_CATALOG_AUTONOMOUS = [
   { slug: "ortho-distinguer-ou-ou",             title: "Distinguer ou / où",                          category: "Français", subCategory: "Orthographe" },
   { slug: "ortho-distinguer-quel",              title: "Distinguer quel(s), quelle(s), qu'elle(s)",   category: "Français", subCategory: "Orthographe" },
 
-  /* ── Lexique (js/lex-comprendre.js) ──────────────────────────────────────── */
-  { slug: "ordre-alphabetique",  title: "Ranger dans l'ordre alphabétique",               category: "Français", subCategory: "Lexique" },
-  { slug: "trouver-synonyme",    title: "Trouver un synonyme",                            category: "Français", subCategory: "Lexique" },
-  { slug: "trouver-antonyme",    title: "Trouver un antonyme",                            category: "Français", subCategory: "Lexique" },
-  { slug: "identifier-homonyme", title: "Identifier un homonyme",                         category: "Français", subCategory: "Lexique" },
-  { slug: "polysemie",           title: "Comprendre la polysémie d'un mot",               category: "Français", subCategory: "Lexique" },
-  { slug: "sens-propre-figure",  title: "Identifier le sens propre et le sens figuré",    category: "Français", subCategory: "Lexique" },
+  /* ── Vocabulaire (js/lex-comprendre.js) ──────────────────────────────────────── */
+  { slug: "ordre-alphabetique",  title: "Ranger dans l'ordre alphabétique",               category: "Français", subCategory: "Vocabulaire" },
+  { slug: "trouver-synonyme",    title: "Trouver un synonyme",                            category: "Français", subCategory: "Vocabulaire" },
+  { slug: "trouver-antonyme",    title: "Trouver un antonyme",                            category: "Français", subCategory: "Vocabulaire" },
+  { slug: "identifier-homonyme", title: "Identifier un homonyme",                         category: "Français", subCategory: "Vocabulaire" },
+  { slug: "polysemie",           title: "Comprendre la polysémie d'un mot",               category: "Français", subCategory: "Vocabulaire" },
+  { slug: "sens-propre-figure",  title: "Identifier le sens propre et le sens figuré",    category: "Français", subCategory: "Vocabulaire" },
 
-  /* ── Lexique (js/lex-construire.js) ──────────────────────────────────────── */
-  { slug: "famille-de-mots",    title: "Identifier une famille de mots",                 category: "Français", subCategory: "Lexique" },
-  { slug: "identifier-radical", title: "Identifier le radical d'un mot",                 category: "Français", subCategory: "Lexique" },
-  { slug: "identifier-prefixe", title: "Identifier un préfixe",                          category: "Français", subCategory: "Lexique" },
-  { slug: "identifier-suffixe", title: "Identifier un suffixe",                          category: "Français", subCategory: "Lexique" },
-  { slug: "mot-derive",         title: "Former un mot dérivé",                           category: "Français", subCategory: "Lexique" },
-  { slug: "origine-mots",       title: "Comprendre l'origine des mots (latin, grec)",    category: "Français", subCategory: "Lexique" },
+  /* ── Vocabulaire (js/lex-construire.js) ──────────────────────────────────────── */
+  { slug: "famille-de-mots",    title: "Identifier une famille de mots",                 category: "Français", subCategory: "Vocabulaire" },
+  { slug: "identifier-radical", title: "Identifier le radical d'un mot",                 category: "Français", subCategory: "Vocabulaire" },
+  { slug: "identifier-prefixe", title: "Identifier un préfixe",                          category: "Français", subCategory: "Vocabulaire" },
+  { slug: "identifier-suffixe", title: "Identifier un suffixe",                          category: "Français", subCategory: "Vocabulaire" },
+  { slug: "mot-derive",         title: "Former un mot dérivé",                           category: "Français", subCategory: "Vocabulaire" },
+  { slug: "origine-mots",       title: "Comprendre l'origine des mots (latin, grec)",    category: "Français", subCategory: "Vocabulaire" },
 
-  /* ── Lexique (js/lex-relations.js) ───────────────────────────────────────── */
-  { slug: "regrouper-par-theme", title: "Regrouper des mots par thème",       category: "Français", subCategory: "Lexique" },
-  { slug: "champ-lexical",       title: "Identifier un champ lexical",       category: "Français", subCategory: "Lexique" },
-  { slug: "mot-adapte-contexte", title: "Choisir le mot adapté au contexte", category: "Français", subCategory: "Lexique" },
-  { slug: "niveaux-de-langue",   title: "Distinguer les niveaux de langue",  category: "Français", subCategory: "Lexique" },
+  /* ── Vocabulaire (js/lex-relations.js) ───────────────────────────────────────── */
+  { slug: "regrouper-par-theme", title: "Regrouper des mots par thème",       category: "Français", subCategory: "Vocabulaire" },
+  { slug: "champ-lexical",       title: "Identifier un champ lexical",       category: "Français", subCategory: "Vocabulaire" },
+  { slug: "mot-adapte-contexte", title: "Choisir le mot adapté au contexte", category: "Français", subCategory: "Vocabulaire" },
+  { slug: "niveaux-de-langue",   title: "Distinguer les niveaux de langue",  category: "Français", subCategory: "Vocabulaire" },
 
   /* ── Grammaire (page autonome dédiée) ────────────────────────────────────── */
   { slug: "identifier-verbe-conjugue", title: "Identifier le verbe conjugué", category: "Français", subCategory: "Grammaire" },

@@ -41,6 +41,12 @@
   fill: #F5A623;
 }
 
+/* Badge du rang suivant, désaturé au centre de la couronne : "pas encore
+   obtenu", même intention que .laurel-badge--locked. */
+.laurel-crown-target {
+  filter: grayscale(1) opacity(0.55);
+}
+
 .laurel-leaf-breakdown {
   font-size: 12px;
   color: var(--muted, #5F6368);
@@ -150,6 +156,54 @@
   color: #F5A623;
 }
 
+/* ── Frise des rangs déjà validés (couleur pleine) ────────────────────────── */
+
+.laurel-ranks-frise {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.laurel-ranks-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 72px;
+  background: none;
+  border: none;
+  border-radius: 12px;
+  padding: 6px 4px;
+  cursor: pointer;
+  font: inherit;
+  transition: transform 150ms ease, background 150ms ease;
+}
+
+.laurel-ranks-item:hover,
+.laurel-ranks-item:focus-visible {
+  background: var(--bg, #F8FAFC);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.laurel-ranks-item img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  display: block;
+}
+
+.laurel-ranks-item-label {
+  font-family: var(--font-display, 'Fredoka', sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted, #5F6368);
+  text-align: center;
+  line-height: 1.15;
+}
+
 /* ── Badges de domaine ────────────────────────────────────────────────── */
 
 .laurel-badges-grid {
@@ -246,6 +300,7 @@
 #laurels-root.laurel-context-teacher .laurel-crown-wrap { grid-area: crown; }
 #laurels-root.laurel-context-teacher .laurel-rank-block { grid-area: rank; }
 #laurels-root.laurel-context-teacher .laurel-badges-grid { grid-area: badges; align-self: center; }
+#laurels-root.laurel-context-teacher .laurel-ranks-frise { justify-content: flex-start; }
 
 @media (max-width: 700px) {
   #laurels-root.laurel-context-teacher .laurel-section {
@@ -253,4 +308,93 @@
     text-align: center;
   }
   #laurels-root.laurel-context-teacher .laurel-badges-grid { text-align: left; }
+}
+
+/* ── Modale "badge en grand" ────────────────────────────────────────────── */
+
+.laurel-rank-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.laurel-rank-modal--open {
+  display: flex;
+}
+
+.laurel-rank-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 26, 58, 0.62);
+  backdrop-filter: blur(2px);
+}
+
+.laurel-rank-modal-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: var(--card-bg, #ffffff);
+  border-radius: var(--radius-card, 20px);
+  padding: 40px 36px 30px;
+  max-width: min(90vw, 340px);
+  box-shadow: 0 24px 64px rgba(15, 26, 58, 0.3);
+  animation: laurelRankModalPop 220ms cubic-bezier(.2,.9,.3,1.2);
+}
+
+@keyframes laurelRankModalPop {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.laurel-rank-modal-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--muted, #5F6368);
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.laurel-rank-modal-close:hover,
+.laurel-rank-modal-close:focus-visible {
+  background: var(--bg, #F8FAFC);
+  color: var(--blue, #1A2D6B);
+  outline: none;
+}
+
+.laurel-rank-modal-img {
+  width: 180px;
+  height: 180px;
+  max-width: 100%;
+  object-fit: contain;
+  margin-bottom: 6px;
+}
+
+.laurel-rank-modal-name {
+  font-family: var(--font-display, 'Fredoka', sans-serif);
+  font-weight: 800;
+  font-size: 24px;
+  color: var(--blue, #1A2D6B);
+}
+
+.laurel-rank-modal-fr {
+  font-family: var(--font-display, 'Fredoka', sans-serif);
+  font-weight: 600;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--muted, #5F6368);
+  opacity: 0.7;
 }
