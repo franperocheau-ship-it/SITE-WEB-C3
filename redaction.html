@@ -59,6 +59,8 @@
         <p class="page-subtitle">Choisis un jogging d'écriture. Fais passer tous les feux au vert !</p>
       </div>
 
+      <img src="assets/Explication jogging.png" alt="Frise expliquant le fonctionnement du jogging d'écriture : rédaction, correction automatique, feux Code Champion" class="jog-explication-frise">
+
       <div class="jog-cards-grid" id="jog-cards-grid"></div>
 
     </div>
@@ -107,13 +109,12 @@
     }
 
     /* jog.title/competence peuvent venir d'une personnalisation enseignante
-       (Phase 4, §5.8) : échappés avant insertion dans le DOM (jog.duree/
-       niveau sont numériques, jog.tempsImpose est restreint aux 4 libellés
-       de TEMPS_CLASS — sans risque). */
+       (Phase 4, §5.8) : échappés avant insertion dans le DOM (jog.duree
+       est numérique, jog.tempsImpose est restreint aux 4 libellés de
+       TEMPS_CLASS — sans risque). */
     function renderJoggingCard(jog, locked) {
       const badges = `
           <div class="jog-card-badges">
-            <span class="ls-pastille" style="--ls-color:var(--ls-color-${jog.niveau})">Niveau ${jog.niveau}</span>
             <span class="jog-temps ${TEMPS_CLASS[jog.tempsImpose] || ''}">${jog.tempsImpose}</span>
           </div>`;
 

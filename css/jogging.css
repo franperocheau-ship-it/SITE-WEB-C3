@@ -33,6 +33,16 @@
 .jog-temps--passe-compose  { background: #D62839; }
 .jog-temps--futur          { background: #1A2D6B; }
 
+/* ─── Catalogue (redaction.html) : frise explicative du dispositif ───── */
+.jog-explication-frise {
+  display: block;
+  width: 100%;
+  max-width: 750px;
+  height: auto;
+  margin: 0 auto 24px;
+  border-radius: var(--radius-card);
+}
+
 /* ─── Catalogue (redaction.html) : grille des 15 cartes ───────────────── */
 .jog-cards-grid {
   display: grid;

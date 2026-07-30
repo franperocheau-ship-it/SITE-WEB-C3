@@ -399,7 +399,7 @@
 
   /* ═══════════════════════════════════════════════════════════════════════════
      GÉRER MES JOGGINGS (Phase 4, §5.7 point 5 / §5.8) — personnalisation par
-     classe (titre/consigne/temps imposé/niveau/durée/compétence) et
+     classe (titre/consigne/temps imposé/durée/compétence) et
      verrouillage en parcours guidé. Tout est écrit directement en base
      (RLS), aucun appel externe.
   ═══════════════════════════════════════════════════════════════════════════ */
@@ -489,10 +489,6 @@
     const tempsOptionsHtml = TEMPS_IMPOSE_OPTIONS.map(o =>
       `<option value="${o.value}" ${o.value === currentTempsValue ? 'selected' : ''}>${o.label}</option>`
     ).join('');
-    const currentNiveau = isCustom('niveau') ? row.niveau : jog.niveau;
-    const niveauOptionsHtml = [1, 2, 3].map(n =>
-      `<option value="${n}" ${n === currentNiveau ? 'selected' : ''}>Niveau ${n}</option>`
-    ).join('');
     const locked = !!(row && row.locked === true);
 
     return `
@@ -516,12 +512,6 @@
           <button type="button" class="jog-gerer-reset-btn" data-reset data-field="temps_impose" data-default="${defaultTempsValue}">↺ Réinitialiser</button>
         </div>
         <select data-field="temps_impose" data-custom="${isCustom('temps_impose')}">${tempsOptionsHtml}</select>
-
-        <div class="jog-gerer-field-row">
-          <label>Niveau</label>
-          <button type="button" class="jog-gerer-reset-btn" data-reset data-field="niveau" data-default="${jog.niveau}">↺ Réinitialiser</button>
-        </div>
-        <select data-field="niveau" data-custom="${isCustom('niveau')}">${niveauOptionsHtml}</select>
 
         <div class="jog-gerer-field-row">
           <label>Durée estimée (minutes)</label>
@@ -603,11 +593,17 @@
       return isNumber ? parseInt(raw, 10) : raw;
     };
 
+    // "niveau" n'a plus de champ dans ce formulaire (UI retirée) : on
+    // reconduit tel quel l'éventuelle valeur déjà personnalisée en base
+    // plutôt que de lire un champ absent, pour ne pas l'écraser à null
+    // à chaque enregistrement d'un autre champ.
+    const existingRow = _gererSettings.get(joggingId) || null;
+
     const fields = {
       titre: readField('titre'),
       consigne: readField('consigne'),
       temps_impose: readField('temps_impose'),
-      niveau: readField('niveau', true),
+      niveau: existingRow ? existingRow.niveau : null,
       duree_estimee: readField('duree_estimee', true),
       competence: readField('competence')
     };
