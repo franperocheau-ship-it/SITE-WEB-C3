@@ -41,12 +41,26 @@ const DicteesSpeech = (() => {
   /* Chrome tronque/déforme le début de l'énoncé quand speak() est appelé
      juste après cancel() dans le même tick (bug connu du moteur réseau
      "Google français") — on n'annule que si une lecture est vraiment en
-     cours, et on laisse un court délai au moteur avant de relancer. */
+     cours, et on laisse un court délai au moteur avant de relancer.
+
+     requestId : si un 2e speak() arrive pendant le délai de 150 ms d'un 1er
+     appel encore en attente, rien n'empêchait jusqu'ici le fire() du 1er
+     appel de s'exécuter quand même une fois le délai écoulé — il jouait
+     alors SON texte à lui, désormais périmé, après (ou en même temps que)
+     le mot suivant déjà affiché à l'écran. Symptôme observé sur le palier
+     "effacement progressif" (passage 3), qui relance l'audio à chaque mot
+     et expose donc bien plus ce risque qu'avant. Le jeton ci-dessous rend
+     tout fire() retardé inoffensif dès qu'un appel plus récent a pris le
+     relais. */
+  let requestId = 0;
+
   function speak(text, onEnd) {
     if (!('speechSynthesis' in window)) { if (onEnd) onEnd(); return; }
     const synth = window.speechSynthesis;
+    const myRequest = ++requestId;
 
     const fire = () => {
+      if (myRequest !== requestId) return; // supplanté par un appel plus récent
       const utter  = new SpeechSynthesisUtterance(text);
       utter.lang   = 'fr-FR';
       utter.rate   = 0.85;

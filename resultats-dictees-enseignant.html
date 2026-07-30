@@ -17,7 +17,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=2"></script>
-  <script src="js/dictees-teacher.js?v=1"></script>
+  <script src="js/dictees-teacher.js?v=2"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=1">
   <script src="js/resultats-nav.js?v=1"></script>
   <style>
@@ -77,6 +77,16 @@
     .student-rank-name { flex: 1; font-weight: 600; font-size: 13.5px; color: var(--text); }
     .student-rank-meta { font-size: 11.5px; color: var(--muted); }
     .student-rank-pct { font-weight: 700; font-size: 13px; }
+
+    /* Ligne cliquable : affiche les mots ratés de l'élève dans le panneau
+       ci-dessous, sans page/vue séparée (choix délibéré, cf. dictees-teacher.js). */
+    .student-rank-row[data-student-idx] { cursor: pointer; transition: background 150ms; }
+    .student-rank-row[data-student-idx]:hover,
+    .student-rank-row[data-student-idx]:focus-visible { background: rgba(16,43,106,0.06); outline: none; }
+    .student-rank-row.is-selected { background: rgba(16,43,106,0.10); }
+    #dic-student-missed-panel:empty { display: none; }
+    #dic-student-missed-panel { margin-top: 16px; padding-top: 16px; border-top: 1.5px solid var(--border); }
+    .dic-student-missed-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
     .dic-stat-table-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; margin-bottom: 8px; }
     .dic-stat-table-title { flex: 1; font-weight: 700; font-size: 13.5px; color: var(--text); }
     .dic-stat-pill { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 100px; white-space: nowrap; }
@@ -193,7 +203,26 @@
       return 'dic-stat-pill--low';
     }
 
+    /* Réutilisé pour le tally global ("Mots les plus ratés") et pour le
+       panneau par élève — même gabarit .comp-bar-row, juste une liste de
+       mots différente en entrée. */
+    function renderMissedList(missedWords, emptyText) {
+      if (!missedWords.length) return `<div class="empty-inline">${escHtml(emptyText)}</div>`;
+      return missedWords.map(m => `
+        <div class="comp-bar-row">
+          <div class="comp-bar-label"><span>${escHtml(m.contenu)}</span><span class="n">${m.count} raté${m.count !== 1 ? 's' : ''}</span></div>
+          <div class="comp-bar-track"><div class="comp-bar-fill down" style="width:${Math.min(100, m.count * 20)}%"></div></div>
+        </div>
+      `).join('');
+    }
+
+    /* Stats de la classe actuellement affichées — nécessaire pour retrouver
+       missedWords au clic sur une ligne "Élèves à suivre" sans tout
+       recalculer côté client. */
+    let _currentStats = null;
+
     function renderStats(stats) {
+      _currentStats = stats;
       const body = document.getElementById('dic-stats-body');
 
       const perDicteeHtml = stats.perDictee.length ? stats.perDictee.map(d => `
@@ -208,15 +237,11 @@
         </div>
       `).join('') : '<div class="empty-inline">Aucune dictée pour cette classe.</div>';
 
-      const missedHtml = stats.mostMissed.length ? stats.mostMissed.map(m => `
-        <div class="comp-bar-row">
-          <div class="comp-bar-label"><span>${escHtml(m.contenu)}</span><span class="n">${m.count} raté${m.count !== 1 ? 's' : ''}</span></div>
-          <div class="comp-bar-track"><div class="comp-bar-fill down" style="width:${Math.min(100, m.count * 20)}%"></div></div>
-        </div>
-      `).join('') : '<div class="empty-inline">Pas encore de mot raté.</div>';
+      const missedHtml = renderMissedList(stats.mostMissed, 'Pas encore de mot raté.');
 
       const watchHtml = stats.studentsToWatch.length ? stats.studentsToWatch.map((s, i) => `
-        <div class="student-rank-row">
+        <div class="student-rank-row" data-student-idx="${i}" tabindex="0" role="button"
+             aria-label="Voir les mots ratés de ${escHtml(s.student.display_name)}">
           <div class="student-rank-num">${i + 1}</div>
           <div>
             <div class="student-rank-name">${escHtml(s.student.display_name)}</div>
@@ -238,7 +263,34 @@
         <div class="overview-card">
           <div class="overview-card-title">Élèves à suivre</div>
           <div class="student-rank-list">${watchHtml}</div>
+          <div id="dic-student-missed-panel"></div>
         </div>
+      `;
+
+      document.querySelectorAll('.student-rank-row[data-student-idx]').forEach(row => {
+        const idx = parseInt(row.dataset.studentIdx, 10);
+        row.addEventListener('click', () => selectStudentMissed(idx));
+        row.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectStudentMissed(idx); }
+        });
+      });
+    }
+
+    /* Clic (ou clavier) sur une ligne "Élèves à suivre" : affiche ses mots
+       ratés dans un panneau sous la liste — pas de vue/page séparée, voir
+       la proposition validée avant implémentation. */
+    function selectStudentMissed(idx) {
+      const entry = _currentStats && _currentStats.studentsToWatch[idx];
+      const panel = document.getElementById('dic-student-missed-panel');
+      if (!entry || !panel) return;
+
+      document.querySelectorAll('.student-rank-row.is-selected').forEach(r => r.classList.remove('is-selected'));
+      const row = document.querySelector(`.student-rank-row[data-student-idx="${idx}"]`);
+      if (row) row.classList.add('is-selected');
+
+      panel.innerHTML = `
+        <div class="dic-student-missed-title">Mots ratés de ${escHtml(entry.student.display_name)}</div>
+        ${renderMissedList(entry.missedWords, 'Aucun mot raté pour cet élève.')}
       `;
     }
 

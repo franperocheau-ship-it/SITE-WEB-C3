@@ -1,19 +1,57 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    dictees-engine.js — Parcours élève d'une dictée préparée (dictee.html).
 
-   Deux exercices successifs sur les mots difficiles de la dictée :
-     1. Capsule sonore  — chaque mot est dicté une fois, l'élève l'écrit.
-     2. Répétition      — les mots reviennent, mélangés, jusqu'à ce que
-        CHAQUE mot ait été écrit correctement au moins une fois (les mots
-        ratés reviennent dans le tirage).
+   Trois paliers successifs sur les mots difficiles de la dictée (state.step
+   vaut 0, 0.5 ou 1 — la valeur 1 ne bouge pas, pour rester compatible avec
+   dictee_results.exercice) :
+     0.   Photographie le mot — le mot s'affiche en grand puis disparaît
+          complètement, l'élève l'écrit de mémoire. Correction automatique
+          (DicteesSpeech.normalize, comme les autres paliers) : la saisie et
+          le mot correct restent affichés côte à côte, mais c'est le site qui
+          tranche juste/faux, jamais l'élève. Les mots ratés reviennent plus
+          tard dans le tirage, jamais juste après.
+     0.5. Effacement progressif — le mot est affiché à trous (lettres tirées
+          au hasard à chaque passage, jamais les mêmes positions) : passage 1
+          ≈25 % de lettres masquées, passage 2 ≈60 %. Pas d'audio dans ce
+          palier (retiré pour ne pas faire doublon avec le palier 1, qui est
+          déjà une dictée audio). Correction automatique comme au palier 0.
+          Par mot : une réussite fait progresser d'un passage (jusqu'à
+          maîtrisé au passage 2), un échec fait redescendre d'un passage
+          (jamais retiré, jamais retenté au même passage juste après —
+          même mécanique de tirage differé que le palier 1 : mot raté exclu
+          du prochain tirage seulement, jamais retenté immédiatement).
+     1.   Dictée audio à correction retardée — lots de LOT_SIZE mots dictés
+          (TTS) sans aucun retour pendant le lot. À la fin du lot : bilan
+          "X/Y", un unique repêchage (réécoute possible, mais sans indice
+          visuel) pour les mots ratés, puis révélation de l'orthographe pour
+          ceux encore faux. Comme les autres
+          paliers la correction est automatique (DicteesSpeech.normalize),
+          seulement différée à la fin du lot. Un mot encore faux après
+          repêchage réapparaît dans un lot ultérieur (jamais le suivant
+          immédiat). Dernier palier du parcours : son écran de fin
+          (showExercice1Results) est l'écran de fin du module entier.
+
+   Le palier 0 et 0.5 sont purement formatifs : aucune écriture en base (voir
+   submitResult, appelé uniquement pour l'exercice 1 ci-dessus).
 
    Progression persistée en sessionStorage (postes de classe partagés — la
-   BDD n'est écrite qu'à la fin de chaque exercice, jamais comme source de
-   la progression en cours). Dépend de : supabase-client.js (window.lfmDb),
+   BDD n'est écrite qu'à la fin de l'exercice 1, jamais comme source de la
+   progression en cours). Dépend de : supabase-client.js (window.lfmDb),
    auth.js (lfmAuth), dictees-speech.js (DicteesSpeech), breadcrumb.js.
+
+   SCHEMA_VERSION : la forme/les règles de `state` ont changé plusieurs fois
+   (dernier changement : palier "dictée finale" — state.step 2, `ex2` — retiré
+   entièrement du parcours ; une session sauvegardée sous l'ancien schéma
+   pourrait encore avoir step=2). Toute session sessionStorage sauvegardée
+   sous un schéma différent est ignorée au chargement (redémarrage propre sur
+   l'écran de choix du niveau) plutôt que de risquer un état incohérent — à
+   bumper à chaque futur changement de forme/règles de state.
    ───────────────────────────────────────────────────────────────────────────── */
 
 const DicteesEngine = (() => {
+  const LOT_SIZE = 5;        // nb de mots par lot pour le palier 1 (dictée audio à correction retardée)
+  const SCHEMA_VERSION = 6;  // voir note ci-dessus
+
   let dictee = null;
   let allMots = [];  // tous les mots de la dictée, non filtrés
   let mots = [];      // mots effectivement travaillés (filtrés selon le niveau choisi)
@@ -54,11 +92,28 @@ const DicteesEngine = (() => {
   }
 
   function freshState(niveauChoisi) {
+    const ids = mots.map(m => m.id);
     return {
       niveauChoisi,
-      step: 1,
-      ex1: { order: shuffle(mots.map(m => m.id)), index: 0, correct: 0, attempts: 0, wrongIds: [], submitted: false },
-      ex2: null
+      step: 0,
+      /* Mécanique de tirage differé (deck mélangé, unmastered = mots pas
+         encore réussis, réutilisée par les autres paliers) : un mot raté
+         reste hors du deck courant et ne revient qu'au réapprovisionnement
+         (mélange des mots restants), donc jamais immédiatement après. Pas de
+         champ submitted/wrongAny : ce palier n'écrit jamais en base (voir
+         en-tête du fichier). */
+      ex0: {
+        unmastered: ids,
+        deck: shuffle(ids),
+        current: null,
+        phase: 'photo',   // 'photo' (mot affiché) → 'input' (saisie, correction automatique)
+        correct: 0,
+        attempts: 0,
+        wrongIds: []
+      },
+      ex05: null,
+      ex1: null,
+      schemaVersion: SCHEMA_VERSION
     };
   }
 
@@ -108,11 +163,15 @@ const DicteesEngine = (() => {
     if (typeof Breadcrumb !== 'undefined') Breadcrumb.setCurrent(dictee.titre);
 
     /* Reprise d'une dictée déjà commencée : le niveau choisi fait partie de
-       l'état persisté, on ne le redemande pas (le reste de l'état — par ex.
-       ex1.order, une liste d'ids — en dépend directement). Nouvelle dictée :
-       écran de choix systématique. */
+       l'état persisté, on ne le redemande pas (le reste de l'état — les ids
+       de mots par palier — en dépend directement). saved.schemaVersion
+       différent de SCHEMA_VERSION (ou absent, anciennes sessions) : la forme
+       de `state` a changé depuis, on ignore la sauvegarde plutôt que de
+       risquer un crash sur des champs disparus (voir note SCHEMA_VERSION en
+       en-tête de fichier). Nouvelle dictée ou schéma périmé : écran de choix
+       systématique. */
     const saved = loadState(dictee.id);
-    if (saved && saved.niveauChoisi) {
+    if (saved && saved.niveauChoisi && saved.schemaVersion === SCHEMA_VERSION) {
       mots = filterByChosenNiveau(allMots, saved.niveauChoisi);
       state = saved;
       exStartTime = Date.now();
@@ -154,9 +213,11 @@ const DicteesEngine = (() => {
   /* ── Rendu général ───────────────────────────────────────────────────── */
   function renderStepBanner() {
     const banner = document.getElementById('dic-step-banner');
-    banner.innerHTML = [1, 2].map(n => {
+    banner.innerHTML = [0, 0.5, 1].map(n => {
       const cls = n < state.step ? 'dic-step--done' : n === state.step ? 'dic-step--active' : '';
-      const label = n === 1 ? '1. Capsule sonore' : '2. Jusqu’à la maîtrise';
+      const label = n === 0 ? 'Photographie le mot'
+        : n === 0.5 ? 'Effacement progressif'
+        : 'Dictée audio';
       return `<span class="dic-step ${cls}">${label}</span>`;
     }).join('') + `<span class="ls-pastille" style="--ls-color:var(--ls-color-${state.niveauChoisi})">Niveau ${state.niveauChoisi}</span>`;
   }
@@ -165,8 +226,9 @@ const DicteesEngine = (() => {
     document.getElementById('dic-state-loading').style.display = 'none';
     document.getElementById('dic-state-error').style.display = 'none';
     renderStepBanner();
-    if (state.step === 1) renderExercice1();
-    else renderExercice2();
+    if (state.step === 0) renderExercice0();
+    else if (state.step === 0.5) renderPalier05();
+    else renderExercice1();
   }
 
   function renderListenAndInputHTML(counterHTML) {
@@ -199,169 +261,446 @@ const DicteesEngine = (() => {
     DicteesSpeech.speak(text, () => { if (btn) btn.disabled = false; });
   }
 
-  function lockItem() {
-    document.getElementById('dic-input').disabled = true;
-    document.getElementById('dic-val-btn').disabled = true;
-    document.getElementById('dic-listen-btn').disabled = true;
+  /* ── Exercice 0 : photographie le mot ────────────────────────────────── */
+  function drawNextExercice0() {
+    if (state.ex0.deck.length === 0) state.ex0.deck = shuffle(state.ex0.unmastered);
+    state.ex0.current = state.ex0.deck.shift();
+    state.ex0.phase = 'photo';
   }
 
-  /* ── Exercice 1 : capsule sonore ─────────────────────────────────────── */
-  function renderExercice1() {
+  function renderExercice0() {
     document.getElementById('dic-state-results').style.display = 'none';
     document.getElementById('dic-state-exercise').style.display = '';
     document.getElementById('dic-intro-consigne').textContent =
-      'Écoute chaque mot ou groupe de mots, puis écris ce que tu entends.';
+      "Observe bien le mot affiché : il va disparaître. Écris-le ensuite de mémoire — la correction est automatique.";
 
-    if (state.ex1.index >= state.ex1.order.length) {
-      showExercice1Results();
-      if (!state.ex1.submitted) {
-        state.ex1.submitted = true;
-        saveState();
-        submitResult(1, state.ex1.correct, state.ex1.order.length, false,
-          Math.round((Date.now() - exStartTime) / 1000), state.ex1.attempts, state.ex1.wrongIds);
-      }
+    if (state.ex0.unmastered.length === 0) {
+      showExercice0Results();
+      return;
+    }
+    if (state.ex0.current == null) { drawNextExercice0(); saveState(); }
+
+    const mot = motById(state.ex0.current);
+    const remaining = state.ex0.unmastered.length;
+    const counterHTML = `<div class="dic-counters"><div class="dic-word-count">Il reste ${remaining} mot${remaining !== 1 ? 's' : ''} à photographier</div></div>`;
+
+    if (state.ex0.phase === 'photo') {
+      document.getElementById('dic-item').innerHTML = `
+        ${counterHTML}
+        <div class="dic-flash-wrap"><div class="dic-flash-word">${escapeHtml(mot.contenu)}</div></div>
+      `;
+      /* ~1,5 s de base + 0,3 s par caractère (espaces compris, un groupe de
+         mots comme "les enfants jouaient" doit rester lisible plus longtemps
+         qu'un seul mot court). */
+      const displayMs = Math.round((1.5 + 0.3 * mot.contenu.length) * 1000);
+      setTimeout(() => {
+        if (state.ex0.current === mot.id && state.ex0.phase === 'photo') {
+          state.ex0.phase = 'input';
+          saveState();
+          render();
+        }
+      }, displayMs);
       return;
     }
 
-    const mot = motById(state.ex1.order[state.ex1.index]);
-    document.getElementById('dic-item').innerHTML = renderListenAndInputHTML(
-      `<div class="dic-counters"><div class="dic-word-count">Mot ${state.ex1.index + 1} / ${state.ex1.order.length}</div></div>`
-    );
-    wireItem(mot, () => validateExercice1(mot));
-  }
-
-  function validateExercice1(mot) {
+    /* phase === 'input' : correction automatique (DicteesSpeech.normalize,
+       même comparaison que pour l'exercice 1) — le site tranche juste/faux,
+       jamais l'élève. */
+    document.getElementById('dic-item').innerHTML = `
+      ${counterHTML}
+      <div class="dic-input-row">
+        <input type="text" class="dic-input" id="dic-input"
+               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+               placeholder="Écris le mot de mémoire…">
+        <button type="button" class="dic-validate-btn" id="dic-val-btn">Valider</button>
+      </div>
+      <div class="dic-feedback-area" id="dic-feedback"></div>
+    `;
     const input = document.getElementById('dic-input');
-    if (!input || !input.value.trim() || input.disabled) return;
+    const onValidate = () => {
+      if (!input || !input.value.trim() || input.disabled) return;
+      const typed = input.value;
+      const isRight = DicteesSpeech.normalize(typed) === DicteesSpeech.normalize(mot.contenu);
+      input.disabled = true;
+      document.getElementById('dic-val-btn').disabled = true;
+      input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+      state.ex0.attempts++;
 
-    const typed = input.value;
-    const isRight = DicteesSpeech.normalize(typed) === DicteesSpeech.normalize(mot.contenu);
-    lockItem();
-    state.ex1.attempts++;
+      if (isRight) {
+        state.ex0.correct++;
+        state.ex0.unmastered = state.ex0.unmastered.filter(id => id !== mot.id);
+        state.ex0.deck = state.ex0.deck.filter(id => id !== mot.id);
+      } else if (!state.ex0.wrongIds.includes(mot.id)) {
+        state.ex0.wrongIds.push(mot.id);
+      }
 
-    if (isRight) {
-      state.ex1.correct++;
-      input.classList.add('is-correct');
-      document.getElementById('dic-feedback').innerHTML =
-        `<div class="dic-feedback-correct">✅ ${escapeHtml(mot.contenu)}</div>`;
-    } else {
-      state.ex1.wrongIds.push(mot.id);
-      input.classList.add('is-wrong');
-      document.getElementById('dic-feedback').innerHTML = `
-        <div class="dic-feedback-wrong">
-          Ça s'écrit : <span class="dic-correct-word">${DicteesSpeech.diffHighlight(mot.contenu, typed)}</span>
-        </div>`;
-    }
-
-    state.ex1.index++;
-    saveState();
-    setTimeout(render, isRight ? 900 : 2200);
+      /* Uniquement le verdict automatique : la saisie de l'élève reste
+         visible juste au-dessus dans le champ, jamais répétée ici. */
+      document.getElementById('dic-feedback').innerHTML = isRight
+        ? '<div class="dic-feedback-correct">✅ Correct</div>'
+        : `<div class="dic-feedback-wrong">❌ Incorrect — le mot correct est <span class="dic-correct-word">${escapeHtml(mot.contenu)}</span></div>`;
+      state.ex0.current = null;
+      saveState();
+      setTimeout(render, isRight ? 900 : 2200);
+    };
+    document.getElementById('dic-val-btn').addEventListener('click', onValidate);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') onValidate(); });
+    setTimeout(() => document.getElementById('dic-input')?.focus(), 80);
   }
 
-  function showExercice1Results() {
-    const total = state.ex1.order.length;
-    const score = state.ex1.correct;
+  function showExercice0Results() {
+    const total = mots.length;
     document.getElementById('dic-state-exercise').style.display = 'none';
     document.getElementById('dic-state-results').style.display = '';
-    document.getElementById('dic-final-message').textContent = 'Capsule sonore terminée !';
+    document.getElementById('dic-final-message').textContent = 'Photographie terminée !';
     document.getElementById('dic-final-detail').textContent =
-      `${score} mot${score !== 1 ? 's' : ''} juste${score !== 1 ? 's' : ''} du premier coup sur ${total}.`;
+      `${total} mot${total !== 1 ? 's' : ''} mémorisé${total !== 1 ? 's' : ''}.`;
     document.getElementById('dic-final-actions').innerHTML =
-      `<button type="button" class="dic-card-btn" id="dic-next-ex-btn" style="width:auto;padding:12px 28px;">Continuer vers l'exercice 2 →</button>`;
-    document.getElementById('dic-next-ex-btn').addEventListener('click', startExercice2);
+      `<button type="button" class="dic-card-btn" id="dic-next-ex-btn" style="width:auto;padding:12px 28px;">Continuer vers l'effacement progressif →</button>`;
+    document.getElementById('dic-next-ex-btn').addEventListener('click', startPalier05);
   }
 
-  /* ── Exercice 2 : répétition jusqu'à maîtrise ────────────────────────── */
-  function startExercice2() {
+  /* ── Palier 0.5 : effacement progressif ──────────────────────────────── */
+  /* Fraction de lettres masquées par passage (1 → 2, maîtrisé après le 2).
+     Seules les lettres comptent (espaces, apostrophes, traits d'union
+     toujours visibles) : sur un groupe comme "les enfants jouaient", le
+     découpage en mots reste un repère constant, seule l'orthographe des
+     lettres est à retrouver. */
+  function maskFraction(passage) {
+    return passage === 1 ? 0.25 : 0.6;
+  }
+
+  function computeMaskIndices(word, passage) {
+    const letterPositions = [];
+    for (let i = 0; i < word.length; i++) {
+      if (/\p{L}/u.test(word[i])) letterPositions.push(i);
+    }
+    const count = Math.round(maskFraction(passage) * letterPositions.length);
+    return shuffle(letterPositions).slice(0, count);
+  }
+
+  function renderMaskedWord(word, maskIndices) {
+    const masked = new Set(maskIndices);
+    return word.split('').map((ch, i) => masked.has(i) ? '_' : ch).join('');
+  }
+
+  function startPalier05() {
     const ids = mots.map(m => m.id);
-    state.step = 2;
-    state.ex2 = {
+    state.step = 0.5;
+    state.ex05 = {
       unmastered: ids,
       deck: shuffle(ids),
       current: null,
+      levels: Object.fromEntries(ids.map(id => [id, 1])),  // passage courant (1-3) par mot
+      maskIndices: [],
       correct: 0,
       attempts: 0,
-      wrongIds: [],
-      wrongAny: false,
-      submitted: false
+      wrongIds: []
     };
     exStartTime = Date.now();
     saveState();
     render();
   }
 
-  function drawNextExercice2() {
-    if (state.ex2.deck.length === 0) state.ex2.deck = shuffle(state.ex2.unmastered);
-    state.ex2.current = state.ex2.deck.shift();
+  function drawNextPalier05() {
+    if (state.ex05.deck.length === 0) state.ex05.deck = shuffle(state.ex05.unmastered);
+    state.ex05.current = state.ex05.deck.shift();
+    state.ex05.maskIndices = computeMaskIndices(motById(state.ex05.current).contenu, state.ex05.levels[state.ex05.current]);
   }
 
-  function renderExercice2() {
+  function renderPalier05() {
     document.getElementById('dic-state-results').style.display = 'none';
     document.getElementById('dic-state-exercise').style.display = '';
     document.getElementById('dic-intro-consigne').textContent =
-      "Écris chaque mot correctement au moins une fois. Les mots ratés reviennent jusqu'à réussite !";
+      "Complète le mot à trous. Il y aura de moins en moins d'indices à chaque passage. La correction est automatique.";
 
-    if (state.ex2.unmastered.length === 0) {
-      showExercice2Results();
-      if (!state.ex2.submitted) {
-        state.ex2.submitted = true;
+    if (state.ex05.unmastered.length === 0) {
+      showPalier05Results();
+      return;
+    }
+    if (state.ex05.current == null) { drawNextPalier05(); saveState(); }
+
+    const mot = motById(state.ex05.current);
+    const passage = state.ex05.levels[mot.id];
+    const remaining = state.ex05.unmastered.length;
+    const counterHTML = `
+      <div class="dic-counters">
+        <div class="dic-word-count">Il reste ${remaining} mot${remaining !== 1 ? 's' : ''} à maîtriser</div>
+        <div class="dic-passage-badge">Passage ${passage} / 2</div>
+      </div>`;
+
+    const hintHTML = `<div class="dic-flash-wrap"><div class="dic-flash-word dic-mask-word">${escapeHtml(renderMaskedWord(mot.contenu, state.ex05.maskIndices))}</div></div>`;
+
+    document.getElementById('dic-item').innerHTML = `
+      ${counterHTML}
+      ${hintHTML}
+      <div class="dic-input-row">
+        <input type="text" class="dic-input" id="dic-input"
+               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+               placeholder="Complète le mot…">
+        <button type="button" class="dic-validate-btn" id="dic-val-btn">Valider</button>
+      </div>
+      <div class="dic-feedback-area" id="dic-feedback"></div>
+    `;
+    const input = document.getElementById('dic-input');
+    /* Correction automatique (DicteesSpeech.normalize, comme au palier 0) :
+       le site tranche et fait progresser/reculer le mot entre les 2 passages
+       — maîtrisé (retiré du tirage) dès la réussite au passage 2. */
+    const onValidate = () => {
+      if (!input || !input.value.trim() || input.disabled) return;
+      const typed = input.value;
+      const isRight = DicteesSpeech.normalize(typed) === DicteesSpeech.normalize(mot.contenu);
+      input.disabled = true;
+      document.getElementById('dic-val-btn').disabled = true;
+      input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+      state.ex05.attempts++;
+
+      if (isRight) {
+        state.ex05.correct++;
+        if (passage >= 2) {
+          state.ex05.unmastered = state.ex05.unmastered.filter(id => id !== mot.id);
+          state.ex05.deck = state.ex05.deck.filter(id => id !== mot.id);
+        } else {
+          state.ex05.levels[mot.id] = passage + 1;
+        }
+      } else {
+        if (!state.ex05.wrongIds.includes(mot.id)) state.ex05.wrongIds.push(mot.id);
+        state.ex05.levels[mot.id] = Math.max(1, passage - 1);
+      }
+
+      /* Écran de correction : uniquement le verdict automatique, la saisie de
+         l'élève reste visible juste au-dessus dans le champ (pas de doublon
+         "Tu as écrit"). */
+      document.getElementById('dic-feedback').innerHTML = isRight
+        ? '<div class="dic-feedback-correct">✅ Correct</div>'
+        : `<div class="dic-feedback-wrong">❌ Incorrect — le mot correct est <span class="dic-correct-word">${escapeHtml(mot.contenu)}</span></div>`;
+      state.ex05.current = null;
+      saveState();
+      setTimeout(render, isRight ? 900 : 2200);
+    };
+    document.getElementById('dic-val-btn').addEventListener('click', onValidate);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') onValidate(); });
+    setTimeout(() => document.getElementById('dic-input')?.focus(), 80);
+  }
+
+  function showPalier05Results() {
+    const total = mots.length;
+    document.getElementById('dic-state-exercise').style.display = 'none';
+    document.getElementById('dic-state-results').style.display = '';
+    document.getElementById('dic-final-message').textContent = 'Effacement progressif terminé !';
+    document.getElementById('dic-final-detail').textContent =
+      `${total} mot${total !== 1 ? 's' : ''} maîtrisé${total !== 1 ? 's' : ''}.`;
+    document.getElementById('dic-final-actions').innerHTML =
+      `<button type="button" class="dic-card-btn" id="dic-next-ex-btn" style="width:auto;padding:12px 28px;">Continuer vers l'exercice 1 →</button>`;
+    document.getElementById('dic-next-ex-btn').addEventListener('click', startExercice1);
+  }
+
+  /* ── Exercice 1 : dictée audio à correction retardée ─────────────────── */
+  /* Recyclage adapté (pas de deck/shift comme ex0/ex05, remplacé par un
+     tirage direct filtré+mélangé à chaque lot) : `unmastered` = mots jamais
+     réussis (1er passage ou repêchage) ; `coolingDown` = mots ratés du lot
+     qui vient de se terminer, exclus du tirage du PROCHAIN lot seulement
+     (jamais retiré, jamais dans le lot immédiatement suivant). */
+  function formLotExercice1() {
+    const excluded = new Set(state.ex1.coolingDown);
+    let pool = state.ex1.unmastered.filter(id => !excluded.has(id));
+    if (pool.length === 0) pool = state.ex1.unmastered.slice(); // repli : il ne reste que des mots en "repos"
+    pool = shuffle(pool);
+    state.ex1.lot = pool.slice(0, Math.min(LOT_SIZE, pool.length));
+    state.ex1.lotIndex = 0;
+    state.ex1.answers = {};
+    state.ex1.firstTryWrong = [];
+    state.ex1.repechageIndex = 0;
+    state.ex1.stillWrong = [];
+    state.ex1.phase = 'dictate';
+  }
+
+  function startExercice1() {
+    state.step = 1;
+    state.ex1 = {
+      unmastered: mots.map(m => m.id),
+      coolingDown: [],
+      lot: [],
+      lotIndex: 0,
+      phase: 'dictate',   // 'dictate' (lot en cours) → 'recap' (bilan) → 'repechage' → 'reveal'
+      answers: {},        // { [motId]: dernière saisie }, pour le récap/reveal du lot courant
+      firstTryWrong: [],  // ids ratés au 1er passage de ce lot (candidats au repêchage)
+      repechageIndex: 0,
+      stillWrong: [],      // ids encore faux après repêchage (pour 'reveal')
+      correctFirstTry: 0,  // stats cumulées sur toute la durée du palier
+      attempts: 0,
+      wrongIds: [],
+      submitted: false
+    };
+    formLotExercice1();
+    exStartTime = Date.now();
+    saveState();
+    render();
+  }
+
+  function renderExercice1() {
+    document.getElementById('dic-state-results').style.display = 'none';
+    document.getElementById('dic-state-exercise').style.display = '';
+
+    if (state.ex1.unmastered.length === 0) {
+      showExercice1Results();
+      if (!state.ex1.submitted) {
+        state.ex1.submitted = true;
         saveState();
-        submitResult(2, state.ex2.correct, mots.length, !state.ex2.wrongAny,
-          Math.round((Date.now() - exStartTime) / 1000), state.ex2.attempts, state.ex2.wrongIds);
+        submitResult(1, state.ex1.correctFirstTry, mots.length, false,
+          Math.round((Date.now() - exStartTime) / 1000), state.ex1.attempts, state.ex1.wrongIds);
       }
       return;
     }
-    if (state.ex2.current == null) { drawNextExercice2(); saveState(); }
 
-    const mot = motById(state.ex2.current);
-    const remaining = state.ex2.unmastered.length;
-    document.getElementById('dic-item').innerHTML = renderListenAndInputHTML(
-      `<div class="dic-counters"><div class="dic-word-count">Il reste ${remaining} mot${remaining !== 1 ? 's' : ''} à maîtriser</div></div>`
-    );
-    wireItem(mot, () => validateExercice2(mot));
+    if (state.ex1.phase === 'dictate') return renderLotDictate();
+    if (state.ex1.phase === 'recap') return renderLotRecap();
+    if (state.ex1.phase === 'repechage') return renderLotRepechage();
+    return renderLotReveal();
   }
 
-  function validateExercice2(mot) {
+  function renderLotDictate() {
+    document.getElementById('dic-intro-consigne').textContent =
+      "Écoute et écris chaque mot du lot. Pas de correction pendant le lot : le bilan arrive à la fin.";
+
+    const mot = motById(state.ex1.lot[state.ex1.lotIndex]);
+    document.getElementById('dic-item').innerHTML = renderListenAndInputHTML(
+      `<div class="dic-counters"><div class="dic-word-count">Mot ${state.ex1.lotIndex + 1} / ${state.ex1.lot.length} du lot</div></div>`
+    );
+    wireItem(mot, () => validateLotDictate(mot));
+  }
+
+  function validateLotDictate(mot) {
     const input = document.getElementById('dic-input');
     if (!input || !input.value.trim() || input.disabled) return;
 
     const typed = input.value;
     const isRight = DicteesSpeech.normalize(typed) === DicteesSpeech.normalize(mot.contenu);
-    lockItem();
-    state.ex2.attempts++;
+    state.ex1.attempts++;
+    state.ex1.answers[mot.id] = typed;
 
     if (isRight) {
-      state.ex2.correct++;
-      state.ex2.unmastered = state.ex2.unmastered.filter(id => id !== mot.id);
-      state.ex2.deck = state.ex2.deck.filter(id => id !== mot.id);
-      input.classList.add('is-correct');
-      document.getElementById('dic-feedback').innerHTML =
-        `<div class="dic-feedback-correct">✅ ${escapeHtml(mot.contenu)}</div>`;
+      state.ex1.correctFirstTry++;
     } else {
-      state.ex2.wrongAny = true;
-      if (!state.ex2.wrongIds.includes(mot.id)) state.ex2.wrongIds.push(mot.id);
-      input.classList.add('is-wrong');
-      document.getElementById('dic-feedback').innerHTML = `
-        <div class="dic-feedback-wrong">
-          Ça s'écrit : <span class="dic-correct-word">${DicteesSpeech.diffHighlight(mot.contenu, typed)}</span>. Ce mot reviendra plus tard.
-        </div>`;
+      state.ex1.firstTryWrong.push(mot.id);
+      if (!state.ex1.wrongIds.includes(mot.id)) state.ex1.wrongIds.push(mot.id);
     }
 
-    state.ex2.current = null;
+    state.ex1.lotIndex++;
+    if (state.ex1.lotIndex >= state.ex1.lot.length) state.ex1.phase = 'recap';
     saveState();
-    setTimeout(render, isRight ? 900 : 2200);
+    render();
   }
 
-  function showExercice2Results() {
+  function renderLotRecap() {
+    document.getElementById('dic-intro-consigne').textContent = 'Voici ton bilan sur ce lot.';
+    const total = state.ex1.lot.length;
+    const score = total - state.ex1.firstTryWrong.length;
+    document.getElementById('dic-item').innerHTML = `
+      <div class="dic-final-message" style="margin-top:4px;">Lot terminé : ${score} / ${total}</div>
+      <div class="dic-actions" style="margin-top:18px;">
+        <button type="button" class="dic-card-btn" id="dic-lot-continue-btn" style="width:auto;padding:12px 28px;">Continuer →</button>
+      </div>
+    `;
+    document.getElementById('dic-lot-continue-btn').addEventListener('click', () => {
+      if (state.ex1.firstTryWrong.length > 0) {
+        state.ex1.phase = 'repechage';
+        saveState();
+        render();
+      } else {
+        finishLotExercice1();
+      }
+    });
+  }
+
+  /* Réécoute possible pendant le repêchage (bouton + auto-play, comme au
+     passage "dictée" du lot via wireItem/renderListenAndInputHTML) : sans
+     ça l'élève n'a aucun moyen de savoir quel mot réécrire. Le reste est
+     inchangé : une seule tentative, puis révélation si encore faux. */
+  function renderLotRepechage() {
+    document.getElementById('dic-intro-consigne').textContent =
+      'Dernière chance pour les mots ratés : réécoute et réécris-les.';
+
+    const mot = motById(state.ex1.firstTryWrong[state.ex1.repechageIndex]);
+    document.getElementById('dic-item').innerHTML = renderListenAndInputHTML(
+      `<div class="dic-counters"><div class="dic-word-count">Repêchage ${state.ex1.repechageIndex + 1} / ${state.ex1.firstTryWrong.length}</div></div>`
+    );
+    wireItem(mot, () => validateRepechage(mot));
+  }
+
+  function validateRepechage(mot) {
+    const input = document.getElementById('dic-input');
+    if (!input || !input.value.trim() || input.disabled) return;
+
+    const typed = input.value;
+    state.ex1.attempts++;
+    state.ex1.answers[mot.id] = typed;
+    if (DicteesSpeech.normalize(typed) !== DicteesSpeech.normalize(mot.contenu)) {
+      state.ex1.stillWrong.push(mot.id);
+    }
+    state.ex1.repechageIndex++;
+
+    if (state.ex1.repechageIndex < state.ex1.firstTryWrong.length) {
+      saveState();
+      render();
+      return;
+    }
+    if (state.ex1.stillWrong.length > 0) {
+      state.ex1.phase = 'reveal';
+      saveState();
+      render();
+    } else {
+      finishLotExercice1();
+    }
+  }
+
+  function renderLotReveal() {
+    document.getElementById('dic-intro-consigne').textContent =
+      "Voici l'orthographe correcte des mots encore ratés après le repêchage.";
+    /* Uniquement l'orthographe correcte (avec les lettres fautives mises en
+       évidence) : tous les mots listés ici sont déjà connus comme ratés, pas
+       besoin de répéter la saisie de l'élève (déjà vue pendant le lot/le
+       repêchage). */
+    const rows = state.ex1.stillWrong.map(id => {
+      const mot = motById(id);
+      const typed = state.ex1.answers[id] || '';
+      return `
+        <div class="dic-feedback-area" style="margin-bottom:14px;">
+          <div class="dic-feedback-wrong">❌ La bonne orthographe : <span class="dic-correct-word">${DicteesSpeech.diffHighlight(mot.contenu, typed)}</span></div>
+        </div>`;
+    }).join('');
+    document.getElementById('dic-item').innerHTML = `
+      ${rows}
+      <div class="dic-actions" style="margin-top:8px;">
+        <button type="button" class="dic-card-btn" id="dic-lot-continue-btn" style="width:auto;padding:12px 28px;">Continuer →</button>
+      </div>
+    `;
+    document.getElementById('dic-lot-continue-btn').addEventListener('click', finishLotExercice1);
+  }
+
+  /* Clôture le lot courant : les mots non retenus dans `stillWrong` sont
+     maîtrisés (réussis au 1er passage ou au repêchage) et sortent du tirage ;
+     les mots encore faux restent dans `unmastered` et passent en
+     `coolingDown` (exclus du prochain lot uniquement). */
+  function finishLotExercice1() {
+    const masteredThisLot = state.ex1.lot.filter(id => !state.ex1.stillWrong.includes(id));
+    state.ex1.unmastered = state.ex1.unmastered.filter(id => !masteredThisLot.includes(id));
+    state.ex1.coolingDown = state.ex1.stillWrong.slice();
+    if (state.ex1.unmastered.length > 0) formLotExercice1();
+    saveState();
+    render();
+  }
+
+  /* Dernier palier du parcours : cet écran est désormais l'écran de fin du
+     module entier (plus de palier "dictée finale" à la suite). */
+  function showExercice1Results() {
     const total = mots.length;
-    const sansFaute = !state.ex2.wrongAny;
+    const score = state.ex1.correctFirstTry;
     document.getElementById('dic-state-exercise').style.display = 'none';
     document.getElementById('dic-state-results').style.display = '';
-    document.getElementById('dic-final-message').textContent = sansFaute
-      ? '🌟 Dictée réussie sans aucune faute !'
-      : 'Dictée terminée, tous les mots sont maîtrisés !';
+    document.getElementById('dic-final-message').textContent = 'Dictée audio terminée !';
     document.getElementById('dic-final-detail').textContent =
-      `${total} mot${total !== 1 ? 's' : ''} maîtrisé${total !== 1 ? 's' : ''}.`;
+      `${score} mot${score !== 1 ? 's' : ''} juste${score !== 1 ? 's' : ''} du premier coup sur ${total}.`;
     document.getElementById('dic-final-actions').innerHTML =
       `<a href="français-orthographe.html" class="dic-card-btn" style="width:auto;padding:12px 28px;">← Retour à l'Orthographe</a>`;
   }

@@ -265,6 +265,56 @@
 .dic-feedback-wrong .dic-correct-word { font-size: 19px; font-weight: 800; }
 .dic-diff-char { background: rgba(214,40,57,0.16); border-radius: 3px; padding: 0 1px; }
 
+/* ─── Exercice 0 "Photographie le mot" — le mot s'affiche en grand puis
+   disparaît complètement (aucune lettre, aucun indice), l'élève l'écrit de
+   mémoire puis compare lui-même sa réponse au mot correct (auto-déclaration,
+   jamais de comparaison automatique caractère par caractère). ─────────────── */
+.dic-flash-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 110px;
+  margin-bottom: 18px;
+}
+.dic-flash-word {
+  max-width: 90%;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 34px;
+  line-height: 1.3;
+  color: var(--text);
+  text-align: center;
+  word-break: break-word;
+  padding: 20px 28px;
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+}
+
+@media (max-width: 480px) {
+  .dic-flash-word { font-size: 24px; padding: 16px 20px; }
+}
+
+/* ─── Palier 0.5 "Effacement progressif" — mot affiché à trous sur 2 passages
+   (lettres masquées tirées au hasard à chaque passage, .dic-mask-word), pas
+   d'audio dans ce palier (pour rester distinct du palier 1, dictée audio).
+   Réutilise .dic-flash-word ci-dessus pour l'affichage ; correction
+   automatique, pas de boutons dédiés. ────────────────────────────────────── */
+.dic-mask-word {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 3px;
+}
+.dic-passage-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue);
+  margin-top: 4px;
+}
+
+@media (max-width: 480px) {
+  .dic-mask-word { font-size: 22px; letter-spacing: 2px; }
+}
+
 /* ─── Résultats de fin d'exercice ───────────────────────────────────────── */
 .dic-final-message {
   text-align: center;

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/favicon/favicon.ico?v=1" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png?v=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png?v=1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/favicon-192x192.png?v=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512x512.png?v=1">
+  <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
+  <link rel="manifest" href="site.webmanifest?v=1">
+  <title>Dictées préparées — Orthographe — Lycée Français de Madrid</title>
+  <meta name="description" content="">
+  <!-- SEO: description à rédiger avant le lancement du référencement (voir SEO-TODO.md) -->
+  <link rel="canonical" href="https://proficiamus.eu/dictees-catalogue.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Dictées préparées — Orthographe — Lycée Français de Madrid">
+  <meta property="og:description" content="">
+  <meta property="og:url" content="https://proficiamus.eu/dictees-catalogue.html">
+  <meta property="og:image" content="">
+  <!-- SEO: og:description et og:image à compléter avant le lancement (voir SEO-TODO.md) -->
+  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="breadcrumb.css?v=1">
+  <link rel="stylesheet" href="css/dictees.css?v=1">
+  <script src="js/breadcrumb.js?v=1"></script>
+  <script src="js/dictees-colors.js?v=1"></script>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <!-- MAIN -->
+  <div class="page-wrap">
+    <div class="page-content">
+
+      <script>Breadcrumb.render({ category: { href: "français-orthographe.html", label: "Orthographe" }, current: "Dictées préparées" });</script>
+
+      <a href="français-orthographe.html" class="back-link">← Orthographe</a>
+
+      <div class="page-header">
+        <div class="page-header-icon" style="font-size:56px;line-height:1;">📖</div>
+        <h1 class="page-title">DICTÉES PRÉPARÉES</h1>
+        <div class="page-title-rule"></div>
+        <p class="page-subtitle">Choisis une dictée à préparer.</p>
+      </div>
+
+      <div class="dic-cards-grid" id="dic-cards-grid"></div>
+      <div class="dic-empty-state" id="dic-empty-state" style="display:none;">
+        Ta classe n'a pas encore de dictée disponible.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau – LFM &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/menu.js"></script>
+
+  <script>
+    /* ── Catalogue des dictées de la classe de l'élève ───────────────────────
+       Contrairement au catalogue de joggings (redaction.html, catalogue
+       statique JOGGING_LIST), les dictées sont entièrement créées par
+       l'enseignant pour sa classe — pas de badge de niveau ici (le niveau ne
+       s'applique qu'aux mots, dans l'exercice), seulement les pastilles de
+       points grammaticaux (couleur déterministe, js/dictees-colors.js).
+       Logique reprise telle quelle de français-orthographe.html (déplacée
+       ici avec le retrait de la grille complète de cette page). */
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function renderDicteeCard(dictee) {
+      const badges = (dictee.points_grammaticaux || []).map(p =>
+        `<span class="dic-point-pastille" style="--dic-color:${DicteesColors.colorFor(p)}">${escapeHtml(p)}</span>`
+      ).join('');
+      return `
+        <a class="dic-card" href="dictee.html?id=${dictee.id}">
+          <div class="dic-card-illustration">📖</div>
+          <div class="dic-card-badges">${badges}</div>
+          <div class="dic-card-title">${escapeHtml(dictee.titre)}</div>
+          <span class="dic-card-btn">Commencer →</span>
+        </a>
+      `;
+    }
+
+    async function loadDictees() {
+      const grid = document.getElementById('dic-cards-grid');
+      const empty = document.getElementById('dic-empty-state');
+      if (!window.lfmDb || typeof lfmAuth === 'undefined') { empty.style.display = ''; return; }
+      try {
+        const session = await lfmAuth.getSession();
+        if (!session) { empty.style.display = ''; return; }
+
+        const { data: student } = await window.lfmDb
+          .from('students').select('class_id').eq('auth_user_id', session.user.id).single();
+        if (!student || !student.class_id) { empty.style.display = ''; return; }
+
+        const { data: dictees, error } = await window.lfmDb
+          .from('dictees').select('*').eq('class_id', student.class_id)
+          .order('created_at', { ascending: false });
+        if (error || !dictees || dictees.length === 0) { empty.style.display = ''; return; }
+
+        grid.innerHTML = dictees.map(renderDicteeCard).join('');
+      } catch (e) {
+        empty.style.display = '';
+      }
+    }
+
+    loadDictees();
+  </script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

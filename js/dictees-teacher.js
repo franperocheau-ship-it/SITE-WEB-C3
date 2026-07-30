@@ -97,12 +97,30 @@ const lfmDicteesTeacher = (() => {
     if (error) throw error;
   }
 
+  /* Tally générique mot→nb de fois raté (wrong_mot_ids), résolu contre
+     dictee_mots.contenu et trié du plus au moins raté — utilisé aussi bien
+     pour le tally global de la classe que pour le tally d'un seul élève
+     (même mots, même méthode, juste un sous-ensemble de `results` différent
+     en entrée). */
+  function tallyMissedWords(resultsList, motById) {
+    const missTally = new Map();
+    resultsList.forEach(r => (r.wrong_mot_ids || []).forEach(motId => {
+      missTally.set(motId, (missTally.get(motId) || 0) + 1);
+    }));
+    return [...missTally.entries()]
+      .map(([motId, count]) => ({ contenu: motById.get(motId) ? motById.get(motId).contenu : '—', count }))
+      .sort((a, b) => b.count - a.count);
+  }
+
   /* Seuil minimal avant d'inclure un élève dans "Élèves à suivre" : on
      retient tout élève ayant au moins une tentative d'exercice 1, plutôt
      qu'un seuil élevé façon MIN_ATTEMPTS_RANKING (js/teacher-analytics.js,
      10 exercices) — inadapté ici, une classe n'a en pratique que quelques
-     dictées au total. */
-  function computeStudentsToWatch(students, resultsByStudent) {
+     dictées au total. `missedWords` (mots ratés de CET élève, toutes
+     dictées/sessions confondues) n'est calculé que pour les élèves déjà
+     retenus ici — pas de vue par élève indépendante, la liste "à suivre"
+     sert aussi de point d'entrée pour le détail par élève côté page. */
+  function computeStudentsToWatch(students, resultsByStudent, motById) {
     const rows = students.map(st => {
       const results = resultsByStudent.get(st.auth_user_id) || [];
       const ex1 = results.filter(r => r.exercice === 1);
@@ -110,7 +128,7 @@ const lfmDicteesTeacher = (() => {
       const ex1ScoreSum = ex1.reduce((s, r) => s + (r.score || 0), 0);
       const ex1TotalSum = ex1.reduce((s, r) => s + (r.total || 0), 0);
       const avgPct = ex1TotalSum > 0 ? Math.round((ex1ScoreSum / ex1TotalSum) * 100) : null;
-      return { student: st, completedCount, avgPct };
+      return { student: st, completedCount, avgPct, results };
     });
 
     const withData = rows.filter(r => r.completedCount > 0 || r.avgPct !== null);
@@ -120,7 +138,8 @@ const lfmDicteesTeacher = (() => {
     return rows
       .filter(r => r.completedCount < avgCompleted || (r.avgPct !== null && r.avgPct < 60))
       .sort((a, b) => (a.avgPct ?? 0) - (b.avgPct ?? 0) || a.completedCount - b.completedCount)
-      .slice(0, 8);
+      .slice(0, 8)
+      .map(r => ({ ...r, missedWords: tallyMissedWords(r.results, motById) }));
   }
 
   /**
@@ -132,7 +151,9 @@ const lfmDicteesTeacher = (() => {
    *    pour rester comparable entre dictées de longueurs différentes).
    *  - mostMissed : mots les plus ratés toutes dictées confondues (dérivé de
    *    dictee_results.wrong_mot_ids).
-   *  - studentsToWatch : peu de dictées complétées ou taux ex.1 bas.
+   *  - studentsToWatch : peu de dictées complétées ou taux ex.1 bas ; chaque
+   *    entrée porte aussi `missedWords` (mots ratés de CET élève, même tally
+   *    que mostMissed mais restreint à ses propres résultats).
    */
   async function getClassDicteeStats(classId) {
     const dictees = await getClassDictees(classId);
@@ -174,23 +195,16 @@ const lfmDicteesTeacher = (() => {
       return { id: d.id, titre: d.titre, motCount: d.mot_count, ex1AvgPct, ex2AttemptsPerWord };
     });
 
-    /* ── Mots les plus ratés ── */
-    const missTally = new Map();
-    results.forEach(r => (r.wrong_mot_ids || []).forEach(motId => {
-      missTally.set(motId, (missTally.get(motId) || 0) + 1);
-    }));
-    const mostMissed = [...missTally.entries()]
-      .map(([motId, count]) => ({ contenu: motById.get(motId) ? motById.get(motId).contenu : '—', count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 8);
+    /* ── Mots les plus ratés (toute la classe) ── */
+    const mostMissed = tallyMissedWords(results, motById).slice(0, 8);
 
-    /* ── Élèves à suivre ── */
+    /* ── Élèves à suivre (+ mots ratés par élève, voir computeStudentsToWatch) ── */
     const resultsByStudent = new Map();
     results.forEach(r => {
       if (!resultsByStudent.has(r.student_id)) resultsByStudent.set(r.student_id, []);
       resultsByStudent.get(r.student_id).push(r);
     });
-    const studentsToWatch = computeStudentsToWatch(students, resultsByStudent);
+    const studentsToWatch = computeStudentsToWatch(students, resultsByStudent, motById);
 
     return { perDictee, mostMissed, studentsToWatch };
   }
