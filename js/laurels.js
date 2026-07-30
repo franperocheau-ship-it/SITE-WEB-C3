@@ -25,6 +25,19 @@ const LAUREL_BADGE_TIERS = [
   { tier: 'bronze',  min: 5 }
 ];
 
+/* ── Icônes dorées par sous-domaine (assets/Badges dores/) ────────────────
+   Notions sans fichier dédié (Grammaire, Lecture, Lexique) : pas d'entrée
+   ici, renderLaurelBadges() retombe alors sur l'emoji 🏅/🔒 générique. ──── */
+const LAUREL_BADGE_ICONS = {
+  'Conjugaison':      'assets/Badges dores/conj doré.png',
+  'Orthographe':      'assets/Badges dores/orthographe doré.png',
+  'Fractions':        'assets/Badges dores/fraction doré.png',
+  'Nombres décimaux': 'assets/Badges dores/décimaux doré.png',
+  'Nombres entiers':  'assets/Badges dores/nombres entiers dorés.png',
+  'Probabilités':     'assets/Badges dores/probabilité doré.png',
+  'Algèbre':          'assets/Badges dores/algèbre doré.png'
+};
+
 /* ── Table de correspondance slug → domaine/notion ────────────────────────────
    Réplique la logique de buildExerciseTree() (pilotage-enseignant.html) :
    - EXERCISE_DATA : la notion est le préfixe de `competence` avant " — "
@@ -336,9 +349,13 @@ function renderLaurelBadges(bySlug, notionMap) {
     const count = byNotion.get(notion) || 0;
     const tier = laurelBadgeTierFor(count);
     const locked = !tier;
+    const iconSrc = LAUREL_BADGE_ICONS[notion];
+    const iconInner = iconSrc
+      ? `<img src="${encodeURI(iconSrc)}" alt="" loading="lazy">`
+      : (locked ? '🔒' : '🏅');
     return `
       <div class="laurel-badge ${locked ? 'laurel-badge--locked' : 'laurel-badge--' + tier}">
-        <div class="laurel-badge-icon">${locked ? '🔒' : '🏅'}</div>
+        <div class="laurel-badge-icon">${iconInner}</div>
         <div class="laurel-badge-label">${notion}</div>
       </div>`;
   }).join('');

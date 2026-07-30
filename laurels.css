@@ -176,6 +176,17 @@
   line-height: 1;
 }
 
+.laurel-badge-icon img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  display: block;
+}
+
+.laurel-badge--locked .laurel-badge-icon img {
+  filter: grayscale(1);
+}
+
 .laurel-badge-label {
   font-family: var(--font-display, 'Fredoka', sans-serif);
   font-weight: 700;
