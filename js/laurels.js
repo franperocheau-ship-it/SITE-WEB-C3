@@ -43,16 +43,16 @@ const LAUREL_GRADE_LEVELS = ['CM1', 'CM2', '6e'];
 
 /* ── Icônes dorées par sous-domaine (assets/Badges dores/) ──────────────── */
 const LAUREL_BADGE_ICONS = {
-  'Conjugaison':      'assets/Badges dores/conj doré.png',
-  'Orthographe':      'assets/Badges dores/orthographe doré.png',
+  'Conjugaison':      'assets/Badges dores/conj doré.png',
+  'Orthographe':      'assets/Badges dores/orthographe doré.png',
   'Grammaire':        'assets/Badges dores/grammaire.png',
   'Lecture':          'assets/Badges dores/Lecture.png',
   'Vocabulaire':      'assets/Badges dores/vocabulaire doré.png',
-  'Fractions':        'assets/Badges dores/fraction doré.png',
-  'Nombres décimaux': 'assets/Badges dores/décimaux doré.png',
-  'Nombres entiers':  'assets/Badges dores/nombres entiers dorés.png',
-  'Probabilités':     'assets/Badges dores/probabilité doré.png',
-  'Algèbre':          'assets/Badges dores/algèbre doré.png',
+  'Fractions':        'assets/Badges dores/fraction doré.png',
+  'Nombres décimaux': 'assets/Badges dores/décimaux doré.png',
+  'Nombres entiers':  'assets/Badges dores/nombres entiers dorés.png',
+  'Probabilités':     'assets/Badges dores/probabilité doré.png',
+  'Algèbre':          'assets/Badges dores/algèbre doré.png',
 };
 
 /* ── Table de correspondance slug → domaine/notion ────────────────────────────
