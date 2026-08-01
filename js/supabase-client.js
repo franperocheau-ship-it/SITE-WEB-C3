@@ -8,17 +8,23 @@
      3. Copiez "anon public" → SUPABASE_ANON
    ───────────────────────────────────────────────────────────────────────────── */
 
-const SUPABASE_URL  = 'https://wugqxkiljayqqnzdctuf.supabase.co';
-const SUPABASE_ANON = 'sb_publishable_EuUKNCFYOehAe16-udO1Jg_r0RL7OFy';
+/* `var` (pas `const`) : SUPABASE_URL/SUPABASE_ANON sont aussi lus comme
+   globaux bruts par js/teacher.js et test-connexion.html. `var` tolère une
+   redéclaration sans lever d'erreur si ce script venait à être chargé deux
+   fois sur une même page (cf. commit e3f7dca). */
+var SUPABASE_URL  = 'https://wugqxkiljayqqnzdctuf.supabase.co';
+var SUPABASE_ANON = 'sb_publishable_EuUKNCFYOehAe16-udO1Jg_r0RL7OFy';
 
-window.lfmDb = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON,
-  {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true
+if (!window.lfmDb) {
+  window.lfmDb = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
     }
-  }
-);
+  );
+}
