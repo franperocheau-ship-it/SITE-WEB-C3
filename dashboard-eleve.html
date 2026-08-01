@@ -724,7 +724,6 @@
        "Mes résultats" (résultats + lauriers) sans recharger toute la page —
        voir refreshResultsTab() plus bas. */
     let _profile   = null;
-    let _classMeta = null;
     let _currentResSub = sessionStorage.getItem(RES_SUB_KEY) || 'general';
     let _resNavBar = null;
     let _catalogMap = null; /* lfmAnalytics.buildCatalogMap(), mémorisé — voir renderDashboard() */
@@ -863,7 +862,7 @@
     }
 
     /* ── Rendu du dashboard ────────────────────────────────────────────────── */
-    function renderDashboard(profile, results, classMeta) {
+    function renderDashboard(profile, results) {
       /* En-tête */
       const initial = (profile.display_name || '?')[0].toUpperCase();
       document.getElementById('dash-avatar').textContent = initial;
@@ -943,7 +942,7 @@
 
       if (resultsErr) console.warn('[LFM] refreshResultsTab:', resultsErr.message);
 
-      renderDashboard(_profile, results || [], _classMeta);
+      renderDashboard(_profile, results || []);
       initLaurels(_profile.id);
     }
 
@@ -985,22 +984,6 @@
         sessionStorage.removeItem(TAB_KEY);
         lfmAuth.signOut();
       });
-
-      /* Info de classe (optionnel, peut être absent) */
-      try {
-        const { data } = await window.lfmDb
-          .from('class_memberships')
-          .select('classes(name, level, teacher:profiles!classes_teacher_id_fkey(display_name))')
-          .limit(1)
-          .maybeSingle();
-        if (data?.classes) {
-          _classMeta = {
-            className:   data.classes.name,
-            level:       data.classes.level,
-            teacherName: data.classes.teacher?.display_name || null
-          };
-        }
-      } catch (_) { /* pas encore inscrit dans une classe */ }
 
       /* activateTab()/activateResultsSub() ont tourné avant que _profile ne
          soit chargé : leur rendu initial a été sauté faute de profil
