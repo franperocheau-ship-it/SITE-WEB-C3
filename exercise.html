@@ -1989,7 +1989,9 @@
     }
 
     /* ══════════════════════════════════════════════════════════════
-       TYPE : cond-niveaux — moteur partagé (styles pqp-*)
+       Styles pqp-* — partagés par plusieurs moteurs "identifier dans un
+       texte" / "phrase à trous" (passé composé avoir/être, dictée-flash…),
+       PAS par un type "pqp-niveaux" qui n'existe plus.
        ══════════════════════════════════════════════════════════════ */
 
     @keyframes pqpShake {
@@ -5231,14 +5233,14 @@
       } else if (currentType === "faire-niveaux") {
         faireInitSession();
         return;
-      } else if (currentType === "cond-niveaux" || currentType === "futur-niveaux" || currentType === "imparfait-niveaux") {
-        pqpInitSession();
-        return;
       } else if (currentType === "plus-que-parfait-groupes-niveaux") {
         cpqpInitSession();
         return;
       } else if (currentType === "imperatif-groupes-niveaux") {
         cimperInitSession();
+        return;
+      } else if (currentType === "conditionnel-groupes-niveaux") {
+        ccondInitSession();
         return;
       } else if (currentType === "sujet-inverse-niveaux") {
         siInitSession();
@@ -5552,12 +5554,12 @@
         /* session managed by gnpInitSession — no-op here */
       } else if (currentType === "faire-niveaux") {
         /* session managed by faireInitSession — no-op here */
-      } else if (currentType === "cond-niveaux" || currentType === "futur-niveaux" || currentType === "imparfait-niveaux") {
-        /* session managed by pqpInitSession — no-op here */
       } else if (currentType === "plus-que-parfait-groupes-niveaux") {
         /* session managed by cpqpInitSession — no-op here */
       } else if (currentType === "imperatif-groupes-niveaux") {
         /* session managed by cimperInitSession — no-op here */
+      } else if (currentType === "conditionnel-groupes-niveaux") {
+        /* session managed by ccondInitSession — no-op here */
       } else if (currentType === "sujet-inverse-niveaux") {
         /* session managed by siInitSession — no-op here */
       } else if (currentType === "epithete-attribut-niveaux") {
@@ -10654,387 +10656,6 @@
         level:        faireState.level,
         score:        faireState.score,
         total:        faireState.total,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
-      });
-    }
-
-    /* ══════════════════════════════════════════════════════════════════════════
-       TYPE : cond-niveaux — moteur partagé (conditionnel présent)
-       (à l'origine conçu pour pqp-niveaux ; le plus-que-parfait et l'impératif
-       utilisent désormais leurs moteurs -groupes-niveaux dédiés, voir blocs
-       cpqp* et cimper* plus bas — les fonctions pqp* restent nécessaires au
-       conditionnel)
-       Deux niveaux déverrouillables (localStorage), seuil 80 %.
-       Niveau 1 : identifier les groupes ciblés dans un texte (sélection + validation)
-       Niveau 2 : saisie libre de la forme conjuguée
-       ══════════════════════════════════════════════════════════════════════════ */
-
-    const PQP_SEUIL    = 0.80;
-    const PQP_POSITIFS = ['Excellent ! 🎉', 'Bravo ! ⭐', 'Parfait ! 🌟', 'Super ! 👏'];
-    const PQP_REGLE    = 'Plus-que-parfait = auxiliaire <em>être</em> ou <em>avoir</em> à l\'imparfait + participe passé';
-
-    let pqpState = null;
-    let pqpLevelSelect = null;
-
-    function pqpNorm(str) {
-      return str.trim().toLowerCase()
-        .normalize('NFD').replace(/[̀-ͯ]/g, '')
-        .replace(/\s+/g, ' ')
-        .replace(/[''`´'']/g, "'");
-    }
-
-    function pqpShuffle(arr) {
-      const a = [...arr];
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-
-    function pqpR(key, fallback) {
-      return sessionData?.niveauxConfig?.[key] ?? fallback;
-    }
-
-    /* ── Init : cache la progression, affiche la sélection de niveau ─────── */
-    /* ── Retour à l'écran "Choisis ton niveau" depuis les résultats ──────────── */
-    function pqpBackToSelectScreen() {
-      pqpState = null;
-      document.getElementById('results-screen').classList.add('ex-hidden');
-      document.getElementById('exercise-screen').classList.remove('ex-hidden');
-      const prog = document.querySelector('#exercise-screen .ex-progress');
-      if (prog) prog.classList.add('ex-hidden');
-    }
-
-    function pqpInitSession() {
-      pqpState     = null;
-      score        = 0;
-      currentIndex = 0;
-      sessionStartTime = Date.now();
-
-      document.getElementById('results-screen').classList.add('ex-hidden');
-      document.getElementById('exercise-screen').classList.remove('ex-hidden');
-      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
-
-      const prog = document.querySelector('#exercise-screen .ex-progress');
-      if (prog) prog.classList.add('ex-hidden');
-
-      const lvDefs = pqpR('lvDefs', [
-        { lv: 1, label: 'Repère le plus-que-parfait', desc: 'Lis un texte, identifie les verbes au plus-que-parfait' },
-        { lv: 2, label: 'Complète au plus-que-parfait', desc: 'Conjugue des phrases à trous au plus-que-parfait' }
-      ]);
-      const rule = pqpR('rule', PQP_REGLE);
-
-      if (lvDefs.length === 1) {
-        pqpStartLevel(lvDefs[0].lv);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        return;
-      }
-
-      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
-      pqpLevelSelect = LevelSelect.create({
-        exerciseKey: slug,
-        levels: lvDefs.map(d => ({ id: d.lv, label: d.label, description: d.desc })),
-        threshold: PQP_SEUIL,
-        onSelectLevel: (lv) => pqpStartLevel(parseInt(lv, 10)),
-        selectContainer: document.getElementById('ex-card'),
-        badgesContainer: document.getElementById('ex-badges'),
-        onBackToSelect: pqpBackToSelectScreen,
-        introHTML: `<div class="pqp-rule-chip" style="display:flex;margin:0 auto 20px;max-width:520px">📌 ${rule}</div>`
-      });
-      pqpLevelSelect.renderSelectScreen();
-    }
-
-    /* ── Démarre un niveau ──────────────────────────────────────────────────── */
-    function pqpStartLevel(lv) {
-      const prog = document.querySelector('#exercise-screen .ex-progress');
-      if (prog) prog.classList.remove('ex-hidden');
-
-      if (lv === 1) {
-        const texts = pqpShuffle([...sessionData.identTexts]);
-        const total = texts.reduce((n, t) => n + t.tokens.filter(tk => tk.v && tk.pqp).length, 0);
-        pqpState = { level: 1, texts, idx: 0, score: 0, total };
-        document.getElementById('q-total').textContent = texts.length;
-        pqpRenderText(document.getElementById('ex-card'));
-      } else {
-        const questions = pqpShuffle([...sessionData.writeBank]);
-        pqpState = { level: 2, questions, idx: 0, score: 0, total: questions.length };
-        document.getElementById('q-total').textContent = questions.length;
-        pqpRenderWriteQ(document.getElementById('ex-card'));
-      }
-      if (pqpLevelSelect) pqpLevelSelect.renderBadges(lv);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    /* ══════════════════════════════════════════════════════════════════════════
-       NIVEAU 1 — Identification dans un texte
-       ══════════════════════════════════════════════════════════════════════════ */
-
-    function pqpRenderText(card) {
-      const { texts, idx } = pqpState;
-      const textObj   = texts[idx];
-      const pqpCount  = textObj.tokens.filter(tk => tk.v && tk.pqp).length;
-
-      document.getElementById('q-num').textContent       = idx + 1;
-      document.getElementById('ex-bar-fill').style.width = (idx / texts.length * 100) + '%';
-
-      const htmlTokens = textObj.tokens.map((tk, i) =>
-        tk.v
-          ? `<button class="pqp-verb-btn" data-idx="${i}" data-pqp="${tk.pqp ? '1' : '0'}">${tk.t}</button>`
-          : `<span>${tk.t}</span>`
-      ).join('');
-
-      card.innerHTML = `
-        <p class="pqp-text-counter">Texte ${idx + 1} / ${texts.length}</p>
-        <p class="ex-question-label">${pqpR('verb1Instruction', 'Clique sur les verbes au <strong>plus-que-parfait</strong>, puis valide.')}</p>
-        <div class="pqp-text-display" id="pqp-text">${htmlTokens}</div>
-        <div class="ex-feedback-area" id="pqp-fb" style="min-height:20px;margin-bottom:12px"></div>
-        <button class="ex-choice" id="pqp-validate" style="width:100%">Valider ma sélection</button>
-        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < texts.length ? 'Texte suivant →' : 'Voir les résultats →'}</button>
-      `;
-
-      const selected = new Set();
-      let answered = false;
-
-      card.querySelectorAll('.pqp-verb-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (answered) return;
-          const isPqp = btn.dataset.pqp === '1';
-          if (!isPqp) {
-            btn.classList.add('pqp-shake');
-            document.getElementById('pqp-fb').innerHTML =
-              `<div class="ex-feedback-wrong" style="font-size:13px;padding:8px 14px">⚠️ « <strong>${btn.textContent}</strong> » ${pqpR('verb1NotTarget', "n'est pas au plus-que-parfait : l'auxiliaire n'est pas à l'imparfait")}.<br><small>📌 ${pqpR('rule', PQP_REGLE)}</small></div>`;
-            setTimeout(() => btn.classList.remove('pqp-shake'), 500);
-          } else {
-            if (selected.has(btn)) {
-              selected.delete(btn);
-              btn.classList.remove('is-selected');
-            } else {
-              selected.add(btn);
-              btn.classList.add('is-selected');
-              document.getElementById('pqp-fb').innerHTML = '';
-            }
-          }
-        });
-      });
-
-      document.getElementById('pqp-validate').addEventListener('click', () => {
-        if (answered) return;
-        answered = true;
-        document.getElementById('pqp-validate').disabled = true;
-
-        let correct = 0, missed = 0;
-        card.querySelectorAll('.pqp-verb-btn').forEach(btn => {
-          btn.disabled = true;
-          const isPqp = btn.dataset.pqp === '1';
-          const isSel = selected.has(btn);
-          btn.classList.remove('is-selected');
-          if (isPqp && isSel)  { btn.classList.add('is-correct'); correct++; }
-          if (isPqp && !isSel) { btn.classList.add('is-missed');  missed++;  }
-        });
-
-        pqpState.score += correct;
-
-        let fbHtml;
-        const _tName = pqpR('verb1TargetName', 'plus-que-parfait');
-        const _rule  = pqpR('rule', PQP_REGLE);
-        if (missed === 0) {
-          fbHtml = `<div class="ex-feedback-correct">🎉 ${PQP_POSITIFS[Math.floor(Math.random()*PQP_POSITIFS.length)]} ${pqpR('verb1FoundAll', 'Tu as trouvé tous les plus-que-parfaits !')}<br><small>📌 ${_rule}</small></div>`;
-        } else {
-          fbHtml = `<div class="ex-feedback-wrong">Tu as trouvé <strong>${correct}/${pqpCount}</strong> ${_tName}${pqpCount > 1 ? 's' : ''}. Les formes manquées (en orange) devaient être sélectionnées.<br><small>📌 ${_rule}</small></div>`;
-        }
-        document.getElementById('pqp-fb').innerHTML = fbHtml;
-        document.getElementById('next-btn').classList.remove('ex-hidden');
-      });
-
-      document.getElementById('next-btn').addEventListener('click', () => {
-        pqpState.idx++;
-        if (pqpState.idx >= pqpState.texts.length) {
-          pqpShowLevelResults();
-        } else {
-          pqpRenderText(document.getElementById('ex-card'));
-        }
-      });
-    }
-
-    /* ══════════════════════════════════════════════════════════════════════════
-       NIVEAU 2 — Saisie libre
-       ══════════════════════════════════════════════════════════════════════════ */
-
-    function pqpRenderWriteQ(card) {
-      const { questions, idx, total } = pqpState;
-      const q = questions[idx];
-
-      document.getElementById('q-num').textContent       = idx + 1;
-      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
-
-      const sentenceHtml = q.sentence
-        .replace(/\(([^)]+)\)/g, (_, inf) =>
-          `<span class="pqp-infinitif-chip">${inf}</span>`)
-        .replace(/___/, `<span style="color:var(--muted);font-style:italic">___</span>`);
-
-      card.innerHTML = `
-        <p class="ex-question-label">${pqpR('verb2Instruction', 'Conjugue le verbe au <strong>plus-que-parfait</strong>.')}</p>
-        <div class="pqp-rule-chip">📌 ${pqpR('rule', PQP_REGLE)}</div>
-        <div class="pqp-sentence-display">${sentenceHtml}</div>
-        <div class="ex-input-row">
-          <input type="text" id="pqp-input" class="ex-text-input"
-                 autocomplete="off" autocorrect="off" autocapitalize="off"
-                 spellcheck="false" placeholder="Ta réponse…">
-          <button class="ex-validate-btn" id="pqp-val-btn">Valider</button>
-        </div>
-        <div class="ex-feedback-area" id="pqp-write-fb"></div>
-        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'}</button>
-      `;
-
-      const input = document.getElementById('pqp-input');
-      const vbtn  = document.getElementById('pqp-val-btn');
-      setTimeout(() => input.focus(), 50);
-
-      const doValidate = () => {
-        if (input.disabled || !input.value.trim()) return;
-        input.disabled = true;
-        vbtn.disabled  = true;
-
-        const userNorm    = pqpNorm(input.value);
-        const correctNorm = pqpNorm(q.answers[0]);
-        const isRight     = q.answers.some(a => pqpNorm(a) === userNorm);
-
-        if (isRight) {
-          pqpState.score++;
-          input.classList.add('is-correct');
-          document.getElementById('pqp-write-fb').innerHTML =
-            `<div class="ex-feedback-correct">${PQP_POSITIFS[Math.floor(Math.random()*PQP_POSITIFS.length)]}<br><small>📌 ${pqpR('rule', PQP_REGLE)}</small></div>`;
-        } else {
-          input.classList.add('is-wrong');
-          document.getElementById('pqp-write-fb').innerHTML =
-            `<div class="ex-feedback-wrong">${pqpBuildErrorFeedback(userNorm, correctNorm, q.answers[0], q)}<br><small>📌 ${q.explication}</small></div>`;
-        }
-        document.getElementById('next-btn').classList.remove('ex-hidden');
-      };
-
-      vbtn.addEventListener('click', doValidate);
-      input.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
-
-      document.getElementById('next-btn').addEventListener('click', () => {
-        pqpState.idx++;
-        if (pqpState.idx >= pqpState.questions.length) {
-          pqpShowLevelResults();
-        } else {
-          pqpRenderWriteQ(document.getElementById('ex-card'));
-        }
-      });
-    }
-
-    function pqpBuildErrorFeedback(userNorm, correctNorm, correctDisplay, q) {
-      if (sessionData?.niveauxConfig?.simpleErrorFeedback) {
-        return `❌ La bonne réponse est : <strong>${correctDisplay}</strong>.`;
-      }
-      const uWords = userNorm.split(' ');
-      const cWords = correctNorm.split(' ');
-      const reflexPfx = /^(s'|m'|t'|l'|se|me|te)$/i;
-
-      const skip   = reflexPfx.test(cWords[0]) ? 1 : 0;
-      const uAux   = uWords[skip]  || '';
-      const cAux   = cWords[skip]  || '';
-      const uPP    = uWords.slice(skip + 1).join(' ');
-      const cPP    = cWords.slice(skip + 1).join(' ');
-
-      let msg;
-      if (uAux !== cAux) {
-        msg = `L'auxiliaire est incorrect : tu as écrit <span class="pqp-error-part">${uAux || '?'}</span> au lieu de <strong>${cAux}</strong> (l'auxiliaire doit être à l'imparfait).`;
-      } else if (uPP !== cPP) {
-        msg = `Le participe passé est incorrect : tu as écrit <span class="pqp-error-part">${uPP || '?'}</span> au lieu de <strong>${cPP}</strong>${q.auxVerb === 'être' ? ' (accord avec le sujet !)' : ''}.`;
-      } else {
-        msg = `La bonne réponse est : <strong>${correctDisplay}</strong>.`;
-      }
-      return `❌ ${msg}`;
-    }
-
-    /* ── Résultats d'un niveau ──────────────────────────────────────────────── */
-    function pqpShowLevelResults() {
-      const { level, score: lvScore, total } = pqpState;
-      const { passed, pct, isLast } = pqpLevelSelect.completeLevel(level, lvScore, total);
-      const pctPct = Math.round(pct * 100);
-
-      const prog = document.querySelector('#exercise-screen .ex-progress');
-      if (prog) prog.classList.add('ex-hidden');
-
-      document.getElementById('exercise-screen').classList.add('ex-hidden');
-      document.getElementById('results-screen').classList.remove('ex-hidden');
-      document.getElementById('ex-bar-fill').style.width = '100%';
-
-      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
-      document.getElementById('score-pct').textContent   = pctPct + ' %';
-
-      const backHref = sessionData.backLink?.href || 'français-conjugaison.html';
-      let msg, btnsHTML;
-      const stars = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 60 ? '⭐' : '';
-      const backToSelectBtn = pqpLevelSelect.backToSelectButtonHTML();
-
-      const backLabel = sessionData.backLink?.label ? `← Retour à la ${sessionData.backLink.label}` : '← Retour à la Conjugaison';
-      if (passed && isLast) {
-        msg = `${stars} Bravo ! ${pqpR('winMsg', 'Tu maîtrises le plus-que-parfait aux deux niveaux !')}`;
-        btnsHTML = `
-          <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="pqp-restart-btn">Recommencer</button>
-            ${backToSelectBtn}
-            <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
-          </div>`;
-      } else if (passed) {
-        msg = `${stars} Niveau 1 validé ! 🏆 Le Niveau 2 est débloqué !`;
-        btnsHTML = `
-          <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="pqp-next-btn">${pqpR('lv2NextBtnLabel', 'Niveau 2 — Complète →')}</button>
-            <button class="ex-btn-secondary" id="pqp-retry-btn">Recommencer ce niveau</button>
-            ${backToSelectBtn}
-          </div>
-          <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
-      } else {
-        const needed = Math.ceil(total * PQP_SEUIL);
-        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour passer. On réessaie ?`;
-        btnsHTML = `
-          <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="pqp-retry-btn">Recommencer ce niveau</button>
-            ${backToSelectBtn}
-            <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
-          </div>`;
-      }
-
-      document.getElementById('score-msg').textContent          = msg;
-      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
-      resultsBtnsWrap.innerHTML = btnsHTML;
-
-      document.getElementById('pqp-retry-btn')?.addEventListener('click', () => {
-        document.getElementById('results-screen').classList.add('ex-hidden');
-        document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        pqpStartLevel(pqpState.level);
-      });
-      document.getElementById('pqp-next-btn')?.addEventListener('click', () => {
-        document.getElementById('results-screen').classList.add('ex-hidden');
-        document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        pqpStartLevel(2);
-      });
-      document.getElementById('pqp-restart-btn')?.addEventListener('click', () => {
-        pqpLevelSelect.reset();
-        document.getElementById('results-screen').classList.add('ex-hidden');
-        document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        pqpInitSession();
-      });
-      pqpLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      const slug = new URLSearchParams(window.location.search).get('slug');
-      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
-      saveExerciseResult({
-        exerciseSlug: slug,
-        subject,
-        category,
-        exerciseType: currentType,
-        level:        'Niveau ' + level,
-        score:        lvScore,
-        total,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
       });
     }
@@ -19813,6 +19434,356 @@
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
         exerciseType: 'imperatif-groupes-niveaux',
+        level:        'Niveau ' + level,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : conditionnel-groupes-niveaux — « Conjuguer au conditionnel présent »
+       Niveau 1 : QCM + associer sujet↔forme (distracteurs = confusion avec
+                  l'imparfait, même terminaison, et le futur, même radical)
+       Niveau 2 : radical régulier (= infinitif) ou irrégulier ? — choix
+                  binaire (motif déjà utilisé pour le futur : regRadical) puis
+                  saisie
+       Niveau 3 : saisie libre, sujet = groupe nominal (toujours 3e personne,
+                  donc jamais d'ambiguïté de personne) — paires de phrases
+                  contrastant futur/conditionnel + verbes irréguliers
+       3 niveaux déverrouillables à 80 %. Un seul essai par question.
+       ════════════════════════════════════════════════════════════════════════ */
+
+    const CCOND_SEUIL = 0.8;
+
+    const CCOND_LV_DEFS = [
+      { lv: 1, desc: 'QCM et association : trouve la bonne forme' },
+      { lv: 2, desc: 'Radical régulier ou irrégulier ?' },
+      { lv: 3, desc: 'Écris la forme du verbe avec un autre sujet' }
+    ];
+
+    let ccondState = null;
+    let ccondLevelSelect = null;
+
+    function ccondBackToSelectScreen() {
+      ccondState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    /* ── Init : réinitialise et affiche le sélecteur de niveau ──────────── */
+    function ccondInitSession() {
+      ccondState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      ccondLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: CCOND_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: CCOND_SEUIL,
+        onSelectLevel: (lv) => ccondStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: ccondBackToSelectScreen
+      });
+      ccondLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function ccondStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const pool = shuffle((sessionData.bank || []).filter(item => item.level === lv));
+      const qs   = pool.slice(0, sessionData.questionsPerSession || 10);
+      ccondState = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+      document.getElementById('q-total').textContent = qs.length;
+
+      ccondLevelSelect.renderBadges(lv);
+      ccondRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Affiche une question — dispatche sur le niveau + q.mode ─────────── */
+    function ccondRenderQuestion(card) {
+      const { questions, idx, total, level } = ccondState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if (level === 1 && q.mode === 'mcq')           ccondRenderMcq(card, q);
+      else if (level === 1 && q.mode === 'matching') ccondRenderMatching(card, q);
+      else if (level === 2)                          ccondRenderRadicalChoice(card, q);
+      else                                             ccondRenderTextInput(card, q);
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        ccondState.idx++;
+        if (ccondState.idx >= ccondState.questions.length) ccondShowLevelResults();
+        else ccondRenderQuestion(document.getElementById('ex-card'));
+      });
+    }
+
+    function ccondRenderMcq(card, q) {
+      const { idx, total } = ccondState;
+      card.innerHTML = `
+        <p class="ex-question-label">Quelle est la forme du verbe <em>${q.infinitive}</em> au conditionnel avec ce sujet ?</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="ccond-choices"></div>
+        <div class="ex-feedback-area" id="ccond-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('ccond-choices');
+      grid.innerHTML = shuffle(q.choices).map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => ccondHandleChoice(btn, q))
+      );
+    }
+
+    function ccondRenderMatching(card, q) {
+      const { idx, total } = ccondState;
+      card.innerHTML = `
+        <p class="ex-question-label">Associe ce sujet à la bonne forme du verbe <em>${q.infinitive}</em> au conditionnel.</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="ccond-choices"></div>
+        <div class="ex-feedback-area" id="ccond-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('ccond-choices');
+      grid.innerHTML = shuffle(q.forms).map(f => `<button class="ex-choice" data-value="${f}">${f}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => ccondHandleChoice(btn, q))
+      );
+    }
+
+    function ccondHandleChoice(btn, q) {
+      document.querySelectorAll('#ccond-choices .ex-choice').forEach(b => b.disabled = true);
+      const isRight = btn.dataset.value === q.answer;
+      document.querySelectorAll('#ccond-choices .ex-choice').forEach(b => {
+        if (b.dataset.value === q.answer) b.classList.add('is-correct');
+      });
+      if (!isRight) btn.classList.add('is-wrong');
+      if (isRight) {
+        ccondState.score++;
+        document.getElementById('ccond-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+      } else {
+        document.getElementById('ccond-fb').innerHTML = `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne forme.<br>
+            Avec « <strong>${q.subject}</strong> » : <strong>${q.answer}</strong>.
+          </div>
+        `;
+      }
+      document.getElementById('next-btn').classList.remove('ex-hidden');
+    }
+
+    /* ── Niveau 2 : choix radical régulier/irrégulier (step1) puis saisie (step2) ── */
+    function ccondRenderRadicalChoice(card, q) {
+      const { idx, total } = ccondState;
+      let step1Correct = false;
+
+      card.innerHTML = `
+        <p class="ex-question-label">Ce verbe a-t-il un radical <strong>régulier</strong> (= l'infinitif) au conditionnel ?</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div id="ccond-step1">
+          <div class="ex-group-row" id="ccond-rad-btns">
+            <button class="ex-group-btn" data-reg="true">Radical régulier</button>
+            <button class="ex-group-btn" data-reg="false">Radical irrégulier</button>
+          </div>
+          <div class="ex-feedback-area" id="ccond-fb1"></div>
+        </div>
+        <div id="ccond-step2" class="ex-hidden">
+          <div class="ex-step2-divider"></div>
+          <p class="ex-question-label">Conjugue maintenant le verbe dans la phrase.</p>
+          <div class="ex-sentence-display">${q.sentence}</div>
+          <div class="ex-input-row">
+            <input type="text" class="ex-text-input" id="ccond-input"
+                   autocomplete="off" autocorrect="off" autocapitalize="off"
+                   spellcheck="false" placeholder="Ta réponse…">
+            <button class="ex-validate-btn" id="ccond-val-btn">Valider</button>
+          </div>
+          <div class="ex-feedback-area" id="ccond-fb2"></div>
+        </div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+
+      card.querySelectorAll('#ccond-rad-btns .ex-group-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          card.querySelectorAll('#ccond-rad-btns .ex-group-btn').forEach(b => b.disabled = true);
+          const chosenReg = btn.dataset.reg === 'true';
+          step1Correct = chosenReg === q.regRadical;
+
+          card.querySelectorAll('#ccond-rad-btns .ex-group-btn').forEach(b => {
+            if ((b.dataset.reg === 'true') === q.regRadical) b.classList.add('is-correct');
+          });
+          if (!step1Correct) btn.classList.add('is-wrong');
+
+          document.getElementById('ccond-fb1').innerHTML = step1Correct
+            ? `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`
+            : `<div class="ex-feedback-wrong">❌ « ${q.infinitive} » a un radical ${q.regRadical ? 'régulier' : 'irrégulier'} au conditionnel.</div>`;
+
+          setTimeout(() => {
+            document.getElementById('ccond-step2').classList.remove('ex-hidden');
+            document.getElementById('ccond-step2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            setTimeout(() => document.getElementById('ccond-input')?.focus(), 80);
+          }, 650);
+        });
+      });
+
+      function submit() {
+        const input  = document.getElementById('ccond-input');
+        const valBtn = document.getElementById('ccond-val-btn');
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          if (step1Correct) ccondState.score++;
+          const extra = step1Correct ? '' : '<br><small style="font-size:12px">Pense à bien identifier le radical d\'abord !</small>';
+          document.getElementById('ccond-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}${extra}</div>`;
+        } else {
+          document.getElementById('ccond-fb2').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.answer}</strong>
+            </div>
+          `;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+
+      document.getElementById('ccond-val-btn').addEventListener('click', submit);
+      document.getElementById('ccond-input').addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    }
+
+    function ccondRenderTextInput(card, q) {
+      const { idx, total } = ccondState;
+      card.innerHTML = `
+        <p class="ex-question-label">Conjugue le verbe suivant au conditionnel présent.</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="ccond-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="ccond-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="ccond-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const input  = document.getElementById('ccond-input');
+      const valBtn = document.getElementById('ccond-val-btn');
+      setTimeout(() => input.focus(), 50);
+
+      function submit() {
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          ccondState.score++;
+          document.getElementById('ccond-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+        } else {
+          document.getElementById('ccond-fb').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.answer}</strong>
+            </div>
+          `;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+
+      valBtn.addEventListener('click', submit);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    }
+
+    /* ── Résultats de fin de niveau ───────────────────────────────────────── */
+    function ccondShowLevelResults() {
+      const { level, score: lvScore, total } = ccondState;
+      const { passed, pct, isLast } = ccondLevelSelect.completeLevel(level, lvScore, total);
+      const pctPct = Math.round(pct * 100);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-conjugaison.html';
+      const backLabel = `← Retour à ${sessionData.backLink?.label || 'la Conjugaison'}`;
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const backToSelectBtn = ccondLevelSelect.backToSelectButtonHTML();
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises la conjugaison au conditionnel !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="ccond-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="ccond-next-btn">Niveau ${level + 1} →</button>
+          <button class="ex-btn-secondary" id="ccond-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * CCOND_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour débloquer le niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="ccond-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
+
+      document.getElementById('ccond-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        ccondStartLevel(ccondState.level);
+      });
+      document.getElementById('ccond-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        ccondStartLevel(level + 1);
+      });
+      document.getElementById('ccond-restart-btn')?.addEventListener('click', () => {
+        ccondLevelSelect.reset();
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        ccondInitSession();
+      });
+      ccondLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'conditionnel-groupes-niveaux',
         level:        'Niveau ' + level,
         score:        lvScore,
         total,

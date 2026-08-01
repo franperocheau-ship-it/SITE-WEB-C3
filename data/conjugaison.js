@@ -1871,131 +1871,77 @@ Object.assign(window.EXERCISE_DATA, {
     ]
   },
 
+  /* ══════════════════════════════════════════════════════════════════════════
+     Type : conditionnel-groupes-niveaux
+     Niveau 1 : QCM (5) + associer sujet↔forme (5) — distracteurs = confusion
+                avec l'imparfait (même terminaison) et le futur (même radical).
+                Pour le mode "matching", je/tu partagent la même forme comme à
+                l'imparfait (terminaisons identiques) : 5 formes distinctes.
+     Niveau 2 : SPÉCIFICITÉ — radical régulier (= infinitif) ou irrégulier ? —
+                choix binaire (motif déjà utilisé pour le futur : regRadical)
+                puis saisie. Les 10 phrases reprennent telles quelles
+                l'ancienne writeBank.
+     Niveau 3 : saisie libre, sujet = groupe nominal (toujours 3e personne,
+                donc jamais d'ambiguïté tu/nous/vous). Réponse toujours au
+                conditionnel — la distinction avec le futur se travaille via
+                un déclencheur "Si + imparfait" systématique (jamais "Si +
+                présent", qui appellerait un futur), pas via des items-pièges
+                dont la réponse serait un futur. Sujet toujours cohérent
+                sémantiquement avec le verbe à la voix active (agent réel),
+                sinon voix passive ("serait + participe", ex. "le match
+                serait annulé"). Verbes irréguliers fréquents (être, avoir,
+                aller, venir, faire, pouvoir, voir).
+     Progression verrouillée : seuil 80 %, persistance sessionStorage.
+  ══════════════════════════════════════════════════════════════════════════ */
+
   "conjuguer-conditionnel-present": {
-    title:               "Conjuguer au conditionnel présent",
+    title:      "Conjuguer au conditionnel présent",
     domaine:    "Français",
     competence: "Conjugaison — Conditionnel présent",
-    levels:              ["6e"],
-    paliers:             2, /* nombre réel de paliers du moteur */
-    type:                "cond-niveaux",
+    type:       "conditionnel-groupes-niveaux",
+    levels:     ["6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
-    backLink:            { href: "français-conjugaison.html", label: "Conjugaison" },
-    niveauxConfig: {
-      rule:             "Conditionnel présent = radical du futur + terminaisons de l'imparfait (-<em>ais</em>, -<em>ais</em>, -<em>ait</em>, -<em>ions</em>, -<em>iez</em>, -<em>aient</em>)",
-      lvDefs: [
-        { lv: 1, icon: '⭐',   label: "Niveau 1 — Repère le conditionnel", desc: "Lis un texte, identifie les verbes au conditionnel présent" },
-        { lv: 2, icon: '⭐⭐', label: "Niveau 2 — Complète au conditionnel", desc: "Conjugue des phrases à trous au conditionnel présent" }
-      ],
-      verb1Instruction: "Clique sur les verbes au <strong>conditionnel présent</strong>, puis valide.",
-      verb1NotTarget:   "n'est pas au conditionnel présent",
-      verb1TargetName:  "conditionnel",
-      verb1FoundAll:    "Tu as trouvé tous les conditionnels !",
-      verb2Instruction: "Conjugue le verbe au <strong>conditionnel présent</strong>.",
-      lv2NextBtnLabel:  "Niveau 2 — Complète →",
-      winMsg:           "Tu maîtrises le conditionnel présent aux deux niveaux !",
-      simpleErrorFeedback: true
-    },
-    identTexts: [
-      /* Texte 1 — La maison de rêve : conditionnels "achèterais", "aurait" ; imparfaits "rêvais", "préférait" */
-      { tokens: [
-        { t: "Si j'avais beaucoup d'argent, j'" },
-        { t: "achèterais", v: true, pqp: true },
-        { t: " une grande maison avec un jardin. Quand j'étais enfant, je " },
-        { t: "rêvais", v: true, pqp: false },
-        { t: " d'y habiter chaque soir. La maison " },
-        { t: "aurait", v: true, pqp: true },
-        { t: " une piscine et une bibliothèque. Mon frère " },
-        { t: "préférait", v: true, pqp: false },
-        { t: " un appartement en ville." }
-      ]},
-      /* Texte 2 — Le voyage imaginaire : "serait", "trouverait" ; "étudiaient", "publiaient" */
-      { tokens: [
-        { t: "D'après les explorateurs, cette île " },
-        { t: "serait", v: true, pqp: true },
-        { t: " magnifique. On y " },
-        { t: "trouverait", v: true, pqp: true },
-        { t: " des plantes inconnues. Les scientifiques " },
-        { t: "étudiaient", v: true, pqp: false },
-        { t: " la région depuis des années. Ils " },
-        { t: "publiaient", v: true, pqp: false },
-        { t: " leurs résultats chaque mois." }
-      ]},
-      /* Texte 3 — La météo : "neigerait", "descendraient" ; "s'inquiétaient", "préparaient" */
-      { tokens: [
-        { t: "Le journaliste annonça : « Il " },
-        { t: "neigerait", v: true, pqp: true },
-        { t: " ce week-end sur les sommets et les températures " },
-        { t: "descendraient", v: true, pqp: true },
-        { t: " sous zéro. » Les habitants " },
-        { t: "s'inquiétaient", v: true, pqp: false },
-        { t: " pour les routes. Ils " },
-        { t: "préparaient", v: true, pqp: false },
-        { t: " du bois pour se chauffer." }
-      ]},
-      /* Texte 4 — La fête : "aimeraient", "voudrait" ; "décoraient", "pensait" */
-      { tokens: [
-        { t: "Mes amis " },
-        { t: "aimeraient", v: true, pqp: true },
-        { t: " organiser une surprise pour mon anniversaire. Ils " },
-        { t: "décoraient", v: true, pqp: false },
-        { t: " la salle en secret chaque fois. Julia " },
-        { t: "voudrait", v: true, pqp: true },
-        { t: " inviter toute la classe. Elle " },
-        { t: "pensait", v: true, pqp: false },
-        { t: " à un thème différent." }
-      ]}
-    ],
-    writeBank: [
-      {
-        sentence:    "Si j'avais des ailes, j'(aimer) ___ voler au-dessus des nuages.",
-        answers:     ["aimerais"],
-        explication: "1<sup>er</sup> groupe, je : <strong>aim-</strong> (radical futur) + <strong>-ais</strong> → <strong>aimerais</strong>."
-      },
-      {
-        sentence:    "Avec un peu d'entraînement, tu (chanter) ___ encore mieux !",
-        answers:     ["chanterais"],
-        explication: "1<sup>er</sup> groupe, tu : <strong>chanter-</strong> + <strong>-ais</strong> → <strong>chanterais</strong>."
-      },
-      {
-        sentence:    "Il (finir) ___ son travail bien plus vite avec de l'aide.",
-        answers:     ["finirait"],
-        explication: "2<sup>e</sup> groupe, il : <strong>finir-</strong> + <strong>-ait</strong> → <strong>finirait</strong>."
-      },
-      {
-        sentence:    "Nous (voyager) ___ autour du monde si nous avions le temps.",
-        answers:     ["voyagerions"],
-        explication: "1<sup>er</sup> groupe, nous : <strong>voyager-</strong> + <strong>-ions</strong> → <strong>voyagerions</strong>."
-      },
-      {
-        sentence:    "Vous (arriver) ___ à l'heure si vous partiez maintenant.",
-        answers:     ["arriveriez"],
-        explication: "1<sup>er</sup> groupe, vous : <strong>arriver-</strong> + <strong>-iez</strong> → <strong>arriveriez</strong>."
-      },
-      {
-        sentence:    "Elles (choisir) ___ le menu si on leur demandait.",
-        answers:     ["choisiraient"],
-        explication: "2<sup>e</sup> groupe, elles : <strong>choisir-</strong> + <strong>-aient</strong> → <strong>choisiraient</strong>."
-      },
-      {
-        sentence:    "Sans la pluie, ce (être) ___ la journée parfaite.",
-        answers:     ["serait"],
-        explication: "Être, il/ce : radical irrégulier <strong>ser-</strong> + <strong>-ait</strong> → <strong>serait</strong>."
-      },
-      {
-        sentence:    "Elle (avoir) ___ peur si elle voyait une araignée géante.",
-        answers:     ["aurait"],
-        explication: "Avoir, elle : radical irrégulier <strong>aur-</strong> + <strong>-ait</strong> → <strong>aurait</strong>."
-      },
-      {
-        sentence:    "Tu (aller) ___ jouer dehors si le soleil revenait.",
-        answers:     ["irais"],
-        explication: "Aller, tu : radical irrégulier <strong>ir-</strong> + <strong>-ais</strong> → <strong>irais</strong>."
-      },
-      {
-        sentence:    "Nous (faire) ___ un gâteau si nous avions assez d'œufs.",
-        answers:     ["ferions"],
-        explication: "Faire, nous : radical irrégulier <strong>fer-</strong> + <strong>-ions</strong> → <strong>ferions</strong>."
-      }
+    backLink:   { href: "français-conjugaison.html", label: "Conjugaison" },
+
+    bank: [
+      /* ── NIVEAU 1 : QCM (5) — distracteurs imparfait/futur/présent ── */
+      { level: 1, mode: "mcq", infinitive: "aimer", subject: "je",   choices: ["aimerais", "aimerai", "aimais", "aime"], answer: "aimerais" },
+      { level: 1, mode: "mcq", infinitive: "être",  subject: "il",   choices: ["serait", "sera", "était", "est"], answer: "serait" },
+      { level: 1, mode: "mcq", infinitive: "avoir", subject: "elle", choices: ["aurait", "aura", "avait", "a"], answer: "aurait" },
+      { level: 1, mode: "mcq", infinitive: "aller", subject: "tu",   choices: ["irais", "iras", "allais", "vas"], answer: "irais" },
+      { level: 1, mode: "mcq", infinitive: "faire", subject: "nous", choices: ["ferions", "ferons", "faisions", "faisons"], answer: "ferions" },
+
+      /* ── NIVEAU 1 : associer sujet ↔ forme (5) ── */
+      { level: 1, mode: "matching", infinitive: "chanter",  subject: "Elle",  forms: ["chanterais", "chanterait", "chanterions", "chanteriez", "chanteraient"], answer: "chanterait" },
+      { level: 1, mode: "matching", infinitive: "finir",    subject: "Ils",   forms: ["finirais", "finirait", "finirions", "finiriez", "finiraient"], answer: "finiraient" },
+      { level: 1, mode: "matching", infinitive: "être",     subject: "Nous",  forms: ["serais", "serait", "serions", "seriez", "seraient"], answer: "serions" },
+      { level: 1, mode: "matching", infinitive: "avoir",    subject: "Vous",  forms: ["aurais", "aurait", "aurions", "auriez", "auraient"], answer: "auriez" },
+      { level: 1, mode: "matching", infinitive: "voyager",  subject: "Il",    forms: ["voyagerais", "voyagerait", "voyagerions", "voyageriez", "voyageraient"], answer: "voyagerait" },
+
+      /* ── NIVEAU 2 : radical régulier (infinitif) ou irrégulier ? (10) — reprise telle quelle de l'ancienne writeBank ── */
+      { level: 2, infinitive: "aimer",   sentence: "Si j'avais des ailes, j'________ voler au-dessus des nuages.",  answer: "aimerais",    regRadical: true  },
+      { level: 2, infinitive: "chanter", sentence: "Si tu t'entraînais un peu, tu ________ encore mieux !",         answer: "chanterais",  regRadical: true  },
+      { level: 2, infinitive: "finir",   sentence: "S'il avait de l'aide, il ________ son travail bien plus vite.", answer: "finirait",    regRadical: true  },
+      { level: 2, infinitive: "voyager", sentence: "Nous ________ autour du monde si nous avions le temps.",        answer: "voyagerions", regRadical: true  },
+      { level: 2, infinitive: "arriver", sentence: "Vous ________ à l'heure si vous partiez maintenant.",           answer: "arriveriez",  regRadical: true  },
+      { level: 2, infinitive: "choisir", sentence: "Elles ________ le menu si on leur demandait.",                  answer: "choisiraient", regRadical: true },
+      { level: 2, infinitive: "être",    sentence: "S'il ne pleuvait pas, ce ________ la journée parfaite.",        answer: "serait",      regRadical: false },
+      { level: 2, infinitive: "avoir",   sentence: "Elle ________ peur si elle voyait une araignée géante.",        answer: "aurait",      regRadical: false },
+      { level: 2, infinitive: "aller",   sentence: "Tu ________ jouer dehors si le soleil revenait.",               answer: "irais",       regRadical: false },
+      { level: 2, infinitive: "faire",   sentence: "Nous ________ un gâteau si nous avions assez d'œufs.",          answer: "ferions",     regRadical: false },
+
+      /* ── NIVEAU 3 : saisie libre, sujet = GN (3e personne, sans ambiguïté), déclencheur "Si + imparfait" systématique, réponse toujours au conditionnel (10) ── */
+      { level: 3, infinitive: "être",    sentence: "S'il faisait beau, la fête ________ réussie.",                          answer: "serait"       },
+      { level: 3, infinitive: "aller",   sentence: "Si tout allait bien, les enfants ________ à la piscine samedi.",        answer: "iraient"      },
+      { level: 3, infinitive: "annuler", sentence: "Si la pluie continuait, le match ________.",                            answer: "serait annulé" },
+      { level: 3, infinitive: "avoir",   sentence: "Si le week-end durait plus longtemps, mes parents ________ plus de temps libre.", answer: "auraient" },
+      { level: 3, infinitive: "venir",   sentence: "Si tu insistais, mes cousins ________ volontiers.",                     answer: "viendraient"  },
+      { level: 3, infinitive: "faire",   sentence: "Si elle avait plus de temps, la maîtresse ________ un projet artistique avec la classe.", answer: "ferait" },
+      { level: 3, infinitive: "voir",    sentence: "Si les visiteurs montaient en haut de la tour, ils ________ toute la ville.", answer: "verraient" },
+      { level: 3, infinitive: "pouvoir", sentence: "Si l'équipe s'entraînait davantage, elle ________ gagner le tournoi.", answer: "pourrait"     },
+      { level: 3, infinitive: "finir",   sentence: "Si on aidait les ouvriers, ils ________ le chantier à temps.",          answer: "finiraient"   },
+      { level: 3, infinitive: "arriver", sentence: "Si le train partait à l'heure, les voyageurs ________ avant midi.",     answer: "arriveraient" }
     ]
   },
 
