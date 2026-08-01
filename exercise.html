@@ -23,7 +23,7 @@
   <script src="js/niveau-mode.js?v=1"></script>
   <script src="js/level-unlock.js?v=1"></script>
   <script src="js/level-select.js?v=3"></script>
-  <script src="data/index.js?v=1"></script>
+  <script src="data/index.js?v=2"></script>
   <style>
     /* ── Exercise container (narrows content to readable width) ── */
     .ex-container {
@@ -1989,7 +1989,7 @@
     }
 
     /* ══════════════════════════════════════════════════════════════
-       TYPE : imp-niveaux / cond-niveaux — moteur partagé (styles pqp-*)
+       TYPE : cond-niveaux — moteur partagé (styles pqp-*)
        ══════════════════════════════════════════════════════════════ */
 
     @keyframes pqpShake {
@@ -5231,11 +5231,14 @@
       } else if (currentType === "faire-niveaux") {
         faireInitSession();
         return;
-      } else if (currentType === "imp-niveaux" || currentType === "cond-niveaux" || currentType === "futur-niveaux" || currentType === "imparfait-niveaux") {
+      } else if (currentType === "cond-niveaux" || currentType === "futur-niveaux" || currentType === "imparfait-niveaux") {
         pqpInitSession();
         return;
       } else if (currentType === "plus-que-parfait-groupes-niveaux") {
         cpqpInitSession();
+        return;
+      } else if (currentType === "imperatif-groupes-niveaux") {
+        cimperInitSession();
         return;
       } else if (currentType === "sujet-inverse-niveaux") {
         siInitSession();
@@ -5549,10 +5552,12 @@
         /* session managed by gnpInitSession — no-op here */
       } else if (currentType === "faire-niveaux") {
         /* session managed by faireInitSession — no-op here */
-      } else if (currentType === "imp-niveaux" || currentType === "cond-niveaux" || currentType === "futur-niveaux" || currentType === "imparfait-niveaux") {
+      } else if (currentType === "cond-niveaux" || currentType === "futur-niveaux" || currentType === "imparfait-niveaux") {
         /* session managed by pqpInitSession — no-op here */
       } else if (currentType === "plus-que-parfait-groupes-niveaux") {
         /* session managed by cpqpInitSession — no-op here */
+      } else if (currentType === "imperatif-groupes-niveaux") {
+        /* session managed by cimperInitSession — no-op here */
       } else if (currentType === "sujet-inverse-niveaux") {
         /* session managed by siInitSession — no-op here */
       } else if (currentType === "epithete-attribut-niveaux") {
@@ -10654,10 +10659,11 @@
     }
 
     /* ══════════════════════════════════════════════════════════════════════════
-       TYPE : imp-niveaux / cond-niveaux — moteur partagé impératif/conditionnel
-       (à l'origine conçu pour pqp-niveaux ; le plus-que-parfait utilise
-       désormais plus-que-parfait-groupes-niveaux, voir bloc cpqp* plus bas —
-       les fonctions pqp* restent nécessaires à l'impératif et au conditionnel)
+       TYPE : cond-niveaux — moteur partagé (conditionnel présent)
+       (à l'origine conçu pour pqp-niveaux ; le plus-que-parfait et l'impératif
+       utilisent désormais leurs moteurs -groupes-niveaux dédiés, voir blocs
+       cpqp* et cimper* plus bas — les fonctions pqp* restent nécessaires au
+       conditionnel)
        Deux niveaux déverrouillables (localStorage), seuil 80 %.
        Niveau 1 : identifier les groupes ciblés dans un texte (sélection + validation)
        Niveau 2 : saisie libre de la forme conjuguée
@@ -19475,6 +19481,338 @@
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
         exerciseType: 'plus-que-parfait-groupes-niveaux',
+        level:        'Niveau ' + level,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : imperatif-groupes-niveaux — « Conjuguer à l'impératif présent »
+       Particularité : l'impératif n'a jamais de sujet exprimé (pas de pronom,
+       pas de 3e personne) — "subject" ci-dessous indique la personne
+       (tu/nous/vous) visée par la forme, pas un sujet grammatical écrit.
+       Niveau 1 : QCM + associer personne↔forme (distracteurs = piège du -s,
+                  confusion avec le présent/l'imparfait)
+       Niveau 2 : saisie directe — la personne est indiquée explicitement dans
+                  la consigne ("Conjugue à la [personne] :") via cimperPersonLabel,
+                  sinon une phrase comme "________ attentifs" reste ambiguë
+                  entre nous/vous et force à deviner le sujet sur la seule
+                  terminaison
+       Niveau 3 : saisie libre, phrases plus complexes — pronominaux (trait
+                  d'union à l'affirmatif), impératif négatif, 3e groupe.
+                  Même consigne de personne explicite qu'au niveau 2 via
+                  cimperPersonLabel(q.subject).
+       3 niveaux déverrouillables à 80 %. Un seul essai par question.
+       ════════════════════════════════════════════════════════════════════════ */
+
+    const CIMPER_SEUIL = 0.8;
+
+    const CIMPER_LV_DEFS = [
+      { lv: 1, desc: 'QCM et association : trouve la bonne forme' },
+      { lv: 2, desc: 'Écris la forme demandée à l\'impératif' },
+      { lv: 3, desc: 'Phrases plus complexes : pronominaux, négation…' }
+    ];
+
+    let cimperState = null;
+    let cimperLevelSelect = null;
+
+    function cimperBackToSelectScreen() {
+      cimperState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    /* ── Init : réinitialise et affiche le sélecteur de niveau ──────────── */
+    function cimperInitSession() {
+      cimperState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      cimperLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: CIMPER_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: CIMPER_SEUIL,
+        onSelectLevel: (lv) => cimperStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: cimperBackToSelectScreen
+      });
+      cimperLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function cimperStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const pool = shuffle((sessionData.bank || []).filter(item => item.level === lv));
+      const qs   = pool.slice(0, sessionData.questionsPerSession || 10);
+      cimperState = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+      document.getElementById('q-total').textContent = qs.length;
+
+      cimperLevelSelect.renderBadges(lv);
+      cimperRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Affiche une question — dispatche sur le niveau + q.mode ─────────── */
+    function cimperRenderQuestion(card) {
+      const { questions, idx, total, level } = cimperState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if (level === 1 && q.mode === 'mcq')           cimperRenderMcq(card, q);
+      else if (level === 1 && q.mode === 'matching') cimperRenderMatching(card, q);
+      else if (level === 2)                          cimperRenderLevel2(card, q);
+      else                                             cimperRenderTextInput(card, q);
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        cimperState.idx++;
+        if (cimperState.idx >= cimperState.questions.length) cimperShowLevelResults();
+        else cimperRenderQuestion(document.getElementById('ex-card'));
+      });
+    }
+
+    /* L'impératif n'a jamais de sujet exprimé : on désigne la personne en
+       toutes lettres plutôt que d'afficher le pronom (tu/nous/vous) comme un
+       sujet grammatical de la phrase. */
+    function cimperPersonLabel(subject) {
+      switch ((subject || '').toLowerCase()) {
+        case 'tu':   return '2ème personne du singulier';
+        case 'nous': return '1ère personne du pluriel';
+        case 'vous': return '2ème personne du pluriel';
+        default:     return subject;
+      }
+    }
+
+    function cimperRenderMcq(card, q) {
+      const { idx, total } = cimperState;
+      card.innerHTML = `
+        <p class="ex-question-label">Quelle est la forme du verbe <em>${q.infinitive}</em> à l'impératif pour cette personne ?</p>
+        <div class="ex-verb-display">${cimperPersonLabel(q.subject)}</div>
+        <div class="ex-choices-grid" id="cimper-choices"></div>
+        <div class="ex-feedback-area" id="cimper-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('cimper-choices');
+      grid.innerHTML = shuffle(q.choices).map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => cimperHandleChoice(btn, q))
+      );
+    }
+
+    function cimperRenderMatching(card, q) {
+      const { idx, total } = cimperState;
+      card.innerHTML = `
+        <p class="ex-question-label">Associe cette personne à la bonne forme du verbe <em>${q.infinitive}</em> à l'impératif.</p>
+        <div class="ex-verb-display">${cimperPersonLabel(q.subject)}</div>
+        <div class="ex-choices-grid" id="cimper-choices"></div>
+        <div class="ex-feedback-area" id="cimper-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('cimper-choices');
+      grid.innerHTML = shuffle(q.forms).map(f => `<button class="ex-choice" data-value="${f}">${f}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => cimperHandleChoice(btn, q))
+      );
+    }
+
+    function cimperHandleChoice(btn, q) {
+      document.querySelectorAll('#cimper-choices .ex-choice').forEach(b => b.disabled = true);
+      const isRight = btn.dataset.value === q.answer;
+      document.querySelectorAll('#cimper-choices .ex-choice').forEach(b => {
+        if (b.dataset.value === q.answer) b.classList.add('is-correct');
+      });
+      if (!isRight) btn.classList.add('is-wrong');
+      if (isRight) {
+        cimperState.score++;
+        document.getElementById('cimper-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+      } else {
+        document.getElementById('cimper-fb').innerHTML = `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne forme.<br>
+            À la <strong>${cimperPersonLabel(q.subject)}</strong> : <strong>${q.answer}</strong>.
+          </div>
+        `;
+      }
+      document.getElementById('next-btn').classList.remove('ex-hidden');
+    }
+
+    /* ── Niveau 2 : saisie directe, personne indiquée explicitement dans la consigne ── */
+    function cimperRenderLevel2(card, q) {
+      const { idx, total } = cimperState;
+      card.innerHTML = `
+        <p class="ex-question-label">Conjugue à la <strong>${cimperPersonLabel(q.subject)}</strong> :</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="cimper-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="cimper-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="cimper-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const input  = document.getElementById('cimper-input');
+      const valBtn = document.getElementById('cimper-val-btn');
+      setTimeout(() => input.focus(), 50);
+
+      function submit() {
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          cimperState.score++;
+          document.getElementById('cimper-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+        } else {
+          document.getElementById('cimper-fb').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.answer}</strong>
+            </div>
+          `;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+
+      valBtn.addEventListener('click', submit);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    }
+
+    function cimperRenderTextInput(card, q) {
+      const { idx, total } = cimperState;
+      card.innerHTML = `
+        <p class="ex-question-label">Conjugue à la <strong>${cimperPersonLabel(q.subject)}</strong> :</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="cimper-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="cimper-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="cimper-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const input  = document.getElementById('cimper-input');
+      const valBtn = document.getElementById('cimper-val-btn');
+      setTimeout(() => input.focus(), 50);
+
+      function submit() {
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          cimperState.score++;
+          document.getElementById('cimper-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+        } else {
+          document.getElementById('cimper-fb').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.answer}</strong>
+            </div>
+          `;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+
+      valBtn.addEventListener('click', submit);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    }
+
+    /* ── Résultats de fin de niveau ───────────────────────────────────────── */
+    function cimperShowLevelResults() {
+      const { level, score: lvScore, total } = cimperState;
+      const { passed, pct, isLast } = cimperLevelSelect.completeLevel(level, lvScore, total);
+      const pctPct = Math.round(pct * 100);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-conjugaison.html';
+      const backLabel = `← Retour à ${sessionData.backLink?.label || 'la Conjugaison'}`;
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const backToSelectBtn = cimperLevelSelect.backToSelectButtonHTML();
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises l'impératif présent !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cimper-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cimper-next-btn">Niveau ${level + 1} →</button>
+          <button class="ex-btn-secondary" id="cimper-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * CIMPER_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour débloquer le niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cimper-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
+
+      document.getElementById('cimper-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cimperStartLevel(cimperState.level);
+      });
+      document.getElementById('cimper-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cimperStartLevel(level + 1);
+      });
+      document.getElementById('cimper-restart-btn')?.addEventListener('click', () => {
+        cimperLevelSelect.reset();
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cimperInitSession();
+      });
+      cimperLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'imperatif-groupes-niveaux',
         level:        'Niveau ' + level,
         score:        lvScore,
         total,

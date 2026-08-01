@@ -20,6 +20,6 @@
     "data/probabilites.js"
   ];
   DOMAIN_FILES.forEach(function (src) {
-    document.write('<script src="' + src + '?v=1"></script>');
+    document.write('<script src="' + src + '?v=2"></script>');
   });
 })();

@@ -987,14 +987,14 @@
            loadScript('exercise-data.js?v=21'). À conserver si loadCompetenceStats
            est commitée ou reversée séparément de ce commit de migration. */
         await Promise.all([
-          'data/conjugaison.js?v=1',
-          'data/grammaire.js?v=1',
-          'data/orthographe.js?v=1',
-          'data/lecture.js?v=1',
-          'data/nombres-entiers.js?v=1',
-          'data/fractions.js?v=1',
-          'data/nombres-decimaux.js?v=1',
-          'data/probabilites.js?v=1'
+          'data/conjugaison.js?v=2',
+          'data/grammaire.js?v=2',
+          'data/orthographe.js?v=2',
+          'data/lecture.js?v=2',
+          'data/nombres-entiers.js?v=2',
+          'data/fractions.js?v=2',
+          'data/nombres-decimaux.js?v=2',
+          'data/probabilites.js?v=2'
         ].map(loadScript));
         const catalogMap = lfmAnalytics.buildCatalogMap();
         const results     = await lfmAdmin.getAllResultsRaw();

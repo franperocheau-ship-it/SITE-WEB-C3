@@ -1792,131 +1792,82 @@ Object.assign(window.EXERCISE_DATA, {
     ]
   },
 
+  /* ══════════════════════════════════════════════════════════════════════════
+     Type : imperatif-groupes-niveaux
+     Particularité : l'impératif n'a jamais de sujet exprimé (pas de pronom, pas
+     de 3e personne) — le modèle "niveau 3 = sujet non pronominal" utilisé pour
+     les autres compétences de conjugaison ne s'applique pas ici.
+     Niveau 1 : QCM (5) + associer personne↔forme (5) — "subject" = tu/nous/vous
+                utilisé comme indicateur de personne (pas un sujet grammatical
+                réellement écrit), distracteurs = piège du -s (1er groupe et
+                aller), confusion avec le présent/l'imparfait.
+     Niveau 2 : saisie directe. La personne visée (tu/nous/vous) est indiquée
+                explicitement dans la consigne ("Conjugue à la [personne] :")
+                via "subject" — sans ça, une phrase comme "________ attentifs"
+                accepte aussi bien "Soyons" que "Soyez" et force l'élève à
+                deviner le sujet sur la seule terminaison, ce qui est trop
+                difficile à ce niveau. Verbes réguliers + les 4 classiques à
+                mémoriser par cœur (être/avoir/aller/savoir), tous à
+                l'affirmatif et non pronominaux — le Niveau 3 se charge de la
+                complexité syntaxique (pronominaux, négation).
+     Niveau 3 : saisie libre, phrases plus complexes — verbes pronominaux avec
+                trait d'union à l'affirmatif, impératif négatif (le pronom
+                repasse avant le verbe, sans trait d'union), verbes irréguliers
+                du 3e groupe. Même principe qu'au niveau 2 : "subject" indique
+                la personne visée, affichée en toutes lettres dans la consigne
+                ("Conjugue à la [personne] :") — sans ça, "________ toujours la
+                vérité." accepte aussi bien "Dis" que "Dites".
+     Progression verrouillée : seuil 80 %, persistance sessionStorage.
+  ══════════════════════════════════════════════════════════════════════════ */
+
   "conjuguer-imperatif-present": {
-    title:              "Conjuguer à l'impératif présent",
+    title:      "Conjuguer à l'impératif présent",
     domaine:    "Français",
     competence: "Conjugaison — Impératif présent",
-    levels:             ["CM2", "6e"],
-    paliers:            2, /* nombre réel de paliers du moteur */
-    type:               "imp-niveaux",
+    type:       "imperatif-groupes-niveaux",
+    levels:     ["CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
-    backLink:           { href: "français-conjugaison.html", label: "Conjugaison" },
-    niveauxConfig: {
-      rule:             "Impératif présent : sans pronom sujet · <em>tu</em> (1<sup>er</sup> groupe : pas de -s) / <em>nous</em> / <em>vous</em>",
-      lvDefs: [
-        { lv: 1, icon: '⭐',   label: "Niveau 1 — Repère l'impératif", desc: "Lis un texte, identifie les verbes à l'impératif présent" },
-        { lv: 2, icon: '⭐⭐', label: "Niveau 2 — Écris à l'impératif", desc: "Conjugue des phrases à trous à l'impératif présent" }
-      ],
-      verb1Instruction: "Clique sur les verbes à l'<strong>impératif présent</strong>, puis valide.",
-      verb1NotTarget:   "n'est pas à l'impératif présent",
-      verb1TargetName:  "impératif",
-      verb1FoundAll:    "Tu as trouvé tous les impératifs !",
-      verb2Instruction: "Conjugue le verbe à l'<strong>impératif présent</strong>.",
-      lv2NextBtnLabel:  "Niveau 2 — Écris →",
-      winMsg:           "Tu maîtrises l'impératif présent aux deux niveaux !",
-      simpleErrorFeedback: true
-    },
-    identTexts: [
-      /* Texte 1 — La recette */
-      { tokens: [
-        { t: "Maman ouvrit le livre de cuisine. Elle dit : « " },
-        { t: "Prends", v: true, pqp: true },
-        { t: " deux œufs et " },
-        { t: "mélange", v: true, pqp: true },
-        { t: "-les bien. » Paul " },
-        { t: "prit", v: true, pqp: false },
-        { t: " les ingrédients sur l'étagère. Il " },
-        { t: "versa", v: true, pqp: false },
-        { t: " le lait dans le bol." }
-      ]},
-      /* Texte 2 — À l'école */
-      { tokens: [
-        { t: "La maîtresse se leva et dit aux élèves : « " },
-        { t: "Ouvrez", v: true, pqp: true },
-        { t: " vos cahiers et " },
-        { t: "écrivez", v: true, pqp: true },
-        { t: " la date. » Les enfants " },
-        { t: "ouvrirent", v: true, pqp: false },
-        { t: " leurs cahiers en silence. Théo " },
-        { t: "écrit", v: true, pqp: false },
-        { t: " très lentement." }
-      ]},
-      /* Texte 3 — La forêt magique */
-      { tokens: [
-        { t: "Un lutin apparut devant Hugo. « " },
-        { t: "Suis", v: true, pqp: true },
-        { t: "-moi jusqu'à la clairière et " },
-        { t: "ferme", v: true, pqp: true },
-        { t: " les yeux. » Hugo " },
-        { t: "suivit", v: true, pqp: false },
-        { t: " le lutin à travers les arbres. Il " },
-        { t: "ferma", v: true, pqp: false },
-        { t: " les yeux comme demandé." }
-      ]},
-      /* Texte 4 — Chez grand-mère */
-      { tokens: [
-        { t: "Grand-mère nous regarda et dit : « " },
-        { t: "Soyez", v: true, pqp: true },
-        { t: " sages pendant le dîner et " },
-        { t: "rangez", v: true, pqp: true },
-        { t: " vos affaires après. » Les enfants se regardèrent et " },
-        { t: "obéirent", v: true, pqp: false },
-        { t: " sans protester. Léa " },
-        { t: "rangea", v: true, pqp: false },
-        { t: " son sac en premier." }
-      ]}
-    ],
-    writeBank: [
-      {
-        sentence:    "(manger) ___ tes légumes avant d'aller jouer !",
-        answers:     ["Mange", "mange"],
-        explication: "1<sup>er</sup> groupe, tu : <strong>mange</strong> — pas de -s à l'impératif (tu manges → mange)."
-      },
-      {
-        sentence:    "(choisir) ___ votre place en silence, s'il vous plaît.",
-        answers:     ["Choisissez", "choisissez"],
-        explication: "2<sup>e</sup> groupe, vous : <strong>choisissez</strong> — même forme qu'au présent de l'indicatif."
-      },
-      {
-        sentence:    "(chanter) ___ la chanson tous ensemble !",
-        answers:     ["Chantons", "chantons"],
-        explication: "1<sup>er</sup> groupe, nous : <strong>chantons</strong> — même forme qu'au présent de l'indicatif."
-      },
-      {
-        sentence:    "(finir) ___ ton exercice avant la récréation.",
-        answers:     ["Finis", "finis"],
-        explication: "2<sup>e</sup> groupe, tu : <strong>finis</strong> — même forme qu'au présent de l'indicatif."
-      },
-      {
-        sentence:    "(être) ___ attentifs pendant toute la leçon !",
-        answers:     ["Soyez", "soyez"],
-        explication: "Être, vous : <strong>soyez</strong> — forme irrégulière (à mémoriser)."
-      },
-      {
-        sentence:    "(avoir) ___ confiance en vous !",
-        answers:     ["Ayez", "ayez"],
-        explication: "Avoir, vous : <strong>ayez</strong> — forme irrégulière (à mémoriser)."
-      },
-      {
-        sentence:    "(aller) ___ te coucher, il est tard !",
-        answers:     ["Va", "va"],
-        explication: "Aller, tu : <strong>va</strong> — pas de -s (exception : va-s-y avec le pronom y)."
-      },
-      {
-        sentence:    "Vous êtes prêts ? (avancer) ___ vers la sortie !",
-        answers:     ["Avancez", "avancez"],
-        explication: "1<sup>er</sup> groupe, vous : <strong>avancez</strong> — même forme qu'au présent."
-      },
-      {
-        sentence:    "(prendre) ___ ton manteau, il fait froid dehors.",
-        answers:     ["Prends", "prends"],
-        explication: "3<sup>e</sup> groupe, tu : <strong>prends</strong> — forme irrégulière, avec -ds."
-      },
-      {
-        sentence:    "(partir) ___ à l'aventure avant que la nuit tombe !",
-        answers:     ["Partons", "partons"],
-        explication: "3<sup>e</sup> groupe, nous : <strong>partons</strong> — même forme qu'au présent de l'indicatif."
-      }
+    backLink:   { href: "français-conjugaison.html", label: "Conjugaison" },
+
+    bank: [
+      /* ── NIVEAU 1 : QCM (5) — piège du -s, confusion présent/imparfait ── */
+      { level: 1, mode: "mcq", infinitive: "manger", subject: "tu",   choices: ["Mange", "Manges", "Mangeons", "Mangez"], answer: "Mange" },
+      { level: 1, mode: "mcq", infinitive: "aller",  subject: "tu",   choices: ["Va", "Vas", "Allons", "Allez"], answer: "Va" },
+      { level: 1, mode: "mcq", infinitive: "être",   subject: "vous", choices: ["Soyez", "Êtes", "Soyons", "Étiez"], answer: "Soyez" },
+      { level: 1, mode: "mcq", infinitive: "avoir",  subject: "nous", choices: ["Ayons", "Avons", "Ayez", "Aviez"], answer: "Ayons" },
+      { level: 1, mode: "mcq", infinitive: "finir",  subject: "tu",   choices: ["Finis", "Finit", "Finissons", "Finissez"], answer: "Finis" },
+
+      /* ── NIVEAU 1 : associer personne ↔ forme (5) ── */
+      { level: 1, mode: "matching", infinitive: "chanter", subject: "Tu",   forms: ["Chante", "Chantons", "Chantez"], answer: "Chante" },
+      { level: 1, mode: "matching", infinitive: "finir",   subject: "Nous", forms: ["Finis", "Finissons", "Finissez"], answer: "Finissons" },
+      { level: 1, mode: "matching", infinitive: "aller",   subject: "Vous", forms: ["Va", "Allons", "Allez"], answer: "Allez" },
+      { level: 1, mode: "matching", infinitive: "être",    subject: "Tu",   forms: ["Sois", "Soyons", "Soyez"], answer: "Sois" },
+      { level: 1, mode: "matching", infinitive: "prendre", subject: "Nous", forms: ["Prends", "Prenons", "Prenez"], answer: "Prenons" },
+
+      /* ── NIVEAU 2 : saisie directe, personne indiquée explicitement (10) ── */
+      { level: 2, infinitive: "manger",  subject: "tu",   sentence: "________ tes légumes avant d'aller jouer !",              answer: "Mange"      },
+      { level: 2, infinitive: "choisir", subject: "vous", sentence: "________ votre place en silence, s'il vous plaît.",       answer: "Choisissez" },
+      { level: 2, infinitive: "chanter", subject: "nous", sentence: "________ la chanson tous ensemble !",                     answer: "Chantons"   },
+      { level: 2, infinitive: "finir",   subject: "tu",   sentence: "________ ton exercice avant la récréation.",              answer: "Finis"      },
+      { level: 2, infinitive: "être",    subject: "vous", sentence: "________ attentifs pendant toute la leçon !",             answer: "Soyez"      },
+      { level: 2, infinitive: "avoir",   subject: "vous", sentence: "________ confiance en vous !",                            answer: "Ayez"       },
+      { level: 2, infinitive: "aller",   subject: "tu",   sentence: "________ te coucher, il est tard !",                      answer: "Va"         },
+      { level: 2, infinitive: "savoir",  subject: "vous", sentence: "________ que je compte sur vous pour ce projet.",         answer: "Sachez"     },
+      { level: 2, infinitive: "prendre", subject: "tu",   sentence: "________ ton manteau, il fait froid dehors.",             answer: "Prends"     },
+      { level: 2, infinitive: "partir",  subject: "nous", sentence: "________ à l'aventure avant que la nuit tombe !",         answer: "Partons"    },
+
+      /* ── NIVEAU 3 : saisie libre, pronominaux + négation + 3e groupe, personne indiquée explicitement (10) ── */
+      { level: 3, infinitive: "se lever",    subject: "tu",   sentence: "________ tout de suite, il est l'heure !",                    answer: "Lève-toi"       },
+      { level: 3, infinitive: "se dépêcher", subject: "nous", sentence: "________, le bus va partir !",                                answer: "Dépêchons-nous" },
+      { level: 3, infinitive: "s'asseoir",   subject: "vous", sentence: "________ ici, je vous en prie.",                              answer: "Asseyez-vous"   },
+      { level: 3, infinitive: "parler",      subject: "tu",   sentence: "Ne ________ pas la bouche pleine !",                          answer: "parle"          },
+      { level: 3, infinitive: "se lever",    subject: "vous", sentence: "Ne vous ________ pas maintenant, attendez le signal.",        answer: "levez"          },
+      { level: 3, infinitive: "dire",        subject: "vous", sentence: "________ toujours la vérité.",                                answer: "Dites"          },
+      { level: 3, infinitive: "faire",       subject: "nous", sentence: "________ attention en traversant la rue.",                    answer: "Faisons"        },
+      { level: 3, infinitive: "mettre",      subject: "tu",   sentence: "________ ton manteau avant de sortir.",                       answer: "Mets"           },
+      { level: 3, infinitive: "venir",       subject: "tu",   sentence: "________ voir ce que j'ai trouvé !",                          answer: "Viens"          },
+      { level: 3, infinitive: "se taire",    subject: "vous", sentence: "________, s'il vous plaît, le film commence.",                answer: "Taisez-vous"    }
     ]
   },
 
