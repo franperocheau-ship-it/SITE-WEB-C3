@@ -808,115 +808,71 @@ Object.assign(window.EXERCISE_DATA, {
     ]
   },
 
+  /* ══════════════════════════════════════════════════════════════════════════
+     Type : passe-simple-groupes-niveaux
+     Niveau 1 : QCM (5) + associer sujet↔forme (5) — sujets = pronoms,
+                distracteurs = confusion avec l'imparfait/le futur et pièges
+                de terminaison à la 3e pers. du pluriel (-èrent vs -aient).
+                Pour être/avoir et les verbes du 2e groupe, je et tu partagent
+                la même forme au passé simple (fus/fus, eus/eus, finis/finis) :
+                le mode "matching" n'affiche alors que 5 formes distinctes,
+                comme pour l'imparfait.
+     Niveau 2 : SPÉCIFICITÉ — choix binaire avant saisie : le verbe est-il du
+                1er groupe (terminaisons en -a-) ou du 2e/3e groupe/être/avoir
+                (terminaisons en -i-/-u-) ? Réutilise le motif step1/step2 déjà
+                utilisé pour l'imparfait (hasIss) et le futur (regRadical).
+     Niveau 3 : saisie libre, sujet = groupe nominal, groupes mélangés.
+     Progression verrouillée : seuil 80 %, persistance sessionStorage.
+  ══════════════════════════════════════════════════════════════════════════ */
+
   "conjuguer-passe-simple": {
     title: "Conjuguer des verbes au passé simple",
     domaine:    "Français",
     competence: "Conjugaison — Passé simple",
-    type: "text-input",
-    levels: ["CM2", "6e"],
-    paliers: 1, /* nombre réel de paliers du moteur */
-    questionsPerSession: 25,
-    sortByDifficulty: true,
+    type:       "passe-simple-groupes-niveaux",
+    levels:     ["CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
+    questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
     bank: [
-      /* ── ÊTRE (je fus, tu fus, il fut, nous fûmes, vous fûtes, ils furent) ── */
-      { subject: "je",    infinitive: "être",    sentence: "Ce jour-là, je ________ très courageux.",              answer: "fus",      difficulty: 3 },
-      { subject: "tu",    infinitive: "être",    sentence: "Tu ________ le premier à arriver sur les lieux.",      answer: "fus",      difficulty: 3 },
-      { subject: "il",    infinitive: "être",    sentence: "Il ________ très surpris par la nouvelle.",            answer: "fut",      difficulty: 3 },
-      { subject: "elle",  infinitive: "être",    sentence: "Elle ________ heureuse d'apprendre la nouvelle.",      answer: "fut",      difficulty: 3 },
-      { subject: "nous",  infinitive: "être",    sentence: "Nous ________ récompensés pour notre courage.",        answer: "fûmes",    difficulty: 3 },
-      { subject: "vous",  infinitive: "être",    sentence: "Vous ________ les héros de cette aventure.",           answer: "fûtes",    difficulty: 3 },
-      { subject: "ils",   infinitive: "être",    sentence: "Ils ________ très émus à la fin du spectacle.",        answer: "furent",   difficulty: 3 },
-      { subject: "elles", infinitive: "être",    sentence: "Elles ________ ravies de leur long voyage.",           answer: "furent",   difficulty: 3 },
+      /* ── NIVEAU 1 : QCM (5) — distracteurs imparfait/futur et terminaisons ── */
+      { level: 1, mode: "mcq", infinitive: "chanter", subject: "il",   choices: ["chanta", "chantait", "chantera", "chantèrent"], answer: "chanta" },
+      { level: 1, mode: "mcq", infinitive: "finir",    subject: "je",   choices: ["finis", "finissais", "finirai", "finit"], answer: "finis" },
+      { level: 1, mode: "mcq", infinitive: "être",     subject: "elle", choices: ["fut", "était", "sera", "furent"], answer: "fut" },
+      { level: 1, mode: "mcq", infinitive: "avoir",    subject: "nous", choices: ["eûmes", "avions", "aurons", "eurent"], answer: "eûmes" },
+      { level: 1, mode: "mcq", infinitive: "parler",   subject: "ils",  choices: ["parlèrent", "parlaient", "parleront", "parla"], answer: "parlèrent" },
 
-      /* ── AVOIR (j'eus, tu eus, il eut, nous eûmes, vous eûtes, ils eurent) ── */
-      { subject: "j'",    infinitive: "avoir",   sentence: "J'________ très peur en traversant la forêt.",         answer: "eus",      difficulty: 3 },
-      { subject: "tu",    infinitive: "avoir",   sentence: "Tu ________ une idée brillante à ce moment-là.",       answer: "eus",      difficulty: 3 },
-      { subject: "il",    infinitive: "avoir",   sentence: "Il ________ très faim après la longue randonnée.",     answer: "eut",      difficulty: 3 },
-      { subject: "elle",  infinitive: "avoir",   sentence: "Elle ________ un grand courage face au danger.",       answer: "eut",      difficulty: 3 },
-      { subject: "nous",  infinitive: "avoir",   sentence: "Nous ________ beaucoup de chance ce jour-là.",         answer: "eûmes",    difficulty: 3 },
-      { subject: "vous",  infinitive: "avoir",   sentence: "Vous ________ la surprise de votre vie.",              answer: "eûtes",    difficulty: 3 },
-      { subject: "ils",   infinitive: "avoir",   sentence: "Ils ________ du mal à trouver leur chemin.",           answer: "eurent",   difficulty: 3 },
-      { subject: "elles", infinitive: "avoir",   sentence: "Elles ________ envie de repartir dès le lendemain.",   answer: "eurent",   difficulty: 3 },
+      /* ── NIVEAU 1 : associer sujet ↔ forme (5) ── */
+      { level: 1, mode: "matching", infinitive: "chanter",  subject: "Elle",  forms: ["chantai", "chantas", "chanta", "chantâmes", "chantâtes", "chantèrent"], answer: "chanta" },
+      { level: 1, mode: "matching", infinitive: "finir",    subject: "Ils",   forms: ["finis", "finit", "finîmes", "finîtes", "finirent"], answer: "finirent" },
+      { level: 1, mode: "matching", infinitive: "être",     subject: "Elles", forms: ["fus", "fut", "fûmes", "fûtes", "furent"], answer: "furent" },
+      { level: 1, mode: "matching", infinitive: "avoir",    subject: "Vous",  forms: ["eus", "eut", "eûmes", "eûtes", "eurent"], answer: "eûtes" },
+      { level: 1, mode: "matching", infinitive: "regarder", subject: "On",    forms: ["regardai", "regardas", "regarda", "regardâmes", "regardâtes", "regardèrent"], answer: "regarda" },
 
-      /* ── 1er GROUPE : chanter ── */
-      { subject: "je",    infinitive: "chanter", sentence: "Je ________ une vieille chanson autour du feu.",       answer: "chantai",    difficulty: 1 },
-      { subject: "tu",    infinitive: "chanter", sentence: "Tu ________ devant tout le village.",                  answer: "chantas",    difficulty: 1 },
-      { subject: "il",    infinitive: "chanter", sentence: "Il ________ pour célébrer la victoire.",               answer: "chanta",     difficulty: 1 },
-      { subject: "nous",  infinitive: "chanter", sentence: "Nous ________ tous ensemble jusqu'au matin.",          answer: "chantâmes",  difficulty: 2 },
-      { subject: "vous",  infinitive: "chanter", sentence: "Vous ________ si bien que tout le monde applaudit.",   answer: "chantâtes",  difficulty: 2 },
-      { subject: "ils",   infinitive: "chanter", sentence: "Ils ________ et dansèrent jusqu'au lever du jour.",    answer: "chantèrent", difficulty: 2 },
+      /* ── NIVEAU 2 : 1er groupe (-a-) vs 2e/3e groupe/être/avoir (-i-/-u-) (10) ── */
+      { level: 2, infinitive: "chanter",  sentence: "Je ________ une vieille chanson autour du feu.",   answer: "chantai", groupe1: true },
+      { level: 2, infinitive: "finir",    sentence: "Tu ________ ta course le premier.",                answer: "finis",   groupe1: false },
+      { level: 2, infinitive: "regarder", sentence: "Elle ________ le tableau sans dire un mot.",       answer: "regarda", groupe1: true },
+      { level: 2, infinitive: "choisir",  sentence: "Il ________ la plus belle des pierres précieuses.", answer: "choisit", groupe1: false },
+      { level: 2, infinitive: "tomber",   sentence: "Il ________ dans le piège tendu par l'ennemi.",    answer: "tomba",   groupe1: true },
+      { level: 2, infinitive: "être",     sentence: "Tu ________ le premier à arriver sur les lieux.",  answer: "fus",     groupe1: false },
+      { level: 2, infinitive: "trouver",  sentence: "Il ________ un trésor caché dans la grotte.",      answer: "trouva",  groupe1: true },
+      { level: 2, infinitive: "avoir",    sentence: "Il ________ très faim après la longue randonnée.", answer: "eut",     groupe1: false },
+      { level: 2, infinitive: "crier",    sentence: "Elle ________ de joie en voyant le résultat.",     answer: "cria",    groupe1: true },
+      { level: 2, infinitive: "obéir",    sentence: "Il ________ aux ordres sans discuter.",            answer: "obéit",   groupe1: false },
 
-      /* ── 1er GROUPE : parler ── */
-      { subject: "je",    infinitive: "parler",  sentence: "Je ________ au roi avec beaucoup de respect.",         answer: "parlai",    difficulty: 1 },
-      { subject: "tu",    infinitive: "parler",  sentence: "Tu ________ d'une voix douce et assurée.",             answer: "parlas",    difficulty: 1 },
-      { subject: "il",    infinitive: "parler",  sentence: "Il ________ pendant de longues heures.",               answer: "parla",     difficulty: 1 },
-      { subject: "nous",  infinitive: "parler",  sentence: "Nous ________ longuement de cette étrange aventure.",  answer: "parlâmes",  difficulty: 2 },
-      { subject: "vous",  infinitive: "parler",  sentence: "Vous ________ avec beaucoup de sagesse.",              answer: "parlâtes",  difficulty: 2 },
-      { subject: "ils",   infinitive: "parler",  sentence: "Ils ________ entre eux à voix basse.",                 answer: "parlèrent", difficulty: 2 },
-
-      /* ── 1er GROUPE : marcher ── */
-      { subject: "je",    infinitive: "marcher", sentence: "Je ________ toute la nuit pour rentrer chez moi.",     answer: "marchai",    difficulty: 1 },
-      { subject: "il",    infinitive: "marcher", sentence: "Il ________ seul jusqu'au vieux château.",             answer: "marcha",     difficulty: 1 },
-      { subject: "nous",  infinitive: "marcher", sentence: "Nous ________ en silence à travers la forêt sombre.",  answer: "marchâmes",  difficulty: 2 },
-      { subject: "ils",   infinitive: "marcher", sentence: "Ils ________ pendant des heures sans s'arrêter.",      answer: "marchèrent", difficulty: 2 },
-
-      /* ── 1er GROUPE : regarder ── */
-      { subject: "je",    infinitive: "regarder",sentence: "Je ________ le coucher de soleil en silence.",         answer: "regardai",    difficulty: 1 },
-      { subject: "tu",    infinitive: "regarder",sentence: "Tu ________ les étoiles toute la nuit.",               answer: "regardas",    difficulty: 1 },
-      { subject: "elle",  infinitive: "regarder",sentence: "Elle ________ le tableau sans dire un mot.",           answer: "regarda",     difficulty: 1 },
-      { subject: "ils",   infinitive: "regarder",sentence: "Ils ________ le bateau disparaître à l'horizon.",      answer: "regardèrent", difficulty: 2 },
-
-      /* ── 1er GROUPE : trouver ── */
-      { subject: "il",    infinitive: "trouver", sentence: "Il ________ un trésor caché dans la grotte.",          answer: "trouva",     difficulty: 1 },
-      { subject: "nous",  infinitive: "trouver", sentence: "Nous ________ enfin la sortie du labyrinthe.",         answer: "trouvâmes",  difficulty: 2 },
-      { subject: "ils",   infinitive: "trouver", sentence: "Ils ________ refuge dans une vieille cabane.",         answer: "trouvèrent", difficulty: 2 },
-
-      /* ── 1er GROUPE : entrer ── */
-      { subject: "il",    infinitive: "entrer",  sentence: "Il ________ dans la pièce sans frapper.",              answer: "entra",     difficulty: 1 },
-      { subject: "nous",  infinitive: "entrer",  sentence: "Nous ________ dans le château au lever du soleil.",    answer: "entrâmes",  difficulty: 2 },
-      { subject: "ils",   infinitive: "entrer",  sentence: "Ils ________ dans la ville en triomphe.",              answer: "entrèrent", difficulty: 2 },
-
-      /* ── 1er GROUPE : tomber ── */
-      { subject: "je",    infinitive: "tomber",  sentence: "Je ________ de fatigue à la fin de la course.",        answer: "tombai",    difficulty: 1 },
-      { subject: "il",    infinitive: "tomber",  sentence: "Il ________ dans le piège tendu par l'ennemi.",        answer: "tomba",     difficulty: 1 },
-      { subject: "ils",   infinitive: "tomber",  sentence: "Ils ________ les uns après les autres.",               answer: "tombèrent", difficulty: 2 },
-
-      /* ── 1er GROUPE : crier ── */
-      { subject: "elle",  infinitive: "crier",   sentence: "Elle ________ de joie en voyant le résultat.",         answer: "cria",      difficulty: 1 },
-      { subject: "ils",   infinitive: "crier",   sentence: "Ils ________ pour alerter le reste du village.",       answer: "crièrent",  difficulty: 2 },
-
-      /* ── 2e GROUPE : finir ── */
-      { subject: "je",    infinitive: "finir",   sentence: "Je ________ mon récit et fermai le livre.",            answer: "finis",     difficulty: 1 },
-      { subject: "tu",    infinitive: "finir",   sentence: "Tu ________ ta course le premier.",                    answer: "finis",     difficulty: 1 },
-      { subject: "il",    infinitive: "finir",   sentence: "Il ________ son discours sous les applaudissements.",  answer: "finit",     difficulty: 1 },
-      { subject: "nous",  infinitive: "finir",   sentence: "Nous ________ notre long voyage à la tombée de la nuit.", answer: "finîmes", difficulty: 2 },
-      { subject: "vous",  infinitive: "finir",   sentence: "Vous ________ votre repas en silence.",                answer: "finîtes",  difficulty: 2 },
-      { subject: "ils",   infinitive: "finir",   sentence: "Ils ________ par trouver la bonne solution.",          answer: "finirent", difficulty: 2 },
-
-      /* ── 2e GROUPE : choisir ── */
-      { subject: "je",    infinitive: "choisir", sentence: "Je ________ le chemin le plus court.",                 answer: "choisis",    difficulty: 1 },
-      { subject: "il",    infinitive: "choisir", sentence: "Il ________ la plus belle des pierres précieuses.",    answer: "choisit",    difficulty: 1 },
-      { subject: "nous",  infinitive: "choisir", sentence: "Nous ________ de rester ensemble coûte que coûte.",    answer: "choisîmes",  difficulty: 2 },
-      { subject: "ils",   infinitive: "choisir", sentence: "Ils ________ leur chef après une longue discussion.",  answer: "choisirent", difficulty: 2 },
-
-      /* ── 2e GROUPE : grandir ── */
-      { subject: "il",    infinitive: "grandir", sentence: "Il ________ vite et devint un homme fort.",            answer: "grandit",    difficulty: 1 },
-      { subject: "ils",   infinitive: "grandir", sentence: "Ils ________ ensemble dans ce petit village.",         answer: "grandirent", difficulty: 2 },
-
-      /* ── 2e GROUPE : réussir ── */
-      { subject: "il",    infinitive: "réussir", sentence: "Il ________ enfin à traverser la rivière.",            answer: "réussit",    difficulty: 1 },
-      { subject: "nous",  infinitive: "réussir", sentence: "Nous ________ à déjouer tous les pièges.",             answer: "réussîmes",  difficulty: 2 },
-      { subject: "ils",   infinitive: "réussir", sentence: "Ils ________ à atteindre le sommet au coucher du soleil.", answer: "réussirent", difficulty: 2 },
-
-      /* ── 2e GROUPE : obéir ── */
-      { subject: "il",    infinitive: "obéir",   sentence: "Il ________ aux ordres sans discuter.",                answer: "obéit",     difficulty: 1 },
-      { subject: "ils",   infinitive: "obéir",   sentence: "Ils ________ au signal et s'immobilisèrent.",          answer: "obéirent",  difficulty: 2 },
-
-      /* ── 2e GROUPE : rougir ── */
-      { subject: "elle",  infinitive: "rougir",  sentence: "Elle ________ en entendant ces mots.",                 answer: "rougit",    difficulty: 1 },
-      { subject: "ils",   infinitive: "rougir",  sentence: "Ils ________ de honte devant toute la cour.",          answer: "rougirent", difficulty: 2 }
+      /* ── NIVEAU 3 : saisie libre, sujet = groupe nominal, groupes mélangés (10) ── */
+      { level: 3, infinitive: "être",     sentence: "Les villageois ________ très surpris par la nouvelle.",        answer: "furent"     },
+      { level: 3, infinitive: "avoir",    sentence: "Le chevalier ________ très peur en traversant la forêt.",      answer: "eut"        },
+      { level: 3, infinitive: "chanter",  sentence: "Les enfants ________ une vieille chanson autour du feu.",      answer: "chantèrent" },
+      { level: 3, infinitive: "parler",   sentence: "Le vieux sage ________ avec beaucoup de sagesse.",             answer: "parla"      },
+      { level: 3, infinitive: "marcher",  sentence: "Les voyageurs ________ pendant des heures sans s'arrêter.",    answer: "marchèrent" },
+      { level: 3, infinitive: "regarder", sentence: "La foule ________ le coucher de soleil en silence.",           answer: "regarda"    },
+      { level: 3, infinitive: "trouver",  sentence: "Le chevalier ________ un trésor caché dans la grotte.",        answer: "trouva"     },
+      { level: 3, infinitive: "finir",    sentence: "La reine ________ son discours sous les applaudissements.",    answer: "finit"      },
+      { level: 3, infinitive: "choisir",  sentence: "Les habitants ________ leur chef après une longue discussion.", answer: "choisirent" },
+      { level: 3, infinitive: "grandir",  sentence: "Les arbres ________ vite dans cette forêt lointaine.",         answer: "grandirent" }
     ]
   },
 

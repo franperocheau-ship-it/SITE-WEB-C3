@@ -5300,6 +5300,9 @@
       } else if (currentType === "futur-groupes-niveaux") {
         cfutInitSession();
         return;
+      } else if (currentType === "passe-simple-groupes-niveaux") {
+        cpsInitSession();
+        return;
       } else if (currentType === "change-sujet-niveaux") {
         csjInitSession();
         return;
@@ -5505,8 +5508,6 @@
         renderWordOrder(card, q);
       } else if (currentType === "accord-ecrit") {
         renderAccordEcrit(card, q);
-      } else if (currentType === "text-input") {
-        renderTextInput(card, q);
       } else if (currentType === "produire-3-formes") {
         renderProduire3Formes(card, q);
       } else if (currentType === "mots-cliquables") {
@@ -5587,6 +5588,8 @@
         /* session managed by cimpInitSession — no-op here */
       } else if (currentType === "futur-groupes-niveaux") {
         /* session managed by cfutInitSession — no-op here */
+      } else if (currentType === "passe-simple-groupes-niveaux") {
+        /* session managed by cpsInitSession — no-op here */
       } else if (currentType === "decomposer-nombre-entier-niveaux") {
         /* session managed by dniInitSession — no-op here */
       } else if (currentType === "composer-nombre-entier-niveaux") {
@@ -6264,60 +6267,12 @@
 
     /* ── Helpers ──────────────────────────────────────────────────────────── */
 
-    /* ── Type: text-input ────────────────────────────────────────────────── */
-
     function normalize(str) {
       return str
         .toLowerCase()
         .trim()
         .replace(/\s+/g, ' ')
         .replace(/[''`´‘’]/g, '');
-    }
-
-    function renderTextInput(card, q) {
-      card.innerHTML = `
-        <p class="ex-question-label">Conjugue le verbe suivant dans la phrase.</p>
-        <div class="ex-verb-display">${q.infinitive}</div>
-        <div class="ex-sentence-display">${q.sentence}</div>
-        <div class="ex-input-row">
-          <input type="text" class="ex-text-input" id="ex-text-input"
-                 autocomplete="off" autocorrect="off" autocapitalize="off"
-                 spellcheck="false" placeholder="Ta réponse…">
-          <button class="ex-validate-btn" id="ex-validate-btn">Valider</button>
-        </div>
-        <div class="ex-feedback-area" id="feedback1"></div>
-        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
-      `;
-      const input  = document.getElementById("ex-text-input");
-      const valBtn = document.getElementById("ex-validate-btn");
-      setTimeout(() => input.focus(), 50);
-      valBtn.addEventListener("click", () => handleTextInput(q));
-      input.addEventListener("keydown", e => { if (e.key === "Enter") handleTextInput(q); });
-    }
-
-    function handleTextInput(q) {
-      const input  = document.getElementById("ex-text-input");
-      const valBtn = document.getElementById("ex-validate-btn");
-      if (!input.value.trim()) return;
-
-      input.disabled  = true;
-      valBtn.disabled = true;
-
-      const isRight = normalize(input.value) === normalize(q.answer);
-      input.classList.add(isRight ? "is-correct" : "is-wrong");
-
-      if (isRight) {
-        score++;
-        setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
-      } else {
-        setFeedback("feedback1", `
-          <div class="ex-feedback-wrong">
-            ❌ Ce n'est pas la bonne réponse.<br>
-            La bonne réponse était : <strong>${q.answer}</strong>
-          </div>
-        `);
-      }
-      showNextBtn();
     }
 
     /* ── Type: accord-ecrit ──────────────────────────────────────────────────
@@ -18814,6 +18769,354 @@
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
         exerciseType: 'futur-groupes-niveaux',
+        level:        'Niveau ' + level,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : passe-simple-groupes-niveaux — « Conjuguer au passé simple »
+       Niveau 1 : QCM + associer sujet↔forme (sujets pronoms, distracteurs
+                  imparfait/futur et pièges de terminaison)
+       Niveau 2 : 1er groupe (-a-) ou 2e/3e groupe/être/avoir (-i-/-u-) — choix
+                  binaire (motif step1/step2 déjà utilisé pour l'imparfait et
+                  le futur) puis saisie
+       Niveau 3 : saisie libre, sujet = groupe nominal, groupes mélangés
+       3 niveaux déverrouillables à 80 %. Un seul essai par question.
+       ════════════════════════════════════════════════════════════════════════ */
+
+    const CPS_SEUIL = 0.8;
+
+    const CPS_LV_DEFS = [
+      { lv: 1, desc: 'QCM et association : trouve la bonne forme' },
+      { lv: 2, desc: '1er groupe ou 2e/3e groupe (et être/avoir) ?' },
+      { lv: 3, desc: 'Écris la forme du verbe avec un autre sujet' }
+    ];
+
+    let cpsState = null;
+    let cpsLevelSelect = null;
+
+    function cpsBackToSelectScreen() {
+      cpsState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    /* ── Init : réinitialise et affiche le sélecteur de niveau ──────────── */
+    function cpsInitSession() {
+      cpsState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      cpsLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: CPS_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: CPS_SEUIL,
+        onSelectLevel: (lv) => cpsStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: cpsBackToSelectScreen
+      });
+      cpsLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function cpsStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const pool = shuffle((sessionData.bank || []).filter(item => item.level === lv));
+      const qs   = pool.slice(0, sessionData.questionsPerSession || 10);
+      cpsState   = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+      document.getElementById('q-total').textContent = qs.length;
+
+      cpsLevelSelect.renderBadges(lv);
+      cpsRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Affiche une question — dispatche sur le niveau + q.mode ─────────── */
+    function cpsRenderQuestion(card) {
+      const { questions, idx, total, level } = cpsState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if (level === 1 && q.mode === 'mcq')           cpsRenderMcq(card, q);
+      else if (level === 1 && q.mode === 'matching') cpsRenderMatching(card, q);
+      else if (level === 2)                          cpsRenderGroupeChoice(card, q);
+      else                                             cpsRenderTextInput(card, q);
+
+      document.getElementById('next-btn').addEventListener('click', () => {
+        cpsState.idx++;
+        if (cpsState.idx >= cpsState.questions.length) cpsShowLevelResults();
+        else cpsRenderQuestion(document.getElementById('ex-card'));
+      });
+    }
+
+    function cpsRenderMcq(card, q) {
+      const { idx, total } = cpsState;
+      card.innerHTML = `
+        <p class="ex-question-label">Quelle est la forme du verbe <em>${q.infinitive}</em> au passé simple avec ce sujet ?</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="cps-choices"></div>
+        <div class="ex-feedback-area" id="cps-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('cps-choices');
+      grid.innerHTML = shuffle(q.choices).map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => cpsHandleChoice(btn, q))
+      );
+    }
+
+    function cpsRenderMatching(card, q) {
+      const { idx, total } = cpsState;
+      card.innerHTML = `
+        <p class="ex-question-label">Associe ce sujet à la bonne forme du verbe <em>${q.infinitive}</em> au passé simple.</p>
+        <div class="ex-verb-display">${q.subject}</div>
+        <div class="ex-choices-grid" id="cps-choices"></div>
+        <div class="ex-feedback-area" id="cps-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('cps-choices');
+      grid.innerHTML = shuffle(q.forms).map(f => `<button class="ex-choice" data-value="${f}">${f}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => cpsHandleChoice(btn, q))
+      );
+    }
+
+    function cpsHandleChoice(btn, q) {
+      document.querySelectorAll('#cps-choices .ex-choice').forEach(b => b.disabled = true);
+      const isRight = btn.dataset.value === q.answer;
+      document.querySelectorAll('#cps-choices .ex-choice').forEach(b => {
+        if (b.dataset.value === q.answer) b.classList.add('is-correct');
+      });
+      if (!isRight) btn.classList.add('is-wrong');
+      if (isRight) {
+        cpsState.score++;
+        document.getElementById('cps-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+      } else {
+        document.getElementById('cps-fb').innerHTML = `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne forme.<br>
+            Avec « <strong>${q.subject}</strong> » : <strong>${q.answer}</strong>.
+          </div>
+        `;
+      }
+      document.getElementById('next-btn').classList.remove('ex-hidden');
+    }
+
+    /* ── Niveau 2 : choix du groupe (step1) puis saisie (step2) ─────────── */
+    function cpsRenderGroupeChoice(card, q) {
+      const { idx, total } = cpsState;
+      let step1Correct = false;
+
+      card.innerHTML = `
+        <p class="ex-question-label">Ce verbe est-il du <strong>1er groupe</strong> au passé simple (terminaisons en <em>-a-</em>) ?</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div id="cps-step1">
+          <div class="ex-group-row" id="cps-grp-btns">
+            <button class="ex-group-btn" data-g1="true">1er groupe (-a-)</button>
+            <button class="ex-group-btn" data-g1="false">2e/3e groupe, être, avoir (-i-/-u-)</button>
+          </div>
+          <div class="ex-feedback-area" id="cps-fb1"></div>
+        </div>
+        <div id="cps-step2" class="ex-hidden">
+          <div class="ex-step2-divider"></div>
+          <p class="ex-question-label">Conjugue maintenant le verbe dans la phrase.</p>
+          <div class="ex-sentence-display">${q.sentence}</div>
+          <div class="ex-input-row">
+            <input type="text" class="ex-text-input" id="cps-input"
+                   autocomplete="off" autocorrect="off" autocapitalize="off"
+                   spellcheck="false" placeholder="Ta réponse…">
+            <button class="ex-validate-btn" id="cps-val-btn">Valider</button>
+          </div>
+          <div class="ex-feedback-area" id="cps-fb2"></div>
+        </div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+
+      card.querySelectorAll('#cps-grp-btns .ex-group-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          card.querySelectorAll('#cps-grp-btns .ex-group-btn').forEach(b => b.disabled = true);
+          const chosenG1 = btn.dataset.g1 === 'true';
+          step1Correct = chosenG1 === q.groupe1;
+
+          card.querySelectorAll('#cps-grp-btns .ex-group-btn').forEach(b => {
+            if ((b.dataset.g1 === 'true') === q.groupe1) b.classList.add('is-correct');
+          });
+          if (!step1Correct) btn.classList.add('is-wrong');
+
+          document.getElementById('cps-fb1').innerHTML = step1Correct
+            ? `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`
+            : `<div class="ex-feedback-wrong">❌ « ${q.infinitive} » est ${q.groupe1 ? 'du 1er groupe' : 'du 2e/3e groupe (ou être/avoir)'} au passé simple.</div>`;
+
+          setTimeout(() => {
+            document.getElementById('cps-step2').classList.remove('ex-hidden');
+            document.getElementById('cps-step2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            setTimeout(() => document.getElementById('cps-input')?.focus(), 80);
+          }, 650);
+        });
+      });
+
+      function submit() {
+        const input  = document.getElementById('cps-input');
+        const valBtn = document.getElementById('cps-val-btn');
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          if (step1Correct) cpsState.score++;
+          const extra = step1Correct ? '' : '<br><small style="font-size:12px">Pense à bien identifier le groupe d\'abord !</small>';
+          document.getElementById('cps-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}${extra}</div>`;
+        } else {
+          document.getElementById('cps-fb2').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.answer}</strong>
+            </div>
+          `;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+
+      document.getElementById('cps-val-btn').addEventListener('click', submit);
+      document.getElementById('cps-input').addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    }
+
+    function cpsRenderTextInput(card, q) {
+      const { idx, total } = cpsState;
+      card.innerHTML = `
+        <p class="ex-question-label">Conjugue le verbe suivant au passé simple.</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="cps-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="cps-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="cps-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const input  = document.getElementById('cps-input');
+      const valBtn = document.getElementById('cps-val-btn');
+      setTimeout(() => input.focus(), 50);
+
+      function submit() {
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+
+        const isRight = normalize(input.value) === normalize(q.answer);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          cpsState.score++;
+          document.getElementById('cps-fb').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+        } else {
+          document.getElementById('cps-fb').innerHTML = `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              La bonne réponse était : <strong>${q.answer}</strong>
+            </div>
+          `;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+
+      valBtn.addEventListener('click', submit);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    }
+
+    /* ── Résultats de fin de niveau ───────────────────────────────────────── */
+    function cpsShowLevelResults() {
+      const { level, score: lvScore, total } = cpsState;
+      const { passed, pct, isLast } = cpsLevelSelect.completeLevel(level, lvScore, total);
+      const pctPct = Math.round(pct * 100);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-conjugaison.html';
+      const backLabel = `← Retour à ${sessionData.backLink?.label || 'la Conjugaison'}`;
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const backToSelectBtn = cpsLevelSelect.backToSelectButtonHTML();
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises la conjugaison au passé simple !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cps-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cps-next-btn">Niveau ${level + 1} →</button>
+          <button class="ex-btn-secondary" id="cps-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * CPS_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour débloquer le niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cps-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
+
+      document.getElementById('cps-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cpsStartLevel(cpsState.level);
+      });
+      document.getElementById('cps-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cpsStartLevel(level + 1);
+      });
+      document.getElementById('cps-restart-btn')?.addEventListener('click', () => {
+        cpsLevelSelect.reset();
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cpsInitSession();
+      });
+      cpsLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'passe-simple-groupes-niveaux',
         level:        'Niveau ' + level,
         score:        lvScore,
         total,
