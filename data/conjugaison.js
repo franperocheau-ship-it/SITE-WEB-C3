@@ -1724,163 +1724,72 @@ Object.assign(window.EXERCISE_DATA, {
     }
   },
 
+  /* ══════════════════════════════════════════════════════════════════════════
+     Type : plus-que-parfait-groupes-niveaux
+     Niveau 1 : QCM (5) + associer sujet↔forme (5) — sujets = pronoms,
+                distracteurs = confusion avec le passé composé (aux. au présent
+                vs à l'imparfait) et l'imparfait simple, mélange avoir/être.
+     Niveau 2 : SPÉCIFICITÉ — choix binaire avant saisie : le verbe se
+                conjugue-t-il avec être ou avoir au plus-que-parfait ? Réutilise
+                le motif step1/step2 déjà utilisé pour l'imparfait (hasIss), le
+                futur (regRadical) et le passé simple (groupe1). Les 10 phrases
+                reprennent telles quelles l'ancienne banque writeBank.
+     Niveau 3 : saisie libre, sujet = groupe nominal. Couvre la matrice
+                d'accord complète du participe avec être (masc./fém.
+                singulier/pluriel + piège d'accord mixte), sur le modèle de
+                ortho-accorder-participe-passe-etre (data/orthographe.js).
+     Progression verrouillée : seuil 80 %, persistance sessionStorage.
+  ══════════════════════════════════════════════════════════════════════════ */
+
   "conjuguer-plus-que-parfait": {
     title: "Conjuguer au plus-que-parfait",
     domaine:    "Français",
     competence: "Conjugaison — Plus-que-parfait",
-    levels: ["CM2", "6e"],
-    paliers: 2, /* nombre réel de paliers du moteur */
-    type: "pqp-niveaux",
+    type:       "plus-que-parfait-groupes-niveaux",
+    levels:     ["CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
-    /* ── Niveau 1 : 4 textes d'identification ───────────────────────────────
-       tokens : {t: texte, v: true = groupe verbal cliquable, pqp: true = cible}
-       Pièges : passé composé (auxiliaire au PRÉSENT) vs plus-que-parfait (aux à l'IMPARFAIT)
-    ──────────────────────────────────────────────────────────────────────── */
-    identTexts: [
-      /* Texte 1 — Le voyage en famille */
-      {
-        tokens: [
-          { t: "La veille du voyage, maman " },
-          { t: "avait préparé", v: true, pqp: true },
-          { t: " les valises avec soin. Le matin, Paul " },
-          { t: "s'était levé", v: true, pqp: true },
-          { t: " très tôt. Il réveilla sa sœur qui dormait encore. Ils " },
-          { t: "ont pris", v: true, pqp: false },
-          { t: " le train et " },
-          { t: "sont arrivés", v: true, pqp: false },
-          { t: " à destination." }
-        ]
-      },
-      /* Texte 2 — Le renard */
-      {
-        tokens: [
-          { t: "Ce soir-là, Léa raconta qu'elle " },
-          { t: "avait vu", v: true, pqp: true },
-          { t: " un renard dans le jardin. Son frère " },
-          { t: "a dessiné", v: true, pqp: false },
-          { t: " l'animal dans son cahier, mais il " },
-          { t: "avait oublié", v: true, pqp: true },
-          { t: " d'écrire son nom. Il " },
-          { t: "est rentré", v: true, pqp: false },
-          { t: " chez lui sans son dessin." }
-        ]
-      },
-      /* Texte 3 — Le château enchanté */
-      {
-        tokens: [
-          { t: "La sorcière habitait un château sombre. Avant l'arrivée du héros, elle " },
-          { t: "avait préparé", v: true, pqp: true },
-          { t: " un piège terrible. Les gardes " },
-          { t: "avaient fermé", v: true, pqp: true },
-          { t: " toutes les portes. Le héros " },
-          { t: "a frappé", v: true, pqp: false },
-          { t: " à la porte et " },
-          { t: "a crié", v: true, pqp: false },
-          { t: " son nom. Personne ne répondit." }
-        ]
-      },
-      /* Texte 4 — Jules à l'école */
-      {
-        tokens: [
-          { t: "Jules " },
-          { t: "était arrivé", v: true, pqp: true },
-          { t: " en avance car il " },
-          { t: "avait fini", v: true, pqp: true },
-          { t: " ses devoirs dès le réveil. La maîtresse " },
-          { t: "a regardé", v: true, pqp: false },
-          { t: " son travail et " },
-          { t: "a souri", v: true, pqp: false },
-          { t: ". Il lui " },
-          { t: "a montré", v: true, pqp: false },
-          { t: " fièrement son cahier." }
-        ]
-      }
-    ],
+    bank: [
+      /* ── NIVEAU 1 : QCM (5) — distracteurs passé composé/imparfait ── */
+      { level: 1, mode: "mcq", infinitive: "préparer", subject: "elle", choices: ["avait préparé", "a préparé", "préparait", "préparera"], answer: "avait préparé" },
+      { level: 1, mode: "mcq", infinitive: "partir",   subject: "elle", choices: ["était partie", "est partie", "partait", "partira"], answer: "était partie" },
+      { level: 1, mode: "mcq", infinitive: "manger",   subject: "nous", choices: ["avions mangé", "avons mangé", "mangions", "mangerons"], answer: "avions mangé" },
+      { level: 1, mode: "mcq", infinitive: "venir",    subject: "ils",  choices: ["étaient venus", "sont venus", "venaient", "viendront"], answer: "étaient venus" },
+      { level: 1, mode: "mcq", infinitive: "finir",    subject: "tu",   choices: ["avais fini", "as fini", "finissais", "finiras"], answer: "avais fini" },
 
-    /* ── Niveau 2 : 10 phrases à trous ────────────────────────────────────
-       sentence : phrase avec ___ (trou) et (infinitif) comme aide
-       answers  : formes acceptées (tableau, pour couvrir variations genre)
-       auxVerb  : "avoir" | "être" — pour orienter le message d'erreur
-       explication : règle rappelée en cas d'erreur
-    ──────────────────────────────────────────────────────────────────────── */
-    writeBank: [
-      {
-        sentence:    "Quand nous sommes arrivés, le film (commencer) ___ déjà.",
-        answers:     ["avait commencé"],
-        auxVerb:     "avoir",
-        explication: "Le film → il : <strong>avait</strong> (avoir à l'imparfait) + <strong>commencé</strong> (participe invariable)."
-      },
-      {
-        sentence:    "Elle (partir) ___ bien avant que la pluie tombe.",
-        answers:     ["était partie"],
-        auxVerb:     "être",
-        explication: "Partir prend être : <strong>était</strong> (être à l'imparfait) + <strong>partie</strong> (accord avec elle → -e)."
-      },
-      {
-        sentence:    "Ils (manger) ___ avant d'aller jouer.",
-        answers:     ["avaient mangé"],
-        auxVerb:     "avoir",
-        explication: "Plus-que-parfait avec avoir : <strong>avaient</strong> + <strong>mangé</strong> (participe invariable)."
-      },
-      {
-        sentence:    "Tu (finir) ___ tes devoirs quand le téléphone a sonné.",
-        answers:     ["avais fini"],
-        auxVerb:     "avoir",
-        explication: "Plus-que-parfait avec avoir : <strong>avais</strong> + <strong>fini</strong> (participe invariable)."
-      },
-      {
-        sentence:    "Il (se lever) ___ si tôt qu'il n'y avait personne dans la rue.",
-        answers:     ["s'était levé"],
-        auxVerb:     "être",
-        explication: "Verbe pronominal avec être : <strong>s'était</strong> + <strong>levé</strong> (accord avec il → pas de -e)."
-      },
-      {
-        sentence:    "Vous (lire) ___ ce roman avant d'en discuter en classe.",
-        answers:     ["aviez lu"],
-        auxVerb:     "avoir",
-        explication: "Plus-que-parfait avec avoir : <strong>aviez</strong> + <strong>lu</strong> (participe invariable)."
-      },
-      {
-        sentence:    "Le chat (manger) ___ toute la nourriture avant notre retour.",
-        answers:     ["avait mangé"],
-        auxVerb:     "avoir",
-        explication: "Le chat → il : <strong>avait</strong> + <strong>mangé</strong> (participe invariable)."
-      },
-      {
-        sentence:    "Elles (rentrer) ___ depuis une heure quand il a téléphoné.",
-        answers:     ["étaient rentrées"],
-        auxVerb:     "être",
-        explication: "Rentrer prend être : <strong>étaient</strong> + <strong>rentrées</strong> (accord féminin pluriel → -ées)."
-      },
-      {
-        sentence:    "Nous (faire) ___ nos valises avant que le taxi arrive.",
-        answers:     ["avions fait"],
-        auxVerb:     "avoir",
-        explication: "Plus-que-parfait avec avoir : <strong>avions</strong> + <strong>fait</strong> (participe invariable)."
-      },
-      {
-        sentence:    "Comme j'(oublier) ___ mon sac, je suis retourné le chercher.",
-        answers:     ["avais oublié"],
-        auxVerb:     "avoir",
-        explication: "J' → je : <strong>avais</strong> + <strong>oublié</strong> (participe invariable)."
-      }
-    ],
-    niveauxConfig: {
-      rule:             "Plus-que-parfait = auxiliaire <em>être</em> ou <em>avoir</em> à l'imparfait + participe passé",
-      lvDefs: [
-        { lv: 1, icon: '⭐',   label: 'Niveau 1 — Repère le plus-que-parfait', desc: 'Lis un texte, identifie les verbes au plus-que-parfait' },
-        { lv: 2, icon: '⭐⭐', label: 'Niveau 2 — Complète au plus-que-parfait', desc: 'Conjugue des phrases à trous au plus-que-parfait' }
-      ],
-      verb1Instruction: "Clique sur les verbes au <strong>plus-que-parfait</strong>, puis valide.",
-      verb1NotTarget:   "n'est pas au plus-que-parfait : l'auxiliaire n'est pas à l'imparfait",
-      verb1TargetName:  "plus-que-parfait",
-      verb1FoundAll:    "Tu as trouvé tous les plus-que-parfaits !",
-      verb2Instruction: "Conjugue le verbe au <strong>plus-que-parfait</strong>.",
-      lv2NextBtnLabel:  "Niveau 2 — Complète →",
-      winMsg:           "Tu maîtrises le plus-que-parfait aux deux niveaux !"
-    }
+      /* ── NIVEAU 1 : associer sujet ↔ forme (5) ── */
+      { level: 1, mode: "matching", infinitive: "chanter", subject: "Elle",  forms: ["avais chanté", "avait chanté", "avions chanté", "aviez chanté", "avaient chanté"], answer: "avait chanté" },
+      { level: 1, mode: "matching", infinitive: "finir",   subject: "Ils",   forms: ["avais fini", "avait fini", "avions fini", "aviez fini", "avaient fini"], answer: "avaient fini" },
+      { level: 1, mode: "matching", infinitive: "partir",  subject: "Il",    forms: ["étais parti", "était parti", "étions partis", "étiez partis", "étaient partis"], answer: "était parti" },
+      { level: 1, mode: "matching", infinitive: "venir",   subject: "Elles", forms: ["étais venue", "était venue", "étions venues", "étiez venues", "étaient venues"], answer: "étaient venues" },
+      { level: 1, mode: "matching", infinitive: "manger",  subject: "Vous",  forms: ["avais mangé", "avait mangé", "avions mangé", "aviez mangé", "avaient mangé"], answer: "aviez mangé" },
+
+      /* ── NIVEAU 2 : être ou avoir ? (10) — reprise telle quelle de l'ancienne writeBank ── */
+      { level: 2, infinitive: "débuter",   sentence: "Quand nous sommes arrivés, le film ________.",                     answer: "avait débuté",    auxEtre: false },
+      { level: 2, infinitive: "partir",    sentence: "Elle ________ bien avant que la pluie tombe.",                     answer: "était partie",    auxEtre: true  },
+      { level: 2, infinitive: "manger",    sentence: "Ils ________ avant d'aller jouer.",                                answer: "avaient mangé",   auxEtre: false },
+      { level: 2, infinitive: "finir",     sentence: "Tu ________ tes devoirs quand le téléphone a sonné.",              answer: "avais fini",      auxEtre: false },
+      { level: 2, infinitive: "se lever",  sentence: "Il ________ si tôt qu'il n'y avait personne dans la rue.",         answer: "s'était levé",    auxEtre: true  },
+      { level: 2, infinitive: "lire",      sentence: "Vous ________ ce roman avant d'en discuter en classe.",            answer: "aviez lu",        auxEtre: false },
+      { level: 2, infinitive: "manger",    sentence: "Le chat ________ toute la nourriture avant notre retour.",         answer: "avait mangé",     auxEtre: false },
+      { level: 2, infinitive: "rentrer",   sentence: "Elles ________ depuis une heure quand il a téléphoné.",            answer: "étaient rentrées", auxEtre: true  },
+      { level: 2, infinitive: "faire",     sentence: "Nous ________ nos valises avant que le taxi arrive.",              answer: "avions fait",     auxEtre: false },
+      { level: 2, infinitive: "oublier",   sentence: "Comme j'________ mon sac, je suis retourné le chercher.",          answer: "avais oublié",    auxEtre: false },
+
+      /* ── NIVEAU 3 : saisie libre, sujet = GN, matrice d'accord être/avoir (10) ── */
+      { level: 3, infinitive: "déposer",  sentence: "Le facteur ________ le colis avant midi.",                          answer: "avait déposé"     },
+      { level: 3, infinitive: "finir",    sentence: "Les enfants ________ leurs devoirs avant le dîner.",                answer: "avaient fini"     },
+      { level: 3, infinitive: "préparer", sentence: "La sorcière ________ un piège terrible avant l'arrivée du héros.",  answer: "avait préparé"    },
+      { level: 3, infinitive: "fermer",   sentence: "Les gardes ________ toutes les portes avant l'aube.",               answer: "avaient fermé"    },
+      { level: 3, infinitive: "manger",   sentence: "Le chien ________ tout son repas avant notre retour.",              answer: "avait mangé"      },
+      { level: 3, infinitive: "arriver",  sentence: "Jules ________ en avance ce matin-là.",                             answer: "était arrivé"     },
+      { level: 3, infinitive: "arriver",  sentence: "La reine ________ la première dans la salle du trône.",             answer: "était arrivée"    },
+      { level: 3, infinitive: "partir",   sentence: "Les voyageurs ________ tôt ce matin-là, avant le lever du soleil.", answer: "étaient partis"   },
+      { level: 3, infinitive: "rentrer",  sentence: "Les filles ________ avant la tombée de la nuit.",                   answer: "étaient rentrées" },
+      { level: 3, infinitive: "venir",    sentence: "Paul et Marie ________ ensemble à la fête, main dans la main.",     answer: "étaient venus"    }
+    ]
   },
 
   "conjuguer-imperatif-present": {
