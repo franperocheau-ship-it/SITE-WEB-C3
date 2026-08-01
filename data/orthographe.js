@@ -317,272 +317,136 @@ Object.assign(window.EXERCISE_DATA, {
   },
 
   "ortho-accorder-participe-passe-cod": {
-    title: "Accorder le participe passé avec le COD",
+    title:      "Accorder le participe passé avec le COD",
     domaine:    "Français",
     competence: "Orthographe — Accord participe passé (COD)",
-    type:  "accord-participe-cod",
-    levels: ["CM2", "6e"],
-    paliers: 2, /* nombre réel de paliers du moteur */
-    questionsPerSession: 8,
+    type:       "accord-cod-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    questionsPerSession: 10,
     backLink: { href: "français-orthographe.html", label: "Orthographe" },
 
-    /* ── Banque de phrases ──────────────────────────────────────────────────
-       Chaque phrase contient un participe passé à compléter (marqué ___).
-       Trois situations :
-         A. COD placé AVANT le verbe via pronom relatif « que/qu' »  → accord
-         B. COD placé AVANT le verbe via déplacement + pronom perso  → accord
-         C. COD placé APRÈS le verbe ou absent                       → invariable
-       Champs :
-         sentence    — phrase affichée (avec « ___ » comme emplacement)
-         base        — forme de base du participe (masc. sing.)
-         answer      — forme correcte attendue
-         hasCodBefore — true si le COD est placé avant le verbe
-         choices     — boutons du niveau 1 : { label, isCorrect, gender?, number? }
-         codHint     — explication d'accord affichée après l'étape 1 (niv. 1)
-         explanation — explication complète pour le feedback de l'étape 2
-    ────────────────────────────────────────────────────────────────────── */
-    bank: [
+    /* ── Niveau 1 — raisonnement guidé (10 items) ─────────────────────────
+       Étape 1 (mots-cliquables) : clique sur le COD, placé avant le verbe
+                                    via le pronom relatif « que/qu' ».
+       Étape 2 (classification)  : genre + nombre du COD, combinés.
+       Étape 3 (saisie)          : participe passé accordé.
+       infinitive — verbe à l'infinitif, affiché au-dessus de la phrase
+       codWords — mots du GN-COD (cliquables)      codCore — noyau du GN-COD
+       gender — "m" | "f"   number — "s" | "p"
+    ─────────────────────────────────────────────────────────────────── */
+    level1Bank: [
+      { codWords: ["Les", "photos"],  codCore: "photos",  codPhrase: "les photos",
+        gender: "f", number: "p", base: "pris", infinitive: "prendre",
+        sentence: "Les photos que j'ai ___ sont magnifiques.", answer: "prises" },
+      { codWords: ["La", "lettre"],   codCore: "lettre",  codPhrase: "la lettre",
+        gender: "f", number: "s", base: "écrit", infinitive: "écrire",
+        sentence: "La lettre qu'il a ___ était très longue.", answer: "écrite" },
+      { codWords: ["Les", "livres"],  codCore: "livres",  codPhrase: "les livres",
+        gender: "m", number: "p", base: "lu", infinitive: "lire",
+        sentence: "Les livres que nous avons ___ étaient passionnants.", answer: "lus" },
+      { codWords: ["La", "tarte"],    codCore: "tarte",   codPhrase: "la tarte",
+        gender: "f", number: "s", base: "fait", infinitive: "faire",
+        sentence: "La tarte que ma mère a ___ est délicieuse.", answer: "faite" },
+      { codWords: ["Les", "chansons"], codCore: "chansons", codPhrase: "les chansons",
+        gender: "f", number: "p", base: "chanté", infinitive: "chanter",
+        sentence: "Les chansons qu'elles ont ___ étaient belles.", answer: "chantées" },
+      { codWords: ["La", "robe"],     codCore: "robe",    codPhrase: "la robe",
+        gender: "f", number: "s", base: "choisi", infinitive: "choisir",
+        sentence: "La robe que Julie a ___ est magnifique.", answer: "choisie" },
+      { codWords: ["Les", "devoirs"], codCore: "devoirs", codPhrase: "les devoirs",
+        gender: "m", number: "p", base: "rendu", infinitive: "rendre",
+        sentence: "Les devoirs que les élèves ont ___ étaient difficiles.", answer: "rendus" },
+      { codWords: ["La", "voiture"],  codCore: "voiture", codPhrase: "la voiture",
+        gender: "f", number: "s", base: "acheté", infinitive: "acheter",
+        sentence: "La voiture que mon père a ___ est rouge.", answer: "achetée" },
+      { codWords: ["Les", "fleurs"],  codCore: "fleurs",  codPhrase: "les fleurs",
+        gender: "f", number: "p", base: "cueilli", infinitive: "cueillir",
+        sentence: "Les fleurs que tu as ___ sentent bon.", answer: "cueillies" },
+      { codWords: ["La", "leçon"],    codCore: "leçon",   codPhrase: "la leçon",
+        gender: "f", number: "s", base: "expliqué", infinitive: "expliquer",
+        sentence: "La leçon que l'enseignante a ___ était très claire.", answer: "expliquée" }
+    ],
 
-      /* ── A : COD avant le verbe — pronom relatif « que / qu' » ─────────── */
-      {
-        sentence:     "Les photos que j'ai ___ sont magnifiques.",
-        base:         "pris", answer: "prises",
-        hasCodBefore: true,
-        choices: [
-          { label: "les photos",                 isCorrect: true,  gender: "f", number: "p" },
-          { label: "Pas de COD avant le verbe",  isCorrect: false }
-        ],
-        codHint:     "Le COD « les photos » est féminin pluriel.",
-        explanation: "Le COD « les photos » (féminin pluriel) est avant le verbe → « prises »."
-      },
-      {
-        sentence:     "La lettre qu'il a ___ était très longue.",
-        base:         "écrit", answer: "écrite",
-        hasCodBefore: true,
-        choices: [
-          { label: "la lettre",                  isCorrect: true,  gender: "f", number: "s" },
-          { label: "Pas de COD avant le verbe",  isCorrect: false }
-        ],
-        codHint:     "Le COD « la lettre » est féminin singulier.",
-        explanation: "Le COD « la lettre » (féminin singulier) est avant le verbe → « écrite »."
-      },
-      {
-        sentence:     "Les livres que nous avons ___ étaient passionnants.",
-        base:         "lu", answer: "lus",
-        hasCodBefore: true,
-        choices: [
-          { label: "les livres",                 isCorrect: true,  gender: "m", number: "p" },
-          { label: "nous",                       isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: false }
-        ],
-        codHint:     "Le COD « les livres » est masculin pluriel.",
-        explanation: "Le COD « les livres » (masculin pluriel) est avant le verbe → « lus »."
-      },
-      {
-        sentence:     "La tarte que ma mère a ___ est délicieuse.",
-        base:         "fait", answer: "faite",
-        hasCodBefore: true,
-        choices: [
-          { label: "la tarte",                   isCorrect: true,  gender: "f", number: "s" },
-          { label: "ma mère",                    isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: false }
-        ],
-        codHint:     "Le COD « la tarte » est féminin singulier.",
-        explanation: "Le COD « la tarte » (féminin singulier) est avant le verbe → « faite »."
-      },
-      {
-        sentence:     "Les chansons qu'elles ont ___ étaient belles.",
-        base:         "chanté", answer: "chantées",
-        hasCodBefore: true,
-        choices: [
-          { label: "les chansons",               isCorrect: true,  gender: "f", number: "p" },
-          { label: "Pas de COD avant le verbe",  isCorrect: false }
-        ],
-        codHint:     "Le COD « les chansons » est féminin pluriel.",
-        explanation: "Le COD « les chansons » (féminin pluriel) est avant le verbe → « chantées »."
-      },
-      {
-        sentence:     "La robe que Julie a ___ est magnifique.",
-        base:         "choisi", answer: "choisie",
-        hasCodBefore: true,
-        choices: [
-          { label: "la robe",                    isCorrect: true,  gender: "f", number: "s" },
-          { label: "Julie",                      isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: false }
-        ],
-        codHint:     "Le COD « la robe » est féminin singulier.",
-        explanation: "Le COD « la robe » (féminin singulier) est avant le verbe → « choisie »."
-      },
-      {
-        sentence:     "Les devoirs que les élèves ont ___ étaient difficiles.",
-        base:         "rendu", answer: "rendus",
-        hasCodBefore: true,
-        choices: [
-          { label: "les devoirs",                isCorrect: true,  gender: "m", number: "p" },
-          { label: "les élèves",                 isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: false }
-        ],
-        codHint:     "Le COD « les devoirs » est masculin pluriel.",
-        explanation: "Le COD « les devoirs » (masculin pluriel) est avant le verbe → « rendus »."
-      },
-      {
-        sentence:     "La voiture que mon père a ___ est rouge.",
-        base:         "acheté", answer: "achetée",
-        hasCodBefore: true,
-        choices: [
-          { label: "la voiture",                 isCorrect: true,  gender: "f", number: "s" },
-          { label: "mon père",                   isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: false }
-        ],
-        codHint:     "Le COD « la voiture » est féminin singulier.",
-        explanation: "Le COD « la voiture » (féminin singulier) est avant le verbe → « achetée »."
-      },
-      {
-        sentence:     "Les fleurs que tu as ___ sentent bon.",
-        base:         "cueilli", answer: "cueillies",
-        hasCodBefore: true,
-        choices: [
-          { label: "les fleurs",                 isCorrect: true,  gender: "f", number: "p" },
-          { label: "Pas de COD avant le verbe",  isCorrect: false }
-        ],
-        codHint:     "Le COD « les fleurs » est féminin pluriel.",
-        explanation: "Le COD « les fleurs » (féminin pluriel) est avant le verbe → « cueillies »."
-      },
-      {
-        sentence:     "La leçon que l'enseignante a ___ était très claire.",
-        base:         "expliqué", answer: "expliquée",
-        hasCodBefore: true,
-        choices: [
-          { label: "la leçon",                   isCorrect: true,  gender: "f", number: "s" },
-          { label: "l'enseignante",              isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: false }
-        ],
-        codHint:     "Le COD « la leçon » est féminin singulier.",
-        explanation: "Le COD « la leçon » (féminin singulier) est avant le verbe → « expliquée »."
-      },
+    /* ── Niveau 2 — écriture directe, sans aide (10 items) ────────────────
+       COD placé avant le verbe via déplacement + reprise par un pronom
+       personnel (l', les) : l'élève doit repérer seul le COD et accorder.
+       infinitive — verbe à l'infinitif, affiché au-dessus de la phrase
+    ─────────────────────────────────────────────────────────────────── */
+    level2Bank: [
+      { base: "regardé",  infinitive: "regarder", sentence: "Cette émission, je l'ai ___ deux fois.",
+        answer: "regardée", explanation: "Le COD « cette émission », repris par « l' », est féminin singulier → « regardée »." },
+      { base: "préparé",  infinitive: "préparer", sentence: "Ces gâteaux, maman les a ___ ce matin.",
+        answer: "préparés", explanation: "Le COD « ces gâteaux », repris par « les », est masculin pluriel → « préparés »." },
+      { base: "mis",      infinitive: "mettre", sentence: "Mes clés, je les ai ___ dans mon sac.",
+        answer: "mises", explanation: "Le COD « mes clés », repris par « les », est féminin pluriel → « mises »." },
+      { base: "lu",       infinitive: "lire", sentence: "Ce livre, je l'ai ___ deux fois.",
+        answer: "lu", explanation: "Le COD « ce livre », repris par « l' », est masculin singulier → « lu » (pas de terminaison supplémentaire)." },
+      { base: "acheté",   infinitive: "acheter", sentence: "Cette maison, mes parents l'ont ___ l'an dernier.",
+        answer: "achetée", explanation: "Le COD « cette maison », repris par « l' », est féminin singulier → « achetée »." },
+      { base: "pris",     infinitive: "prendre", sentence: "Ces photos, je les ai ___ pendant les vacances.",
+        answer: "prises", explanation: "Le COD « ces photos », repris par « les », est féminin pluriel → « prises »." },
+      { base: "mangé",    infinitive: "manger", sentence: "Ce gâteau, je l'ai ___ hier soir.",
+        answer: "mangé", explanation: "Le COD « ce gâteau », repris par « l' », est masculin singulier → « mangé » (pas de terminaison supplémentaire)." },
+      { base: "raconté",  infinitive: "raconter", sentence: "Cette histoire, il l'a ___ en classe.",
+        answer: "racontée", explanation: "Le COD « cette histoire », repris par « l' », est féminin singulier → « racontée »." },
+      { base: "rendu",    infinitive: "rendre", sentence: "Ces devoirs, les élèves les ont ___ à temps.",
+        answer: "rendus", explanation: "Le COD « ces devoirs », repris par « les », est masculin pluriel → « rendus »." },
+      { base: "envoyé",   infinitive: "envoyer", sentence: "Ce message, je l'ai ___ ce matin.",
+        answer: "envoyé", explanation: "Le COD « ce message », repris par « l' », est masculin singulier → « envoyé » (pas de terminaison supplémentaire)." }
+    ],
 
-      /* ── B : COD avant le verbe — déplacement + pronom personnel ──────── */
-      {
-        sentence:     "Cette émission, je l'ai ___ deux fois.",
-        base:         "regardé", answer: "regardée",
-        hasCodBefore: true,
-        choices: [
-          { label: "cette émission (→ l')",      isCorrect: true,  gender: "f", number: "s" },
-          { label: "deux fois",                  isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: false }
-        ],
-        codHint:     "Le COD « cette émission », repris par « l' », est féminin singulier.",
-        explanation: "Le COD « cette émission » (féminin singulier, repris par « l' ») est avant le verbe → « regardée »."
-      },
-      {
-        sentence:     "Ces gâteaux, maman les a ___ ce matin.",
-        base:         "préparé", answer: "préparés",
-        hasCodBefore: true,
-        choices: [
-          { label: "ces gâteaux (→ les)",        isCorrect: true,  gender: "m", number: "p" },
-          { label: "ce matin",                   isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: false }
-        ],
-        codHint:     "Le COD « ces gâteaux », repris par « les », est masculin pluriel.",
-        explanation: "Le COD « ces gâteaux » (masculin pluriel, repris par « les ») est avant le verbe → « préparés »."
-      },
-      {
-        sentence:     "Mes clés, je les ai ___ dans mon sac.",
-        base:         "mis", answer: "mises",
-        hasCodBefore: true,
-        choices: [
-          { label: "mes clés (→ les)",           isCorrect: true,  gender: "f", number: "p" },
-          { label: "mon sac",                    isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: false }
-        ],
-        codHint:     "Le COD « mes clés », repris par « les », est féminin pluriel.",
-        explanation: "Le COD « mes clés » (féminin pluriel, repris par « les ») est avant le verbe → « mises »."
-      },
+    /* ── Niveau 3 — accord ou pas d'accord (12 items) ─────────────────────
+       Étape 1 (classification) : le COD est-il placé avant le verbe ?
+                                   → « Accord » ou « Pas d'accord ».
+       Étape 2 (saisie)         : forme correcte (accordée ou invariable).
+       hasCodBefore — true si le COD est placé avant le verbe (accord)
+       infinitive   — verbe à l'infinitif, affiché au-dessus de la phrase
+       Plusieurs paires minimales (même verbe, avec/sans COD antéposé) pour
+       bien faire sentir le mécanisme : cueilli/cueillies, visité/visitée,
+       envoyé/envoyée, rangé/rangés.
+    ─────────────────────────────────────────────────────────────────── */
+    level3Bank: [
+      /* ── Accord : COD antéposé ── */
+      { base: "visité",  infinitive: "visiter", hasCodBefore: true,
+        sentence: "La maison, nous l'avons ___ hier.", answer: "visitée",
+        explanation: "Le COD « la maison » (féminin singulier, repris par « l' ») est avant le verbe → « visitée »." },
+      { base: "envoyé",  infinitive: "envoyer", hasCodBefore: true,
+        sentence: "La lettre qu'elle a ___ est arrivée à temps.", answer: "envoyée",
+        explanation: "Le COD « la lettre » (féminin singulier) est avant le verbe → « envoyée »." },
+      { base: "rangé",   infinitive: "ranger", hasCodBefore: true,
+        sentence: "Les jouets que les enfants ont ___ étaient neufs.", answer: "rangés",
+        explanation: "Le COD « les jouets » (masculin pluriel) est avant le verbe → « rangés »." },
+      { base: "cueilli", infinitive: "cueillir", hasCodBefore: true,
+        sentence: "Les fraises que j'ai ___ étaient sucrées.", answer: "cueillies",
+        explanation: "Le COD « les fraises » (féminin pluriel) est avant le verbe → « cueillies »." },
+      { base: "écrit",   infinitive: "écrire", hasCodBefore: true,
+        sentence: "Les lettres qu'il a ___ hier sont arrivées.", answer: "écrites",
+        explanation: "Le COD « les lettres » (féminin pluriel) est avant le verbe → « écrites »." },
 
-      /* ── C : COD après le verbe → pas d'accord ──────────────────────── */
-      {
-        sentence:     "J'ai ___ des fraises dans le jardin.",
-        base:         "cueilli", answer: "cueilli",
-        hasCodBefore: false,
-        choices: [
-          { label: "des fraises",                isCorrect: false },
-          { label: "le jardin",                  isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: true }
-        ],
-        codHint:     "",
-        explanation: "Le COD « des fraises » est placé APRÈS le verbe → pas d'accord : « cueilli »."
-      },
-      {
-        sentence:     "Nous avons ___ un beau château médiéval.",
-        base:         "visité", answer: "visité",
-        hasCodBefore: false,
-        choices: [
-          { label: "un beau château médiéval",   isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: true }
-        ],
-        codHint:     "",
-        explanation: "Le COD « un beau château médiéval » est après le verbe → pas d'accord : « visité »."
-      },
-      {
-        sentence:     "Elle a ___ une lettre à ses parents.",
-        base:         "envoyé", answer: "envoyé",
-        hasCodBefore: false,
-        choices: [
-          { label: "une lettre",                 isCorrect: false },
-          { label: "ses parents",                isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: true }
-        ],
-        codHint:     "",
-        explanation: "Le COD « une lettre » est après le verbe → pas d'accord : « envoyé »."
-      },
-      {
-        sentence:     "Les enfants ont ___ leurs jouets avant le dîner.",
-        base:         "rangé", answer: "rangé",
-        hasCodBefore: false,
-        choices: [
-          { label: "leurs jouets",               isCorrect: false },
-          { label: "le dîner",                   isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: true }
-        ],
-        codHint:     "",
-        explanation: "Le COD « leurs jouets » est placé après le verbe → pas d'accord : « rangé »."
-      },
+      /* ── Pas d'accord : COD postposé ── */
+      { base: "cueilli", infinitive: "cueillir", hasCodBefore: false,
+        sentence: "J'ai ___ des fraises dans le jardin.", answer: "cueilli",
+        explanation: "Le COD « des fraises » est placé APRÈS le verbe → pas d'accord : « cueilli »." },
+      { base: "visité",  infinitive: "visiter", hasCodBefore: false,
+        sentence: "Nous avons ___ un beau château médiéval.", answer: "visité",
+        explanation: "Le COD « un beau château médiéval » est après le verbe → pas d'accord : « visité »." },
+      { base: "envoyé",  infinitive: "envoyer", hasCodBefore: false,
+        sentence: "Elle a ___ une lettre à ses parents.", answer: "envoyé",
+        explanation: "Le COD « une lettre » est après le verbe → pas d'accord : « envoyé »." },
+      { base: "rangé",   infinitive: "ranger", hasCodBefore: false,
+        sentence: "Les enfants ont ___ leurs jouets avant le dîner.", answer: "rangé",
+        explanation: "Le COD « leurs jouets » est placé après le verbe → pas d'accord : « rangé »." },
 
-      /* ── C : verbe sans COD → pas d'accord ─────────────────────────── */
-      {
-        sentence:     "Nous avons ___ toute la journée.",
-        base:         "ri", answer: "ri",
-        hasCodBefore: false,
-        choices: [
-          { label: "la journée",                 isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: true }
-        ],
-        codHint:     "",
-        explanation: "Il n'y a pas de COD → le participe passé ne s'accorde pas : « ri »."
-      },
-      {
-        sentence:     "Elle a ___ très tard cette nuit-là.",
-        base:         "dormi", answer: "dormi",
-        hasCodBefore: false,
-        choices: [
-          { label: "cette nuit-là",              isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: true }
-        ],
-        codHint:     "",
-        explanation: "Il n'y a pas de COD → le participe passé ne s'accorde pas : « dormi »."
-      },
-      {
-        sentence:     "Ils ont ___ pendant toute la récréation.",
-        base:         "couru", answer: "couru",
-        hasCodBefore: false,
-        choices: [
-          { label: "la récréation",              isCorrect: false },
-          { label: "Pas de COD avant le verbe",  isCorrect: true }
-        ],
-        codHint:     "",
-        explanation: "Il n'y a pas de COD → le participe passé ne s'accorde pas : « couru »."
-      }
-
+      /* ── Pas d'accord : verbe sans COD ── */
+      { base: "ri",     infinitive: "rire", hasCodBefore: false,
+        sentence: "Nous avons ___ toute la journée.", answer: "ri",
+        explanation: "Il n'y a pas de COD → le participe passé ne s'accorde pas : « ri »." },
+      { base: "dormi",  infinitive: "dormir", hasCodBefore: false,
+        sentence: "Elle a ___ très tard cette nuit-là.", answer: "dormi",
+        explanation: "Il n'y a pas de COD → le participe passé ne s'accorde pas : « dormi »." },
+      { base: "couru",  infinitive: "courir", hasCodBefore: false,
+        sentence: "Ils ont ___ pendant toute la récréation.", answer: "couru",
+        explanation: "Il n'y a pas de COD → le participe passé ne s'accorde pas : « couru »." }
     ]
   },
 

@@ -1323,54 +1323,6 @@
       background: rgba(22,163,74,0.06);
     }
 
-    /* ── Type : accord-participe-cod ───────────────────────────────────── */
-    .pp-sentence {
-      font-size: 20px;
-      font-weight: 600;
-      line-height: 1.8;
-      padding: 18px 20px;
-      background: var(--card-bg);
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      margin: 12px 0 18px;
-      text-align: center;
-    }
-    .pp-blank {
-      display: inline-block;
-      border-bottom: 3px solid var(--blue);
-      padding: 0 8px 2px;
-      color: rgba(16,43,106,0.4);
-      font-style: italic;
-      min-width: 56px;
-      text-align: center;
-    }
-    .apcod-choices {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin: 8px 0 4px;
-    }
-    .apcod-hint-agree {
-      background: rgba(22,163,74,0.08);
-      border: 1px solid rgba(22,163,74,0.25);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #15803d;
-      margin-bottom: 14px;
-    }
-    .apcod-hint-no-agree {
-      background: rgba(16,43,106,0.05);
-      border: 1px solid rgba(16,43,106,0.15);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--blue);
-      margin-bottom: 14px;
-    }
-
     /* ── Type : choix-etiquette ──────────────────────────────────────────── */
     .ex-label-display {
       font-size: 56px;
@@ -4409,8 +4361,6 @@
     let pfiLevelSelect   = null; /* produire-3-formes : instance LevelSelect */
     let accordLevel      = null; /* accord-ecrit      : niveau sélectionné */
     let accordLevelSelect = null; /* accord-ecrit     : instance LevelSelect */
-    let apcodLevel       = null; /* accord-participe-cod : niveau sélectionné */
-    let apcodLevelSelect  = null; /* accord-participe-cod : instance LevelSelect */
     let decompLevel      = null; /* decomposer-fraction : niveau sélectionné */
     let decompLevelSelect = null; /* decomposer-fraction : instance LevelSelect */
     let fpLevel           = null; /* fractions-problemes : niveau sélectionné */
@@ -4539,7 +4489,6 @@
       nbEntierLevel    = null;
       cmpLevel         = null;
       encadrLevel      = null;
-      apcodLevel       = null;
       decompLevel      = null;
       fpLevel           = null;
       probaChancesLevel = null;
@@ -5095,58 +5044,6 @@
       fpLevelSelect.renderSelectScreen();
     }
 
-    /* accord-participe-cod : même banque de phrases aux deux niveaux — seul le
-       mode d'interaction change (Niveau 1 = CM2 : identification du COD guidée
-       avant d'écrire le participe ; Niveau 2 = 6e : analyse directe, sans étape
-       guidée). Ordre confirmé conforme à exercise-data.js (levels: ["CM2","6e"]). */
-    function showAccordParticipeCodLevelSelect() {
-      document.getElementById("level-select-screen").classList.remove("ex-hidden");
-      document.getElementById("exercise-screen").classList.add("ex-hidden");
-      document.getElementById("results-screen").classList.add("ex-hidden");
-
-      const levels  = sessionData.levels || ["CM2", "6e"];
-      const descs   = {
-        "CM2": "Identifie d'abord le COD, puis écris le participe accordé",
-        "6e":  "Analyse seul(e) et écris directement le participe"
-      };
-      const diffMap = { "CM2": 1, "6e": 2 };
-
-      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
-      apcodLevelSelect = LevelSelect.create({
-        exerciseKey: slug,
-        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
-        threshold: 0.8,
-        onSelectLevel: (l) => {
-          apcodLevel = diffMap[l];
-          questions = shuffle(sessionData.bank).slice(0, sessionData.questionsPerSession);
-          currentIndex = 0;
-          score        = 0;
-          sessionLevelList   = [...levels];
-          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
-          sessionLevelIdx    = levels.indexOf(l);
-          sessionLevelLoader = (lv) => {
-            apcodLevel = diffMap[lv];
-            questions  = shuffle(sessionData.bank).slice(0, sessionData.questionsPerSession);
-            document.getElementById('q-total').textContent = questions.length;
-            document.getElementById('ex-bar-fill').style.width = '0%';
-            currentIndex = 0;
-            score        = 0;
-            showQuestion(0);
-            apcodLevelSelect.renderBadges(lv);
-          };
-          document.getElementById('q-total').textContent = questions.length;
-          document.getElementById("level-select-screen").classList.add("ex-hidden");
-          document.getElementById("exercise-screen").classList.remove("ex-hidden");
-          showQuestion(0);
-          apcodLevelSelect.renderBadges(l);
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        },
-        selectContainer: document.getElementById("level-select-screen"),
-        badgesContainer: document.getElementById("ex-badges")
-      });
-      apcodLevelSelect.renderSelectScreen();
-    }
-
     /* ── Type : probabilite-chances / probabilite-issues / probabilite-nombre
        Ids de niveau génériques "niveau1/2/3" (pas CM1/CM2/6e) : chaque
        compétence Probabilités correspond à une seule pastille CM1/CM2/6e sur
@@ -5373,6 +5270,9 @@
       } else if (currentType === "pc-etre-niveaux") {
         pceInitSession();
         return;
+      } else if (currentType === "accord-cod-niveaux") {
+        apcInitSession();
+        return;
       } else if (currentType === "change-temps-niveaux") {
         ctInitSession();
         return;
@@ -5557,11 +5457,6 @@
         return;
       }
 
-      if (currentType === "accord-participe-cod" && apcodLevel === null) {
-        showAccordParticipeCodLevelSelect();
-        return;
-      }
-
       if (currentType === "probabilite-chances" && probaChancesLevel === null) {
         showProbaChancesLevelSelect();
         return;
@@ -5740,8 +5635,6 @@
         /* session managed by fdtnInitSession — no-op here */
       } else if (currentType === "comprendre-implicites-niveaux" || currentType === "comprendre-mot-contexte-niveaux") {
         /* session managed by lecInitSession — no-op here */
-      } else if (currentType === "accord-participe-cod") {
-        renderAccordParticipeCod(card, q);
       }
     }
 
@@ -6175,7 +6068,7 @@
         'produire-3-formes', 'accord-ecrit',
         'lire-fraction', 'representer-fraction', 'placer-fraction-droite',
         'comparer-fractions', 'encadrer-fraction', 'nombre-entier',
-        'decomposer-fraction', 'fractions-problemes', 'accord-participe-cod',
+        'decomposer-fraction', 'fractions-problemes',
         'probabilite-chances', 'probabilite-issues', 'probabilite-nombre'
       ].includes(currentType);
       const canProgress = !lockedType || pct >= 80;
@@ -6235,7 +6128,6 @@
           else if (currentType === 'nombre-entier') showNombreEntierLevelSelect();
           else if (currentType === 'decomposer-fraction') showDecomposerFractionLevelSelect();
           else if (currentType === 'fractions-problemes') showFractionsProblemesLevelSelect();
-          else if (currentType === 'accord-participe-cod') showAccordParticipeCodLevelSelect();
           else if (currentType === 'probabilite-chances') showProbaChancesLevelSelect();
           else if (currentType === 'probabilite-issues') showProbaIssuesLevelSelect();
           else if (currentType === 'probabilite-nombre') showProbaNombreLevelSelect();
@@ -6323,9 +6215,6 @@
       if (currentType === 'encadrer-fraction' && encadrLevel !== null && encadrLevelSelect) {
         encadrLevelSelect.completeLevel(sessionLevelList[sessionLevelIdx], score, total);
       }
-      if (currentType === 'accord-participe-cod' && apcodLevel !== null && apcodLevelSelect) {
-        apcodLevelSelect.completeLevel(sessionLevelList[sessionLevelIdx], score, total);
-      }
       if (currentType === 'nombre-entier' && nbEntierLevel && nbEntierLevelSelect) {
         nbEntierLevelSelect.completeLevel(nbEntierLevel, score, total);
       }
@@ -6351,12 +6240,12 @@
       /* Enregistrement du résultat pour les élèves connectés */
       const slug = new URLSearchParams(window.location.search).get('slug');
       const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
-      /* apcodLevel/fracLevel/rfLevel/nlLevel/cmpLevel sont des entiers de
+      /* fracLevel/rfLevel/nlLevel/cmpLevel sont des entiers de
          difficulté (diffMap) internes au type, sans rapport avec l'id
          LevelSelect (CM1/CM2/6e) — voir sessionLevelList/sessionLevelIdx,
-         déjà tenus à jour par onSelectLevel pour ces 5 types, seule source
+         déjà tenus à jour par onSelectLevel pour ces 4 types, seule source
          fiable de l'id réel pour l'enregistrement Supabase. */
-      const sessionLevelIdTypes = ['accord-participe-cod', 'lire-fraction', 'representer-fraction', 'placer-fraction-droite', 'comparer-fractions'];
+      const sessionLevelIdTypes = ['lire-fraction', 'representer-fraction', 'placer-fraction-droite', 'comparer-fractions'];
       const activeLevel = pfiSelectedLevel || accordLevel
         || (sessionLevelIdTypes.includes(currentType) ? sessionLevelList[sessionLevelIdx] : null)
         || nbEntierLevel || encadrLevel || decompLevel || fpLevel
@@ -10130,155 +10019,425 @@
       }
     }
 
-    /* ── Type : accord-participe-cod ────────────────────────────────────────
-       Niveau 1 (guidé) : étape 1 → clic sur le COD, étape 2 → écrire le PP
-       Niveau 2 (autonome) : l'élève écrit directement le PP correctement accordé
-    ────────────────────────────────────────────────────────────────────────── */
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : accord-cod-niveaux — « Accorder le participe passé avec le COD »
+       Niveau 1 : raisonnement guidé — clic sur le COD (mots-cliquables) →
+                  genre/nombre du COD (classification) → saisie du participe.
+       Niveau 2 : écriture directe, COD antéposé via pronom personnel.
+       Niveau 3 : l'élève détermine d'abord si le COD est antéposé (accord)
+                  ou non (pas d'accord), puis écrit la forme correcte.
+       3 niveaux déverrouillables à 80 %. Un seul essai par question.
+       ════════════════════════════════════════════════════════════════════════ */
 
-    function renderAccordParticipeCod(card, q) {
-      if (apcodLevel === 1) {
-        _renderApcodNiveau1(card, q);
+    const APC_SEUIL     = 0.80;
+    const APC_POSITIFS  = ['Excellent ! 🎉', 'Bravo ! ⭐', 'Parfait ! 🌟', 'Super ! 👏', 'Très bien ! 👍'];
+    const APC_LEVEL_DEFS = [
+      { lv: 1, desc: "Identifie le COD, son genre et son nombre, puis écris la forme accordée" },
+      { lv: 2, desc: "Écris directement le participe accordé (COD repris par un pronom)" },
+      { lv: 3, desc: "Détermine si le participe s'accorde, puis écris la forme correcte" }
+    ];
+
+    let apcState = null;
+    let apcLevelSelect = null;
+
+    function apcNorm(str) {
+      return str.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[''`´'']/g, "'");
+    }
+    function apcShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+    function apcBuildAgreementFeedback(q) {
+      if (q.gender === 'f' && q.number === 'p') return `Le COD est féminin pluriel : on ajoute <strong>-es</strong> au participe.`;
+      if (q.gender === 'f' && q.number === 's') return `Le COD est féminin singulier : on ajoute <strong>-e</strong> au participe.`;
+      if (q.gender === 'm' && q.number === 'p') return `Le COD est masculin pluriel : on ajoute <strong>-s</strong> au participe.`;
+      return `Le COD est masculin singulier : le participe ne prend pas de terminaison supplémentaire.`;
+    }
+
+    function apcBackToSelectScreen() {
+      apcState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    /* ── Init session ──────────────────────────────────────────────────────── */
+    function apcInitSession() {
+      apcState = null;
+      score = 0; currentIndex = 0;
+      sessionStartTime = Date.now();
+
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      apcLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: APC_LEVEL_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: APC_SEUIL,
+        onSelectLevel: lv => apcStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: apcBackToSelectScreen
+      });
+      apcLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Démarre un niveau ─────────────────────────────────────────────────── */
+    function apcStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const bankKey = lv === 1 ? 'level1Bank' : lv === 2 ? 'level2Bank' : 'level3Bank';
+      const bank    = sessionData[bankKey] || [];
+      const n       = sessionData.questionsPerSession || bank.length;
+      const items   = apcShuffle([...bank]).slice(0, n);
+
+      apcState = { lv, items, idx: 0, score: 0, total: items.length };
+
+      document.getElementById('q-total').textContent = items.length;
+      apcLevelSelect.renderBadges(lv);
+      apcRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Dispatch niveau ───────────────────────────────────────────────────── */
+    function apcRenderQuestion(card) {
+      const { lv, items, idx, total } = apcState;
+      const q = items[idx];
+
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if (lv === 1)      apcRenderLevel1(card, q);
+      else if (lv === 2) apcRenderLevel2(card, q);
+      else               apcRenderLevel3(card, q);
+    }
+
+    /* ── Avance à la question suivante ─────────────────────────────────────── */
+    function apcAdvance() {
+      apcState.idx++;
+      if (apcState.idx >= apcState.items.length) {
+        apcShowLevelResults();
       } else {
-        _renderApcodNiveau2(card, q);
+        apcRenderQuestion(document.getElementById('ex-card'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
 
-    function _apcodSentenceHtml(q) {
-      return q.sentence.replace('___', `<span class="pp-blank">${q.base}…</span>`);
-    }
-
-    function _renderApcodNiveau1(card, q) {
-      let step1Correct = false;
-      const sentHtml   = _apcodSentenceHtml(q);
-      const correctChoice = q.choices.find(c => c.isCorrect);
-
-      const choicesHtml = shuffle([...q.choices]).map(c =>
-        `<button class="ex-choice apcod-cod-btn" data-correct="${c.isCorrect}">${c.label}</button>`
-      ).join('');
+    /* ── Niveau 1 — raisonnement guidé : mots-cliquables (COD) →
+       classification (genre+nombre) → saisie ─────────────────────────────── */
+    function apcRenderLevel1(card, q) {
+      const { idx, total } = apcState;
 
       card.innerHTML = `
-        <div id="apcod-step1">
-          <p class="ex-question-label">Repère le COD placé <strong>avant</strong> le verbe. Clique sur le bon groupe.</p>
-          <div class="pp-sentence">${sentHtml}</div>
-          <div class="apcod-choices" id="apcod-choices">${choicesHtml}</div>
-          <div class="ex-feedback-area" id="apcod-fb1"></div>
+        <p class="ex-question-label">Accorde le participe passé avec le <strong>COD</strong></p>
+
+        <div id="apc-step1" class="ex-classify-step" style="margin-top:6px">
+          <div class="ex-classify-step-title">Étape 1 — Clique sur le COD placé avant le verbe</div>
+          <div class="ex-verb-display">${q.infinitive}</div>
+          <div class="ex-sentence-words" id="apc-words"></div>
+          <div class="ex-feedback-area" id="apc-fb1"></div>
+          <button class="ex-choice" id="apc-val1" style="margin-top:10px;width:100%">Valider l'étape 1</button>
         </div>
-        <div id="apcod-step2" class="ex-hidden">
+
+        <div id="apc-step2" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title">Étape 2 — Genre et nombre du COD</div>
+          <div class="ex-choices-grid" id="apc-choices2"></div>
+          <div class="ex-feedback-area" id="apc-fb2"></div>
+        </div>
+
+        <div id="apc-step3" class="ex-hidden">
           <div class="ex-step2-divider"></div>
-          <p class="ex-question-label">Écris le participe passé correctement accordé.</p>
-          <div id="apcod-agree-hint"></div>
+          <p class="ex-question-label">Étape 3 — Écris le participe passé accordé</p>
           <div class="ex-input-row">
-            <input type="text" class="ex-text-input" id="apcod-pp-input"
-                   autocomplete="off" autocorrect="off" autocapitalize="off"
-                   spellcheck="false" placeholder="Écris le participe passé…">
-            <button class="ex-validate-btn" id="apcod-pp-btn">Valider</button>
+            <input type="text" id="apc-input" class="ex-text-input"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                   placeholder="ex : prises, écrite…">
+            <button class="ex-validate-btn" id="apc-val3">Valider</button>
           </div>
-          <div class="ex-feedback-area" id="apcod-fb2"></div>
+          <div class="ex-feedback-area" id="apc-fb3"></div>
         </div>
-        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
       `;
 
-      card.querySelectorAll('.apcod-cod-btn').forEach(btn =>
+      /* ── Étape 1 : clic COD (pattern mots-cliquables) ─────────────────── */
+      const wordsEl  = document.getElementById('apc-words');
+      const selected = new Set();
+      const fullSet  = new Set(q.codWords.map(w => w.toLowerCase()));
+      const coreSet  = new Set([q.codCore.toLowerCase()]);
+
+      const setsEqual = (a, b) => a.size === b.size && [...a].every(x => b.has(x));
+
+      q.sentence.split(/\s+/).forEach(token => {
+        if (token === '___') {
+          const span = document.createElement('span');
+          span.className = 'ex-blank';
+          span.style.cursor = 'default';
+          wordsEl.appendChild(span);
+          return;
+        }
+        const clean = token.replace(/[.,!?;:«»""'']/g, '');
+        if (!clean) return;
+        const btn = document.createElement('button');
+        btn.className = 'ex-word-btn';
+        btn.textContent = token;
+        btn.dataset.clean = clean;
         btn.addEventListener('click', () => {
-          card.querySelectorAll('.apcod-cod-btn').forEach(b => b.disabled = true);
-          const isCorrect = btn.dataset.correct === 'true';
-          step1Correct = isCorrect;
+          if (btn.disabled) return;
+          if (selected.has(btn)) { selected.delete(btn); btn.classList.remove('is-selected'); }
+          else                   { selected.add(btn);    btn.classList.add('is-selected'); }
+        });
+        wordsEl.appendChild(btn);
+      });
 
-          card.querySelectorAll('.apcod-cod-btn').forEach(b => {
-            if (b.dataset.correct === 'true') b.classList.add('is-correct');
+      document.getElementById('apc-val1').addEventListener('click', () => {
+        const selectedClean = new Set(
+          Array.from(selected).map(b => b.dataset.clean.toLowerCase())
+        );
+        const matchesCore = setsEqual(selectedClean, coreSet);
+        const ok = matchesCore || setsEqual(selectedClean, fullSet);
+        const targets = matchesCore ? coreSet : fullSet;
+
+        wordsEl.querySelectorAll('.ex-word-btn').forEach(btn => {
+          const isTarget    = targets.has(btn.dataset.clean.toLowerCase());
+          const wasSelected = selected.has(btn);
+          btn.disabled = true;
+          btn.classList.remove('is-selected');
+          if      (isTarget && wasSelected)  btn.classList.add('is-correct');
+          else if (isTarget && !wasSelected) btn.classList.add('is-missed');
+          else if (!isTarget && wasSelected) btn.classList.add('is-wrong');
+        });
+        document.getElementById('apc-val1').disabled = true;
+        document.getElementById('apc-fb1').innerHTML = ok
+          ? `<div class="ex-feedback-correct" style="font-size:13px">✅ <strong>${q.codPhrase}</strong> est bien le COD.</div>`
+          : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Le COD était <strong>${q.codPhrase}</strong> (en vert).</div>`;
+
+        setTimeout(() => {
+          const s2 = document.getElementById('apc-step2');
+          s2.classList.remove('ex-hidden');
+          s2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 500);
+      });
+
+      /* ── Étape 2 : genre + nombre combinés (pattern classification) ──── */
+      const CHOICES2 = [
+        { key: 'm-s', label: 'Masculin singulier' },
+        { key: 'f-s', label: 'Féminin singulier' },
+        { key: 'm-p', label: 'Masculin pluriel' },
+        { key: 'f-p', label: 'Féminin pluriel' }
+      ];
+      const correctKey   = q.gender + '-' + q.number;
+      const correctLabel = CHOICES2.find(c => c.key === correctKey).label;
+      const choices2El   = document.getElementById('apc-choices2');
+
+      apcShuffle(CHOICES2).forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'ex-choice';
+        btn.textContent = c.label;
+        btn.addEventListener('click', () => {
+          choices2El.querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === correctLabel) b.classList.add('is-correct');
           });
-          if (!isCorrect) btn.classList.add('is-wrong');
-
-          const hintEl = document.getElementById('apcod-agree-hint');
-          if (q.hasCodBefore) {
-            const fb = isCorrect
-              ? `<div class="ex-feedback-correct">${rand(SUCCESS)}<br><small style="font-size:12px">${q.codHint}</small></div>`
-              : `<div class="ex-feedback-wrong">❌ Le COD est <strong>« ${correctChoice.label} »</strong>.<br><small>${q.codHint}</small></div>`;
-            setFeedback('apcod-fb1', fb);
-            hintEl.innerHTML = `<div class="apcod-hint-agree">ℹ️ ${q.codHint} → accorde le participe !</div>`;
-          } else {
-            const fb = isCorrect
-              ? `<div class="ex-feedback-correct">${rand(SUCCESS)}<br><small style="font-size:12px">Il n'y a pas de COD avant le verbe → le participe ne s'accorde pas.</small></div>`
-              : `<div class="ex-feedback-wrong">❌ Ce groupe n'est pas le COD avant le verbe.<br><small>${q.explanation}</small></div>`;
-            setFeedback('apcod-fb1', fb);
-            hintEl.innerHTML = `<div class="apcod-hint-no-agree">ℹ️ Pas de COD avant le verbe → le participe passé ne s'accorde pas.</div>`;
-          }
+          const isRight = c.key === correctKey;
+          if (!isRight) btn.classList.add('is-wrong');
+          document.getElementById('apc-fb2').innerHTML = isRight
+            ? `<div class="ex-feedback-correct" style="font-size:13px">✅ Exact ! Maintenant écris la forme complète.</div>`
+            : `<div class="ex-feedback-wrong" style="font-size:13px">❌ ${apcBuildAgreementFeedback(q)}</div>`;
 
           setTimeout(() => {
-            document.getElementById('apcod-step2').classList.remove('ex-hidden');
-            document.getElementById('apcod-step2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            setTimeout(() => { const inp = document.getElementById('apcod-pp-input'); if (inp) inp.focus(); }, 80);
-          }, 820);
-        })
-      );
+            const s3 = document.getElementById('apc-step3');
+            s3.classList.remove('ex-hidden');
+            s3.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            setTimeout(() => document.getElementById('apc-input')?.focus(), 80);
+          }, 500);
+        });
+        choices2El.appendChild(btn);
+      });
 
-      function validatePP() {
-        const input  = document.getElementById('apcod-pp-input');
-        const valBtn = document.getElementById('apcod-pp-btn');
-        if (!input.value.trim()) return;
-        input.disabled  = true;
-        valBtn.disabled = true;
-        const isRight = normalize(input.value) === normalize(q.answer);
-        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
-        if (isRight) {
-          if (step1Correct) score++;
-          const extra = step1Correct ? '' : '<br><small style="font-size:12px">Pense à bien repérer le COD d\'abord !</small>';
-          setFeedback('apcod-fb2', `<div class="ex-feedback-correct">${rand(SUCCESS)}${extra}</div>`);
-        } else {
-          setFeedback('apcod-fb2', `
-            <div class="ex-feedback-wrong">
-              ❌ La bonne réponse est <strong>« ${q.answer} »</strong>.<br>
-              <small>${q.explanation}</small>
-            </div>`);
-        }
-        showNextBtn();
-      }
-
-      document.getElementById('apcod-pp-input').addEventListener('keydown', e => { if (e.key === 'Enter') validatePP(); });
-      document.getElementById('apcod-pp-btn').addEventListener('click', validatePP);
+      /* ── Étape 3 : saisie du participe (pattern standard) ─────────────── */
+      apcWireTextInput(q, 'apc-input', 'apc-val3', 'apc-fb3');
+      document.getElementById('next-btn').addEventListener('click', apcAdvance);
     }
 
-    function _renderApcodNiveau2(card, q) {
-      const sentHtml = _apcodSentenceHtml(q);
+    /* ── Niveau 2 — écriture directe (COD repris par un pronom) ──────────── */
+    function apcRenderLevel2(card, q) {
+      const { idx, total } = apcState;
+      const sentDisplay = q.sentence.replace('___', '<span class="ex-blank" style="cursor:default"></span>');
 
       card.innerHTML = `
-        <p class="ex-question-label">Repère le COD et écris le participe passé correctement accordé.</p>
-        <div class="pp-sentence">${sentHtml}</div>
-        <div class="ex-input-row" style="margin-top:14px">
-          <input type="text" class="ex-text-input" id="apcod-pp-input"
-                 autocomplete="off" autocorrect="off" autocapitalize="off"
-                 spellcheck="false" placeholder="Écris le participe passé…">
-          <button class="ex-validate-btn" id="apcod-pp-btn">Valider</button>
+        <p class="ex-question-label">Repère le COD et écris le participe passé accordé</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div class="ex-sentence-display">${sentDisplay}</div>
+        <div class="ex-input-row">
+          <input type="text" id="apc-input" class="ex-text-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                 placeholder="Participe passé accordé…">
+          <button class="ex-validate-btn" id="apc-val-btn">Valider</button>
         </div>
-        <div class="ex-feedback-area" id="apcod-fb1"></div>
-        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+        <div class="ex-feedback-area" id="apc-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
       `;
 
-      const input  = document.getElementById('apcod-pp-input');
-      const valBtn = document.getElementById('apcod-pp-btn');
-      setTimeout(() => input.focus(), 50);
+      setTimeout(() => document.getElementById('apc-input')?.focus(), 60);
+      apcWireTextInput(q, 'apc-input', 'apc-val-btn', 'apc-fb');
+      document.getElementById('next-btn').addEventListener('click', apcAdvance);
+    }
 
-      function validate() {
-        if (!input.value.trim()) return;
-        input.disabled  = true;
-        valBtn.disabled = true;
-        const isRight = normalize(input.value) === normalize(q.answer);
+    /* ── Niveau 3 — accord ou pas d'accord : classification → saisie ─────── */
+    function apcRenderLevel3(card, q) {
+      const { idx, total } = apcState;
+      const sentDisplay = q.sentence.replace('___', '<span class="ex-blank" style="cursor:default"></span>');
+
+      card.innerHTML = `
+        <p class="ex-question-label">Accorde le participe passé avec le <strong>COD</strong> — s'il y a lieu</p>
+        <div class="ex-verb-display">${q.infinitive}</div>
+        <div class="ex-sentence-display">${sentDisplay}</div>
+        <div class="ex-input-row">
+          <input type="text" id="apc-input" class="ex-text-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                 placeholder="Participe passé…">
+          <button class="ex-validate-btn" id="apc-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="apc-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      setTimeout(() => document.getElementById('apc-input')?.focus(), 60);
+      apcWireTextInput(q, 'apc-input', 'apc-val-btn', 'apc-fb', true);
+      document.getElementById('next-btn').addEventListener('click', apcAdvance);
+    }
+
+    /* ── Saisie du participe accordé — partagée niveaux 1/2/3 ─────────────
+       Un seul essai : succès → 1 pt + bouton suivant ; échec → réponse
+       affichée (+ rappel de la règle si showRule et q.explanation) puis
+       passage automatique à la question suivante. ────────────────────── */
+    function apcWireTextInput(q, inputId, btnId, fbId, showRule = false) {
+      const input = document.getElementById(inputId);
+      const vbtn  = document.getElementById(btnId);
+
+      const doValidate = () => {
+        if (!input || input.disabled || !input.value.trim()) return;
+        const isRight = apcNorm(input.value) === apcNorm(q.answer);
+        input.disabled = true;
+        vbtn.disabled  = true;
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
         if (isRight) {
-          score++;
-          setFeedback('apcod-fb1', `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+          apcState.score++;
+          document.getElementById(fbId).innerHTML =
+            `<div class="ex-feedback-correct">${APC_POSITIFS[Math.floor(Math.random() * APC_POSITIFS.length)]}</div>`;
+          document.getElementById('next-btn').classList.remove('ex-hidden');
         } else {
-          setFeedback('apcod-fb1', `
-            <div class="ex-feedback-wrong">
-              ❌ La bonne réponse est <strong>« ${q.answer} »</strong>.<br>
-              <small>${q.explanation}</small>
-            </div>`);
+          const rule = showRule && q.explanation ? `<br><small>${q.explanation}</small>` : '';
+          document.getElementById(fbId).innerHTML =
+            `<div class="ex-feedback-wrong">❌ La forme correcte est <strong>${q.answer}</strong>.${rule}</div>`;
+          setTimeout(() => apcAdvance(), showRule ? 3200 : 2200);
         }
-        showNextBtn();
+      };
+
+      vbtn.addEventListener('click', doValidate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
+    }
+
+    /* ── Résultats d'un niveau ───────────────────────────────────────────── */
+    function apcShowLevelResults() {
+      const { lv, score: lvScore, total } = apcState;
+      const { passed, pct, isLast } = apcLevelSelect.completeLevel(lv, lvScore, total);
+      const pctPct = Math.round(pct * 100);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const backHref  = sessionData.backLink?.href  || 'français-orthographe.html';
+      const backLabel = `← Retour à ${sessionData.backLink?.label || "l'Orthographe"}`;
+      const backToSelectBtn = apcLevelSelect.backToSelectButtonHTML();
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises l'accord du participe passé avec le COD aux trois niveaux !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="apc-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${lv} validé ! 🏆 Le Niveau ${lv + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="apc-next-btn">Niveau ${lv + 1} →</button>
+          <button class="ex-btn-secondary" id="apc-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        msg = `${stars || '💪'} Pas encore… il faut 80 % pour passer au niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="apc-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
       }
 
-      input.addEventListener('keydown', e => { if (e.key === 'Enter') validate(); });
-      valBtn.addEventListener('click', validate);
+      document.getElementById('score-msg').textContent          = msg;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
+
+      document.getElementById('apc-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        apcStartLevel(apcState.lv);
+      });
+      document.getElementById('apc-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        apcStartLevel(lv + 1);
+      });
+      document.getElementById('apc-restart-btn')?.addEventListener('click', () => {
+        apcLevelSelect.reset();
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        apcInitSession();
+      });
+      apcLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'accord-cod-niveaux',
+        level:        'Niveau ' + lv,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
     }
 
     /* ══════════════════════════════════════════════════════════════════════════
