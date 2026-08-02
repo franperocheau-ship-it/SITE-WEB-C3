@@ -13,11 +13,13 @@
     "data/conjugaison.js",
     "data/grammaire.js",
     "data/orthographe.js",
+    "data/orthographe-homophones.js",
     "data/lecture.js",
     "data/nombres-entiers.js",
     "data/fractions.js",
     "data/nombres-decimaux.js",
-    "data/probabilites.js"
+    "data/probabilites.js",
+    "data/vocabulaire.js"
   ];
   DOMAIN_FILES.forEach(function (src) {
     document.write('<script src="' + src + '?v=2"></script>');

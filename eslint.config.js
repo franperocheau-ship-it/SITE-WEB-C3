@@ -31,9 +31,6 @@ const PROJECT_GLOBALS = {
   EXERCISE_CATALOG_AUTONOMOUS: 'readonly',
   EXERCISE_CATALOG_GROUPS: 'readonly',
   REMEDIATION_DATA: 'readonly',
-  LEX_COMPRENDRE: 'readonly',
-  LEX_CONSTRUIRE: 'readonly',
-  LEX_RELATIONS: 'readonly',
 
   // Client Supabase + espaces d'API "lfm*" (chaque js/*.js expose son
   // namespace, cf. en-têtes "Dépend de :" dans chaque fichier)

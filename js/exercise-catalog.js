@@ -14,13 +14,16 @@
    exercise.html?slug=) : ils n'ont pas de champ `competence` à partir duquel
    déduire une catégorie, donc leur rattachement est explicite ici.
 
-   - Homophones grammaticaux (ortho-distinguer-*.html, français-orthographe.html)
-     → Français / Orthographe (groupe "Homophones", voir EXERCISE_CATALOG_GROUPS)
-   - Vocabulaire (js/lex-comprendre.js, js/lex-construire.js, js/lex-relations.js,
-     ouverts depuis français-lexique.html)
-     → Français / Vocabulaire
    - identifier-verbe-conjugue (francais/grammaire/identifier-verbe-conjugue/)
      → Français / Grammaire
+
+   Vocabulaire n'est plus listé ici depuis sa migration vers exercise.html?slug=
+   (data/vocabulaire.js, competence: "Vocabulaire") : classification désormais
+   automatique comme le reste d'EXERCISE_DATA. Les 10 homophones grammaticaux
+   (ortho-distinguer-*.html) ont suivi le même chemin (data/orthographe-
+   homophones.js, competence: "Orthographe — Homophones grammaticaux") — le
+   groupe "Homophones" reste défini dans EXERCISE_CATALOG_GROUPS ci-dessous
+   (purement cosmétique, indépendant du statut autonome/EXERCISE_DATA).
 
    Tout exercice qui n'est NI dans EXERCISE_DATA NI listé ici est exclu du
    parcours guidé avec un console.warn (voir buildExerciseTree dans
@@ -28,40 +31,6 @@
    ────────────────────────────────────────────────────────────────────────── */
 
 const EXERCISE_CATALOG_AUTONOMOUS = [
-
-  /* ── Homophones grammaticaux (français-orthographe.html → CUSTOM_HREFS) ── */
-  { slug: "ortho-distinguer-a-a",               title: "Distinguer a / à",                            category: "Français", subCategory: "Orthographe" },
-  { slug: "ortho-distinguer-et-est",            title: "Distinguer et / est",                         category: "Français", subCategory: "Orthographe" },
-  { slug: "ortho-distinguer-son-sont",          title: "Distinguer son / sont",                       category: "Français", subCategory: "Orthographe" },
-  { slug: "ortho-distinguer-on-ont",            title: "Distinguer on / ont",                         category: "Français", subCategory: "Orthographe" },
-  { slug: "ortho-distinguer-ce-se",             title: "Distinguer ce / se",                          category: "Français", subCategory: "Orthographe" },
-  { slug: "ortho-distinguer-ces-ses-cest-sest", title: "ces / ses / c'est / s'est / sait / sais",     category: "Français", subCategory: "Orthographe" },
-  { slug: "ortho-distinguer-leur-leurs",        title: "Distinguer leur / leurs",                     category: "Français", subCategory: "Orthographe" },
-  { slug: "ortho-distinguer-tout",              title: "tout, tous, toute, toutes",                   category: "Français", subCategory: "Orthographe" },
-  { slug: "ortho-distinguer-ou-ou",             title: "Distinguer ou / où",                          category: "Français", subCategory: "Orthographe" },
-  { slug: "ortho-distinguer-quel",              title: "Distinguer quel(s), quelle(s), qu'elle(s)",   category: "Français", subCategory: "Orthographe" },
-
-  /* ── Vocabulaire (js/lex-comprendre.js) ──────────────────────────────────────── */
-  { slug: "ordre-alphabetique",  title: "Ranger dans l'ordre alphabétique",               category: "Français", subCategory: "Vocabulaire" },
-  { slug: "trouver-synonyme",    title: "Trouver un synonyme",                            category: "Français", subCategory: "Vocabulaire" },
-  { slug: "trouver-antonyme",    title: "Trouver un antonyme",                            category: "Français", subCategory: "Vocabulaire" },
-  { slug: "identifier-homonyme", title: "Identifier un homonyme",                         category: "Français", subCategory: "Vocabulaire" },
-  { slug: "polysemie",           title: "Comprendre la polysémie d'un mot",               category: "Français", subCategory: "Vocabulaire" },
-  { slug: "sens-propre-figure",  title: "Identifier le sens propre et le sens figuré",    category: "Français", subCategory: "Vocabulaire" },
-
-  /* ── Vocabulaire (js/lex-construire.js) ──────────────────────────────────────── */
-  { slug: "famille-de-mots",    title: "Identifier une famille de mots",                 category: "Français", subCategory: "Vocabulaire" },
-  { slug: "identifier-radical", title: "Identifier le radical d'un mot",                 category: "Français", subCategory: "Vocabulaire" },
-  { slug: "identifier-prefixe", title: "Identifier un préfixe",                          category: "Français", subCategory: "Vocabulaire" },
-  { slug: "identifier-suffixe", title: "Identifier un suffixe",                          category: "Français", subCategory: "Vocabulaire" },
-  { slug: "mot-derive",         title: "Former un mot dérivé",                           category: "Français", subCategory: "Vocabulaire" },
-  { slug: "origine-mots",       title: "Comprendre l'origine des mots (latin, grec)",    category: "Français", subCategory: "Vocabulaire" },
-
-  /* ── Vocabulaire (js/lex-relations.js) ───────────────────────────────────────── */
-  { slug: "regrouper-par-theme", title: "Regrouper des mots par thème",       category: "Français", subCategory: "Vocabulaire" },
-  { slug: "champ-lexical",       title: "Identifier un champ lexical",       category: "Français", subCategory: "Vocabulaire" },
-  { slug: "mot-adapte-contexte", title: "Choisir le mot adapté au contexte", category: "Français", subCategory: "Vocabulaire" },
-  { slug: "niveaux-de-langue",   title: "Distinguer les niveaux de langue",  category: "Français", subCategory: "Vocabulaire" },
 
   /* ── Grammaire (page autonome dédiée) ────────────────────────────────────── */
   { slug: "identifier-verbe-conjugue", title: "Identifier le verbe conjugué", category: "Français", subCategory: "Grammaire" },
@@ -138,9 +107,9 @@ const EXERCISE_CATALOG_GROUPS = {
         "ortho-distinguer-ce-se",
         "ortho-distinguer-ces-ses-cest-sest",
         "ortho-distinguer-leur-leurs",
-        "ortho-distinguer-tout",
+        "ortho-distinguer-tout-tous-toute-toutes",
         "ortho-distinguer-ou-ou",
-        "ortho-distinguer-quel"
+        "ortho-distinguer-quel-quelle-quels-quelles"
       ] }
     ]
   },

@@ -23,10 +23,15 @@
   <link rel="stylesheet" href="styles.css?v=11">
   <link rel="stylesheet" href="breadcrumb.css?v=1">
   <script src="js/breadcrumb.js?v=1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/guided-access.js?v=1"></script>
+  <script src="data/index.js?v=2"></script>
+  <script src="js/skill-badges.js?v=1"></script>
   <style>
-
-    /* ── Controls (search + filters) — mirrors Grammaire ────────────────────── */
-    .skill-controls {
+    /* ── Controls (search + filters) — mirrors Grammaire/Orthographe ────────── */
+    .filter-bar {
       display: flex;
       align-items: center;
       gap: 16px;
@@ -67,769 +72,166 @@
       box-shadow: 0 0 0 3px rgba(16,43,106,0.08);
     }
 
-    .filter-row {
+    .level-filters {
       display: flex;
       gap: 8px;
       flex-shrink: 0;
     }
 
-    /* ── Category section ────────────────────────────────────────────────────── */
-    .category-section {
-      margin-bottom: 44px;
-    }
-
-    .category-header {
+    /* ── Sections ─────────────────────────────────────────────────────────── */
+    .skill-sections {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 18px;
-      cursor: pointer;
-      user-select: none;
+      flex-direction: column;
+      gap: 20px;
     }
 
-    .category-emoji {
-      font-size: 22px;
-      line-height: 1;
-      flex-shrink: 0;
-    }
-
-    .category-title {
-      font-weight: 800;
-      font-size: 17px;
-      color: var(--blue);
-      flex: 1;
-    }
-
-    .category-count {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--blue);
-      background: rgba(16,43,106,0.07);
-      border-radius: 100px;
-      padding: 3px 12px;
-      letter-spacing: 0.02em;
-      flex-shrink: 0;
-    }
-
-    .category-toggle {
-      color: var(--muted);
-      font-size: 13px;
-      transition: transform 250ms ease;
-      flex-shrink: 0;
-    }
-    .category-section.collapsed .category-toggle {
-      transform: rotate(-90deg);
-    }
-
-    .category-divider {
-      height: 1px;
-      background: var(--border);
-      margin-bottom: 20px;
-    }
-
-    .skill-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .category-section.collapsed .skill-grid,
-    .category-section.collapsed .category-divider {
-      display: none;
-    }
-
-    /* ── Skill card ──────────────────────────────────────────────────────────── */
-    .skill-card {
+    .skill-section {
       background: var(--card-bg);
       border-radius: var(--radius-card);
       box-shadow: var(--shadow-sm);
-      padding: 18px 20px 16px;
+      overflow: hidden;
+      transition: box-shadow 250ms ease;
+    }
+
+    .skill-section.section-hidden { display: none; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 24px;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1.5px solid var(--border);
+      transition: background 200ms;
+    }
+
+    .section-header:hover { background: rgba(16,43,106,0.025); }
+
+    .section-emoji { font-size: 20px; flex-shrink: 0; line-height: 1; }
+
+    .section-title {
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--blue);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      flex: 1;
+    }
+
+    .section-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(16,43,106,0.07);
+      color: var(--blue);
+      font-weight: 700;
+      font-size: 11px;
+      border-radius: 100px;
+      padding: 3px 12px;
+      flex-shrink: 0;
+      transition: background 200ms;
+    }
+
+    .section-toggle {
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      flex-shrink: 0;
+      transition: transform 280ms cubic-bezier(.4,0,.2,1), border-color 200ms;
+    }
+
+    .skill-section.is-collapsed .section-toggle { transform: rotate(-90deg); }
+
+    .section-body {
+      display: grid;
+      grid-template-rows: 1fr;
+      transition: grid-template-rows 300ms cubic-bezier(.4,0,.2,1);
+    }
+
+    .skill-section.is-collapsed .section-body { grid-template-rows: 0fr; }
+
+    .section-body-inner { overflow: hidden; }
+
+    .section-content { padding: 22px 24px; }
+
+    /* ── Skills grid ──────────────────────────────────────────────────────── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    /* ── Skill card ───────────────────────────────────────────────────────── */
+    .skill-card {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      cursor: pointer;
+      text-decoration: none;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      text-decoration: none;
-      color: inherit;
-      position: relative;
-      overflow: hidden;
-      transition: transform 250ms ease, box-shadow 250ms ease;
-      border: 1.5px solid transparent;
+      gap: 8px;
+      transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms;
     }
+
     .skill-card:hover {
       transform: translateY(-4px);
       box-shadow: var(--shadow-md);
-      border-color: var(--border);
+      border-color: rgba(16,43,106,0.18);
     }
 
-    .skill-card-badges {
+    .skill-card.card-hidden { display: none; }
+    .skill-card-locked { opacity: 0.45; cursor: not-allowed; }
+    .skill-card-locked:hover { transform: none; box-shadow: none; border-color: var(--border); }
+
+    .skill-badges {
       display: flex;
-      gap: 5px;
       flex-wrap: wrap;
+      gap: 5px;
     }
 
-    .skill-card-title {
-      font-weight: 700;
-      font-size: 14px;
+    .skill-title {
+      font-weight: 600;
+      font-size: 13px;
       color: var(--text);
       line-height: 1.45;
-      flex: 1;
     }
 
-    .skill-card-accent {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 3px;
-    }
-
-    /* ── Empty state ─────────────────────────────────────────────────────────── */
-    .no-results {
+    /* ── Empty state ──────────────────────────────────────────────────────── */
+    .empty-state {
       text-align: center;
-      padding: 56px 0;
+      padding: 56px 24px;
       color: var(--muted);
       font-size: 15px;
       display: none;
     }
-    .no-results.visible { display: block; }
+    .empty-state.visible { display: block; }
 
-    /* ── Responsive ──────────────────────────────────────────────────────────── */
-    @media (max-width: 1024px) {
-      .skill-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
+    /* ── Responsive ───────────────────────────────────────────────────────── */
     @media (max-width: 768px) {
-      .skill-controls { flex-direction: column; align-items: stretch; }
-      .filter-row { justify-content: center; }
-      .skill-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .skills-grid { grid-template-columns: repeat(2, 1fr); }
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      .level-filters { justify-content: center; }
+      .section-title { font-size: 11px; }
     }
 
     @media (max-width: 480px) {
-      .skill-grid { grid-template-columns: 1fr; }
-      .filter-row { flex-wrap: wrap; justify-content: center; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .level-filters { flex-wrap: wrap; justify-content: center; }
     }
-
-    /* ── Exercise overlay ────────────────────────────────────────────────────── */
-    .ex-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      background: rgba(10, 20, 50, 0.50);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 280ms ease;
-    }
-    .ex-overlay.is-open { opacity: 1; pointer-events: all; }
-
-    .ex-panel {
-      background: var(--card-bg);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-img);
-      width: 100%;
-      max-width: 740px;
-      max-height: 88vh;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      transform: translateY(20px);
-      transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .ex-overlay.is-open .ex-panel { transform: translateY(0); }
-
-    /* ── Panel header ─────────────────────────────────────────────────────── */
-    .ex-panel-header {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      padding: 22px 24px 18px;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      background: var(--card-bg);
-      z-index: 1;
-      border-radius: var(--radius-card) var(--radius-card) 0 0;
-    }
-
-    .ex-close-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 1.5px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: border-color 180ms, color 180ms, background 180ms;
-    }
-    .ex-close-btn:hover { border-color: var(--blue); color: var(--blue); background: rgba(16,43,106,0.04); }
-
-    .ex-skill-info { flex: 1; }
-
-    .ex-skill-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 6px; }
-
-    .ex-skill-title {
-      font-weight: 800;
-      font-size: 17px;
-      color: var(--blue);
-      line-height: 1.3;
-    }
-
-    /* ── Segmented toggle ─────────────────────────────────────────────────── */
-    .ex-type-toggle-wrap { padding: 18px 24px 2px; }
-
-    .ex-type-toggle {
-      display: inline-flex;
-      background: rgba(16,43,106,0.06);
-      border-radius: 100px;
-      padding: 3px;
-    }
-
-    .ex-type-btn {
-      border: none;
-      background: transparent;
-      border-radius: 100px;
-      padding: 8px 22px;
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--muted);
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 220ms ease, color 220ms ease, box-shadow 220ms ease;
-    }
-    .ex-type-btn.active {
-      background: var(--card-bg);
-      color: var(--blue);
-      box-shadow: 0 2px 8px rgba(16,43,106,0.12);
-    }
-
-    /* ── Exercise list ────────────────────────────────────────────────────── */
-    .ex-list {
-      padding: 16px 24px 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .ex-item {
-      background: var(--bg);
-      border-radius: 14px;
-      padding: 18px 20px;
-    }
-
-    .ex-item-num {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--muted);
-      letter-spacing: 0.10em;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    /* Fill-blank */
-    .ex-sentence { font-size: 15px; line-height: 1.75; color: var(--text); }
-
-    .ex-blank {
-      display: inline-block;
-      min-width: 90px;
-      border: none;
-      border-bottom: 2px solid var(--blue);
-      padding: 0 4px 1px;
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--blue);
-      background: transparent;
-      outline: none;
-      vertical-align: baseline;
-      transition: border-color 180ms;
-    }
-    .ex-blank:focus { border-color: var(--red); }
-
-    .ex-hint { margin-top: 10px; font-size: 12px; color: var(--muted); font-style: italic; }
-
-    /* MCQ */
-    .ex-question { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 14px; line-height: 1.5; }
-
-    .ex-choices { display: flex; flex-direction: column; gap: 8px; }
-
-    .ex-choice {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 16px;
-      border-radius: 10px;
-      border: 1.5px solid var(--border);
-      background: var(--card-bg);
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 14px;
-      color: var(--text);
-      text-align: left;
-      transition: border-color 180ms, background 180ms;
-    }
-    .ex-choice:hover:not(.correct):not(.incorrect) {
-      border-color: var(--blue);
-      background: rgba(16,43,106,0.03);
-    }
-
-    .ex-choice-dot {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
-      flex-shrink: 0;
-      transition: border-color 180ms, background 180ms;
-    }
-    .ex-choice:hover:not(.correct):not(.incorrect) .ex-choice-dot { border-color: var(--blue); }
-
-    .ex-choice.correct  { border-color: #16a34a; background: rgba(22,163,74,0.07);  cursor: default; }
-    .ex-choice.incorrect{ border-color: var(--red); background: rgba(214,40,57,0.07); cursor: default; }
-    .ex-choice.correct  .ex-choice-dot { background: #16a34a; border-color: #16a34a; }
-    .ex-choice.incorrect .ex-choice-dot { background: var(--red); border-color: var(--red); }
-
-    /* ── Responsive: panel ────────────────────────────────────────────────── */
-    @media (max-width: 600px) {
-      .ex-overlay { padding: 0; align-items: flex-end; }
-      .ex-panel {
-        max-width: 100%;
-        max-height: 92vh;
-        border-radius: var(--radius-card) var(--radius-card) 0 0;
-        transform: translateY(100%);
-      }
-      .ex-overlay.is-open .ex-panel { transform: translateY(0); }
-      .ex-type-btn { padding: 8px 14px; }
-    }
-
-    /* ════════════════════════════════════════════════════════════════════════
-       NOUVEAU SYSTÈME — Niveaux & exercices interactifs
-    ════════════════════════════════════════════════════════════════════════ */
-
-    .ex-panel-body { padding: 24px; }
-
-    /* ── Sélecteur de niveau ─────────────────────────────────────────────── */
-    .lv-intro {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 20px;
-      line-height: 1.6;
-    }
-
-    .lv-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .lv-card {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 18px 20px;
-      border-radius: 14px;
-      border: 2px solid var(--border);
-      background: var(--card-bg);
-      cursor: pointer;
-      transition: border-color 200ms, box-shadow 200ms, background 200ms;
-      text-align: left;
-      font-family: inherit;
-      width: 100%;
-    }
-    .lv-card:not(.lv-locked):hover {
-      border-color: var(--color-brand-navy);
-      box-shadow: 0 4px 16px rgba(26,45,107,.12);
-    }
-    .lv-card.lv-locked {
-      opacity: .55;
-      cursor: not-allowed;
-      background: var(--bg);
-    }
-
-    .lv-badge {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--font-display);
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
-      flex-shrink: 0;
-    }
-    .lv-badge-1 { background: var(--color-niveau-cm1); }
-    .lv-badge-2 { background: var(--color-brand-navy); }
-    .lv-badge-3 { background: var(--color-brand-gold); }
-
-    .lv-info { flex: 1; }
-    .lv-num {
-      font-weight: 800;
-      font-size: 15px;
-      color: var(--text);
-      margin-bottom: 2px;
-    }
-    .lv-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
-
-    .lv-lock {
-      font-size: 18px;
-      color: var(--muted);
-    }
-
-    .lv-star {
-      font-size: 18px;
-    }
-
-    /* ── Écran question ─────────────────────────────────────────────────── */
-    .qz-progress-wrap { margin-bottom: 20px; }
-    .qz-progress-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--muted);
-      letter-spacing: .04em;
-      text-transform: uppercase;
-    }
-    .qz-bar-bg {
-      height: 6px;
-      background: var(--border);
-      border-radius: 100px;
-      overflow: hidden;
-    }
-    .qz-bar-fill {
-      height: 100%;
-      border-radius: 100px;
-      background: var(--color-brand-navy);
-      transition: width 400ms ease;
-    }
-
-    .qz-instruction {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--blue);
-      margin-bottom: 18px;
-      line-height: 1.5;
-    }
-
-    /* MCQ ------------------------------------------------------------------ */
-    .qz-choices { display: flex; flex-direction: column; gap: 8px; }
-    .qz-choice {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 11px 16px;
-      border-radius: 10px;
-      border: 1.5px solid var(--border);
-      background: var(--card-bg);
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 14px;
-      color: var(--text);
-      text-align: left;
-      transition: border-color 180ms, background 180ms;
-    }
-    .qz-choice:hover:not([disabled]):not(.qz-selected) {
-      border-color: var(--color-brand-navy);
-      background: rgba(26,45,107,.04);
-    }
-    /* état sélectionné (avant validation) */
-    .qz-choice.qz-selected {
-      border-color: #4B8DEE;
-      background: rgba(75,141,238,.11);
-    }
-    .qz-choice[disabled] { cursor: default; }
-    .qz-choice.qz-correct  { border-color:#16a34a; background:rgba(22,163,74,.08); }
-    .qz-choice.qz-wrong    { border-color:var(--red); background:rgba(214,40,57,.07); }
-    .qz-dot {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
-      flex-shrink: 0;
-      transition: all 180ms;
-    }
-    .qz-choice:hover:not([disabled]):not(.qz-selected) .qz-dot { border-color: var(--blue); }
-    .qz-choice.qz-selected .qz-dot { background: #4B8DEE; border-color: #4B8DEE; }
-    .qz-choice.qz-correct .qz-dot { background:#16a34a; border-color:#16a34a; }
-    .qz-choice.qz-wrong   .qz-dot { background:var(--red); border-color:var(--red); }
-
-    /* Click-sort ----------------------------------------------------------- */
-    .cs-bank-label, .cs-slots-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-    .cs-bank {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      min-height: 44px;
-      padding: 10px;
-      background: var(--bg);
-      border-radius: 10px;
-      border: 1.5px dashed var(--border);
-      margin-bottom: 16px;
-    }
-    .cs-chip {
-      padding: 7px 14px;
-      background: var(--card-bg);
-      border: 1.5px solid var(--border);
-      border-radius: 100px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-      cursor: pointer;
-      transition: all 160ms;
-      user-select: none;
-    }
-    .cs-chip:hover:not(.cs-placed):not(.cs-done) {
-      border-color: #4B8DEE;
-      background: rgba(75,141,238,.09);
-    }
-    .cs-chip.cs-placed { opacity: .35; cursor: default; }
-    .cs-chip.cs-done.cs-ok  { background:rgba(22,163,74,.12); border-color:#16a34a; color:#15803d; }
-    .cs-chip.cs-done.cs-err { background:rgba(214,40,57,.09); border-color:var(--red); color:var(--red); }
-
-    .cs-slots {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .cs-slot {
-      min-width: 80px;
-      padding: 7px 14px;
-      border-radius: 100px;
-      border: 1.5px dashed var(--border);
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--muted);
-      background: var(--bg);
-      text-align: center;
-      cursor: pointer;
-      transition: all 160ms;
-    }
-    .cs-slot.cs-filled {
-      border-style: solid;
-      border-color: var(--color-brand-navy);
-      color: var(--text);
-      background: var(--card-bg);
-    }
-    .cs-slot.cs-filled:hover { border-color: var(--red); }
-    .cs-slot.cs-ok-slot  { border-color:#16a34a; color:#15803d; background:rgba(22,163,74,.08); }
-    .cs-slot.cs-err-slot { border-color:var(--red); color:var(--red); background:rgba(214,40,57,.07); }
-
-    .cs-reset-btn {
-      margin-top: 10px;
-      padding: 6px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 100px;
-      background: transparent;
-      font-family: inherit;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--muted);
-      cursor: pointer;
-    }
-    .cs-reset-btn:hover { border-color: var(--red); color: var(--red); }
-
-    /* Match (pair clicking) ------------------------------------------------ */
-    .match-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-    .match-col { display: flex; flex-direction: column; gap: 8px; }
-    .match-chip {
-      padding: 10px 14px;
-      border-radius: 10px;
-      border: 1.5px solid var(--border);
-      background: var(--card-bg);
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text);
-      cursor: pointer;
-      text-align: center;
-      transition: all 180ms;
-      user-select: none;
-    }
-    .match-chip:hover:not([data-paired]):not([disabled]) {
-      border-color: var(--color-brand-navy);
-      background: rgba(26,45,107,.05);
-    }
-    .match-chip.match-selected {
-      border-color: #4B8DEE;
-      background: rgba(75,141,238,.12);
-      color: #1a4db8;
-      box-shadow: 0 0 0 3px rgba(75,141,238,.20);
-    }
-    .match-chip.match-ok  { border-color:#16a34a; background:rgba(22,163,74,.1); color:#15803d; cursor:default; }
-    .match-chip.match-err { border-color:var(--red); background:rgba(214,40,57,.08); color:var(--red); }
-
-    /* Column sort (propre / figuré, etc.) ---------------------------------- */
-    .col-sort-items { display: flex; flex-direction: column; gap: 10px; }
-    .col-sort-item {
-      padding: 12px 14px;
-      background: var(--bg);
-      border-radius: 10px;
-      border: 1.5px solid var(--border);
-    }
-    .col-sort-text {
-      font-size: 14px;
-      color: var(--text);
-      margin-bottom: 10px;
-      line-height: 1.5;
-    }
-    .col-sort-btns { display: flex; gap: 8px; }
-    .col-sort-btn {
-      flex: 1;
-      padding: 7px 10px;
-      border-radius: 8px;
-      border: 1.5px solid var(--border);
-      background: var(--card-bg);
-      font-family: inherit;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 160ms;
-    }
-    .col-sort-btn:hover:not([disabled]) { opacity: .8; }
-    .col-sort-btn.col-btn-a { color: var(--color-niveau-cm1); border-color: var(--color-niveau-cm1); }
-    .col-sort-btn.col-btn-b { color: var(--color-brand-gold); border-color: var(--color-brand-gold); }
-    .col-sort-btn.col-btn-a:hover:not([disabled]) { background: rgba(29,191,160,.1); }
-    .col-sort-btn.col-btn-b:hover:not([disabled]) { background: rgba(245,166,35,.1); }
-    .col-sort-btn.col-ok-a  { background:rgba(22,163,74,.12); border-color:#16a34a; color:#15803d; }
-    .col-sort-btn.col-ok-b  { background:rgba(22,163,74,.12); border-color:#16a34a; color:#15803d; }
-    .col-sort-btn.col-wrong { background:rgba(214,40,57,.08); border-color:var(--red); color:var(--red); }
-
-    /* Dictionary entry ----------------------------------------------------- */
-    .dict-entry {
-      background: var(--bg);
-      border-radius: 12px;
-      border: 1.5px solid var(--border);
-      padding: 16px 18px;
-      margin-bottom: 16px;
-    }
-    .dict-headword {
-      font-family: var(--font-display);
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--color-brand-navy);
-      margin-bottom: 2px;
-    }
-    .dict-class {
-      font-size: 12px;
-      color: var(--muted);
-      font-style: italic;
-      margin-bottom: 10px;
-    }
-    .dict-defs { list-style: none; padding: 0; margin: 0 0 10px; }
-    .dict-defs li {
-      font-size: 13px;
-      color: var(--text);
-      padding: 4px 0;
-      border-bottom: 1px solid var(--border);
-      line-height: 1.5;
-    }
-    .dict-defs li:last-child { border-bottom: none; }
-    .dict-def-num { font-weight: 700; color: var(--color-brand-navy); margin-right: 4px; }
-    .dict-example {
-      font-size: 12px;
-      color: var(--muted);
-      font-style: italic;
-    }
-
-    /* Feedback banner ------------------------------------------------------ */
-    .qz-feedback {
-      margin-top: 14px;
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 13px;
-      line-height: 1.5;
-      display: none;
-    }
-    .qz-feedback.fb-ok  { background:rgba(22,163,74,.10); color:#15803d; border:1px solid rgba(22,163,74,.25); }
-    .qz-feedback.fb-err { background:rgba(214,40,57,.08); color:#b91c1c; border:1px solid rgba(214,40,57,.20); }
-    .qz-feedback.visible { display: block; }
-
-    /* Next / Validate buttons ---------------------------------------------- */
-    .qz-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .qz-btn {
-      padding: 11px 24px;
-      border-radius: 100px;
-      border: none;
-      font-family: var(--font-display);
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 200ms;
-    }
-    .qz-btn-primary {
-      background: var(--color-brand-navy);
-      color: #fff;
-    }
-    .qz-btn-primary:hover { opacity: .88; }
-    .qz-btn-primary:disabled { opacity: .4; cursor: not-allowed; }
-    .qz-btn-secondary {
-      background: var(--bg);
-      color: var(--muted);
-      border: 1.5px solid var(--border);
-    }
-    .qz-btn-secondary:hover { border-color: var(--color-brand-navy); color: var(--color-brand-navy); }
-
-    /* Result screen -------------------------------------------------------- */
-    .qz-result {
-      text-align: center;
-      padding: 8px 0 24px;
-    }
-    .qz-result-emoji { font-size: 52px; margin-bottom: 12px; }
-    .qz-result-score {
-      font-family: var(--font-display);
-      font-size: 36px;
-      font-weight: 700;
-      color: var(--color-brand-navy);
-      margin-bottom: 6px;
-    }
-    .qz-result-msg {
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 24px;
-      line-height: 1.6;
-    }
-    .qz-result-unlock {
-      display: inline-block;
-      padding: 10px 20px;
-      background: rgba(29,191,160,.12);
-      border: 1px solid rgba(29,191,160,.35);
-      border-radius: 100px;
-      font-size: 13px;
-      font-weight: 700;
-      color: #0d7a67;
-      margin-bottom: 24px;
-    }
-
   </style>
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════════
-       HEADER
-  ═══════════════════════════════════════════ -->
+  <!-- NAVBAR -->
   <nav class="navbar">
   <div class="navbar__inner">
     <a href="index.html" class="navbar__brand">
@@ -844,9 +246,7 @@
   </div>
 </nav>
 
-  <!-- ═══════════════════════════════════════════
-       MAIN
-  ═══════════════════════════════════════════ -->
+  <!-- MAIN -->
   <div class="page-wrap">
     <div class="page-content">
 
@@ -863,236 +263,41 @@
         <p class="page-subtitle">Choisis une notion à travailler.</p>
       </div>
 
-      <!-- Controls -->
-      <div class="skill-controls">
+      <!-- Filter bar -->
+      <div class="filter-bar">
         <div class="search-wrap">
           <svg class="search-icon" width="16" height="16" viewBox="0 0 20 20" fill="none">
-            <circle cx="9" cy="9" r="6" stroke="#5F6368" stroke-width="1.8"/>
-            <path d="M13.5 13.5L17 17" stroke="#5F6368" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="2"/>
+            <line x1="12.5" y1="12.5" x2="17" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
           <input
-            type="search"
-            id="searchInput"
+            type="text"
             class="search-input"
+            id="search-input"
             placeholder="Rechercher une notion..."
             autocomplete="off"
             spellcheck="false"
           >
         </div>
-        <div class="filter-row" role="group" aria-label="Filtrer par niveau">
-          <button class="filter-btn active" data-level="all">Tous</button>
-          <button class="filter-btn" data-level="CM1">CM1</button>
-          <button class="filter-btn" data-level="CM2">CM2</button>
-          <button class="filter-btn" data-level="6e">6e</button>
+        <div class="level-filters">
+          <button class="level-btn active" data-level="all">Tous</button>
+          <button class="level-btn" data-level="CM1">CM1</button>
+          <button class="level-btn" data-level="CM2">CM2</button>
+          <button class="level-btn" data-level="6e">6e</button>
         </div>
       </div>
 
-      <div class="no-results" id="noResults">Aucune notion ne correspond à votre recherche.</div>
+      <!-- Skills container (rendered by JS) -->
+      <div class="skill-sections" id="skills-container"></div>
 
-      <!-- ═══════════════════════════════════════
-           SECTION 1 — Comprendre les mots
-      ═══════════════════════════════════════ -->
-      <section class="category-section" data-category="comprendre-mots">
-        <div class="category-header" role="button" tabindex="0" aria-expanded="true">
-          <span class="category-emoji">📚</span>
-          <h2 class="category-title">Comprendre les mots</h2>
-          <span class="category-count" id="count-comprendre-mots">6 notions</span>
-          <span class="category-toggle">▾</span>
-        </div>
-        <div class="category-divider"></div>
-        <div class="skill-grid">
-
-          <a class="skill-card" href="#ordre-alphabetique" data-levels="CM1,CM2,6e" data-slug="ordre-alphabetique">
-            <div class="skill-card-badges">
-              <span class="badge badge-cm1">CM1</span>
-              <span class="badge badge-cm2">CM2</span>
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Ranger dans l'ordre alphabétique</div>
-            <div class="skill-card-accent" style="background:var(--color-brand-navy)"></div>
-          </a>
-
-          <a class="skill-card" href="#trouver-synonyme" data-levels="CM1,CM2,6e" data-slug="trouver-synonyme">
-            <div class="skill-card-badges">
-              <span class="badge badge-cm1">CM1</span>
-              <span class="badge badge-cm2">CM2</span>
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Trouver un synonyme</div>
-            <div class="skill-card-accent" style="background:var(--blue)"></div>
-          </a>
-
-          <a class="skill-card" href="#trouver-antonyme" data-levels="CM1,CM2,6e" data-slug="trouver-antonyme">
-            <div class="skill-card-badges">
-              <span class="badge badge-cm1">CM1</span>
-              <span class="badge badge-cm2">CM2</span>
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Trouver un antonyme</div>
-            <div class="skill-card-accent" style="background:var(--blue)"></div>
-          </a>
-
-          <a class="skill-card" href="#identifier-homonyme" data-levels="CM2,6e" data-slug="identifier-homonyme">
-            <div class="skill-card-badges">
-              <span class="badge badge-cm2">CM2</span>
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Identifier un homonyme</div>
-            <div class="skill-card-accent" style="background:var(--blue)"></div>
-          </a>
-
-          <a class="skill-card" href="#polysemie" data-levels="CM2,6e" data-slug="polysemie">
-            <div class="skill-card-badges">
-              <span class="badge badge-cm2">CM2</span>
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Comprendre la polysémie d'un mot</div>
-            <div class="skill-card-accent" style="background:var(--blue)"></div>
-          </a>
-
-          <a class="skill-card" href="#sens-propre-figure" data-levels="CM2,6e" data-slug="sens-propre-figure">
-            <div class="skill-card-badges">
-              <span class="badge badge-cm2">CM2</span>
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Identifier le sens propre et le sens figuré</div>
-            <div class="skill-card-accent" style="background:var(--blue)"></div>
-          </a>
-
-        </div>
-      </section>
-
-      <!-- ═══════════════════════════════════════
-           SECTION 2 — Construire les mots
-      ═══════════════════════════════════════ -->
-      <section class="category-section" data-category="construire-mots">
-        <div class="category-header" role="button" tabindex="0" aria-expanded="true">
-          <span class="category-emoji">🏗️</span>
-          <h2 class="category-title">Construire les mots</h2>
-          <span class="category-count" id="count-construire-mots">6 notions</span>
-          <span class="category-toggle">▾</span>
-        </div>
-        <div class="category-divider"></div>
-        <div class="skill-grid">
-
-          <a class="skill-card" href="#famille-de-mots" data-levels="CM1,CM2,6e" data-slug="famille-de-mots">
-            <div class="skill-card-badges">
-              <span class="badge badge-cm1">CM1</span>
-              <span class="badge badge-cm2">CM2</span>
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Identifier une famille de mots</div>
-            <div class="skill-card-accent" style="background:var(--blue)"></div>
-          </a>
-
-          <a class="skill-card" href="#identifier-radical" data-levels="CM1,CM2,6e" data-slug="identifier-radical">
-            <div class="skill-card-badges">
-              <span class="badge badge-cm1">CM1</span>
-              <span class="badge badge-cm2">CM2</span>
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Identifier le radical d'un mot</div>
-            <div class="skill-card-accent" style="background:var(--blue)"></div>
-          </a>
-
-          <a class="skill-card" href="#identifier-prefixe" data-levels="CM1,CM2,6e" data-slug="identifier-prefixe">
-            <div class="skill-card-badges">
-              <span class="badge badge-cm1">CM1</span>
-              <span class="badge badge-cm2">CM2</span>
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Identifier un préfixe</div>
-            <div class="skill-card-accent" style="background:var(--blue)"></div>
-          </a>
-
-          <a class="skill-card" href="#identifier-suffixe" data-levels="CM1,CM2,6e" data-slug="identifier-suffixe">
-            <div class="skill-card-badges">
-              <span class="badge badge-cm1">CM1</span>
-              <span class="badge badge-cm2">CM2</span>
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Identifier un suffixe</div>
-            <div class="skill-card-accent" style="background:var(--blue)"></div>
-          </a>
-
-          <a class="skill-card" href="#mot-derive" data-levels="CM2,6e" data-slug="mot-derive">
-            <div class="skill-card-badges">
-              <span class="badge badge-cm2">CM2</span>
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Former un mot dérivé</div>
-            <div class="skill-card-accent" style="background:var(--blue)"></div>
-          </a>
-
-          <a class="skill-card" href="#origine-mots" data-levels="6e" data-slug="origine-mots">
-            <div class="skill-card-badges">
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Comprendre l'origine de certains mots (latin, grec)</div>
-            <div class="skill-card-accent" style="background:var(--red)"></div>
-          </a>
-
-        </div>
-      </section>
-
-      <!-- ═══════════════════════════════════════
-           SECTION 3 — Relations entre les mots
-      ═══════════════════════════════════════ -->
-      <section class="category-section" data-category="relations-mots">
-        <div class="category-header" role="button" tabindex="0" aria-expanded="true">
-          <span class="category-emoji">🔗</span>
-          <h2 class="category-title">Relations entre les mots</h2>
-          <span class="category-count" id="count-relations-mots">4 notions</span>
-          <span class="category-toggle">▾</span>
-        </div>
-        <div class="category-divider"></div>
-        <div class="skill-grid">
-
-          <a class="skill-card" href="#regrouper-par-theme" data-levels="CM1,CM2,6e" data-slug="regrouper-par-theme">
-            <div class="skill-card-badges">
-              <span class="badge badge-cm1">CM1</span>
-              <span class="badge badge-cm2">CM2</span>
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Regrouper des mots par thème</div>
-            <div class="skill-card-accent" style="background:var(--blue)"></div>
-          </a>
-
-          <a class="skill-card" href="#champ-lexical" data-levels="CM2,6e" data-slug="champ-lexical">
-            <div class="skill-card-badges">
-              <span class="badge badge-cm2">CM2</span>
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Identifier un champ lexical</div>
-            <div class="skill-card-accent" style="background:var(--blue)"></div>
-          </a>
-
-          <a class="skill-card" href="#mot-adapte-contexte" data-levels="CM2,6e" data-slug="mot-adapte-contexte">
-            <div class="skill-card-badges">
-              <span class="badge badge-cm2">CM2</span>
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Choisir le mot adapté au contexte</div>
-            <div class="skill-card-accent" style="background:var(--blue)"></div>
-          </a>
-
-          <a class="skill-card" href="#niveaux-de-langue" data-levels="6e" data-slug="niveaux-de-langue">
-            <div class="skill-card-badges">
-              <span class="badge badge-6e">6e</span>
-            </div>
-            <div class="skill-card-title">Distinguer les niveaux de langue</div>
-            <div class="skill-card-accent" style="background:var(--red)"></div>
-          </a>
-
-        </div>
-      </section>
+      <div class="empty-state" id="empty-state">
+        Aucune notion ne correspond à ta recherche.
+      </div>
 
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════
-       FOOTER
-  ═══════════════════════════════════════════ -->
+  <!-- FOOTER -->
   <footer>
   <div class="footer__inner">
     <p class="footer__text">
@@ -1113,797 +318,218 @@
   </div>
 </footer>
 
-  <!-- ═══════════════════════════════════════════
-       EXERCISE PANEL OVERLAY
-  ═══════════════════════════════════════════ -->
-  <div id="exerciseOverlay" class="ex-overlay" aria-hidden="true">
-    <div id="exercisePanel" class="ex-panel" role="dialog" aria-modal="true" aria-label="Exercices">
-
-      <div class="ex-panel-header">
-        <button class="ex-close-btn" id="exerciseCloseBtn" aria-label="Fermer">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
-        <div class="ex-skill-info">
-          <div class="ex-skill-badges" id="exerciseSkillBadges"></div>
-          <div class="ex-skill-title" id="exerciseSkillTitle"></div>
-        </div>
-      </div>
-
-      <!-- Filled dynamically: level-select OR question OR result screen -->
-      <div id="exercisePanelBody" class="ex-panel-body"></div>
-
-      <!-- Legacy toggle (only shown for old-format skills) -->
-      <div class="ex-type-toggle-wrap" id="legacyToggleWrap" style="display:none">
-        <div class="ex-type-toggle" role="group" aria-label="Type d'exercice">
-          <button class="ex-type-btn active" data-type="fillBlank">Texte à trous</button>
-          <button class="ex-type-btn" data-type="mcq">QCM</button>
-        </div>
-      </div>
-      <div class="ex-list" id="exerciseList" style="display:none"></div>
-
-    </div>
-  </div>
-
   <script>
-    /* ════════════════════════════════════════════════════════════════════════
-       SKILL DATA  —  single source of truth
-       Toutes les compétences sont dans js/lex-comprendre.js, js/lex-construire.js et js/lex-relations.js
-    ════════════════════════════════════════════════════════════════════════ */
-    const SKILLS = []; // toutes les compétences sont désormais dans LEX_COMPRENDRE, LEX_CONSTRUIRE et LEX_RELATIONS
-
-    /* ════════════════════════════════════════════════════════════════════════
-       UTILITIES
-    ════════════════════════════════════════════════════════════════════════ */
-
-    function shuffle(array) {
-      const a = [...array];
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
+    /* ── Data ──────────────────────────────────────────────────────────────
+       Catalogue statique (titres/niveaux repris de data/vocabulaire.js, seule
+       source de vérité pour le contenu des exercices). Tous les slugs pointent
+       vers exercise.html?slug=... — plus de moteur maison ni de modale.
+    ────────────────────────────────────────────────────────────────────── */
+    const SECTIONS = [
+      {
+        id: "comprendre-mots",
+        emoji: "📚",
+        title: "Comprendre les mots",
+        subSections: [
+          {
+            label: null,
+            skills: [
+              { title: "Ranger dans l'ordre alphabétique",               slug: "ordre-alphabetique",  levels: ["CM1","CM2","6e"] },
+              { title: "Trouver un synonyme",                            slug: "trouver-synonyme",    levels: ["CM1","CM2","6e"] },
+              { title: "Trouver un antonyme",                            slug: "trouver-antonyme",    levels: ["CM1","CM2","6e"] },
+              { title: "Identifier un homonyme",                        slug: "identifier-homonyme", levels: ["CM2","6e"] },
+              { title: "Comprendre la polysémie d'un mot",              slug: "polysemie",           levels: ["CM2","6e"] },
+              { title: "Identifier le sens propre et le sens figuré",   slug: "sens-propre-figure",  levels: ["CM2","6e"] },
+            ]
+          }
+        ]
+      },
+      {
+        id: "construire-mots",
+        emoji: "🏗️",
+        title: "Construire les mots",
+        subSections: [
+          {
+            label: null,
+            skills: [
+              { title: "Identifier une famille de mots",                 slug: "famille-de-mots",    levels: ["CM1","CM2","6e"] },
+              { title: "Identifier le radical d'un mot",                 slug: "identifier-radical", levels: ["CM1","CM2","6e"] },
+              { title: "Identifier un préfixe",                          slug: "identifier-prefixe", levels: ["CM1","CM2","6e"] },
+              { title: "Identifier un suffixe",                          slug: "identifier-suffixe", levels: ["CM1","CM2","6e"] },
+              { title: "Former un mot dérivé",                           slug: "mot-derive",         levels: ["CM2","6e"] },
+              { title: "Comprendre l'origine des mots (latin, grec)",    slug: "origine-mots",       levels: ["6e"] },
+            ]
+          }
+        ]
+      },
+      {
+        id: "relations-mots",
+        emoji: "🔗",
+        title: "Relations entre les mots",
+        subSections: [
+          {
+            label: null,
+            skills: [
+              { title: "Regrouper des mots par thème",       slug: "regrouper-par-theme",  levels: ["CM1","CM2","6e"] },
+              { title: "Identifier un champ lexical",        slug: "champ-lexical",        levels: ["CM2","6e"] },
+              { title: "Choisir le mot adapté au contexte",  slug: "mot-adapte-contexte",  levels: ["CM2","6e"] },
+              { title: "Distinguer les niveaux de langue",   slug: "niveaux-de-langue",    levels: ["6e"] },
+            ]
+          }
+        ]
       }
-      return a;
+    ];
+
+    /* ── Badge rendering ───────────────────────────────────────────────────── */
+    function renderBadges(levels) {
+      return levels.map(level => {
+        const cls = level === "CM1" ? "badge-cm1"
+                  : level === "CM2" ? "badge-cm2"
+                  : level === "6e"  ? "badge-6e"
+                  : "badge-niveau";
+        return `<span class="badge ${cls}">${level}</span>`;
+      }).join("");
     }
 
-    function htmlEsc(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+    /* ── Skill card rendering ──────────────────────────────────────────────── */
+    function renderSkillCard(skill, sectionId) {
+      const isBlocked = typeof lfmGuidedAccess !== 'undefined' && !lfmGuidedAccess.isAllowedSync(skill.slug);
+      const href       = isBlocked ? "#" : `exercise.html?slug=${skill.slug}`;
+      const onclick    = isBlocked ? `onclick="return false;"` : "";
+      const lockedClass = isBlocked ? " skill-card-locked" : "";
+      return `
+        <a class="skill-card${lockedClass}"
+           href="${href}"
+           data-slug="${skill.slug}"
+           data-exercise-slug="${skill.slug}"
+           data-levels="${skill.levels.join(",")}"
+           data-title="${skill.title.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}"
+           data-section="${sectionId}"
+           ${onclick}>
+          <div class="skill-badges">${renderBadges(skill.levels)}</div>
+          <div class="skill-title">${skill.title}${isBlocked ? ' 🔒' : ''}</div>
+        </a>
+      `;
     }
 
-    function badgesHTML(levels) {
-      return levels.map(lvl => {
-        const cls = lvl === 'CM1' ? 'badge-cm1' : lvl === 'CM2' ? 'badge-cm2' : 'badge-6e';
-        return `<span class="badge ${cls}">${lvl}</span>`;
-      }).join('');
+    /* ── Section rendering ─────────────────────────────────────────────────── */
+    function renderSection(section) {
+      const totalSkills = section.subSections.reduce((n, s) => n + s.skills.length, 0);
+      const label = `${totalSkills} notion${totalSkills > 1 ? "s" : ""}`;
+
+      const subSectionsHTML = section.subSections.map((sub, subIdx) => {
+        const skillsHTML = sub.skills.map(skill => renderSkillCard(skill, section.id)).join("");
+        const labelHTML  = sub.label ? `<div class="subsection-label">${sub.label}</div>` : "";
+        return `
+          <div class="subsection" data-subsection="${section.id}-${subIdx}">
+            ${labelHTML}
+            <div class="skills-grid">${skillsHTML}</div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="skill-section" data-section-id="${section.id}">
+          <div class="section-header" onclick="toggleSection('${section.id}')">
+            <span class="section-emoji">${section.emoji}</span>
+            <span class="section-title">${section.title}</span>
+            <span class="section-count" data-count-for="${section.id}">${label}</span>
+            <span class="section-toggle">▾</span>
+          </div>
+          <div class="section-body">
+            <div class="section-body-inner">
+              <div class="section-content">${subSectionsHTML}</div>
+            </div>
+          </div>
+        </div>
+      `;
     }
 
-    /* ════════════════════════════════════════════════════════════════════════
-       PANEL PRINCIPAL — gère les deux formats (niveaux + legacy)
-    ════════════════════════════════════════════════════════════════════════ */
-    const ExercisePanel = {
-      overlay: null,
-      panel:   null,
-      body:    null,
-      currentSkill: null,
-      currentType:  'fillBlank',
-      /* état quiz interactif */
-      _skill:    null,
-      _niveauIdx: 0,
-      _questions: [],
-      _qIdx:      0,
-      _score:     0,
-      _answered:  false,
-      _unlocks:   {},   /* slug → {n1: bool, n2: bool, n3: bool} */
+    /* ── Init ──────────────────────────────────────────────────────────────── */
+    async function init() {
+      if (typeof lfmGuidedAccess !== 'undefined') await lfmGuidedAccess.get();
+      document.getElementById("skills-container").innerHTML =
+        SECTIONS.map(renderSection).join("");
+      bindEvents();
+      if (typeof applySkillValidationBadges === 'function') applySkillValidationBadges();
+    }
 
-      init() {
-        this.overlay = document.getElementById('exerciseOverlay');
-        this.panel   = document.getElementById('exercisePanel');
-        this.body    = document.getElementById('exercisePanelBody');
+    /* ── Toggle section collapse ───────────────────────────────────────────── */
+    function toggleSection(sectionId) {
+      document.querySelector(`[data-section-id="${sectionId}"]`).classList.toggle("is-collapsed");
+    }
 
-        document.getElementById('exerciseCloseBtn')
-          .addEventListener('click', () => this.close());
-        this.overlay.addEventListener('click', e => {
-          if (e.target === this.overlay) this.close();
-        });
-        document.addEventListener('keydown', e => {
-          if (e.key === 'Escape' && this.overlay.classList.contains('is-open')) this.close();
-        });
+    /* ── Filter state ─────────────────────────────────────────────────────── */
+    let activeLevel = "all";
+    let searchQuery  = "";
 
-        /* Legacy toggle */
-        document.querySelectorAll('.ex-type-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            document.querySelectorAll('.ex-type-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            this.currentType = btn.dataset.type;
-            this.panel.scrollTop = 0;
-            this._renderLegacy();
-          });
-        });
+    function normalize(str) {
+      return str.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    }
 
-        document.querySelectorAll('.skill-card').forEach(card => {
-          card.addEventListener('click', e => {
-            e.preventDefault();
-            this.open(card.dataset.slug);
-          });
-        });
-      },
+    function applyFilters() {
+      const query    = normalize(searchQuery.trim());
+      let anyVisible = false;
 
-      open(slug) {
-        /* ── Nouveau système (LEX_COMPRENDRE + LEX_CONSTRUIRE + LEX_RELATIONS) ── */
-        const _allLex = [...(window.LEX_COMPRENDRE||[]), ...(window.LEX_CONSTRUIRE||[]), ...(window.LEX_RELATIONS||[])];
-        if (_allLex.length) {
-          const skill = _allLex.find(s => s.slug === slug);
-          if (skill) {
-            this._skill = skill;
-            document.getElementById('exerciseSkillBadges').innerHTML = badgesHTML(skill.levels);
-            document.getElementById('exerciseSkillTitle').textContent = skill.title;
-            document.getElementById('legacyToggleWrap').style.display = 'none';
-            document.getElementById('exerciseList').style.display = 'none';
-            this.body.style.display = '';
-            this._openPanel();
-            this._loadUnlocks(slug).then(() => this._showLevelSelect());
-            return;
+      SECTIONS.forEach(section => {
+        const sectionEl = document.querySelector(`[data-section-id="${section.id}"]`);
+        const cards     = sectionEl.querySelectorAll(".skill-card");
+        let sectionVisibleCount = 0;
+
+        cards.forEach(card => {
+          const matchesLevel  = activeLevel === "all" || card.dataset.levels.split(",").includes(activeLevel);
+          const matchesSearch = !query || card.dataset.title.includes(query);
+
+          if (matchesLevel && matchesSearch) {
+            card.classList.remove("card-hidden");
+            sectionVisibleCount++;
+            anyVisible = true;
+          } else {
+            card.classList.add("card-hidden");
           }
-        }
-        /* ── Format legacy ── */
-        this.currentSkill = SKILLS.find(s => s.slug === slug);
-        if (!this.currentSkill?.exercises) return;
-        this.body.style.display = 'none';
-        document.getElementById('legacyToggleWrap').style.display = '';
-        document.getElementById('exerciseList').style.display = '';
-        this.currentType = 'fillBlank';
-        document.querySelectorAll('.ex-type-btn').forEach(b => b.classList.remove('active'));
-        document.querySelector('[data-type="fillBlank"]').classList.add('active');
-        document.getElementById('exerciseSkillBadges').innerHTML = badgesHTML(this.currentSkill.levels);
-        document.getElementById('exerciseSkillTitle').textContent = this.currentSkill.title;
-        this._renderLegacy();
-        this._openPanel();
-      },
-
-      _openPanel() {
-        document.body.style.overflow = 'hidden';
-        this.overlay.setAttribute('aria-hidden', 'false');
-        requestAnimationFrame(() => this.overlay.classList.add('is-open'));
-        document.getElementById('exerciseCloseBtn').focus();
-      },
-
-      close() {
-        this.overlay.classList.remove('is-open');
-        this.overlay.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-        setTimeout(() => { this.panel.scrollTop = 0; }, 300);
-      },
-
-      /* ── Unlock check via Supabase ─────────────────────────────────────── */
-      async _loadUnlocks(slug) {
-        const key = `lex-${slug}`;
-        this._unlocks[slug] = { n1: false, n2: false, n3: false };
-        try {
-          if (!window.lfmDb || typeof lfmAuth === 'undefined') return;
-          const session = await lfmAuth.getSession();
-          if (!session) return;
-          const { data } = await window.lfmDb
-            .from('exercise_results')
-            .select('exercise_slug, score, total')
-            .eq('student_id', session.user.id)
-            .like('exercise_slug', `${key}-%`);
-          if (!data) return;
-          const passed = (s) => s && s.total > 0 && (s.score / s.total) >= 0.8;
-          const best = { n1: null, n2: null, n3: null };
-          data.forEach(r => {
-            const m = r.exercise_slug.match(/-n([123])$/);
-            if (!m) return;
-            const k = `n${m[1]}`;
-            if (!best[k] || r.score > best[k].score) best[k] = r;
-          });
-          this._unlocks[slug].n1 = passed(best.n1);
-          this._unlocks[slug].n2 = passed(best.n2);
-          this._unlocks[slug].n3 = passed(best.n3);
-        } catch(e) { /* silencieux */ }
-      },
-
-      /* ── Écran sélection de niveau ─────────────────────────────────────── */
-      _showLevelSelect() {
-        const slug = this._skill.slug;
-        const u = this._unlocks[slug] || {};
-        const stars = ['🌟', '⭐⭐', '🏆'];
-        const descs = this._skill.niveaux.map(n => n.desc);
-        const locked = [false, !u.n1, !u.n2];
-        const passed = [u.n1, u.n2, u.n3];
-
-        this.body.innerHTML = `
-          <p class="lv-intro">Choisis un niveau. Réussis le Niveau 1 pour débloquer le Niveau 2, etc.<br>
-          <strong>Réussite</strong> = 4 bonnes réponses sur 5.</p>
-          <div class="lv-grid">
-            ${[0,1,2].map(i => `
-              <button class="lv-card ${locked[i] ? 'lv-locked' : ''}"
-                      data-num="${i+1}" ${locked[i] ? 'disabled' : ''}>
-                <div class="lv-badge lv-badge-${i+1}">${i+1}</div>
-                <div class="lv-info">
-                  <div class="lv-num">Niveau ${i+1}</div>
-                  <div class="lv-desc">${descs[i]}</div>
-                </div>
-                ${locked[i]
-                  ? `<span class="lv-lock">🔒</span>`
-                  : passed[i]
-                    ? `<span class="lv-star">${stars[i]}</span>`
-                    : ''}
-              </button>`).join('')}
-          </div>`;
-
-        this.body.querySelectorAll('.lv-card:not(.lv-locked)').forEach(btn => {
-          btn.addEventListener('click', () => this._startLevel(+btn.dataset.num));
-        });
-        this.panel.scrollTop = 0;
-      },
-
-      /* ── Démarrer un niveau ────────────────────────────────────────────── */
-      _startLevel(num) {
-        this._niveauIdx = num - 1;
-        this._questions = this._skill.niveaux[this._niveauIdx].questions;
-        this._qIdx  = 0;
-        this._score = 0;
-        this._renderQuestion();
-      },
-
-      /* ── Rendu d'une question ──────────────────────────────────────────── */
-      _renderQuestion() {
-        const q     = this._questions[this._qIdx];
-        const total = this._questions.length;
-        const pct   = Math.round((this._qIdx / total) * 100);
-        this._answered = false;
-
-        let questionHTML = '';
-        switch(q.type) {
-          case 'mcq':      questionHTML = this._renderMCQ(q);      break;
-          case 'dict-mcq': questionHTML = this._renderDictMCQ(q);  break;
-          case 'click-sort': questionHTML = this._renderClickSort(q); break;
-          case 'match':    questionHTML = this._renderMatch(q);    break;
-          case 'col-sort': questionHTML = this._renderColSort(q);  break;
-          default:         questionHTML = `<p>Type inconnu : ${q.type}</p>`;
-        }
-
-        this.body.innerHTML = `
-          <div class="qz-progress-wrap">
-            <div class="qz-progress-top">
-              <span>Niveau ${this._niveauIdx + 1} — Question ${this._qIdx + 1}/${total}</span>
-              <span>${this._score}/${this._qIdx} ✓</span>
-            </div>
-            <div class="qz-bar-bg"><div class="qz-bar-fill" style="width:${pct}%"></div></div>
-          </div>
-          ${questionHTML}
-          <div class="qz-feedback" id="qzFeedback"></div>
-          <div class="qz-actions">
-            <button class="qz-btn qz-btn-primary" id="qzValidate" disabled>Valider</button>
-            <button class="qz-btn qz-btn-secondary" id="qzBack">← Niveaux</button>
-          </div>`;
-
-        this.panel.scrollTop = 0;
-        this._bindQuestionEvents(q);
-
-        document.getElementById('qzBack').addEventListener('click', () => this._showLevelSelect());
-        document.getElementById('qzValidate').addEventListener('click', () => this._validate(q));
-      },
-
-      _bindQuestionEvents(q) {
-        const validateBtn = () => document.getElementById('qzValidate');
-        if (q.type === 'mcq' || q.type === 'dict-mcq') {
-          document.querySelectorAll('.qz-choice').forEach(btn => {
-            btn.addEventListener('click', () => {
-              if (this._answered) return;
-              document.querySelectorAll('.qz-choice').forEach(b => b.classList.remove('qz-selected'));
-              btn.classList.add('qz-selected');
-              validateBtn().disabled = false;
-            });
-          });
-        }
-        if (q.type === 'click-sort') {
-          this._bindClickSort(q, validateBtn);
-        }
-        if (q.type === 'match') {
-          this._bindMatch(q, validateBtn);
-        }
-        if (q.type === 'col-sort') {
-          this._bindColSort(q, validateBtn);
-        }
-      },
-
-      /* ── RENDU MCQ ─────────────────────────────────────────────────────── */
-      _renderMCQ(q) {
-        const shuffled = shuffle(q.choices);
-        return `
-          <div class="qz-instruction">${htmlEsc(q.instruction)}</div>
-          <div class="qz-choices">
-            ${shuffled.map(c => `
-              <button class="qz-choice" data-value="${htmlEsc(c)}">
-                <span class="qz-dot"></span>
-                <span>${htmlEsc(c)}</span>
-              </button>`).join('')}
-          </div>`;
-      },
-
-      /* ── RENDU DICT-MCQ ────────────────────────────────────────────────── */
-      _renderDictMCQ(q) {
-        const e = q.entry;
-        const defsHTML = e.defs.map(d => `<li><span class="dict-def-num"></span>${htmlEsc(d)}</li>`).join('');
-        const shuffled = shuffle(q.choices);
-        return `
-          <div class="dict-entry">
-            <div class="dict-headword">${htmlEsc(e.mot)}</div>
-            <div class="dict-class">${htmlEsc(e.classe)}</div>
-            <ul class="dict-defs">${defsHTML}</ul>
-            ${e.exemple ? `<div class="dict-example">${htmlEsc(e.exemple)}</div>` : ''}
-          </div>
-          <div class="qz-instruction">${htmlEsc(q.question)}</div>
-          <div class="qz-choices">
-            ${shuffled.map(c => `
-              <button class="qz-choice" data-value="${htmlEsc(c)}">
-                <span class="qz-dot"></span>
-                <span>${htmlEsc(c)}</span>
-              </button>`).join('')}
-          </div>`;
-      },
-
-      /* ── RENDU CLICK-SORT ──────────────────────────────────────────────── */
-      _renderClickSort(q) {
-        const scrambled = shuffle([...q.words]);
-        return `
-          <div class="qz-instruction">${htmlEsc(q.instruction)}</div>
-          <div class="cs-bank-label">Mots à classer :</div>
-          <div class="cs-bank" id="csBank">
-            ${scrambled.map((w,i) => `<button class="cs-chip" data-word="${htmlEsc(w)}" data-idx="${i}">${htmlEsc(w)}</button>`).join('')}
-          </div>
-          <div class="cs-slots-label">Ton classement (clique les mots dans l'ordre) :</div>
-          <div class="cs-slots" id="csSlots">
-            ${q.answer.map((_,i) => `<div class="cs-slot" data-pos="${i}">${i+1}</div>`).join('')}
-          </div>
-          <button class="cs-reset-btn" id="csReset">↺ Recommencer</button>`;
-      },
-
-      _bindClickSort(q, validateBtn) {
-        const bank  = document.getElementById('csBank');
-        const slots = document.getElementById('csSlots');
-        const reset = document.getElementById('csReset');
-        let placed = []; /* ordered list of words placed */
-
-        const refresh = () => {
-          slots.querySelectorAll('.cs-slot').forEach((slot, i) => {
-            slot.textContent = placed[i] || (i+1);
-            slot.classList.toggle('cs-filled', !!placed[i]);
-          });
-          validateBtn().disabled = placed.length < q.answer.length;
-        };
-
-        bank.addEventListener('click', e => {
-          if (this._answered) return;
-          const chip = e.target.closest('.cs-chip');
-          if (!chip || chip.classList.contains('cs-placed')) return;
-          if (placed.length >= q.answer.length) return;
-          placed.push(chip.dataset.word);
-          chip.classList.add('cs-placed');
-          refresh();
         });
 
-        slots.addEventListener('click', e => {
-          if (this._answered) return;
-          const slot = e.target.closest('.cs-slot');
-          if (!slot || !slot.classList.contains('cs-filled')) return;
-          const pos = +slot.dataset.pos;
-          const word = placed[pos];
-          placed.splice(pos, 1);
-          /* re-enable chip */
-          bank.querySelectorAll('.cs-chip').forEach(c => {
-            if (c.dataset.word === word && c.classList.contains('cs-placed')) {
-              c.classList.remove('cs-placed');
-              return;
-            }
-          });
-          refresh();
+        sectionEl.querySelectorAll(".subsection").forEach(sub => {
+          const visibleInSub = sub.querySelectorAll(".skill-card:not(.card-hidden)").length;
+          sub.style.display  = visibleInSub === 0 ? "none" : "";
         });
 
-        reset.addEventListener('click', () => {
-          if (this._answered) return;
-          placed = [];
-          bank.querySelectorAll('.cs-chip').forEach(c => c.classList.remove('cs-placed'));
-          refresh();
-        });
+        const countEl = sectionEl.querySelector(`[data-count-for="${section.id}"]`);
+        const total   = section.subSections.reduce((n, s) => n + s.skills.length, 0);
+        countEl.textContent = sectionVisibleCount === total
+          ? `${total} notion${total > 1 ? "s" : ""}`
+          : `${sectionVisibleCount} / ${total}`;
 
-        /* Store accessor for validate */
-        this._csGetPlaced = () => placed;
-      },
-
-      /* ── RENDU MATCH ───────────────────────────────────────────────────── */
-      _renderMatch(q) {
-        const lefts  = shuffle(q.pairs.map(p => p.left));
-        const rights = shuffle(q.pairs.map(p => p.right));
-        return `
-          <div class="qz-instruction">${htmlEsc(q.instruction)}</div>
-          <div class="match-grid">
-            <div class="match-col" id="matchLeft">
-              ${lefts.map(l => `<button class="match-chip" data-side="left" data-word="${htmlEsc(l)}">${htmlEsc(l)}</button>`).join('')}
-            </div>
-            <div class="match-col" id="matchRight">
-              ${rights.map(r => `<button class="match-chip" data-side="right" data-word="${htmlEsc(r)}">${htmlEsc(r)}</button>`).join('')}
-            </div>
-          </div>`;
-      },
-
-      _bindMatch(q, validateBtn) {
-        let selected = null; /* { side, word, el } */
-        let matched  = 0;
-        const total  = q.pairs.length;
-        const pairMap = {};
-        q.pairs.forEach(p => {
-          pairMap[p.left]  = p.right;
-          pairMap[p.right] = p.left;
-        });
-
-        document.querySelectorAll('.match-chip').forEach(chip => {
-          chip.addEventListener('click', () => {
-            if (this._answered || chip.hasAttribute('data-paired')) return;
-
-            if (!selected) {
-              chip.classList.add('match-selected');
-              selected = { side: chip.dataset.side, word: chip.dataset.word, el: chip };
-              return;
-            }
-
-            if (selected.el === chip) {
-              chip.classList.remove('match-selected');
-              selected = null;
-              return;
-            }
-
-            if (selected.side === chip.dataset.side) {
-              /* same side — move selection */
-              selected.el.classList.remove('match-selected');
-              chip.classList.add('match-selected');
-              selected = { side: chip.dataset.side, word: chip.dataset.word, el: chip };
-              return;
-            }
-
-            /* Different sides — check pair */
-            const isOk = pairMap[selected.word] === chip.dataset.word;
-            if (isOk) {
-              [selected.el, chip].forEach(el => {
-                el.classList.remove('match-selected');
-                el.classList.add('match-ok');
-                el.setAttribute('data-paired', '1');
-              });
-              matched++;
-              selected = null;
-              if (matched === total) validateBtn().disabled = false;
-            } else {
-              [selected.el, chip].forEach(el => el.classList.add('match-err'));
-              setTimeout(() => {
-                [selected.el, chip].forEach(el => el.classList.remove('match-err', 'match-selected'));
-                selected = null;
-              }, 700);
-            }
-          });
-        });
-
-        this._matchGetScore = () => matched;
-        this._matchTotal    = () => total;
-      },
-
-      /* ── RENDU COL-SORT ────────────────────────────────────────────────── */
-      _renderColSort(q) {
-        return `
-          <div class="qz-instruction">${htmlEsc(q.instruction)}</div>
-          <div style="display:flex;gap:12px;margin-bottom:14px;">
-            <span style="background:rgba(29,191,160,.15);color:#0d7a67;padding:4px 14px;border-radius:100px;font-size:12px;font-weight:700;">${htmlEsc(q.colA)}</span>
-            <span style="background:rgba(245,166,35,.15);color:#92400e;padding:4px 14px;border-radius:100px;font-size:12px;font-weight:700;">${htmlEsc(q.colB)}</span>
-          </div>
-          <div class="col-sort-items" id="colSortItems">
-            ${shuffle([...q.items]).map((item, i) => `
-              <div class="col-sort-item" data-idx="${i}" data-answer="${item.answer}" data-feedback="${htmlEsc(item.feedback)}">
-                <div class="col-sort-text">${htmlEsc(item.text)}</div>
-                <div class="col-sort-btns">
-                  <button class="col-sort-btn col-btn-a" data-col="A">${htmlEsc(q.colA)}</button>
-                  <button class="col-sort-btn col-btn-b" data-col="B">${htmlEsc(q.colB)}</button>
-                </div>
-              </div>`).join('')}
-          </div>`;
-      },
-
-      _bindColSort(q, validateBtn) {
-        let answered = 0;
-        const total  = q.items.length;
-        document.querySelectorAll('.col-sort-item').forEach(item => {
-          item.querySelectorAll('.col-sort-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-              if (item.dataset.done) return;
-              item.dataset.done = '1';
-              const correct = btn.dataset.col === item.dataset.answer;
-              btn.classList.add(correct ? (btn.dataset.col === 'A' ? 'col-ok-a' : 'col-ok-b') : 'col-wrong');
-              const other = item.querySelector(`.col-sort-btn[data-col="${item.dataset.answer}"]`);
-              if (!correct) other.classList.add(item.dataset.answer === 'A' ? 'col-ok-a' : 'col-ok-b');
-              item.querySelectorAll('.col-sort-btn').forEach(b => b.disabled = true);
-              /* micro-feedback */
-              const fb = document.createElement('div');
-              fb.style.cssText = `font-size:12px;color:${correct?'#15803d':'#b91c1c'};margin-top:6px;`;
-              fb.textContent = item.dataset.feedback;
-              item.appendChild(fb);
-              answered++;
-              if (answered === total) validateBtn().disabled = false;
-            });
-          });
-        });
-
-        this._colSortGetScore = () => {
-          let ok = 0;
-          document.querySelectorAll('.col-sort-item').forEach(item => {
-            const chosenEl = item.querySelector('.col-ok-a, .col-ok-b');
-            if (chosenEl && chosenEl.dataset.col === item.dataset.answer) ok++;
-          });
-          return ok;
-        };
-        this._colSortTotal = () => total;
-      },
-
-      /* ── VALIDATION ────────────────────────────────────────────────────── */
-      _validate(q) {
-        if (this._answered) return;
-        this._answered = true;
-        document.getElementById('qzValidate').disabled = true;
-
-        let ok = false;
-        let score = 0;
-        let total = 1;
-
-        if (q.type === 'mcq' || q.type === 'dict-mcq') {
-          const sel = document.querySelector('.qz-choice.qz-selected');
-          if (!sel) return;
-          ok = sel.dataset.value === q.answer;
-          score = ok ? 1 : 0;
-          document.querySelectorAll('.qz-choice').forEach(btn => {
-            btn.disabled = true;
-            if (btn.dataset.value === q.answer) btn.classList.add('qz-correct');
-            else if (btn.classList.contains('qz-selected') && !ok) btn.classList.add('qz-wrong');
-          });
-        }
-
-        if (q.type === 'click-sort') {
-          const placed = this._csGetPlaced ? this._csGetPlaced() : [];
-          ok = placed.join('|') === q.answer.join('|');
-          score = ok ? 1 : 0;
-          /* show correct */
-          document.querySelectorAll('.cs-slot').forEach((slot, i) => {
-            const isRight = placed[i] === q.answer[i];
-            slot.classList.add(isRight ? 'cs-ok-slot' : 'cs-err-slot');
-          });
-          document.querySelectorAll('.cs-chip').forEach(chip => {
-            const i = q.answer.indexOf(chip.dataset.word);
-            chip.classList.add('cs-done');
-            chip.classList.add(placed.includes(chip.dataset.word) && ok ? 'cs-ok' : 'cs-err');
-          });
-        }
-
-        if (q.type === 'match') {
-          const m = this._matchGetScore ? this._matchGetScore() : 0;
-          const t = this._matchTotal  ? this._matchTotal()    : q.pairs.length;
-          ok    = m === t;
-          score = m;
-          total = t;
-        }
-
-        if (q.type === 'col-sort') {
-          score = this._colSortGetScore ? this._colSortGetScore() : 0;
-          total = this._colSortTotal   ? this._colSortTotal()    : q.items.length;
-          ok    = score === total;
-        }
-
-        /* Accumulate score (normalize to 1 question = 1 point) */
-        this._score += (score / total);
-
-        /* Feedback */
-        const fb = document.getElementById('qzFeedback');
-        fb.textContent = (ok ? '✓ ' : '✗ ') + q.feedback;
-        fb.className = `qz-feedback visible ${ok ? 'fb-ok' : 'fb-err'}`;
-
-        /* Replace Valider with Suivant */
-        const btn = document.getElementById('qzValidate');
-        btn.disabled = false;
-        const isLast = this._qIdx === this._questions.length - 1;
-        btn.textContent = isLast ? 'Voir mes résultats' : 'Question suivante →';
-        btn.onclick = () => {
-          if (isLast) this._showResult();
-          else { this._qIdx++; this._renderQuestion(); }
-        };
-      },
-
-      /* ── ÉCRAN RÉSULTATS ───────────────────────────────────────────────── */
-      async _showResult() {
-        const total  = this._questions.length;
-        const score  = Math.round(this._score);
-        const passed = score >= Math.ceil(total * 0.8);
-        const num    = this._niveauIdx + 1;
-        const slug   = this._skill.slug;
-
-        /* Save to Supabase */
-        try {
-          if (window.saveExerciseResult) {
-            await saveExerciseResult({
-              exerciseSlug: `lex-${slug}-n${num}`,
-              subject:      'français',
-              category:     'vocabulaire',
-              exerciseType: `niveau-${num}`,
-              level:        `Niveau ${num}`,
-              score,
-              total
-            });
-          }
-        } catch(e) { /* silencieux */ }
-
-        /* Update local unlock cache */
-        if (!this._unlocks[slug]) this._unlocks[slug] = {};
-        if (passed) this._unlocks[slug][`n${num}`] = true;
-
-        const emoji   = passed ? (score === total ? '🏆' : '🌟') : '💪';
-        const unlockMsg = passed && num < 3
-          ? `<div class="qz-result-unlock">🔓 Niveau ${num+1} débloqué !</div>` : '';
-
-        this.body.innerHTML = `
-          <div class="qz-result">
-            <div class="qz-result-emoji">${emoji}</div>
-            <div class="qz-result-score">${score} / ${total}</div>
-            <div class="qz-result-msg">
-              ${passed
-                ? `Bravo ! Tu as réussi le Niveau ${num}.`
-                : `Tu as obtenu ${score} bonne${score>1?'s':''} réponse${score>1?'s':''} sur ${total}. Il faut au moins ${Math.ceil(total*0.8)} pour valider ce niveau. Entraîne-toi encore !`}
-            </div>
-            ${unlockMsg}
-            <div class="qz-actions" style="justify-content:center;gap:12px;">
-              <button class="qz-btn qz-btn-primary" id="qzRetry">↺ Recommencer ce niveau</button>
-              <button class="qz-btn qz-btn-secondary" id="qzLevels">← Tous les niveaux</button>
-            </div>
-          </div>`;
-
-        document.getElementById('qzRetry').addEventListener('click', () => this._startLevel(num));
-        document.getElementById('qzLevels').addEventListener('click', () => this._showLevelSelect());
-        this.panel.scrollTop = 0;
-      },
-
-      /* ── LEGACY ────────────────────────────────────────────────────────── */
-      _renderLegacy() {
-        const exList    = document.getElementById('exerciseList');
-        const exercises = this.currentSkill.exercises[this.currentType];
-        if (this.currentType === 'fillBlank') {
-          exList.innerHTML = exercises.map((ex, i) => this._fillBlankItem(ex, i)).join('');
+        if (sectionVisibleCount === 0) {
+          sectionEl.classList.add("section-hidden");
         } else {
-          exList.innerHTML = exercises.map((ex, i) => this._mcqItem(ex, i)).join('');
-          this._bindLegacyChoices();
+          sectionEl.classList.remove("section-hidden");
+          if (query) sectionEl.classList.remove("is-collapsed");
         }
-      },
-      _fillBlankItem(ex, i) {
-        const parts = ex.sentence.split('____');
-        const input = `<input class="ex-blank" type="text" autocomplete="off" spellcheck="false"
-          aria-label="Votre réponse" data-answer="${htmlEsc(ex.answer)}" placeholder="…">`;
-        const sentence = htmlEsc(parts[0]) + input + (parts[1] ? htmlEsc(parts[1]) : '');
-        return `<div class="ex-item"><div class="ex-item-num">Exercice ${i+1}</div>
-          <div class="ex-sentence">${sentence}</div>
-          <div class="ex-hint">${htmlEsc(ex.hint)}</div></div>`;
-      },
-      _mcqItem(ex, i) {
-        const shuffled = shuffle(ex.choices);
-        const choices  = shuffled.map(c => `
-          <button class="ex-choice" data-correct="${htmlEsc(ex.answer)}" data-value="${htmlEsc(c)}">
-            <span class="ex-choice-dot"></span><span>${htmlEsc(c)}</span>
-          </button>`).join('');
-        return `<div class="ex-item"><div class="ex-item-num">Exercice ${i+1}</div>
-          <div class="ex-question">${htmlEsc(ex.question)}</div>
-          <div class="ex-choices">${choices}</div></div>`;
-      },
-      _bindLegacyChoices() {
-        document.querySelectorAll('.ex-choice').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const item = btn.closest('.ex-item');
-            if (item.querySelector('.correct, .incorrect')) return;
-            const correct = btn.dataset.value === btn.dataset.correct;
-            btn.classList.add(correct ? 'correct' : 'incorrect');
-            if (!correct) {
-              item.querySelectorAll('.ex-choice').forEach(c => {
-                if (c.dataset.value === c.dataset.correct) c.classList.add('correct');
-              });
-            }
-          });
+      });
+
+      document.getElementById("empty-state").classList.toggle("visible", !anyVisible);
+    }
+
+    /* ── Event binding ────────────────────────────────────────────────────── */
+    function bindEvents() {
+      document.getElementById("search-input").addEventListener("input", e => {
+        searchQuery = e.target.value;
+        applyFilters();
+      });
+
+      document.querySelectorAll(".level-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".level-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          activeLevel = btn.dataset.level;
+          applyFilters();
         });
-      }
-    };
-
-    /* ════════════════════════════════════════════════════════════════════════
-       FILTER / SEARCH / COLLAPSE
-    ════════════════════════════════════════════════════════════════════════ */
-    const searchInput = document.getElementById('searchInput');
-    const filterBtns  = document.querySelectorAll('.filter-btn');
-    const allCards    = document.querySelectorAll('.skill-card');
-    const noResults   = document.getElementById('noResults');
-
-    let activeLevel = 'all';
-    let searchQuery = '';
-
-    function normalise(str) {
-      return str.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+      });
     }
 
-    function updateVisibility() {
-      const q = normalise(searchQuery.trim());
-      const catCounts = {};
-
-      document.querySelectorAll('.category-section').forEach(s => {
-        catCounts[s.dataset.category] = 0;
-      });
-
-      allCards.forEach(card => {
-        const levels   = card.dataset.levels.split(',');
-        const title    = normalise(card.querySelector('.skill-card-title').textContent);
-        const category = card.closest('.category-section').dataset.category;
-
-        const levelOk  = activeLevel === 'all' || levels.includes(activeLevel);
-        const searchOk = !q || title.includes(q);
-        const visible  = levelOk && searchOk;
-
-        card.style.display = visible ? '' : 'none';
-        if (visible) catCounts[category]++;
-      });
-
-      let totalVisible = 0;
-      document.querySelectorAll('.category-section').forEach(section => {
-        const cat   = section.dataset.category;
-        const count = catCounts[cat] || 0;
-        totalVisible += count;
-
-        const countEl = section.querySelector('.category-count');
-        if (countEl) countEl.textContent = count + (count === 1 ? ' notion' : ' notions');
-
-        section.style.display = count === 0 ? 'none' : '';
-      });
-
-      noResults.classList.toggle('visible', totalVisible === 0);
-    }
-
-    searchInput.addEventListener('input', e => {
-      searchQuery = e.target.value;
-      updateVisibility();
-    });
-
-    filterBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeLevel = btn.dataset.level;
-        updateVisibility();
-      });
-    });
-
-    document.querySelectorAll('.category-header').forEach(header => {
-      const toggle = () => {
-        const section   = header.closest('.category-section');
-        const collapsed = section.classList.toggle('collapsed');
-        header.setAttribute('aria-expanded', String(!collapsed));
-      };
-      header.addEventListener('click', toggle);
-      header.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
-      });
-    });
-
-    /* ── Boot ─────────────────────────────────────────────────────────────── */
-    ExercisePanel.init();
+    init();
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/results.js"></script>
-  <script src="js/lex-comprendre.js"></script>
-  <script src="js/lex-construire.js"></script>
-  <script src="js/lex-relations.js"></script>
   <script src="js/menu.js"></script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */

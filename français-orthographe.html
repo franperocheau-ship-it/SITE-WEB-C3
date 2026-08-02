@@ -416,8 +416,8 @@
               { title: "ces / ses / c'est / s'est / sait / sais",                             slug: "ortho-distinguer-ces-ses-cest-sest",      levels: ["CM1","CM2","6e"] },
               { title: "Distinguer ou / où",                                                   slug: "ortho-distinguer-ou-ou",                  levels: ["CM1","CM2","6e"] },
               { title: "Distinguer leur / leurs",                                              slug: "ortho-distinguer-leur-leurs",             levels: ["CM1","CM2","6e"] },
-              { title: "tout, tous, toute, toutes",                                             slug: "ortho-distinguer-tout",                   levels: ["CM1","CM2","6e"] },
-              { title: "Distinguer quel(s), quelle(s), qu'elle(s)",                           slug: "ortho-distinguer-quel",                   levels: ["CM1","CM2","6e"] },
+              { title: "tout, tous, toute, toutes",                                             slug: "ortho-distinguer-tout-tous-toute-toutes", levels: ["CM1","CM2","6e"] },
+              { title: "Distinguer quel(s), quelle(s), qu'elle(s)",                           slug: "ortho-distinguer-quel-quelle-quels-quelles", levels: ["CM1","CM2","6e"] },
             ]
           }
         ]
@@ -451,21 +451,21 @@
       "ortho-distinguer-a-a",
       "ortho-distinguer-et-est",
       "ortho-distinguer-on-ont",
+      "ortho-distinguer-son-sont",
+      "ortho-distinguer-ce-se",
+      "ortho-distinguer-ces-ses-cest-sest",
+      "ortho-distinguer-leur-leurs",
+      "ortho-distinguer-tout-tous-toute-toutes",
+      "ortho-distinguer-ou-ou",
+      "ortho-distinguer-quel-quelle-quels-quelles",
       "ortho-mots-invariables"
     ]);
 
-    const CUSTOM_HREFS = {
-      "ortho-distinguer-a-a":               "ortho-distinguer-a-a.html",
-      "ortho-distinguer-et-est":            "ortho-distinguer-et-est.html",
-      "ortho-distinguer-son-sont":          "ortho-distinguer-son-sont.html",
-      "ortho-distinguer-on-ont":            "ortho-distinguer-on-ont.html",
-      "ortho-distinguer-ce-se":             "ortho-distinguer-ce-se.html",
-      "ortho-distinguer-ces-ses-cest-sest": "ortho-distinguer-ces-ses-cest-sest.html",
-      "ortho-distinguer-leur-leurs":        "ortho-distinguer-leur-leurs.html",
-      "ortho-distinguer-tout":              "ortho-distinguer-tout-tous-toute-toutes.html",
-      "ortho-distinguer-ou-ou":            "ortho-distinguer-ou-ou.html",
-      "ortho-distinguer-quel":             "ortho-distinguer-quel-quelle-quels-quelles.html"
-    };
+    /* Les 10 homophones grammaticaux étaient auparavant des pages autonomes
+       (ortho-distinguer-*.html, voir CUSTOM_HREFS) ; ils sont désormais
+       pilotés par exercise.html?slug=... comme le reste du catalogue
+       (données dans data/orthographe-homophones.js). */
+    const CUSTOM_HREFS = {};
 
     /* ── Badge rendering ───────────────────────────────────────────────────── */
     function renderBadges(levels) {

@@ -1400,6 +1400,284 @@
       margin-bottom: 10px;
     }
 
+    /* ── Type : click-sort / match / col-sort / dict-mcq ──────────────────
+       Portés depuis français-lexique.html (ExercisePanel) — mêmes noms de
+       classes, mêmes règles visuelles, pour rester cohérent si Vocabulaire
+       migre vers ce moteur standard plus tard.
+    ────────────────────────────────────────────────────────────────────── */
+    .cs-bank-label, .cs-slots-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .cs-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 44px;
+      padding: 10px;
+      background: var(--bg);
+      border-radius: 10px;
+      border: 1.5px dashed var(--border);
+      margin-bottom: 16px;
+    }
+    .cs-chip {
+      padding: 7px 14px;
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 160ms;
+      user-select: none;
+    }
+    .cs-chip:hover:not(.cs-placed):not(.cs-done) {
+      border-color: #4B8DEE;
+      background: rgba(75,141,238,.09);
+    }
+    .cs-chip.cs-placed { opacity: .35; cursor: default; }
+    .cs-chip.cs-done.cs-ok  { background:rgba(22,163,74,.12); border-color:#16a34a; color:#15803d; }
+    .cs-chip.cs-done.cs-err { background:rgba(214,40,57,.09); border-color:var(--red); color:var(--red); }
+
+    .cs-slots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .cs-slot {
+      min-width: 80px;
+      padding: 7px 14px;
+      border-radius: 100px;
+      border: 1.5px dashed var(--border);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      background: var(--bg);
+      text-align: center;
+      cursor: pointer;
+      transition: all 160ms;
+    }
+    .cs-slot.cs-filled {
+      border-style: solid;
+      border-color: var(--color-brand-navy);
+      color: var(--text);
+      background: var(--card-bg);
+    }
+    .cs-slot.cs-filled:hover { border-color: var(--red); }
+    .cs-slot.cs-ok-slot  { border-color:#16a34a; color:#15803d; background:rgba(22,163,74,.08); }
+    .cs-slot.cs-err-slot { border-color:var(--red); color:var(--red); background:rgba(214,40,57,.07); }
+
+    .cs-reset-btn {
+      margin-top: 10px;
+      padding: 6px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      background: transparent;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .cs-reset-btn:hover { border-color: var(--red); color: var(--red); }
+
+    .match-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .match-col { display: flex; flex-direction: column; gap: 8px; }
+    .match-chip {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      transition: all 180ms;
+      user-select: none;
+    }
+    .match-chip:hover:not([data-paired]):not([disabled]) {
+      border-color: var(--color-brand-navy);
+      background: rgba(26,45,107,.05);
+    }
+    .match-chip.match-selected {
+      border-color: #4B8DEE;
+      background: rgba(75,141,238,.12);
+      color: #1a4db8;
+      box-shadow: 0 0 0 3px rgba(75,141,238,.20);
+    }
+    .match-chip.match-ok  { border-color:#16a34a; background:rgba(22,163,74,.1); color:#15803d; cursor:default; }
+    .match-chip.match-err { border-color:var(--red); background:rgba(214,40,57,.08); color:var(--red); }
+
+    .col-sort-items { display: flex; flex-direction: column; gap: 10px; }
+    .col-sort-item {
+      padding: 12px 14px;
+      background: var(--bg);
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+    }
+    .col-sort-text {
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    .col-sort-btns { display: flex; gap: 8px; }
+    .col-sort-btn {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 160ms;
+    }
+    .col-sort-btn:hover:not([disabled]) { opacity: .8; }
+    .col-sort-btn.col-btn-a { color: var(--color-niveau-cm1); border-color: var(--color-niveau-cm1); }
+    .col-sort-btn.col-btn-b { color: var(--color-brand-gold); border-color: var(--color-brand-gold); }
+    .col-sort-btn.col-btn-a:hover:not([disabled]) { background: rgba(29,191,160,.1); }
+    .col-sort-btn.col-btn-b:hover:not([disabled]) { background: rgba(245,166,35,.1); }
+    .col-sort-btn.col-ok-a  { background:rgba(22,163,74,.12); border-color:#16a34a; color:#15803d; }
+    .col-sort-btn.col-ok-b  { background:rgba(22,163,74,.12); border-color:#16a34a; color:#15803d; }
+    .col-sort-btn.col-wrong { background:rgba(214,40,57,.08); border-color:var(--red); color:var(--red); }
+
+    .dict-entry {
+      background: var(--bg);
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      padding: 16px 18px;
+      margin-bottom: 16px;
+    }
+    .dict-headword {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-brand-navy);
+      margin-bottom: 2px;
+    }
+    .dict-class {
+      font-size: 12px;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+    .dict-defs { list-style: none; padding: 0; margin: 0 0 10px; }
+    .dict-defs li {
+      font-size: 13px;
+      color: var(--text);
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.5;
+    }
+    .dict-defs li:last-child { border-bottom: none; }
+    .dict-def-num { font-weight: 700; color: var(--color-brand-navy); margin-right: 4px; }
+    .dict-example {
+      font-size: 12px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* ── Type : texte-a-trous / production-libre / double-blanc ───────────
+       Portés depuis les 10 pages homophones (ortho-distinguer-*.html) —
+       mêmes comportements (saisie libre dans une phrase à blancs, rédaction
+       libre validée par simple présence des mots-cibles, double blanc à
+       choix indépendants), généralisés pour ce moteur. Acceptent le même
+       `ctx` optionnel {addScore(n), showNext()} que dict-mcq/click-sort/
+       match/col-sort ci-dessus. Voir audit-homophones.md pour le détail des
+       3 types côté pages sources.
+    ────────────────────────────────────────────────────────────────────── */
+    .tt-sentence {
+      font-size: 17px;
+      line-height: 2.4;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    .tt-input {
+      width: 90px;
+      margin: 0 3px;
+      padding: 5px 8px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+    .tt-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(16,43,106,0.10);
+    }
+    .tt-input.is-correct { border-color:#16a34a; background:rgba(22,163,74,.08); color:#15803d; }
+    .tt-input.is-wrong   { border-color:var(--red); background:rgba(214,40,57,.07); color:var(--red); }
+    .tt-input:disabled   { cursor: default; }
+
+    .pl-prompt {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .pl-textarea {
+      width: 100%;
+      min-height: 90px;
+      resize: vertical;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      margin-bottom: 14px;
+      transition: border-color 200ms;
+    }
+    .pl-textarea:focus    { border-color: var(--blue); }
+    .pl-textarea:disabled { cursor: default; opacity: .75; }
+
+    .db-sentence {
+      font-size: 17px;
+      line-height: 2.4;
+      color: var(--text);
+      margin-bottom: 18px;
+    }
+    .db-section { margin-bottom: 16px; }
+    .db-section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .db-choices { display: flex; flex-wrap: wrap; gap: 8px; }
+    .db-choice.is-selected {
+      border-color: #4B8DEE;
+      background: rgba(75,141,238,.12);
+      color: #1a4db8;
+      box-shadow: 0 0 0 3px rgba(75,141,238,.20);
+    }
+
     /* ── Type : lire-fraction ────────────────────────────────────────────── */
     .frac-display-area {
       text-align: center;
@@ -4362,6 +4640,8 @@
     let pfiSelectedLevel = null; /* produire-3-formes : niveau sélectionné */
     let pfiLevelSelect   = null; /* produire-3-formes : instance LevelSelect */
     let accordLevel      = null; /* accord-ecrit      : niveau sélectionné */
+    let homoLevel         = null; /* homophones-niveaux : niveau sélectionné */
+    let homoLevelSelect   = null; /* homophones-niveaux : instance LevelSelect */
     let accordLevelSelect = null; /* accord-ecrit     : instance LevelSelect */
     let decompLevel      = null; /* decomposer-fraction : niveau sélectionné */
     let decompLevelSelect = null; /* decomposer-fraction : instance LevelSelect */
@@ -4644,6 +4924,67 @@
         badgesContainer: document.getElementById("ex-badges")
       });
       accordLevelSelect.renderSelectScreen();
+    }
+
+    /* ── Type : homophones-niveaux ─────────────────────────────────────────
+       3 niveaux via level1Bank/level2Bank/level3Bank (contenu propre à
+       chaque niveau, pas un filtrage par difficulté d'une banque unique
+       comme accord-ecrit). Chaque item de niveau porte son propre `type`
+       (choix-etiquette / mots-cliquables / classification-etapes /
+       texte-a-trous / production-libre / double-blanc), dispatché dans
+       showQuestion(). Réutilise sessionLevelList/sessionLevelLoader et donc
+       l'écran de résultats générique (_setupResultsScreen), exactement
+       comme accord-ecrit / produire-3-formes.
+    ────────────────────────────────────────────────────────────────────── */
+
+    function showHomoLevelSelect() {
+      document.getElementById("type-select-screen").classList.add("ex-hidden");
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels     = sessionData.levels || ["CM1", "CM2", "6e"];
+      const descs      = sessionData.levelDescs || {};
+      const bankKeyMap = { "CM1": "level1Bank", "CM2": "level2Bank", "6e": "level3Bank" };
+      const shuffleIdx = { "CM1": 0, "CM2": 1, "6e": 2 };
+      const doShuffle  = sessionData.homoShuffle || [false, true, false];
+
+      const loadLevel = (lv) => {
+        homoLevel  = lv;
+        const bank = sessionData[bankKeyMap[lv]] || [];
+        questions  = doShuffle[shuffleIdx[lv]] ? shuffle([...bank]) : [...bank];
+        currentIndex = 0;
+        score        = 0;
+      };
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      homoLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          loadLevel(l);
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(homoLevel);
+          sessionLevelLoader = (lv) => {
+            loadLevel(lv);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            showQuestion(0);
+            homoLevelSelect.renderBadges(lv);
+          };
+          document.getElementById("q-total").textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          homoLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      homoLevelSelect.renderSelectScreen();
     }
 
     function showLireFractionLevelSelect() {
@@ -5224,6 +5565,9 @@
       } else if (currentType === "valeur-position") {
         vpInitSession();
         return;
+      } else if (currentType === "homophones-niveaux") {
+        showHomoLevelSelect();
+        return;
       } else if (currentType === "vocabu-bilingue") {
         vbInitSession();
         return;
@@ -5271,6 +5615,9 @@
         return;
       } else if (currentType === "donneur-niveaux") {
         donneurInitSession();
+        return;
+      } else if (currentType === "vocabulaire-niveaux") {
+        vocInitSession();
         return;
       } else if (currentType === "pc-avoir-niveaux") {
         pcaInitSession();
@@ -5525,6 +5872,30 @@
         renderChoixEtiquette(card, q);
       } else if (currentType === "classification-etapes") {
         renderClassificationEtapes(card, q);
+      } else if (currentType === "click-sort") {
+        renderClickSort(card, q);
+      } else if (currentType === "match") {
+        renderMatch(card, q);
+      } else if (currentType === "col-sort") {
+        renderColSort(card, q);
+      } else if (currentType === "dict-mcq") {
+        renderDictMcq(card, q);
+      } else if (currentType === "texte-a-trous") {
+        renderTexteATrous(card, q);
+      } else if (currentType === "production-libre") {
+        renderProductionLibre(card, q);
+      } else if (currentType === "double-blanc") {
+        renderDoubleBlanc(card, q);
+      } else if (currentType === "homophones-niveaux") {
+        const HOMO_RENDERERS = {
+          "choix-etiquette":      renderChoixEtiquette,
+          "mots-cliquables":      renderMotsCliquables,
+          "classification-etapes": renderClassificationEtapes,
+          "texte-a-trous":        renderTexteATrous,
+          "production-libre":     renderProductionLibre,
+          "double-blanc":         renderDoubleBlanc
+        };
+        HOMO_RENDERERS[q.type](card, q);
       } else if (currentType === "probabilite-chances") {
         renderChoixEtiquette(card, q);
       } else if (currentType === "probabilite-issues") {
@@ -5579,6 +5950,8 @@
         /* session managed by genreInitSession — no-op here */
       } else if (currentType === "donneur-niveaux") {
         /* session managed by donneurInitSession — no-op here */
+      } else if (currentType === "vocabulaire-niveaux") {
+        /* session managed by vocInitSession — no-op here */
       } else if (currentType === "pc-avoir-niveaux") {
         /* session managed by pcaInitSession — no-op here */
       } else if (currentType === "etre-ou-avoir-niveaux") {
@@ -5994,7 +6367,7 @@
       const hasMulti   = sessionLevelIdx >= 0 && sessionLevelList.length > 1;
       const isLast     = sessionLevelIdx >= sessionLevelList.length - 1;
       const lockedType = [
-        'produire-3-formes', 'accord-ecrit',
+        'produire-3-formes', 'accord-ecrit', 'homophones-niveaux',
         'lire-fraction', 'representer-fraction', 'placer-fraction-droite',
         'comparer-fractions', 'encadrer-fraction', 'nombre-entier',
         'decomposer-fraction', 'fractions-problemes',
@@ -6049,6 +6422,7 @@
           document.getElementById('results-screen').classList.add('ex-hidden');
           if (currentType === 'produire-3-formes') showLevelSelect();
           else if (currentType === 'accord-ecrit') showAccordLevelSelect();
+          else if (currentType === 'homophones-niveaux') showHomoLevelSelect();
           else if (currentType === 'lire-fraction') showLireFractionLevelSelect();
           else if (currentType === 'representer-fraction') showRepresenterFractionLevelSelect();
           else if (currentType === 'placer-fraction-droite') showPlacerFractionDroiteLevelSelect();
@@ -6125,6 +6499,9 @@
       if (currentType === 'accord-ecrit' && accordLevel && accordLevelSelect) {
         accordLevelSelect.completeLevel(accordLevel, score, total);
       }
+      if (currentType === 'homophones-niveaux' && homoLevel && homoLevelSelect) {
+        homoLevelSelect.completeLevel(homoLevel, score, total);
+      }
       /* Les six premiers types ci-dessous conservent en interne la valeur
          historique (entier) du niveau — l'identifiant LevelSelect (CM1/CM2/6e)
          attendu par completeLevel() est retrouvé via sessionLevelList/Idx,
@@ -6175,7 +6552,7 @@
          déjà tenus à jour par onSelectLevel pour ces 4 types, seule source
          fiable de l'id réel pour l'enregistrement Supabase. */
       const sessionLevelIdTypes = ['lire-fraction', 'representer-fraction', 'placer-fraction-droite', 'comparer-fractions'];
-      const activeLevel = pfiSelectedLevel || accordLevel
+      const activeLevel = pfiSelectedLevel || accordLevel || homoLevel
         || (sessionLevelIdTypes.includes(currentType) ? sessionLevelList[sessionLevelIdx] : null)
         || nbEntierLevel || encadrLevel || decompLevel || fpLevel
         || probaChancesLevel || probaIssuesLevel || probaNombreLevel || null;
@@ -6663,11 +7040,11 @@
           if (!isRight) btn.classList.add("is-wrong");
           if (isRight) {
             score++;
-            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}${q.hint ? `<br>${q.hint}` : ''}</div>`);
           } else {
             setFeedback("feedback1", `
               <div class="ex-feedback-wrong">
-                ❌ On dit : <strong>${q.answer} ${q.word}</strong>.
+                ❌ On dit : <strong>${q.answer} ${q.word}</strong>.${q.hint ? `<br>${q.hint}` : ''}
               </div>`);
           }
           showNextBtn();
@@ -6784,6 +7161,741 @@
           showNextBtn();
         });
         choices2El.appendChild(btn);
+      });
+    }
+
+    /* ── Types : dict-mcq / click-sort / match / col-sort — contexte partagé ──
+       Ces 4 renderers acceptent un `ctx` optionnel {addScore(n), showNext()}
+       pour rester réutilisables par un module "niveaux" (score/progression
+       locaux à ce module) plutôt que par les seules variables globales
+       score/currentIndex/questions de l'engine générique (mots-cliquables
+       etc.). Sans ctx fourni, comportement identique à avant : score global
+       + showNextBtn(). Aucun renderer préexistant n'est concerné.
+    ────────────────────────────────────────────────────────────────────── */
+    function defaultQuestionCtx() {
+      return { addScore: n => { score += n; }, showNext: showNextBtn };
+    }
+
+    /* data-word etc. embed question data straight into an HTML attribute
+       (not just inner text) — a stray `"` there would break out of the
+       attribute, unlike plain innerHTML text interpolation. */
+    function attrEsc(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    /* ── Type : dict-mcq ───────────────────────────────────────────────────
+       Basé sur choix-etiquette (grille de choix, validation immédiate au
+       clic) — on ajoute juste un bloc "entrée de dictionnaire" au-dessus.
+    ────────────────────────────────────────────────────────────────────── */
+
+    function renderDictMcq(card, q, ctx) {
+      ctx = ctx || defaultQuestionCtx();
+      const e = q.entry;
+      const defsHTML = e.defs.map(d => `<li><span class="dict-def-num"></span>${d}</li>`).join('');
+      card.innerHTML = `
+        <div class="dict-entry">
+          <div class="dict-headword">${e.mot}</div>
+          <div class="dict-class">${e.classe}</div>
+          <ul class="dict-defs">${defsHTML}</ul>
+          ${e.exemple ? `<div class="dict-example">${e.exemple}</div>` : ''}
+        </div>
+        <p class="ex-question-label">${q.question}</p>
+        <div class="ex-choices-grid" id="ex-choices-grid"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      const grid = document.getElementById("ex-choices-grid");
+      shuffle(q.choices).forEach(c => {
+        const btn = document.createElement("button");
+        btn.className   = "ex-choice";
+        btn.textContent = c;
+        btn.addEventListener("click", () => {
+          grid.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
+          const isRight = c === q.answer;
+          grid.querySelectorAll(".ex-choice").forEach(b => {
+            if (b.textContent === q.answer) b.classList.add("is-correct");
+          });
+          if (!isRight) btn.classList.add("is-wrong");
+          if (isRight) {
+            ctx.addScore(1);
+            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}${q.feedback ? `<br>${q.feedback}` : ''}</div>`);
+          } else {
+            setFeedback("feedback1", `
+              <div class="ex-feedback-wrong">
+                ❌ La bonne réponse est : <strong>${q.answer}</strong>.${q.feedback ? `<br>${q.feedback}` : ''}
+              </div>`);
+          }
+          ctx.showNext();
+        });
+        grid.appendChild(btn);
+      });
+    }
+
+    /* ── Type : click-sort ────────────────────────────────────────────────
+       Basé sur glisser-deposer (banque de mots cliquables → emplacements
+       cliquables) : au lieu de remplir des trous dans une phrase, on classe
+       les mots dans l'ordre en cliquant sur des emplacements numérotés.
+    ────────────────────────────────────────────────────────────────────── */
+
+    function renderClickSort(card, q, ctx) {
+      ctx = ctx || defaultQuestionCtx();
+      const scrambled = shuffle([...q.words]);
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction}</p>
+        <div class="cs-bank-label">Mots à classer :</div>
+        <div class="cs-bank" id="cs-bank">
+          ${scrambled.map((w,i) => `<button class="cs-chip" data-word="${attrEsc(w)}" data-idx="${i}">${w}</button>`).join('')}
+        </div>
+        <div class="cs-slots-label">Ton classement (clique les mots dans l'ordre) :</div>
+        <div class="cs-slots" id="cs-slots">
+          ${q.answer.map((_,i) => `<div class="cs-slot" data-pos="${i}">${i+1}</div>`).join('')}
+        </div>
+        <button class="cs-reset-btn" id="cs-reset">↺ Recommencer</button>
+        <div style="margin-top:14px">
+          <button class="ex-choice" id="cs-validate" disabled>Valider mon classement</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const bank    = document.getElementById("cs-bank");
+      const slots   = document.getElementById("cs-slots");
+      const reset   = document.getElementById("cs-reset");
+      const validateBtn = document.getElementById("cs-validate");
+      let placed    = [];
+      let answered  = false;
+
+      const refresh = () => {
+        slots.querySelectorAll(".cs-slot").forEach((slot, i) => {
+          slot.textContent = placed[i] || (i + 1);
+          slot.classList.toggle("cs-filled", !!placed[i]);
+        });
+        validateBtn.disabled = placed.length < q.answer.length;
+      };
+
+      bank.addEventListener("click", e => {
+        if (answered) return;
+        const chip = e.target.closest(".cs-chip");
+        if (!chip || chip.classList.contains("cs-placed")) return;
+        if (placed.length >= q.answer.length) return;
+        placed.push(chip.dataset.word);
+        chip.classList.add("cs-placed");
+        refresh();
+      });
+
+      slots.addEventListener("click", e => {
+        if (answered) return;
+        const slot = e.target.closest(".cs-slot");
+        if (!slot || !slot.classList.contains("cs-filled")) return;
+        const pos  = +slot.dataset.pos;
+        const word = placed[pos];
+        placed.splice(pos, 1);
+        const chip = [...bank.querySelectorAll(".cs-chip.cs-placed")].find(c => c.dataset.word === word);
+        if (chip) chip.classList.remove("cs-placed");
+        refresh();
+      });
+
+      reset.addEventListener("click", () => {
+        if (answered) return;
+        placed = [];
+        bank.querySelectorAll(".cs-chip").forEach(c => c.classList.remove("cs-placed"));
+        refresh();
+      });
+
+      validateBtn.addEventListener("click", () => {
+        if (answered || placed.length < q.answer.length) return;
+        answered = true;
+        reset.disabled = true;
+        validateBtn.disabled = true;
+
+        const isRight = placed.join('|') === q.answer.join('|');
+        slots.querySelectorAll(".cs-slot").forEach((slot, i) => {
+          slot.classList.add(placed[i] === q.answer[i] ? "cs-ok-slot" : "cs-err-slot");
+        });
+        bank.querySelectorAll(".cs-chip").forEach(chip => {
+          chip.classList.add("cs-done", isRight ? "cs-ok" : "cs-err");
+        });
+
+        if (isRight) {
+          ctx.addScore(1);
+          setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}${q.feedback ? `<br>${q.feedback}` : ''}</div>`);
+        } else {
+          setFeedback("feedback1", `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas le bon classement.${q.feedback ? `<br>${q.feedback}` : ''}
+            </div>`);
+        }
+        ctx.showNext();
+      });
+
+      refresh();
+    }
+
+    /* ── Type : match ─────────────────────────────────────────────────────
+       Nouveau : réutilise le mécanisme "clic pour sélectionner" de
+       mots-cliquables (états .is-selected / feedback immédiat), appliqué à
+       deux colonnes de jetons à apparier plutôt qu'à une phrase à trous.
+    ────────────────────────────────────────────────────────────────────── */
+
+    function renderMatch(card, q, ctx) {
+      ctx = ctx || defaultQuestionCtx();
+      const lefts  = shuffle(q.pairs.map(p => p.left));
+      const rights = shuffle(q.pairs.map(p => p.right));
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction}</p>
+        <div class="match-grid">
+          <div class="match-col" id="match-left">
+            ${lefts.map(l => `<button class="match-chip" data-side="left" data-word="${attrEsc(l)}">${l}</button>`).join('')}
+          </div>
+          <div class="match-col" id="match-right">
+            ${rights.map(r => `<button class="match-chip" data-side="right" data-word="${attrEsc(r)}">${r}</button>`).join('')}
+          </div>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      let selected = null;
+      let matched  = 0;
+      const total  = q.pairs.length;
+      const pairMap = {};
+      q.pairs.forEach(p => { pairMap[p.left] = p.right; pairMap[p.right] = p.left; });
+
+      card.querySelectorAll(".match-chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          if (chip.hasAttribute("data-paired")) return;
+
+          if (!selected) {
+            chip.classList.add("match-selected");
+            selected = { side: chip.dataset.side, word: chip.dataset.word, el: chip };
+            return;
+          }
+          if (selected.el === chip) {
+            chip.classList.remove("match-selected");
+            selected = null;
+            return;
+          }
+          if (selected.side === chip.dataset.side) {
+            selected.el.classList.remove("match-selected");
+            chip.classList.add("match-selected");
+            selected = { side: chip.dataset.side, word: chip.dataset.word, el: chip };
+            return;
+          }
+
+          const isOk = pairMap[selected.word] === chip.dataset.word;
+          if (isOk) {
+            [selected.el, chip].forEach(el => {
+              el.classList.remove("match-selected");
+              el.classList.add("match-ok");
+              el.setAttribute("data-paired", "1");
+            });
+            matched++;
+            selected = null;
+            if (matched === total) {
+              ctx.addScore(1);
+              setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}${q.feedback ? `<br>${q.feedback}` : ''}</div>`);
+              ctx.showNext();
+            }
+          } else {
+            [selected.el, chip].forEach(el => el.classList.add("match-err"));
+            const toReset = [selected.el, chip];
+            selected = null;
+            setTimeout(() => toReset.forEach(el => el.classList.remove("match-err", "match-selected")), 700);
+          }
+        });
+      });
+    }
+
+    /* ── Type : col-sort ──────────────────────────────────────────────────
+       Basé sur choix-etiquette (grille de boutons, validation immédiate au
+       clic), répété pour chaque item de la liste avec 2 colonnes cibles
+       (A / B) au lieu d'une grille de choix libres.
+    ────────────────────────────────────────────────────────────────────── */
+
+    function renderColSort(card, q, ctx) {
+      ctx = ctx || defaultQuestionCtx();
+      const items = shuffle([...q.items]);
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction}</p>
+        <div style="display:flex;gap:12px;margin-bottom:14px;">
+          <span style="background:rgba(29,191,160,.15);color:#0d7a67;padding:4px 14px;border-radius:100px;font-size:12px;font-weight:700;">${q.colA}</span>
+          <span style="background:rgba(245,166,35,.15);color:#92400e;padding:4px 14px;border-radius:100px;font-size:12px;font-weight:700;">${q.colB}</span>
+        </div>
+        <div class="col-sort-items" id="col-sort-items">
+          ${items.map((item, i) => `
+            <div class="col-sort-item" data-idx="${i}" data-answer="${item.answer}">
+              <div class="col-sort-text">${item.text}</div>
+              <div class="col-sort-btns">
+                <button class="col-sort-btn col-btn-a" data-col="A">${q.colA}</button>
+                <button class="col-sort-btn col-btn-b" data-col="B">${q.colB}</button>
+              </div>
+            </div>`).join('')}
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      let answered = 0;
+      const total  = items.length;
+      let allCorrect = true;
+
+      card.querySelectorAll(".col-sort-item").forEach(itemEl => {
+        const item = items[+itemEl.dataset.idx];
+        itemEl.querySelectorAll(".col-sort-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            if (itemEl.dataset.done) return;
+            itemEl.dataset.done = "1";
+            const correct = btn.dataset.col === itemEl.dataset.answer;
+            if (!correct) allCorrect = false;
+            btn.classList.add(correct ? (btn.dataset.col === 'A' ? 'col-ok-a' : 'col-ok-b') : 'col-wrong');
+            const other = itemEl.querySelector(`.col-sort-btn[data-col="${itemEl.dataset.answer}"]`);
+            if (!correct) other.classList.add(itemEl.dataset.answer === 'A' ? 'col-ok-a' : 'col-ok-b');
+            itemEl.querySelectorAll(".col-sort-btn").forEach(b => b.disabled = true);
+            if (item.feedback) {
+              const fb = document.createElement("div");
+              fb.style.cssText = `font-size:12px;color:${correct ? '#15803d' : '#b91c1c'};margin-top:6px;`;
+              fb.textContent = item.feedback;
+              itemEl.appendChild(fb);
+            }
+            answered++;
+            if (answered === total) {
+              if (allCorrect) {
+                ctx.addScore(1);
+                setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}${q.feedback ? `<br>${q.feedback}` : ''}</div>`);
+              } else {
+                setFeedback("feedback1", `<div class="ex-feedback-wrong">❌ Certaines réponses sont fausses. Les bonnes réponses sont en vert.${q.feedback ? `<br>${q.feedback}` : ''}</div>`);
+              }
+              ctx.showNext();
+            }
+          });
+        });
+      });
+    }
+
+    /* ── Type : texte-a-trous ────────────────────────────────────────────
+       Phrase à un ou plusieurs blancs, saisie libre par <input>. Comparaison
+       stricte après trim()+toLowerCase(). Porté depuis le rendu "fill-in"
+       des pages homophones (ortho-distinguer-*.html, niveau 3).
+    ────────────────────────────────────────────────────────────────────── */
+
+    function renderTexteATrous(card, q, ctx) {
+      ctx = ctx || defaultQuestionCtx();
+      let blankIdx = 0;
+      const sentHtml = q.sentence.replace(/___/g, () => {
+        const i = blankIdx++;
+        return `<input class="tt-input" id="tt-inp-${i}" data-idx="${i}"
+                       type="text" autocomplete="off" autocorrect="off"
+                       autocapitalize="off" spellcheck="false" placeholder="?"
+                       aria-label="réponse ${i + 1}">`;
+      });
+
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction || "Complète la phrase avec le mot qui convient."}</p>
+        <div class="tt-sentence">${sentHtml}</div>
+        <button class="ex-validate-btn" id="tt-validate">Valider</button>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      setTimeout(() => card.querySelector('#tt-inp-0')?.focus(), 60);
+
+      card.querySelectorAll('.tt-input').forEach(inp => {
+        inp.addEventListener('keydown', e => {
+          if (e.key !== 'Enter') return;
+          const next = card.querySelector(`#tt-inp-${parseInt(inp.dataset.idx, 10) + 1}`);
+          if (next) next.focus(); else doValidate();
+        });
+      });
+
+      card.querySelector('#tt-validate').addEventListener('click', doValidate);
+
+      function doValidate() {
+        const inputs = [...card.querySelectorAll('.tt-input')];
+        if (inputs.some(i => !i.value.trim())) return;
+
+        inputs.forEach(i => i.disabled = true);
+        card.querySelector('#tt-validate').disabled = true;
+
+        let allOk = true;
+        const lines = inputs.map((inp, i) => {
+          const val   = inp.value.trim().toLowerCase();
+          const blank = q.blanks[i];
+          const ok    = val === blank.answer.toLowerCase();
+          inp.classList.add(ok ? 'is-correct' : 'is-wrong');
+          if (!ok) allOk = false;
+          return ok
+            ? `✓ <strong>${blank.answer}</strong>${blank.hint ? ` — ${blank.hint}` : ''}`
+            : `✗ La bonne réponse était <strong>${blank.answer}</strong>.${blank.hint ? ` ${blank.hint}` : ''}`;
+        });
+
+        if (allOk) {
+          ctx.addScore(1);
+          setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}<br>${lines.join('<br>')}${q.feedback ? `<br>${q.feedback}` : ''}</div>`);
+        } else {
+          setFeedback("feedback1", `<div class="ex-feedback-wrong">${lines.join('<br>')}${q.feedback ? `<br>${q.feedback}` : ''}</div>`);
+        }
+        ctx.showNext();
+      }
+    }
+
+    /* ── Type : production-libre ───────────────────────────────────────────
+       L'élève rédige une phrase complète ; validation par simple présence
+       des mots-cibles (mêmes limites que côté homophones : aucune
+       vérification grammaticale réelle). Porté depuis "N3_PL".
+    ────────────────────────────────────────────────────────────────────── */
+
+    function plWordPresent(text, word) {
+      const esc = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re  = new RegExp('(^|[^\\p{L}])' + esc + '($|[^\\p{L}])', 'iu');
+      return re.test(' ' + text + ' ');
+    }
+
+    function renderProductionLibre(card, q, ctx) {
+      ctx = ctx || defaultQuestionCtx();
+      card.innerHTML = `
+        <p class="ex-question-label">Écris ta propre phrase.</p>
+        <div class="pl-prompt">${q.consigne}</div>
+        <textarea class="pl-textarea" id="pl-textarea" placeholder="Écris ta phrase ici…"></textarea>
+        <button class="ex-validate-btn" id="pl-validate">Valider</button>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      card.querySelector('#pl-validate').addEventListener('click', () => {
+        const text = card.querySelector('#pl-textarea').value.trim();
+        if (!text) return;
+
+        card.querySelector('#pl-textarea').disabled = true;
+        card.querySelector('#pl-validate').disabled  = true;
+
+        const missing = q.words.filter(w => !plWordPresent(text, w));
+
+        if (missing.length === 0) {
+          ctx.addScore(1);
+          setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)} Ta phrase contient bien ${q.words.map(w => `<strong>${w}</strong>`).join(' et ')}. Relis-la pour vérifier que tout est correct.${q.feedback ? `<br>${q.feedback}` : ''}</div>`);
+        } else {
+          setFeedback("feedback1", `<div class="ex-feedback-wrong">❌ Ta phrase ne contient pas encore : ${missing.map(w => `<strong>${w}</strong>`).join(', ')}. Essaie d'inclure ${q.words.length > 1 ? 'tous les mots demandés' : 'ce mot'} !</div>`);
+        }
+        ctx.showNext();
+      });
+    }
+
+    /* ── Type : double-blanc ─────────────────────────────────────────────
+       Deux blancs indépendants dans la même phrase, chacun avec son propre
+       groupe de choix ; validation groupée via un bouton "Vérifier". Porté
+       depuis le rendu "choix double" des pages homophones (ex. tout/tous/
+       toute/toutes, quel/quelle/quels/quelles, ces/ses/c'est/s'est).
+    ────────────────────────────────────────────────────────────────────── */
+
+    function renderDoubleBlanc(card, q, ctx) {
+      ctx = ctx || defaultQuestionCtx();
+      let blankIdx = 0;
+      const sentHtml = q.sentence.replace(/___/g, () => {
+        const i = blankIdx++;
+        return `<span class="ex-blank" id="db-bl-${i}"></span>`;
+      });
+
+      const sectionsHtml = q.blanks.map((b, i) => `
+        <div class="db-section">
+          <div class="db-section-label">Blanc ${i + 1}</div>
+          <div class="db-choices" id="db-choices-${i}"></div>
+        </div>`).join('');
+
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction || "Quel mot complète chaque blanc ?"}</p>
+        <div class="db-sentence">${sentHtml}</div>
+        ${sectionsHtml}
+        <button class="ex-validate-btn" id="db-validate" disabled>Vérifier</button>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const sel = q.blanks.map(() => null);
+
+      q.blanks.forEach((b, i) => {
+        const grid = card.querySelector(`#db-choices-${i}`);
+        b.choices.forEach(choice => {
+          const btn = document.createElement("button");
+          btn.className   = "ex-choice db-choice";
+          btn.textContent = choice;
+          btn.addEventListener("click", () => {
+            grid.querySelectorAll(".db-choice").forEach(x => x.classList.remove("is-selected"));
+            btn.classList.add("is-selected");
+            sel[i] = choice;
+            const blank = card.querySelector(`#db-bl-${i}`);
+            blank.textContent = choice;
+            blank.classList.add("is-filled");
+            if (sel.every(s => s !== null)) {
+              card.querySelector('#db-validate').disabled = false;
+            }
+          });
+          grid.appendChild(btn);
+        });
+      });
+
+      card.querySelector('#db-validate').addEventListener('click', () => {
+        if (sel.some(s => s === null)) return;
+        card.querySelectorAll('.db-choice').forEach(b => b.disabled = true);
+        card.querySelector('#db-validate').disabled = true;
+
+        let allOk = true;
+        const lines = q.blanks.map((b, i) => {
+          const ok = sel[i] === b.answer;
+          if (!ok) allOk = false;
+
+          const blank = card.querySelector(`#db-bl-${i}`);
+          blank.textContent = b.answer;
+          blank.classList.remove("is-filled");
+          blank.classList.add(ok ? "is-correct" : "is-wrong");
+
+          card.querySelectorAll(`#db-choices-${i} .db-choice`).forEach(btn => {
+            btn.classList.remove("is-selected");
+            if (btn.textContent === b.answer) btn.classList.add("is-correct");
+            else if (btn.textContent === sel[i] && !ok) btn.classList.add("is-wrong");
+          });
+
+          return ok
+            ? `Blanc ${i + 1} ✓ — <strong>${b.answer}</strong>${b.hint ? ` : ${b.hint}` : ''}`
+            : `Blanc ${i + 1} ✗ — la bonne réponse était <strong>${b.answer}</strong>.${b.hint ? ` ${b.hint}` : ''}`;
+        });
+
+        if (allOk) {
+          ctx.addScore(1);
+          setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}<br>${lines.join('<br>')}</div>`);
+        } else {
+          setFeedback("feedback1", `<div class="ex-feedback-wrong">${lines.join('<br>')}</div>`);
+        }
+        ctx.showNext();
+      });
+    }
+
+    /* ── Type : mcq ──────────────────────────────────────────────────────
+       Basé sur choix-etiquette (grille de choix, validation immédiate au
+       clic), sans le bloc emoji/mot d'accroche : juste l'instruction et
+       les choix. Nouveau — ne remplace pas choix-etiquette. Utilisé par
+       le module vocabulaire-niveaux ci-dessous.
+    ────────────────────────────────────────────────────────────────────── */
+
+    function renderMcq(card, q, ctx) {
+      ctx = ctx || defaultQuestionCtx();
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction}</p>
+        <div class="ex-choices-grid" id="ex-choices-grid"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      const grid = document.getElementById("ex-choices-grid");
+      shuffle(q.choices).forEach(c => {
+        const btn = document.createElement("button");
+        btn.className   = "ex-choice";
+        btn.textContent = c;
+        btn.addEventListener("click", () => {
+          grid.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
+          const isRight = c === q.answer;
+          grid.querySelectorAll(".ex-choice").forEach(b => {
+            if (b.textContent === q.answer) b.classList.add("is-correct");
+          });
+          if (!isRight) btn.classList.add("is-wrong");
+          if (isRight) {
+            ctx.addScore(1);
+            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}${q.feedback ? `<br>${q.feedback}` : ''}</div>`);
+          } else {
+            setFeedback("feedback1", `
+              <div class="ex-feedback-wrong">
+                ❌ La bonne réponse est : <strong>${q.answer}</strong>.${q.feedback ? `<br>${q.feedback}` : ''}
+              </div>`);
+          }
+          ctx.showNext();
+        });
+        grid.appendChild(btn);
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : vocabulaire-niveaux — module partagé pour les 20 compétences
+       de Vocabulaire migrées depuis l'ancien moteur français-lexique.html
+       (js/lex-comprendre.js, lex-construire.js, lex-relations.js).
+
+       Un seul module pour les 20 compétences : mêmes mécaniques (3 niveaux,
+       5 questions par niveau, seuil 80 % comme l'ancien moteur), seules les
+       données (data/vocabulaire.js) changent d'une compétence à l'autre.
+       Chaque question de level1Bank/level2Bank/level3Bank porte son propre
+       q.type (mcq / dict-mcq / click-sort / match / col-sort), rendu via
+       les renderers partagés ci-dessus avec un ctx propre à ce module
+       (score/progression locaux à vocState, pas les variables globales de
+       l'engine générique) — précédent : encadrer-decimaux-niveaux (ed),
+       qui fait déjà commuter son rendu sur q.type au sein d'un niveau.
+       ══════════════════════════════════════════════════════════════════════ */
+
+    const VOC_SEUIL = 0.80;
+    let vocState       = null;
+    let vocLevelSelect = null;
+
+    function vocInitSession() {
+      vocState = null;
+      score = 0; currentIndex = 0;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      vocLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: [1, 2, 3].map(n => ({
+          id: n,
+          label: `Niveau ${n}`,
+          description: (sessionData.levelDescs && sessionData.levelDescs[n]) || `Niveau ${n}`
+        })),
+        threshold: VOC_SEUIL,
+        onSelectLevel: (lv) => vocStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: vocBackToSelectScreen
+      });
+      vocLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function vocBackToSelectScreen() {
+      vocState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    function vocStartLevel(lv) {
+      /* Ordre volontairement non mélangé : les 5 questions d'un niveau
+         suivent une progression pédagogique déjà pensée dans les données
+         (comme l'ancien moteur ExercisePanel, qui ne mélangeait pas non
+         plus). Seuls les choix internes à chaque question sont mélangés
+         (shuffle dans chaque renderer). */
+      const questions = sessionData['level' + lv + 'Bank'];
+      vocState = { level: lv, questions, idx: 0, score: 0, total: questions.length };
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = questions.length;
+      if (vocLevelSelect) vocLevelSelect.renderBadges(lv);
+      vocRenderQuestion();
+    }
+
+    function vocCtx() {
+      return { addScore: n => { vocState.score += n; }, showNext: vocShowNextBtn };
+    }
+
+    function vocRenderQuestion() {
+      const { questions, idx, total } = vocState;
+      const q    = questions[idx];
+      const card = document.getElementById('ex-card');
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      const ctx = vocCtx();
+      switch (q.type) {
+        case 'mcq':        renderMcq(card, q, ctx);        break;
+        case 'dict-mcq':   renderDictMcq(card, q, ctx);    break;
+        case 'click-sort': renderClickSort(card, q, ctx);  break;
+        case 'match':      renderMatch(card, q, ctx);      break;
+        case 'col-sort':   renderColSort(card, q, ctx);    break;
+        default:           card.innerHTML = `<p>Type de question inconnu : ${q.type}</p>`;
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function vocShowNextBtn() {
+      const btn = document.getElementById('next-btn');
+      if (!btn) return;
+      const isLast = vocState.idx === vocState.total - 1;
+      btn.textContent = isLast ? 'Voir mes résultats' : 'Suivant →';
+      btn.classList.remove('ex-hidden');
+      btn.onclick = vocNextQuestion;
+    }
+
+    function vocNextQuestion() {
+      vocState.idx++;
+      if (vocState.idx >= vocState.total) { vocShowLevelResults(); return; }
+      vocRenderQuestion();
+    }
+
+    function vocShowLevelResults() {
+      const { level, score: lvScore, total } = vocState;
+      const { passed, isLast } = vocLevelSelect.completeLevel(level, lvScore, total);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      const pct = total > 0 ? lvScore / total : 0;
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(pct * 100) + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-lexique.html';
+      const backLabel = `← Retour à ${sessionData.backLink?.label || 'Vocabulaire'}`;
+      const stars     = pct === 1 ? '🏆' : pct >= VOC_SEUIL ? '🌟' : '';
+      const backToSelectBtn = vocLevelSelect.backToSelectButtonHTML();
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises cette compétence.`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="voc-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="voc-next-lv-btn">Niveau ${level + 1} →</button>
+          <button class="ex-btn-secondary" id="voc-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * VOC_SEUIL);
+        msg = `💪 Pas encore… il faut ${needed} / ${total} pour valider. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="voc-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('voc-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        vocStartLevel(vocState.level);
+      });
+      document.getElementById('voc-next-lv-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        vocStartLevel(vocState.level + 1);
+      });
+      document.getElementById('voc-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        vocLevelSelect.reset();
+        vocInitSession();
+      });
+      vocLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'vocabulaire-niveaux',
+        level:        'Niveau ' + level,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
       });
     }
 
