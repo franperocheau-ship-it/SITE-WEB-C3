@@ -5242,6 +5242,9 @@
       } else if (currentType === "conditionnel-groupes-niveaux") {
         ccondInitSession();
         return;
+      } else if (currentType === "infinitif-groupe-niveaux") {
+        cigInitSession();
+        return;
       } else if (currentType === "sujet-inverse-niveaux") {
         siInitSession();
         return;
@@ -5498,9 +5501,7 @@
       document.getElementById("ex-bar-fill").style.width = (idx / questions.length * 100) + "%";
 
       const card = document.getElementById("ex-card");
-      if (currentType === "infinitif-et-groupe") {
-        renderInfinitifEtGroupe(card, q);
-      } else if (currentType === "fill-blank") {
+      if (currentType === "fill-blank") {
         renderFillBlank(card, q);
       } else if (currentType === "multiple-choice") {
         renderMultipleChoice(card, q);
@@ -5560,6 +5561,8 @@
         /* session managed by cimperInitSession — no-op here */
       } else if (currentType === "conditionnel-groupes-niveaux") {
         /* session managed by ccondInitSession — no-op here */
+      } else if (currentType === "infinitif-groupe-niveaux") {
+        /* session managed by cigInitSession — no-op here */
       } else if (currentType === "sujet-inverse-niveaux") {
         /* session managed by siInitSession — no-op here */
       } else if (currentType === "epithete-attribut-niveaux") {
@@ -5651,95 +5654,6 @@
       } else if (currentType === "comprendre-implicites-niveaux" || currentType === "comprendre-mot-contexte-niveaux") {
         /* session managed by lecInitSession — no-op here */
       }
-    }
-
-    /* ── Type: infinitif-et-groupe (2-step) ──────────────────────────────── */
-
-    function renderInfinitifEtGroupe(card, q) {
-      card.innerHTML = `
-        <div id="step1">
-          <p class="ex-question-label">Quel est l'infinitif de ce verbe ?</p>
-          <div class="ex-verb-display">${q.sentence}</div>
-          <div class="ex-choices-grid" id="ex-choices-grid"></div>
-          <div class="ex-feedback-area" id="feedback1"></div>
-        </div>
-        <div id="step2" class="ex-hidden">
-          <div class="ex-step2-divider"></div>
-          <p class="ex-question-label">À quel groupe appartient ce verbe ?</p>
-          <div class="ex-group-row">
-            <button class="ex-group-btn" data-group="1er groupe">1er groupe</button>
-            <button class="ex-group-btn" data-group="2e groupe">2e groupe</button>
-            <button class="ex-group-btn" data-group="3e groupe">3e groupe</button>
-          </div>
-          <div class="ex-feedback-area" id="feedback2"></div>
-        </div>
-        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
-      `;
-
-      const grid = document.getElementById("ex-choices-grid");
-      grid.innerHTML = shuffle(q.choices)
-        .map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`)
-        .join("");
-      grid.querySelectorAll(".ex-choice").forEach(btn =>
-        btn.addEventListener("click", () => handleStep1(btn, q))
-      );
-
-      document.querySelectorAll(".ex-group-btn").forEach(btn =>
-        btn.addEventListener("click", () => handleStep2(btn, q))
-      );
-    }
-
-    function handleStep1(btn, q) {
-      document.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
-
-      const isRight = btn.dataset.value === q.infinitive;
-
-      document.querySelectorAll(".ex-choice").forEach(b => {
-        if (b.dataset.value === q.infinitive) b.classList.add("is-correct");
-      });
-      if (!isRight) btn.classList.add("is-wrong");
-
-      if (isRight) {
-        setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
-        setTimeout(() => {
-          document.getElementById("step2").classList.remove("ex-hidden");
-          document.getElementById("step2").scrollIntoView({ behavior: "smooth", block: "nearest" });
-        }, 750);
-      } else {
-        setFeedback("feedback1", `
-          <div class="ex-feedback-wrong">
-            ❌ Ce n'est pas la bonne réponse.<br>
-            L'infinitif de « <strong>${q.verb}</strong> » est <strong>${q.infinitive}</strong>.<br>
-            C'est un verbe du ${q.group}.
-          </div>
-        `);
-        showNextBtn();
-      }
-    }
-
-    function handleStep2(btn, q) {
-      document.querySelectorAll(".ex-group-btn").forEach(b => b.disabled = true);
-
-      const isRight = btn.dataset.group === q.group;
-
-      document.querySelectorAll(".ex-group-btn").forEach(b => {
-        if (b.dataset.group === q.group) b.classList.add("is-correct");
-      });
-      if (!isRight) btn.classList.add("is-wrong");
-
-      if (isRight) {
-        score++;
-        setFeedback("feedback2", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
-      } else {
-        setFeedback("feedback2", `
-          <div class="ex-feedback-wrong">
-            ❌ Ce n'est pas le bon groupe.<br>
-            <strong>${q.infinitive}</strong> est un verbe du <strong>${q.group}</strong>.
-          </div>
-        `);
-      }
-
-      showNextBtn();
     }
 
     /* ── Type: fill-blank ────────────────────────────────────────────────── */
@@ -19784,6 +19698,286 @@
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
         exerciseType: 'conditionnel-groupes-niveaux',
+        level:        'Niveau ' + level,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : infinitif-groupe-niveaux — « Retrouver l'infinitif d'un verbe
+       conjugué puis son groupe »
+       Compétence d'identification (pas de production) : chaque question se
+       déroule en 2 étapes — trouver l'infinitif, puis classer son groupe.
+       Niveau 1 : QCM pour l'infinitif (4 choix)
+       Niveau 2 et 3 : saisie libre de l'infinitif (niveau 3 = pièges)
+       L'étape "groupe" n'apparaît que si l'infinitif est trouvé du premier
+       coup ; sinon la question passe directement à la suivante (0 point).
+       3 niveaux déverrouillables à 80 %.
+       ════════════════════════════════════════════════════════════════════════ */
+
+    const CIG_SEUIL = 0.8;
+
+    const CIG_LV_DEFS = [
+      { lv: 1, desc: 'QCM : trouve l\'infinitif et le groupe' },
+      { lv: 2, desc: 'Écris l\'infinitif et trouve le groupe' },
+      { lv: 3, desc: 'Pièges classiques : trouve l\'infinitif et le groupe' }
+    ];
+
+    let cigState = null;
+    let cigLevelSelect = null;
+
+    function cigBackToSelectScreen() {
+      cigState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    /* ── Init : réinitialise et affiche le sélecteur de niveau ──────────── */
+    function cigInitSession() {
+      cigState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      cigLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: CIG_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: CIG_SEUIL,
+        onSelectLevel: (lv) => cigStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: cigBackToSelectScreen
+      });
+      cigLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Démarre un niveau ───────────────────────────────────────────────── */
+    function cigStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const pool = shuffle((sessionData.bank || []).filter(item => item.level === lv));
+      const qs   = pool.slice(0, sessionData.questionsPerSession || 10);
+      cigState   = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
+      document.getElementById('q-total').textContent = qs.length;
+
+      cigLevelSelect.renderBadges(lv);
+      cigRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Affiche l'étape 1 (infinitif) — QCM au niveau 1, saisie sinon ────── */
+    function cigRenderQuestion(card) {
+      const { questions, idx, total, level } = cigState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if (level === 1) cigRenderStep1Mcq(card, q);
+      else              cigRenderStep1Input(card, q);
+    }
+
+    function cigGoToNext() {
+      cigState.idx++;
+      if (cigState.idx >= cigState.questions.length) cigShowLevelResults();
+      else cigRenderQuestion(document.getElementById('ex-card'));
+    }
+
+    function cigRenderStep1Mcq(card, q) {
+      const { idx, total } = cigState;
+      card.innerHTML = `
+        <p class="ex-question-label">Quel est l'infinitif de ce verbe ?</p>
+        <div class="ex-verb-display">${q.sentence}</div>
+        <div class="ex-choices-grid" id="cig-choices"></div>
+        <div class="ex-feedback-area" id="cig-fb1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const grid = document.getElementById('cig-choices');
+      grid.innerHTML = shuffle(q.choices).map(c => `<button class="ex-choice" data-value="${c}">${c}</button>`).join('');
+      grid.querySelectorAll('.ex-choice').forEach(btn =>
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#cig-choices .ex-choice').forEach(b => b.disabled = true);
+          const isRight = btn.dataset.value === q.infinitive;
+          document.querySelectorAll('#cig-choices .ex-choice').forEach(b => {
+            if (b.dataset.value === q.infinitive) b.classList.add('is-correct');
+          });
+          if (!isRight) btn.classList.add('is-wrong');
+          cigResolveStep1(card, q, isRight);
+        })
+      );
+      document.getElementById('next-btn').addEventListener('click', cigGoToNext);
+    }
+
+    function cigRenderStep1Input(card, q) {
+      const { idx, total } = cigState;
+      card.innerHTML = `
+        <p class="ex-question-label">Quel est l'infinitif de ce verbe ?</p>
+        <div class="ex-verb-display">${q.sentence}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="cig-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse…">
+          <button class="ex-validate-btn" id="cig-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="cig-fb1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      const input  = document.getElementById('cig-input');
+      const valBtn = document.getElementById('cig-val-btn');
+      setTimeout(() => input.focus(), 50);
+
+      function submit() {
+        if (!input.value.trim()) return;
+        input.disabled  = true;
+        valBtn.disabled = true;
+        const isRight = normalize(input.value) === normalize(q.infinitive);
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+        cigResolveStep1(card, q, isRight);
+      }
+      valBtn.addEventListener('click', submit);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+      document.getElementById('next-btn').addEventListener('click', cigGoToNext);
+    }
+
+    function cigResolveStep1(card, q, isRight) {
+      if (isRight) {
+        document.getElementById('cig-fb1').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+        setTimeout(() => cigRenderStep2(card, q), 700);
+      } else {
+        document.getElementById('cig-fb1').innerHTML = `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas la bonne réponse.<br>
+            L'infinitif de « <strong>${q.verb}</strong> » est <strong>${q.infinitive}</strong> (${q.group}).
+          </div>
+        `;
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+    }
+
+    /* ── Étape 2 : classification du groupe ───────────────────────────────── */
+    function cigRenderStep2(card, q) {
+      const { idx, total } = cigState;
+      card.innerHTML = `
+        <p class="ex-question-label">À quel groupe appartient <em>${q.infinitive}</em> ?</p>
+        <div class="ex-verb-display">${q.sentence}</div>
+        <div class="ex-group-row" id="cig-group-btns">
+          <button class="ex-group-btn" data-group="1er groupe">1er groupe</button>
+          <button class="ex-group-btn" data-group="2e groupe">2e groupe</button>
+          <button class="ex-group-btn" data-group="3e groupe">3e groupe</button>
+        </div>
+        <div class="ex-feedback-area" id="cig-fb2"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Question suivante →' : 'Voir les résultats →'}</button>
+      `;
+      document.querySelectorAll('#cig-group-btns .ex-group-btn').forEach(btn =>
+        btn.addEventListener('click', () => cigHandleStep2(btn, q))
+      );
+      document.getElementById('next-btn').addEventListener('click', cigGoToNext);
+    }
+
+    function cigHandleStep2(btn, q) {
+      document.querySelectorAll('#cig-group-btns .ex-group-btn').forEach(b => b.disabled = true);
+      const isRight = btn.dataset.group === q.group;
+      document.querySelectorAll('#cig-group-btns .ex-group-btn').forEach(b => {
+        if (b.dataset.group === q.group) b.classList.add('is-correct');
+      });
+      if (!isRight) btn.classList.add('is-wrong');
+
+      if (isRight) {
+        cigState.score++;
+        document.getElementById('cig-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+      } else {
+        document.getElementById('cig-fb2').innerHTML = `
+          <div class="ex-feedback-wrong">
+            ❌ Ce n'est pas le bon groupe.<br>
+            <strong>${q.infinitive}</strong> est un verbe du <strong>${q.group}</strong>.
+          </div>
+        `;
+      }
+      document.getElementById('next-btn').classList.remove('ex-hidden');
+    }
+
+    /* ── Résultats de fin de niveau ───────────────────────────────────────── */
+    function cigShowLevelResults() {
+      const { level, score: lvScore, total } = cigState;
+      const { passed, pct, isLast } = cigLevelSelect.completeLevel(level, lvScore, total);
+      const pctPct = Math.round(pct * 100);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-conjugaison.html';
+      const backLabel = `← Retour à ${sessionData.backLink?.label || 'la Conjugaison'}`;
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const backToSelectBtn = cigLevelSelect.backToSelectButtonHTML();
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises l'infinitif et le groupe des verbes !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cig-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cig-next-btn">Niveau ${level + 1} →</button>
+          <button class="ex-btn-secondary" id="cig-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * CIG_SEUIL);
+        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour débloquer le niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="cig-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
+
+      document.getElementById('cig-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cigStartLevel(cigState.level);
+      });
+      document.getElementById('cig-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cigStartLevel(level + 1);
+      });
+      document.getElementById('cig-restart-btn')?.addEventListener('click', () => {
+        cigLevelSelect.reset();
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        cigInitSession();
+      });
+      cigLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'infinitif-groupe-niveaux',
         level:        'Niveau ' + level,
         score:        lvScore,
         total,

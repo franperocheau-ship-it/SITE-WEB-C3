@@ -8,288 +8,69 @@ window.EXERCISE_DATA = window.EXERCISE_DATA || {};
 
 Object.assign(window.EXERCISE_DATA, {
 
+  /* ══════════════════════════════════════════════════════════════════════════
+     Type : infinitif-groupe-niveaux
+     Compétence d'identification (pas de production) : retrouver l'infinitif
+     d'un verbe conjugué, puis son groupe. Chaque item se déroule en 2 étapes
+     (infinitif → classification du groupe), quel que soit le niveau.
+     Niveau 1 : QCM pour l'infinitif (4 choix) — formes proches de l'infinitif,
+                verbes fréquents des 3 groupes.
+     Niveau 2 : saisie de l'infinitif (pas de QCM) — formes plus éloignées
+                (irréguliers du 3e groupe, subjonctif, passé simple).
+     Niveau 3 : saisie de l'infinitif — pièges classiques : "aller" (finale
+                en -er mais 3e groupe, plusieurs radicaux va/allons/iront),
+                croire/croître (formes proches à l'écrit), verbes en -ir à
+                distinguer entre 2e et 3e groupe (sortir/servir vs rougir/punir).
+     Classification du groupe : 3 boutons (identique aux 3 niveaux).
+     Progression verrouillée : seuil 80 %, persistance sessionStorage.
+  ══════════════════════════════════════════════════════════════════════════ */
+
   "retrouver-infinitif-verbe-conjugue": {
-    title: "Retrouver l'infinitif d'un verbe conjugué puis son groupe",
+    title:      "Retrouver l'infinitif d'un verbe conjugué puis son groupe",
     domaine:    "Français",
     competence: "Conjugaison — Identifier l'infinitif et le groupe",
-    levels: ["CM1", "CM2", "6e"],
-    paliers: 1, /* nombre réel de paliers du moteur */
-    type: "infinitif-et-groupe",
-    questionsPerSession: 20,
-    backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
+    type:       "infinitif-groupe-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
+    questionsPerSession: 10,
+    backLink:   { href: "français-conjugaison.html", label: "Conjugaison" },
 
-    /* ── Question bank ──────────────────────────────────────────────────────
-       difficulty 1 = 1er groupe   (verbs in -er)
-       difficulty 2 = 2e groupe    (verbs in -ir/-issant)
-       difficulty 3 = 3e groupe    (all others)
-       choices must contain exactly the infinitive + 3 distractors.
-    ──────────────────────────────────────────────────────────────────────── */
     bank: [
-      /* 1er groupe */
-      {
-        sentence:   "Nous mangeons.",
-        verb:       "mangeons",
-        infinitive: "manger",
-        group:      "1er groupe",
-        difficulty: 1,
-        choices:    ["manger", "mangé", "mangeant", "mangions"]
-      },
-      {
-        sentence:   "Ils jouaient.",
-        verb:       "jouaient",
-        infinitive: "jouer",
-        group:      "1er groupe",
-        difficulty: 1,
-        choices:    ["jouer", "joué", "jouant", "jouerait"]
-      },
-      {
-        sentence:   "Il chantait.",
-        verb:       "chantait",
-        infinitive: "chanter",
-        group:      "1er groupe",
-        difficulty: 1,
-        choices:    ["chanter", "chanté", "chantant", "chantons"]
-      },
-      {
-        sentence:   "Elles parlaient.",
-        verb:       "parlaient",
-        infinitive: "parler",
-        group:      "1er groupe",
-        difficulty: 1,
-        choices:    ["parler", "parlé", "parlant", "parlera"]
-      },
-      {
-        sentence:   "Tu aimais.",
-        verb:       "aimais",
-        infinitive: "aimer",
-        group:      "1er groupe",
-        difficulty: 1,
-        choices:    ["aimer", "aimé", "aimant", "aimait"]
-      },
-      {
-        sentence:   "Nous donnons.",
-        verb:       "donnons",
-        infinitive: "donner",
-        group:      "1er groupe",
-        difficulty: 1,
-        choices:    ["donner", "donné", "donnant", "donnons"]
-      },
+      /* ── NIVEAU 1 : QCM infinitif (10) — formes proches de l'infinitif ── */
+      { level: 1, sentence: "Nous mangeons.",      verb: "mangeons",      infinitive: "manger",   group: "1er groupe", choices: ["manger", "mangé", "mangeant", "mangions"] },
+      { level: 1, sentence: "Il chantait.",        verb: "chantait",      infinitive: "chanter",  group: "1er groupe", choices: ["chanter", "chanté", "chantant", "chantons"] },
+      { level: 1, sentence: "Nous donnons.",       verb: "donnons",       infinitive: "donner",   group: "1er groupe", choices: ["donner", "donné", "donnant", "donnons"] },
+      { level: 1, sentence: "Ils finissaient.",    verb: "finissaient",   infinitive: "finir",    group: "2e groupe",  choices: ["finir", "fini", "finissant", "finissait"] },
+      { level: 1, sentence: "Nous choisissons.",   verb: "choisissons",   infinitive: "choisir",  group: "2e groupe",  choices: ["choisir", "choisi", "choisissant", "choisissait"] },
+      { level: 1, sentence: "Vous obéissez.",      verb: "obéissez",      infinitive: "obéir",    group: "2e groupe",  choices: ["obéir", "obéi", "obéissant", "obéissait"] },
+      { level: 1, sentence: "Je vendais.",         verb: "vendais",       infinitive: "vendre",   group: "3e groupe",  choices: ["vendre", "vendu", "vendant", "vendit"] },
+      { level: 1, sentence: "Nous entendions.",    verb: "entendions",    infinitive: "entendre", group: "3e groupe",  choices: ["entendre", "entendu", "entendant", "entendait"] },
+      { level: 1, sentence: "Ils dormaient.",      verb: "dormaient",     infinitive: "dormir",   group: "3e groupe",  choices: ["dormir", "dormi", "dormant", "dormait"] },
+      { level: 1, sentence: "Elle servait.",       verb: "servait",       infinitive: "servir",   group: "3e groupe",  choices: ["servir", "servi", "servant", "servait"] },
 
-      /* 2e groupe */
-      {
-        sentence:   "Ils finissaient.",
-        verb:       "finissaient",
-        infinitive: "finir",
-        group:      "2e groupe",
-        difficulty: 2,
-        choices:    ["finir", "fini", "finissant", "finissait"]
-      },
-      {
-        sentence:   "Elle rougira.",
-        verb:       "rougira",
-        infinitive: "rougir",
-        group:      "2e groupe",
-        difficulty: 2,
-        choices:    ["rougir", "rouge", "rougi", "rougissant"]
-      },
-      {
-        sentence:   "Ils grandissaient.",
-        verb:       "grandissaient",
-        infinitive: "grandir",
-        group:      "2e groupe",
-        difficulty: 2,
-        choices:    ["grandir", "grandi", "grandissant", "grandissait"]
-      },
-      {
-        sentence:   "Nous choisissons.",
-        verb:       "choisissons",
-        infinitive: "choisir",
-        group:      "2e groupe",
-        difficulty: 2,
-        choices:    ["choisir", "choisi", "choisissant", "choisissait"]
-      },
-      {
-        sentence:   "Vous obéissez.",
-        verb:       "obéissez",
-        infinitive: "obéir",
-        group:      "2e groupe",
-        difficulty: 2,
-        choices:    ["obéir", "obéi", "obéissant", "obéissait"]
-      },
+      /* ── NIVEAU 2 : saisie de l'infinitif (10) — formes éloignées, subjonctif, passé simple ── */
+      { level: 2, sentence: "Ils prennent.",           verb: "prennent",     infinitive: "prendre",  group: "3e groupe" },
+      { level: 2, sentence: "Je voyais.",               verb: "voyais",       infinitive: "voir",     group: "3e groupe" },
+      { level: 2, sentence: "Ils diront.",               verb: "diront",       infinitive: "dire",     group: "3e groupe" },
+      { level: 2, sentence: "Elle écrira.",             verb: "écrira",       infinitive: "écrire",   group: "3e groupe" },
+      { level: 2, sentence: "Je lisais.",               verb: "lisais",       infinitive: "lire",     group: "3e groupe" },
+      { level: 2, sentence: "Ils couraient.",           verb: "couraient",    infinitive: "courir",   group: "3e groupe" },
+      { level: 2, sentence: "Elle réfléchissait.",      verb: "réfléchissait", infinitive: "réfléchir", group: "2e groupe" },
+      { level: 2, sentence: "Il faut qu'elle parte.",   verb: "parte",        infinitive: "partir",   group: "3e groupe" },
+      { level: 2, sentence: "Ils eurent très peur.",    verb: "eurent",       infinitive: "avoir",    group: "3e groupe" },
+      { level: 2, sentence: "Nous fûmes surpris.",      verb: "fûmes",        infinitive: "être",     group: "3e groupe" },
 
-      /* 3e groupe */
-      {
-        sentence:   "Ils prennent.",
-        verb:       "prennent",
-        infinitive: "prendre",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["prendre", "pris", "prenant", "prenait"]
-      },
-      {
-        sentence:   "Je voyais.",
-        verb:       "voyais",
-        infinitive: "voir",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["voir", "vu", "voyant", "vois"]
-      },
-      {
-        sentence:   "Ils diront.",
-        verb:       "diront",
-        infinitive: "dire",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["dire", "dit", "disant", "dirait"]
-      },
-      {
-        sentence:   "Ils feront.",
-        verb:       "feront",
-        infinitive: "faire",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["faire", "fait", "faisant", "ferait"]
-      },
-      {
-        sentence:   "Je vendais.",
-        verb:       "vendais",
-        infinitive: "vendre",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["vendre", "vendu", "vendant", "vendit"]
-      },
-      {
-        sentence:   "Il venait.",
-        verb:       "venait",
-        infinitive: "venir",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["venir", "venu", "venant", "venait"]
-      },
-      {
-        sentence:   "Ils couraient.",
-        verb:       "couraient",
-        infinitive: "courir",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["courir", "couru", "courant", "courait"]
-      },
-      {
-        sentence:   "Elle écrira.",
-        verb:       "écrira",
-        infinitive: "écrire",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["écrire", "écrit", "écrivant", "écrivait"]
-      },
-      {
-        sentence:   "Nous entendions.",
-        verb:       "entendions",
-        infinitive: "entendre",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["entendre", "entendu", "entendant", "entendait"]
-      },
-      {
-        sentence:   "Je lisais.",
-        verb:       "lisais",
-        infinitive: "lire",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["lire", "lu", "lisant", "lisait"]
-      },
-      {
-        sentence:   "Ils dormaient.",
-        verb:       "dormaient",
-        infinitive: "dormir",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["dormir", "dormi", "dormant", "dormait"]
-      },
-
-      /* 2e groupe — supplémentaires */
-      {
-        sentence:   "Elle réfléchissait.",
-        verb:       "réfléchissait",
-        infinitive: "réfléchir",
-        group:      "2e groupe",
-        difficulty: 2,
-        choices:    ["réfléchir", "réfléchi", "réfléchissant", "réfléchissait"]
-      },
-      {
-        sentence:   "Ils applaudissaient.",
-        verb:       "applaudissaient",
-        infinitive: "applaudir",
-        group:      "2e groupe",
-        difficulty: 2,
-        choices:    ["applaudir", "applaudi", "applaudissant", "applaudissait"]
-      },
-      {
-        sentence:   "Vous réussissez.",
-        verb:       "réussissez",
-        infinitive: "réussir",
-        group:      "2e groupe",
-        difficulty: 2,
-        choices:    ["réussir", "réussi", "réussissant", "réussissait"]
-      },
-      {
-        sentence:   "Il punissait.",
-        verb:       "punissait",
-        infinitive: "punir",
-        group:      "2e groupe",
-        difficulty: 2,
-        choices:    ["punir", "puni", "punissant", "punissait"]
-      },
-
-      /* 3e groupe — verbes en -ir (sans -issant) */
-      {
-        sentence:   "Elle partait.",
-        verb:       "partait",
-        infinitive: "partir",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["partir", "parti", "partant", "partait"]
-      },
-      {
-        sentence:   "Ils sortaient.",
-        verb:       "sortaient",
-        infinitive: "sortir",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["sortir", "sorti", "sortant", "sortait"]
-      },
-      {
-        sentence:   "Il tenait.",
-        verb:       "tenait",
-        infinitive: "tenir",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["tenir", "tenu", "tenant", "tenait"]
-      },
-      {
-        sentence:   "Ils sentaient.",
-        verb:       "sentaient",
-        infinitive: "sentir",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["sentir", "senti", "sentant", "sentait"]
-      },
-      {
-        sentence:   "Elle servait.",
-        verb:       "servait",
-        infinitive: "servir",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["servir", "servi", "servant", "servait"]
-      },
-      {
-        sentence:   "Il mourra.",
-        verb:       "mourra",
-        infinitive: "mourir",
-        group:      "3e groupe",
-        difficulty: 3,
-        choices:    ["mourir", "mort", "mourant", "mourrait"]
-      }
+      /* ── NIVEAU 3 : saisie de l'infinitif (10) — pièges classiques ── */
+      { level: 3, sentence: "Nous allons au marché.",       verb: "allons",  infinitive: "aller",    group: "3e groupe" },
+      { level: 3, sentence: "Ils iront demain.",             verb: "iront",   infinitive: "aller",    group: "3e groupe" },
+      { level: 3, sentence: "Va chercher ton frère !",       verb: "va",      infinitive: "aller",    group: "3e groupe" },
+      { level: 3, sentence: "Il mourra bientôt.",            verb: "mourra",  infinitive: "mourir",   group: "3e groupe" },
+      { level: 3, sentence: "Le champignon croît vite.",     verb: "croît",   infinitive: "croître",  group: "3e groupe" },
+      { level: 3, sentence: "Il croit au père Noël.",        verb: "croit",   infinitive: "croire",   group: "3e groupe" },
+      { level: 3, sentence: "Ils sortaient tous les soirs.", verb: "sortaient", infinitive: "sortir",  group: "3e groupe" },
+      { level: 3, sentence: "Elle servait à table.",         verb: "servait", infinitive: "servir",   group: "3e groupe" },
+      { level: 3, sentence: "Elle rougira de honte.",        verb: "rougira", infinitive: "rougir",   group: "2e groupe" },
+      { level: 3, sentence: "Il punissait sans pitié.",      verb: "punissait", infinitive: "punir",  group: "2e groupe" }
     ]
   },
 
