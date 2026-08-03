@@ -307,6 +307,39 @@
       color: var(--red);
     }
 
+    /* ── Type : articles-def-indef-niveaux ─────────────────────────────── */
+    .idi-mark {
+      background: rgba(16,43,106,0.12);
+      color: var(--blue);
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-weight: 700;
+    }
+    .idi-choice-col { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
+    .idi-choice-label { display: block; }
+    .idi-hint-btn {
+      align-self: flex-start;
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 200ms, color 200ms;
+    }
+    .idi-hint-btn:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); }
+    .idi-hint-btn:disabled { opacity: 0.45; cursor: default; }
+    .idi-hint {
+      display: block;
+      font-size: 12px;
+      font-weight: 400;
+      opacity: 0.7;
+      line-height: 1.35;
+    }
+
     /* ── Feedback ───────────────────────────────────────────── */
     .ex-feedback-area { margin-top: 4px; }
 
@@ -5597,8 +5630,8 @@
       } else if (currentType === "gnsp-niveaux") {
         gnspInitSession();
         return;
-      } else if (currentType === "det-demo-niveaux") {
-        ddnInitSession();
+      } else if (currentType === "det-demo-poss-niveaux") {
+        ddpInitSession();
         return;
       } else if (currentType === "adv-niveaux") {
         advInitSession();
@@ -5711,14 +5744,8 @@
       } else if (currentType === "transformer-phrase-niveaux") {
         tpInitSession();
         return;
-      } else if (currentType === "articles-definis-niveaux") {
-        adInitSession();
-        return;
-      } else if (currentType === "determinants-possessifs-niveaux") {
-        dpInitSession();
-        return;
-      } else if (currentType === "articles-indefinis-niveaux") {
-        aiInitSession();
+      } else if (currentType === "articles-def-indef-niveaux") {
+        idiInitSession();
         return;
       } else if (currentType === "fraction-decimale-grille-droite-niveaux") {
         fdgdInitSession();
@@ -5935,8 +5962,8 @@
         /* session managed by pscInitSession — no-op here */
       } else if (currentType === "gnsp-niveaux") {
         /* session managed by gnspInitSession — no-op here */
-      } else if (currentType === "det-demo-niveaux") {
-        /* session managed by ddnInitSession — no-op here */
+      } else if (currentType === "det-demo-poss-niveaux") {
+        /* session managed by ddpInitSession — no-op here */
       } else if (currentType === "adv-niveaux") {
         /* session managed by advInitSession — no-op here */
       } else if (currentType === "genre-niveaux") {
@@ -6007,12 +6034,8 @@
         /* session managed by itpInitSession — no-op here */
       } else if (currentType === "transformer-phrase-niveaux") {
         /* session managed by tpInitSession — no-op here */
-      } else if (currentType === "articles-definis-niveaux") {
-        /* session managed by adInitSession — no-op here */
-      } else if (currentType === "determinants-possessifs-niveaux") {
-        /* session managed by dpInitSession — no-op here */
-      } else if (currentType === "articles-indefinis-niveaux") {
-        /* session managed by aiInitSession — no-op here */
+      } else if (currentType === "articles-def-indef-niveaux") {
+        /* session managed by idiInitSession — no-op here */
       } else if (currentType === "fraction-decimale-grille-droite-niveaux") {
         /* session managed by fdgdInitSession — no-op here */
       } else if (currentType === "fraction-decimale-tableau-niveaux") {
@@ -8990,12 +9013,10 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
 
       const total = questions.length;
-      const s20   = Math.round(score / total * 20);
       const pct   = Math.round(score / total * 100);
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent   =
-        score + ' bonne' + (score > 1 ? 's' : '') + ' réponse' + (score > 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = score + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pct + ' %';
 
       let msg;
       if (pct === 100)    msg = '🏆 Incroyable ! Tu maîtrises cette compétence.';
@@ -9930,11 +9951,9 @@
     function vpShowResults() {
       document.getElementById('exercise-screen').classList.add('ex-hidden');
       document.getElementById('results-screen').classList.remove('ex-hidden');
-      const s20 = Math.round(score / 13 * 20);
       const pct = Math.round(score / 13 * 100);
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent   =
-        score + ' bonne' + (score > 1 ? 's' : '') + ' réponse' + (score > 1 ? 's' : '') + ' sur 13';
+      document.getElementById('score-value').textContent = score + ' / 13';
+      document.getElementById('score-pct').textContent   = pct + ' %';
       let msg;
       if (pct === 100)    msg = '🏆 Incroyable ! Tu maîtrise cette compétence.';
       else if (pct >= 80) msg = '🌟 Très bien !';
@@ -10933,12 +10952,10 @@
       document.getElementById('exercise-screen').classList.add('ex-hidden');
       document.getElementById('results-screen').classList.remove('ex-hidden');
 
-      const s20 = Math.round(s / total * 20);
       const pct = Math.round(s / total * 100);
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent   =
-        s + ' bonne' + (s > 1 ? 's' : '') + ' réponse' + (s > 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = s + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pct + ' %';
 
       const l3Name = sessionData.level3Type === 'ecrit' ? 'Écris' : 'Écoute';
 
@@ -14235,502 +14252,6 @@
     }
 
     /* ══════════════════════════════════════════════════════════════════════════
-       TYPE : det-demo-niveaux — Déterminant démonstratif (ce/cet/cette/ces)
-       Niveau 1 : cliquer sur le déterminant démonstratif dans une phrase
-       Niveau 2 : 2 étapes — observer le nom, puis choisir ce/cet/cette/ces
-       Niveau 3 : homophones ce / se — compléter 20 phrases à trous
-       Seuil 80 % — localStorage — déverrouillage progressif
-       ══════════════════════════════════════════════════════════════════════════ */
-
-    const DDN_SEUIL    = 0.8;
-    const DDN_POSITIFS = ['Bravo !', 'Excellent !', 'Parfait !', 'Très bien !', 'Super !'];
-    const DDN_LEVEL_DEFS = [
-      { lv: 1, desc: 'Clique sur le déterminant démonstratif dans la phrase (ce, cet, cette, ces)' },
-      { lv: 2, desc: 'Observe le nom, analyse son genre et son nombre, puis choisis ce / cet / cette / ces' },
-      { lv: 3, desc: 'Complète 20 phrases avec ce (déterminant devant un nom) ou se (pronom réfléchi devant un verbe)' }
-    ];
-
-    let ddnState = null;
-    let ddnLevelSelect = null;
-
-    function ddnShuffle(arr) {
-      const a = [...arr];
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-    function ddnPos() { return DDN_POSITIFS[Math.floor(Math.random() * DDN_POSITIFS.length)]; }
-
-    /* ── Retour à l'écran "Choisis ton niveau" depuis les résultats ──────────── */
-    function ddnBackToSelectScreen() {
-      ddnState = null;
-      document.getElementById('results-screen').classList.add('ex-hidden');
-      document.getElementById('exercise-screen').classList.remove('ex-hidden');
-      const prog = document.querySelector('#exercise-screen .ex-progress');
-      if (prog) prog.classList.add('ex-hidden');
-    }
-
-    /* ── Init ───────────────────────────────────────────────────────────────── */
-    function ddnInitSession() {
-      ddnState = null;
-      score = 0; currentIndex = 0;
-      sessionStartTime = Date.now();
-      document.getElementById('results-screen').classList.add('ex-hidden');
-      document.getElementById('exercise-screen').classList.remove('ex-hidden');
-      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
-      const prog = document.querySelector('#exercise-screen .ex-progress');
-      if (prog) prog.classList.add('ex-hidden');
-
-      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
-      ddnLevelSelect = LevelSelect.create({
-        exerciseKey: slug,
-        levels: DDN_LEVEL_DEFS.map(d => ({ id: d.lv, description: d.desc })),
-        threshold: DDN_SEUIL,
-        onSelectLevel: lv => ddnStartLevel(parseInt(lv, 10)),
-        selectContainer: document.getElementById('ex-card'),
-        badgesContainer: document.getElementById('ex-badges'),
-        onBackToSelect: ddnBackToSelectScreen,
-        introHTML: '<div class="ea-rule-chip">📌 <em>ce / cet / cette / ces</em> se place <strong>devant un nom</strong> pour désigner quelque chose de précis.</div>'
-      });
-      ddnLevelSelect.renderSelectScreen();
-    }
-
-    /* ── Démarrer un niveau ─────────────────────────────────────────────────── */
-    function ddnStartLevel(lv) {
-      const prog = document.querySelector('#exercise-screen .ex-progress');
-      if (prog) prog.classList.remove('ex-hidden');
-
-      if (lv === 1) {
-        const qs = [...sessionData.lvl1Bank];
-        ddnState = { level: 1, questions: qs, idx: 0, score: 0, total: qs.length };
-        document.getElementById('q-total').textContent = qs.length;
-        ddnRenderLvl1(document.getElementById('ex-card'));
-
-      } else if (lv === 2) {
-        const qs = ddnShuffle([...sessionData.lvl2Bank]);
-        ddnState = { level: 2, questions: qs, idx: 0, score: 0, total: qs.length };
-        document.getElementById('q-total').textContent = qs.length;
-        ddnRenderLvl2(document.getElementById('ex-card'));
-
-      } else {
-        const qs = ddnShuffle([...sessionData.lvl3Bank]);
-        ddnState = { level: 3, questions: qs, idx: 0, score: 0, total: qs.length };
-        document.getElementById('q-total').textContent = qs.length;
-        ddnRenderLvl3(document.getElementById('ex-card'));
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    /* ══════════════════════════════════════════════════════════════════════════
-       NIVEAU 1 — Cliquer sur le déterminant démonstratif
-       ══════════════════════════════════════════════════════════════════════════ */
-    function ddnRenderLvl1(card) {
-      const { questions, idx, total } = ddnState;
-      const q = questions[idx];
-      document.getElementById('q-num').textContent = idx + 1;
-      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
-
-      card.innerHTML = `
-        <p class="ex-question-label">Clique sur le <strong>déterminant démonstratif</strong> dans cette phrase</p>
-        <p style="text-align:center;font-size:12px;color:var(--muted);margin:-10px 0 18px;font-style:italic">
-          💡 Il se place <strong>devant un nom</strong> et sert à montrer, à désigner · formes : <em>ce, cet, cette, ces</em>
-        </p>
-        <div class="ex-sentence-words" id="ddn-words"></div>
-        <div class="ex-feedback-area" id="ddn-fb" style="margin-top:12px"></div>
-        <button class="ex-next-btn ex-hidden" id="next-btn">
-          ${idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'}
-        </button>`;
-
-      const container = document.getElementById('ddn-words');
-      let answered = false;
-
-      q.sentence.split(/\s+/).forEach(token => {
-        if (!token) return;
-        const clean  = token.replace(/[.,!?;:«»"""]/g, '').replace(/[''`]/g, "'");
-        const isPunct = /^[.,!?;:]+$/.test(token);
-
-        if (isPunct) {
-          const span = document.createElement('span');
-          span.textContent = ' ' + token;
-          span.style.cssText = 'font-size:18px;font-weight:600;color:var(--muted)';
-          container.appendChild(span);
-          return;
-        }
-
-        const btn = document.createElement('button');
-        btn.className     = 'ex-word-btn';
-        btn.textContent   = token;
-        btn.dataset.clean = clean;
-
-        btn.addEventListener('click', () => {
-          if (answered) return;
-          answered = true;
-          container.querySelectorAll('.ex-word-btn').forEach(b => b.disabled = true);
-          const isCorrect = q.targets.includes(clean);
-
-          if (isCorrect) {
-            btn.classList.add('is-correct');
-            ddnState.score++;
-            document.getElementById('ddn-fb').innerHTML =
-              `<div class="ex-feedback-correct">✓ ${ddnPos()} ${q.feedbackOk}</div>`;
-          } else {
-            btn.classList.add('is-wrong');
-            container.querySelectorAll('.ex-word-btn').forEach(b => {
-              if (q.targets.includes(b.dataset.clean)) b.classList.add('is-correct');
-            });
-            document.getElementById('ddn-fb').innerHTML =
-              `<div class="ex-feedback-wrong">❌ ${q.feedbackErr}</div>`;
-          }
-          document.getElementById('next-btn').classList.remove('ex-hidden');
-        });
-        container.appendChild(btn);
-      });
-
-      document.getElementById('next-btn').addEventListener('click', () => {
-        ddnState.idx++;
-        if (ddnState.idx >= ddnState.questions.length) ddnShowLevelResults();
-        else ddnRenderLvl1(document.getElementById('ex-card'));
-      });
-    }
-
-    /* ══════════════════════════════════════════════════════════════════════════
-       NIVEAU 2 — 2 étapes : observer le nom → choisir le déterminant
-       ══════════════════════════════════════════════════════════════════════════ */
-    function ddnRenderLvl2(card) {
-      const { questions, idx, total } = ddnState;
-      const q = questions[idx];
-      document.getElementById('q-num').textContent = idx + 1;
-      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
-
-      const phraseHtml = q.phrase.replace('___',
-        '<span style="color:var(--muted);font-style:italic;font-weight:700">___</span>');
-
-      card.innerHTML = `
-        <p class="ex-question-label">Quel déterminant démonstratif emploie-t-on devant <strong><em>${q.noun}</em></strong> ?</p>
-        <div class="ex-sentence-display" style="font-size:18px">${phraseHtml}</div>
-
-        <div id="ddn-step1">
-          <p style="font-size:13px;font-weight:700;color:var(--blue);margin:0 0 12px">
-            Étape 1 — Observe le nom <em>${q.noun}</em> :
-          </p>
-
-          <div style="margin-bottom:10px">
-            <p style="font-size:12px;color:var(--muted);margin:0 0 6px;font-style:italic">Il est…</p>
-            <div style="display:flex;gap:8px">
-              <button class="ex-group-btn ddn-obs-btn" data-grp="genre" data-val="masculin" style="flex:1">masculin</button>
-              <button class="ex-group-btn ddn-obs-btn" data-grp="genre" data-val="féminin"  style="flex:1">féminin</button>
-            </div>
-          </div>
-
-          <div style="margin-bottom:10px">
-            <p style="font-size:12px;color:var(--muted);margin:0 0 6px;font-style:italic">singulier ou pluriel ?</p>
-            <div style="display:flex;gap:8px">
-              <button class="ex-group-btn ddn-obs-btn" data-grp="nombre" data-val="singulier" style="flex:1">singulier</button>
-              <button class="ex-group-btn ddn-obs-btn" data-grp="nombre" data-val="pluriel"   style="flex:1">pluriel</button>
-            </div>
-          </div>
-
-          <div style="margin-bottom:16px" id="ddn-initiale-section">
-            <p style="font-size:12px;color:var(--muted);margin:0 0 6px;font-style:italic">Il commence par…</p>
-            <div style="display:flex;gap:8px">
-              <button class="ex-group-btn ddn-obs-btn" data-grp="initiale" data-val="consonne" style="flex:1">une consonne</button>
-              <button class="ex-group-btn ddn-obs-btn" data-grp="initiale" data-val="voyelle"  style="flex:1">une voyelle</button>
-              <button class="ex-group-btn ddn-obs-btn" data-grp="initiale" data-val="h muet"   style="flex:1">un h muet</button>
-            </div>
-          </div>
-
-          <div class="ex-feedback-area" id="ddn-fb1"></div>
-          <button class="ex-next-btn ex-hidden" id="ddn-val-step1" style="margin-top:12px">
-            Valider mes observations →
-          </button>
-        </div>
-
-        <div id="ddn-step2" class="ex-hidden">
-          <div class="ex-step2-divider"></div>
-          <p class="ex-question-label">Étape 2 — Quel déterminant démonstratif employer ?</p>
-          <div class="ex-choices-grid" id="ddn-choices"></div>
-          <div class="ex-feedback-area" id="ddn-fb2"></div>
-        </div>
-
-        <button class="ex-next-btn ex-hidden" id="next-btn">
-          ${idx + 1 < total ? 'Item suivant →' : 'Voir les résultats →'}
-        </button>`;
-
-      const obs = {};
-
-      function updateInitialeVisibility() {
-        const sec = document.getElementById('ddn-initiale-section');
-        if (!sec) return;
-        const isPluriel = obs.nombre === 'pluriel';
-        sec.style.opacity = isPluriel ? '0.35' : '1';
-        sec.querySelectorAll('.ddn-obs-btn').forEach(b => {
-          b.disabled = isPluriel;
-          if (isPluriel) b.classList.remove('is-selected');
-        });
-        if (isPluriel) delete obs.initiale;
-      }
-
-      function checkObsReady() {
-        const needsInitiale = obs.nombre !== 'pluriel';
-        const ready = obs.genre && obs.nombre && (!needsInitiale || obs.initiale);
-        document.getElementById('ddn-val-step1')?.classList.toggle('ex-hidden', !ready);
-      }
-
-      card.querySelectorAll('.ddn-obs-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const grp = btn.dataset.grp;
-          const val = btn.dataset.val;
-          obs[grp] = val;
-          card.querySelectorAll(`.ddn-obs-btn[data-grp="${grp}"]`).forEach(b =>
-            b.classList.toggle('is-selected', b === btn)
-          );
-          updateInitialeVisibility();
-          checkObsReady();
-        });
-      });
-
-      document.getElementById('ddn-val-step1').addEventListener('click', () => {
-        card.querySelectorAll('.ddn-obs-btn').forEach(b => b.disabled = true);
-        document.getElementById('ddn-val-step1').disabled = true;
-
-        let allOk = true;
-        ['genre', 'nombre'].forEach(grp => {
-          const sel = card.querySelector(`.ddn-obs-btn[data-grp="${grp}"].is-selected`);
-          if (!sel) return;
-          if (sel.dataset.val === q[grp]) {
-            sel.classList.add('is-correct');
-          } else {
-            sel.classList.add('is-wrong'); allOk = false;
-            card.querySelector(`.ddn-obs-btn[data-grp="${grp}"][data-val="${q[grp]}"]`)
-              ?.classList.add('is-correct');
-          }
-        });
-        if (q.nombre !== 'pluriel') {
-          const selInit = card.querySelector('.ddn-obs-btn[data-grp="initiale"].is-selected');
-          if (selInit) {
-            if (selInit.dataset.val === q.initiale) {
-              selInit.classList.add('is-correct');
-            } else {
-              selInit.classList.add('is-wrong'); allOk = false;
-              card.querySelector(`.ddn-obs-btn[data-grp="initiale"][data-val="${q.initiale}"]`)
-                ?.classList.add('is-correct');
-            }
-          }
-        }
-
-        const initLabel = q.nombre === 'pluriel' ? ''
-          : q.initiale === 'voyelle' ? ', commence par une voyelle'
-          : q.initiale === 'h muet'  ? ', commence par un h muet'
-          : ', commence par une consonne';
-
-        const fb1Html = allOk
-          ? `<div class="ex-feedback-correct" style="font-size:13px;padding:10px 14px">
-              ✓ Bien observé ! <em>${q.noun}</em> est <strong>${q.genre} ${q.nombre}</strong>${initLabel}.
-             </div>`
-          : `<div class="ex-feedback-wrong" style="font-size:13px;padding:10px 14px">
-              Attention : <em>${q.noun}</em> est <strong>${q.genre} ${q.nombre}</strong>${initLabel}. Les bonnes réponses sont en vert.
-             </div>`;
-        document.getElementById('ddn-fb1').innerHTML = fb1Html;
-
-        setTimeout(() => {
-          const step2 = document.getElementById('ddn-step2');
-          step2.classList.remove('ex-hidden');
-          step2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-          const choices = ['ce', 'cet', 'cette', 'ces'];
-          const grid    = document.getElementById('ddn-choices');
-          choices.forEach(c => {
-            const btn = document.createElement('button');
-            btn.className   = 'ex-choice';
-            btn.textContent = c;
-            btn.addEventListener('click', () => {
-              grid.querySelectorAll('.ex-choice').forEach(b => b.disabled = true);
-              const isRight = c === q.answer;
-              grid.querySelectorAll('.ex-choice').forEach(b => {
-                if (b.textContent === q.answer) b.classList.add('is-correct');
-              });
-              if (!isRight) btn.classList.add('is-wrong');
-              if (isRight) ddnState.score++;
-
-              let fb2Html = isRight
-                ? `<div class="ex-feedback-correct">✓ ${ddnPos()} ${q.explication}</div>`
-                : `<div class="ex-feedback-wrong">❌ On dit : <strong>${q.answer} ${q.noun}</strong>.<br>${q.explication}</div>`;
-              if (q.noteSesCes) {
-                fb2Html += `<div class="ex-note">💡 À distinguer : <strong>ces</strong> (démonstratif) = on montre · <strong>ses</strong> (possessif) = ça appartient à quelqu'un.</div>`;
-              }
-              document.getElementById('ddn-fb2').innerHTML = fb2Html;
-              document.getElementById('next-btn').classList.remove('ex-hidden');
-            });
-            grid.appendChild(btn);
-          });
-        }, 600);
-      });
-
-      document.getElementById('next-btn').addEventListener('click', () => {
-        ddnState.idx++;
-        if (ddnState.idx >= ddnState.questions.length) ddnShowLevelResults();
-        else ddnRenderLvl2(document.getElementById('ex-card'));
-      });
-    }
-
-    /* ══════════════════════════════════════════════════════════════════════════
-       NIVEAU 3 — ce ou se ? (20 phrases à trous, score /20)
-       ══════════════════════════════════════════════════════════════════════════ */
-    function ddnRenderLvl3(card) {
-      const { questions, idx, total } = ddnState;
-      const q = questions[idx];
-      document.getElementById('q-num').textContent = idx + 1;
-      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
-
-      const displaySentence = q.sentence.replace('___',
-        '<span style="color:var(--muted);font-weight:700;font-style:italic">___</span>');
-
-      card.innerHTML = `
-        <p class="ex-question-label">Complète avec <strong>ce</strong> ou <strong>se</strong></p>
-        <div class="ex-note" style="margin-bottom:18px;font-size:13px">
-          📌 <strong>ce</strong> = déterminant démonstratif → placé <strong>devant un nom</strong> (<em>ce chien</em>)<br>
-          📌 <strong>se</strong> = pronom réfléchi → placé <strong>devant un verbe</strong>, remplaçable par <em>me</em> ou <em>te</em> (<em>il se lave → je me lave</em>)
-        </div>
-        <div class="ex-sentence-display" style="font-size:20px">${displaySentence}</div>
-        <div class="ex-input-row">
-          <input type="text" id="ddn-input" class="ex-text-input"
-                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                 placeholder="ce ou se ?">
-          <button class="ex-validate-btn" id="ddn-val-btn">Valider</button>
-        </div>
-        <div class="ex-feedback-area" id="ddn-fb"></div>
-        <button class="ex-next-btn ex-hidden" id="next-btn">
-          ${idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'}
-        </button>`;
-
-      const input  = document.getElementById('ddn-input');
-      const valBtn = document.getElementById('ddn-val-btn');
-
-      setTimeout(() => input.focus(), 50);
-      input.addEventListener('keydown', e => { if (e.key === 'Enter') valBtn.click(); });
-
-      valBtn.addEventListener('click', () => {
-        const raw = input.value.trim().toLowerCase();
-        if (!raw) return;
-        valBtn.disabled = true;
-        input.disabled  = true;
-
-        const isRight = raw === q.answer.toLowerCase();
-
-        if (isRight) {
-          input.classList.add('is-correct');
-          ddnState.score++;
-          document.getElementById('ddn-fb').innerHTML =
-            `<div class="ex-feedback-correct">✓ ${ddnPos()} ${q.explication}</div>`;
-        } else {
-          input.classList.add('is-wrong');
-          const wrongWord = raw;
-          const isWordAfterNoun = q.answer === 'ce';
-          document.getElementById('ddn-fb').innerHTML = `
-            <div class="ex-feedback-wrong">
-              ❌ On écrit <strong>${q.answer}</strong> ici.<br>
-              Test : y a-t-il un <strong>${isWordAfterNoun ? 'nom' : 'verbe'}</strong> juste après le blanc ?
-              → ${isWordAfterNoun
-                ? 'oui → <em>ce</em> est un déterminant démonstratif.'
-                : 'oui → <em>se</em> est un pronom réfléchi (remplaçable par <em>me</em> ou <em>te</em>).'}
-              <br><br>${q.explication}
-            </div>`;
-        }
-        document.getElementById('next-btn').classList.remove('ex-hidden');
-      });
-
-      document.getElementById('next-btn').addEventListener('click', () => {
-        ddnState.idx++;
-        if (ddnState.idx >= ddnState.questions.length) ddnShowLevelResults();
-        else ddnRenderLvl3(document.getElementById('ex-card'));
-      });
-    }
-
-    /* ── Résultats de niveau (commun aux 3 niveaux) ─────────────────────────── */
-    function ddnShowLevelResults() {
-      const { level, score: lvScore, total } = ddnState;
-      const { passed, pct, isLast } = ddnLevelSelect.completeLevel(level, lvScore, total);
-      const pctPct = Math.round(pct * 100);
-      const stars  = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
-
-      const prog = document.querySelector('#exercise-screen .ex-progress');
-      if (prog) prog.classList.add('ex-hidden');
-      document.getElementById('exercise-screen').classList.add('ex-hidden');
-      document.getElementById('results-screen').classList.remove('ex-hidden');
-      document.getElementById('ex-bar-fill').style.width = '100%';
-
-      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
-      document.getElementById('score-pct').textContent   = pctPct + ' %';
-
-      const backHref  = sessionData.backLink?.href  || 'français-grammaire.html';
-      const backLabel = '← Retour à la ' + (sessionData.backLink?.label || 'Grammaire');
-      const lvNextLabels = ['', 'Niveau 2 — Choisis le bon démonstratif →', 'Niveau 3 — ce ou se ? →', ''];
-      const backToSelectBtn = ddnLevelSelect.backToSelectButtonHTML();
-
-      let msg, btnsHTML;
-      if (passed && isLast) {
-        msg = `${stars} Félicitations ! Tu maîtrises les déterminants démonstratifs et la distinction ce / se !`;
-        btnsHTML = `<div class="ex-results-btns">
-          <button class="ex-btn-primary" id="ddn-restart-btn">Recommencer depuis le début</button>
-          ${backToSelectBtn}
-          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
-        </div>`;
-      } else if (passed) {
-        msg = `${stars} Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
-        btnsHTML = `<div class="ex-results-btns">
-          <button class="ex-btn-primary" id="ddn-next-btn">${lvNextLabels[level]}</button>
-          <button class="ex-btn-secondary" id="ddn-retry-btn">Recommencer ce niveau</button>
-          ${backToSelectBtn}
-        </div>
-        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
-      } else {
-        const needed = Math.ceil(total * DDN_SEUIL);
-        msg = `${stars || '💪'} Pas encore… il faut ${needed}/${total} pour passer au niveau suivant. On réessaie ?`;
-        btnsHTML = `<div class="ex-results-btns">
-          <button class="ex-btn-primary" id="ddn-retry-btn">Recommencer ce niveau</button>
-          ${backToSelectBtn}
-          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
-        </div>`;
-      }
-
-      document.getElementById('score-msg').textContent          = msg;
-      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
-      resultsBtnsWrap.innerHTML = btnsHTML;
-
-      document.getElementById('ddn-retry-btn')?.addEventListener('click', () => {
-        document.getElementById('results-screen').classList.add('ex-hidden');
-        document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        ddnStartLevel(ddnState.level);
-      });
-      document.getElementById('ddn-next-btn')?.addEventListener('click', () => {
-        document.getElementById('results-screen').classList.add('ex-hidden');
-        document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        ddnStartLevel(ddnState.level + 1);
-      });
-      document.getElementById('ddn-restart-btn')?.addEventListener('click', () => {
-        ddnLevelSelect.reset();
-        document.getElementById('results-screen').classList.add('ex-hidden');
-        document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        ddnInitSession();
-      });
-      ddnLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      const slug = new URLSearchParams(window.location.search).get('slug');
-      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
-      saveExerciseResult({
-        exerciseSlug: slug, subject, category,
-        exerciseType: currentType,
-        level:        'Niveau ' + level,
-        score:        lvScore, total,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
-      });
-    }
-
-    /* ══════════════════════════════════════════════════════════════════════════
        TYPE : gn-pluriel-niveaux
        Orthographe — Transformer un groupe nominal du singulier au pluriel
        Niveau 1 ★  : pluriels réguliers en -s
@@ -14910,9 +14431,8 @@
       const pct100 = Math.round(pct * 100);
       const stars  = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : s20 >= 1 ? ' ⭐' : '';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent   =
-        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') + ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pct100 + ' %';
 
       const backHref = sessionData.backLink?.href || 'français-orthographe.html';
       const backToSelectBtn = gnpLevelSelect.backToSelectButtonHTML();
@@ -15222,10 +14742,8 @@
       const s20   = Math.round(rawScore / total * 20);
       const stars = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : s20 >= 1 ? ' ⭐' : '';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent   =
-        correctCount + ' bonne' + (correctCount !== 1 ? 's' : '') +
-        ' réponse' + (correctCount !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = correctCount + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(correctCount / total * 100) + ' %';
 
       const backHref = sessionData.backLink?.href || 'français-orthographe.html';
       const backToSelectBtn = genreLevelSelect.backToSelectButtonHTML();
@@ -15637,8 +15155,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent   = `(${lvScore} / ${maxPts} pts · ${Math.round(pct * 100)} %)`;
+      document.getElementById('score-value').textContent = lvScore + ' / ' + maxPts;
+      document.getElementById('score-pct').textContent   = Math.round(pct * 100) + ' %';
 
       const backHref  = sessionData.backLink?.href  || 'français-orthographe.html';
       const backLabel = `← Retour à l'${sessionData.backLink?.label || 'Orthographe'}`;
@@ -16007,7 +15525,7 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-value').textContent = rawScore + ' / ' + rawMax;
       document.getElementById('score-pct').textContent   = pctPct + ' %';
 
       const stars    = s20 >= 19 ? '🌟🌟🌟' : s20 >= 16 ? '⭐⭐' : s20 >= 10 ? '⭐' : '';
@@ -16380,7 +15898,7 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-value').textContent = rawScore + ' / ' + rawMax;
       document.getElementById('score-pct').textContent   = pctPct + ' %';
 
       const stars  = s20 >= 19 ? '🌟🌟🌟' : s20 >= 16 ? '⭐⭐' : s20 >= 10 ? '⭐' : '';
@@ -17123,7 +16641,7 @@
       document.getElementById('exercise-screen').classList.add('ex-hidden');
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
-      document.getElementById('score-value').textContent = s20 + ' / 20';
+      document.getElementById('score-value').textContent = rawScore + ' / ' + rawMax;
       document.getElementById('score-pct').textContent   = pctPct + ' %';
 
       const stars  = s20 >= 18 ? '🌟🌟🌟' : s20 >= 14 ? '⭐⭐' : s20 >= 10 ? '⭐' : '';
@@ -21340,10 +20858,8 @@
       const s20   = Math.round(rawScore / total * 20);
       const stars = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : s20 >= 1 ? ' ⭐' : '';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent   =
-        correctCount + ' bonne' + (correctCount !== 1 ? 's' : '') +
-        ' réponse' + (correctCount !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = correctCount + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(correctCount / total * 100) + ' %';
 
       const backHref = sessionData.backLink?.href || 'français-orthographe.html';
       const backToSelectBtn = csjLevelSelect.backToSelectButtonHTML();
@@ -21805,9 +21321,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent   =
-        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') + ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(lvScore / total * 100) + ' %';
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
       const backToSelectBtn = dniLevelSelect.backToSelectButtonHTML();
@@ -22119,9 +21634,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent   =
-        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') + ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(lvScore / total * 100) + ' %';
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
       const backToSelectBtn = cniLevelSelect.backToSelectButtonHTML();
@@ -22360,10 +21874,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') +
-        ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(lvScore / total * 100) + ' %';
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
       const backToSelectBtn = cneLevelSelect.backToSelectButtonHTML();
@@ -22703,10 +22215,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') +
-        ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(lvScore / total * 100) + ' %';
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
       const backToSelectBtn = rniLevelSelect.backToSelectButtonHTML();
@@ -23027,10 +22537,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') +
-        ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(lvScore / total * 100) + ' %';
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
       const backToSelectBtn = eniLevelSelect.backToSelectButtonHTML();
@@ -23381,10 +22889,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent   =
-        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') +
-        ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(lvScore / total * 100) + ' %';
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
       const backToSelectBtn = dgnLevelSelect.backToSelectButtonHTML();
@@ -23689,10 +23195,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') +
-        ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(lvScore / total * 100) + ' %';
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
       const backToSelectBtn = aniLevelSelect.backToSelectButtonHTML();
@@ -23931,10 +23435,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent   =
-        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') +
-        ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(lvScore / total * 100) + ' %';
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-entiers.html';
       const backToSelectBtn = aaLevelSelect.backToSelectButtonHTML();
@@ -24168,6 +23670,8 @@
     }
 
     function cdBackToSelectScreen() {
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
     }
@@ -24855,8 +24359,7 @@
     function cdShowLevelResults() {
       const level = cdActiveLevel;
       const total = cdSession.length;
-      const s20   = Math.round(cdScore / total * 20);
-
+      const s20 = Math.round(cdScore / total * 20);
       const { passed, isLast } = cdLevelSelect.completeLevel(level, cdScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
@@ -24865,9 +24368,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        cdScore + ' bonne' + (cdScore !== 1 ? 's' : '') + ' réponse' + (cdScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = cdScore + ' / ' + total;
+      document.getElementById('score-pct').textContent = Math.round(cdScore / total * 100) + ' %';
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-decimaux.html';
       const backLabel = sessionData.backLink?.label || 'Nombres décimaux';
@@ -25121,6 +24623,8 @@
     }
 
     function rdBackToSelectScreen() {
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
     }
@@ -25831,8 +25335,7 @@
     function rdShowLevelResults() {
       const level = rdActiveLevel;
       const total = rdSession.length;
-      const s20   = Math.round(rdScore / total * 20);
-
+      const s20 = Math.round(rdScore / total * 20);
       const { passed, isLast } = rdLevelSelect.completeLevel(level, rdScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
@@ -25841,9 +25344,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        rdScore + ' bonne' + (rdScore !== 1 ? 's' : '') + ' réponse' + (rdScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = rdScore + ' / ' + total;
+      document.getElementById('score-pct').textContent = Math.round(rdScore / total * 100) + ' %';
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-decimaux.html';
       const backLabel = sessionData.backLink?.label || 'Nombres décimaux';
@@ -26105,6 +25607,8 @@
     }
 
     function edBackToSelectScreen() {
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
     }
@@ -26775,8 +26279,7 @@
     function edShowLevelResults() {
       const level = edActiveLevel;
       const total = edSession.length;
-      const s20   = Math.round(edScore / total * 20);
-
+      const s20 = Math.round(edScore / total * 20);
       const { passed, isLast } = edLevelSelect.completeLevel(level, edScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
@@ -26785,9 +26288,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        edScore + ' bonne' + (edScore !== 1 ? 's' : '') + ' réponse' + (edScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = edScore + ' / ' + total;
+      document.getElementById('score-pct').textContent = Math.round(edScore / total * 100) + ' %';
 
       const backHref = sessionData.backLink?.href || 'mathématiques-nombres-decimaux.html';
       const backLabel = sessionData.backLink?.label || 'Nombres décimaux';
@@ -26938,6 +26440,8 @@
     }
 
     function ddBackToSelectScreen() {
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
     }
@@ -27632,8 +27136,7 @@
     function ddShowLevelResults() {
       const level = ddActiveLevel;
       const total = ddSession.length;
-      const s20   = Math.round(ddScore / total * 20);
-
+      const s20 = Math.round(ddScore / total * 20);
       const { passed, isLast } = ddLevelSelect.completeLevel(level, ddScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
@@ -27642,9 +27145,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        ddScore + ' bonne' + (ddScore !== 1 ? 's' : '') + ' réponse' + (ddScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = ddScore + ' / ' + total;
+      document.getElementById('score-pct').textContent = Math.round(ddScore / total * 100) + ' %';
 
       const backHref  = sessionData.backLink?.href || 'mathématiques-nombres-decimaux.html';
       const backLabel = sessionData.backLink?.label || 'Nombres décimaux';
@@ -27919,6 +27421,8 @@
     }
 
     function cpBackToSelectScreen() {
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
     }
@@ -28208,8 +27712,7 @@
     function cpShowLevelResults() {
       const level = cpActiveLevel;
       const total = cpSession.length;
-      const s20   = Math.round(cpScore / total * 20);
-
+      const s20 = Math.round(cpScore / total * 20);
       const { passed, isLast } = cpLevelSelect.completeLevel(level, cpScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
@@ -28218,9 +27721,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        cpScore + ' bonne' + (cpScore !== 1 ? 's' : '') + ' réponse' + (cpScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = cpScore + ' / ' + total;
+      document.getElementById('score-pct').textContent = Math.round(cpScore / total * 100) + ' %';
 
       const backHref  = sessionData.backLink?.href || 'mathématiques-nombres-decimaux.html';
       const backLabel = sessionData.backLink?.label || 'Nombres décimaux';
@@ -28911,6 +28413,8 @@
     }
 
     function icBackToSelectScreen() {
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
     }
@@ -29026,8 +28530,7 @@
     function icShowLevelResults() {
       const level = icActiveLevel;
       const total = icSession.length;
-      const s20   = Math.round(icScore / total * 20);
-
+      const s20 = Math.round(icScore / total * 20);
       const { passed, isLast } = icLevelSelect.completeLevel(level, icScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
@@ -29037,9 +28540,8 @@
       document.getElementById('ex-bar-fill').style.width = '100%';
       icRemoveClickLine();
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        icScore + ' bonne' + (icScore !== 1 ? 's' : '') + ' réponse' + (icScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = icScore + ' / ' + total;
+      document.getElementById('score-pct').textContent = Math.round(icScore / total * 100) + ' %';
 
       const backHref  = sessionData.backLink?.href || 'mathématiques-nombres-decimaux.html';
       const backLabel = sessionData.backLink?.label || 'Nombres décimaux';
@@ -29781,6 +29283,8 @@
     }
 
     function pdBackToSelectScreen() {
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
     }
@@ -30091,8 +29595,7 @@
     function pdShowLevelResults() {
       const level = pdActiveLevel;
       const total = pdSession.length;
-      const s20   = Math.round(pdScore / total * 20);
-
+      const s20 = Math.round(pdScore / total * 20);
       const { passed, isLast } = pdLevelSelect.completeLevel(level, pdScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
@@ -30101,9 +29604,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        pdScore + ' bonne' + (pdScore !== 1 ? 's' : '') + ' réponse' + (pdScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = pdScore + ' / ' + total;
+      document.getElementById('score-pct').textContent = Math.round(pdScore / total * 100) + ' %';
 
       const backHref  = sessionData.backLink?.href || 'mathématiques-nombres-decimaux.html';
       const backLabel = sessionData.backLink?.label || 'Nombres décimaux';
@@ -30337,6 +29839,8 @@
     }
 
     function afBackToSelectScreen() {
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
     }
@@ -30637,8 +30141,7 @@
     function afShowLevelResults() {
       const level = afActiveLevel;
       const total = afSession.length;
-      const s20   = Math.round(afScore / total * 20);
-
+      const s20 = Math.round(afScore / total * 20);
       const { passed, isLast } = afLevelSelect.completeLevel(level, afScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
@@ -30647,9 +30150,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        afScore + ' bonne' + (afScore !== 1 ? 's' : '') + ' réponse' + (afScore !== 1 ? 's' : '') + ' du premier coup sur ' + total;
+      document.getElementById('score-value').textContent = afScore + ' / ' + total;
+      document.getElementById('score-pct').textContent = Math.round(afScore / total * 100) + ' % du premier coup';
 
       const backHref  = sessionData.backLink?.href || 'mathématiques-nombres-decimaux.html';
       const backLabel = sessionData.backLink?.label || 'Nombres décimaux';
@@ -30755,6 +30257,8 @@
     }
 
     function itpBackToSelectScreen() {
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
     }
@@ -30909,8 +30413,7 @@
     function itpShowLevelResults() {
       const level = itpActiveLevel;
       const total = itpSession.length;
-      const s20   = Math.round(itpScore / total * 20);
-
+      const s20 = Math.round(itpScore / total * 20);
       const { passed, isLast } = itpLevelSelect.completeLevel(level, itpScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
@@ -30919,9 +30422,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        itpScore + ' bonne' + (itpScore !== 1 ? 's' : '') + ' réponse' + (itpScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = itpScore + ' / ' + total;
+      document.getElementById('score-pct').textContent = Math.round(itpScore / total * 100) + ' %';
 
       const backHref  = sessionData.backLink?.href || 'français-grammaire.html';
       const backLabel = sessionData.backLink?.label || 'Grammaire';
@@ -31223,6 +30725,8 @@
     }
 
     function tpBackToSelectScreen() {
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
     }
@@ -31485,8 +30989,7 @@
     function tpShowLevelResults() {
       const level = tpActiveLevel;
       const total = tpSession.length;
-      const s20   = Math.round(tpScore / total * 20);
-
+      const s20 = Math.round(tpScore / total * 20);
       const { passed, isLast } = tpLevelSelect.completeLevel(level, tpScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
@@ -31495,9 +30998,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        tpScore + ' bonne' + (tpScore !== 1 ? 's' : '') + ' réponse' + (tpScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = tpScore + ' / ' + total;
+      document.getElementById('score-pct').textContent = Math.round(tpScore / total * 100) + ' %';
 
       const backHref  = sessionData.backLink?.href || 'français-grammaire.html';
       const backLabel = sessionData.backLink?.label || 'Grammaire';
@@ -31568,38 +31070,44 @@
     }
 
     /* ══════════════════════════════════════════════════════════════════════
-       TYPE : articles-definis-niveaux
-       Lot 6, groupe 3a — fusion de identifier-article-defini (niveau 1,
-       mots cliquables), articles-definis-choix (niveau 2, choix d'étiquette)
-       et articles-definis-completer (niveau 3, glisser-déposer — 1 seul
-       item d'origine, absorbé tel quel). Copies adaptées (score/next-btn
-       propres à ce niveau) de renderMotsCliquables / renderChoixEtiquette /
-       renderGlisserDeposer ; réutilise .ex-sentence-words / .ex-word-btn /
-       .ex-choices-grid / .ex-fill-sentence / .ex-bank existants.
+       TYPE : articles-def-indef-niveaux — « Identifier et différencier les
+       articles définis et indéfinis »
+       Niveau 1 : l'article est surligné dans la phrase, l'élève choisit
+                  défini/indéfini (indices permanents sous les boutons).
+       Niveau 2 : l'élève clique d'abord sur l'article (mots-cliquables)
+                  puis le qualifie défini/indéfini (sans indice).
+       Niveau 3 : même mécanique que le niveau 2, sur 2 phrases par item.
+       3 niveaux déverrouillables à 80 % via LevelSelect. Score au niveau
+       2/3 compté par item (les 2 phrases du niveau 3 doivent être
+       correctes pour valider l'item).
        ══════════════════════════════════════════════════════════════════════ */
 
-    let adLevelSelect = null;
-    let adSession      = [];
-    let adSessionIdx   = 0;
-    let adScore        = 0;
-    let adActiveLevel  = 1;
+    let idiLevelSelect  = null;
+    let idiSession       = [];
+    let idiSessionIdx    = 0;
+    let idiScore         = 0;
+    let idiActiveLevel   = 1;
+    let idiL3SubIdx      = 0;
+    let idiL3AllCorrect  = true;
 
-    const AD_SEUIL = 0.8;
-    const AD_LEVEL_DESCS = [
-      'Identifier les articles définis dans un texte',
-      'Choisir le bon article défini (le / la / les / l\')',
-      'Compléter un texte avec les articles définis'
+    const IDI_SEUIL = 0.8;
+    const IDI_LEVEL_DESCS = [
+      'Repérer si un article surligné est défini ou indéfini',
+      "Cliquer sur l'article d'une phrase, puis le qualifier",
+      "Identifier et qualifier l'article dans 2 phrases"
     ];
 
-    function adBuildQuestions(level) { return shuffle(sessionData['lvl' + level]); }
+    function idiBuildQuestions(level) { return shuffle(sessionData['level' + level + 'Bank']); }
 
-    function adBackToSelectScreen() {
+    function idiBackToSelectScreen() {
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
     }
 
-    function adInitSession() {
-      adSession = []; adSessionIdx = 0; adScore = 0;
+    function idiInitSession() {
+      idiSession = []; idiSessionIdx = 0; idiScore = 0;
       sessionStartTime = Date.now();
       document.getElementById('results-screen').classList.add('ex-hidden');
       document.getElementById('exercise-screen').classList.remove('ex-hidden');
@@ -31607,287 +31115,402 @@
       if (prog) prog.classList.add('ex-hidden');
 
       const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
-      adLevelSelect = LevelSelect.create({
+      idiLevelSelect = LevelSelect.create({
         exerciseKey: slug,
-        levels: [1, 2, 3].map(lv => ({ id: lv, label: 'Niveau ' + lv, description: AD_LEVEL_DESCS[lv - 1] })),
-        threshold: AD_SEUIL,
-        onSelectLevel: (lv) => adStartLevel(parseInt(lv, 10)),
+        levels: [1, 2, 3].map(lv => ({ id: lv, label: 'Niveau ' + lv, description: IDI_LEVEL_DESCS[lv - 1] })),
+        threshold: IDI_SEUIL,
+        onSelectLevel: (lv) => idiStartLevel(parseInt(lv, 10)),
         selectContainer: document.getElementById('ex-card'),
         badgesContainer: document.getElementById('ex-badges'),
-        onBackToSelect: adBackToSelectScreen
+        onBackToSelect: idiBackToSelectScreen
       });
-      adLevelSelect.renderSelectScreen();
+      idiLevelSelect.renderSelectScreen();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function adStartLevel(lv) {
-      adActiveLevel = lv;
-      adSession    = adBuildQuestions(lv);
-      adSessionIdx = 0;
-      adScore      = 0;
+    function idiStartLevel(lv) {
+      idiActiveLevel = lv;
+      idiSession    = idiBuildQuestions(lv);
+      idiSessionIdx = 0;
+      idiScore      = 0;
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
-      document.getElementById('q-total').textContent = adSession.length;
-      if (adLevelSelect) adLevelSelect.renderBadges(lv);
-      adRenderQuestion();
+      document.getElementById('q-total').textContent = idiSession.length;
+      if (idiLevelSelect) idiLevelSelect.renderBadges(lv);
+      idiRenderQuestion();
     }
 
-    function adRenderQuestion() {
-      const q = adSession[adSessionIdx];
-      document.getElementById('q-num').textContent = adSessionIdx + 1;
-      document.getElementById('ex-bar-fill').style.width = (adSessionIdx / adSession.length * 100) + '%';
-      adRenderCard(document.getElementById('ex-card'), q);
+    function idiRenderQuestion() {
+      const q = idiSession[idiSessionIdx];
+      document.getElementById('q-num').textContent = idiSessionIdx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idiSessionIdx / idiSession.length * 100) + '%';
+      idiRenderCard(document.getElementById('ex-card'), q);
     }
 
-    function adRenderCard(card, q) {
-      if      (adActiveLevel === 1) adRenderMotsCliquables(card, q);
-      else if (adActiveLevel === 2) adRenderChoixEtiquette(card, q);
-      else                          adRenderGlisserDeposer(card, q);
-      adUpdateProgress();
+    function idiRenderCard(card, q) {
+      if      (idiActiveLevel === 1) idiRenderLevel1(card, q);
+      else if (idiActiveLevel === 2) idiRenderLevel2(card, q);
+      else                            idiRenderLevel3(card, q);
+      idiUpdateProgress();
     }
 
-    function adSetFeedback(html) { document.getElementById('ad-feedback').innerHTML = html; }
+    function idiUpdateProgress() {
+      document.getElementById('q-num').textContent = idiSessionIdx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idiSessionIdx / idiSession.length * 100) + '%';
+      const scoreEl = document.getElementById('idi-progressScore');
+      if (scoreEl) scoreEl.textContent = `Score : ${idiScore}`;
+    }
 
-    function adRenderMotsCliquables(card, q) {
+    function idiShowNextBtn() {
+      const btn = document.getElementById('next-btn');
+      btn.classList.remove('ex-hidden');
+      btn.textContent = idiSessionIdx === idiSession.length - 1 ? 'Voir les résultats →' : 'Question suivante →';
+      btn.onclick = idiNextQuestion;
+    }
+
+    function idiNextQuestion() {
+      idiSessionIdx++;
+      if (idiSessionIdx >= idiSession.length) { idiShowLevelResults(); return; }
+      idiRenderQuestion();
+      document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    /* ── Niveau 1 : phrase avec article surligné + boutons à indices ──────── */
+    function idiRenderLevel1(card, q) {
       card.innerHTML = `
-        <div class="cd-progress-score" id="ad-progressScore">Score : ${adScore}</div>
-        <p class="ex-question-label">${q.instruction}</p>
-        <div class="ex-sentence-words" id="ad-mc-words"></div>
-        <div class="ex-feedback-area" id="ad-mc-piege" style="min-height:24px"></div>
-        <button class="ex-choice" id="ad-mc-validate" style="margin-top:10px;width:100%">Valider ma sélection</button>
-        <div class="ex-feedback-area" id="ad-feedback"></div>
+        <div class="cd-progress-score" id="idi-progressScore">Score : ${idiScore}</div>
+        <p class="ex-question-label">${q.instruction || 'Cet article est-il défini ou indéfini ?'}</p>
+        <div class="ex-sentence-display">${q.html}</div>
+        <div class="ex-choices-grid" id="idi-l1-grid">
+          <div class="idi-choice-col">
+            <button class="ex-choice" data-answer="defini">
+              <span class="idi-choice-label">Article défini</span>
+            </button>
+            <button type="button" class="idi-hint-btn" data-hint-for="defini">💡 Indice</button>
+            <span class="idi-hint ex-hidden" data-hint="defini">→ une personne, un animal ou une chose précise, déjà connue</span>
+          </div>
+          <div class="idi-choice-col">
+            <button class="ex-choice" data-answer="indefini">
+              <span class="idi-choice-label">Article indéfini</span>
+            </button>
+            <button type="button" class="idi-hint-btn" data-hint-for="indefini">💡 Indice</button>
+            <span class="idi-hint ex-hidden" data-hint="indefini">→ une personne, un animal ou une chose non précise</span>
+          </div>
+        </div>
+        <div class="ex-feedback-area" id="idi-feedback"></div>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
-      const container = document.getElementById("ad-mc-words");
-      const selected   = new Set();
-      let answered     = false;
-
-      q.sentence.split(/\s+/).forEach(token => {
-        const clean = token.replace(/[.,!?;:«»"""]/g, "").replace(/['']/g, "'");
-        if (!clean) return;
-        const btn = document.createElement("button");
-        btn.className     = "ex-word-btn";
-        btn.textContent   = token;
-        btn.dataset.clean = clean;
-
-        btn.addEventListener("click", () => {
-          if (answered) return;
-          if (selected.has(btn)) {
-            selected.delete(btn);
-            btn.classList.remove("is-selected");
-            document.getElementById("ad-mc-piege").innerHTML = "";
-          } else {
-            selected.add(btn);
-            btn.classList.add("is-selected");
-            const piegeMsg = q.piege && (q.piege[clean] || q.piege[token]);
-            if (piegeMsg) {
-              document.getElementById("ad-mc-piege").innerHTML =
-                `<div class="ex-feedback-wrong" style="font-size:13px;padding:8px 12px">⚠️ ${piegeMsg}</div>`;
-            }
-          }
+      const grid = document.getElementById('idi-l1-grid');
+      grid.querySelectorAll('.idi-hint-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const hint = grid.querySelector(`.idi-hint[data-hint="${btn.dataset.hintFor}"]`);
+          if (hint) hint.classList.toggle('ex-hidden');
         });
-        container.appendChild(btn);
       });
-
-      document.getElementById("ad-mc-validate").addEventListener("click", () => {
-        if (answered) return;
-        answered = true;
-        let hasWrong = false, hasMissed = false;
-
-        container.querySelectorAll(".ex-word-btn").forEach(btn => {
-          const clean       = btn.dataset.clean;
-          const isTarget    = q.targets.includes(clean);
-          const wasSelected = selected.has(btn);
-          btn.disabled = true;
-          btn.classList.remove("is-selected");
-
-          if      (isTarget && wasSelected)  { btn.classList.add("is-correct"); }
-          else if (isTarget && !wasSelected) { btn.classList.add("is-missed"); hasMissed = true; }
-          else if (!isTarget && wasSelected) { btn.classList.add("is-wrong"); btn.classList.add("shake"); hasWrong = true; }
-        });
-
-        document.getElementById("ad-mc-validate").disabled = true;
-        document.getElementById("ad-mc-piege").innerHTML   = "";
-
-        const noteHtml = q.note ? `<div class="ex-note">${q.note}</div>` : "";
-        if (!hasWrong && !hasMissed) {
-          adScore++; adUpdateProgress();
-          adSetFeedback(`<div class="ex-feedback-correct">${rand(SUCCESS)}</div>${noteHtml}`);
-        } else {
-          adSetFeedback(`
-            <div class="ex-feedback-wrong">
-              ❌ Pas tout à fait !
-              Les bonnes réponses sont en vert${hasMissed ? "; les mots manqués sont encadrés en pointillés" : ""}.
-            </div>${noteHtml}`);
-        }
-        adShowNextBtn();
-      });
-    }
-
-    function adRenderChoixEtiquette(card, q) {
-      card.innerHTML = `
-        <div class="cd-progress-score" id="ad-progressScore">Score : ${adScore}</div>
-        <p class="ex-question-label">${q.instruction || 'Quel article défini va avec ce nom ?'}</p>
-        <div class="ex-label-display">${q.emoji || ''}</div>
-        <div class="ex-label-word">${q.word}</div>
-        <div class="ex-choices-grid" id="ad-choices-grid"></div>
-        <div class="ex-feedback-area" id="ad-feedback"></div>
-        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
-      `;
-      const grid = document.getElementById("ad-choices-grid");
-      shuffle(q.choices).forEach(c => {
-        const btn = document.createElement("button");
-        btn.className   = "ex-choice";
-        btn.textContent = c;
-        btn.addEventListener("click", () => {
-          grid.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
-          const isRight = c === q.answer;
-          grid.querySelectorAll(".ex-choice").forEach(b => {
-            if (b.textContent === q.answer) b.classList.add("is-correct");
+      grid.querySelectorAll('.ex-choice').forEach(btn => {
+        btn.addEventListener('click', () => {
+          grid.querySelectorAll('.ex-choice').forEach(b => b.disabled = true);
+          grid.querySelectorAll('.idi-hint-btn').forEach(b => b.disabled = true);
+          const isRight = btn.dataset.answer === q.answer;
+          grid.querySelectorAll('.ex-choice').forEach(b => {
+            if (b.dataset.answer === q.answer) b.classList.add('is-correct');
           });
-          if (!isRight) btn.classList.add("is-wrong");
+          if (!isRight) btn.classList.add('is-wrong');
+          const fb = document.getElementById('idi-feedback');
           if (isRight) {
-            adScore++; adUpdateProgress();
-            adSetFeedback(`<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+            idiScore++; idiUpdateProgress();
+            fb.innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}<br>${q.explain}</div>`;
           } else {
-            adSetFeedback(`<div class="ex-feedback-wrong">❌ On dit : <strong>${q.answer} ${q.word}</strong>.</div>`);
+            fb.innerHTML = `<div class="ex-feedback-wrong">❌ ${q.explain}</div>`;
           }
-          adShowNextBtn();
+          idiShowNextBtn();
         });
-        grid.appendChild(btn);
       });
     }
 
-    function adRenderGlisserDeposer(card, q) {
-      let blankIdx = 0;
-      const templateHtml = q.template.replace(/___/g, () =>
-        `<span class="ex-blank" data-idx="${blankIdx++}" data-val=""></span>`
-      );
-
+    /* ── Mécanique commune niveaux 2/3 : clic sur l'article (mots-cliquables)
+       puis qualification défini/indéfini (choix-étiquette, sans indice) ──── */
+    function idiRenderTwoStep(card, titleLine, data, onComplete) {
       card.innerHTML = `
-        <div class="cd-progress-score" id="ad-progressScore">Score : ${adScore}</div>
-        <p class="ex-question-label">${q.instruction || 'Place les bons mots dans les cases.'}</p>
-        <div class="ex-fill-sentence" id="ad-gd-sentence">${templateHtml}</div>
-        <div class="ex-bank-label">Mots disponibles :</div>
-        <div class="ex-bank" id="ad-gd-bank"></div>
-        <div class="ex-feedback-area" id="ad-feedback"></div>
-        <button class="ex-choice" id="ad-gd-validate" style="margin-top:10px;width:100%">Valider</button>
+        <div class="cd-progress-score" id="idi-progressScore">Score : ${idiScore}</div>
+        <p class="ex-question-label">${titleLine}</p>
+        <div class="ex-sentence-display">${data.sentence}</div>
+        <div class="ex-classify-step" id="idi-step1">
+          <div class="ex-classify-step-title">Étape 1 — Clique sur l'article de la phrase</div>
+          <div class="ex-sentence-words" id="idi-words"></div>
+          <div class="ex-feedback-area" id="idi-fb1"></div>
+          <button class="ex-choice" id="idi-val1" style="margin-top:10px;width:100%">Valider l'étape 1</button>
+        </div>
+        <div class="ex-classify-step ex-hidden" id="idi-step2">
+          <div class="ex-classify-step-title">Étape 2 — Cet article est-il défini ou indéfini ?</div>
+          <div class="ex-choices-grid" id="idi-choices2"></div>
+          <div class="ex-feedback-area" id="idi-feedback"></div>
+        </div>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
 
-      const bankEl = document.getElementById("ad-gd-bank");
-      let selected = null;
-      let answered = false;
+      const wordsEl   = document.getElementById('idi-words');
+      const selected  = new Set();
+      const targetSet = new Set([data.target]);
+      let step1Correct = false;
 
-      shuffle([...q.bank]).forEach(word => {
-        const btn = document.createElement("button");
-        btn.className    = "ex-word-btn";
-        btn.textContent  = word;
-        btn.dataset.word = word;
-        btn.addEventListener("click", () => {
-          if (answered) return;
-          if (selected && selected.bankBtn === btn) {
-            btn.classList.remove("is-selected");
-            selected = null;
-            return;
-          }
-          if (selected) selected.bankBtn.classList.remove("is-selected");
-          selected = { word, bankBtn: btn };
-          btn.classList.add("is-selected");
+      data.sentence.split(/\s+/).forEach(token => {
+        const clean = token.replace(/[.,!?;:«»"""]/g, "").replace(/['']/g, "'");
+        if (!clean) return;
+        const btn = document.createElement('button');
+        btn.className     = 'ex-word-btn';
+        btn.textContent   = token;
+        btn.dataset.clean = clean;
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          if (selected.has(btn)) { selected.delete(btn); btn.classList.remove('is-selected'); }
+          else                   { selected.add(btn);    btn.classList.add('is-selected'); }
         });
-        bankEl.appendChild(btn);
+        wordsEl.appendChild(btn);
       });
 
-      document.getElementById("ad-gd-sentence").querySelectorAll(".ex-blank").forEach(blank => {
-        blank.addEventListener("click", () => {
-          if (answered) return;
-          const currentVal = blank.dataset.val;
+      document.getElementById('idi-val1').addEventListener('click', () => {
+        const selectedClean = new Set(Array.from(selected).map(b => b.dataset.clean));
+        step1Correct = selectedClean.size === targetSet.size &&
+                       [...selectedClean].every(x => targetSet.has(x));
 
-          if (selected) {
-            if (currentVal) {
-              const oldBtn = bankEl.querySelector(`[data-word="${currentVal}"]`);
-              if (oldBtn) { oldBtn.disabled = false; oldBtn.classList.remove("ex-word-used"); }
-            }
-            blank.dataset.val  = selected.word;
-            blank.textContent  = selected.word;
-            blank.classList.add("is-filled");
-            selected.bankBtn.disabled = true;
-            selected.bankBtn.classList.add("ex-word-used");
-            selected.bankBtn.classList.remove("is-selected");
-            selected = null;
-          } else if (currentVal) {
-            const oldBtn = bankEl.querySelector(`[data-word="${currentVal}"]`);
-            if (oldBtn) { oldBtn.disabled = false; oldBtn.classList.remove("ex-word-used"); }
-            blank.dataset.val = "";
-            blank.textContent = "";
-            blank.classList.remove("is-filled");
-          }
+        wordsEl.querySelectorAll('.ex-word-btn').forEach(btn => {
+          const isTarget    = targetSet.has(btn.dataset.clean);
+          const wasSelected = selected.has(btn);
+          btn.disabled = true;
+          btn.classList.remove('is-selected');
+          if      (isTarget && wasSelected)  btn.classList.add('is-correct');
+          else if (isTarget && !wasSelected) btn.classList.add('is-missed');
+          else if (!isTarget && wasSelected) { btn.classList.add('is-wrong'); btn.classList.add('shake'); }
         });
+        document.getElementById('idi-val1').disabled = true;
+        document.getElementById('idi-fb1').innerHTML = step1Correct
+          ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+          : `<div class="ex-feedback-wrong" style="font-size:13px">❌ L'article était en vert : <strong>${data.target}</strong>.</div>`;
+
+        setTimeout(() => {
+          const s2 = document.getElementById('idi-step2');
+          s2.classList.remove('ex-hidden');
+          s2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 500);
       });
 
-      document.getElementById("ad-gd-validate").addEventListener("click", () => {
-        if (answered) return;
-        answered = true;
+      const choices2El = document.getElementById('idi-choices2');
+      const CHOICES = [
+        { label: 'Article défini',   value: 'defini' },
+        { label: 'Article indéfini', value: 'indefini' }
+      ];
+      shuffle([...CHOICES]).forEach(c => {
+        const btn = document.createElement('button');
+        btn.className   = 'ex-choice';
+        btn.textContent = c.label;
+        btn.addEventListener('click', () => {
+          choices2El.querySelectorAll('.ex-choice').forEach(b => b.disabled = true);
+          const isRight     = c.value === data.answer;
+          const rightLabel  = CHOICES.find(x => x.value === data.answer).label;
+          choices2El.querySelectorAll('.ex-choice').forEach(b => {
+            if (b.textContent === rightLabel) b.classList.add('is-correct');
+          });
+          if (!isRight) btn.classList.add('is-wrong');
 
-        const blanks = document.getElementById("ad-gd-sentence").querySelectorAll(".ex-blank");
-        let correct  = 0;
-        blanks.forEach((blank, i) => {
-          const val    = blank.dataset.val;
-          const expect = q.blanks[i];
-          blank.dataset.locked = "1";
-          if (val === expect) {
-            blank.classList.add("is-correct");
-            correct++;
+          const overallCorrect = isRight && step1Correct;
+          const fb = document.getElementById('idi-feedback');
+          if (overallCorrect) {
+            fb.innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+          } else if (isRight) {
+            fb.innerHTML = `<div class="ex-feedback-correct" style="opacity:0.8">✓ Bonne réponse à l'étape 2 (mais l'étape 1 était incomplète).</div>`;
           } else {
-            blank.classList.add("is-wrong");
-            if (!val) blank.textContent = `(${expect})`;
+            fb.innerHTML = `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${rightLabel}</strong>.</div>`;
           }
+          onComplete(overallCorrect);
         });
-
-        bankEl.querySelectorAll(".ex-word-btn").forEach(b => b.disabled = true);
-        document.getElementById("ad-gd-validate").disabled = true;
-
-        if (correct === blanks.length) {
-          adScore++; adUpdateProgress();
-          adSetFeedback(`<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
-        } else {
-          adSetFeedback(`
-            <div class="ex-feedback-wrong">
-              ❌ ${correct}/${blanks.length} bonne${correct > 1 ? "s" : ""} réponse${correct > 1 ? "s" : ""}.
-              Les cases vertes sont correctes.
-            </div>`);
-        }
-        adShowNextBtn();
+        choices2El.appendChild(btn);
       });
     }
 
-    function adShowNextBtn() {
-      const btn = document.getElementById('next-btn');
-      btn.classList.remove('ex-hidden');
-      btn.textContent = adSessionIdx === adSession.length - 1 ? 'Voir les résultats →' : 'Question suivante →';
-      btn.onclick = adNextQuestion;
+    /* ── Niveau 2 : 1 phrase par item ───────────────────────────────────── */
+    function idiRenderLevel2(card, q) {
+      idiRenderTwoStep(
+        card,
+        "Clique sur l'article de cette phrase, puis dis s'il est défini ou indéfini.",
+        q,
+        (correct) => {
+          if (correct) { idiScore++; idiUpdateProgress(); }
+          idiShowNextBtn();
+        }
+      );
     }
 
-    function adNextQuestion() {
-      adSessionIdx++;
-      if (adSessionIdx >= adSession.length) { adShowLevelResults(); return; }
-      adRenderQuestion();
-      document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    /* ── Niveau 3 : 2 phrases par item, CHAQUE phrase pouvant contenir
+       plusieurs articles. Étape 1 (mots-cliquables) : trouver TOUS les
+       articles de la phrase — la logique de sélection/validation est déjà
+       générique (targetSet), il suffit de lui passer plusieurs mots.
+       Étape 2 : qualifier les articles trouvés un par un (et non au clic,
+       immédiatement) — choix retenu pour rester cohérent avec le pattern
+       « Étape 1 = trouver / Étape 2 = qualifier » déjà utilisé par apc/pce/
+       adv3/gnsp ailleurs sur le site, plutôt que d'inventer une interaction
+       inédite qui interromprait la recherche à chaque clic. L'item ne
+       compte (1 point) que si TOUS les articles des 2 phrases sont trouvés
+       ET correctement qualifiés — tout-ou-rien, comme l'exige la consigne
+       (« aucun article oublié ou mal qualifié »), déjà le comportement du
+       niveau 3 avant cette évolution. */
+    function idiRenderLevel3(card, q) {
+      idiL3SubIdx     = 0;
+      idiL3AllCorrect = true;
+      idiRenderLevel3Sentence(card, q);
     }
 
-    function adUpdateProgress() {
-      document.getElementById('q-num').textContent = adSessionIdx + 1;
-      document.getElementById('ex-bar-fill').style.width = (adSessionIdx / adSession.length * 100) + '%';
-      const scoreEl = document.getElementById('ad-progressScore');
-      if (scoreEl) scoreEl.textContent = `Score : ${adScore}`;
+    function idiRenderLevel3Sentence(card, q) {
+      const sub   = q.sentences[idiL3SubIdx];
+      const label = `Phrase ${idiL3SubIdx + 1} sur 2 — Clique sur tous les articles de cette phrase, puis qualifie-les un par un.`;
+      idiRenderMultiStep(card, label, sub, (correct) => {
+        idiL3AllCorrect = idiL3AllCorrect && correct;
+        if (idiL3SubIdx === 0) {
+          const btn = document.getElementById('next-btn');
+          btn.classList.remove('ex-hidden');
+          btn.textContent = 'Phrase suivante →';
+          btn.onclick = () => {
+            idiL3SubIdx = 1;
+            idiRenderLevel3Sentence(card, q);
+            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          };
+        } else {
+          if (idiL3AllCorrect) { idiScore++; idiUpdateProgress(); }
+          idiShowNextBtn();
+        }
+      });
     }
 
-    function adShowLevelResults() {
-      const level = adActiveLevel;
-      const total = adSession.length;
-      const s20   = Math.round(adScore / total * 20);
+    /* ── Mécanique niveau 3 : comme idiRenderTwoStep, mais data.targets est
+       un tableau (1 à N articles) au lieu d'un couple target/answer unique.
+       Fonction dédiée (ne remplace pas idiRenderTwoStep, toujours utilisée
+       telle quelle par le niveau 2) pour ne rien risquer sur ce dernier. */
+    function idiRenderMultiStep(card, titleLine, data, onComplete) {
+      const targets     = data.targets;
+      const targetWords = targets.map(t => t.word);
+      const targetSet   = new Set(targetWords);
+      let step1Correct      = false;
+      let subIdx            = 0;
+      let allQualifyCorrect = true;
 
-      const { passed, isLast } = adLevelSelect.completeLevel(level, adScore, total);
+      card.innerHTML = `
+        <div class="cd-progress-score" id="idi-progressScore">Score : ${idiScore}</div>
+        <p class="ex-question-label">${titleLine}</p>
+        <div class="ex-sentence-display">${data.sentence}</div>
+        <div class="ex-classify-step" id="idi-step1">
+          <div class="ex-classify-step-title">Étape 1 — Clique sur tous les articles de la phrase</div>
+          <div class="ex-sentence-words" id="idi-words"></div>
+          <div class="ex-feedback-area" id="idi-fb1"></div>
+          <button class="ex-choice" id="idi-val1" style="margin-top:10px;width:100%">Valider l'étape 1</button>
+        </div>
+        <div class="ex-classify-step ex-hidden" id="idi-step2">
+          <div class="ex-classify-step-title" id="idi-step2-title">Étape 2 — Qualifie chaque article trouvé</div>
+          <div class="ex-choices-grid" id="idi-choices2"></div>
+          <div class="ex-feedback-area" id="idi-feedback"></div>
+        </div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const wordsEl  = document.getElementById('idi-words');
+      const selected = new Set();
+
+      data.sentence.split(/\s+/).forEach(token => {
+        const clean = token.replace(/[.,!?;:«»"""]/g, "").replace(/['']/g, "'");
+        if (!clean) return;
+        const btn = document.createElement('button');
+        btn.className     = 'ex-word-btn';
+        btn.textContent   = token;
+        btn.dataset.clean = clean;
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          if (selected.has(btn)) { selected.delete(btn); btn.classList.remove('is-selected'); }
+          else                   { selected.add(btn);    btn.classList.add('is-selected'); }
+        });
+        wordsEl.appendChild(btn);
+      });
+
+      document.getElementById('idi-val1').addEventListener('click', () => {
+        const selectedClean = new Set(Array.from(selected).map(b => b.dataset.clean));
+        step1Correct = selectedClean.size === targetSet.size &&
+                       [...selectedClean].every(x => targetSet.has(x));
+
+        wordsEl.querySelectorAll('.ex-word-btn').forEach(btn => {
+          const isTarget    = targetSet.has(btn.dataset.clean);
+          const wasSelected = selected.has(btn);
+          btn.disabled = true;
+          btn.classList.remove('is-selected');
+          if      (isTarget && wasSelected)  btn.classList.add('is-correct');
+          else if (isTarget && !wasSelected) btn.classList.add('is-missed');
+          else if (!isTarget && wasSelected) { btn.classList.add('is-wrong'); btn.classList.add('shake'); }
+        });
+        document.getElementById('idi-val1').disabled = true;
+        const plural = targets.length > 1;
+        document.getElementById('idi-fb1').innerHTML = step1Correct
+          ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+          : `<div class="ex-feedback-wrong" style="font-size:13px">❌ ${plural ? 'Les articles étaient' : "L'article était"} en vert : <strong>${targetWords.join(', ')}</strong>.</div>`;
+
+        setTimeout(() => {
+          const s2 = document.getElementById('idi-step2');
+          s2.classList.remove('ex-hidden');
+          s2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          renderQualifyStep();
+        }, 500);
+      });
+
+      const CHOICES = [
+        { label: 'Article défini',   value: 'defini' },
+        { label: 'Article indéfini', value: 'indefini' }
+      ];
+
+      function renderQualifyStep() {
+        const current = targets[subIdx];
+        document.getElementById('idi-step2-title').innerHTML =
+          `Étape 2 — Article ${subIdx + 1} sur ${targets.length} : « <span class="idi-mark">${current.word}</span> » est-il défini ou indéfini ?`;
+        document.getElementById('idi-feedback').innerHTML = '';
+        const choices2El = document.getElementById('idi-choices2');
+        choices2El.innerHTML = '';
+        shuffle([...CHOICES]).forEach(c => {
+          const btn = document.createElement('button');
+          btn.className   = 'ex-choice';
+          btn.textContent = c.label;
+          btn.addEventListener('click', () => {
+            choices2El.querySelectorAll('.ex-choice').forEach(b => b.disabled = true);
+            const isRight    = c.value === current.answer;
+            const rightLabel = CHOICES.find(x => x.value === current.answer).label;
+            choices2El.querySelectorAll('.ex-choice').forEach(b => {
+              if (b.textContent === rightLabel) b.classList.add('is-correct');
+            });
+            if (!isRight) btn.classList.add('is-wrong');
+            allQualifyCorrect = allQualifyCorrect && isRight;
+
+            const fb = document.getElementById('idi-feedback');
+            fb.innerHTML = isRight
+              ? `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`
+              : `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${rightLabel}</strong>.</div>`;
+
+            if (subIdx < targets.length - 1) {
+              const nb = document.getElementById('next-btn');
+              nb.classList.remove('ex-hidden');
+              nb.textContent = 'Article suivant →';
+              nb.onclick = () => {
+                subIdx++;
+                nb.classList.add('ex-hidden');
+                renderQualifyStep();
+              };
+            } else {
+              onComplete(step1Correct && allQualifyCorrect);
+            }
+          });
+          choices2El.appendChild(btn);
+        });
+      }
+    }
+
+    function idiShowLevelResults() {
+      const level = idiActiveLevel;
+      const total = idiSession.length;
+      const s20 = Math.round(idiScore / total * 20);
+      const { passed, isLast } = idiLevelSelect.completeLevel(level, idiScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -31895,20 +31518,19 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        adScore + ' bonne' + (adScore !== 1 ? 's' : '') + ' réponse' + (adScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = idiScore + ' / ' + total;
+      document.getElementById('score-pct').textContent = Math.round(idiScore / total * 100) + ' %';
 
       const backHref  = sessionData.backLink?.href || 'français-grammaire.html';
       const backLabel = sessionData.backLink?.label || 'Grammaire';
-      const backToSelectBtn = adLevelSelect.backToSelectButtonHTML();
+      const backToSelectBtn = idiLevelSelect.backToSelectButtonHTML();
       let msg, btnsHTML;
 
       if (passed && isLast) {
-        msg = `🎊 Bravo ! Tu maîtrises les articles définis !`;
+        msg = `🎊 Bravo ! Tu maîtrises les articles définis et indéfinis !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-secondary" id="ad-restart-btn">Recommencer</button>
+            <button class="ex-btn-secondary" id="idi-restart-btn">Recommencer</button>
             ${backToSelectBtn}
             <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>
           </div>`;
@@ -31916,17 +31538,17 @@
         msg = `Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="ad-next-btn">Niveau ${level + 1} →</button>
-            <button class="ex-btn-secondary" id="ad-retry-btn">Recommencer ce niveau</button>
+            <button class="ex-btn-primary" id="idi-next-btn">Niveau ${level + 1} →</button>
+            <button class="ex-btn-secondary" id="idi-retry-btn">Recommencer ce niveau</button>
             ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>`;
       } else {
-        const needed = Math.ceil(total * AD_SEUIL);
+        const needed = Math.ceil(total * IDI_SEUIL);
         msg = `Il faut ${needed} bonnes réponses sur ${total}. Tu peux le faire !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="ad-retry-btn">Recommencer ce niveau</button>
+            <button class="ex-btn-primary" id="idi-retry-btn">Recommencer ce niveau</button>
             ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← ${backLabel}</a>
           </div>`;
@@ -31935,23 +31557,23 @@
       document.getElementById('score-msg').textContent          = msg;
       document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
 
-      document.getElementById('ad-retry-btn')?.addEventListener('click', () => {
+      document.getElementById('idi-retry-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        adStartLevel(level);
+        idiStartLevel(level);
       });
-      document.getElementById('ad-next-btn')?.addEventListener('click', () => {
+      document.getElementById('idi-next-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        adStartLevel(level + 1);
+        idiStartLevel(level + 1);
       });
-      document.getElementById('ad-restart-btn')?.addEventListener('click', () => {
+      document.getElementById('idi-restart-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        adLevelSelect.reset();
-        adInitSession();
+        idiLevelSelect.reset();
+        idiInitSession();
       });
-      adLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
+      idiLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -31959,7 +31581,7 @@
       const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
-        exerciseType: 'articles-definis-niveaux',
+        exerciseType: 'articles-def-indef-niveaux',
         level:        'Niveau ' + level,
         score:        s20,
         total:        20,
@@ -31968,34 +31590,50 @@
     }
 
     /* ══════════════════════════════════════════════════════════════════════
-       TYPE : determinants-possessifs-niveaux
-       Lot 6, groupe 3c — fusion de identifier-determinant-possessif
-       (niveau 1) et possessifs-dans-phrases (niveau 2). Même mécanique
-       (mots cliquables) pour les deux niveaux — copie adaptée de
-       renderMotsCliquables.
+       TYPE : det-demo-poss-niveaux — « Identifier et différencier les
+       déterminants démonstratifs et possessifs »
+       Fusion de determinants-possessifs et identifier-determinant-demonstratif.
+       Niveau 1 : le déterminant est surligné dans la phrase, l'élève choisit
+                  possessif/démonstratif (indice à la demande sous les boutons).
+       Niveau 2 : l'élève clique d'abord sur le déterminant (mots-cliquables)
+                  puis le qualifie possessif/démonstratif (sans indice).
+                  1 seul déterminant possessif/démonstratif par phrase.
+       Niveau 3 : même mécanique que le niveau 2, 1 phrase par item, mais
+                  LA phrase peut contenir plusieurs déterminants possessifs/
+                  démonstratifs à trouver ET qualifier (facteur de difficulté
+                  vs niveau 2). Fort accent pédagogique sur le piège ses/ces.
+       3 niveaux déverrouillables à 80 % via LevelSelect.
+       Les consignes ciblent explicitement « déterminants possessifs et
+       démonstratifs » (et non « déterminants » au sens large) pour éviter
+       toute ambiguïté avec les articles (le/la/les/un/une/des), qui sont
+       aussi grammaticalement des déterminants mais ne sont jamais des
+       cibles valides ici.
        ══════════════════════════════════════════════════════════════════════ */
 
-    let dpLevelSelect = null;
-    let dpSession      = [];
-    let dpSessionIdx   = 0;
-    let dpScore        = 0;
-    let dpActiveLevel  = 1;
+    let ddpLevelSelect  = null;
+    let ddpSession       = [];
+    let ddpSessionIdx    = 0;
+    let ddpScore         = 0;
+    let ddpActiveLevel   = 1;
 
-    const DP_SEUIL = 0.8;
-    const DP_LEVEL_DESCS = [
-      'Identifier les déterminants possessifs dans une phrase',
-      'Repérer les déterminants possessifs en contexte'
+    const DDP_SEUIL = 0.8;
+    const DDP_LEVEL_DESCS = [
+      'Repérer si un déterminant surligné est possessif ou démonstratif',
+      "Cliquer sur le déterminant possessif ou démonstratif d'une phrase, puis le qualifier",
+      "Identifier et qualifier tous les déterminants possessifs et démonstratifs d'une phrase"
     ];
 
-    function dpBuildQuestions(level) { return shuffle(sessionData['lvl' + level]); }
+    function ddpBuildQuestions(level) { return shuffle(sessionData['level' + level + 'Bank']); }
 
-    function dpBackToSelectScreen() {
+    function ddpBackToSelectScreen() {
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
     }
 
-    function dpInitSession() {
-      dpSession = []; dpSessionIdx = 0; dpScore = 0;
+    function ddpInitSession() {
+      ddpSession = []; ddpSessionIdx = 0; ddpScore = 0;
       sessionStartTime = Date.now();
       document.getElementById('results-screen').classList.add('ex-hidden');
       document.getElementById('exercise-screen').classList.remove('ex-hidden');
@@ -32003,505 +31641,386 @@
       if (prog) prog.classList.add('ex-hidden');
 
       const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
-      dpLevelSelect = LevelSelect.create({
+      ddpLevelSelect = LevelSelect.create({
         exerciseKey: slug,
-        levels: [1, 2].map(lv => ({ id: lv, label: 'Niveau ' + lv, description: DP_LEVEL_DESCS[lv - 1] })),
-        threshold: DP_SEUIL,
-        onSelectLevel: (lv) => dpStartLevel(parseInt(lv, 10)),
+        levels: [1, 2, 3].map(lv => ({ id: lv, label: 'Niveau ' + lv, description: DDP_LEVEL_DESCS[lv - 1] })),
+        threshold: DDP_SEUIL,
+        onSelectLevel: (lv) => ddpStartLevel(parseInt(lv, 10)),
         selectContainer: document.getElementById('ex-card'),
         badgesContainer: document.getElementById('ex-badges'),
-        onBackToSelect: dpBackToSelectScreen
+        onBackToSelect: ddpBackToSelectScreen
       });
-      dpLevelSelect.renderSelectScreen();
+      ddpLevelSelect.renderSelectScreen();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function dpStartLevel(lv) {
-      dpActiveLevel = lv;
-      dpSession    = dpBuildQuestions(lv);
-      dpSessionIdx = 0;
-      dpScore      = 0;
+    function ddpStartLevel(lv) {
+      ddpActiveLevel = lv;
+      ddpSession    = ddpBuildQuestions(lv);
+      ddpSessionIdx = 0;
+      ddpScore      = 0;
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
-      document.getElementById('q-total').textContent = dpSession.length;
-      if (dpLevelSelect) dpLevelSelect.renderBadges(lv);
-      dpRenderQuestion();
+      document.getElementById('q-total').textContent = ddpSession.length;
+      if (ddpLevelSelect) ddpLevelSelect.renderBadges(lv);
+      ddpRenderQuestion();
     }
 
-    function dpRenderQuestion() {
-      const q = dpSession[dpSessionIdx];
-      document.getElementById('q-num').textContent = dpSessionIdx + 1;
-      document.getElementById('ex-bar-fill').style.width = (dpSessionIdx / dpSession.length * 100) + '%';
-      dpRenderCard(document.getElementById('ex-card'), q);
+    function ddpRenderQuestion() {
+      const q = ddpSession[ddpSessionIdx];
+      document.getElementById('q-num').textContent = ddpSessionIdx + 1;
+      document.getElementById('ex-bar-fill').style.width = (ddpSessionIdx / ddpSession.length * 100) + '%';
+      ddpRenderCard(document.getElementById('ex-card'), q);
     }
 
-    function dpRenderCard(card, q) {
-      card.innerHTML = `
-        <div class="cd-progress-score" id="dp-progressScore">Score : ${dpScore}</div>
-        <p class="ex-question-label">${q.instruction}</p>
-        <div class="ex-sentence-words" id="dp-mc-words"></div>
-        <div class="ex-feedback-area" id="dp-mc-piege" style="min-height:24px"></div>
-        <button class="ex-choice" id="dp-mc-validate" style="margin-top:10px;width:100%">Valider ma sélection</button>
-        <div class="ex-feedback-area" id="dp-feedback"></div>
-        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
-      `;
-      dpUpdateProgress();
-
-      const container = document.getElementById("dp-mc-words");
-      const selected   = new Set();
-      let answered     = false;
-
-      q.sentence.split(/\s+/).forEach(token => {
-        const clean = token.replace(/[.,!?;:«»"""]/g, "").replace(/['']/g, "'");
-        if (!clean) return;
-        const btn = document.createElement("button");
-        btn.className     = "ex-word-btn";
-        btn.textContent   = token;
-        btn.dataset.clean = clean;
-
-        btn.addEventListener("click", () => {
-          if (answered) return;
-          if (selected.has(btn)) {
-            selected.delete(btn);
-            btn.classList.remove("is-selected");
-            document.getElementById("dp-mc-piege").innerHTML = "";
-          } else {
-            selected.add(btn);
-            btn.classList.add("is-selected");
-            const piegeMsg = q.piege && (q.piege[clean] || q.piege[token]);
-            if (piegeMsg) {
-              document.getElementById("dp-mc-piege").innerHTML =
-                `<div class="ex-feedback-wrong" style="font-size:13px;padding:8px 12px">⚠️ ${piegeMsg}</div>`;
-            }
-          }
-        });
-        container.appendChild(btn);
-      });
-
-      document.getElementById("dp-mc-validate").addEventListener("click", () => {
-        if (answered) return;
-        answered = true;
-        let hasWrong = false, hasMissed = false;
-
-        container.querySelectorAll(".ex-word-btn").forEach(btn => {
-          const clean       = btn.dataset.clean;
-          const isTarget    = q.targets.includes(clean);
-          const wasSelected = selected.has(btn);
-          btn.disabled = true;
-          btn.classList.remove("is-selected");
-
-          if      (isTarget && wasSelected)  { btn.classList.add("is-correct"); }
-          else if (isTarget && !wasSelected) { btn.classList.add("is-missed"); hasMissed = true; }
-          else if (!isTarget && wasSelected) { btn.classList.add("is-wrong"); btn.classList.add("shake"); hasWrong = true; }
-        });
-
-        document.getElementById("dp-mc-validate").disabled = true;
-        document.getElementById("dp-mc-piege").innerHTML   = "";
-
-        const noteHtml = q.note ? `<div class="ex-note">${q.note}</div>` : "";
-        const fb = document.getElementById('dp-feedback');
-        if (!hasWrong && !hasMissed) {
-          dpScore++; dpUpdateProgress();
-          fb.innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>${noteHtml}`;
-        } else {
-          fb.innerHTML = `
-            <div class="ex-feedback-wrong">
-              ❌ Pas tout à fait !
-              Les bonnes réponses sont en vert${hasMissed ? "; les mots manqués sont encadrés en pointillés" : ""}.
-            </div>${noteHtml}`;
-        }
-        dpShowNextBtn();
-      });
+    function ddpRenderCard(card, q) {
+      if      (ddpActiveLevel === 1) ddpRenderLevel1(card, q);
+      else if (ddpActiveLevel === 2) ddpRenderLevel2(card, q);
+      else                            ddpRenderLevel3(card, q);
+      ddpUpdateProgress();
     }
 
-    function dpShowNextBtn() {
+    function ddpUpdateProgress() {
+      document.getElementById('q-num').textContent = ddpSessionIdx + 1;
+      document.getElementById('ex-bar-fill').style.width = (ddpSessionIdx / ddpSession.length * 100) + '%';
+      const scoreEl = document.getElementById('ddp-progressScore');
+      if (scoreEl) scoreEl.textContent = `Score : ${ddpScore}`;
+    }
+
+    function ddpShowNextBtn() {
       const btn = document.getElementById('next-btn');
       btn.classList.remove('ex-hidden');
-      btn.textContent = dpSessionIdx === dpSession.length - 1 ? 'Voir les résultats →' : 'Question suivante →';
-      btn.onclick = dpNextQuestion;
+      btn.textContent = ddpSessionIdx === ddpSession.length - 1 ? 'Voir les résultats →' : 'Question suivante →';
+      btn.onclick = ddpNextQuestion;
     }
 
-    function dpNextQuestion() {
-      dpSessionIdx++;
-      if (dpSessionIdx >= dpSession.length) { dpShowLevelResults(); return; }
-      dpRenderQuestion();
+    function ddpNextQuestion() {
+      ddpSessionIdx++;
+      if (ddpSessionIdx >= ddpSession.length) { ddpShowLevelResults(); return; }
+      ddpRenderQuestion();
       document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    function dpUpdateProgress() {
-      document.getElementById('q-num').textContent = dpSessionIdx + 1;
-      document.getElementById('ex-bar-fill').style.width = (dpSessionIdx / dpSession.length * 100) + '%';
-      const scoreEl = document.getElementById('dp-progressScore');
-      if (scoreEl) scoreEl.textContent = `Score : ${dpScore}`;
-    }
-
-    function dpShowLevelResults() {
-      const level = dpActiveLevel;
-      const total = dpSession.length;
-      const s20   = Math.round(dpScore / total * 20);
-
-      const { passed, isLast } = dpLevelSelect.completeLevel(level, dpScore, total);
-
-      const prog = document.querySelector('#exercise-screen .ex-progress');
-      if (prog) prog.classList.add('ex-hidden');
-      document.getElementById('exercise-screen').classList.add('ex-hidden');
-      document.getElementById('results-screen').classList.remove('ex-hidden');
-      document.getElementById('ex-bar-fill').style.width = '100%';
-
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        dpScore + ' bonne' + (dpScore !== 1 ? 's' : '') + ' réponse' + (dpScore !== 1 ? 's' : '') + ' sur ' + total;
-
-      const backHref  = sessionData.backLink?.href || 'français-grammaire.html';
-      const backLabel = sessionData.backLink?.label || 'Grammaire';
-      const backToSelectBtn = dpLevelSelect.backToSelectButtonHTML();
-      let msg, btnsHTML;
-
-      if (passed && isLast) {
-        msg = `🎊 Bravo ! Tu maîtrises les déterminants possessifs !`;
-        btnsHTML = `
-          <div class="ex-results-btns">
-            <button class="ex-btn-secondary" id="dp-restart-btn">Recommencer</button>
-            ${backToSelectBtn}
-            <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>
-          </div>`;
-      } else if (passed) {
-        msg = `Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
-        btnsHTML = `
-          <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="dp-next-btn">Niveau ${level + 1} →</button>
-            <button class="ex-btn-secondary" id="dp-retry-btn">Recommencer ce niveau</button>
-            ${backToSelectBtn}
-          </div>
-          <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>`;
-      } else {
-        const needed = Math.ceil(total * DP_SEUIL);
-        msg = `Il faut ${needed} bonnes réponses sur ${total}. Tu peux le faire !`;
-        btnsHTML = `
-          <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="dp-retry-btn">Recommencer ce niveau</button>
-            ${backToSelectBtn}
-            <a href="${backHref}" class="ex-btn-secondary">← ${backLabel}</a>
-          </div>`;
-      }
-
-      document.getElementById('score-msg').textContent          = msg;
-      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
-
-      document.getElementById('dp-retry-btn')?.addEventListener('click', () => {
-        document.getElementById('results-screen').classList.add('ex-hidden');
-        document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        dpStartLevel(level);
-      });
-      document.getElementById('dp-next-btn')?.addEventListener('click', () => {
-        document.getElementById('results-screen').classList.add('ex-hidden');
-        document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        dpStartLevel(level + 1);
-      });
-      document.getElementById('dp-restart-btn')?.addEventListener('click', () => {
-        document.getElementById('results-screen').classList.add('ex-hidden');
-        document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        dpLevelSelect.reset();
-        dpInitSession();
-      });
-      dpLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      const slug = new URLSearchParams(window.location.search).get('slug');
-      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
-      saveExerciseResult({
-        exerciseSlug: slug, subject, category,
-        exerciseType: 'determinants-possessifs-niveaux',
-        level:        'Niveau ' + level,
-        score:        s20,
-        total:        20,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
-      });
-    }
-
-    /* ══════════════════════════════════════════════════════════════════════
-       TYPE : articles-indefinis-niveaux
-       Lot 6, groupe 3b — fusion de identifier-article-indefini (niveau 1,
-       mots cliquables) et articles-indefinis-premiere-rencontre (niveau 2,
-       glisser-déposer, enrichi de 8 items validés). Copies adaptées de
-       renderMotsCliquables / renderGlisserDeposer (voir groupe 3a).
-       ══════════════════════════════════════════════════════════════════════ */
-
-    let aiLevelSelect = null;
-    let aiSession      = [];
-    let aiSessionIdx   = 0;
-    let aiScore        = 0;
-    let aiActiveLevel  = 1;
-
-    const AI_SEUIL = 0.8;
-    const AI_LEVEL_DESCS = [
-      'Identifier les articles indéfinis dans un texte',
-      'Distinguer première mention (indéfini) et rappel (défini)'
-    ];
-
-    function aiBuildQuestions(level) { return shuffle(sessionData['lvl' + level]); }
-
-    function aiBackToSelectScreen() {
-      const prog = document.querySelector('#exercise-screen .ex-progress');
-      if (prog) prog.classList.add('ex-hidden');
-    }
-
-    function aiInitSession() {
-      aiSession = []; aiSessionIdx = 0; aiScore = 0;
-      sessionStartTime = Date.now();
-      document.getElementById('results-screen').classList.add('ex-hidden');
-      document.getElementById('exercise-screen').classList.remove('ex-hidden');
-      const prog = document.querySelector('#exercise-screen .ex-progress');
-      if (prog) prog.classList.add('ex-hidden');
-
-      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
-      aiLevelSelect = LevelSelect.create({
-        exerciseKey: slug,
-        levels: [1, 2].map(lv => ({ id: lv, label: 'Niveau ' + lv, description: AI_LEVEL_DESCS[lv - 1] })),
-        threshold: AI_SEUIL,
-        onSelectLevel: (lv) => aiStartLevel(parseInt(lv, 10)),
-        selectContainer: document.getElementById('ex-card'),
-        badgesContainer: document.getElementById('ex-badges'),
-        onBackToSelect: aiBackToSelectScreen
-      });
-      aiLevelSelect.renderSelectScreen();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function aiStartLevel(lv) {
-      aiActiveLevel = lv;
-      aiSession    = aiBuildQuestions(lv);
-      aiSessionIdx = 0;
-      aiScore      = 0;
-      const prog = document.querySelector('#exercise-screen .ex-progress');
-      if (prog) prog.classList.remove('ex-hidden');
-      document.getElementById('q-total').textContent = aiSession.length;
-      if (aiLevelSelect) aiLevelSelect.renderBadges(lv);
-      aiRenderQuestion();
-    }
-
-    function aiRenderQuestion() {
-      const q = aiSession[aiSessionIdx];
-      document.getElementById('q-num').textContent = aiSessionIdx + 1;
-      document.getElementById('ex-bar-fill').style.width = (aiSessionIdx / aiSession.length * 100) + '%';
-      aiRenderCard(document.getElementById('ex-card'), q);
-    }
-
-    function aiRenderCard(card, q) {
-      if (aiActiveLevel === 1) aiRenderMotsCliquables(card, q);
-      else                     aiRenderGlisserDeposer(card, q);
-      aiUpdateProgress();
-    }
-
-    function aiRenderMotsCliquables(card, q) {
+    /* ── Niveau 1 : phrase avec déterminant surligné + boutons à indice à la
+       demande ──────────────────────────────────────────────────────────── */
+    function ddpRenderLevel1(card, q) {
       card.innerHTML = `
-        <div class="cd-progress-score" id="ai-progressScore">Score : ${aiScore}</div>
-        <p class="ex-question-label">${q.instruction}</p>
-        <div class="ex-sentence-words" id="ai-mc-words"></div>
-        <div class="ex-feedback-area" id="ai-mc-piege" style="min-height:24px"></div>
-        <button class="ex-choice" id="ai-mc-validate" style="margin-top:10px;width:100%">Valider ma sélection</button>
-        <div class="ex-feedback-area" id="ai-feedback"></div>
+        <div class="cd-progress-score" id="ddp-progressScore">Score : ${ddpScore}</div>
+        <p class="ex-question-label">${q.instruction || 'Ce déterminant est-il possessif ou démonstratif ?'}</p>
+        <div class="ex-sentence-display">${q.html}</div>
+        <div class="ex-choices-grid" id="ddp-l1-grid">
+          <div class="idi-choice-col">
+            <button class="ex-choice" data-answer="possessif">
+              <span class="idi-choice-label">Déterminant possessif</span>
+            </button>
+            <button type="button" class="idi-hint-btn" data-hint-for="possessif">💡 Indice</button>
+            <span class="idi-hint ex-hidden" data-hint="possessif">→ indique à qui appartient la personne, l'animal ou la chose</span>
+          </div>
+          <div class="idi-choice-col">
+            <button class="ex-choice" data-answer="demonstratif">
+              <span class="idi-choice-label">Déterminant démonstratif</span>
+            </button>
+            <button type="button" class="idi-hint-btn" data-hint-for="demonstratif">💡 Indice</button>
+            <span class="idi-hint ex-hidden" data-hint="demonstratif">→ montre ou désigne la personne, l'animal ou la chose</span>
+          </div>
+        </div>
+        <div class="ex-feedback-area" id="ddp-feedback"></div>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
-      const container = document.getElementById("ai-mc-words");
-      const selected   = new Set();
-      let answered     = false;
-
-      q.sentence.split(/\s+/).forEach(token => {
-        const clean = token.replace(/[.,!?;:«»"""]/g, "").replace(/['']/g, "'");
-        if (!clean) return;
-        const btn = document.createElement("button");
-        btn.className     = "ex-word-btn";
-        btn.textContent   = token;
-        btn.dataset.clean = clean;
-
-        btn.addEventListener("click", () => {
-          if (answered) return;
-          if (selected.has(btn)) {
-            selected.delete(btn);
-            btn.classList.remove("is-selected");
-            document.getElementById("ai-mc-piege").innerHTML = "";
-          } else {
-            selected.add(btn);
-            btn.classList.add("is-selected");
-            const piegeMsg = q.piege && (q.piege[clean] || q.piege[token]);
-            if (piegeMsg) {
-              document.getElementById("ai-mc-piege").innerHTML =
-                `<div class="ex-feedback-wrong" style="font-size:13px;padding:8px 12px">⚠️ ${piegeMsg}</div>`;
-            }
-          }
+      const grid = document.getElementById('ddp-l1-grid');
+      grid.querySelectorAll('.idi-hint-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const hint = grid.querySelector(`.idi-hint[data-hint="${btn.dataset.hintFor}"]`);
+          if (hint) hint.classList.toggle('ex-hidden');
         });
-        container.appendChild(btn);
       });
-
-      document.getElementById("ai-mc-validate").addEventListener("click", () => {
-        if (answered) return;
-        answered = true;
-        let hasWrong = false, hasMissed = false;
-
-        container.querySelectorAll(".ex-word-btn").forEach(btn => {
-          const clean       = btn.dataset.clean;
-          const isTarget    = q.targets.includes(clean);
-          const wasSelected = selected.has(btn);
-          btn.disabled = true;
-          btn.classList.remove("is-selected");
-
-          if      (isTarget && wasSelected)  { btn.classList.add("is-correct"); }
-          else if (isTarget && !wasSelected) { btn.classList.add("is-missed"); hasMissed = true; }
-          else if (!isTarget && wasSelected) { btn.classList.add("is-wrong"); btn.classList.add("shake"); hasWrong = true; }
+      grid.querySelectorAll('.ex-choice').forEach(btn => {
+        btn.addEventListener('click', () => {
+          grid.querySelectorAll('.ex-choice').forEach(b => b.disabled = true);
+          grid.querySelectorAll('.idi-hint-btn').forEach(b => b.disabled = true);
+          const isRight = btn.dataset.answer === q.answer;
+          grid.querySelectorAll('.ex-choice').forEach(b => {
+            if (b.dataset.answer === q.answer) b.classList.add('is-correct');
+          });
+          if (!isRight) btn.classList.add('is-wrong');
+          const fb = document.getElementById('ddp-feedback');
+          if (isRight) {
+            ddpScore++; ddpUpdateProgress();
+            fb.innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}<br>${q.explain}</div>`;
+          } else {
+            fb.innerHTML = `<div class="ex-feedback-wrong">❌ ${q.explain}</div>`;
+          }
+          ddpShowNextBtn();
         });
-
-        document.getElementById("ai-mc-validate").disabled = true;
-        document.getElementById("ai-mc-piege").innerHTML   = "";
-
-        const noteHtml = q.note ? `<div class="ex-note">${q.note}</div>` : "";
-        const fb = document.getElementById('ai-feedback');
-        if (!hasWrong && !hasMissed) {
-          aiScore++; aiUpdateProgress();
-          fb.innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>${noteHtml}`;
-        } else {
-          fb.innerHTML = `
-            <div class="ex-feedback-wrong">
-              ❌ Pas tout à fait !
-              Les bonnes réponses sont en vert${hasMissed ? "; les mots manqués sont encadrés en pointillés" : ""}.
-            </div>${noteHtml}`;
-        }
-        aiShowNextBtn();
       });
     }
 
-    function aiRenderGlisserDeposer(card, q) {
-      let blankIdx = 0;
-      const templateHtml = q.template.replace(/___/g, () =>
-        `<span class="ex-blank" data-idx="${blankIdx++}" data-val=""></span>`
+    /* ── Mécanique commune niveaux 2/3 : clic sur le déterminant (mots-
+       cliquables) puis qualification possessif/démonstratif (choix-étiquette,
+       sans indice) ─────────────────────────────────────────────────────── */
+    function ddpRenderTwoStep(card, titleLine, data, onComplete) {
+      card.innerHTML = `
+        <div class="cd-progress-score" id="ddp-progressScore">Score : ${ddpScore}</div>
+        <p class="ex-question-label">${titleLine}</p>
+        <div class="ex-sentence-display">${data.sentence}</div>
+        <div class="ex-classify-step" id="ddp-step1">
+          <div class="ex-classify-step-title">Étape 1 — Clique sur le déterminant possessif ou démonstratif de la phrase</div>
+          <div class="ex-sentence-words" id="ddp-words"></div>
+          <div class="ex-feedback-area" id="ddp-fb1"></div>
+          <button class="ex-choice" id="ddp-val1" style="margin-top:10px;width:100%">Valider l'étape 1</button>
+        </div>
+        <div class="ex-classify-step ex-hidden" id="ddp-step2">
+          <div class="ex-classify-step-title">Étape 2 — Ce déterminant est-il possessif ou démonstratif ?</div>
+          <div class="ex-choices-grid" id="ddp-choices2"></div>
+          <div class="ex-feedback-area" id="ddp-feedback"></div>
+        </div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const wordsEl   = document.getElementById('ddp-words');
+      const selected  = new Set();
+      const targetSet = new Set([data.target]);
+      let step1Correct = false;
+
+      data.sentence.split(/\s+/).forEach(token => {
+        const clean = token.replace(/[.,!?;:«»"""]/g, "").replace(/['']/g, "'");
+        if (!clean) return;
+        const btn = document.createElement('button');
+        btn.className     = 'ex-word-btn';
+        btn.textContent   = token;
+        btn.dataset.clean = clean;
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          if (selected.has(btn)) { selected.delete(btn); btn.classList.remove('is-selected'); }
+          else                   { selected.add(btn);    btn.classList.add('is-selected'); }
+        });
+        wordsEl.appendChild(btn);
+      });
+
+      document.getElementById('ddp-val1').addEventListener('click', () => {
+        const selectedClean = new Set(Array.from(selected).map(b => b.dataset.clean));
+        step1Correct = selectedClean.size === targetSet.size &&
+                       [...selectedClean].every(x => targetSet.has(x));
+
+        wordsEl.querySelectorAll('.ex-word-btn').forEach(btn => {
+          const isTarget    = targetSet.has(btn.dataset.clean);
+          const wasSelected = selected.has(btn);
+          btn.disabled = true;
+          btn.classList.remove('is-selected');
+          if      (isTarget && wasSelected)  btn.classList.add('is-correct');
+          else if (isTarget && !wasSelected) btn.classList.add('is-missed');
+          else if (!isTarget && wasSelected) { btn.classList.add('is-wrong'); btn.classList.add('shake'); }
+        });
+        document.getElementById('ddp-val1').disabled = true;
+        document.getElementById('ddp-fb1').innerHTML = step1Correct
+          ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+          : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Le déterminant possessif ou démonstratif était en vert : <strong>${data.target}</strong>.</div>`;
+
+        setTimeout(() => {
+          const s2 = document.getElementById('ddp-step2');
+          s2.classList.remove('ex-hidden');
+          s2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 500);
+      });
+
+      const choices2El = document.getElementById('ddp-choices2');
+      const CHOICES = [
+        { label: 'Déterminant possessif',    value: 'possessif' },
+        { label: 'Déterminant démonstratif', value: 'demonstratif' }
+      ];
+      /* Ordre fixe (pas de shuffle) : l'élève doit toujours retrouver les
+         boutons à la même position d'un item à l'autre. */
+      CHOICES.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className   = 'ex-choice';
+        btn.textContent = c.label;
+        btn.addEventListener('click', () => {
+          choices2El.querySelectorAll('.ex-choice').forEach(b => b.disabled = true);
+          const isRight     = c.value === data.answer;
+          const rightLabel  = CHOICES.find(x => x.value === data.answer).label;
+          choices2El.querySelectorAll('.ex-choice').forEach(b => {
+            if (b.textContent === rightLabel) b.classList.add('is-correct');
+          });
+          if (!isRight) btn.classList.add('is-wrong');
+
+          const overallCorrect = isRight && step1Correct;
+          const fb = document.getElementById('ddp-feedback');
+          if (overallCorrect) {
+            fb.innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+          } else if (isRight) {
+            fb.innerHTML = `<div class="ex-feedback-correct" style="opacity:0.8">✓ Bonne réponse à l'étape 2 (mais l'étape 1 était incomplète).</div>`;
+          } else {
+            fb.innerHTML = `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${rightLabel}</strong>.</div>`;
+          }
+          onComplete(overallCorrect);
+        });
+        choices2El.appendChild(btn);
+      });
+    }
+
+    /* ── Niveau 2 : 1 phrase par item ───────────────────────────────────── */
+    function ddpRenderLevel2(card, q) {
+      ddpRenderTwoStep(
+        card,
+        "Clique sur le déterminant possessif ou démonstratif de cette phrase, puis dis lequel c'est.",
+        q,
+        (correct) => {
+          if (correct) { ddpScore++; ddpUpdateProgress(); }
+          ddpShowNextBtn();
+        }
       );
+    }
+
+    /* ── Niveau 3 : 1 phrase par item, comme le niveau 2, mais LA phrase peut
+       contenir plusieurs déterminants possessifs/démonstratifs à trouver ET
+       qualifier (facteur de difficulté vs niveau 2, qui n'en cible qu'un
+       seul). Réutilise directement ddpRenderMultiStep — pas besoin du
+       wrapper « 2 phrases » de l'ancienne version. L'item ne compte
+       (1 point) que si TOUS les déterminants de la phrase sont trouvés ET
+       correctement qualifiés — tout-ou-rien, comme identifier-differencier-
+       articles-definis-indefinis. */
+    function ddpRenderLevel3(card, q) {
+      ddpRenderMultiStep(
+        card,
+        "Clique sur tous les déterminants possessifs et démonstratifs de cette phrase, puis qualifie-les un par un.",
+        q,
+        (correct) => {
+          if (correct) { ddpScore++; ddpUpdateProgress(); }
+          ddpShowNextBtn();
+        }
+      );
+    }
+
+    /* ── Mécanique niveau 3 : comme ddpRenderTwoStep, mais data.targets est
+       un tableau (1 à N déterminants) au lieu d'un couple target/answer
+       unique. */
+    function ddpRenderMultiStep(card, titleLine, data, onComplete) {
+      const targets     = data.targets;
+      const targetWords = targets.map(t => t.word);
+      const targetSet   = new Set(targetWords);
+      let step1Correct      = false;
+      let subIdx            = 0;
+      let allQualifyCorrect = true;
 
       card.innerHTML = `
-        <div class="cd-progress-score" id="ai-progressScore">Score : ${aiScore}</div>
-        <p class="ex-question-label">${q.instruction || 'Place les bons mots dans les cases.'}</p>
-        <div class="ex-fill-sentence" id="ai-gd-sentence">${templateHtml}</div>
-        <div class="ex-bank-label">Mots disponibles :</div>
-        <div class="ex-bank" id="ai-gd-bank"></div>
-        <div class="ex-feedback-area" id="ai-feedback"></div>
-        <button class="ex-choice" id="ai-gd-validate" style="margin-top:10px;width:100%">Valider</button>
+        <div class="cd-progress-score" id="ddp-progressScore">Score : ${ddpScore}</div>
+        <p class="ex-question-label">${titleLine}</p>
+        <div class="ex-sentence-display">${data.sentence}</div>
+        <div class="ex-classify-step" id="ddp-step1">
+          <div class="ex-classify-step-title">Étape 1 — Clique sur tous les déterminants possessifs et démonstratifs de la phrase</div>
+          <div class="ex-sentence-words" id="ddp-words"></div>
+          <div class="ex-feedback-area" id="ddp-fb1"></div>
+          <button class="ex-choice" id="ddp-val1" style="margin-top:10px;width:100%">Valider l'étape 1</button>
+        </div>
+        <div class="ex-classify-step ex-hidden" id="ddp-step2">
+          <div class="ex-classify-step-title" id="ddp-step2-title">Étape 2 — Qualifie chaque déterminant trouvé</div>
+          <div class="ex-choices-grid" id="ddp-choices2"></div>
+          <div class="ex-feedback-area" id="ddp-feedback"></div>
+        </div>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
 
-      const bankEl = document.getElementById("ai-gd-bank");
-      let selected = null;
-      let answered = false;
+      const wordsEl  = document.getElementById('ddp-words');
+      const selected = new Set();
 
-      shuffle([...q.bank]).forEach(word => {
-        const btn = document.createElement("button");
-        btn.className    = "ex-word-btn";
-        btn.textContent  = word;
-        btn.dataset.word = word;
-        btn.addEventListener("click", () => {
-          if (answered) return;
-          if (selected && selected.bankBtn === btn) {
-            btn.classList.remove("is-selected");
-            selected = null;
-            return;
-          }
-          if (selected) selected.bankBtn.classList.remove("is-selected");
-          selected = { word, bankBtn: btn };
-          btn.classList.add("is-selected");
+      data.sentence.split(/\s+/).forEach(token => {
+        const clean = token.replace(/[.,!?;:«»"""]/g, "").replace(/['']/g, "'");
+        if (!clean) return;
+        const btn = document.createElement('button');
+        btn.className     = 'ex-word-btn';
+        btn.textContent   = token;
+        btn.dataset.clean = clean;
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          if (selected.has(btn)) { selected.delete(btn); btn.classList.remove('is-selected'); }
+          else                   { selected.add(btn);    btn.classList.add('is-selected'); }
         });
-        bankEl.appendChild(btn);
+        wordsEl.appendChild(btn);
       });
 
-      document.getElementById("ai-gd-sentence").querySelectorAll(".ex-blank").forEach(blank => {
-        blank.addEventListener("click", () => {
-          if (answered) return;
-          const currentVal = blank.dataset.val;
+      document.getElementById('ddp-val1').addEventListener('click', () => {
+        const selectedClean = new Set(Array.from(selected).map(b => b.dataset.clean));
+        step1Correct = selectedClean.size === targetSet.size &&
+                       [...selectedClean].every(x => targetSet.has(x));
 
-          if (selected) {
-            if (currentVal) {
-              const oldBtn = bankEl.querySelector(`[data-word="${currentVal}"]`);
-              if (oldBtn) { oldBtn.disabled = false; oldBtn.classList.remove("ex-word-used"); }
+        wordsEl.querySelectorAll('.ex-word-btn').forEach(btn => {
+          const isTarget    = targetSet.has(btn.dataset.clean);
+          const wasSelected = selected.has(btn);
+          btn.disabled = true;
+          btn.classList.remove('is-selected');
+          if      (isTarget && wasSelected)  btn.classList.add('is-correct');
+          else if (isTarget && !wasSelected) btn.classList.add('is-missed');
+          else if (!isTarget && wasSelected) { btn.classList.add('is-wrong'); btn.classList.add('shake'); }
+        });
+        document.getElementById('ddp-val1').disabled = true;
+        const plural = targets.length > 1;
+        document.getElementById('ddp-fb1').innerHTML = step1Correct
+          ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+          : `<div class="ex-feedback-wrong" style="font-size:13px">❌ ${plural ? 'Les déterminants possessifs/démonstratifs étaient' : 'Le déterminant possessif/démonstratif était'} en vert : <strong>${targetWords.join(', ')}</strong>.</div>`;
+
+        setTimeout(() => {
+          const s2 = document.getElementById('ddp-step2');
+          s2.classList.remove('ex-hidden');
+          s2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          renderQualifyStep();
+        }, 500);
+      });
+
+      const CHOICES = [
+        { label: 'Déterminant possessif',    value: 'possessif' },
+        { label: 'Déterminant démonstratif', value: 'demonstratif' }
+      ];
+
+      function renderQualifyStep() {
+        const current = targets[subIdx];
+        document.getElementById('ddp-step2-title').innerHTML =
+          `Étape 2 — Déterminant ${subIdx + 1} sur ${targets.length} : « <span class="idi-mark">${current.word}</span> » est-il possessif ou démonstratif ?`;
+        document.getElementById('ddp-feedback').innerHTML = '';
+        const choices2El = document.getElementById('ddp-choices2');
+        choices2El.innerHTML = '';
+        /* Ordre fixe (pas de shuffle) : même position à chaque item. */
+        CHOICES.forEach(c => {
+          const btn = document.createElement('button');
+          btn.className   = 'ex-choice';
+          btn.textContent = c.label;
+          btn.addEventListener('click', () => {
+            choices2El.querySelectorAll('.ex-choice').forEach(b => b.disabled = true);
+            const isRight    = c.value === current.answer;
+            const rightLabel = CHOICES.find(x => x.value === current.answer).label;
+            choices2El.querySelectorAll('.ex-choice').forEach(b => {
+              if (b.textContent === rightLabel) b.classList.add('is-correct');
+            });
+            if (!isRight) btn.classList.add('is-wrong');
+            allQualifyCorrect = allQualifyCorrect && isRight;
+
+            const fb = document.getElementById('ddp-feedback');
+            fb.innerHTML = isRight
+              ? `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`
+              : `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${rightLabel}</strong>.</div>`;
+
+            if (subIdx < targets.length - 1) {
+              const nb = document.getElementById('next-btn');
+              nb.classList.remove('ex-hidden');
+              nb.textContent = 'Déterminant suivant →';
+              nb.onclick = () => {
+                subIdx++;
+                nb.classList.add('ex-hidden');
+                renderQualifyStep();
+              };
+            } else {
+              onComplete(step1Correct && allQualifyCorrect);
             }
-            blank.dataset.val  = selected.word;
-            blank.textContent  = selected.word;
-            blank.classList.add("is-filled");
-            selected.bankBtn.disabled = true;
-            selected.bankBtn.classList.add("ex-word-used");
-            selected.bankBtn.classList.remove("is-selected");
-            selected = null;
-          } else if (currentVal) {
-            const oldBtn = bankEl.querySelector(`[data-word="${currentVal}"]`);
-            if (oldBtn) { oldBtn.disabled = false; oldBtn.classList.remove("ex-word-used"); }
-            blank.dataset.val = "";
-            blank.textContent = "";
-            blank.classList.remove("is-filled");
-          }
+          });
+          choices2El.appendChild(btn);
         });
-      });
-
-      document.getElementById("ai-gd-validate").addEventListener("click", () => {
-        if (answered) return;
-        answered = true;
-
-        const blanks = document.getElementById("ai-gd-sentence").querySelectorAll(".ex-blank");
-        let correct  = 0;
-        blanks.forEach((blank, i) => {
-          const val    = blank.dataset.val;
-          const expect = q.blanks[i];
-          blank.dataset.locked = "1";
-          if (val === expect) {
-            blank.classList.add("is-correct");
-            correct++;
-          } else {
-            blank.classList.add("is-wrong");
-            if (!val) blank.textContent = `(${expect})`;
-          }
-        });
-
-        bankEl.querySelectorAll(".ex-word-btn").forEach(b => b.disabled = true);
-        document.getElementById("ai-gd-validate").disabled = true;
-
-        const fb = document.getElementById('ai-feedback');
-        if (correct === blanks.length) {
-          aiScore++; aiUpdateProgress();
-          fb.innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
-        } else {
-          fb.innerHTML = `
-            <div class="ex-feedback-wrong">
-              ❌ ${correct}/${blanks.length} bonne${correct > 1 ? "s" : ""} réponse${correct > 1 ? "s" : ""}.
-              Les cases vertes sont correctes.
-            </div>`;
-        }
-        aiShowNextBtn();
-      });
+      }
     }
 
-    function aiShowNextBtn() {
-      const btn = document.getElementById('next-btn');
-      btn.classList.remove('ex-hidden');
-      btn.textContent = aiSessionIdx === aiSession.length - 1 ? 'Voir les résultats →' : 'Question suivante →';
-      btn.onclick = aiNextQuestion;
-    }
-
-    function aiNextQuestion() {
-      aiSessionIdx++;
-      if (aiSessionIdx >= aiSession.length) { aiShowLevelResults(); return; }
-      aiRenderQuestion();
-      document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    function aiUpdateProgress() {
-      document.getElementById('q-num').textContent = aiSessionIdx + 1;
-      document.getElementById('ex-bar-fill').style.width = (aiSessionIdx / aiSession.length * 100) + '%';
-      const scoreEl = document.getElementById('ai-progressScore');
-      if (scoreEl) scoreEl.textContent = `Score : ${aiScore}`;
-    }
-
-    function aiShowLevelResults() {
-      const level = aiActiveLevel;
-      const total = aiSession.length;
-      const s20   = Math.round(aiScore / total * 20);
-
-      const { passed, isLast } = aiLevelSelect.completeLevel(level, aiScore, total);
+    function ddpShowLevelResults() {
+      const level = ddpActiveLevel;
+      const total = ddpSession.length;
+      const s20 = Math.round(ddpScore / total * 20);
+      const { passed, isLast } = ddpLevelSelect.completeLevel(level, ddpScore, total);
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.add('ex-hidden');
@@ -32509,20 +32028,19 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent =
-        aiScore + ' bonne' + (aiScore !== 1 ? 's' : '') + ' réponse' + (aiScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = ddpScore + ' / ' + total;
+      document.getElementById('score-pct').textContent = Math.round(ddpScore / total * 100) + ' %';
 
       const backHref  = sessionData.backLink?.href || 'français-grammaire.html';
       const backLabel = sessionData.backLink?.label || 'Grammaire';
-      const backToSelectBtn = aiLevelSelect.backToSelectButtonHTML();
+      const backToSelectBtn = ddpLevelSelect.backToSelectButtonHTML();
       let msg, btnsHTML;
 
       if (passed && isLast) {
-        msg = `🎊 Bravo ! Tu maîtrises les articles indéfinis !`;
+        msg = `🎊 Bravo ! Tu maîtrises les déterminants démonstratifs et possessifs !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-secondary" id="ai-restart-btn">Recommencer</button>
+            <button class="ex-btn-secondary" id="ddp-restart-btn">Recommencer</button>
             ${backToSelectBtn}
             <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>
           </div>`;
@@ -32530,17 +32048,17 @@
         msg = `Niveau ${level} validé ! 🏆 Le Niveau ${level + 1} est débloqué !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="ai-next-btn">Niveau ${level + 1} →</button>
-            <button class="ex-btn-secondary" id="ai-retry-btn">Recommencer ce niveau</button>
+            <button class="ex-btn-primary" id="ddp-next-btn">Niveau ${level + 1} →</button>
+            <button class="ex-btn-secondary" id="ddp-retry-btn">Recommencer ce niveau</button>
             ${backToSelectBtn}
           </div>
           <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>`;
       } else {
-        const needed = Math.ceil(total * AI_SEUIL);
+        const needed = Math.ceil(total * DDP_SEUIL);
         msg = `Il faut ${needed} bonnes réponses sur ${total}. Tu peux le faire !`;
         btnsHTML = `
           <div class="ex-results-btns">
-            <button class="ex-btn-primary" id="ai-retry-btn">Recommencer ce niveau</button>
+            <button class="ex-btn-primary" id="ddp-retry-btn">Recommencer ce niveau</button>
             ${backToSelectBtn}
             <a href="${backHref}" class="ex-btn-secondary">← ${backLabel}</a>
           </div>`;
@@ -32549,23 +32067,23 @@
       document.getElementById('score-msg').textContent          = msg;
       document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
 
-      document.getElementById('ai-retry-btn')?.addEventListener('click', () => {
+      document.getElementById('ddp-retry-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        aiStartLevel(level);
+        ddpStartLevel(level);
       });
-      document.getElementById('ai-next-btn')?.addEventListener('click', () => {
+      document.getElementById('ddp-next-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        aiStartLevel(level + 1);
+        ddpStartLevel(level + 1);
       });
-      document.getElementById('ai-restart-btn')?.addEventListener('click', () => {
+      document.getElementById('ddp-restart-btn')?.addEventListener('click', () => {
         document.getElementById('results-screen').classList.add('ex-hidden');
         document.getElementById('exercise-screen').classList.remove('ex-hidden');
-        aiLevelSelect.reset();
-        aiInitSession();
+        ddpLevelSelect.reset();
+        ddpInitSession();
       });
-      aiLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
+      ddpLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -32573,7 +32091,7 @@
       const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
-        exerciseType: 'articles-indefinis-niveaux',
+        exerciseType: 'det-demo-poss-niveaux',
         level:        'Niveau ' + level,
         score:        s20,
         total:        20,
@@ -32957,9 +32475,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent   =
-        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') + ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(lvScore / total * 100) + ' %';
 
       const backHref = sessionData.backLink?.href || 'mathématiques-fractions.html';
       const backToSelectBtn = fdgdLevelSelect.backToSelectButtonHTML();
@@ -33255,9 +32772,8 @@
       document.getElementById('results-screen').classList.remove('ex-hidden');
       document.getElementById('ex-bar-fill').style.width = '100%';
 
-      document.getElementById('score-value').textContent = s20 + ' / 20';
-      document.getElementById('score-pct').textContent   =
-        lvScore + ' bonne' + (lvScore !== 1 ? 's' : '') + ' réponse' + (lvScore !== 1 ? 's' : '') + ' sur ' + total;
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(lvScore / total * 100) + ' %';
 
       const backHref = sessionData.backLink?.href || 'mathématiques-fractions.html';
       const backToSelectBtn = fdtnLevelSelect.backToSelectButtonHTML();

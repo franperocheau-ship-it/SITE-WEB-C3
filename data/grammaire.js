@@ -8,178 +8,6 @@ window.EXERCISE_DATA = window.EXERCISE_DATA || {};
 
 Object.assign(window.EXERCISE_DATA, {
 
-  "identifier-determinant-demonstratif": {
-    title: "Identifier un déterminant démonstratif",
-    domaine:    "Français",
-    competence: "Grammaire — Déterminants démonstratifs",
-    levels: ["CM1", "CM2", "6e"],
-    paliers: 3, /* nombre réel de paliers du moteur */
-    type: "det-demo-niveaux",
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-
-    /* ── Niveau 1 : clique sur le déterminant démonstratif ─────────────────
-       targets = tableau des formes attendues (version "clean" sans ponctuation)
-    ─────────────────────────────────────────────────────────────────────── */
-    lvl1Bank: [
-      {
-        sentence: "Ce matin, le soleil brille dans le ciel.",
-        targets: ["Ce"],
-        feedbackOk: "Oui ! <strong>Ce</strong> est un déterminant démonstratif : il est placé devant le nom <em>matin</em> pour désigner un moment précis.",
-        feedbackErr: "Le déterminant démonstratif est <strong>Ce</strong>, placé devant le nom <em>matin</em>. <em>Le</em> est un article défini, pas un démonstratif."
-      },
-      {
-        sentence: "J'ai lu cet article très intéressant.",
-        targets: ["cet"],
-        feedbackOk: "Bravo ! <strong>Cet</strong> s'emploie devant un nom masculin singulier qui commence par une <strong>voyelle</strong> (<em>article</em> commence par <em>a</em>).",
-        feedbackErr: "Le déterminant démonstratif est <strong>cet</strong>. On l'emploie devant un nom masculin singulier commençant par une voyelle ou un h muet (<em>article</em> → voyelle <em>a</em>)."
-      },
-      {
-        sentence: "Regarde cette belle fleur dans le jardin !",
-        targets: ["cette"],
-        feedbackOk: "Oui ! <strong>Cette</strong> est le déterminant démonstratif féminin singulier, placé devant le nom <em>fleur</em>.",
-        feedbackErr: "Le déterminant démonstratif est <strong>cette</strong>, féminin singulier, devant le nom <em>fleur</em>. <em>Le</em> est un article défini."
-      },
-      {
-        sentence: "Ces enfants jouent dans la cour de l'école.",
-        targets: ["Ces"],
-        feedbackOk: "Parfait ! <strong>Ces</strong> est la forme plurielle du déterminant démonstratif — il désigne plusieurs enfants à la fois.",
-        feedbackErr: "Le déterminant démonstratif est <strong>Ces</strong> (pluriel). <em>La</em> et <em>l'</em> sont des articles définis."
-      },
-      {
-        sentence: "Mon voisin promène son chien dans ce parc.",
-        targets: ["ce"],
-        feedbackOk: "Bien trouvé ! <strong>Ce</strong> est un déterminant démonstratif (masculin singulier devant consonne), placé devant le nom <em>parc</em>.",
-        feedbackErr: "Le déterminant démonstratif est <strong>ce</strong>, devant le nom <em>parc</em>. <em>Mon</em> et <em>son</em> sont des déterminants possessifs, pas démonstratifs."
-      },
-      {
-        sentence: "Cet homme est très gentil avec les voisins.",
-        targets: ["Cet"],
-        feedbackOk: "Excellent ! <strong>Cet</strong> s'utilise devant un nom masculin commençant par un <strong>h muet</strong> (<em>homme</em>). On prononce « cet·homme » avec une liaison.",
-        feedbackErr: "Le déterminant démonstratif est <strong>Cet</strong>, devant <em>homme</em>. On emploie <em>cet</em> (et non <em>ce</em>) car <em>homme</em> commence par un h muet — le h muet entraîne la liaison comme une voyelle."
-      },
-      {
-        sentence: "Elle range ses affaires dans cette armoire.",
-        targets: ["cette"],
-        feedbackOk: "Bravo ! <strong>Cette</strong> est le déterminant démonstratif féminin singulier, placé devant le nom <em>armoire</em>.",
-        feedbackErr: "Le déterminant démonstratif est <strong>cette</strong>, devant le nom féminin <em>armoire</em>. <em>Ses</em> est un déterminant possessif (il indique l'appartenance)."
-      },
-      {
-        sentence: "Les élèves rangent leurs livres sur ces étagères.",
-        targets: ["ces"],
-        feedbackOk: "Oui ! <strong>Ces</strong> est le déterminant démonstratif pluriel, placé devant le nom <em>étagères</em> pour désigner des étagères précises.",
-        feedbackErr: "Le déterminant démonstratif est <strong>ces</strong> (pluriel), devant <em>étagères</em>. <em>Les</em> est un article défini et <em>leurs</em> est un déterminant possessif."
-      }
-    ],
-
-    /* ── Niveau 2 : 2 étapes — observe le nom, puis choisis le démonstratif ──
-       genre    : "masculin" | "féminin"
-       nombre   : "singulier" | "pluriel"
-       initiale : "consonne" | "voyelle" | "h muet"  (ignoré si pluriel)
-       answer   : "ce" | "cet" | "cette" | "ces"
-    ─────────────────────────────────────────────────────────────────────── */
-    lvl2Bank: [
-      {
-        phrase: "___ avion décolle dans cinq minutes.",
-        noun: "avion", genre: "masculin", nombre: "singulier", initiale: "voyelle", answer: "cet",
-        explication: "<strong>Cet</strong> : masculin singulier commençant par une voyelle (<em>a</em>)."
-      },
-      {
-        phrase: "___ homme est arrivé ce matin.",
-        noun: "homme", genre: "masculin", nombre: "singulier", initiale: "h muet", answer: "cet",
-        explication: "<strong>Cet</strong> : masculin singulier commençant par un h muet (liaison comme une voyelle)."
-      },
-      {
-        phrase: "___ amie est très sympathique.",
-        noun: "amie", genre: "féminin", nombre: "singulier", initiale: "voyelle", answer: "cette",
-        explication: "<strong>Cette</strong> : féminin singulier. Même devant une voyelle, on dit <em>cette</em> et non *<em>cet</em>."
-      },
-      {
-        phrase: "___ oiseaux font leurs nids dans les arbres.",
-        noun: "oiseaux", genre: "masculin", nombre: "pluriel", initiale: "voyelle", answer: "ces",
-        explication: "<strong>Ces</strong> : toujours au pluriel, quel que soit le genre ou l'initiale."
-      },
-      {
-        phrase: "___ livre est vraiment passionnant.",
-        noun: "livre", genre: "masculin", nombre: "singulier", initiale: "consonne", answer: "ce",
-        explication: "<strong>Ce</strong> : masculin singulier commençant par une consonne."
-      },
-      {
-        phrase: "___ fleur sent très bon.",
-        noun: "fleur", genre: "féminin", nombre: "singulier", initiale: "consonne", answer: "cette",
-        explication: "<strong>Cette</strong> : féminin singulier."
-      },
-      {
-        phrase: "Regarde ___ beau château !",
-        noun: "château", genre: "masculin", nombre: "singulier", initiale: "consonne", answer: "ce",
-        explication: "<strong>Ce</strong> : masculin singulier devant consonne."
-      },
-      {
-        phrase: "___ chaussures sont toutes neuves.",
-        noun: "chaussures", genre: "féminin", nombre: "pluriel", initiale: "consonne", answer: "ces",
-        explication: "<strong>Ces</strong> : pluriel (ici féminin pluriel)."
-      },
-      {
-        phrase: "___ école est vraiment très grande.",
-        noun: "école", genre: "féminin", nombre: "singulier", initiale: "voyelle", answer: "cette",
-        explication: "<strong>Cette</strong> : féminin singulier. Contrairement au masculin, le féminin ne prend pas <em>cet</em> devant une voyelle."
-      },
-      {
-        phrase: "___ jouets sont éparpillés dans le salon.",
-        noun: "jouets", genre: "masculin", nombre: "pluriel", initiale: "consonne", answer: "ces",
-        explication: "<strong>Ces</strong> : pluriel. Ne pas confondre avec <em>ses</em> (possessif) : <em>ces jouets</em> = on montre des jouets précis ; <em>ses jouets</em> = les jouets lui appartiennent.",
-        noteSesCes: true
-      }
-    ],
-
-    /* ── Niveau 3 : ce ou se ? (20 items, score /20) ───────────────────────
-       answer : "ce" (déterminant devant nom) | "se" (pronom réfléchi devant verbe)
-    ─────────────────────────────────────────────────────────────────────── */
-    lvl3Bank: [
-      /* ── « ce » devant un nom ── */
-      { sentence: "___ chien aboie très fort.",                          answer: "ce",
-        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>chien</em>." },
-      { sentence: "J'aime beaucoup ___ film.",                           answer: "ce",
-        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>film</em>." },
-      { sentence: "___ problème est difficile à résoudre.",              answer: "ce",
-        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>problème</em>." },
-      { sentence: "Regarde ___ beau papillon !",                        answer: "ce",
-        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>papillon</em> (l'adjectif <em>beau</em> est intercalé)." },
-      { sentence: "___ livre est vraiment passionnant.",                 answer: "ce",
-        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>livre</em>." },
-      { sentence: "Elle habite dans ___ quartier depuis longtemps.",     answer: "ce",
-        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>quartier</em>." },
-      { sentence: "Il travaille dans ___ bureau depuis l'an dernier.",   answer: "ce",
-        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>bureau</em>." },
-      { sentence: "Prends ___ chemin, c'est plus court.",               answer: "ce",
-        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>chemin</em>." },
-      { sentence: "Nous allons voir ___ spectacle demain.",              answer: "ce",
-        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>spectacle</em>." },
-      { sentence: "___ matin, Paul se lève tôt.",                       answer: "ce",
-        explication: "<strong>Ce</strong> est un déterminant démonstratif : placé devant le nom <em>matin</em>. Dans cette même phrase, <em>se</em> est un pronom réfléchi devant le verbe <em>lève</em>." },
-      /* ── « se » devant un verbe (pronom réfléchi) ── */
-      { sentence: "Le chat ___ lave les pattes.",                       answer: "se",
-        explication: "<strong>Se</strong> est un pronom réfléchi : placé devant le verbe <em>lave</em>. Test : on peut dire <em>je me lave</em> → c'est bien un pronom réfléchi." },
-      { sentence: "Il ___ lève tôt chaque matin.",                      answer: "se",
-        explication: "<strong>Se</strong> est un pronom réfléchi : placé devant le verbe <em>lève</em>. Test : <em>je me lève</em> → pronom réfléchi." },
-      { sentence: "Elle ___ promène dans le parc.",                     answer: "se",
-        explication: "<strong>Se</strong> est un pronom réfléchi : placé devant le verbe <em>promène</em>. Test : <em>je me promène</em>." },
-      { sentence: "Paul ___ dépêche d'aller à l'école.",                answer: "se",
-        explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>dépêche</em>. Test : <em>je me dépêche</em>." },
-      { sentence: "Les enfants ___ couchent à vingt et une heures.",    answer: "se",
-        explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>couchent</em>. Test : <em>je me couche</em>." },
-      { sentence: "Tom ___ regarde dans le miroir.",                    answer: "se",
-        explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>regarde</em>. Test : <em>je me regarde</em>." },
-      { sentence: "Ma sœur ___ peigne les cheveux chaque matin.",       answer: "se",
-        explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>peigne</em>. Test : <em>je me peigne</em>." },
-      { sentence: "Il ___ tait quand le professeur parle.",             answer: "se",
-        explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>tait</em>. Test : <em>je me tais</em>." },
-      { sentence: "Ils ___ parlent souvent après la classe.",           answer: "se",
-        explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>parlent</em>. Test : <em>nous nous parlons</em>." },
-      { sentence: "Ce matin, Paul ___ lève tôt.",                       answer: "se",
-        explication: "<strong>Se</strong> est un pronom réfléchi : devant le verbe <em>lève</em>. Test : <em>je me lève</em>. Dans cette même phrase, <em>Ce</em> est un déterminant démonstratif devant le nom <em>matin</em>." }
-    ]
-  },
-
   "identifier-adjectif": {
     title: "Identifier les adjectifs",
     domaine:    "Français",
@@ -2054,119 +1882,236 @@ Object.assign(window.EXERCISE_DATA, {
     ]
   },
 
-  "articles-definis": {
-    title:      "Les articles définis (le, la, les, l')",
+  "identifier-differencier-articles-definis-indefinis": {
+    title:      "Identifier et différencier les articles définis et indéfinis",
     domaine:    "Français",
-    competence: "Grammaire — Déterminants : articles définis",
-    type:       "articles-definis-niveaux",
+    competence: "Grammaire — Déterminants : articles définis et indéfinis",
+    type:       "articles-def-indef-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
-    /* Fusion de identifier-article-defini (niveau 1, mots cliquables),
-       articles-definis-choix (niveau 2, choix d'étiquette) et
-       articles-definis-completer (niveau 3, glisser-déposer) — Lot 6,
-       groupe 3a. Le niveau 3 n'a qu'un seul item (banque d'origine),
-       absorbé tel quel plutôt que supprimé. */
+    /* Fusion de articles-definis et articles-indefinis en une seule
+       compétence progressive. Niveau 1 : l'article est surligné dans la
+       phrase, l'élève choisit défini/indéfini (indices permanents sous
+       les boutons). Niveau 2 : l'élève clique d'abord sur l'article
+       (mots-cliquables) puis le qualifie (sans indice). Niveau 3 : même
+       mécanique que le niveau 2, appliquée à 2 phrases par item (dont
+       des articles élidés « l' », toujours définis grammaticalement). */
 
-    lvl1: [
-      { instruction: "Clique sur tous les articles définis dans ce texte.", sentence: "Le chien joue dans le jardin . Il renifle les fleurs et s' approche de la fontaine . Le soleil brille et l' air est doux .", targets: ["Le","le","les","la","l'"], piege: {}, note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet." },
-      { instruction: "Clique sur tous les articles définis dans ce texte.", sentence: "La classe prépare la pièce de théâtre . Les élèves apprennent le texte et l' institutrice sourit . Le spectacle aura lieu vendredi .", targets: ["La","la","Les","le","l'","Le"], piege: {}, note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet." },
-      { instruction: "Clique sur tous les articles définis dans ce texte.", sentence: "L' hiver arrive dans la montagne . La neige recouvre les sapins et le sentier disparaît sous le blanc . Les randonneurs rentrent au refuge .", targets: ["L'","la","La","les","le","Les","au"], piege: {}, note: "💡 <b>L'</b> et <b>au</b> (= à + le) sont des articles définis contractés." },
-      { instruction: "Clique sur tous les articles définis dans ce texte.", sentence: "Le soir , l' enfant lit le livre que sa maman lui a offert . Les illustrations sont magnifiques et les couleurs très vives .", targets: ["Le","l'","le","Les","les"], piege: {}, note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet." },
-      { instruction: "Clique sur tous les articles définis dans ce texte.", sentence: "La fermière nourrit les poules avec le grain . L' après-midi , elle va au marché acheter les légumes . Le soir , elle ferme la porte .", targets: ["La","les","le","L'","au","Le","la"], piege: {}, note: "💡 <b>L'</b> et <b>au</b> (= à + le) sont des articles définis contractés." },
-      { instruction: "Clique sur tous les articles définis dans ce texte. Attention, il y a peut-être un piège !", sentence: "Les oiseaux font leur nid dans l' arbre près de la haie . Le chat les observe depuis la fenêtre sans bouger . Il les guette depuis des heures .", targets: ["Les","l'","la","Le"], piege: { "les": "Ici, « les » remplace un nom (les oiseaux). C'est un pronom personnel, pas un article !" }, note: "💡 <b>L'</b> est un article défini contracté : il remplace <b>le</b> ou <b>la</b> devant une voyelle ou un <i>h</i> muet." }
+    level1Bank: [
+      { html: "<mark class=\"idi-mark\">Le</mark> chien de Léa dort sur son tapis.", answer: "defini", explain: "« Le » désigne un chien précis : celui de Léa." },
+      { html: "Léa a vu <mark class=\"idi-mark\">un</mark> renard près de chez elle.", answer: "indefini", explain: "« un » ne précise pas de quel renard il s'agit : un renard parmi d'autres." },
+      { html: "<mark class=\"idi-mark\">L'</mark>école est fermée aujourd'hui.", answer: "defini", explain: "« L' » (= la) désigne une école précise, celle qu'on connaît." },
+      { html: "Il mange <mark class=\"idi-mark\">une</mark> pomme verte.", answer: "indefini", explain: "« une » désigne une pomme quelconque, non précisée." },
+      { html: "<mark class=\"idi-mark\">Les</mark> enfants de la classe chantent joyeusement.", answer: "defini", explain: "« Les » désigne un groupe précis : les enfants de cette classe." },
+      { html: "Nous avons trouvé <mark class=\"idi-mark\">des</mark> coquillages ce matin.", answer: "indefini", explain: "« des » désigne des coquillages non précisés, en quantité indéterminée." },
+      { html: "<mark class=\"idi-mark\">Les</mark> chats détestent l'eau.", answer: "defini", explain: "Même si on parle des chats en général (sens générique), « les » reste un article défini." },
+      { html: "As-tu vu <mark class=\"idi-mark\">l'</mark>oiseau bleu dans l'arbre ?", answer: "defini", explain: "« l' » (= le) désigne un oiseau précis, que tu as vu." },
+      { html: "Notre maître a donné <mark class=\"idi-mark\">un</mark> livre à chaque élève.", answer: "indefini", explain: "« un » désigne un livre parmi d'autres, non précisé." },
+      { html: "<mark class=\"idi-mark\">La</mark> maîtresse que j'aime beaucoup est absente aujourd'hui.", answer: "defini", explain: "« La » désigne une maîtresse précise : celle que tu connais." }
     ],
 
-    lvl2: [
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "🐱", word: "chat", answer: "le", choices: ["le","la","les","l'"] },
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "🏫", word: "école", answer: "l'", choices: ["le","la","les","l'"] },
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "🌳", word: "arbre", answer: "l'", choices: ["le","la","les","l'"] },
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "🐶", word: "chiens", answer: "les", choices: ["le","la","les","l'"] },
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "🌙", word: "lune", answer: "la", choices: ["le","la","les","l'"] },
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "🤝", word: "ami", answer: "l'", choices: ["le","la","les","l'"] },
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "🌸", word: "fleurs", answer: "les", choices: ["le","la","les","l'"] },
-      { instruction: "Quel article défini va avec ce nom ?", emoji: "☀️", word: "soleil", answer: "le", choices: ["le","la","les","l'"] }
+    level2Bank: [
+      { sentence: "Léo range un cahier dans son sac .", target: "un", answer: "indefini" },
+      { sentence: "Le professeur explique son cours .", target: "Le", answer: "defini" },
+      { sentence: "Elle a mangé une pomme ce matin .", target: "une", answer: "indefini" },
+      { sentence: "L' oiseau chante sur mon balcon .", target: "L'", answer: "defini" },
+      { sentence: "Il a trouvé des champignons ce matin .", target: "des", answer: "indefini" },
+      { sentence: "La maîtresse corrige nos cahiers .", target: "La", answer: "defini" },
+      { sentence: "Nous avons vu un dauphin ce matin .", target: "un", answer: "indefini" },
+      { sentence: "L' arbre perd ses feuilles en automne .", target: "L'", answer: "defini" },
+      { sentence: "Elle porte des lunettes de soleil .", target: "des", answer: "indefini" },
+      { sentence: "Les enfants jouent dans mon jardin .", target: "Les", answer: "defini" }
     ],
 
-    lvl3: [
-      { instruction: "Place les bons articles définis dans les cases. Attention à l'intrus !", template: "___ printemps est arrivé ! ___ hirondelles reviennent dans ___ ciel. ___ école organise une sortie dans la forêt.", blanks: ["Le","Les","le","L'"], bank: ["Le","Les","le","L'","des"] }
+    /* Chaque phrase peut contenir plusieurs articles à trouver ET qualifier
+       (2, 3 voire plus selon les phrases) — c'est ce qui différencie ce
+       niveau du niveau 2 (1 seul article par phrase). Les articles élidés
+       (l') restent mélangés parmi les cas défini/indéfini normaux, jamais
+       un 3e type. Aucun "du/au/aux" (article contracté) : uniquement des
+       déterminants isolables sans ambiguïté (sujet ou COD direct). */
+    level3Bank: [
+      { sentences: [
+        { sentence: "Le chien joue avec un ballon .", targets: [
+          { word: "Le", answer: "defini" }, { word: "un", answer: "indefini" }
+        ]},
+        { sentence: "Les enfants caressent une petite chienne .", targets: [
+          { word: "Les", answer: "defini" }, { word: "une", answer: "indefini" }
+        ]}
+      ]},
+      { sentences: [
+        { sentence: "L' hirondelle revient chaque printemps .", targets: [
+          { word: "L'", answer: "defini" }
+        ]},
+        { sentence: "Elle attrape des insectes et une libellule .", targets: [
+          { word: "des", answer: "indefini" }, { word: "une", answer: "indefini" }
+        ]}
+      ]},
+      { sentences: [
+        { sentence: "Une girafe broute des feuilles vertes .", targets: [
+          { word: "Une", answer: "indefini" }, { word: "des", answer: "indefini" }
+        ]},
+        { sentence: "La girafe rejoint le troupeau .", targets: [
+          { word: "La", answer: "defini" }, { word: "le", answer: "defini" }
+        ]}
+      ]},
+      { sentences: [
+        { sentence: "L' ami de mon frère arrive ce soir .", targets: [
+          { word: "L'", answer: "defini" }
+        ]},
+        { sentence: "Il apporte un cadeau et une carte .", targets: [
+          { word: "un", answer: "indefini" }, { word: "une", answer: "indefini" }
+        ]}
+      ]},
+      { sentences: [
+        { sentence: "Le soleil réchauffe la terre et les plantes .", targets: [
+          { word: "Le", answer: "defini" }, { word: "la", answer: "defini" }, { word: "les", answer: "defini" }
+        ]},
+        { sentence: "Des nuages arrivent avec un vent frais .", targets: [
+          { word: "Des", answer: "indefini" }, { word: "un", answer: "indefini" }
+        ]}
+      ]},
+      { sentences: [
+        { sentence: "Le miel coule lentement de la ruche .", targets: [
+          { word: "Le", answer: "defini" }, { word: "la", answer: "defini" }
+        ]},
+        { sentence: "Des abeilles butinent une fleur .", targets: [
+          { word: "Des", answer: "indefini" }, { word: "une", answer: "indefini" }
+        ]}
+      ]},
+      { sentences: [
+        { sentence: "Un dragon garde son trésor .", targets: [
+          { word: "Un", answer: "indefini" }
+        ]},
+        { sentence: "Le dragon rugit et les villageois s'enfuient .", targets: [
+          { word: "Le", answer: "defini" }, { word: "les", answer: "defini" }
+        ]}
+      ]},
+      { sentences: [
+        { sentence: "Une tempête approche avec des vents violents .", targets: [
+          { word: "Une", answer: "indefini" }, { word: "des", answer: "indefini" }
+        ]},
+        { sentence: "La tempête frappe le village .", targets: [
+          { word: "La", answer: "defini" }, { word: "le", answer: "defini" }
+        ]}
+      ]},
+      { sentences: [
+        { sentence: "L' orage gronde très fort .", targets: [
+          { word: "L'", answer: "defini" }
+        ]},
+        { sentence: "Des éclairs illuminent le ciel sombre .", targets: [
+          { word: "Des", answer: "indefini" }, { word: "le", answer: "defini" }
+        ]}
+      ]},
+      { sentences: [
+        { sentence: "Le fermier nourrit un cheval et une vache .", targets: [
+          { word: "Le", answer: "defini" }, { word: "un", answer: "indefini" }, { word: "une", answer: "indefini" }
+        ]},
+        { sentence: "Les animaux mangent tranquillement .", targets: [
+          { word: "Les", answer: "defini" }
+        ]}
+      ]}
     ]
   },
 
-  "determinants-possessifs": {
-    title:      "Les déterminants possessifs",
+  "identifier-differencier-determinants-demonstratifs-possessifs": {
+    title:      "Identifier et différencier les déterminants démonstratifs et possessifs",
     domaine:    "Français",
-    competence: "Grammaire — Déterminants possessifs",
-    type:       "determinants-possessifs-niveaux",
+    competence: "Grammaire — Déterminants : démonstratifs et possessifs",
+    type:       "det-demo-poss-niveaux",
     levels:     ["CM1", "CM2", "6e"],
-    paliers:    2, /* nombre réel de paliers du moteur */
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
-    /* Fusion de identifier-determinant-possessif (niveau 1) et
-       possessifs-dans-phrases (niveau 2) — Lot 6, groupe 3c. Même
-       mécanique (mots cliquables) pour les deux niveaux. */
+    /* Fusion de determinants-possessifs et identifier-determinant-
+       demonstratif en une seule compétence progressive, sur le modèle de
+       identifier-differencier-articles-definis-indefinis. Niveau 1 : le
+       déterminant est surligné dans la phrase, l'élève choisit
+       possessif/démonstratif (indice à la demande sous les boutons).
+       Niveau 2 : l'élève clique d'abord sur le déterminant (mots-
+       cliquables) puis le qualifie (sans indice) — 1 seul déterminant par
+       phrase. Niveau 3 : même mécanique, 1 phrase par item comme le
+       niveau 2, mais la phrase peut contenir plusieurs déterminants à
+       trouver et qualifier (facteur de difficulté vs niveau 2). */
 
-    lvl1: [
-      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Je range mes affaires dans mon cartable .", targets: ["mes","mon"], piege: {}, note: "📌 <strong>mes</strong> et <strong>mon</strong> indiquent l'appartenance à la 1<sup>re</sup> personne du singulier (<em>je</em>)." },
-      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Tu as oublié ton stylo et tes cahiers .", targets: ["ton","tes"], piege: {}, note: "📌 <strong>ton</strong> et <strong>tes</strong> : 2<sup>e</sup> personne du singulier (<em>tu</em>). <em>Ton</em> devant un nom masculin, <em>tes</em> au pluriel." },
-      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Il promène son chien avec ses amis .", targets: ["son","ses"], piege: {}, note: "📌 <strong>son</strong> et <strong>ses</strong> : 3<sup>e</sup> personne du singulier (<em>il</em>). <em>Son</em> devant un nom singulier, <em>ses</em> au pluriel." },
-      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Elle lit ses livres dans sa chambre .", targets: ["ses","sa"], piege: {}, note: "📌 <strong>ses</strong> et <strong>sa</strong> : 3<sup>e</sup> personne du singulier (<em>elle</em>). <em>Sa</em> devant un nom féminin singulier." },
-      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Nous adorons notre école et nos professeurs .", targets: ["notre","nos"], piege: {}, note: "📌 <strong>notre</strong> et <strong>nos</strong> : 1<sup>re</sup> personne du pluriel (<em>nous</em>). <em>Notre</em> au singulier, <em>nos</em> au pluriel." },
-      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Vous avez rangé votre sac et vos affaires .", targets: ["votre","vos"], piege: {}, note: "📌 <strong>votre</strong> et <strong>vos</strong> : 2<sup>e</sup> personne du pluriel ou de politesse (<em>vous</em>)." },
-      { instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention au piège !", sentence: "Les enfants jouent avec leurs jouets dans leur chambre .", targets: ["leurs","leur"], piege: { "Les": "« Les » est un article défini, pas un déterminant possessif." }, note: "📌 <strong>leurs</strong> et <strong>leur</strong> : 3<sup>e</sup> personne du pluriel (<em>ils/elles</em>). <em>Leur</em> devant un nom singulier, <em>leurs</em> devant un nom pluriel." },
-      { instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention aux pièges !", sentence: "Mon petit frère prête sa guitare à ses camarades le week-end .", targets: ["Mon","sa","ses"], piege: { "le": "« le » est un article défini, pas un déterminant possessif." }, note: "📌 Trois possessifs : <strong>Mon</strong> (masc. sing., 1<sup>re</sup> pers.), <strong>sa</strong> (fém. sing., 3<sup>e</sup> pers.), <strong>ses</strong> (plur., 3<sup>e</sup> pers.)." },
-      { instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention au piège !", sentence: "Ta mère et ton père sont partis avec leurs valises ce matin .", targets: ["Ta","ton","leurs"], piege: { "ce": "« ce » est un déterminant démonstratif (il montre un moment précis), pas un possessif." }, note: "📌 <strong>Ta</strong> et <strong>ton</strong> (2<sup>e</sup> pers. sing.) + <strong>leurs</strong> (3<sup>e</sup> pers. plur.) dans la même phrase." },
-      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Notre jardin et nos fleurs sont magnifiques en été .", targets: ["Notre","nos"], piege: {}, note: "📌 <strong>Notre</strong> et <strong>nos</strong> : 1<sup>re</sup> personne du pluriel (<em>nous</em>)." }
+    level1Bank: [
+      { html: "Je prends <mark class=\"idi-mark\">mon</mark> cartable.", answer: "possessif", explain: "« mon » indique que le cartable appartient à la personne qui parle (1<sup>re</sup> pers. du singulier)." },
+      { html: "Regarde <mark class=\"idi-mark\">cette</mark> fleur !", answer: "demonstratif", explain: "« cette » montre une fleur précise, sous les yeux de la personne à qui l'on parle." },
+      { html: "Il range <mark class=\"idi-mark\">ses</mark> jouets avant de dormir.", answer: "possessif", explain: "« ses » (pluriel) indique que les jouets appartiennent à « il » (3<sup>e</sup> pers. du singulier)." },
+      { html: "<mark class=\"idi-mark\">Ces</mark> nuages annoncent la pluie.", answer: "demonstratif", explain: "« Ces » désigne des nuages précis, que l'on montre." },
+      { html: "Nous rangeons <mark class=\"idi-mark\">notre</mark> classe avant la récréation.", answer: "possessif", explain: "« notre » indique que la classe appartient à « nous » (1<sup>re</sup> pers. du pluriel)." },
+      { html: "J'ai vu <mark class=\"idi-mark\">cet</mark> oiseau dans le jardin.", answer: "demonstratif", explain: "« cet » désigne un oiseau précis ; on emploie <em>cet</em> (et non <em>ce</em>) devant un nom masculin qui commence par une voyelle." },
+      { html: "Vous avez oublié <mark class=\"idi-mark\">vos</mark> cahiers à la maison.", answer: "possessif", explain: "« vos » indique que les cahiers appartiennent à « vous » (2<sup>e</sup> pers. du pluriel)." },
+      { html: "Elle a choisi <mark class=\"idi-mark\">ce</mark> livre à la bibliothèque.", answer: "demonstratif", explain: "« ce » désigne un livre précis, devant un nom masculin qui commence par une consonne." },
+      { html: "Les enfants promènent <mark class=\"idi-mark\">leur</mark> chien tous les soirs.", answer: "possessif", explain: "« leur » indique que le chien appartient aux enfants (3<sup>e</sup> pers. du pluriel)." },
+      { html: "Il faut ranger <mark class=\"idi-mark\">ces</mark> outils dans la remise.", answer: "demonstratif", explain: "« ces » (pluriel) désigne des outils précis, que l'on montre." }
     ],
 
-    lvl2: [
-      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Je range mes affaires dans mon sac .", targets: ["mes","mon"], piege: {} },
-      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Elle prête son crayon à sa camarade .", targets: ["son","sa"], piege: {} },
-      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Nous adorons notre école et nos professeurs .", targets: ["notre","nos"], piege: {} },
-      { instruction: "Clique sur tous les déterminants possessifs dans la phrase.", sentence: "Il promène son chien avec ses amis .", targets: ["son","ses"], piege: {} },
-      { instruction: "Clique sur tous les déterminants possessifs dans la phrase. Attention au piège !", sentence: "Leurs parents les attendent devant leur maison .", targets: ["Leurs","leur"], piege: { "les": "« les » est un pronom personnel complément, pas un possessif !" } }
+    level2Bank: [
+      { sentence: "Léa porte son sac à dos .", target: "son", answer: "possessif" },
+      { sentence: "Regarde ce nuage étrange .", target: "ce", answer: "demonstratif" },
+      { sentence: "Nous rangeons nos vélos dans le garage .", target: "nos", answer: "possessif" },
+      { sentence: "Cette histoire est passionnante .", target: "Cette", answer: "demonstratif" },
+      { sentence: "Ils apportent leurs raquettes .", target: "leurs", answer: "possessif" },
+      { sentence: "Ces montagnes sont magnifiques .", target: "Ces", answer: "demonstratif" },
+      { sentence: "Tu as perdu ton écharpe .", target: "ton", answer: "possessif" },
+      { sentence: "J'ai goûté cet ananas .", target: "cet", answer: "demonstratif" },
+      { sentence: "Vous partagez votre goûter .", target: "votre", answer: "possessif" },
+      { sentence: "Elle adore ces vacances .", target: "ces", answer: "demonstratif" }
+    ],
+
+    /* 1 phrase par item (comme le niveau 2), mais chaque phrase peut
+       contenir plusieurs déterminants possessifs/démonstratifs à trouver ET
+       qualifier (2 à 3 selon les phrases) — c'est ce facteur de difficulté,
+       et non une 2<sup>e</sup> phrase, qui distingue ce niveau du niveau 2
+       (qui n'en cible qu'un seul par phrase).
+       Large diversité des formes plutôt qu'une concentration artificielle
+       sur la paire homophone ses/ces : les 15 possessifs (mon, ma, mes,
+       ton, ta, tes, son, sa, ses, notre, nos, votre, vos, leur, leurs) et
+       les 4 démonstratifs (ce, cet, cette, ces) sont chacun représentés au
+       moins une fois sur les 10 phrases. Chaque démonstratif reste employé
+       dans un contexte simple et naturel où le sens est évident sans effort
+       (geste de pointage « Regarde/Observe », ou fait déclaratif sur un
+       objet compris comme présent/visible) — jamais construit artificiellement
+       via une reprise anaphorique forcée. Aucun article (le/la/les/un/une/
+       des) n'est jamais une cible attendue, même quand un article apparaît
+       dans la phrase comme mot non pertinent — voir la consigne du moteur
+       (« déterminants possessifs et démonstratifs », jamais « déterminants »
+       au sens large). Aucune forme ambiguë ne se répète deux fois dans la
+       même phrase. */
+    level3Bank: [
+      { sentence: "Léa porte son manteau et ses bottes .", targets: [
+        { word: "son", answer: "possessif" }, { word: "ses", answer: "possessif" }
+      ]},
+      { sentence: "Regarde cette photo de mon anniversaire !", targets: [
+        { word: "cette", answer: "demonstratif" }, { word: "mon", answer: "possessif" }
+      ]},
+      { sentence: "Nous rangeons notre chambre pendant que vous rangez vos jouets .", targets: [
+        { word: "notre", answer: "possessif" }, { word: "vos", answer: "possessif" }
+      ]},
+      { sentence: "Ce livre appartient à ma sœur .", targets: [
+        { word: "Ce", answer: "demonstratif" }, { word: "ma", answer: "possessif" }
+      ]},
+      { sentence: "Tu as oublié ton écharpe et tes gants .", targets: [
+        { word: "ton", answer: "possessif" }, { word: "tes", answer: "possessif" }
+      ]},
+      { sentence: "Cet exercice est difficile, mais ta persévérance est remarquable .", targets: [
+        { word: "Cet", answer: "demonstratif" }, { word: "ta", answer: "possessif" }
+      ]},
+      { sentence: "Ils rangent leurs vélos pendant que leur père répare la voiture .", targets: [
+        { word: "leurs", answer: "possessif" }, { word: "leur", answer: "possessif" }
+      ]},
+      { sentence: "Sa robe et ces chaussures vont très bien ensemble .", targets: [
+        { word: "Sa", answer: "possessif" }, { word: "ces", answer: "demonstratif" }
+      ]},
+      { sentence: "Suivez mes conseils et prenez votre temps .", targets: [
+        { word: "mes", answer: "possessif" }, { word: "votre", answer: "possessif" }
+      ]},
+      { sentence: "Regardez ces étoiles : nos ancêtres les observaient déjà .", targets: [
+        { word: "ces", answer: "demonstratif" }, { word: "nos", answer: "possessif" }
+      ]}
     ]
   },
-
-  "articles-indefinis": {
-    title:      "Les articles indéfinis (un, une, des)",
-    domaine:    "Français",
-    competence: "Grammaire — Déterminants : articles indéfinis",
-    type:       "articles-indefinis-niveaux",
-    levels:     ["CM1", "CM2", "6e"],
-    paliers:    2, /* nombre réel de paliers du moteur */
-    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
-
-    /* Fusion de identifier-article-indefini (niveau 1, mots cliquables) et
-       articles-indefinis-premiere-rencontre (niveau 2, glisser-déposer) —
-       Lot 6, groupe 3b. Niveau 2 enrichi de 8 items supplémentaires
-       (validés par l'utilisateur) car la banque d'origine (4 items) était
-       trop mince pour un niveau à part entière. */
-
-    lvl1: [
-      { instruction: "Clique sur tous les articles indéfinis dans ce texte.", sentence: "Un enfant joue dans le jardin . Il trouve une coccinelle et des fourmis sous les pierres .", targets: ["Un","une","des"], piege: {} },
-      { instruction: "Clique sur tous les articles indéfinis dans ce texte.", sentence: "Des nuages arrivent dans le ciel . Un vent froid souffle et les feuilles tombent . Il faut une veste pour sortir .", targets: ["Des","Un","une"], piege: {} },
-      { instruction: "Clique sur tous les articles indéfinis dans ce texte.", sentence: "Dans une vieille maison , un fantôme habite . Des bruits étranges se font entendre la nuit . Les habitants ont très peur .", targets: ["une","un","Des"], piege: {} },
-      { instruction: "Clique sur tous les articles indéfinis dans ce texte.", sentence: "Le boulanger prépare des croissants et des baguettes chaque matin . Une cliente arrive et achète un pain aux raisins .", targets: ["des","Une","un"], piege: {} },
-      { instruction: "Clique sur tous les articles indéfinis dans ce texte.", sentence: "Un explorateur découvre une grotte cachée dans la forêt . Des stalactites pendent et des cristaux scintillent sous sa lampe .", targets: ["Un","une","Des","des"], piege: {} },
-      { instruction: "Clique sur tous les articles indéfinis dans ce texte.", sentence: "Un matin de printemps , des hirondelles arrivent dans le village . Une hirondelle construit un nid sous le toit de la grange .", targets: ["Un","des","Une","un"], piege: {} }
-    ],
-
-    lvl2: [
-      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ chat noir dort sur la fenêtre. ___ chat s'appelle Minuit.", blanks: ["Un","Le"], bank: ["Un","Le","Une","La"] },
-      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ élève entre dans la salle. ___ élève s'appelle Emma.", blanks: ["Une","L'"], bank: ["Une","L'","Un","Le"] },
-      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ chien aboie dans le jardin. ___ chien appartient à notre voisin.", blanks: ["Un","Le"], bank: ["Un","Le","Une","La"] },
-      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ livre est posé sur la table. ___ livre parle des dinosaures.", blanks: ["Un","Le"], bank: ["Un","Le","Une","La"] },
-      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ fille chante dans la cour. ___ fille s'appelle Léa.", blanks: ["Une","La"], bank: ["Une","La","Un","Le"] },
-      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ oiseau se pose sur la branche. ___ oiseau chante joliment.", blanks: ["Un","L'"], bank: ["Un","L'","Une","La"] },
-      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ maison est à vendre dans notre rue. ___ maison a un grand jardin.", blanks: ["Une","La"], bank: ["Une","La","Un","Le"] },
-      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ homme traverse la rue prudemment. ___ homme porte un manteau gris.", blanks: ["Un","L'"], bank: ["Un","L'","Une","La"] },
-      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ voiture rouge est garée devant l'école. ___ voiture appartient à la maîtresse.", blanks: ["Une","La"], bank: ["Une","La","Un","Le"] },
-      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ ballon roule jusqu'au but. ___ ballon est neuf.", blanks: ["Un","Le"], bank: ["Un","Le","Une","La"] },
-      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ araignée tisse sa toile dans le coin. ___ araignée est minuscule.", blanks: ["Une","L'"], bank: ["Une","L'","Un","Le"] },
-      { instruction: "Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.", template: "___ ami m'attend à la sortie. ___ ami s'appelle Karim.", blanks: ["Un","L'"], bank: ["Un","L'","Une","La"] }
-    ]
-  }
 
 });
