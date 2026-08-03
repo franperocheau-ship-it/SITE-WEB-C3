@@ -21,6 +21,8 @@
   <meta property="og:image" content="">
   <!-- SEO: og:description et og:image à compléter avant le lancement (voir SEO-TODO.md) -->
   <link rel="stylesheet" href="styles.css?v=11">
+  <link rel="stylesheet" href="breadcrumb.css?v=1">
+  <script src="js/breadcrumb.js?v=1"></script>
 </head>
 <body>
 
@@ -43,9 +45,7 @@
   <div class="page-wrap">
     <div class="page-content">
 
-      <div class="hub-nav-row">
-        <a href="visiteur.html" class="back-link">← Choisir une matière</a>
-      </div>
+      <script>Breadcrumb.render({ current: 'Mathématiques' });</script>
 
       <div class="page-header">
         <div class="page-header-icon">

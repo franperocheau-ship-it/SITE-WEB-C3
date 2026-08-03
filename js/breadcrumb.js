@@ -2,13 +2,16 @@
    Composant partagé — Fil d'Ariane élève
 
    Barre sticky insérée en tête de <body>, juste sous la navbar fixe :
-     🏠 Mon espace › Matière › Catégorie › Titre de la page
+     🏠 Mon espace › Choisir la matière › Matière › Catégorie › Titre de la page
 
    « Mon espace » renvoie vers l'onglet "Faire des exercices" du dashboard
    élève (dashboard-eleve.html?tab=exercices — voir la lecture du paramètre
    `tab` dans dashboard-eleve.html, prioritaire sur le dernier onglet
-   mémorisé en sessionStorage). Les maillons Matière et Catégorie sont
-   cliquables ; le dernier maillon (page courante) ne l'est jamais.
+   mémorisé en sessionStorage). « Choisir la matière » renvoie vers
+   visiteur.html (sélecteur Français/Mathématiques) et est toujours présent,
+   qu'une matière ait pu être déduite ou non. Les maillons Choisir la
+   matière, Matière et Catégorie sont cliquables ; le dernier maillon (page
+   courante) ne l'est jamais.
 
    Le maillon Matière (Français / Mathématiques) est déterminé automati-
    quement à partir du libellé de la catégorie ou, à défaut, du libellé de
@@ -21,7 +24,8 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 const Breadcrumb = (() => {
-  const HOME_HREF = 'dashboard-eleve.html?tab=exercices';
+  const HOME_HREF     = 'dashboard-eleve.html?tab=exercices';
+  const CHOOSE_SUBJECT = { href: 'visiteur.html', label: 'Choisir la matière' };
 
   const FRANCAIS      = { href: 'français.html',      label: 'Français' };
   const MATHEMATIQUES = { href: 'mathématiques.html',  label: 'Mathématiques' };
@@ -90,6 +94,8 @@ const Breadcrumb = (() => {
     bar.innerHTML = `
       <div class="bc-inner">
         <a href="${HOME_HREF}" class="bc-home">🏠 <span class="bc-home-label">Mon espace</span></a>
+        <span class="bc-sep">›</span>
+        <a class="bc-link" href="${CHOOSE_SUBJECT.href}">${escapeHTML(CHOOSE_SUBJECT.label)}</a>
         <span class="bc-sep" id="bc-sep-subj"${subject ? '' : ' hidden'}>›</span>
         <a class="bc-link" id="bc-link-subject" href="${subject ? subject.href : '#'}"${subject ? '' : ' hidden'}>${subject ? escapeHTML(subject.label) : ''}</a>
         <span class="bc-sep" id="bc-sep-cat"${category ? '' : ' hidden'}>›</span>
