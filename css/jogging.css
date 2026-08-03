@@ -282,6 +282,18 @@
 .jog-validate-btn:hover:not(:disabled) { background: #0d2255; transform: translateY(-1px); }
 .jog-validate-btn:disabled { opacity: 0.5; cursor: default; }
 
+/* Rappel visuel de la grille Code Champion (C-H-A-M-P-I-O-N-S), affiché sous
+   le bouton de validation à chaque version — mêmes propriétés responsives
+   que .jog-explication-frise (redaction.html). */
+.jog-champion-reminder {
+  display: block;
+  width: 100%;
+  max-width: 750px;
+  height: auto;
+  margin: 0 auto;
+  border-radius: var(--radius-card);
+}
+
 /* Transition brève éditeur → correction (§3.11 : Grammalecte est quasi
    instantané, plus besoin d'un écran d'attente à message). */
 .jog-fade-out { animation: jog-fade-out 300ms ease forwards; }
