@@ -54,9 +54,9 @@
     .wrapper {
       position: relative;
       z-index: 1;
-      max-width: 1100px;
+      max-width: 1440px;
       margin: 0 auto;
-      padding: 0 20px;
+      padding: 0 clamp(20px, 4vw, 64px);
     }
 
     /* ─── NAVBAR ─── */
@@ -72,9 +72,9 @@
       align-items: center;
     }
     .navbar__inner {
-      max-width: 1100px;
+      max-width: 1440px;
       margin: 0 auto;
-      padding: 0 20px;
+      padding: 0 clamp(20px, 4vw, 64px);
       width: 100%;
       display: flex;
       align-items: center;
@@ -133,7 +133,7 @@
       padding: 10px 20px;
     }
     .footer__inner {
-      max-width: 1100px;
+      max-width: 1440px;
       margin: 0 auto;
       display: flex;
       align-items: center;
