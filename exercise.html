@@ -30224,11 +30224,14 @@
     /* ══════════════════════════════════════════════════════════════════════
        TYPE : identifier-type-phrase-niveaux
        Lot 6, groupe 1 — fusion de identifier-phrase-declarative/interrogative/
-       imperative/exclamative (QCM progressif sur le TYPE, niveaux 1-3) et de
-       identifier-phrase-negative (oui/non sur la FORME, niveau 4 — axe
-       grammatical distinct, une phrase peut être déclarative ET négative).
+       imperative/exclamative. Niveau 1 : QCM sur le TYPE de phrase
+       (déclarative / interrogative / impérative). Niveau 2 :
+       identifier-phrase-negative (oui/non sur la FORME — axe grammatical
+       distinct, une phrase peut être déclarative ET négative). Niveau 3 :
+       transformation en phrase exclamative (saisie libre, « Comme... ! »).
        Réutilise .ex-sentence-display / .cd-choices-grid / .cd-choice-btn /
-       .cd-vf-row / .cd-vf-btn / .cd-feedback / .cd-validate-btn.
+       .cd-vf-row / .cd-vf-btn / .cd-feedback / .cd-validate-btn /
+       .ex-input-row / .ex-text-input / .ex-validate-btn.
        ══════════════════════════════════════════════════════════════════════ */
 
     let itpLevelSelect = null;
@@ -30240,16 +30243,21 @@
 
     const ITP_SEUIL = 0.8;
     const ITP_LEVEL_DESCS = [
-      'Distinguer déclarative et interrogative',
-      'Ajouter l\'impérative',
-      'Ajouter l\'exclamative — les 4 types de phrase',
-      'Identifier la forme : affirmative ou négative'
+      'Identifier le type : déclarative, interrogative, impérative',
+      'Identifier la forme : affirmative ou négative',
+      'Transformer une phrase à la forme exclamative'
     ];
     const ITP_CHOICES_BY_LEVEL = {
-      1: ['déclarative', 'interrogative'],
-      2: ['déclarative', 'interrogative', 'impérative'],
-      3: ['déclarative', 'interrogative', 'impérative', 'exclamative']
+      1: ['déclarative', 'interrogative', 'impérative']
     };
+
+    function itpNormExcl(str) {
+      return String(str || '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .replace(/\s*!\s*$/, ' !');
+    }
 
     function itpBuildQuestions(level) {
       const bank = sessionData['lvl' + level];
@@ -30274,7 +30282,7 @@
       const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
       itpLevelSelect = LevelSelect.create({
         exerciseKey: slug,
-        levels: [1, 2, 3, 4].map(lv => ({ id: lv, label: 'Niveau ' + lv, description: ITP_LEVEL_DESCS[lv - 1] })),
+        levels: [1, 2, 3].map(lv => ({ id: lv, label: 'Niveau ' + lv, description: ITP_LEVEL_DESCS[lv - 1] })),
         threshold: ITP_SEUIL,
         onSelectLevel: (lv) => itpStartLevel(parseInt(lv, 10)),
         selectContainer: document.getElementById('ex-card'),
@@ -30307,19 +30315,23 @@
     function itpRenderCard(card, q) {
       itpAnswered = false;
 
-      if (itpActiveLevel === 4) {
+      if (itpActiveLevel === 2) {
         card.innerHTML = `
           <div class="cd-progress-score" id="itp-progressScore">Score : ${itpScore}</div>
           <div class="cd-q-type-badge">Forme de la phrase</div>
-          <p class="ex-question-label">Cette phrase est-elle à la forme négative ?</p>
+          <p class="ex-question-label">Quelle est la forme de cette phrase ?</p>
           <div class="ex-sentence-display">${q.sentence}</div>
           <div class="cd-vf-row" id="itp-vfRow">
-            <button type="button" class="cd-vf-btn" onclick="itpValidateForme(true)">Oui</button>
-            <button type="button" class="cd-vf-btn" onclick="itpValidateForme(false)">Non</button>
+            <button type="button" class="cd-vf-btn" id="itp-vf-aff" onclick="itpValidateForme(false)">Forme affirmative</button>
+            <button type="button" class="cd-vf-btn" id="itp-vf-neg" onclick="itpValidateForme(true)">Forme négative</button>
           </div>
           <div class="ex-feedback-area cd-feedback" id="itp-feedback"></div>
           <button class="ex-next-btn ex-hidden" id="next-btn"></button>
         `;
+        itpUpdateProgress();
+      } else if (itpActiveLevel === 3) {
+        itpRenderExclamative(card, q);
+        itpUpdateProgress();
       } else {
         const choices = ITP_CHOICES_BY_LEVEL[itpActiveLevel];
         card.innerHTML = `
@@ -30332,9 +30344,51 @@
           <div class="ex-feedback-area cd-feedback" id="itp-feedback"></div>
           <button class="ex-next-btn ex-hidden" id="next-btn"></button>
         `;
+        itpUpdateProgress();
       }
+    }
 
-      itpUpdateProgress();
+    function itpRenderExclamative(card, q) {
+      card.innerHTML = `
+        <div class="cd-progress-score" id="itp-progressScore">Score : ${itpScore}</div>
+        <p class="ex-question-label">Transforme cette phrase à la forme exclamative en commençant par « Comme ».</p>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="itp-excl-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Comme…">
+          <button class="ex-validate-btn" id="itp-excl-validate">Valider</button>
+        </div>
+        <div class="ex-feedback-area cd-feedback" id="itp-feedback"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const inp = document.getElementById('itp-excl-input');
+      const btn = document.getElementById('itp-excl-validate');
+      setTimeout(() => inp.focus(), 50);
+      btn.addEventListener('click', submit);
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+
+      function submit() {
+        if (itpAnswered) return;
+        const answer = inp.value.trim();
+        if (!answer) return;
+        itpAnswered = true;
+        inp.disabled = true;
+        btn.disabled = true;
+
+        const ok = itpNormExcl(answer) === itpNormExcl(q.reponse);
+        inp.classList.add(ok ? 'is-correct' : 'is-wrong');
+
+        if (ok) {
+          itpScore++;
+          itpUpdateProgress();
+          itpShowFeedback('ok', '✓ Exact ! « ' + q.reponse + ' »');
+        } else {
+          itpShowFeedback('err', '✗ La bonne réponse était : « ' + q.reponse + ' »');
+        }
+        itpShowNextBtn();
+      }
     }
 
     function itpValidateQcm(idx) {
@@ -30367,6 +30421,8 @@
       const ok = answer === q.isNegative;
 
       document.querySelectorAll('#itp-vfRow .cd-vf-btn').forEach(b => b.disabled = true);
+      document.getElementById(q.isNegative ? 'itp-vf-neg' : 'itp-vf-aff').classList.add('cd-ok');
+      if (!ok) document.getElementById(answer ? 'itp-vf-neg' : 'itp-vf-aff').classList.add('cd-err');
 
       if (ok) {
         itpScore++;

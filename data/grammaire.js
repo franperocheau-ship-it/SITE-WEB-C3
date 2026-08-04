@@ -1720,126 +1720,56 @@ Object.assign(window.EXERCISE_DATA, {
     competence: "Grammaire — Identifier le type et la forme de la phrase",
     type:       "identifier-type-phrase-niveaux",
     levels:     ["CM1", "CM2", "6e"],
-    paliers:    4, /* nombre réel de paliers du moteur */
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
     /* Fusion de identifier-phrase-declarative/interrogative/imperative/exclamative
-       (Lot 6, groupe 1). Niveaux 1-3 : QCM sur le TYPE de phrase (mutuellement
-       exclusifs). Niveau 4 : identifier-phrase-negative — la négation est une
-       FORME (orthogonale aux types, ex. une phrase peut être déclarative ET
-       négative), traitée à part en oui/non plutôt que fondue dans le QCM. */
+       (Lot 6, groupe 1). Niveau 1 : QCM sur le TYPE de phrase (déclarative /
+       interrogative / impérative — l'exclamative n'est plus traitée comme un
+       type au même titre que les 3 autres, voir niveau 3). Niveau 2 :
+       identifier-phrase-negative — la négation est une FORME (orthogonale
+       aux types, ex. une phrase peut être déclarative ET négative), traitée
+       à part en oui/non. Niveau 3 : transformer-phrase-exclamative — saisie
+       libre, transformer une phrase déclarative/affirmative en phrase
+       exclamative commençant par « Comme ». */
 
     lvl1: [
       { sentence: "Le chien court.", correctType: "déclarative" },
       { sentence: "Je mange une pomme.", correctType: "déclarative" },
       { sentence: "Emma joue du piano.", correctType: "déclarative" },
       { sentence: "Il pleut depuis ce matin.", correctType: "déclarative" },
-      { sentence: "Le train arrive à la gare.", correctType: "déclarative" },
-      { sentence: "Mon frère lit une bande dessinée.", correctType: "déclarative" },
-      { sentence: "Les oiseaux chantent dans les arbres.", correctType: "déclarative" },
-      { sentence: "La maîtresse distribue les cahiers.", correctType: "déclarative" },
-      { sentence: "Les enfants jouent dans la cour.", correctType: "déclarative" },
-      { sentence: "Papa prépare le dîner.", correctType: "déclarative" },
-      { sentence: "Le jardin est couvert de fleurs.", correctType: "déclarative" },
-      { sentence: "Vous êtes très gentils.", correctType: "déclarative" },
-      { sentence: "Le soleil se couche derrière les montagnes.", correctType: "déclarative" },
-      { sentence: "Après la récréation, les élèves retournent calmement dans leur classe.", correctType: "déclarative" },
-      { sentence: "Dans le jardin, les fleurs poussent rapidement au printemps.", correctType: "déclarative" },
       { sentence: "Où vas-tu ce matin ?", correctType: "interrogative" },
       { sentence: "As-tu fini tes devoirs ?", correctType: "interrogative" },
-      { sentence: "Qu'est-ce que tu aimes lire ?", correctType: "interrogative" },
-      { sentence: "Est-ce que tu viens à la fête ?", correctType: "interrogative" },
       { sentence: "Comment s'appelle ton chat ?", correctType: "interrogative" },
-      { sentence: "Pourquoi es-tu en retard ?", correctType: "interrogative" },
-      { sentence: "Veux-tu jouer avec nous ?", correctType: "interrogative" }
+      { sentence: "Ferme la porte.", correctType: "impérative" },
+      { sentence: "Range tes affaires.", correctType: "impérative" },
+      { sentence: "Lis ce livre avec attention.", correctType: "impérative" }
     ],
 
     lvl2: [
-      { sentence: "Le chien court.", correctType: "déclarative" },
-      { sentence: "Je mange une pomme.", correctType: "déclarative" },
-      { sentence: "Emma joue du piano.", correctType: "déclarative" },
-      { sentence: "Il pleut depuis ce matin.", correctType: "déclarative" },
-      { sentence: "Le train arrive à la gare.", correctType: "déclarative" },
-      { sentence: "Mon frère lit une bande dessinée.", correctType: "déclarative" },
-      { sentence: "Les oiseaux chantent dans les arbres.", correctType: "déclarative" },
-      { sentence: "La maîtresse distribue les cahiers.", correctType: "déclarative" },
-      { sentence: "Les enfants jouent dans la cour.", correctType: "déclarative" },
-      { sentence: "Papa prépare le dîner.", correctType: "déclarative" },
-      { sentence: "Le jardin est couvert de fleurs.", correctType: "déclarative" },
-      { sentence: "Vous êtes très gentils.", correctType: "déclarative" },
-      { sentence: "Le soleil se couche derrière les montagnes.", correctType: "déclarative" },
-      { sentence: "Après la récréation, les élèves retournent calmement dans leur classe.", correctType: "déclarative" },
-      { sentence: "Dans le jardin, les fleurs poussent rapidement au printemps.", correctType: "déclarative" },
-      { sentence: "Où vas-tu ce matin ?", correctType: "interrogative" },
-      { sentence: "As-tu fini tes devoirs ?", correctType: "interrogative" },
-      { sentence: "Qu'est-ce que tu aimes lire ?", correctType: "interrogative" },
-      { sentence: "Est-ce que tu viens à la fête ?", correctType: "interrogative" },
-      { sentence: "Comment s'appelle ton chat ?", correctType: "interrogative" },
-      { sentence: "Pourquoi es-tu en retard ?", correctType: "interrogative" },
-      { sentence: "Veux-tu jouer avec nous ?", correctType: "interrogative" },
-      { sentence: "Ferme la porte.", correctType: "impérative" },
-      { sentence: "Range tes affaires.", correctType: "impérative" },
-      { sentence: "Lis ce livre avec attention.", correctType: "impérative" },
-      { sentence: "Venez écouter l'histoire.", correctType: "impérative" },
-      { sentence: "N'oublie pas ton manteau.", correctType: "impérative" },
-      { sentence: "Levez-vous tous ensemble.", correctType: "impérative" },
-      { sentence: "Écris ton prénom en haut de la page.", correctType: "impérative" }
+      { sentence: "Le chat dort sur le canapé.", isNegative: false },
+      { sentence: "Le jardin est couvert de fleurs.", isNegative: false },
+      { sentence: "As-tu faim ?", isNegative: false },
+      { sentence: "Où vas-tu ce matin ?", isNegative: false },
+      { sentence: "Viens jouer avec moi.", isNegative: false },
+      { sentence: "Je ne mange pas de viande.", isNegative: true },
+      { sentence: "Elle ne lit jamais le soir.", isNegative: true },
+      { sentence: "Pourquoi tu ne viens pas avec nous ?", isNegative: true },
+      { sentence: "N'oublie pas tes affaires.", isNegative: true },
+      { sentence: "Ne crie pas dans les couloirs.", isNegative: true }
     ],
 
     lvl3: [
-      { sentence: "Le chien court.", correctType: "déclarative" },
-      { sentence: "Je mange une pomme.", correctType: "déclarative" },
-      { sentence: "Emma joue du piano.", correctType: "déclarative" },
-      { sentence: "Il pleut depuis ce matin.", correctType: "déclarative" },
-      { sentence: "Le train arrive à la gare.", correctType: "déclarative" },
-      { sentence: "Mon frère lit une bande dessinée.", correctType: "déclarative" },
-      { sentence: "Les oiseaux chantent dans les arbres.", correctType: "déclarative" },
-      { sentence: "La maîtresse distribue les cahiers.", correctType: "déclarative" },
-      { sentence: "Les enfants jouent dans la cour.", correctType: "déclarative" },
-      { sentence: "Papa prépare le dîner.", correctType: "déclarative" },
-      { sentence: "Le jardin est couvert de fleurs.", correctType: "déclarative" },
-      { sentence: "Vous êtes très gentils.", correctType: "déclarative" },
-      { sentence: "Le soleil se couche derrière les montagnes.", correctType: "déclarative" },
-      { sentence: "Après la récréation, les élèves retournent calmement dans leur classe.", correctType: "déclarative" },
-      { sentence: "Dans le jardin, les fleurs poussent rapidement au printemps.", correctType: "déclarative" },
-      { sentence: "Où vas-tu ce matin ?", correctType: "interrogative" },
-      { sentence: "As-tu fini tes devoirs ?", correctType: "interrogative" },
-      { sentence: "Qu'est-ce que tu aimes lire ?", correctType: "interrogative" },
-      { sentence: "Est-ce que tu viens à la fête ?", correctType: "interrogative" },
-      { sentence: "Comment s'appelle ton chat ?", correctType: "interrogative" },
-      { sentence: "Pourquoi es-tu en retard ?", correctType: "interrogative" },
-      { sentence: "Veux-tu jouer avec nous ?", correctType: "interrogative" },
-      { sentence: "Ferme la porte.", correctType: "impérative" },
-      { sentence: "Range tes affaires.", correctType: "impérative" },
-      { sentence: "Lis ce livre avec attention.", correctType: "impérative" },
-      { sentence: "Venez écouter l'histoire.", correctType: "impérative" },
-      { sentence: "N'oublie pas ton manteau.", correctType: "impérative" },
-      { sentence: "Levez-vous tous ensemble.", correctType: "impérative" },
-      { sentence: "Écris ton prénom en haut de la page.", correctType: "impérative" },
-      { sentence: "Quelle belle journée !", correctType: "exclamative" },
-      { sentence: "Comme tu es grand !", correctType: "exclamative" },
-      { sentence: "Quel dommage !", correctType: "exclamative" },
-      { sentence: "Comme c'est magnifique !", correctType: "exclamative" },
-      { sentence: "Que tu es intelligent !", correctType: "exclamative" },
-      { sentence: "Quel beau dessin tu as fait !", correctType: "exclamative" },
-      { sentence: "Comme il fait froid ce matin !", correctType: "exclamative" }
-    ],
-
-    lvl4: [
-      { sentence: "Je ne mange pas de viande.", isNegative: true },
-      { sentence: "Elle ne lit jamais le soir.", isNegative: true },
-      { sentence: "Nous n'allons plus à cette école.", isNegative: true },
-      { sentence: "Il n'a pas encore fini ses devoirs.", isNegative: true },
-      { sentence: "N'oublie pas tes affaires.", isNegative: true },
-      { sentence: "Ne crie pas dans les couloirs.", isNegative: true },
-      { sentence: "Il ne dit rien à personne.", isNegative: true },
-      { sentence: "Le chat dort sur le canapé.", isNegative: false },
-      { sentence: "Mes amis jouent au foot.", isNegative: false },
-      { sentence: "Quelle belle histoire !", isNegative: false },
-      { sentence: "Viens jouer avec moi.", isNegative: false },
-      { sentence: "As-tu faim ?", isNegative: false },
-      { sentence: "Prends ton manteau.", isNegative: false },
-      { sentence: "La rivière coule doucement.", isNegative: false }
+      { sentence: "Il fait beau.", reponse: "Comme il fait beau !" },
+      { sentence: "Elle chante bien.", reponse: "Comme elle chante bien !" },
+      { sentence: "Tu cours vite.", reponse: "Comme tu cours vite !" },
+      { sentence: "Vous êtes gentils.", reponse: "Comme vous êtes gentils !" },
+      { sentence: "Nous sommes heureux.", reponse: "Comme nous sommes heureux !" },
+      { sentence: "Ils travaillent bien.", reponse: "Comme ils travaillent bien !" },
+      { sentence: "Elle est belle.", reponse: "Comme elle est belle !" },
+      { sentence: "Cette maison est grande.", reponse: "Comme cette maison est grande !" },
+      { sentence: "Ce gâteau est délicieux.", reponse: "Comme ce gâteau est délicieux !" },
+      { sentence: "Il pleut fort.", reponse: "Comme il pleut fort !" }
     ]
   },
 
