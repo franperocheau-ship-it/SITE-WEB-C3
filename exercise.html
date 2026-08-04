@@ -31155,14 +31155,18 @@
       function submitStep2() {
         const input = document.getElementById('dpsc-input');
         if (input.disabled || !input.value.trim()) return;
-        const isRight = dpscNorm(input.value) === dpscNorm(q.connector);
+        /* blankAnswer permet de couvrir l'élision (ex. connecteur "parce que"
+           mais texte attendu dans le trou "parce qu'il" devant un sujet
+           vocalique) sans changer le libellé du choix à l'étape 1. */
+        const expected = q.blankAnswer || q.connector;
+        const isRight  = dpscNorm(input.value) === dpscNorm(expected);
         input.disabled = true;
         document.getElementById('dpsc-val2').disabled = true;
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         const blank = document.getElementById('dpsc-blank');
         if (blank) {
-          blank.textContent = q.connector;
+          blank.textContent = expected;
           blank.classList.add('is-filled', isRight ? 'is-correct' : 'is-wrong');
         }
 
@@ -31174,7 +31178,7 @@
             `<div class="ex-feedback-correct" style="opacity:0.8">✓ Bien complété (mais l'étape 1 était incorrecte).</div>`;
         } else {
           document.getElementById('dpsc-fb2').innerHTML =
-            `<div class="ex-feedback-wrong">❌ Le connecteur était <strong>${q.connector}</strong>.</div>`;
+            `<div class="ex-feedback-wrong">❌ Le connecteur était <strong>${expected}</strong>.</div>`;
         }
         document.getElementById('next-btn').classList.remove('ex-hidden');
       }

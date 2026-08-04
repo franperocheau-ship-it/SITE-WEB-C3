@@ -437,9 +437,10 @@ Object.assign(window.EXERCISE_DATA, {
 
     level1Bank: [
       {
-        sentence1: "Le chat dort.", sentence2: "Le chien joue dehors.",
-        choices: ["et", "mais", "donc"], connector: "et",
-        template: "Le chat dort ___ le chien joue dehors."
+        sentence1: "Le chat dort.", sentence2: "Il a passé toute la nuit dehors.",
+        choices: ["parce que", "et", "donc"], connector: "parce que",
+        blankAnswer: "parce qu'il",
+        template: "Le chat dort ___ a passé toute la nuit dehors."
       },
       {
         sentence1: "Léa est triste.", sentence2: "Elle sourit quand même.",
