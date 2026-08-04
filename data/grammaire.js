@@ -1774,41 +1774,63 @@ Object.assign(window.EXERCISE_DATA, {
   },
 
   "transformer-phrase": {
-    title:      "Transformer une phrase (interrogative, négative)",
+    title:      "Transformer une phrase à la forme négative",
     domaine:    "Français",
     competence: "Grammaire — Transformer une phrase",
     type:       "transformer-phrase-niveaux",
     levels:     ["CM1", "CM2", "6e"],
-    paliers:    2, /* nombre réel de paliers du moteur */
+    paliers:    3, /* nombre réel de paliers du moteur */
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
-    /* Fusion de transformer-declarative-interrogative (niveau 1) et
-       transformer-affirmative-negative (niveau 2) — Lot 6, groupe 2. */
+    /* Le volet « interrogative » a été retiré (redondant avec
+       produire-formes-interrogatives). Compétence recentrée sur la seule
+       transformation affirmative → négative, sur 3 niveaux croissants :
+       niveau 1 = négation simple (ne...pas, présent, dont un/une/des → de) ;
+       niveau 2 = temps composés (passé composé, futur proche) et phrases
+       plus longues (deux verbes, subordonnée), mais négation encore
+       limitée à ne...pas ; niveau 3 = négations variées
+       (jamais/plus/rien/personne), avec des indices contextuels dans la
+       phrase de départ (toujours→jamais, encore→plus, quelque chose→rien,
+       quelqu'un→personne) — plus difficile car il faut choisir le bon mot
+       de négation, pas seulement le placer. */
 
     lvl1: [
-      { sentence: "Tu ranges tes affaires.", keyWords: ["ranges", "affaires"], modelEcQ: "Est-ce que tu ranges tes affaires ?", modelInv: "Ranges-tu tes affaires ?" },
-      { sentence: "Il mange une pomme.", keyWords: ["mange", "pomme"], modelEcQ: "Est-ce qu'il mange une pomme ?", modelInv: "Mange-t-il une pomme ?" },
-      { sentence: "Les enfants jouent dans le jardin.", keyWords: ["enfants", "jouent", "jardin"], modelEcQ: "Est-ce que les enfants jouent dans le jardin ?", modelInv: "Les enfants jouent-ils dans le jardin ?" },
-      { sentence: "Elle lit un livre.", keyWords: ["lit", "livre"], modelEcQ: "Est-ce qu'elle lit un livre ?", modelInv: "Lit-elle un livre ?" },
-      { sentence: "Vous aimez la musique.", keyWords: ["aimez", "musique"], modelEcQ: "Est-ce que vous aimez la musique ?", modelInv: "Aimez-vous la musique ?" },
-      { sentence: "Papa prépare le dîner.", keyWords: ["prépare", "dîner"], modelEcQ: "Est-ce que papa prépare le dîner ?", modelInv: "Papa prépare-t-il le dîner ?" },
-      { sentence: "Nous partons en vacances demain.", keyWords: ["partons", "vacances", "demain"], modelEcQ: "Est-ce que nous partons en vacances demain ?", modelInv: "Partons-nous en vacances demain ?" },
-      { sentence: "Le chat dort sur le canapé.", keyWords: ["chat", "dort", "canapé"], modelEcQ: "Est-ce que le chat dort sur le canapé ?", modelInv: "Le chat dort-il sur le canapé ?" },
-      { sentence: "Les élèves écoutent la maîtresse.", keyWords: ["élèves", "écoutent", "maîtresse"], modelEcQ: "Est-ce que les élèves écoutent la maîtresse ?", modelInv: "Les élèves écoutent-ils la maîtresse ?" },
-      { sentence: "Tu viens à la fête samedi.", keyWords: ["viens", "fête", "samedi"], modelEcQ: "Est-ce que tu viens à la fête samedi ?", modelInv: "Viens-tu à la fête samedi ?" }
+      { sentence: "Tom range sa chambre.", keyWords: ["range", "chambre"], modelNeg: "Tom ne range pas sa chambre." },
+      { sentence: "Il mange une pomme.", keyWords: ["mange", "pomme"], modelNeg: "Il ne mange pas de pomme." },
+      { sentence: "Léa boit du chocolat chaud.", keyWords: ["boit", "chocolat", "chaud"], modelNeg: "Léa ne boit pas de chocolat chaud." },
+      { sentence: "Nous achetons des fraises.", keyWords: ["achetons", "fraises"], modelNeg: "Nous n'achetons pas de fraises." },
+      { sentence: "Vous regardez la télévision.", keyWords: ["regardez", "télévision"], modelNeg: "Vous ne regardez pas la télévision." },
+      { sentence: "Le chat attrape une souris.", keyWords: ["chat", "attrape", "souris"], modelNeg: "Le chat n'attrape pas de souris." },
+      { sentence: "Les enfants font du bruit.", keyWords: ["enfants", "font", "bruit"], modelNeg: "Les enfants ne font pas de bruit." },
+      { sentence: "Tu portes des lunettes.", keyWords: ["portes", "lunettes"], modelNeg: "Tu ne portes pas de lunettes." },
+      { sentence: "Papa prépare un gâteau.", keyWords: ["prépare", "gâteau"], modelNeg: "Papa ne prépare pas de gâteau." },
+      { sentence: "Elle aime les épinards.", keyWords: ["aime", "épinards"], modelNeg: "Elle n'aime pas les épinards." }
     ],
 
     lvl2: [
-      { sentence: "Tu ranges tes affaires.", keyWords: ["ranges", "affaires"], modelNeg: "Tu ne ranges pas tes affaires." },
-      { sentence: "Il mange des bonbons.", keyWords: ["mange", "bonbons"], modelNeg: "Il ne mange pas de bonbons." },
-      { sentence: "Les enfants jouent dans le jardin.", keyWords: ["enfants", "jouent", "jardin"], modelNeg: "Les enfants ne jouent pas dans le jardin." },
-      { sentence: "Elle lit tous les soirs.", keyWords: ["lit", "soirs"], modelNeg: "Elle ne lit pas tous les soirs." },
-      { sentence: "Nous aimons la pizza.", keyWords: ["aimons", "pizza"], modelNeg: "Nous n'aimons pas la pizza." },
-      { sentence: "Je comprends la leçon.", keyWords: ["comprends", "leçon"], modelNeg: "Je ne comprends pas la leçon." },
-      { sentence: "Le chat dort sur le canapé.", keyWords: ["chat", "dort", "canapé"], modelNeg: "Le chat ne dort pas sur le canapé." },
-      { sentence: "Vous regardez la télévision.", keyWords: ["regardez", "télévision"], modelNeg: "Vous ne regardez pas la télévision." },
-      { sentence: "Papa prépare le dîner.", keyWords: ["prépare", "dîner"], modelNeg: "Papa ne prépare pas le dîner." },
-      { sentence: "Les élèves écoutent la maîtresse.", keyWords: ["élèves", "écoutent", "maîtresse"], modelNeg: "Les élèves n'écoutent pas la maîtresse." }
+      { sentence: "Il a mangé son repas.", keyWords: ["mangé", "repas"], modelNeg: "Il n'a pas mangé son repas." },
+      { sentence: "Elle a fini ses devoirs.", keyWords: ["fini", "devoirs"], modelNeg: "Elle n'a pas fini ses devoirs." },
+      { sentence: "Nous allons partir en vacances.", keyWords: ["allons", "partir", "vacances"], modelNeg: "Nous n'allons pas partir en vacances." },
+      { sentence: "Tu vas gagner ce match.", keyWords: ["vas", "gagner", "match"], modelNeg: "Tu ne vas pas gagner ce match." },
+      { sentence: "Il a acheté des fleurs.", keyWords: ["acheté", "fleurs"], modelNeg: "Il n'a pas acheté de fleurs." },
+      { sentence: "Elle aime regarder des films.", keyWords: ["aime", "regarder", "films"], modelNeg: "Elle n'aime pas regarder de films." },
+      { sentence: "Je pense qu'il viendra demain.", keyWords: ["pense", "viendra", "demain"], modelNeg: "Je ne pense pas qu'il viendra demain." },
+      { sentence: "Ils ont trouvé quelque chose dans le grenier.", keyWords: ["trouvé", "grenier"], modelNeg: "Ils n'ont rien trouvé dans le grenier." },
+      { sentence: "Elle sait que tu as raison.", keyWords: ["sait", "raison"], modelNeg: "Elle ne sait pas que tu as raison." },
+      { sentence: "Nous allons regarder un film ce soir.", keyWords: ["allons", "regarder", "soir"], modelNeg: "Nous n'allons pas regarder de film ce soir." }
+    ],
+
+    lvl3: [
+      { sentence: "Il arrive toujours en retard.", keyWords: ["arrive", "retard"], modelNeg: "Il n'arrive jamais en retard." },
+      { sentence: "Elle mange encore des bonbons.", keyWords: ["mange", "bonbons"], modelNeg: "Elle ne mange plus de bonbons." },
+      { sentence: "Tu dis toujours la vérité.", keyWords: ["dis", "vérité"], modelNeg: "Tu ne dis jamais la vérité." },
+      { sentence: "Nous voyons quelqu'un dans le jardin.", keyWords: ["voyons", "jardin"], modelNeg: "Nous ne voyons personne dans le jardin." },
+      { sentence: "Il entend quelque chose derrière la porte.", keyWords: ["entend", "porte"], modelNeg: "Il n'entend rien derrière la porte." },
+      { sentence: "Elle joue encore avec sa poupée.", keyWords: ["joue", "poupée"], modelNeg: "Elle ne joue plus avec sa poupée." },
+      { sentence: "Les élèves parlent toujours pendant le cours.", keyWords: ["élèves", "parlent", "cours"], modelNeg: "Les élèves ne parlent jamais pendant le cours." },
+      { sentence: "Il voit quelqu'un au loin.", keyWords: ["voit", "loin"], modelNeg: "Il ne voit personne au loin." },
+      { sentence: "Il achète encore des jouets.", keyWords: ["achète", "jouets"], modelNeg: "Il n'achète plus de jouets." },
+      { sentence: "Elle voit quelque chose dans le ciel.", keyWords: ["voit", "ciel"], modelNeg: "Elle ne voit rien dans le ciel." }
     ]
   },
 

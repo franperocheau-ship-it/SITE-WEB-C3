@@ -6649,43 +6649,6 @@
       showNextBtn();
     }
 
-    /* ── Type: transform-interrogative ──────────────────────────────────────── */
-
-    function normTI(str) {
-      return str
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, ' ')
-        .normalize("NFD")
-        .replace(/[̀-ͯ]/g, '');
-    }
-
-    function validateTI(answer, q) {
-      const raw  = answer.trim();
-      const norm = normTI(raw);
-
-      /* Critère 1 — point d'interrogation */
-      if (!raw.endsWith('?')) {
-        return { valid: false, reason: 'no-question-mark' };
-      }
-
-      /* Critère 2 — mots-clés présents */
-      const wordStr = norm.replace(/[?.,!;:«»'"]/g, '');
-      const missing = q.keyWords.filter(w => !wordStr.includes(normTI(w)));
-      if (missing.length > 0) {
-        return { valid: false, reason: 'missing-words' };
-      }
-
-      /* Détection de la forme */
-      if (norm.includes('est-ce qu')) {
-        return { valid: true, form: 'est-ce-que' };
-      }
-      if (/[a-z]+(-t)?-(tu|il|elle|on|nous|vous|ils|elles)\b/.test(norm)) {
-        return { valid: true, form: 'inversion' };
-      }
-      return { valid: true, form: 'intonation' };
-    }
-
     /* ── Type: transform-negative ───────────────────────────────────────────── */
 
     function normTN(str) {
@@ -30755,13 +30718,11 @@
     }
 
     /* ══════════════════════════════════════════════════════════════════════
-       TYPE : transformer-phrase-niveaux
-       Lot 6, groupe 2 — fusion de transformer-declarative-interrogative
-       (niveau 1) et transformer-affirmative-negative (niveau 2). Réutilise
-       telles quelles les fonctions de validation existantes validateTI /
-       validateTN / normTI / normTN / highlightNegation (type: transform-
-       interrogative / transform-negative) — seule la coquille session/niveaux
-       est nouvelle.
+       TYPE : transformer-phrase-niveaux — « Transformer une phrase à la
+       forme négative » (le volet interrogative a été retiré, redondant avec
+       produire-formes-interrogatives). 3 niveaux, tous rendus via
+       tpRenderNegative, qui réutilise telles quelles les fonctions de
+       validation existantes validateTN / normTN / highlightNegation.
        ══════════════════════════════════════════════════════════════════════ */
 
     let tpLevelSelect = null;
@@ -30772,8 +30733,9 @@
 
     const TP_SEUIL = 0.8;
     const TP_LEVEL_DESCS = [
-      'Transformer une phrase déclarative en phrase interrogative',
-      'Transformer une phrase affirmative en phrase négative'
+      'Négation simple : ne...pas',
+      'Négation avec temps composés et phrases plus longues',
+      'Négations variées : ne...jamais, ne...plus, ne...rien, ne...personne'
     ];
 
     function tpBuildQuestions(level) {
@@ -30798,7 +30760,7 @@
       const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
       tpLevelSelect = LevelSelect.create({
         exerciseKey: slug,
-        levels: [1, 2].map(lv => ({ id: lv, label: 'Niveau ' + lv, description: TP_LEVEL_DESCS[lv - 1] })),
+        levels: [1, 2, 3].map(lv => ({ id: lv, label: 'Niveau ' + lv, description: TP_LEVEL_DESCS[lv - 1] })),
         threshold: TP_SEUIL,
         onSelectLevel: (lv) => tpStartLevel(parseInt(lv, 10)),
         selectContainer: document.getElementById('ex-card'),
@@ -30829,105 +30791,8 @@
     }
 
     function tpRenderCard(card, q) {
-      if (tpActiveLevel === 1) tpRenderInterrogative(card, q);
-      else                     tpRenderNegative(card, q);
+      tpRenderNegative(card, q);
       tpUpdateProgress();
-    }
-
-    function tpRenderInterrogative(card, q) {
-      let scored       = false;
-      let bonusTryMode = false;
-
-      card.innerHTML = `
-        <div class="cd-progress-score" id="tp-progressScore">Score : ${tpScore}</div>
-        <p class="ex-question-label">Transforme cette phrase déclarative en phrase interrogative.</p>
-        <div class="ex-sentence-display">${q.sentence}</div>
-        <div class="ex-input-row">
-          <input type="text" class="ex-text-input" id="tp-ti-input"
-                 autocomplete="off" autocorrect="off" autocapitalize="off"
-                 spellcheck="false" placeholder="Écris ta phrase interrogative…">
-          <button class="ex-validate-btn" id="tp-ti-validate">Valider</button>
-        </div>
-        <div class="ex-feedback-area" id="tp-feedback"></div>
-        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
-      `;
-
-      const inp = document.getElementById("tp-ti-input");
-      const btn = document.getElementById("tp-ti-validate");
-      setTimeout(() => inp.focus(), 50);
-      btn.addEventListener("click", submit);
-      inp.addEventListener("keydown", e => { if (e.key === "Enter") submit(); });
-
-      function enableRetry() {
-        inp.disabled = false;
-        inp.classList.remove("is-correct", "is-wrong");
-        inp.value    = "";
-        btn.disabled = false;
-        document.getElementById("tp-feedback").innerHTML = "";
-        inp.focus();
-      }
-
-      function submit() {
-        const answer = inp.value.trim();
-        if (!answer) return;
-
-        inp.disabled = true;
-        btn.disabled = true;
-
-        const result = validateTI(answer, q);
-
-        if (result.valid) {
-          if (!scored) { scored = true; tpScore++; tpUpdateProgress(); }
-          inp.classList.add("is-correct");
-
-          if (result.form === 'intonation' && !bonusTryMode) {
-            const skipLabel = tpSessionIdx === tpSession.length - 1
-              ? "Voir mes résultats" : "Phrase suivante";
-            tpSetFeedback(`
-              <div class="ex-feedback-correct" style="margin-bottom:12px">
-                ✅ C'est juste ! À l'oral, on pose souvent la question comme ça.<br>
-                Essaie maintenant de l'écrire avec « est-ce que » ou en inversant le sujet et le verbe :<br>
-                <em style="display:inline-block;margin-top:6px">« ${q.modelEcQ} »</em><br>
-                <em>« ${q.modelInv} »</em>
-              </div>
-              <div style="display:flex;gap:12px;flex-wrap:wrap">
-                <button class="ex-validate-btn" id="tp-ti-retry-btn">Réessayer</button>
-                <button class="ex-next-btn" id="tp-ti-skip-btn" style="margin:0">${skipLabel}</button>
-              </div>
-            `);
-            document.getElementById("tp-ti-retry-btn").addEventListener("click", () => {
-              bonusTryMode = true;
-              enableRetry();
-            });
-            document.getElementById("tp-ti-skip-btn").addEventListener("click", tpNextQuestion);
-
-          } else {
-            const formMsg = result.form === 'est-ce-que'
-              ? '✨ Bonne forme avec « est-ce que » !'
-              : result.form === 'inversion'
-              ? '🌟 Bonne forme avec l\'inversion sujet-verbe !'
-              : rand(SUCCESS);
-            tpSetFeedback(`<div class="ex-feedback-correct">${formMsg}</div>`);
-            tpShowNextBtn();
-          }
-
-        } else {
-          inp.classList.add("is-wrong");
-          const errMsg = result.reason === 'no-question-mark'
-            ? "Une phrase interrogative se termine par un point d'interrogation ( ? )."
-            : "Pense à conserver les mots importants de la phrase de départ.";
-
-          tpSetFeedback(`
-            <div class="ex-feedback-wrong">
-              ❌ ${errMsg}<br><br>
-              <strong>Réponses modèles :</strong><br>
-              <em>« ${q.modelEcQ} »</em><br>
-              <em>« ${q.modelInv} »</em>
-            </div>
-          `);
-          tpShowNextBtn();
-        }
-      }
     }
 
     function tpRenderNegative(card, q) {
@@ -31063,7 +30928,7 @@
       let msg, btnsHTML;
 
       if (passed && isLast) {
-        msg = `🎊 Bravo ! Tu sais transformer une phrase en interrogative et en négative !`;
+        msg = `🎊 Bravo ! Tu sais transformer une phrase à la forme négative !`;
         btnsHTML = `
           <div class="ex-results-btns">
             <button class="ex-btn-secondary" id="tp-restart-btn">Recommencer</button>
