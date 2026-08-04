@@ -416,15 +416,89 @@ Object.assign(window.EXERCISE_DATA, {
   },
 
   "distinguer-phrase-simple-complexe": {
-    title: "Distinguer phrase simple et phrase complexe",
+    title:      "Distinguer phrase simple et phrase complexe",
     domaine:    "Français",
     competence: "Grammaire — Phrase simple et complexe",
-    levels: ["CM2", "6e"],
-    paliers: 1, /* nombre réel de paliers du moteur */
-    type: "classification-etapes",
-    questionsPerSession: 8,
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-    bank: [
+    type:       "distinguer-phrase-simple-complexe-niveaux",
+    levels:     ["CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+
+    /* Refonte en 3 niveaux (même schéma que identifier-type-phrase /
+       transformer-phrase). Niveau 1 : construire une phrase complexe en
+       choisissant le bon connecteur (guidé, 2 étapes : choix-étiquette puis
+       complétion en texte à trous). Niveau 2 : raisonnement en 2 étapes
+       (repérer le(s) verbe(s) conjugué(s) puis classer) — reprend le
+       contenu de l'ancienne banque unique (classification-etapes) sur un
+       sous-ensemble d'items. Niveau 3 : jugement direct simple/complexe
+       sans repérage préalable, banque plus large avec cas pièges (sujets
+       multiples + un seul verbe = toujours simple, complément long dans
+       une phrase simple, coordination courte dans une phrase complexe). */
+
+    level1Bank: [
+      {
+        sentence1: "Le chat dort.", sentence2: "Le chien joue dehors.",
+        choices: ["et", "mais", "donc"], connector: "et",
+        template: "Le chat dort ___ le chien joue dehors."
+      },
+      {
+        sentence1: "Léa est triste.", sentence2: "Elle sourit quand même.",
+        choices: ["mais", "et", "car"], connector: "mais",
+        template: "Léa est triste ___ elle sourit quand même."
+      },
+      {
+        sentence1: "Il pleut.", sentence2: "Nous restons à la maison.",
+        choices: ["donc", "mais", "qui"], connector: "donc",
+        template: "Il pleut ___ nous restons à la maison."
+      },
+      {
+        sentence1: "Tom est content.", sentence2: "Il a gagné le match.",
+        choices: ["car", "donc", "quand"], connector: "car",
+        template: "Tom est content ___ il a gagné le match."
+      },
+      {
+        sentence1: "Le chien aboie.", sentence2: "Le facteur arrive.",
+        choices: ["quand", "parce que", "qui"], connector: "quand",
+        template: "Le chien aboie ___ le facteur arrive."
+      },
+      {
+        sentence1: "Les enfants applaudissent.", sentence2: "Le clown entre en scène.",
+        choices: ["quand", "mais", "donc"], connector: "quand",
+        template: "Les enfants applaudissent ___ le clown entre en scène."
+      },
+      {
+        sentence1: "Zoé pleure.", sentence2: "Son ballon s'est envolé.",
+        choices: ["parce que", "et", "lorsque"], connector: "parce que",
+        template: "Zoé pleure ___ son ballon s'est envolé."
+      },
+      {
+        sentence1: "Nous restons chez nous.", sentence2: "Le temps est mauvais.",
+        choices: ["parce que", "quand", "si"], connector: "parce que",
+        template: "Nous restons chez nous ___ le temps est mauvais."
+      },
+      {
+        sentence1: "J'ai un chat.", sentence2: "Il miaule beaucoup.",
+        choices: ["qui", "et", "mais"], connector: "qui",
+        template: "J'ai un chat ___ miaule beaucoup."
+      },
+      {
+        sentence1: "Les oiseaux rentrent au nid.", sentence2: "Le soleil se couche.",
+        choices: ["lorsque", "donc", "car"], connector: "lorsque",
+        template: "Les oiseaux rentrent au nid ___ le soleil se couche."
+      },
+      {
+        sentence1: "Tu ranges ta chambre.", sentence2: "Tu pourras jouer dehors.",
+        choices: ["si", "quand", "donc"], connector: "si",
+        template: "Tu pourras jouer dehors ___ tu ranges ta chambre."
+      },
+      {
+        sentence1: "Le vent souffle fort.", sentence2: "Les feuilles tombent des arbres.",
+        choices: ["et", "car", "si"], connector: "et",
+        template: "Le vent souffle fort ___ les feuilles tombent des arbres."
+      }
+    ],
+
+    level2Bank: [
       {
         instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
         sentence: "Le chat dort sur le canapé.",
@@ -433,15 +507,6 @@ Object.assign(window.EXERCISE_DATA, {
         step2Instruction: "Cette phrase est-elle simple ou complexe ?",
         classifyChoices: ["simple", "complexe"],
         step2Answer: "simple"
-      },
-      {
-        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
-        sentence: "Les enfants rient et courent dans la cour.",
-        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
-        step1Targets: ["rient", "courent"],
-        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
-        classifyChoices: ["simple", "complexe"],
-        step2Answer: "complexe"
       },
       {
         instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (aller = infinitif !)",
@@ -462,31 +527,13 @@ Object.assign(window.EXERCISE_DATA, {
         step2Answer: "complexe"
       },
       {
-        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (Même si la phrase semble courte !)",
         sentence: "Le footballeur tire le ballon et marque un but.",
         step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
         step1Targets: ["tire", "marque"],
         step2Instruction: "Cette phrase est-elle simple ou complexe ?",
         classifyChoices: ["simple", "complexe"],
         step2Answer: "complexe"
-      },
-      {
-        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (travailler = infinitif !)",
-        sentence: "La maîtresse demande aux élèves de travailler en silence.",
-        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s). Attention à l'infinitif !",
-        step1Targets: ["demande"],
-        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
-        classifyChoices: ["simple", "complexe"],
-        step2Answer: "simple"
-      },
-      {
-        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
-        sentence: "Le soleil brille dans le ciel bleu.",
-        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
-        step1Targets: ["brille"],
-        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
-        classifyChoices: ["simple", "complexe"],
-        step2Answer: "simple"
       },
       {
         instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
@@ -508,24 +555,6 @@ Object.assign(window.EXERCISE_DATA, {
       },
       {
         instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
-        sentence: "Les oiseaux chantent et les fleurs poussent au printemps.",
-        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
-        step1Targets: ["chantent", "poussent"],
-        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
-        classifyChoices: ["simple", "complexe"],
-        step2Answer: "complexe"
-      },
-      {
-        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (jouer = infinitif !)",
-        sentence: "Mon chat adore jouer avec la pelote de laine.",
-        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s). Attention à l'infinitif !",
-        step1Targets: ["adore"],
-        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
-        classifyChoices: ["simple", "complexe"],
-        step2Answer: "simple"
-      },
-      {
-        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
         sentence: "Il pleut depuis ce matin.",
         step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
         step1Targets: ["pleut"],
@@ -534,25 +563,7 @@ Object.assign(window.EXERCISE_DATA, {
         step2Answer: "simple"
       },
       {
-        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
-        sentence: "Les élèves écoutent quand le professeur parle.",
-        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
-        step1Targets: ["écoutent", "parle"],
-        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
-        classifyChoices: ["simple", "complexe"],
-        step2Answer: "complexe"
-      },
-      {
-        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (décoller = infinitif !)",
-        sentence: "La fusée va décoller dans dix secondes.",
-        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s). Attention à l'infinitif !",
-        step1Targets: ["va"],
-        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
-        classifyChoices: ["simple", "complexe"],
-        step2Answer: "simple"
-      },
-      {
-        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (Même si la phrase semble courte !)",
         sentence: "Le lapin saute mais le renard l'attrape.",
         step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
         step1Targets: ["saute", "l'attrape"],
@@ -568,6 +579,69 @@ Object.assign(window.EXERCISE_DATA, {
         step2Instruction: "Cette phrase est-elle simple ou complexe ?",
         classifyChoices: ["simple", "complexe"],
         step2Answer: "complexe"
+      }
+    ],
+
+    level3Bank: [
+      {
+        sentence: "Les enfants rient et courent dans la cour.",
+        answer: "complexe",
+        hint: "Deux verbes conjugués : « rient » et « courent »."
+      },
+      {
+        sentence: "La maîtresse demande aux élèves de travailler en silence.",
+        answer: "simple",
+        hint: "« travailler » est un infinitif, pas un verbe conjugué : un seul verbe conjugué, « demande »."
+      },
+      {
+        sentence: "Le soleil brille dans le ciel bleu.",
+        answer: "simple",
+        hint: "Un seul verbe conjugué : « brille »."
+      },
+      {
+        sentence: "Les oiseaux chantent et les fleurs poussent au printemps.",
+        answer: "complexe",
+        hint: "Deux verbes conjugués : « chantent » et « poussent »."
+      },
+      {
+        sentence: "Mon chat adore jouer avec la pelote de laine.",
+        answer: "simple",
+        hint: "« jouer » est un infinitif : un seul verbe conjugué, « adore »."
+      },
+      {
+        sentence: "Les élèves écoutent quand le professeur parle.",
+        answer: "complexe",
+        hint: "Deux verbes conjugués : « écoutent » et « parle »."
+      },
+      {
+        sentence: "La fusée va décoller dans dix secondes.",
+        answer: "simple",
+        hint: "« décoller » est un infinitif : un seul verbe conjugué, « va »."
+      },
+      {
+        sentence: "Paul et Marie regardent un film.",
+        answer: "simple",
+        hint: "Deux sujets, mais un seul verbe conjugué (« regardent ») : la phrase reste simple."
+      },
+      {
+        sentence: "Le chat, le chien et le lapin dorment ensemble dans le panier.",
+        answer: "simple",
+        hint: "Trois sujets, mais un seul verbe conjugué (« dorment ») : la phrase reste simple."
+      },
+      {
+        sentence: "Après une longue journée de classe bien remplie, les élèves rentrent chez eux.",
+        answer: "simple",
+        hint: "Le complément est long, mais un seul verbe conjugué (« rentrent ») : la phrase reste simple."
+      },
+      {
+        sentence: "Il tombe, il se relève aussitôt.",
+        answer: "complexe",
+        hint: "Deux verbes conjugués : « tombe » et « se relève »."
+      },
+      {
+        sentence: "Viens si tu peux.",
+        answer: "complexe",
+        hint: "Deux verbes conjugués : « viens » et « peux »."
       }
     ]
   },

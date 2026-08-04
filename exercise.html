@@ -5744,6 +5744,9 @@
       } else if (currentType === "transformer-phrase-niveaux") {
         tpInitSession();
         return;
+      } else if (currentType === "distinguer-phrase-simple-complexe-niveaux") {
+        dpscInitSession();
+        return;
       } else if (currentType === "articles-def-indef-niveaux") {
         idiInitSession();
         return;
@@ -6034,6 +6037,8 @@
         /* session managed by itpInitSession — no-op here */
       } else if (currentType === "transformer-phrase-niveaux") {
         /* session managed by tpInitSession — no-op here */
+      } else if (currentType === "distinguer-phrase-simple-complexe-niveaux") {
+        /* session managed by dpscInitSession — no-op here */
       } else if (currentType === "articles-def-indef-niveaux") {
         /* session managed by idiInitSession — no-op here */
       } else if (currentType === "fraction-decimale-grille-droite-niveaux") {
@@ -30984,6 +30989,421 @@
         exerciseSlug: slug, subject, category,
         exerciseType: 'transformer-phrase-niveaux',
         level:        'Niveau ' + level,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : distinguer-phrase-simple-complexe-niveaux — « Distinguer
+       phrase simple et phrase complexe »
+       Niveau 1 : construire une phrase complexe (guidé) — étape 1 choix du
+                  connecteur (choix-étiquette), étape 2 complétion de la
+                  phrase avec ce connecteur (texte à trous).
+       Niveau 2 : raisonnement en 2 étapes (étai) — repérer le(s) verbe(s)
+                  conjugué(s) (mots-cliquables) puis classer simple/complexe.
+       Niveau 3 : jugement direct simple/complexe, sans repérage préalable.
+       3 niveaux déverrouillables à 80 %.
+    ══════════════════════════════════════════════════════════════════════════ */
+
+    const DPSC_SEUIL = 0.8;
+    const DPSC_LEVEL_DESCS = [
+      "Construire une phrase complexe avec un connecteur",
+      "Repérer le(s) verbe(s) conjugué(s), puis classer la phrase",
+      "Juger seul : phrase simple ou complexe ?"
+    ];
+
+    let dpscState      = null;
+    let dpscLevelSelect = null;
+
+    function dpscNorm(str) {
+      return str.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[’‘`´]/g, "'");
+    }
+
+    function dpscBackToSelectScreen() {
+      dpscState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    function dpscInitSession() {
+      dpscState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      dpscLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: [1, 2, 3].map(lv => ({ id: lv, label: 'Niveau ' + lv, description: DPSC_LEVEL_DESCS[lv - 1] })),
+        threshold: DPSC_SEUIL,
+        onSelectLevel: (lv) => dpscStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: dpscBackToSelectScreen
+      });
+      dpscLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function dpscStartLevel(lv) {
+      const bankKey = 'level' + lv + 'Bank';
+      const items   = shuffle([...(sessionData[bankKey] || [])]);
+      dpscState = { lv, items, idx: 0, score: 0, total: items.length };
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = items.length;
+      if (dpscLevelSelect) dpscLevelSelect.renderBadges(lv);
+      dpscRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function dpscRenderQuestion(card) {
+      const { lv, items, idx, total } = dpscState;
+      const q = items[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if      (lv === 1) dpscRenderLevel1(card, q);
+      else if (lv === 2) dpscRenderLevel2(card, q);
+      else               dpscRenderLevel3(card, q);
+    }
+
+    function dpscAdvance() {
+      dpscState.idx++;
+      if (dpscState.idx >= dpscState.items.length) {
+        dpscShowLevelResults();
+      } else {
+        dpscRenderQuestion(document.getElementById('ex-card'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    /* ── Niveau 1 — choix du connecteur (choix-étiquette) puis complétion
+       de la phrase avec ce connecteur (texte à trous) ────────────────────── */
+    function dpscRenderLevel1(card, q) {
+      const { idx, total } = dpscState;
+      let step1Correct = false;
+
+      card.innerHTML = `
+        <p class="ex-question-label">Relie ces deux phrases pour construire une phrase complexe.</p>
+
+        <div id="dpsc-step1" class="ex-classify-step">
+          <div class="ex-classify-step-title">Étape 1 — Choisis le bon connecteur</div>
+          <div class="ex-sentence-display">${q.sentence1}<br>${q.sentence2}</div>
+          <div class="ex-choices-grid" id="dpsc-choices1"></div>
+          <div class="ex-feedback-area" id="dpsc-fb1"></div>
+        </div>
+
+        <div id="dpsc-step2" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title">Étape 2 — Complète la phrase avec ce connecteur</div>
+          <div class="ex-sentence-display" id="dpsc-template"></div>
+          <div class="ex-input-row">
+            <input type="text" class="ex-text-input" id="dpsc-input"
+                   autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                   placeholder="Écris le connecteur…">
+            <button class="ex-validate-btn" id="dpsc-val2">Valider</button>
+          </div>
+          <div class="ex-feedback-area" id="dpsc-fb2"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      const choices1El = document.getElementById('dpsc-choices1');
+      shuffle([...q.choices]).forEach(c => {
+        const btn = document.createElement('button');
+        btn.className   = 'ex-choice';
+        btn.textContent = c;
+        btn.addEventListener('click', () => {
+          choices1El.querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === q.connector) b.classList.add('is-correct');
+          });
+          const isRight = c === q.connector;
+          if (!isRight) btn.classList.add('is-wrong');
+          step1Correct = isRight;
+          document.getElementById('dpsc-fb1').innerHTML = isRight
+            ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+            : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Le bon connecteur était <strong>${q.connector}</strong>.</div>`;
+
+          document.getElementById('dpsc-template').innerHTML =
+            q.template.replace('___', '<span class="ex-blank" id="dpsc-blank"></span>');
+
+          setTimeout(() => {
+            const s2 = document.getElementById('dpsc-step2');
+            s2.classList.remove('ex-hidden');
+            s2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            setTimeout(() => document.getElementById('dpsc-input')?.focus(), 80);
+          }, 500);
+        });
+        choices1El.appendChild(btn);
+      });
+
+      document.getElementById('dpsc-val2').addEventListener('click', submitStep2);
+      document.getElementById('dpsc-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitStep2(); });
+      document.getElementById('next-btn').addEventListener('click', dpscAdvance);
+
+      function submitStep2() {
+        const input = document.getElementById('dpsc-input');
+        if (input.disabled || !input.value.trim()) return;
+        const isRight = dpscNorm(input.value) === dpscNorm(q.connector);
+        input.disabled = true;
+        document.getElementById('dpsc-val2').disabled = true;
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        const blank = document.getElementById('dpsc-blank');
+        if (blank) {
+          blank.textContent = q.connector;
+          blank.classList.add('is-filled', isRight ? 'is-correct' : 'is-wrong');
+        }
+
+        if (isRight && step1Correct) {
+          dpscState.score++;
+          document.getElementById('dpsc-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+        } else if (isRight) {
+          document.getElementById('dpsc-fb2').innerHTML =
+            `<div class="ex-feedback-correct" style="opacity:0.8">✓ Bien complété (mais l'étape 1 était incorrecte).</div>`;
+        } else {
+          document.getElementById('dpsc-fb2').innerHTML =
+            `<div class="ex-feedback-wrong">❌ Le connecteur était <strong>${q.connector}</strong>.</div>`;
+        }
+        document.getElementById('next-btn').classList.remove('ex-hidden');
+      }
+    }
+
+    /* ── Niveau 2 — mots-cliquables (verbe(s) conjugué(s)) puis
+       classification simple/complexe ─────────────────────────────────────── */
+    function dpscRenderLevel2(card, q) {
+      const { idx, total } = dpscState;
+      let step1Correct = false;
+
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction || 'Identifie, puis classe.'}</p>
+        <div class="ex-sentence-display">${q.sentence}</div>
+
+        <div id="dpsc-step1" class="ex-classify-step">
+          <div class="ex-classify-step-title">Étape 1 — ${q.step1Instruction}</div>
+          <div class="ex-sentence-words" id="dpsc-words"></div>
+          <div class="ex-feedback-area" id="dpsc-fb1"></div>
+          <button class="ex-choice" id="dpsc-val1" style="margin-top:10px;width:100%">Valider l'étape 1</button>
+        </div>
+
+        <div id="dpsc-step2" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title">Étape 2 — ${q.step2Instruction}</div>
+          <div class="ex-choices-grid" id="dpsc-choices2"></div>
+          <div class="ex-feedback-area" id="dpsc-fb2"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      const selected1 = new Set();
+      const wordsEl   = document.getElementById('dpsc-words');
+      q.sentence.split(/\s+/).forEach(token => {
+        const clean = token.replace(/[.,!?;:«»“”‘’]/g, '');
+        if (!clean) return;
+        const btn = document.createElement('button');
+        btn.className    = 'ex-word-btn';
+        btn.textContent  = token;
+        btn.dataset.clean = clean;
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          if (selected1.has(btn)) { selected1.delete(btn); btn.classList.remove('is-selected'); }
+          else                    { selected1.add(btn);    btn.classList.add('is-selected'); }
+        });
+        wordsEl.appendChild(btn);
+      });
+
+      document.getElementById('dpsc-val1').addEventListener('click', () => {
+        const targets = new Set(q.step1Targets.map(t => t.replace(/[.,!?;:]/g, '')));
+        let correct   = true;
+
+        wordsEl.querySelectorAll('.ex-word-btn').forEach(btn => {
+          const clean       = btn.dataset.clean;
+          const isTarget    = targets.has(clean);
+          const wasSelected = selected1.has(btn);
+          btn.disabled = true;
+          btn.classList.remove('is-selected');
+          if      (isTarget && wasSelected)  btn.classList.add('is-correct');
+          else if (isTarget && !wasSelected) { btn.classList.add('is-missed'); correct = false; }
+          else if (!isTarget && wasSelected) { btn.classList.add('is-wrong');  correct = false; }
+        });
+
+        document.getElementById('dpsc-val1').disabled = true;
+        step1Correct = correct;
+        document.getElementById('dpsc-fb1').innerHTML = correct
+          ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+          : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Les bonnes réponses sont en vert.</div>`;
+
+        setTimeout(() => {
+          const s2 = document.getElementById('dpsc-step2');
+          s2.classList.remove('ex-hidden');
+          s2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 500);
+      });
+
+      const choices2El = document.getElementById('dpsc-choices2');
+      shuffle([...q.classifyChoices]).forEach(c => {
+        const btn = document.createElement('button');
+        btn.className   = 'ex-choice';
+        btn.textContent = c;
+        btn.addEventListener('click', () => {
+          choices2El.querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === q.step2Answer) b.classList.add('is-correct');
+          });
+          const isRight = c === q.step2Answer;
+          if (!isRight) btn.classList.add('is-wrong');
+
+          if (isRight && step1Correct) {
+            dpscState.score++;
+            document.getElementById('dpsc-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+          } else if (isRight) {
+            document.getElementById('dpsc-fb2').innerHTML =
+              `<div class="ex-feedback-correct" style="opacity:0.8">✓ Bonne réponse à l'étape 2 (mais l'étape 1 était incomplète).</div>`;
+          } else {
+            document.getElementById('dpsc-fb2').innerHTML =
+              `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${q.step2Answer}</strong>.</div>`;
+          }
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+        choices2El.appendChild(btn);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', dpscAdvance);
+    }
+
+    /* ── Niveau 3 — jugement direct, sans repérage préalable ──────────────── */
+    function dpscRenderLevel3(card, q) {
+      const { idx, total } = dpscState;
+
+      card.innerHTML = `
+        <p class="ex-question-label">Cette phrase est-elle simple ou complexe ?</p>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-choices-grid" id="dpsc-choices3"></div>
+        <div class="ex-feedback-area" id="dpsc-fb3"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      const choicesEl = document.getElementById('dpsc-choices3');
+      shuffle(['simple', 'complexe']).forEach(c => {
+        const btn = document.createElement('button');
+        btn.className   = 'ex-choice';
+        btn.textContent = c;
+        btn.addEventListener('click', () => {
+          choicesEl.querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === q.answer) b.classList.add('is-correct');
+          });
+          const isRight = c === q.answer;
+          if (!isRight) btn.classList.add('is-wrong');
+
+          if (isRight) {
+            dpscState.score++;
+            document.getElementById('dpsc-fb3').innerHTML =
+              `<div class="ex-feedback-correct">${rand(SUCCESS)}${q.hint ? `<br>${q.hint}` : ''}</div>`;
+          } else {
+            document.getElementById('dpsc-fb3').innerHTML =
+              `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${q.answer}</strong>.${q.hint ? `<br>${q.hint}` : ''}</div>`;
+          }
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+        choicesEl.appendChild(btn);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', dpscAdvance);
+    }
+
+    /* ── Résultats d'un niveau ─────────────────────────────────────────────── */
+    function dpscShowLevelResults() {
+      const { lv, score: lvScore, total } = dpscState;
+      const { passed, isLast } = dpscLevelSelect.completeLevel(lv, lvScore, total);
+      const s20 = Math.round(lvScore / total * 20);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(lvScore / total * 100) + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-grammaire.html';
+      const backLabel = sessionData.backLink?.label || 'Grammaire';
+      const backToSelectBtn = dpscLevelSelect.backToSelectButtonHTML();
+      let msg, btnsHTML;
+
+      if (passed && isLast) {
+        msg = `🎊 Bravo ! Tu sais distinguer phrase simple et phrase complexe !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-secondary" id="dpsc-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>
+          </div>`;
+      } else if (passed) {
+        msg = `Niveau ${lv} validé ! 🏆 Le Niveau ${lv + 1} est débloqué !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="dpsc-next-btn">Niveau ${lv + 1} →</button>
+            <button class="ex-btn-secondary" id="dpsc-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * DPSC_SEUIL);
+        msg = `Il faut ${needed} bonnes réponses sur ${total}. Tu peux le faire !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="dpsc-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← ${backLabel}</a>
+          </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('dpsc-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        dpscStartLevel(lv);
+      });
+      document.getElementById('dpsc-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        dpscStartLevel(lv + 1);
+      });
+      document.getElementById('dpsc-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        dpscLevelSelect.reset();
+        dpscInitSession();
+      });
+      dpscLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'distinguer-phrase-simple-complexe-niveaux',
+        level:        'Niveau ' + lv,
         score:        s20,
         total:        20,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
