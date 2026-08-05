@@ -1205,6 +1205,86 @@
       color: #e67e22;
     }
 
+    /* ── Type : reperer-propositions-niveaux (jusqu'à 4 propositions) ─────── */
+    .ex-word-btn.rp-prop3 {
+      border-color: #ca8a04;
+      background: rgba(202,138,4,0.12);
+      color: #ca8a04;
+    }
+    .ex-word-btn.rp-prop4 {
+      border-color: #7c3aed;
+      background: rgba(124,58,237,0.12);
+      color: #7c3aed;
+    }
+
+    /* ── Primitive "curseur de séparation" (reperer-propositions-niveaux
+       Niveau 2) — nouvelle primitive générique, réutilisable pour toute
+       future compétence de segmentation de phrase : mots statiques séparés
+       par de fins boutons-gaps cliquables représentant les frontières
+       possibles entre 2 mots consécutifs. ────────────────────────────────── */
+    .ex-sentence-gaps {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 17px;
+      line-height: 1.8;
+    }
+    .ex-word-static {
+      padding: 6px 3px;
+      color: var(--text);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .ex-gap-btn {
+      width: 14px;
+      height: 34px;
+      flex-shrink: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      position: relative;
+      padding: 0;
+    }
+    .ex-gap-btn::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 2px;
+      height: 18px;
+      border-radius: 2px;
+      background: var(--border);
+      opacity: 0.6;
+    }
+    .ex-gap-btn:hover:not(:disabled)::before { background: var(--blue); opacity: 1; }
+    .ex-gap-btn.is-selected::before {
+      background: var(--blue); opacity: 1; width: 3px; height: 26px;
+    }
+    .ex-gap-btn.is-correct::before {
+      background: #16a34a; opacity: 1; width: 3px; height: 26px;
+    }
+    .ex-gap-btn.is-wrong::before {
+      background: var(--red); opacity: 1; width: 3px; height: 26px;
+    }
+    .ex-gap-btn.is-missed::before {
+      background: transparent; opacity: 1; width: 0; height: 26px;
+      border: 2px dashed #16a34a; border-radius: 2px;
+    }
+    .ex-gap-btn:disabled { cursor: default; }
+
+    /* Ponctuation détachée (virgule/point-virgule/point final rendus comme
+       token à part, cf. rpBuildTokens) affichée dans une rangée .ex-word-btn
+       en flex "gap" : sans ce correctif, le gap flex créerait un espace
+       visible AVANT le signe de ponctuation ("mot ,"). Le margin négatif
+       annule exactement ce gap pour recoller le signe au mot précédent. */
+    .ex-sentence-words .ex-punct-token { margin-left: -10px; }
+
     /* ── Type : distinguer-coordination-subordination-niveaux ────────────── */
     .ex-word-btn.dcs-connector {
       border-color: #7c3aed;
@@ -5801,6 +5881,9 @@
       } else if (currentType === "distinguer-coordination-subordination-niveaux") {
         dcsInitSession();
         return;
+      } else if (currentType === "reperer-propositions-niveaux") {
+        rpInitSession();
+        return;
       } else if (currentType === "articles-def-indef-niveaux") {
         idiInitSession();
         return;
@@ -6099,6 +6182,8 @@
         /* session managed by isInitSession — no-op here */
       } else if (currentType === "distinguer-coordination-subordination-niveaux") {
         /* session managed by dcsInitSession — no-op here */
+      } else if (currentType === "reperer-propositions-niveaux") {
+        /* session managed by rpInitSession — no-op here */
       } else if (currentType === "articles-def-indef-niveaux") {
         /* session managed by idiInitSession — no-op here */
       } else if (currentType === "fraction-decimale-grille-droite-niveaux") {
@@ -32734,6 +32819,680 @@
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
         exerciseType: 'distinguer-coordination-subordination-niveaux',
+        level:        'Niveau ' + lv,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : reperer-propositions-niveaux — « Repérer les propositions dans
+       une phrase complexe »
+       Synthèse qui réinvestit identifier-juxtaposition-niveaux /
+       identifier-subordination-niveaux / distinguer-coordination-
+       subordination-niveaux, avec une progression de MODALITÉ (pas
+       seulement de contenu) entre les 3 niveaux :
+       Niveau 1 : primitive mots-cliquables standard (classes .ex-word-btn,
+                  .ij-prop1/.ij-prop2 réutilisées + 2 nouvelles couleurs
+                  .rp-prop3/.rp-prop4 pour aller jusqu'à 4 propositions),
+                  généralisée à un nombre variable de propositions (au lieu
+                  de 2 fixes) : sélection libre (non phase-gated) des verbes
+                  conjugués + bouton "Valider", sur le modèle de l'étape 1
+                  de distinguer-phrase-simple-complexe-niveaux Niveau 2.
+                  2 ou 3 propositions (majorité à 3), indication du nombre
+                  trouvé (boutons 1/2/3). Pas de catégorisation du lien.
+                  Verbes composés (passé composé, plus-que-parfait...) : le
+                  verbe correspond alors à plusieurs tokens ({ aux,
+                  participle } dans q.verbs — cf. rpBuildTokens/verbIndices),
+                  TOUS requis pour valider la proposition, ni plus ni moins.
+       Niveau 2 : NOUVELLE primitive "curseur de séparation" (aucun indice
+                  verbe ne ressort) — voir rpRenderLevel2 ci-dessous pour la
+                  documentation complète, réutilisable pour toute future
+                  compétence de segmentation de phrase.
+       Niveau 3 : retour à la primitive mots-cliquables (comme Niveau 1),
+                  3-4 propositions, sans indication du nombre attendu,
+                  puis catégorisation de chaque lien (juxtaposition /
+                  coordination / subordination), un lien à la fois.
+       3 niveaux déverrouillables à 80 % via LevelSelect.
+       ══════════════════════════════════════════════════════════════════════ */
+
+    const RP_SEUIL = 0.8;
+    const RP_LEVEL_DESCS = [
+      "Repérer les propositions par leurs verbes et compter",
+      "Segmenter la phrase avec un curseur, puis identifier le connecteur",
+      "Repérer 3 ou 4 propositions et catégoriser chaque lien"
+    ];
+    const RP_PROP_CLASS     = { 1: 'ij-prop1', 2: 'ij-prop2', 3: 'rp-prop3', 4: 'rp-prop4' };
+    const RP_COUNT_OPTIONS  = { 1: [1, 2, 3], 3: [2, 3, 4, 5] };
+    const RP_LINK_LABELS    = ['juxtaposition', 'coordination', 'subordination'];
+
+    let rpState      = null;
+    let rpLevelSelect = null;
+
+    /* Construit la liste de tokens d'un item (chaque proposition q.parts[i]
+       découpée en mots, prop = i+1 ; chaque token porte son index `idx`
+       dans le flux), les frontières entre propositions consécutives, et
+       (si q.verbs est fourni) les index des tokens du verbe de chaque
+       proposition.
+       - Un connecteur (q.connectors[i]) est TOUJOURS un ou plusieurs tokens
+         détachés (prop: 'link') — y compris la ponctuation seule ("," ou
+         ";") : jamais collée au mot qui précède. C'est ce qui permet de la
+         cibler seule comme mot de jonction au Niveau 2. Seul le point final
+         de la phrase reste un simple token sans traitement particulier.
+       - boundaries[i] = { gapIndexes, targetTokenIndices }.
+         gapIndexes : index du/des token(s) qui PRÉCÈDE(NT) une position de
+         frontière valide (elle se place entre tokens[gapIndex] et
+         tokens[gapIndex+1]). Pour un connecteur-mot, une seule position est
+         valide (juste avant le connecteur). Pour une ponctuation seule
+         (",", ";"), DEUX positions sont acceptées : juste avant ET juste
+         après le signe — l'élève peut légitimement considérer que la
+         virgule "ferme" la 1ʳᵉ proposition ou "ouvre" la 2ᵉ.
+         targetTokenIndices : index du/des token(s) qui constituent le mot
+         de jonction à cette frontière (connecteur, ou virgule/point-virgule
+         détachée).
+       - verbIndices[propNumber] = tableau des index de tous les tokens du
+         verbe de cette proposition (1 seul index pour un verbe simple, 2
+         pour un verbe composé { aux, participle }).
+       q.connectors[i] est toujours en position médiane (jamais en tête de
+       phrase) : aucune proposition antéposée à gérer ici. */
+    function rpBuildTokens(q) {
+      const tokens = [];
+      const boundaries = [];
+      const verbIndices = {};
+      function push(text, prop) { tokens.push({ text, prop, idx: tokens.length }); }
+
+      q.parts.forEach((part, i) => {
+        const propKey = i + 1;
+        let verbWords = null;
+        if (q.verbs) {
+          const v = q.verbs[i];
+          verbWords = new Set((typeof v === 'string' ? [v] : [v.aux, v.participle]).map(w => w.toLowerCase()));
+        }
+        const indices = [];
+        part.split(/\s+/).forEach(w => {
+          const idx = tokens.length;
+          push(w, propKey);
+          if (verbWords && verbWords.has(w.replace(IJ_CLEAN_RE, '').toLowerCase())) indices.push(idx);
+        });
+        if (verbWords) verbIndices[propKey] = indices;
+
+        if (i < q.parts.length - 1) {
+          const conn      = q.connectors[i];
+          const startIdx  = tokens.length;
+          const isPunct   = (conn === ',' || conn === ';');
+          conn.split(/\s+/).forEach(w => push(w, 'link'));
+          const endIdx    = tokens.length - 1;
+          const targetTokenIndices = [];
+          for (let k = startIdx; k <= endIdx; k++) targetTokenIndices.push(k);
+          const gapIndexes = isPunct ? [startIdx - 1, endIdx] : [startIdx - 1];
+          boundaries.push({ gapIndexes, targetTokenIndices });
+        }
+      });
+      push('.', q.parts.length);
+      return { tokens, boundaries, verbIndices };
+    }
+
+    /* Rend les mots cliquables d'un item dans `wordsEl`, avec sélection
+       libre (toggle is-selected) mémorisée dans le Set `selected`. Un token
+       de ponctuation seule (virgule/point-virgule détachée, point final)
+       n'a pas de contenu "propre" une fois nettoyé de sa ponctuation : il
+       est rendu en texte statique (non cliquable, jamais une cible verbe)
+       plutôt que d'être silencieusement omis, pour ne pas faire disparaître
+       la ponctuation de la phrase affichée. */
+    function rpRenderWords(wordsEl, q, selected) {
+      rpBuildTokens(q).tokens.forEach(tok => {
+        const clean = tok.text.replace(IJ_CLEAN_RE, '');
+        if (!clean) {
+          const span = document.createElement('span');
+          span.className   = 'ex-word-static ex-punct-token';
+          span.textContent = tok.text;
+          wordsEl.appendChild(span);
+          return;
+        }
+        const btn = document.createElement('button');
+        btn.className     = 'ex-word-btn';
+        btn.textContent   = tok.text;
+        btn.dataset.clean = clean;
+        btn.dataset.prop  = tok.prop;
+        btn.dataset.idx   = tok.idx;
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          if (selected.has(btn)) { selected.delete(btn); btn.classList.remove('is-selected'); }
+          else                   { selected.add(btn);    btn.classList.add('is-selected'); }
+        });
+        wordsEl.appendChild(btn);
+      });
+    }
+
+    /* Valide la sélection de verbes conjugués : colore chaque verbe trouvé
+       selon sa proposition (RP_PROP_CLASS), marque les verbes manqués
+       (is-missed) et les clics incorrects (is-wrong). Renvoie true si la
+       sélection est parfaite.
+       Ciblage par index de token (verbIndices, cf. rpBuildTokens) plutôt
+       que par texte : pour un verbe composé { aux, participle }, les DEUX
+       tokens sont individuellement requis — ni plus ni moins — l'un seul
+       (auxiliaire ou participe) ne suffit pas. */
+    function rpValidateWords(wordsEl, q, selected) {
+      const { verbIndices } = rpBuildTokens(q);
+      const targetIdx = new Set();
+      Object.values(verbIndices).forEach(arr => arr.forEach(i => targetIdx.add(i)));
+
+      let correct = true;
+      wordsEl.querySelectorAll('.ex-word-btn').forEach(btn => {
+        const i            = parseInt(btn.dataset.idx, 10);
+        const isTarget      = targetIdx.has(i);
+        const wasSelected   = selected.has(btn);
+        btn.disabled = true;
+        btn.classList.remove('is-selected');
+        if (isTarget && wasSelected) {
+          btn.classList.add(RP_PROP_CLASS[btn.dataset.prop] || 'ij-prop1');
+        } else if (isTarget && !wasSelected) {
+          btn.classList.add('is-missed');
+          correct = false;
+        } else if (!isTarget && wasSelected) {
+          btn.classList.add('is-wrong');
+          correct = false;
+        }
+      });
+      return correct;
+    }
+
+    function rpBackToSelectScreen() {
+      rpState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    function rpInitSession() {
+      rpState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      rpLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: [1, 2, 3].map(lv => ({ id: lv, label: 'Niveau ' + lv, description: RP_LEVEL_DESCS[lv - 1] })),
+        threshold: RP_SEUIL,
+        onSelectLevel: (lv) => rpStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: rpBackToSelectScreen
+      });
+      rpLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function rpStartLevel(lv) {
+      const bankKey = 'level' + lv + 'Bank';
+      const items   = shuffle([...(sessionData[bankKey] || [])]);
+      rpState = { lv, items, idx: 0, score: 0, total: items.length };
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = items.length;
+      if (rpLevelSelect) rpLevelSelect.renderBadges(lv);
+      rpRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function rpRenderQuestion(card) {
+      const { lv, items, idx, total } = rpState;
+      const q = items[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if      (lv === 1) rpRenderLevel1(card, q);
+      else if (lv === 2) rpRenderLevel2(card, q);
+      else               rpRenderLevel3(card, q);
+    }
+
+    function rpAdvance() {
+      rpState.idx++;
+      if (rpState.idx >= rpState.items.length) {
+        rpShowLevelResults();
+      } else {
+        rpRenderQuestion(document.getElementById('ex-card'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    /* ── Niveau 1 — clique sur tous les verbes conjugués (sélection libre +
+       Valider), puis indique le nombre de propositions trouvées. ────────── */
+    function rpRenderLevel1(card, q) {
+      const { idx, total } = rpState;
+      const N = q.parts.length;
+      let step1Correct = false;
+
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction}</p>
+        <div class="ex-sentence-words" id="rp-words"></div>
+        <button class="ex-choice" id="rp-val1" style="margin-top:10px;width:100%">Valider les verbes</button>
+        <div class="ex-feedback-area" id="rp-fb1"></div>
+
+        <div id="rp-step2" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title">Combien de propositions as-tu trouvées ?</div>
+          <div class="ex-choices-grid" id="rp-choices2"></div>
+          <div class="ex-feedback-area" id="rp-fb2"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      const wordsEl  = document.getElementById('rp-words');
+      const selected = new Set();
+      rpRenderWords(wordsEl, q, selected);
+
+      document.getElementById('rp-val1').addEventListener('click', () => {
+        step1Correct = rpValidateWords(wordsEl, q, selected);
+        document.getElementById('rp-val1').disabled = true;
+        document.getElementById('rp-fb1').innerHTML = step1Correct
+          ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+          : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Les verbes conjugués sont surlignés en couleur ; les clics incorrects sont en rouge.</div>`;
+
+        const choices2El = document.getElementById('rp-choices2');
+        RP_COUNT_OPTIONS[1].forEach(n => {
+          const cbtn = document.createElement('button');
+          cbtn.className   = 'ex-choice';
+          cbtn.textContent = String(n);
+          cbtn.addEventListener('click', () => {
+            choices2El.querySelectorAll('.ex-choice').forEach(b => {
+              b.disabled = true;
+              if (parseInt(b.textContent, 10) === N) b.classList.add('is-correct');
+            });
+            const isRight = n === N;
+            if (!isRight) cbtn.classList.add('is-wrong');
+
+            if (isRight && step1Correct) {
+              rpState.score++;
+              document.getElementById('rp-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+            } else if (isRight) {
+              document.getElementById('rp-fb2').innerHTML =
+                `<div class="ex-feedback-correct" style="opacity:0.8">✓ Bon compte (mais le repérage des verbes n'était pas parfait).</div>`;
+            } else {
+              document.getElementById('rp-fb2').innerHTML =
+                `<div class="ex-feedback-wrong">❌ Cette phrase contient <strong>${N}</strong> proposition${N > 1 ? 's' : ''}.</div>`;
+            }
+            document.getElementById('next-btn').classList.remove('ex-hidden');
+          });
+          choices2El.appendChild(cbtn);
+        });
+
+        setTimeout(() => {
+          const s2 = document.getElementById('rp-step2');
+          s2.classList.remove('ex-hidden');
+          s2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 500);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', rpAdvance);
+    }
+
+    /* ── Niveau 2 — NOUVELLE PRIMITIVE « curseur de séparation » ──────────
+       Aucune primitive de ce type n'existait ailleurs sur le site (recherche
+       effectuée sur word-order, glisser-deposer, droite-graduée) : elle est
+       documentée ici pour réemploi par de futures compétences de
+       segmentation de phrase.
+       Étape 1 : la phrase s'affiche en mots STATIQUES (.ex-word-static,
+       aucun mot mis en évidence, aucun indice verbe) séparés par de fins
+       boutons-gaps cliquables (.ex-gap-btn, un par frontière possible entre
+       2 mots consécutifs — jamais avant le 1ᵉʳ mot ni après le dernier).
+       L'élève toggle un ou plusieurs gaps pour marquer où il pense que se
+       trouve la frontière entre propositions, puis Valide : comparaison à
+       l'ensemble des `boundaries[].gapIndexes` (voir rpBuildTokens) — pour
+       une ponctuation seule (",", ";"), les positions juste avant ET juste
+       après le signe sont TOUTES DEUX acceptées comme frontière correcte.
+       Coloration correct / incorrect / manqué sur chaque gap.
+       Étape 2 : les mots redeviennent cliquables (primitive .ex-word-btn
+       standard, ciblage par `idx` de token plutôt que par texte pour éviter
+       toute ambiguïté en cas de mot répété) ; l'élève clique sur le ou les
+       mots qui font la jonction à chaque frontière (`targetTokenIndices`) —
+       sans catégoriser leur type. Sert de vérification indirecte : si la
+       coupure de l'étape 1 était mal placée, le(s) bon(s) mot(s) de
+       jonction se trouve(nt) ailleurs dans la phrase, ce qui aide l'élève à
+       se corriger visuellement.
+       Score de l'item : correct seulement si les 2 étapes sont parfaites
+       (même convention "tout ou rien" que le reste du site). Pas de bouton
+       de comptage numéroté à ce niveau — le nombre de propositions se
+       déduit du nombre de frontières posées. ─────────────────────────── */
+    function rpRenderLevel2(card, q) {
+      const { idx, total } = rpState;
+      const { tokens, boundaries } = rpBuildTokens(q);
+      let step1Correct = false;
+
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction}</p>
+        <div class="ex-sentence-gaps" id="rp2-gaps"></div>
+        <button class="ex-choice" id="rp2-val1" style="margin-top:10px;width:100%">Valider les frontières</button>
+        <div class="ex-feedback-area" id="rp2-fb1"></div>
+
+        <div id="rp2-step2" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title">Clique sur le ou les mots qui font la jonction entre les propositions.</div>
+          <div class="ex-sentence-words" id="rp2-words"></div>
+          <button class="ex-choice" id="rp2-val2" style="margin-top:10px;width:100%">Valider les connecteurs</button>
+          <div class="ex-feedback-area" id="rp2-fb2"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      const gapsEl       = document.getElementById('rp2-gaps');
+      const selectedGaps = new Set();
+
+      tokens.forEach((tok, i) => {
+        const span = document.createElement('span');
+        span.className   = 'ex-word-static';
+        span.textContent = tok.text;
+        gapsEl.appendChild(span);
+
+        if (i < tokens.length - 1) {
+          const gapBtn = document.createElement('button');
+          gapBtn.type            = 'button';
+          gapBtn.className       = 'ex-gap-btn';
+          gapBtn.dataset.gapIndex = i;
+          gapBtn.setAttribute('aria-label', 'Placer un curseur ici');
+          gapBtn.addEventListener('click', () => {
+            if (gapBtn.disabled) return;
+            if (selectedGaps.has(i)) { selectedGaps.delete(i); gapBtn.classList.remove('is-selected'); }
+            else                     { selectedGaps.add(i);    gapBtn.classList.add('is-selected'); }
+          });
+          gapsEl.appendChild(gapBtn);
+        }
+      });
+
+      document.getElementById('rp2-val1').addEventListener('click', () => {
+        /* Une frontière est satisfaite dès qu'AU MOINS UNE de ses
+           gapIndexes est sélectionnée (2 positions acceptées pour une
+           ponctuation seule : avant ET après le signe). Un gap valide non
+           sélectionné n'est marqué "manqué" que si sa frontière n'a été
+           satisfaite par aucune de ses positions alternatives. */
+        const gapToBoundaries = {};
+        boundaries.forEach((b, bi) => {
+          b.gapIndexes.forEach(g => {
+            (gapToBoundaries[g] = gapToBoundaries[g] || []).push(bi);
+          });
+        });
+        const satisfied = boundaries.map(b => b.gapIndexes.some(g => selectedGaps.has(g)));
+
+        let correct = true;
+        gapsEl.querySelectorAll('.ex-gap-btn').forEach(btn => {
+          const g            = parseInt(btn.dataset.gapIndex, 10);
+          const boundaryIdxs = gapToBoundaries[g] || [];
+          const isTarget     = boundaryIdxs.length > 0;
+          const wasSelected  = selectedGaps.has(g);
+          btn.disabled = true;
+          btn.classList.remove('is-selected');
+          if (isTarget && wasSelected) {
+            btn.classList.add('is-correct');
+          } else if (isTarget && !wasSelected) {
+            if (boundaryIdxs.some(bi => !satisfied[bi])) btn.classList.add('is-missed');
+          } else if (!isTarget && wasSelected) {
+            btn.classList.add('is-wrong');
+            correct = false;
+          }
+        });
+        if (satisfied.some(s => !s)) correct = false;
+        document.getElementById('rp2-val1').disabled = true;
+        step1Correct = correct;
+        document.getElementById('rp2-fb1').innerHTML = correct
+          ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+          : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Les bonnes frontières sont en vert.</div>`;
+
+        const wordsEl2      = document.getElementById('rp2-words');
+        const selectedWords = new Set();
+        tokens.forEach(tok => {
+          const clean = tok.text.replace(IJ_CLEAN_RE, '');
+          const btn2 = document.createElement('button');
+          btn2.className   = 'ex-word-btn' + (clean ? '' : ' ex-punct-token');
+          btn2.textContent = tok.text;
+          btn2.dataset.idx = tok.idx;
+          btn2.addEventListener('click', () => {
+            if (btn2.disabled) return;
+            if (selectedWords.has(btn2)) { selectedWords.delete(btn2); btn2.classList.remove('is-selected'); }
+            else                         { selectedWords.add(btn2);    btn2.classList.add('is-selected'); }
+          });
+          wordsEl2.appendChild(btn2);
+        });
+
+        document.getElementById('rp2-val2').addEventListener('click', () => {
+          const targetIdx = new Set();
+          boundaries.forEach(b => b.targetTokenIndices.forEach(ti => targetIdx.add(ti)));
+          let correct2 = true;
+          wordsEl2.querySelectorAll('.ex-word-btn').forEach(btn2 => {
+            const i2          = parseInt(btn2.dataset.idx, 10);
+            const isTarget     = targetIdx.has(i2);
+            const wasSelected  = selectedWords.has(btn2);
+            btn2.disabled = true;
+            btn2.classList.remove('is-selected');
+            if      (isTarget && wasSelected)  btn2.classList.add('dcs-connector');
+            else if (isTarget && !wasSelected) { btn2.classList.add('is-missed'); correct2 = false; }
+            else if (!isTarget && wasSelected) { btn2.classList.add('is-wrong');  correct2 = false; }
+          });
+          document.getElementById('rp2-val2').disabled = true;
+          const step2Correct = correct2;
+          document.getElementById('rp2-fb2').innerHTML = step2Correct
+            ? `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`
+            : `<div class="ex-feedback-wrong">❌ Le(s) mot(s) de jonction sont surlignés en violet.</div>`;
+
+          if (step1Correct && step2Correct) rpState.score++;
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+
+        setTimeout(() => {
+          const s2 = document.getElementById('rp2-step2');
+          s2.classList.remove('ex-hidden');
+          s2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 500);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', rpAdvance);
+    }
+
+    /* ── Niveau 3 — clique sur tous les verbes (sans indication du nombre),
+       indique le nombre de propositions, puis catégorise chaque lien entre
+       propositions consécutives, un lien à la fois ─────────────────────── */
+    function rpRenderLevel3(card, q) {
+      const { idx, total } = rpState;
+      const N = q.parts.length;
+      let step1Correct = false;
+      let step2Correct = false;
+      let linksCorrect = true;
+      let linkIdx      = 0;
+
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction}</p>
+        <div class="ex-sentence-words" id="rp3-words"></div>
+        <button class="ex-choice" id="rp3-val1" style="margin-top:10px;width:100%">Valider les verbes</button>
+        <div class="ex-feedback-area" id="rp3-fb1"></div>
+
+        <div id="rp3-step2" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title">Combien de propositions as-tu trouvées ?</div>
+          <div class="ex-choices-grid" id="rp3-choices2"></div>
+          <div class="ex-feedback-area" id="rp3-fb2"></div>
+        </div>
+
+        <div id="rp3-step3" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title" id="rp3-step3-title"></div>
+          <div class="ex-choices-grid" id="rp3-choices3"></div>
+          <div class="ex-feedback-area" id="rp3-fb3"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      const wordsEl  = document.getElementById('rp3-words');
+      const selected = new Set();
+      rpRenderWords(wordsEl, q, selected);
+
+      function renderLinkStep() {
+        const totalLinks = q.linkTypes.length;
+        document.getElementById('rp3-step3-title').textContent =
+          `Lien ${linkIdx + 1} sur ${totalLinks} — quel est le type de lien entre la proposition ${linkIdx + 1} et la proposition ${linkIdx + 2} ?`;
+
+        const choices3El = document.getElementById('rp3-choices3');
+        choices3El.innerHTML = '';
+        document.getElementById('rp3-fb3').innerHTML = '';
+
+        RP_LINK_LABELS.forEach(label => {
+          const btn = document.createElement('button');
+          btn.className   = 'ex-choice';
+          btn.textContent = label;
+          btn.addEventListener('click', () => {
+            const correctLabel = q.linkTypes[linkIdx];
+            choices3El.querySelectorAll('.ex-choice').forEach(b => {
+              b.disabled = true;
+              if (b.textContent === correctLabel) b.classList.add('is-correct');
+            });
+            const isRight = label === correctLabel;
+            if (!isRight) { btn.classList.add('is-wrong'); linksCorrect = false; }
+
+            document.getElementById('rp3-fb3').innerHTML = isRight
+              ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+              : `<div class="ex-feedback-wrong" style="font-size:13px">❌ La bonne réponse est : <strong>${correctLabel}</strong>.</div>`;
+
+            linkIdx++;
+            if (linkIdx < totalLinks) {
+              setTimeout(renderLinkStep, 700);
+            } else {
+              if (step1Correct && step2Correct && linksCorrect) rpState.score++;
+              document.getElementById('next-btn').classList.remove('ex-hidden');
+            }
+          });
+          choices3El.appendChild(btn);
+        });
+      }
+
+      document.getElementById('rp3-val1').addEventListener('click', () => {
+        step1Correct = rpValidateWords(wordsEl, q, selected);
+        document.getElementById('rp3-val1').disabled = true;
+        document.getElementById('rp3-fb1').innerHTML = step1Correct
+          ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+          : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Les verbes conjugués sont surlignés en couleur ; les clics incorrects sont en rouge.</div>`;
+
+        const choices2El = document.getElementById('rp3-choices2');
+        RP_COUNT_OPTIONS[3].forEach(n => {
+          const cbtn = document.createElement('button');
+          cbtn.className   = 'ex-choice';
+          cbtn.textContent = String(n);
+          cbtn.addEventListener('click', () => {
+            choices2El.querySelectorAll('.ex-choice').forEach(b => {
+              b.disabled = true;
+              if (parseInt(b.textContent, 10) === N) b.classList.add('is-correct');
+            });
+            step2Correct = n === N;
+            if (!step2Correct) cbtn.classList.add('is-wrong');
+
+            document.getElementById('rp3-fb2').innerHTML = step2Correct
+              ? `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`
+              : `<div class="ex-feedback-wrong">❌ Cette phrase contient <strong>${N}</strong> propositions.</div>`;
+
+            setTimeout(() => {
+              const s3 = document.getElementById('rp3-step3');
+              s3.classList.remove('ex-hidden');
+              s3.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              renderLinkStep();
+            }, 500);
+          });
+          choices2El.appendChild(cbtn);
+        });
+
+        setTimeout(() => {
+          const s2 = document.getElementById('rp3-step2');
+          s2.classList.remove('ex-hidden');
+          s2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 500);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', rpAdvance);
+    }
+
+    /* ── Résultats d'un niveau ─────────────────────────────────────────────── */
+    function rpShowLevelResults() {
+      const { lv, score: lvScore, total } = rpState;
+      const { passed, isLast } = rpLevelSelect.completeLevel(lv, lvScore, total);
+      const s20 = Math.round(lvScore / total * 20);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(lvScore / total * 100) + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-grammaire.html';
+      const backLabel = sessionData.backLink?.label || 'Grammaire';
+      const backToSelectBtn = rpLevelSelect.backToSelectButtonHTML();
+      let msg, btnsHTML;
+
+      if (passed && isLast) {
+        msg = `🎊 Bravo ! Tu sais repérer les propositions d'une phrase complexe !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-secondary" id="rp-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>
+          </div>`;
+      } else if (passed) {
+        msg = `Niveau ${lv} validé ! 🏆 Le Niveau ${lv + 1} est débloqué !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="rp-next-btn">Niveau ${lv + 1} →</button>
+            <button class="ex-btn-secondary" id="rp-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * RP_SEUIL);
+        msg = `Il faut ${needed} bonnes réponses sur ${total}. Tu peux le faire !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="rp-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← ${backLabel}</a>
+          </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('rp-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        rpStartLevel(lv);
+      });
+      document.getElementById('rp-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        rpStartLevel(lv + 1);
+      });
+      document.getElementById('rp-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        rpLevelSelect.reset();
+        rpInitSession();
+      });
+      rpLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'reperer-propositions-niveaux',
         level:        'Niveau ' + lv,
         score:        s20,
         total:        20,

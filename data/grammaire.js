@@ -647,6 +647,227 @@ Object.assign(window.EXERCISE_DATA, {
     ]
   },
 
+  "reperer-propositions": {
+    title:      "Repérer les propositions dans une phrase complexe",
+    domaine:    "Français",
+    competence: "Grammaire — La phrase complexe",
+    type:       "reperer-propositions-niveaux",
+    levels:     ["6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+
+    /* Synthèse qui réinvestit identifier-juxtaposition / identifier-
+       subordination / distinguer-coordination-subordination : mêmes 3
+       types de lien, mais ici l'élève délimite TOUTES les propositions
+       d'une phrase (2 à 4) au lieu d'un lien binaire entre 2 propositions
+       fixes. Chaque item est représenté par un tableau `parts` (une entrée
+       par proposition), `verbs` (le verbe conjugué cible de chaque
+       proposition, dans le même ordre), `connectors` (N-1 mots ou signes
+       de ponctuation entre les propositions) et `linkTypes` (le type de
+       chaque lien N-1, utilisé pour la catégorisation au Niveau 3
+       uniquement — aucun verbe à la forme réfléchie parmi les cibles,
+       pour éviter toute ambiguïté d'élision lors du clic).
+       Un élément de `verbs` peut aussi être { aux, participle } pour un
+       verbe composé (passé composé, plus-que-parfait...) : le moteur exige
+       alors le clic sur les DEUX tokens (auxiliaire ET participe), ni plus
+       ni moins, pour valider la proposition (cf. rpBuildTokens/verbIndices
+       et rpValidateWords dans exercise.html).
+       Niveau 1 : 2 ou 3 propositions (majorité à 3), liens variés incluant
+       parfois 2 types différents dans une même phrase (à 3 propositions).
+       Clique sur le(s) mot(s) du verbe de chaque proposition, indique le
+       nombre de propositions (1/2/3), pas de catégorisation.
+       Niveau 2 : primitive curseur (voir rpRenderLevel2), 2 ou 3
+       propositions, liens mixtes dans une même phrase.
+       Niveau 3 : 3 ou 4 propositions, sans indication du nombre attendu.
+       Comptage (2/3/4/5) puis catégorisation de chaque lien, un lien à la
+       fois (juxtaposition / coordination / subordination). ─────────── */
+    level1Bank: [
+      {
+        instruction: "Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.",
+        parts: ["Le chat dort", "le chien joue"], verbs: ["dort", "joue"],
+        connectors: [","], linkTypes: ["juxtaposition"]
+      },
+      {
+        instruction: "Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.",
+        parts: ["Les enfants dormaient déjà", "leurs parents étaient rentrés"],
+        verbs: ["dormaient", { aux: "étaient", participle: "rentrés" }],
+        connectors: ["quand"], linkTypes: ["subordination"]
+      },
+      {
+        instruction: "Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.",
+        parts: ["Le vent souffle", "les feuilles tombent", "les enfants rentrent vite"],
+        verbs: ["souffle", "tombent", "rentrent"],
+        connectors: [",", "donc"], linkTypes: ["juxtaposition", "coordination"]
+      },
+      {
+        instruction: "Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.",
+        parts: ["Le magasin ferme", "les clients partent", "la nuit tombe"],
+        verbs: ["ferme", "partent", "tombe"],
+        connectors: ["donc", "quand"], linkTypes: ["coordination", "subordination"]
+      },
+      {
+        instruction: "Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.",
+        parts: ["Le vent forcit", "les bateaux rentrent", "les pêcheurs sont contents"],
+        verbs: ["forcit", "rentrent", "sont"],
+        connectors: ["quand", ";"], linkTypes: ["subordination", "juxtaposition"]
+      },
+      {
+        instruction: "Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.",
+        parts: ["Le ciel devient bleu", "le vent tombe", "les oiseaux chantent"],
+        verbs: ["devient", "tombe", "chantent"],
+        connectors: [",", ";"], linkTypes: ["juxtaposition", "juxtaposition"]
+      },
+      {
+        instruction: "Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.",
+        parts: ["Tom a fermé la porte", "il éteint la lumière", "il va dormir"],
+        verbs: [{ aux: "a", participle: "fermé" }, "éteint", "va"],
+        connectors: [",", "puis"], linkTypes: ["juxtaposition", "coordination"]
+      },
+      {
+        instruction: "Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.",
+        parts: ["Le réveil sonne", "Léa sort du lit", "elle prépare son sac"],
+        verbs: ["sonne", "sort", "prépare"],
+        connectors: ["donc", ";"], linkTypes: ["coordination", "juxtaposition"]
+      },
+      {
+        instruction: "Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.",
+        parts: ["Le film commence", "la salle devient sombre", "le générique apparaît"],
+        verbs: ["commence", "devient", "apparaît"],
+        connectors: [",", "quand"], linkTypes: ["juxtaposition", "subordination"]
+      },
+      {
+        instruction: "Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.",
+        parts: ["Les invités sont arrivés", "le repas commence", "la musique démarre"],
+        verbs: [{ aux: "sont", participle: "arrivés" }, "commence", "démarre"],
+        connectors: ["quand", "donc"], linkTypes: ["subordination", "coordination"]
+      }
+    ],
+
+    /* Niveau 2 : nouvelle primitive "curseur de séparation" (voir
+       rpRenderLevel2 dans exercise.html) — pas de champ `verbs` ici, la
+       segmentation se fait au sens global de la phrase, pas via les verbes
+       conjugués. `connectors` est toujours en position médiane (jamais de
+       proposition antéposée) : boundaries calculées automatiquement à
+       partir de `parts`/`connectors`, aucun champ dédié nécessaire.
+       `linkTypes` reste renseigné à titre documentaire (non utilisé pour
+       la notation à ce niveau — pas de catégorisation avant le Niveau 3). */
+    level2Bank: [
+      {
+        instruction: "Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).",
+        parts: ["Le vent souffle fort", "les feuilles tombent"],
+        connectors: [","], linkTypes: ["juxtaposition"]
+      },
+      {
+        instruction: "Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).",
+        parts: ["Elle travaille dur", "l'examen approche"],
+        connectors: ["car"], linkTypes: ["coordination"]
+      },
+      {
+        instruction: "Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).",
+        parts: ["Léa lit un livre", "elle a du temps libre"],
+        connectors: ["quand"], linkTypes: ["subordination"]
+      },
+      {
+        instruction: "Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).",
+        parts: ["Le film commence", "les spectateurs cherchent leur place"],
+        connectors: ["or"], linkTypes: ["coordination"]
+      },
+      {
+        instruction: "Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).",
+        parts: ["Nous partons demain", "mes parents restent ici"],
+        connectors: [";"], linkTypes: ["juxtaposition"]
+      },
+      {
+        instruction: "Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).",
+        parts: ["Le ciel devient gris", "l'orage approche", "les enfants rentrent vite"],
+        connectors: [",", "donc"], linkTypes: ["juxtaposition", "coordination"]
+      },
+      {
+        instruction: "Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).",
+        parts: ["Le chat miaule", "le chien aboie", "quelqu'un arrive"],
+        connectors: ["et", "quand"], linkTypes: ["coordination", "subordination"]
+      },
+      {
+        instruction: "Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).",
+        parts: ["Il fait nuit", "les rues sont calmes", "les magasins ferment"],
+        connectors: [";", "quand"], linkTypes: ["juxtaposition", "subordination"]
+      },
+      {
+        instruction: "Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).",
+        parts: ["Les élèves restent silencieux", "le film commence", "tout le monde applaudit"],
+        connectors: ["quand", "puis"], linkTypes: ["subordination", "coordination"]
+      },
+      {
+        instruction: "Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).",
+        parts: ["La cloche sonne", "les élèves sortent", "ils rejoignent la cour"],
+        connectors: [",", "puis"], linkTypes: ["juxtaposition", "coordination"]
+      }
+    ],
+
+    level3Bank: [
+      {
+        instruction: "Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.",
+        parts: ["Le ciel devient bleu", "le vent tombe", "les oiseaux chantent"],
+        verbs: ["devient", "tombe", "chantent"],
+        connectors: [",", ";"], linkTypes: ["juxtaposition", "juxtaposition"]
+      },
+      {
+        instruction: "Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.",
+        parts: ["Léa a terminé son travail", "elle range son bureau", "elle part enfin"],
+        verbs: [{ aux: "a", participle: "terminé" }, "range", "part"],
+        connectors: ["puis", "et"], linkTypes: ["coordination", "coordination"]
+      },
+      {
+        instruction: "Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.",
+        parts: ["Le magasin ferme", "les clients partent", "la nuit tombe"],
+        verbs: ["ferme", "partent", "tombe"],
+        connectors: ["donc", "quand"], linkTypes: ["coordination", "subordination"]
+      },
+      {
+        instruction: "Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.",
+        parts: ["Le vent forcit", "les bateaux rentrent", "les pêcheurs sont contents"],
+        verbs: ["forcit", "rentrent", "sont"],
+        connectors: ["quand", "et"], linkTypes: ["subordination", "coordination"]
+      },
+      {
+        instruction: "Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.",
+        parts: ["Les cloches sonnent", "le gardien ouvre les portes", "la foule entre"],
+        verbs: ["sonnent", "ouvre", "entre"],
+        connectors: [",", "et"], linkTypes: ["juxtaposition", "coordination"]
+      },
+      {
+        instruction: "Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.",
+        parts: ["La lumière baisse", "on allume les lampes", "le soir arrive"],
+        verbs: ["baisse", "allume", "arrive"],
+        connectors: [";", "quand"], linkTypes: ["juxtaposition", "subordination"]
+      },
+      {
+        instruction: "Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.",
+        parts: ["Le ciel devient noir", "l'orage éclate", "les gens courent", "la pluie commence"],
+        verbs: ["devient", "éclate", "courent", "commence"],
+        connectors: [",", "donc", "quand"], linkTypes: ["juxtaposition", "coordination", "subordination"]
+      },
+      {
+        instruction: "Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.",
+        parts: ["Le film commence", "la salle devient sombre", "le public reste silencieux", "chacun observe l'écran"],
+        verbs: ["commence", "devient", "reste", "observe"],
+        connectors: ["quand", ";", "et"], linkTypes: ["subordination", "juxtaposition", "coordination"]
+      },
+      {
+        instruction: "Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.",
+        parts: ["Léa ferme son livre", "elle éteint la lumière", "le silence règne", "la nuit continue"],
+        verbs: ["ferme", "éteint", "règne", "continue"],
+        connectors: ["puis", "quand", ";"], linkTypes: ["coordination", "subordination", "juxtaposition"]
+      },
+      {
+        instruction: "Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.",
+        parts: ["Le train arrive", "les voyageurs sont prêts", "ils descendent", "ils quittent la gare"],
+        verbs: ["arrive", "sont", "descendent", "quittent"],
+        connectors: [",", "quand", "puis"], linkTypes: ["juxtaposition", "subordination", "coordination"]
+      }
+    ]
+  },
+
   "identifier-juxtaposition": {
     title:      "Distinguer la juxtaposition de la coordination",
     domaine:    "Français",
