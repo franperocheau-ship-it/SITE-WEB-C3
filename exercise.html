@@ -1193,6 +1193,18 @@
     }
     .gnsp-step-label:first-child { margin-top: 0; }
 
+    /* ── Type : identifier-juxtaposition-niveaux (2 propositions colorées) ─ */
+    .ex-word-btn.ij-prop1 {
+      border-color: var(--blue);
+      background: rgba(16,43,106,0.12);
+      color: var(--blue);
+    }
+    .ex-word-btn.ij-prop2 {
+      border-color: #e67e22;
+      background: rgba(230,126,34,0.12);
+      color: #e67e22;
+    }
+
     /* ── Utility ────────────────────────────────────────────── */
     .ex-hidden { display: none !important; }
 
@@ -5747,6 +5759,12 @@
       } else if (currentType === "distinguer-phrase-simple-complexe-niveaux") {
         dpscInitSession();
         return;
+      } else if (currentType === "identifier-juxtaposition-niveaux") {
+        ijInitSession();
+        return;
+      } else if (currentType === "identifier-subordination-niveaux") {
+        isInitSession();
+        return;
       } else if (currentType === "articles-def-indef-niveaux") {
         idiInitSession();
         return;
@@ -6039,6 +6057,10 @@
         /* session managed by tpInitSession — no-op here */
       } else if (currentType === "distinguer-phrase-simple-complexe-niveaux") {
         /* session managed by dpscInitSession — no-op here */
+      } else if (currentType === "identifier-juxtaposition-niveaux") {
+        /* session managed by ijInitSession — no-op here */
+      } else if (currentType === "identifier-subordination-niveaux") {
+        /* session managed by isInitSession — no-op here */
       } else if (currentType === "articles-def-indef-niveaux") {
         /* session managed by idiInitSession — no-op here */
       } else if (currentType === "fraction-decimale-grille-droite-niveaux") {
@@ -31407,6 +31429,802 @@
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
         exerciseType: 'distinguer-phrase-simple-complexe-niveaux',
+        level:        'Niveau ' + lv,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : identifier-juxtaposition-niveaux — « Distinguer la juxtaposition de
+       la coordination »
+       Niveau 1 : mots-cliquables en 2 temps — clique sur le verbe conjugué
+                  de la 1ʳᵉ proposition puis sur celui de la 2ᵉ ; les deux
+                  propositions se colorent ensuite séparément (bleu / orange).
+       Niveau 2 : étai en 2 étapes — propositions déjà surlignées, étape 1 =
+                  clique sur ce qui les relie (ponctuation/connecteur),
+                  étape 2 = choix binaire juxtaposition / coordination.
+       Niveau 3 : jugement direct seul (juxtaposition / coordination).
+       3 niveaux déverrouillables à 80 % via LevelSelect.
+       ══════════════════════════════════════════════════════════════════════ */
+
+    const IJ_SEUIL = 0.8;
+    const IJ_LEVEL_DESCS = [
+      "Repérer le verbe conjugué de chaque proposition",
+      "Identifier ce qui relie les deux propositions",
+      "Juger seul : juxtaposition ou coordination ?"
+    ];
+    const IJ_CLEAN_RE = /[.,!?;:«»""'']/g;
+
+    let ijState      = null;
+    let ijLevelSelect = null;
+
+    function ijBackToSelectScreen() {
+      ijState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    function ijInitSession() {
+      ijState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      ijLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: [1, 2, 3].map(lv => ({ id: lv, label: 'Niveau ' + lv, description: IJ_LEVEL_DESCS[lv - 1] })),
+        threshold: IJ_SEUIL,
+        onSelectLevel: (lv) => ijStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: ijBackToSelectScreen
+      });
+      ijLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function ijStartLevel(lv) {
+      const bankKey = 'level' + lv + 'Bank';
+      const items   = shuffle([...(sessionData[bankKey] || [])]);
+      ijState = { lv, items, idx: 0, score: 0, total: items.length };
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = items.length;
+      if (ijLevelSelect) ijLevelSelect.renderBadges(lv);
+      ijRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function ijRenderQuestion(card) {
+      const { lv, items, idx, total } = ijState;
+      const q = items[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if      (lv === 1) ijRenderLevel1(card, q);
+      else if (lv === 2) ijRenderLevel2(card, q);
+      else               ijRenderLevel3(card, q);
+    }
+
+    function ijAdvance() {
+      ijState.idx++;
+      if (ijState.idx >= ijState.items.length) {
+        ijShowLevelResults();
+      } else {
+        ijRenderQuestion(document.getElementById('ex-card'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    /* ── Niveau 1 — clique sur le verbe de chaque proposition, dans l'ordre ── */
+    function ijRenderLevel1(card, q) {
+      const { idx, total } = ijState;
+
+      card.innerHTML = `
+        <p class="ex-question-label" id="ij-instr">${q.instruction}</p>
+        <div class="ex-sentence-words" id="ij-words"></div>
+        <div class="ex-feedback-area" id="ij-fb1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      const wordsEl = document.getElementById('ij-words');
+      const tokens  = [];
+      const partAWords = q.partA.split(/\s+/);
+      partAWords.forEach((w, i) => {
+        tokens.push({ text: i === partAWords.length - 1 ? w + q.sep : w, prop: 1 });
+      });
+      q.partB.split(/\s+/).forEach(w => tokens.push({ text: w, prop: 2 }));
+      tokens.push({ text: '.', prop: 2 });
+
+      let phase        = 1;
+      let step1Correct = false;
+      let step2Correct = false;
+
+      tokens.forEach(tok => {
+        const clean = tok.text.replace(IJ_CLEAN_RE, '');
+        if (!clean) return;
+        const btn = document.createElement('button');
+        btn.className    = 'ex-word-btn';
+        btn.textContent  = tok.text;
+        btn.dataset.clean = clean;
+        btn.dataset.prop  = tok.prop;
+        btn.addEventListener('click', () => {
+          if (btn.disabled || phase > 2) return;
+          const cleanLower = clean.toLowerCase();
+
+          if (phase === 1) {
+            btn.disabled = true;
+            if (cleanLower === q.verbA.toLowerCase()) {
+              step1Correct = true;
+              btn.classList.add('ij-prop1');
+            } else {
+              btn.classList.add('is-wrong');
+              wordsEl.querySelectorAll('.ex-word-btn').forEach(b => {
+                if (b.dataset.clean.toLowerCase() === q.verbA.toLowerCase()) b.classList.add('ij-prop1');
+              });
+            }
+            document.getElementById('ij-instr').textContent =
+              'Clique maintenant sur le verbe conjugué de la 2ᵉ proposition.';
+            phase = 2;
+          } else {
+            btn.disabled = true;
+            if (cleanLower === q.verbB.toLowerCase()) {
+              step2Correct = true;
+              btn.classList.add('ij-prop2');
+            } else {
+              btn.classList.add('is-wrong');
+              wordsEl.querySelectorAll('.ex-word-btn').forEach(b => {
+                if (b.dataset.clean.toLowerCase() === q.verbB.toLowerCase()) b.classList.add('ij-prop2');
+              });
+            }
+            phase = 3;
+            ijFinishLevel1(wordsEl, step1Correct, step2Correct);
+          }
+        });
+        wordsEl.appendChild(btn);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', ijAdvance);
+    }
+
+    function ijFinishLevel1(wordsEl, step1Correct, step2Correct) {
+      wordsEl.querySelectorAll('.ex-word-btn').forEach(b => {
+        b.disabled = true;
+        b.classList.add(b.dataset.prop === '1' ? 'ij-prop1' : 'ij-prop2');
+      });
+      document.getElementById('ij-instr').textContent = 'Voilà les deux propositions repérées !';
+
+      const ok = step1Correct && step2Correct;
+      if (ok) ijState.score++;
+      document.getElementById('ij-fb1').innerHTML = ok
+        ? `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`
+        : `<div class="ex-feedback-wrong">❌ Les verbes conjugués des deux propositions sont surlignés.</div>`;
+      document.getElementById('next-btn').classList.remove('ex-hidden');
+    }
+
+    /* ── Niveau 2 — étai en 2 étapes : lien puis juxtaposition/coordination ── */
+    function ijRenderLevel2(card, q) {
+      const { idx, total } = ijState;
+      let step1Correct = false;
+
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction}</p>
+
+        <div id="ij2-step1" class="ex-classify-step">
+          <div class="ex-sentence-words" id="ij2-words"></div>
+          <div class="ex-feedback-area" id="ij2-fb1"></div>
+        </div>
+
+        <div id="ij2-step2" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title">Étape 2 — Juxtaposition ou coordination ?</div>
+          <div class="ex-choices-grid" id="ij2-choices2"></div>
+          <div class="ex-feedback-area" id="ij2-fb2"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      const wordsEl = document.getElementById('ij2-words');
+      const tokens  = [];
+      q.partA.split(/\s+/).forEach(w => tokens.push({ text: w, cls: 'ij-prop1', isLink: false }));
+      tokens.push({ text: q.link, cls: '', isLink: true });
+      q.partB.split(/\s+/).forEach(w => tokens.push({ text: w, cls: 'ij-prop2', isLink: false }));
+      tokens.push({ text: '.', cls: 'ij-prop2', isLink: false });
+
+      tokens.forEach(tok => {
+        const clean = tok.text.replace(IJ_CLEAN_RE, '');
+        if (!clean && !tok.isLink) return;
+        const btn = document.createElement('button');
+        btn.className    = 'ex-word-btn' + (tok.cls ? ' ' + tok.cls : '');
+        btn.textContent  = tok.text;
+        btn.dataset.isLink = tok.isLink ? 'true' : 'false';
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          wordsEl.querySelectorAll('.ex-word-btn').forEach(b => b.disabled = true);
+          step1Correct = tok.isLink;
+
+          if (tok.isLink) {
+            btn.classList.add('is-correct');
+          } else {
+            btn.classList.add('is-wrong');
+            wordsEl.querySelectorAll('.ex-word-btn').forEach(b => {
+              if (b.dataset.isLink === 'true') b.classList.add('is-correct');
+            });
+          }
+          document.getElementById('ij2-fb1').innerHTML = step1Correct
+            ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+            : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Ce qui relie les deux propositions est surligné en vert.</div>`;
+
+          setTimeout(() => {
+            const s2 = document.getElementById('ij2-step2');
+            s2.classList.remove('ex-hidden');
+            s2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }, 500);
+        });
+        wordsEl.appendChild(btn);
+      });
+
+      const choices2El = document.getElementById('ij2-choices2');
+      ['juxtaposition', 'coordination'].forEach(c => {
+        const btn = document.createElement('button');
+        btn.className   = 'ex-choice';
+        btn.textContent = c;
+        btn.addEventListener('click', () => {
+          choices2El.querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === q.linkType) b.classList.add('is-correct');
+          });
+          const isRight = c === q.linkType;
+          if (!isRight) btn.classList.add('is-wrong');
+
+          if (isRight && step1Correct) {
+            ijState.score++;
+            document.getElementById('ij2-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+          } else if (isRight) {
+            document.getElementById('ij2-fb2').innerHTML =
+              `<div class="ex-feedback-correct" style="opacity:0.8">✓ Bonne réponse à l'étape 2 (mais l'étape 1 était incorrecte).</div>`;
+          } else {
+            document.getElementById('ij2-fb2').innerHTML =
+              `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${q.linkType}</strong>.</div>`;
+          }
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+        choices2El.appendChild(btn);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', ijAdvance);
+    }
+
+    /* ── Niveau 3 — jugement direct, sans repérage préalable ──────────────── */
+    function ijRenderLevel3(card, q) {
+      const { idx, total } = ijState;
+
+      card.innerHTML = `
+        <p class="ex-question-label">Cette phrase est-elle une juxtaposition ou une coordination ?</p>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-choices-grid" id="ij3-choices"></div>
+        <div class="ex-feedback-area" id="ij3-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      const choicesEl = document.getElementById('ij3-choices');
+      ['juxtaposition', 'coordination'].forEach(c => {
+        const btn = document.createElement('button');
+        btn.className   = 'ex-choice';
+        btn.textContent = c;
+        btn.addEventListener('click', () => {
+          choicesEl.querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === q.answer) b.classList.add('is-correct');
+          });
+          const isRight = c === q.answer;
+          if (!isRight) btn.classList.add('is-wrong');
+
+          if (isRight) {
+            ijState.score++;
+            document.getElementById('ij3-fb').innerHTML =
+              `<div class="ex-feedback-correct">${rand(SUCCESS)}${q.hint ? `<br>${q.hint}` : ''}</div>`;
+          } else {
+            document.getElementById('ij3-fb').innerHTML =
+              `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${q.answer}</strong>.${q.hint ? `<br>${q.hint}` : ''}</div>`;
+          }
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+        choicesEl.appendChild(btn);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', ijAdvance);
+    }
+
+    /* ── Résultats d'un niveau ─────────────────────────────────────────────── */
+    function ijShowLevelResults() {
+      const { lv, score: lvScore, total } = ijState;
+      const { passed, isLast } = ijLevelSelect.completeLevel(lv, lvScore, total);
+      const s20 = Math.round(lvScore / total * 20);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(lvScore / total * 100) + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-grammaire.html';
+      const backLabel = sessionData.backLink?.label || 'Grammaire';
+      const backToSelectBtn = ijLevelSelect.backToSelectButtonHTML();
+      let msg, btnsHTML;
+
+      if (passed && isLast) {
+        msg = `🎊 Bravo ! Tu sais distinguer la juxtaposition de la coordination !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-secondary" id="ij-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>
+          </div>`;
+      } else if (passed) {
+        msg = `Niveau ${lv} validé ! 🏆 Le Niveau ${lv + 1} est débloqué !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="ij-next-btn">Niveau ${lv + 1} →</button>
+            <button class="ex-btn-secondary" id="ij-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * IJ_SEUIL);
+        msg = `Il faut ${needed} bonnes réponses sur ${total}. Tu peux le faire !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="ij-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← ${backLabel}</a>
+          </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('ij-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        ijStartLevel(lv);
+      });
+      document.getElementById('ij-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        ijStartLevel(lv + 1);
+      });
+      document.getElementById('ij-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        ijLevelSelect.reset();
+        ijInitSession();
+      });
+      ijLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'identifier-juxtaposition-niveaux',
+        level:        'Niveau ' + lv,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : identifier-subordination-niveaux — « Distinguer la juxtaposition
+       de la subordination »
+       Même schéma que identifier-juxtaposition-niveaux (mots-cliquables,
+       classes .ij-prop1/.ij-prop2 réutilisées). Binaire : juxtaposition vs
+       subordination UNIQUEMENT (pas de coordination ici).
+       Niveau 1 : clique sur le verbe de la principale, puis sur celui de la
+                  subordonnée (conjonction ou pronom relatif entre les deux).
+       Niveau 2 : étai en 2 étapes — clique sur le mot de liaison, puis choix
+                  binaire (subordination / juxtaposition).
+       Niveau 3 : jugement direct seul, à 2 choix.
+       3 niveaux déverrouillables à 80 % via LevelSelect.
+       ══════════════════════════════════════════════════════════════════════ */
+
+    const IS_SEUIL = 0.8;
+    const IS_LEVEL_DESCS = [
+      "Repérer le verbe de la principale et celui de la subordonnée",
+      "Identifier ce qui relie les deux propositions",
+      "Juger seul : subordination ou juxtaposition ?"
+    ];
+    const IS_LINK_TYPES = ['subordination', 'juxtaposition'];
+
+    let isState      = null;
+    let isLevelSelect = null;
+
+    function isBackToSelectScreen() {
+      isState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    function isInitSession() {
+      isState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      isLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: [1, 2, 3].map(lv => ({ id: lv, label: 'Niveau ' + lv, description: IS_LEVEL_DESCS[lv - 1] })),
+        threshold: IS_SEUIL,
+        onSelectLevel: (lv) => isStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: isBackToSelectScreen
+      });
+      isLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function isStartLevel(lv) {
+      const bankKey = 'level' + lv + 'Bank';
+      const items   = shuffle([...(sessionData[bankKey] || [])]);
+      isState = { lv, items, idx: 0, score: 0, total: items.length };
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = items.length;
+      if (isLevelSelect) isLevelSelect.renderBadges(lv);
+      isRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function isRenderQuestion(card) {
+      const { lv, items, idx, total } = isState;
+      const q = items[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if      (lv === 1) isRenderLevel1(card, q);
+      else if (lv === 2) isRenderLevel2(card, q);
+      else               isRenderLevel3(card, q);
+    }
+
+    function isAdvance() {
+      isState.idx++;
+      if (isState.idx >= isState.items.length) {
+        isShowLevelResults();
+      } else {
+        isRenderQuestion(document.getElementById('ex-card'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    /* ── Niveau 1 — clique sur le verbe de la principale, puis de la subordonnée ── */
+    function isRenderLevel1(card, q) {
+      const { idx, total } = isState;
+
+      card.innerHTML = `
+        <p class="ex-question-label" id="is-instr">${q.instruction}</p>
+        <div class="ex-sentence-words" id="is-words"></div>
+        <div class="ex-feedback-area" id="is-fb1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      const wordsEl = document.getElementById('is-words');
+      const tokens  = [];
+      q.partA.split(/\s+/).forEach(w => tokens.push({ text: w, prop: 1 }));
+      q.connector.split(/\s+/).forEach(w => tokens.push({ text: w, prop: 2 }));
+      q.partB.split(/\s+/).forEach(w => tokens.push({ text: w, prop: 2 }));
+      tokens.push({ text: '.', prop: 2 });
+
+      let phase        = 1;
+      let step1Correct = false;
+      let step2Correct = false;
+
+      tokens.forEach(tok => {
+        const clean = tok.text.replace(IJ_CLEAN_RE, '');
+        if (!clean) return;
+        const btn = document.createElement('button');
+        btn.className    = 'ex-word-btn';
+        btn.textContent  = tok.text;
+        btn.dataset.clean = clean;
+        btn.dataset.prop  = tok.prop;
+        btn.addEventListener('click', () => {
+          if (btn.disabled || phase > 2) return;
+          const cleanLower = clean.toLowerCase();
+
+          if (phase === 1) {
+            btn.disabled = true;
+            if (cleanLower === q.verbA.toLowerCase()) {
+              step1Correct = true;
+              btn.classList.add('ij-prop1');
+            } else {
+              btn.classList.add('is-wrong');
+              wordsEl.querySelectorAll('.ex-word-btn').forEach(b => {
+                if (b.dataset.clean.toLowerCase() === q.verbA.toLowerCase()) b.classList.add('ij-prop1');
+              });
+            }
+            document.getElementById('is-instr').textContent =
+              'Clique maintenant sur le verbe conjugué de la proposition subordonnée.';
+            phase = 2;
+          } else {
+            btn.disabled = true;
+            if (cleanLower === q.verbB.toLowerCase()) {
+              step2Correct = true;
+              btn.classList.add('ij-prop2');
+            } else {
+              btn.classList.add('is-wrong');
+              wordsEl.querySelectorAll('.ex-word-btn').forEach(b => {
+                if (b.dataset.clean.toLowerCase() === q.verbB.toLowerCase()) b.classList.add('ij-prop2');
+              });
+            }
+            phase = 3;
+            isFinishLevel1(wordsEl, step1Correct, step2Correct);
+          }
+        });
+        wordsEl.appendChild(btn);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', isAdvance);
+    }
+
+    function isFinishLevel1(wordsEl, step1Correct, step2Correct) {
+      wordsEl.querySelectorAll('.ex-word-btn').forEach(b => {
+        b.disabled = true;
+        b.classList.add(b.dataset.prop === '1' ? 'ij-prop1' : 'ij-prop2');
+      });
+      document.getElementById('is-instr').textContent = 'Voilà les deux propositions repérées !';
+
+      const ok = step1Correct && step2Correct;
+      if (ok) isState.score++;
+      document.getElementById('is-fb1').innerHTML = ok
+        ? `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`
+        : `<div class="ex-feedback-wrong">❌ Les verbes conjugués des deux propositions sont surlignés.</div>`;
+      document.getElementById('next-btn').classList.remove('ex-hidden');
+    }
+
+    /* ── Niveau 2 — étai en 2 étapes : mot de liaison puis choix à 3 ─────── */
+    function isRenderLevel2(card, q) {
+      const { idx, total } = isState;
+      let step1Correct = false;
+
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction}</p>
+
+        <div id="is2-step1" class="ex-classify-step">
+          <div class="ex-sentence-words" id="is2-words"></div>
+          <div class="ex-feedback-area" id="is2-fb1"></div>
+        </div>
+
+        <div id="is2-step2" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title">Étape 2 — Subordination ou juxtaposition ?</div>
+          <div class="ex-choices-grid" id="is2-choices2"></div>
+          <div class="ex-feedback-area" id="is2-fb2"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      const wordsEl = document.getElementById('is2-words');
+      const tokens  = [];
+      q.partA.split(/\s+/).forEach(w => tokens.push({ text: w, cls: 'ij-prop1', isLink: false }));
+      q.link.split(/\s+/).forEach(w => tokens.push({ text: w, cls: '', isLink: true }));
+      q.partB.split(/\s+/).forEach(w => tokens.push({ text: w, cls: 'ij-prop2', isLink: false }));
+      tokens.push({ text: '.', cls: 'ij-prop2', isLink: false });
+
+      let anyLinkClicked = false;
+
+      tokens.forEach(tok => {
+        const clean = tok.text.replace(IJ_CLEAN_RE, '');
+        if (!clean && !tok.isLink) return;
+        const btn = document.createElement('button');
+        btn.className    = 'ex-word-btn' + (tok.cls ? ' ' + tok.cls : '');
+        btn.textContent  = tok.text;
+        btn.dataset.isLink = tok.isLink ? 'true' : 'false';
+        btn.addEventListener('click', () => {
+          if (btn.disabled || anyLinkClicked) return;
+          anyLinkClicked = true;
+          wordsEl.querySelectorAll('.ex-word-btn').forEach(b => b.disabled = true);
+          step1Correct = tok.isLink;
+
+          if (tok.isLink) {
+            btn.classList.add('is-correct');
+          } else {
+            btn.classList.add('is-wrong');
+            wordsEl.querySelectorAll('.ex-word-btn').forEach(b => {
+              if (b.dataset.isLink === 'true') b.classList.add('is-correct');
+            });
+          }
+          document.getElementById('is2-fb1').innerHTML = step1Correct
+            ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+            : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Ce qui relie les deux propositions est surligné en vert.</div>`;
+
+          setTimeout(() => {
+            const s2 = document.getElementById('is2-step2');
+            s2.classList.remove('ex-hidden');
+            s2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }, 500);
+        });
+        wordsEl.appendChild(btn);
+      });
+
+      const choices2El = document.getElementById('is2-choices2');
+      IS_LINK_TYPES.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className   = 'ex-choice';
+        btn.textContent = c;
+        btn.addEventListener('click', () => {
+          choices2El.querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === q.linkType) b.classList.add('is-correct');
+          });
+          const isRight = c === q.linkType;
+          if (!isRight) btn.classList.add('is-wrong');
+
+          if (isRight && step1Correct) {
+            isState.score++;
+            document.getElementById('is2-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+          } else if (isRight) {
+            document.getElementById('is2-fb2').innerHTML =
+              `<div class="ex-feedback-correct" style="opacity:0.8">✓ Bonne réponse à l'étape 2 (mais l'étape 1 était incorrecte).</div>`;
+          } else {
+            document.getElementById('is2-fb2').innerHTML =
+              `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${q.linkType}</strong>.</div>`;
+          }
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+        choices2El.appendChild(btn);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', isAdvance);
+    }
+
+    /* ── Niveau 3 — jugement direct, sans repérage préalable ──────────────── */
+    function isRenderLevel3(card, q) {
+      const { idx, total } = isState;
+
+      card.innerHTML = `
+        <p class="ex-question-label">Quel est le lien entre les deux propositions de cette phrase ?</p>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-choices-grid" id="is3-choices"></div>
+        <div class="ex-feedback-area" id="is3-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      const choicesEl = document.getElementById('is3-choices');
+      IS_LINK_TYPES.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className   = 'ex-choice';
+        btn.textContent = c;
+        btn.addEventListener('click', () => {
+          choicesEl.querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === q.answer) b.classList.add('is-correct');
+          });
+          const isRight = c === q.answer;
+          if (!isRight) btn.classList.add('is-wrong');
+
+          if (isRight) {
+            isState.score++;
+            document.getElementById('is3-fb').innerHTML =
+              `<div class="ex-feedback-correct">${rand(SUCCESS)}${q.hint ? `<br>${q.hint}` : ''}</div>`;
+          } else {
+            document.getElementById('is3-fb').innerHTML =
+              `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${q.answer}</strong>.${q.hint ? `<br>${q.hint}` : ''}</div>`;
+          }
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+        choicesEl.appendChild(btn);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', isAdvance);
+    }
+
+    /* ── Résultats d'un niveau ─────────────────────────────────────────────── */
+    function isShowLevelResults() {
+      const { lv, score: lvScore, total } = isState;
+      const { passed, isLast } = isLevelSelect.completeLevel(lv, lvScore, total);
+      const s20 = Math.round(lvScore / total * 20);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(lvScore / total * 100) + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-grammaire.html';
+      const backLabel = sessionData.backLink?.label || 'Grammaire';
+      const backToSelectBtn = isLevelSelect.backToSelectButtonHTML();
+      let msg, btnsHTML;
+
+      if (passed && isLast) {
+        msg = `🎊 Bravo ! Tu sais distinguer la juxtaposition de la subordination !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-secondary" id="is-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>
+          </div>`;
+      } else if (passed) {
+        msg = `Niveau ${lv} validé ! 🏆 Le Niveau ${lv + 1} est débloqué !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="is-next-btn">Niveau ${lv + 1} →</button>
+            <button class="ex-btn-secondary" id="is-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * IS_SEUIL);
+        msg = `Il faut ${needed} bonnes réponses sur ${total}. Tu peux le faire !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="is-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← ${backLabel}</a>
+          </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('is-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        isStartLevel(lv);
+      });
+      document.getElementById('is-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        isStartLevel(lv + 1);
+      });
+      document.getElementById('is-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        isLevelSelect.reset();
+        isInitSession();
+      });
+      isLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'identifier-subordination-niveaux',
         level:        'Niveau ' + lv,
         score:        s20,
         total:        20,

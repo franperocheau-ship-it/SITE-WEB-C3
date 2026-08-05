@@ -647,6 +647,351 @@ Object.assign(window.EXERCISE_DATA, {
     ]
   },
 
+  "identifier-juxtaposition": {
+    title:      "Distinguer la juxtaposition de la coordination",
+    domaine:    "Français",
+    competence: "Grammaire — La phrase complexe",
+    type:       "identifier-juxtaposition-niveaux",
+    levels:     ["6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+
+    /* 3 niveaux (même schéma que distinguer-phrase-simple-complexe-niveaux).
+       Niveau 1 : mots-cliquables en 2 temps — clique sur le verbe conjugué
+       de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ ; les deux propositions
+       se colorent ensuite séparément (bleu / orange), sans mention du mot
+       « juxtaposition ». Toutes les phrases de level1Bank sont des
+       juxtapositions (virgule ou point-virgule seul, sans connecteur).
+       Niveau 2 : étai en 2 étapes — les 2 propositions sont déjà surlignées ;
+       étape 1 = clique sur ce qui les relie (ponctuation ou connecteur),
+       étape 2 = choix binaire juxtaposition / coordination. Banque mixte.
+       Niveau 3 : jugement direct seul, avec pièges de virgule énumérative
+       (groupe nominal sujet) à ne pas confondre avec la virgule de
+       juxtaposition entre deux propositions. ─────────────────────────── */
+    level1Bank: [
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Le chat dort", verbA: "dort", sep: ",",
+        partB: "le chien aboie", verbB: "aboie"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Il pleut", verbA: "pleut", sep: ";",
+        partB: "les enfants restent à la maison", verbB: "restent"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Marie chante", verbA: "chante", sep: ",",
+        partB: "Paul danse", verbB: "danse"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Le vent souffle fort", verbA: "souffle", sep: ",",
+        partB: "les feuilles tombent", verbB: "tombent"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Elle lit un livre", verbA: "lit", sep: ";",
+        partB: "son frère joue dehors", verbB: "joue"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Le soleil brille", verbA: "brille", sep: ",",
+        partB: "les oiseaux chantent", verbB: "chantent"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Nous partons demain", verbA: "partons", sep: ",",
+        partB: "mes parents restent ici", verbB: "restent"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Le repas est prêt", verbA: "est", sep: ";",
+        partB: "tout le monde a faim", verbB: "a"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Les élèves travaillent", verbA: "travaillent", sep: ",",
+        partB: "le professeur explique la leçon", verbB: "explique"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Le chien aboie", verbA: "aboie", sep: ",",
+        partB: "le chat miaule", verbB: "miaule"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Il fait froid", verbA: "fait", sep: ";",
+        partB: "nous allumons le chauffage", verbB: "allumons"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "La pluie tombe", verbA: "tombe", sep: ",",
+        partB: "la rivière monte", verbB: "monte"
+      }
+    ],
+
+    level2Bank: [
+      {
+        instruction: "Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).",
+        partA: "Le vent souffle", partB: "les feuilles volent", link: ",", linkType: "juxtaposition"
+      },
+      {
+        instruction: "Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).",
+        partA: "Il fait nuit", partB: "les étoiles brillent", link: ";", linkType: "juxtaposition"
+      },
+      {
+        instruction: "Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).",
+        partA: "Marie sourit", partB: "elle est heureuse", link: ",", linkType: "juxtaposition"
+      },
+      {
+        instruction: "Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).",
+        partA: "Le train arrive", partB: "les voyageurs se lèvent", link: ";", linkType: "juxtaposition"
+      },
+      {
+        instruction: "Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).",
+        partA: "Il pleut", partB: "nous sortons quand même", link: "mais", linkType: "coordination"
+      },
+      {
+        instruction: "Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).",
+        partA: "Elle travaille dur", partB: "l'examen approche", link: "car", linkType: "coordination"
+      },
+      {
+        instruction: "Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).",
+        partA: "Le magasin ferme", partB: "nous partons", link: "donc", linkType: "coordination"
+      },
+      {
+        instruction: "Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).",
+        partA: "Il devait pleuvoir", partB: "le ciel est resté bleu", link: "or", linkType: "coordination"
+      },
+      {
+        instruction: "Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).",
+        partA: "Elle se lave", partB: "elle s'habille", link: "puis", linkType: "coordination"
+      },
+      {
+        instruction: "Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).",
+        partA: "Le chat miaule", partB: "le chien aboie", link: "et", linkType: "coordination"
+      }
+    ],
+
+    level3Bank: [
+      { sentence: "Le ciel s'assombrit, l'orage approche .", answer: "juxtaposition" },
+      { sentence: "Léa révise ; son frère regarde la télévision .", answer: "juxtaposition" },
+      { sentence: "Nous avons faim, le repas n'est pas prêt .", answer: "juxtaposition" },
+      { sentence: "Il neige, les routes sont glissantes .", answer: "juxtaposition" },
+      {
+        sentence: "Tom range sa chambre mais il oublie son bureau .",
+        answer: "coordination",
+        hint: "« mais » est un connecteur de coordination."
+      },
+      {
+        sentence: "Elle a raté le bus donc elle arrive en retard .",
+        answer: "coordination",
+        hint: "« donc » est un connecteur de coordination."
+      },
+      {
+        sentence: "Le film commence or les spectateurs ne sont pas installés .",
+        answer: "coordination",
+        hint: "« or » est un connecteur de coordination."
+      },
+      {
+        sentence: "Ils sont fatigués car ils ont beaucoup marché .",
+        answer: "coordination",
+        hint: "« car » est un connecteur de coordination."
+      },
+      {
+        sentence: "Elle ferme la porte puis elle allume la lumière .",
+        answer: "coordination",
+        hint: "« puis » est un connecteur de coordination."
+      },
+      {
+        sentence: "Paul, Marie et Lucas jouent, ils sont heureux .",
+        answer: "juxtaposition",
+        hint: "« Paul, Marie et Lucas » : virgule d'énumération dans le sujet, pas une juxtaposition. Ce sont les propositions « …jouent » et « ils sont heureux », reliées par la dernière virgule (sans connecteur)."
+      },
+      {
+        sentence: "Le chat, le chien et le lapin dorment, mais le hamster reste éveillé .",
+        answer: "coordination",
+        hint: "La 1ʳᵉ virgule énumère les sujets (« le chat, le chien et le lapin ») ; ce qui relie vraiment les deux propositions est « mais »."
+      },
+      {
+        sentence: "Mes parents, mes cousins et moi partons en vacances ; nous sommes impatients .",
+        answer: "juxtaposition",
+        hint: "Les virgules énumèrent le sujet ; les deux propositions sont reliées par le point-virgule, sans connecteur : c'est une juxtaposition."
+      }
+    ]
+  },
+
+  "identifier-subordination": {
+    title:      "Distinguer la juxtaposition de la subordination",
+    domaine:    "Français",
+    competence: "Grammaire — La phrase complexe",
+    type:       "identifier-subordination-niveaux",
+    levels:     ["6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+
+    /* 3 niveaux (même schéma que identifier-juxtaposition-niveaux).
+       Compétence binaire : juxtaposition vs subordination UNIQUEMENT (pas de
+       coordination ici — fera l'objet d'une compétence séparée).
+       Niveau 1 : mots-cliquables en 2 temps — clique sur le verbe conjugué
+       de la principale, puis sur celui de la subordonnée ; les deux
+       propositions se colorent ensuite séparément (bleu / orange), sans
+       mention du mot « subordination ». Toutes les phrases de level1Bank
+       contiennent une subordination (conjonction ou pronom relatif).
+       Conjonctives et relatives sont séparées ci-dessous.
+       Niveau 2 : étai en 2 étapes — les 2 propositions sont déjà surlignées ;
+       étape 1 = clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ
+       proposition, étape 2 = choix binaire subordination / juxtaposition.
+       Banque mixte des 2 types de liaison uniquement.
+       Niveau 3 : jugement direct seul, à 2 choix, avec pièges : « que »
+       comparatif (pas une proposition) et virgule énumérative dans un
+       groupe nominal (à ne pas confondre avec la virgule de juxtaposition
+       entre deux propositions). ───────────────────────────────────────── */
+    level1Bank: [
+      /* ── Subordonnées conjonctives ── */
+      {
+        instruction: "Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.",
+        partA: "Les enfants sourient", verbA: "sourient",
+        connector: "quand",
+        partB: "le soleil brille", verbB: "brille"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.",
+        partA: "Nous partons", verbA: "partons",
+        connector: "si",
+        partB: "la pluie cesse", verbB: "cesse"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.",
+        partA: "La rivière déborde", verbA: "déborde",
+        connector: "comme",
+        partB: "la pluie tombe abondamment", verbB: "tombe"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.",
+        partA: "Tu peux sortir", verbA: "peux",
+        connector: "puisque",
+        partB: "le devoir est fini", verbB: "est"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.",
+        partA: "Le magasin ferme", verbA: "ferme",
+        connector: "lorsque",
+        partB: "la nuit arrive", verbB: "arrive"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.",
+        partA: "Léa sourit", verbA: "sourit",
+        connector: "parce que",
+        partB: "son ami chante", verbB: "chante"
+      },
+      /* ── Subordonnées relatives ── */
+      {
+        instruction: "Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.",
+        partA: "Léa regarde le chien", verbA: "regarde",
+        connector: "qui",
+        partB: "aboie", verbB: "aboie"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.",
+        partA: "Paul lit la lettre", verbA: "lit",
+        connector: "que",
+        partB: "sa sœur envoie", verbB: "envoie"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.",
+        partA: "Nous visitons la ville", verbA: "visitons",
+        connector: "où",
+        partB: "mes cousins habitent", verbB: "habitent"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.",
+        partA: "Léa raconte l'histoire", verbA: "raconte",
+        connector: "dont",
+        partB: "tout le monde parle", verbB: "parle"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.",
+        partA: "Le fermier nourrit les poules", verbA: "nourrit",
+        connector: "qui",
+        partB: "picorent", verbB: "picorent"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.",
+        partA: "Tom range les jouets", verbA: "range",
+        connector: "que",
+        partB: "son cousin apporte", verbB: "apporte"
+      }
+    ],
+
+    level2Bank: [
+      {
+        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        partA: "Le chat miaule", partB: "Léo oublie de le nourrir", link: "parce que", linkType: "subordination"
+      },
+      {
+        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        partA: "Nous restons chez nous", partB: "le temps se gâte", link: "quand", linkType: "subordination"
+      },
+      {
+        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        partA: "Les élèves applaudissent", partB: "le spectacle commence", link: "lorsque", linkType: "subordination"
+      },
+      {
+        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        partA: "Tom prend un parapluie", partB: "le ciel devient gris", link: "puisque", linkType: "subordination"
+      },
+      {
+        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        partA: "Léa lit le livre", partB: "son frère a offert", link: "que", linkType: "subordination"
+      },
+      {
+        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        partA: "Le vent se lève", partB: "les nuages arrivent", link: ",", linkType: "juxtaposition"
+      },
+      {
+        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        partA: "La nuit tombe", partB: "les lampadaires s'allument", link: ";", linkType: "juxtaposition"
+      },
+      {
+        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        partA: "Les cloches sonnent", partB: "les élèves sortent", link: ",", linkType: "juxtaposition"
+      },
+      {
+        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        partA: "Le vent souffle fort", partB: "les feuilles tombent", link: ";", linkType: "juxtaposition"
+      }
+    ],
+
+    level3Bank: [
+      { sentence: "Les enfants jouent dehors quand il fait beau .", answer: "subordination", hint: "« quand » introduit une subordonnée : conjonction de subordination." },
+      { sentence: "Nous irons à la plage si le temps le permet .", answer: "subordination", hint: "« si » introduit une subordonnée de condition." },
+      { sentence: "Léa est arrivée en retard comme le bus avait du retard .", answer: "subordination", hint: "« comme » introduit une subordonnée de cause." },
+      {
+        sentence: "Le chien qui aboie appartient à mon voisin .",
+        answer: "subordination",
+        hint: "« qui » est un pronom relatif : il introduit une subordonnée relative."
+      },
+      { sentence: "Le livre que je lis est passionnant .", answer: "subordination", hint: "« que » est ici un pronom relatif, pas un comparatif : il introduit une subordonnée relative." },
+      { sentence: "La maison où j'habite est petite .", answer: "subordination", hint: "« où » est un pronom relatif de lieu." },
+      { sentence: "Voici le stylo dont j'ai besoin .", answer: "subordination", hint: "« dont » est un pronom relatif." },
+      { sentence: "Le soleil se couche, les étoiles apparaissent .", answer: "juxtaposition", hint: "Aucun connecteur : virgule seule entre les deux propositions." },
+      { sentence: "Il fait chaud ; les enfants jouent dehors .", answer: "juxtaposition", hint: "Aucun connecteur : point-virgule seul entre les deux propositions." },
+      { sentence: "Le film commence, tout le monde se tait .", answer: "juxtaposition", hint: "Aucun connecteur : virgule seule entre les deux propositions." },
+      {
+        sentence: "Léa court plus vite que Paul, elle gagne toujours la course .",
+        answer: "juxtaposition",
+        hint: "« que Paul » compare deux éléments, sans verbe : ce n'est pas une proposition. Les deux vraies propositions (« Léa court… » et « elle gagne… ») sont juste séparées par une virgule, sans mot de liaison : juxtaposition."
+      },
+      {
+        sentence: "Le chat, le chien et le hamster dorment, ils sont fatigués .",
+        answer: "juxtaposition",
+        hint: "Les deux premières virgules énumèrent le sujet (« le chat, le chien et le hamster ») ; c'est la dernière virgule qui relie les deux propositions (« …dorment » et « ils sont fatigués »), sans connecteur : juxtaposition."
+      }
+    ]
+  },
+
   "phrases-connecteurs": {
     title: "Relier deux phrases avec la bonne conjonction",
     domaine:    "Français",
