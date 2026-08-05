@@ -14,9 +14,6 @@
    exercise.html?slug=) : ils n'ont pas de champ `competence` à partir duquel
    déduire une catégorie, donc leur rattachement est explicite ici.
 
-   - identifier-verbe-conjugue (francais/grammaire/identifier-verbe-conjugue/)
-     → Français / Grammaire
-
    Vocabulaire n'est plus listé ici depuis sa migration vers exercise.html?slug=
    (data/vocabulaire.js, competence: "Vocabulaire") : classification désormais
    automatique comme le reste d'EXERCISE_DATA. Les 10 homophones grammaticaux
@@ -31,9 +28,6 @@
    ────────────────────────────────────────────────────────────────────────── */
 
 const EXERCISE_CATALOG_AUTONOMOUS = [
-
-  /* ── Grammaire (page autonome dédiée) ────────────────────────────────────── */
-  { slug: "identifier-verbe-conjugue", title: "Identifier le verbe conjugué", category: "Français", subCategory: "Grammaire" },
 
   /* ── Algèbre (pages autonomes dédiées, hub algebre.html) ─────────────────── */
   { slug: "algebre-symboles-mysteres",   title: "Symboles mystères",        category: "Mathématiques", subCategory: "Algèbre" },

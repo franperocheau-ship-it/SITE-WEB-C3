@@ -1,4 +1,4 @@
-/* ── data/grammaire.js — Grammaire (17 exercices) ──────────────────────────
+/* ── data/grammaire.js — Grammaire (18 exercices) ──────────────────────────
    Extrait de exercise-data.js (migration par domaine). Chaque fichier de domaine
    s'enregistre lui-même dans window.EXERCISE_DATA : l'ordre de chargement entre
    fichiers de domaine n'a donc pas d'importance.
@@ -9,131 +9,145 @@ window.EXERCISE_DATA = window.EXERCISE_DATA || {};
 Object.assign(window.EXERCISE_DATA, {
 
   "identifier-adjectif": {
-    title: "Identifier les adjectifs",
+    title: "Identifier un adjectif",
     domaine:    "Français",
     competence: "Grammaire — L'adjectif",
-    levels: ["CM1", "CM2", "6e"],
-    paliers: 1, /* nombre réel de paliers du moteur */
-    type: "mots-cliquables",
-    questionsPerSession: 8,
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-    bank: [
-      {
-        instruction: "Clique sur tous les adjectifs parmi ces mots. (Ils peuvent décrire : le chat.)",
-        sentence: "petit noir mange maison silencieusement rapide",
-        targets: ["petit", "noir", "rapide"],
-        piege: {
-          "mange": "« mange » est un verbe.",
-          "maison": "« maison » est un nom.",
-          "silencieusement": "« silencieusement » est un adverbe (finit souvent en -ment)."
-        }
-      },
-      {
-        instruction: "Clique sur tous les adjectifs parmi ces mots. (Ils peuvent décrire : la fille.)",
-        sentence: "jolie gentille chante école doucement bleue",
-        targets: ["jolie", "gentille", "bleue"],
-        piege: {
-          "chante": "« chante » est un verbe.",
-          "école": "« école » est un nom.",
-          "doucement": "« doucement » est un adverbe (finit en -ment)."
-        }
-      },
-      {
-        instruction: "Clique sur tous les adjectifs dans la phrase.",
-        sentence: "La petite chatte grise dort sur le canapé confortable .",
-        targets: ["petite", "grise", "confortable"],
-        piege: {}
-      },
-      {
-        instruction: "Clique sur tous les adjectifs dans la phrase.",
-        sentence: "Un élève curieux lit un livre passionnant .",
-        targets: ["curieux", "passionnant"],
-        piege: {}
-      },
-      {
-        instruction: "Clique sur tous les adjectifs dans la phrase.",
-        sentence: "Il marche lentement dans la rue bondée .",
-        targets: ["bondée"],
-        piege: { "lentement": "« lentement » est un adverbe (il décrit le verbe « marche »), pas un adjectif." }
-      },
-      {
-        instruction: "Clique sur tous les adjectifs dans la phrase.",
-        sentence: "La porte fermée cache un couloir sombre .",
-        targets: ["fermée", "sombre"],
-        piege: {}
-      },
-      {
-        instruction: "Clique sur tous les adjectifs dans la phrase.",
-        sentence: "Ces beaux oiseaux chantent des mélodies douces .",
-        targets: ["beaux", "douces"],
-        piege: {}
-      },
-      {
-        instruction: "Clique sur tous les adjectifs dans la phrase.",
-        sentence: "Mon grand-père prépare une soupe chaude .",
-        targets: ["chaude"],
-        piege: { "grand-père": "« grand-père » est un nom composé, pas un adjectif." }
-      },
-      {
-        instruction: "Clique sur le mot qui N'EST PAS un adjectif (l'intrus).",
-        sentence: "rouge grand table joyeux",
-        targets: ["table"],
-        piege: {
-          "rouge": "« rouge » est un adjectif de couleur — cherche l'intrus !",
-          "grand": "« grand » est un adjectif — cherche l'intrus !",
-          "joyeux": "« joyeux » est un adjectif — cherche l'intrus !"
-        }
-      },
-      {
-        instruction: "Clique sur le mot qui N'EST PAS un adjectif (l'intrus).",
-        sentence: "rapide courir fort doux",
-        targets: ["courir"],
-        piege: {
-          "rapide": "« rapide » est un adjectif — cherche l'intrus !",
-          "fort": "« fort » est un adjectif — cherche l'intrus !",
-          "doux": "« doux » est un adjectif — cherche l'intrus !"
-        }
-      },
-      {
-        instruction: "Clique sur le mot qui N'EST PAS un adjectif (l'intrus).",
-        sentence: "beau maison petit léger",
-        targets: ["maison"],
-        piege: {
-          "beau": "« beau » est un adjectif — cherche l'intrus !",
-          "petit": "« petit » est un adjectif — cherche l'intrus !",
-          "léger": "« léger » est un adjectif — cherche l'intrus !"
-        }
-      },
-      {
-        instruction: "Clique sur le mot qui N'EST PAS un adjectif (l'intrus).",
-        sentence: "chanter triste sage bleu",
-        targets: ["chanter"],
-        piege: {
-          "triste": "« triste » est un adjectif — cherche l'intrus !",
-          "sage": "« sage » est un adjectif — cherche l'intrus !",
-          "bleu": "« bleu » est un adjectif de couleur — cherche l'intrus !"
-        }
-      },
-      {
-        instruction: "Clique sur le mot qui N'EST PAS un adjectif (l'intrus).",
-        sentence: "lentement heureux vif froid",
-        targets: ["lentement"],
-        piege: {
-          "heureux": "« heureux » est un adjectif — cherche l'intrus !",
-          "vif": "« vif » est un adjectif — cherche l'intrus !",
-          "froid": "« froid » est un adjectif — cherche l'intrus !"
-        }
-      },
-      {
-        instruction: "Clique sur le mot qui N'EST PAS un adjectif (l'intrus).",
-        sentence: "verte lumière ancienne nouvelle",
-        targets: ["lumière"],
-        piege: {
-          "verte": "« verte » est un adjectif de couleur — cherche l'intrus !",
-          "ancienne": "« ancienne » est un adjectif — cherche l'intrus !",
-          "nouvelle": "« nouvelle » est un adjectif — cherche l'intrus !"
-        }
-      }
+    type:       "homophones-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+    levelDescs: {
+      "CM1": "Repérer un adjectif parmi plusieurs mots",
+      "CM2": "Trouver tous les adjectifs dans une phrase",
+      "6e":  "Trouver tous les adjectifs dans des phrases plus longues et plus riches"
+    },
+    homoShuffle: [false, true, false],
+
+    /* Refonte en 3 niveaux (level1Bank/level2Bank/level3Bank), moteur
+       générique "homophones-niveaux" — même schéma que identifier-nom-
+       phrase (aucun nouveau moteur : chaque item porte son propre `type`,
+       dispatché dans showQuestion() vers les renderers standards choix-
+       etiquette / mots-cliquables / classification-etapes).
+       Niveau 1 : mots isolés (choix-etiquette), l'élève choisit l'adjectif
+       parmi 3 distracteurs de nature différente (nom/verbe/déterminant) —
+       volontairement sans piège nom/adjectif pour rester simple.
+       Niveau 2 : mots-cliquables, l'élève clique tous les adjectifs d'une
+       phrase ; la position varie (épithète avant/après le nom, attribut du
+       sujet) pour éviter un repérage purement positionnel.
+       Niveau 3 : mots-cliquables (même primitive qu'au niveau 2, une seule
+       étape, pas de "Étape 1"/classification) — identifier TOUS les
+       adjectifs d'une phrase plus riche/longue que le niveau 2 (plusieurs
+       adjectifs par phrase, épithètes avant ET après le nom, structures
+       plus complexes). Pas de volet gentilés/nationalités ni de
+       classification nom/adjectif : mélanger des réponses "ce n'est pas
+       un adjectif" dans une banque censée faire identifier des adjectifs
+       créait une confusion pédagogique, et le double palier de clic
+       (repérer puis classer) était superflu dès lors que la seule
+       réponse possible était toujours "Adjectif". Chaque item ci-dessous
+       a été vérifié mot à mot : tous les `targets` sont des adjectifs
+       qualificatifs réels (aucun déterminant comme « plusieurs »/
+       « quelques », aucun participe employé comme verbe, aucun gentilé/
+       nom de nationalité). */
+
+    level1Bank: [
+      { type:"choix-etiquette", instruction:"Clique sur l'adjectif parmi ces mots.",
+        word:"rouge · voiture · manger · les", choices:["rouge","voiture","manger","les"], answer:"rouge",
+        hint:"« rouge » est un adjectif de couleur : il décrit un nom (une pomme rouge)." },
+      { type:"choix-etiquette", instruction:"Clique sur l'adjectif parmi ces mots.",
+        word:"grand · arbre · sauter · un", choices:["grand","arbre","sauter","un"], answer:"grand",
+        hint:"« grand » est un adjectif de taille : il décrit un nom (un grand arbre)." },
+      { type:"choix-etiquette", instruction:"Clique sur l'adjectif parmi ces mots.",
+        word:"gentil · enfant · parler · des", choices:["gentil","enfant","parler","des"], answer:"gentil",
+        hint:"« gentil » est un adjectif de caractère : il décrit un nom (un enfant gentil)." },
+      { type:"choix-etiquette", instruction:"Clique sur l'adjectif parmi ces mots.",
+        word:"rond · ballon · rouler · ce", choices:["rond","ballon","rouler","ce"], answer:"rond",
+        hint:"« rond » est un adjectif de forme : il décrit un nom (un ballon rond)." },
+      { type:"choix-etiquette", instruction:"Clique sur l'adjectif parmi ces mots.",
+        word:"bleue · robe · danser · cette", choices:["bleue","robe","danser","cette"], answer:"bleue",
+        hint:"« bleue » est un adjectif de couleur : il décrit un nom (une robe bleue)." },
+      { type:"choix-etiquette", instruction:"Clique sur l'adjectif parmi ces mots.",
+        word:"petit · chat · dormir · mon", choices:["petit","chat","dormir","mon"], answer:"petit",
+        hint:"« petit » est un adjectif de taille : il décrit un nom (un petit chat)." },
+      { type:"choix-etiquette", instruction:"Clique sur l'adjectif parmi ces mots.",
+        word:"courageux · pompier · éteindre · le", choices:["courageux","pompier","éteindre","le"], answer:"courageux",
+        hint:"« courageux » est un adjectif de caractère : il décrit un nom (un pompier courageux)." },
+      { type:"choix-etiquette", instruction:"Clique sur l'adjectif parmi ces mots.",
+        word:"carrée · table · poser · une", choices:["carrée","table","poser","une"], answer:"carrée",
+        hint:"« carrée » est un adjectif de forme : il décrit un nom (une table carrée)." },
+      { type:"choix-etiquette", instruction:"Clique sur l'adjectif parmi ces mots.",
+        word:"verte · prairie · brouter · la", choices:["verte","prairie","brouter","la"], answer:"verte",
+        hint:"« verte » est un adjectif de couleur : il décrit un nom (une prairie verte)." },
+      { type:"choix-etiquette", instruction:"Clique sur l'adjectif parmi ces mots.",
+        word:"joyeux · clown · amuser · ces", choices:["joyeux","clown","amuser","ces"], answer:"joyeux",
+        hint:"« joyeux » est un adjectif de caractère : il décrit un nom (un clown joyeux)." },
+      { type:"choix-etiquette", instruction:"Clique sur l'adjectif parmi ces mots.",
+        word:"pointu · crayon · tailler · ce", choices:["pointu","crayon","tailler","ce"], answer:"pointu",
+        hint:"« pointu » est un adjectif de forme : il décrit un nom (un crayon pointu)." },
+      { type:"choix-etiquette", instruction:"Clique sur l'adjectif parmi ces mots.",
+        word:"timide · élève · répondre · cet", choices:["timide","élève","répondre","cet"], answer:"timide",
+        hint:"« timide » est un adjectif de caractère : il décrit un nom (un élève timide)." }
+    ],
+
+    level2Bank: [
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Une jolie maison borde la rivière .", targets:["jolie"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Le chat noir dort sur le canapé .", targets:["noir"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Le ciel est gris aujourd'hui .", targets:["gris"],
+        piege:{ "aujourd'hui": "« aujourd'hui » est un adverbe de temps, pas un adjectif." } },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Cette grande forêt cache un vieux sentier .", targets:["grande","vieux"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Mon frère est fatigué ce soir .", targets:["fatigué"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Les enfants heureux jouent dans le jardin .", targets:["heureux"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Cette petite fille porte une robe rouge .", targets:["petite","rouge"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Le vieux marin raconte une histoire captivante .", targets:["vieux","captivante"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Ton nouveau vélo est très rapide .", targets:["nouveau","rapide"],
+        piege:{ "très": "« très » est un adverbe d'intensité, pas un adjectif." } },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"La mer semble calme ce matin .", targets:["calme"], piege:{} }
+    ],
+
+    level3Bank: [
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Le vieux chat noir dormait paisiblement sur le canapé confortable de sa maîtresse fatiguée .",
+        targets:["vieux","noir","confortable","fatiguée"],
+        piege:{ "paisiblement": "« paisiblement » est un adverbe de manière, pas un adjectif." } },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"La grande maison blanche possède un magnifique jardin fleuri où jouent des enfants heureux .",
+        targets:["grande","blanche","magnifique","fleuri","heureux"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Le jeune pêcheur courageux affronta bravement la mer agitée et rentra chez lui , épuisé mais fier .",
+        targets:["jeune","courageux","agitée","épuisé","fier"],
+        piege:{ "bravement": "« bravement » est un adverbe de manière, pas un adjectif." } },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Cette petite librairie ancienne vend de vieux livres poussiéreux à des clients passionnés .",
+        targets:["petite","ancienne","vieux","poussiéreux","passionnés"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Ce jeune artiste talentueux peint de superbes tableaux colorés dans son petit atelier lumineux .",
+        targets:["jeune","talentueux","superbes","colorés","petit","lumineux"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"La vieille horloge dorée sonnait doucement dans le grand salon silencieux .",
+        targets:["vieille","dorée","grand","silencieux"],
+        piege:{ "doucement": "« doucement » est un adverbe de manière, pas un adjectif." } },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Le petit village tranquille abrite une jolie église ancienne et plusieurs maisons colorées .",
+        targets:["petit","tranquille","jolie","ancienne","colorées"],
+        piege:{ "plusieurs": "« plusieurs » est un déterminant indéfini, pas un adjectif qualificatif." } },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Cette immense forêt sombre cache de nombreux animaux sauvages et quelques ruines mystérieuses .",
+        targets:["immense","sombre","nombreux","sauvages","mystérieuses"],
+        piege:{ "quelques": "« quelques » est un déterminant indéfini, pas un adjectif qualificatif." } },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Le petit garçon timide observait le magicien habile avec de grands yeux curieux .",
+        targets:["petit","timide","habile","grands","curieux"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur tous les adjectifs de la phrase.",
+        sentence:"Cette jeune institutrice patiente explique de longues leçons compliquées à des élèves attentifs .",
+        targets:["jeune","patiente","longues","compliquées","attentifs"], piege:{} }
     ]
   },
 
@@ -495,6 +509,119 @@ Object.assign(window.EXERCISE_DATA, {
         step1Targets:["renard"],
         step2Instruction:"Ce mot est-il un nom commun ou un nom propre ?",
         classifyChoices:["Nom commun","Nom propre"], step2Answer:"Nom commun" }
+    ]
+  },
+
+  "identifier-verbe-conjugue": {
+    title: "Identifier un verbe conjugué",
+    domaine:    "Français",
+    competence: "Grammaire — Le verbe",
+    type:       "homophones-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur — cohérent avec les anciennes
+                       tentatives "Niveau 1/2/3" de la page autonome (analytics enseignant) */
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+    levelDescs: {
+      "CM1": "Repérer le verbe conjugué dans une phrase simple",
+      "CM2": "Reconnaître le verbe conjugué malgré les pièges (infinitif, nom, passé composé)",
+      "6e":  "Repérer un ou plusieurs verbes conjugués dans des phrases plus complexes"
+    },
+    homoShuffle: [false, true, false],
+
+    /* Migration depuis l'ancienne page autonome francais/grammaire/identifier-
+       verbe-conjugue/ (moteur JS dédié, hors EXERCISE_DATA) vers le moteur
+       générique "homophones-niveaux" : chaque item est du type mots-cliquables
+       déjà utilisé ailleurs sur le site (ex. identifier-nom-phrase/level2Bank),
+       ce qui suffit à couvrir les 3 niveaux sans nouveau renderer — le clic
+       gère nativement plusieurs cibles (verbes composés du type "a terminé",
+       ou phrases à deux verbes conjugués).
+       Niveau 1 : un seul verbe conjugué évident, aucun piège.
+       Niveau 2 : temps variés (présent/imparfait/futur/passé composé) et
+       pièges classiques (infinitif, nom homographe) signalés via `piege`.
+       Niveau 3 : phrases plus riches, parfois deux verbes conjugués à la
+       fois, pièges participe passé employé comme adjectif. */
+
+    level1Bank: [
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase.",
+        sentence:"Le chat dort sur le canapé .", targets:["dort"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase.",
+        sentence:"Les élèves écoutent la maîtresse .", targets:["écoutent"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase.",
+        sentence:"Papa prépare le repas .", targets:["prépare"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase.",
+        sentence:"Nous jouons dans la cour .", targets:["jouons"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase.",
+        sentence:"Le vent souffle très fort .", targets:["souffle"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase.",
+        sentence:"Ma sœur dessine un cheval .", targets:["dessine"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase.",
+        sentence:"Vous chantez une jolie chanson .", targets:["chantez"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase.",
+        sentence:"Les oiseaux volent dans le ciel .", targets:["volent"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase.",
+        sentence:"Je range ma chambre .", targets:["range"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase.",
+        sentence:"Tu regardes un dessin animé .", targets:["regardes"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase.",
+        sentence:"Le facteur distribue le courrier .", targets:["distribue"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase.",
+        sentence:"Les abeilles butinent les fleurs .", targets:["butinent"], piege:{} }
+    ],
+
+    level2Bank: [
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).",
+        sentence:"Demain , nous partirons en voyage .", targets:["partirons"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).",
+        sentence:"Il veut manger une glace .", targets:["veut"],
+        piege:{ "manger": "« manger » est un verbe à l'infinitif : il ne se conjugue pas, il ne change pas selon le sujet. Le verbe conjugué est « veut »." } },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).",
+        sentence:"Hier , Léa a terminé son dessin .", targets:["a","terminé"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).",
+        sentence:"Le dîner refroidit sur la table .", targets:["refroidit"],
+        piege:{ "dîner": "« dîner » est un nom ici (le repas du soir) : on peut dire « le dîner ». Le verbe conjugué est « refroidit »." } },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).",
+        sentence:"Avant , mon frère jouait au tennis .", targets:["jouait"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).",
+        sentence:"Elle espère gagner la course .", targets:["espère"],
+        piege:{ "gagner": "« gagner » est un verbe à l'infinitif : il ne se conjugue pas. Le verbe conjugué est « espère »." } },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).",
+        sentence:"Nous avons visité un château .", targets:["avons","visité"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).",
+        sentence:"La marche rapide fatigue les jambes .", targets:["fatigue"],
+        piege:{ "marche": "« marche » est un nom ici (l'activité de marcher) : on peut dire « la marche ». Le verbe conjugué est « fatigue »." } },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).",
+        sentence:"Vous finirez vos devoirs ce soir .", targets:["finirez"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).",
+        sentence:"Tu aimes lire des bandes dessinées .", targets:["aimes"],
+        piege:{ "lire": "« lire » est un verbe à l'infinitif : il ne se conjugue pas. Le verbe conjugué est « aimes »." } }
+    ],
+
+    level3Bank: [
+      { type:"mots-cliquables", instruction:"Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).",
+        sentence:"Quand la cloche sonne , les élèves rangent leurs affaires .", targets:["sonne","rangent"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).",
+        sentence:"La porte fermée grince quand on la pousse .", targets:["grince","pousse"],
+        piege:{ "fermée": "« fermée » est un participe passé employé ici comme adjectif : il décrit le nom « porte ». Ce n'est pas le verbe conjugué (qui est « grince »)." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).",
+        sentence:"Mon voisin est très gentil .", targets:["est"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).",
+        sentence:"Elle prend son manteau et sort rapidement .", targets:["prend","sort"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).",
+        sentence:"Fatigués , les coureurs veulent s'arrêter .", targets:["veulent"],
+        piege:{ "Fatigués": "« Fatigués » est un participe passé employé ici comme adjectif : il décrit les coureurs. Ce n'est pas le verbe conjugué (qui est « veulent »).",
+                 "s'arrêter": "« s'arrêter » est un verbe à l'infinitif : il ne se conjugue pas. Le verbe conjugué est « veulent »." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).",
+        sentence:"Le repas préparé sent délicieusement bon .", targets:["sent"],
+        piege:{ "préparé": "« préparé » est un participe passé employé ici comme adjectif : il décrit le nom « repas ». Ce n'est pas le verbe conjugué (qui est « sent »)." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).",
+        sentence:"Les enfants ont sommeil car ils jouent depuis ce matin .", targets:["ont","jouent"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).",
+        sentence:"Pendant que maman lit , papa écoute de la musique .", targets:["lit","écoute"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).",
+        sentence:"Le champion , épuisé , franchit la ligne d'arrivée .", targets:["franchit"],
+        piege:{ "épuisé": "« épuisé » est un participe passé employé ici comme adjectif : il décrit le champion. Ce n'est pas le verbe conjugué (qui est « franchit »)." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).",
+        sentence:"Le clown a très peur des araignées .", targets:["a"], piege:{} }
     ]
   },
 
@@ -1221,39 +1348,39 @@ Object.assign(window.EXERCISE_DATA, {
 
     level2Bank: [
       {
-        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        instruction: "Clique sur le mot ou la ponctuation qui relie les deux propositions.",
         partA: "Le chat miaule", partB: "Léo oublie de le nourrir", link: "parce que", linkType: "subordination"
       },
       {
-        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        instruction: "Clique sur le mot ou la ponctuation qui relie les deux propositions.",
         partA: "Nous restons chez nous", partB: "le temps se gâte", link: "quand", linkType: "subordination"
       },
       {
-        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        instruction: "Clique sur le mot ou la ponctuation qui relie les deux propositions.",
         partA: "Les élèves applaudissent", partB: "le spectacle commence", link: "lorsque", linkType: "subordination"
       },
       {
-        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        instruction: "Clique sur le mot ou la ponctuation qui relie les deux propositions.",
         partA: "Tom prend un parapluie", partB: "le ciel devient gris", link: "puisque", linkType: "subordination"
       },
       {
-        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        instruction: "Clique sur le mot ou la ponctuation qui relie les deux propositions.",
         partA: "Léa lit le livre", partB: "son frère a offert", link: "que", linkType: "subordination"
       },
       {
-        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        instruction: "Clique sur le mot ou la ponctuation qui relie les deux propositions.",
         partA: "Le vent se lève", partB: "les nuages arrivent", link: ",", linkType: "juxtaposition"
       },
       {
-        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        instruction: "Clique sur le mot ou la ponctuation qui relie les deux propositions.",
         partA: "La nuit tombe", partB: "les lampadaires s'allument", link: ";", linkType: "juxtaposition"
       },
       {
-        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        instruction: "Clique sur le mot ou la ponctuation qui relie les deux propositions.",
         partA: "Les cloches sonnent", partB: "les élèves sortent", link: ",", linkType: "juxtaposition"
       },
       {
-        instruction: "Clique sur le mot (ou la ponctuation) qui introduit la 2ᵉ proposition.",
+        instruction: "Clique sur le mot ou la ponctuation qui relie les deux propositions.",
         partA: "Le vent souffle fort", partB: "les feuilles tombent", link: ";", linkType: "juxtaposition"
       }
     ],
@@ -2082,7 +2209,7 @@ Object.assign(window.EXERCISE_DATA, {
     title: "Distinguer le pronom personnel sujet et le pronom personnel complément",
     domaine:    "Français",
     competence: "Grammaire — Pronoms personnels",
-    levels: ["CM2", "6e"],
+    levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
     type: "psc-niveaux",
     questionsPerSession: 10,

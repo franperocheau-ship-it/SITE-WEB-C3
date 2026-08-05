@@ -384,6 +384,7 @@
       "identifier-differencier-determinants-demonstratifs-possessifs",
       "identifier-nom-phrase",
       "identifier-adjectif",
+      "identifier-verbe-conjugue",
       "accord-verbe-sujet-inverse",
       "differencier-epithete-attribut",
       "distinguer-epithete-complement-nom",
@@ -392,9 +393,7 @@
     ]);
 
     /* ── Standalone exercise pages (not using the generic engine) ─────────── */
-    const CUSTOM_HREFS = {
-      "identifier-verbe-conjugue": "francais/grammaire/identifier-verbe-conjugue/index.html"
-    };
+    const CUSTOM_HREFS = {};
 
     /* ── Data ──────────────────────────────────────────────────────────────── */
     const SECTIONS = [
@@ -455,7 +454,7 @@
           {
             label: "Pronoms",
             skills: [
-              { title: "Distinguer pronom personnel sujet et pronom personnel complément", slug: "distinguer-pronom-sujet-complement",  levels: ["CM2","6e"] },
+              { title: "Distinguer pronom personnel sujet et pronom personnel complément", slug: "distinguer-pronom-sujet-complement",  levels: ["CM1","CM2","6e"] },
               { title: "Remplacer un groupe nominal sujet par un pronom personnel",      slug: "remplacer-gn-sujet-pronom",             levels: ["CM1","CM2","6e"] },
               { title: "Remplacer un groupe nominal complément par un pronom personnel", slug: "remplacer-gn-complement-pronom",        levels: ["CM1","CM2","6e"] },
               { title: "Identifier un pronom personnel complément d'objet",              slug: "identifier-pronom-complement-objet",    levels: ["CM2","6e"] },
@@ -465,14 +464,13 @@
           {
             label: "Verbes",
             skills: [
-              { title: "Identifier le verbe conjugué",                                   slug: "identifier-verbe-conjugue",             levels: ["CM1","CM2","6e"] },
+              { title: "Identifier un verbe conjugué",                                   slug: "identifier-verbe-conjugue",             levels: ["CM1","CM2","6e"] },
             ]
           },
           {
             label: "Mots invariables : adverbes, prépositions, conjonctions",
             skills: [
               { title: "Identifier les adverbes",                                        slug: "identifier-adverbe-frequent",           levels: ["CM1","CM2","6e"] },
-              { title: "Reconnaître qu'un adverbe est invariable",                       slug: "adverbe-invariable",                    levels: ["CM1","CM2","6e"] },
               { title: "Identifier une préposition",                                     slug: "identifier-preposition",                levels: ["CM2","6e"] },
               { title: "Identifier une conjonction de coordination",                     slug: "identifier-conjonction-coordination",   levels: ["CM1","CM2","6e"] },
               { title: "Identifier une conjonction de subordination",                    slug: "identifier-conjonction-subordination",  levels: ["CM2","6e"] },
@@ -506,7 +504,6 @@
             skills: [
               { title: "Identifier le groupe sujet",                                    slug: "identifier-groupe-sujet",               levels: ["CM1","CM2","6e"] },
               { title: "Reconnaître les différents types de sujets",                   slug: "reconnaitre-types-sujets",              levels: ["CM1","CM2","6e"] },
-              { title: "Identifier un sujet inversé",                                  slug: "identifier-sujet-inverse",              levels: ["CM2","6e"] },
               { title: "Accorder le verbe avec un sujet inversé",                      slug: "accord-verbe-sujet-inverse",            levels: ["CM2","6e"] },
             ]
           },

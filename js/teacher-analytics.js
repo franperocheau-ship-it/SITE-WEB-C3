@@ -61,7 +61,9 @@ const lfmAnalytics = (() => {
      — voir grep "saveExerciseResult" *.html). */
   const STANDALONE_META = {
     exact: {
-      'identifier-verbe-conjugue':           { domaine: 'Français',      competence: 'Conjugaison — Identifier le verbe conjugué' },
+      /* identifier-verbe-conjugue migré vers EXERCISE_DATA (data/grammaire.js,
+         competence "Grammaire — Le verbe") : résolu directement par
+         catalogMap[slug] dans metaFor() ci-dessous, plus besoin d'entrée ici. */
       'ecrire-fraction-sous-forme-decimale': { domaine: 'Mathématiques', competence: 'Nombres décimaux — Écrire une fraction sous forme décimale' },
       'ecrire-decimal-sous-forme-fraction':  { domaine: 'Mathématiques', competence: 'Nombres décimaux — Écrire un décimal sous forme de fraction' },
     },
