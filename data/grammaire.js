@@ -992,6 +992,183 @@ Object.assign(window.EXERCISE_DATA, {
     ]
   },
 
+  "distinguer-coordination-subordination": {
+    title:      "Distinguer la coordination de la subordination",
+    domaine:    "Français",
+    competence: "Grammaire — La phrase complexe",
+    type:       "distinguer-coordination-subordination-niveaux",
+    levels:     ["6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+
+    /* 3 niveaux (même primitive mots-cliquables que identifier-juxtaposition-
+       niveaux / identifier-subordination-niveaux). Uniquement des CONJONCTIONS
+       (coordination et subordination) — pas de pronoms relatifs ici (déjà
+       couverts par identifier-subordination), pas de juxtaposition (déjà
+       couverte par identifier-juxtaposition).
+       Niveau 1 : 3 étapes — (1) clique sur le verbe de chaque proposition
+       (colore bleu/orange une fois les 2 trouvés), (2) clique sur le(s)
+       mot(s) de liaison restant(s) (violet), (3) choix binaire "conjonction
+       de coordination" / "conjonction de subordination". Bouton d'indice
+       "?" disponible (rôle grammatical, sans exemple de mot).
+       Niveau 2 : étai en 1 étape — clique directement sur le connecteur (les
+       2 propositions se colorent automatiquement), puis choix binaire
+       "coordonnée" / "subordonnée". Pas d'indice.
+       Niveau 3 : jugement direct seul, à 2 choix, avec pièges ("et"/"ou"
+       reliant deux noms dans une phrase par ailleurs complexe, à ne pas
+       confondre avec le vrai connecteur de la phrase). ─────────────────── */
+    level1Bank: [
+      /* ── Coordination ── */
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Le vent souffle", verbA: "souffle",
+        connector: "et",
+        partB: "la pluie tombe", verbB: "tombe",
+        connectorType: "coordination"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Léa aime lire", verbA: "aime",
+        connector: "mais",
+        partB: "elle déteste écrire", verbB: "déteste",
+        connectorType: "coordination"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Tu restes", verbA: "restes",
+        connector: "ou",
+        partB: "tu pars", verbB: "pars",
+        connectorType: "coordination"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Il court vite", verbA: "court",
+        connector: "donc",
+        partB: "il gagne la course", verbB: "gagne",
+        connectorType: "coordination"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Le film commence", verbA: "commence",
+        connector: "or",
+        partB: "les spectateurs arrivent en retard", verbB: "arrivent",
+        connectorType: "coordination"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Paul reste chez lui", verbA: "reste",
+        connector: "car",
+        partB: "il est malade", verbB: "est",
+        connectorType: "coordination"
+      },
+      /* ── Subordination ── */
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Les enfants sourient", verbA: "sourient",
+        connector: "quand",
+        partB: "le soleil brille", verbB: "brille",
+        connectorType: "subordination"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Nous partons", verbA: "partons",
+        connector: "si",
+        partB: "la pluie cesse", verbB: "cesse",
+        connectorType: "subordination"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "La rivière déborde", verbA: "déborde",
+        connector: "comme",
+        partB: "la pluie tombe abondamment", verbB: "tombe",
+        connectorType: "subordination"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Tu peux sortir", verbA: "peux",
+        connector: "puisque",
+        partB: "le devoir est fini", verbB: "est",
+        connectorType: "subordination"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Le magasin ferme", verbA: "ferme",
+        connector: "lorsque",
+        partB: "la nuit arrive", verbB: "arrive",
+        connectorType: "subordination"
+      },
+      {
+        instruction: "Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.",
+        partA: "Léa sourit", verbA: "sourit",
+        connector: "parce que",
+        partB: "son ami chante", verbB: "chante",
+        connectorType: "subordination"
+      }
+    ],
+
+    level2Bank: [
+      {
+        instruction: "Clique sur le mot (ou les mots) qui relient les deux propositions.",
+        partA: "Léa sort", partB: "le temps soit maussade", link: "bien que", linkType: "subordination"
+      },
+      {
+        instruction: "Clique sur le mot (ou les mots) qui relient les deux propositions.",
+        partA: "Les enfants dessinent", partB: "la pluie tombe", link: "pendant que", linkType: "subordination"
+      },
+      {
+        instruction: "Clique sur le mot (ou les mots) qui relient les deux propositions.",
+        partA: "Le train partira", partB: "tout le monde soit installé", link: "avant que", linkType: "subordination"
+      },
+      {
+        instruction: "Clique sur le mot (ou les mots) qui relient les deux propositions.",
+        partA: "Nous sortirons", partB: "la pluie cessera", link: "dès que", linkType: "subordination"
+      },
+      {
+        instruction: "Clique sur le mot (ou les mots) qui relient les deux propositions.",
+        partA: "Marie est contente", partB: "son frère est déçu", link: "alors que", linkType: "subordination"
+      },
+      {
+        instruction: "Clique sur le mot (ou les mots) qui relient les deux propositions.",
+        partA: "Le ciel s'éclaircit", partB: "les enfants sortent jouer", link: "donc", linkType: "coordination"
+      },
+      {
+        instruction: "Clique sur le mot (ou les mots) qui relient les deux propositions.",
+        partA: "Elle aime la mer", partB: "elle déteste la montagne", link: "mais", linkType: "coordination"
+      },
+      {
+        instruction: "Clique sur le mot (ou les mots) qui relient les deux propositions.",
+        partA: "Tu choisis le rouge", partB: "tu choisis le bleu", link: "ou", linkType: "coordination"
+      },
+      {
+        instruction: "Clique sur le mot (ou les mots) qui relient les deux propositions.",
+        partA: "Le ciel devient sombre", partB: "l'orage approche", link: "or", linkType: "coordination"
+      }
+    ],
+
+    level3Bank: [
+      { sentence: "Les élèves applaudissent quand le spectacle commence .", answer: "subordination", hint: "« quand » est une conjonction de subordination." },
+      { sentence: "Nous resterons chez nous si la tempête continue .", answer: "subordination", hint: "« si » est une conjonction de subordination." },
+      { sentence: "Léo travaille bien qu'il soit fatigué .", answer: "subordination", hint: "« bien que » est une conjonction de subordination (elle exprime la concession)." },
+      { sentence: "Elle prépare le dîner pendant que son frère met la table .", answer: "subordination", hint: "« pendant que » est une conjonction de subordination." },
+      { sentence: "Ils partiront dès que le bus arrivera .", answer: "subordination", hint: "« dès que » est une conjonction de subordination." },
+      {
+        sentence: "Paul et Marie jouent au ballon quand la cloche sonne .",
+        answer: "subordination",
+        hint: "« Paul et Marie » : « et » relie ici deux noms (le sujet), pas deux propositions. Le vrai lien entre les deux propositions est « quand » : subordination."
+      },
+      { sentence: "Le ciel est bleu et les oiseaux chantent .", answer: "coordination", hint: "« et » est une conjonction de coordination." },
+      { sentence: "Elle est fatiguée car elle a beaucoup travaillé .", answer: "coordination", hint: "« car » est une conjonction de coordination." },
+      { sentence: "Tu peux rester ou tu peux partir .", answer: "coordination", hint: "« ou » est une conjonction de coordination." },
+      { sentence: "Il pleuvait donc nous sommes restés à la maison .", answer: "coordination", hint: "« donc » est une conjonction de coordination." },
+      { sentence: "Le magasin est fermé or nous avions besoin de pain .", answer: "coordination", hint: "« or » est une conjonction de coordination." },
+      {
+        sentence: "Léa choisit un livre ou un magazine, mais elle repart les mains vides .",
+        answer: "coordination",
+        hint: "« ou » relie ici deux noms (le complément), pas deux propositions. Le vrai lien entre les deux propositions est « mais » : coordination."
+      }
+    ]
+  },
+
   "phrases-connecteurs": {
     title: "Relier deux phrases avec la bonne conjonction",
     domaine:    "Français",

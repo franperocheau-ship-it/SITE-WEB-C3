@@ -1205,6 +1205,39 @@
       color: #e67e22;
     }
 
+    /* ── Type : distinguer-coordination-subordination-niveaux ────────────── */
+    .ex-word-btn.dcs-connector {
+      border-color: #7c3aed;
+      background: rgba(124,58,237,0.12);
+      color: #7c3aed;
+      font-weight: 700;
+    }
+    .dcs-hint-row { text-align: right; margin-bottom: 10px; }
+    .dcs-hint-btn {
+      background: transparent;
+      color: var(--blue);
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .dcs-hint-btn:hover { border-color: var(--blue); }
+    .dcs-hint-panel {
+      background: rgba(16,43,106,0.05);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .dcs-hint-panel p { margin: 0 0 8px; }
+    .dcs-hint-panel p:last-child { margin-bottom: 0; }
+
     /* ── Utility ────────────────────────────────────────────── */
     .ex-hidden { display: none !important; }
 
@@ -5765,6 +5798,9 @@
       } else if (currentType === "identifier-subordination-niveaux") {
         isInitSession();
         return;
+      } else if (currentType === "distinguer-coordination-subordination-niveaux") {
+        dcsInitSession();
+        return;
       } else if (currentType === "articles-def-indef-niveaux") {
         idiInitSession();
         return;
@@ -6061,6 +6097,8 @@
         /* session managed by ijInitSession — no-op here */
       } else if (currentType === "identifier-subordination-niveaux") {
         /* session managed by isInitSession — no-op here */
+      } else if (currentType === "distinguer-coordination-subordination-niveaux") {
+        /* session managed by dcsInitSession — no-op here */
       } else if (currentType === "articles-def-indef-niveaux") {
         /* session managed by idiInitSession — no-op here */
       } else if (currentType === "fraction-decimale-grille-droite-niveaux") {
@@ -32225,6 +32263,477 @@
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
         exerciseType: 'identifier-subordination-niveaux',
+        level:        'Niveau ' + lv,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : distinguer-coordination-subordination-niveaux — « Distinguer la
+       coordination de la subordination »
+       Même primitive mots-cliquables que identifier-juxtaposition-niveaux /
+       identifier-subordination-niveaux (classes .ij-prop1/.ij-prop2
+       réutilisées) + une 3ᵉ couleur .dcs-connector pour le mot de liaison.
+       Uniquement des conjonctions (pas de pronoms relatifs, pas de
+       juxtaposition — déjà couvertes par les 2 compétences ci-dessus).
+       Niveau 1 : 3 étapes — verbes des 2 propositions, puis mot(s) de
+                  liaison restant(s), puis choix binaire "conjonction de
+                  coordination" / "conjonction de subordination". Bouton
+                  d'indice (rôle grammatical, sans exemple de mot).
+       Niveau 2 : clique direct sur le connecteur (colore les 2 propositions
+                  automatiquement), puis choix binaire "coordonnée" /
+                  "subordonnée". Pas d'indice.
+       Niveau 3 : jugement direct seul, à 2 choix.
+       3 niveaux déverrouillables à 80 % via LevelSelect.
+       ══════════════════════════════════════════════════════════════════════ */
+
+    const DCS_SEUIL = 0.8;
+    const DCS_LEVEL_DESCS = [
+      "Repérer les verbes, le mot de liaison, puis catégoriser",
+      "Identifier le connecteur, puis catégoriser la phrase",
+      "Juger seul : coordonnée ou subordonnée ?"
+    ];
+    const DCS_L1_CHOICES = [
+      { value: 'coordination',  label: 'conjonction de coordination' },
+      { value: 'subordination', label: 'conjonction de subordination' }
+    ];
+    const DCS_L2_LABELS = { coordination: 'coordonnée', subordination: 'subordonnée' };
+    const DCS_HINT_HTML = `
+      <p><strong>Conjonction de coordination</strong> : elle relie deux propositions de même niveau, indépendantes l'une de l'autre — chacune pourrait former une phrase à elle seule.</p>
+      <p><strong>Conjonction de subordination</strong> : elle relie une proposition qui dépend d'une autre — elle a besoin de la proposition principale pour avoir un sens complet.</p>
+    `;
+
+    let dcsState      = null;
+    let dcsLevelSelect = null;
+
+    /* Bouton d'indice cliquable du Niveau 1 (composant local à ce type) —
+       ne fait qu'un toggle d'affichage, contenu 100% statique (jamais de
+       liste de mots-exemples, cf. contrainte pédagogique du Niveau 1). */
+    function dcsToggleHint() {
+      const panel = document.getElementById('dcs-hint-panel');
+      const btn   = document.getElementById('dcs-hint-btn');
+      if (!panel || !btn) return;
+      const hidden = panel.classList.toggle('ex-hidden');
+      btn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+    }
+
+    function dcsBackToSelectScreen() {
+      dcsState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    function dcsInitSession() {
+      dcsState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      dcsLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: [1, 2, 3].map(lv => ({ id: lv, label: 'Niveau ' + lv, description: DCS_LEVEL_DESCS[lv - 1] })),
+        threshold: DCS_SEUIL,
+        onSelectLevel: (lv) => dcsStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: dcsBackToSelectScreen
+      });
+      dcsLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function dcsStartLevel(lv) {
+      const bankKey = 'level' + lv + 'Bank';
+      const items   = shuffle([...(sessionData[bankKey] || [])]);
+      dcsState = { lv, items, idx: 0, score: 0, total: items.length };
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = items.length;
+      if (dcsLevelSelect) dcsLevelSelect.renderBadges(lv);
+      dcsRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function dcsRenderQuestion(card) {
+      const { lv, items, idx, total } = dcsState;
+      const q = items[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if      (lv === 1) dcsRenderLevel1(card, q);
+      else if (lv === 2) dcsRenderLevel2(card, q);
+      else               dcsRenderLevel3(card, q);
+    }
+
+    function dcsAdvance() {
+      dcsState.idx++;
+      if (dcsState.idx >= dcsState.items.length) {
+        dcsShowLevelResults();
+      } else {
+        dcsRenderQuestion(document.getElementById('ex-card'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    /* ── Niveau 1 — verbes des 2 propositions, puis mot(s) de liaison,
+       puis choix binaire conjonction de coordination / subordination ──── */
+    function dcsRenderLevel1(card, q) {
+      const { idx, total } = dcsState;
+
+      card.innerHTML = `
+        <div class="dcs-hint-row">
+          <button type="button" class="dcs-hint-btn" id="dcs-hint-btn" aria-expanded="false">Indice ?</button>
+        </div>
+        <div class="dcs-hint-panel ex-hidden" id="dcs-hint-panel">${DCS_HINT_HTML}</div>
+        <p class="ex-question-label" id="dcs-instr">${q.instruction}</p>
+        <div class="ex-sentence-words" id="dcs-words"></div>
+        <div class="ex-feedback-area" id="dcs-fb1"></div>
+        <div id="dcs-step3" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title">Étape 3 — Coordination ou subordination ?</div>
+          <div class="ex-choices-grid" id="dcs-choices3"></div>
+          <div class="ex-feedback-area" id="dcs-fb3"></div>
+        </div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+      document.getElementById('dcs-hint-btn').addEventListener('click', dcsToggleHint);
+
+      const wordsEl = document.getElementById('dcs-words');
+      const tokens  = [];
+      q.partA.split(/\s+/).forEach(w => tokens.push({ text: w, prop: 1 }));
+      const connectorWords = q.connector.split(/\s+/);
+      connectorWords.forEach(w => tokens.push({ text: w, prop: 'link' }));
+      q.partB.split(/\s+/).forEach(w => tokens.push({ text: w, prop: 2 }));
+      tokens.push({ text: '.', prop: 2 });
+
+      let phase          = 1; /* 1: verbe A, 2: verbe B, 3: mot(s) de liaison, 4: fini */
+      let step1Correct   = false;
+      let step2Correct   = false;
+      let connectorFound = 0;
+      const connectorTotal = connectorWords.length;
+
+      tokens.forEach(tok => {
+        const clean = tok.text.replace(IJ_CLEAN_RE, '');
+        if (!clean) return;
+        const btn = document.createElement('button');
+        btn.className     = 'ex-word-btn';
+        btn.textContent    = tok.text;
+        btn.dataset.clean  = clean;
+        btn.dataset.prop   = tok.prop;
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          const cleanLower = clean.toLowerCase();
+
+          if (phase === 1) {
+            btn.disabled = true;
+            if (cleanLower === q.verbA.toLowerCase()) {
+              step1Correct = true;
+              btn.classList.add('ij-prop1');
+            } else {
+              btn.classList.add('is-wrong');
+              wordsEl.querySelectorAll('.ex-word-btn').forEach(b => {
+                if (b.dataset.clean.toLowerCase() === q.verbA.toLowerCase()) b.classList.add('ij-prop1');
+              });
+            }
+            document.getElementById('dcs-instr').textContent =
+              'Clique maintenant sur le verbe conjugué de la 2ᵉ proposition.';
+            phase = 2;
+
+          } else if (phase === 2) {
+            btn.disabled = true;
+            if (cleanLower === q.verbB.toLowerCase()) {
+              step2Correct = true;
+              btn.classList.add('ij-prop2');
+            } else {
+              btn.classList.add('is-wrong');
+              wordsEl.querySelectorAll('.ex-word-btn').forEach(b => {
+                if (b.dataset.clean.toLowerCase() === q.verbB.toLowerCase()) b.classList.add('ij-prop2');
+              });
+            }
+            wordsEl.querySelectorAll('.ex-word-btn').forEach(b => {
+              if (b.dataset.prop === '1' || b.dataset.prop === '2') {
+                b.disabled = true;
+                b.classList.add(b.dataset.prop === '1' ? 'ij-prop1' : 'ij-prop2');
+              }
+            });
+            document.getElementById('dcs-fb1').innerHTML = (step1Correct && step2Correct)
+              ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+              : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Les verbes conjugués des deux propositions sont surlignés.</div>`;
+            document.getElementById('dcs-instr').textContent =
+              'Clique maintenant sur le(s) mot(s) qui relient les deux propositions.';
+            phase = 3;
+
+          } else if (phase === 3 && tok.prop === 'link') {
+            btn.disabled = true;
+            btn.classList.add('dcs-connector');
+            connectorFound++;
+            if (connectorFound >= connectorTotal) {
+              phase = 4;
+              document.getElementById('dcs-instr').classList.add('ex-hidden');
+
+              const step3El   = document.getElementById('dcs-step3');
+              const choicesEl = document.getElementById('dcs-choices3');
+              step3El.classList.remove('ex-hidden');
+
+              DCS_L1_CHOICES.forEach(choice => {
+                const cbtn = document.createElement('button');
+                cbtn.className   = 'ex-choice';
+                cbtn.textContent = choice.label;
+                cbtn.addEventListener('click', () => {
+                  const correctLabel = DCS_L1_CHOICES.find(c => c.value === q.connectorType).label;
+                  choicesEl.querySelectorAll('.ex-choice').forEach(b => {
+                    b.disabled = true;
+                    if (b.textContent === correctLabel) b.classList.add('is-correct');
+                  });
+                  const isRight = choice.value === q.connectorType;
+                  if (!isRight) cbtn.classList.add('is-wrong');
+
+                  if (isRight && step1Correct && step2Correct) dcsState.score++;
+                  document.getElementById('dcs-fb3').innerHTML = isRight
+                    ? `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`
+                    : `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${correctLabel}</strong>.</div>`;
+                  document.getElementById('next-btn').classList.remove('ex-hidden');
+                });
+                choicesEl.appendChild(cbtn);
+              });
+
+              step3El.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+          }
+        });
+        wordsEl.appendChild(btn);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', dcsAdvance);
+    }
+
+    /* ── Niveau 2 — clique direct sur le connecteur, puis coordonnée/subordonnée ── */
+    function dcsRenderLevel2(card, q) {
+      const { idx, total } = dcsState;
+      let step1Correct = false;
+
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction}</p>
+        <div class="ex-sentence-words" id="dcs2-words"></div>
+        <div class="ex-feedback-area" id="dcs2-fb1"></div>
+
+        <div id="dcs2-step2" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title">Cette phrase est-elle coordonnée ou subordonnée ?</div>
+          <div class="ex-choices-grid" id="dcs2-choices2"></div>
+          <div class="ex-feedback-area" id="dcs2-fb2"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      const wordsEl = document.getElementById('dcs2-words');
+      const tokens  = [];
+      q.partA.split(/\s+/).forEach(w => tokens.push({ text: w, prop: 1, isLink: false }));
+      q.link.split(/\s+/).forEach(w => tokens.push({ text: w, prop: 0, isLink: true }));
+      q.partB.split(/\s+/).forEach(w => tokens.push({ text: w, prop: 2, isLink: false }));
+      tokens.push({ text: '.', prop: 2, isLink: false });
+
+      let answered = false;
+
+      tokens.forEach(tok => {
+        const clean = tok.text.replace(IJ_CLEAN_RE, '');
+        if (!clean && !tok.isLink) return;
+        const btn = document.createElement('button');
+        btn.className      = 'ex-word-btn';
+        btn.textContent     = tok.text;
+        btn.dataset.isLink  = tok.isLink ? 'true' : 'false';
+        btn.dataset.prop    = tok.prop;
+        btn.addEventListener('click', () => {
+          if (btn.disabled || answered) return;
+          answered = true;
+          step1Correct = tok.isLink;
+
+          wordsEl.querySelectorAll('.ex-word-btn').forEach(b => {
+            b.disabled = true;
+            if (b.dataset.isLink === 'true') {
+              b.classList.add('dcs-connector');
+            } else {
+              b.classList.add(b.dataset.prop === '1' ? 'ij-prop1' : 'ij-prop2');
+            }
+          });
+          if (!tok.isLink) btn.classList.add('is-wrong');
+
+          document.getElementById('dcs2-fb1').innerHTML = step1Correct
+            ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+            : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Le mot qui relie les deux propositions est surligné en violet.</div>`;
+
+          setTimeout(() => {
+            const s2 = document.getElementById('dcs2-step2');
+            s2.classList.remove('ex-hidden');
+            s2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }, 500);
+        });
+        wordsEl.appendChild(btn);
+      });
+
+      const choices2El   = document.getElementById('dcs2-choices2');
+      const correctLabel = DCS_L2_LABELS[q.linkType];
+      Object.values(DCS_L2_LABELS).forEach(label => {
+        const btn = document.createElement('button');
+        btn.className   = 'ex-choice';
+        btn.textContent = label;
+        btn.addEventListener('click', () => {
+          choices2El.querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === correctLabel) b.classList.add('is-correct');
+          });
+          const isRight = label === correctLabel;
+          if (!isRight) btn.classList.add('is-wrong');
+
+          if (isRight && step1Correct) {
+            dcsState.score++;
+            document.getElementById('dcs2-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+          } else if (isRight) {
+            document.getElementById('dcs2-fb2').innerHTML =
+              `<div class="ex-feedback-correct" style="opacity:0.8">✓ Bonne réponse à l'étape 2 (mais le mot de liaison cliqué était incorrect).</div>`;
+          } else {
+            document.getElementById('dcs2-fb2').innerHTML =
+              `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${correctLabel}</strong>.</div>`;
+          }
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+        choices2El.appendChild(btn);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', dcsAdvance);
+    }
+
+    /* ── Niveau 3 — jugement direct, sans repérage préalable ──────────────── */
+    function dcsRenderLevel3(card, q) {
+      const { idx, total } = dcsState;
+
+      card.innerHTML = `
+        <p class="ex-question-label">Cette phrase est-elle coordonnée ou subordonnée ?</p>
+        <div class="ex-sentence-display">${q.sentence}</div>
+        <div class="ex-choices-grid" id="dcs3-choices"></div>
+        <div class="ex-feedback-area" id="dcs3-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      const choicesEl    = document.getElementById('dcs3-choices');
+      const correctLabel = DCS_L2_LABELS[q.answer];
+      Object.values(DCS_L2_LABELS).forEach(label => {
+        const btn = document.createElement('button');
+        btn.className   = 'ex-choice';
+        btn.textContent = label;
+        btn.addEventListener('click', () => {
+          choicesEl.querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === correctLabel) b.classList.add('is-correct');
+          });
+          const isRight = label === correctLabel;
+          if (!isRight) btn.classList.add('is-wrong');
+
+          if (isRight) {
+            dcsState.score++;
+            document.getElementById('dcs3-fb').innerHTML =
+              `<div class="ex-feedback-correct">${rand(SUCCESS)}${q.hint ? `<br>${q.hint}` : ''}</div>`;
+          } else {
+            document.getElementById('dcs3-fb').innerHTML =
+              `<div class="ex-feedback-wrong">❌ La bonne réponse est : <strong>${correctLabel}</strong>.${q.hint ? `<br>${q.hint}` : ''}</div>`;
+          }
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+        choicesEl.appendChild(btn);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', dcsAdvance);
+    }
+
+    /* ── Résultats d'un niveau ─────────────────────────────────────────────── */
+    function dcsShowLevelResults() {
+      const { lv, score: lvScore, total } = dcsState;
+      const { passed, isLast } = dcsLevelSelect.completeLevel(lv, lvScore, total);
+      const s20 = Math.round(lvScore / total * 20);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = Math.round(lvScore / total * 100) + ' %';
+
+      const backHref  = sessionData.backLink?.href  || 'français-grammaire.html';
+      const backLabel = sessionData.backLink?.label || 'Grammaire';
+      const backToSelectBtn = dcsLevelSelect.backToSelectButtonHTML();
+      let msg, btnsHTML;
+
+      if (passed && isLast) {
+        msg = `🎊 Bravo ! Tu sais distinguer la coordination de la subordination !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-secondary" id="dcs-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>
+          </div>`;
+      } else if (passed) {
+        msg = `Niveau ${lv} validé ! 🏆 Le Niveau ${lv + 1} est débloqué !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="dcs-next-btn">Niveau ${lv + 1} →</button>
+            <button class="ex-btn-secondary" id="dcs-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← ${backLabel}</a>`;
+      } else {
+        const needed = Math.ceil(total * DCS_SEUIL);
+        msg = `Il faut ${needed} bonnes réponses sur ${total}. Tu peux le faire !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="dcs-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← ${backLabel}</a>
+          </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('dcs-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        dcsStartLevel(lv);
+      });
+      document.getElementById('dcs-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        dcsStartLevel(lv + 1);
+      });
+      document.getElementById('dcs-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        dcsLevelSelect.reset();
+        dcsInitSession();
+      });
+      dcsLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'distinguer-coordination-subordination-niveaux',
         level:        'Niveau ' + lv,
         score:        s20,
         total:        20,
