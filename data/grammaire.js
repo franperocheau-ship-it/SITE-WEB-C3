@@ -317,101 +317,184 @@ Object.assign(window.EXERCISE_DATA, {
   },
 
   "identifier-nom-phrase": {
-    title: "Identifier les noms dans une phrase",
+    title: "Identifier un nom",
     domaine:    "Français",
     competence: "Grammaire — Le nom",
-    levels: ["CM1", "CM2", "6e"],
-    paliers: 1, /* nombre réel de paliers du moteur */
-    type: "mots-cliquables",
-    questionsPerSession: 8,
-    backLink: { href: "français-grammaire.html", label: "Grammaire" },
-    bank: [
-      {
-        instruction: "Clique sur tous les noms dans la phrase.",
-        sentence: "Le chien mange sa nourriture dans le jardin .",
-        targets: ["chien", "nourriture", "jardin"],
-        piege: {}
-      },
-      {
-        instruction: "Clique sur tous les noms dans la phrase.",
-        sentence: "La porte de la salle claque .",
-        targets: ["porte", "salle"],
-        piege: { "claque": "« claque » est un verbe (la porte claque). Les noms s'accompagnent souvent d'un déterminant." }
-      },
-      {
-        instruction: "Clique sur tous les noms dans la phrase.",
-        sentence: "L' astronaute voyage vers la planète rouge .",
-        targets: ["astronaute", "planète"],
-        piege: { "rouge": "« rouge » est un adjectif, pas un nom. Les noms ont souvent un déterminant devant eux." }
-      },
-      {
-        instruction: "Clique sur tous les noms dans la phrase.",
-        sentence: "Le cuisinier prépare une délicieuse soupe .",
-        targets: ["cuisinier", "soupe"],
-        piege: { "délicieuse": "« délicieuse » est un adjectif (il décrit la soupe). Le nom, c'est « soupe »." }
-      },
-      {
-        instruction: "Clique sur tous les noms dans la phrase.",
-        sentence: "Les enfants lisent des histoires amusantes .",
-        targets: ["enfants", "histoires"],
-        piege: { "amusantes": "« amusantes » est un adjectif. Les noms ici sont « enfants » et « histoires »." }
-      },
-      {
-        instruction: "Clique sur tous les noms (communs ET propres) dans la phrase.",
-        sentence: "Emma joue au football avec ses amis .",
-        targets: ["Emma", "football", "amis"],
-        piege: {}
-      },
-      { instruction: "Classe ce nom : ville",       sentence: "commun   propre", targets: ["commun"], piege: { "propre":  "« ville » est un nom commun : il désigne n'importe quelle ville, sans majuscule." } },
-      { instruction: "Classe ce nom : fleuve",      sentence: "commun   propre", targets: ["commun"], piege: { "propre":  "« fleuve » est un nom commun : il désigne n'importe quel fleuve." } },
-      { instruction: "Classe ce nom : chien",       sentence: "commun   propre", targets: ["commun"], piege: { "propre":  "« chien » est un nom commun : il désigne n'importe quel chien." } },
-      { instruction: "Classe ce nom : professeur",  sentence: "commun   propre", targets: ["commun"], piege: { "propre":  "« professeur » est un nom commun : il désigne n'importe quel professeur." } },
-      { instruction: "Classe ce nom : livre",       sentence: "commun   propre", targets: ["commun"], piege: { "propre":  "« livre » est un nom commun." } },
-      { instruction: "Classe ce nom : Madrid",      sentence: "commun   propre", targets: ["propre"],  piege: { "commun": "« Madrid » est un nom propre : il désigne une ville particulière et prend une majuscule." } },
-      { instruction: "Classe ce nom : Emma",        sentence: "commun   propre", targets: ["propre"],  piege: { "commun": "« Emma » est un nom propre : c'est un prénom, il prend une majuscule." } },
-      { instruction: "Classe ce nom : la Seine",    sentence: "commun   propre", targets: ["propre"],  piege: { "commun": "« la Seine » est un nom propre : c'est le nom d'un fleuve particulier." } },
-      { instruction: "Classe ce nom : Léa",         sentence: "commun   propre", targets: ["propre"],  piege: { "commun": "« Léa » est un nom propre : c'est un prénom." } },
-      { instruction: "Classe ce nom : LFM",         sentence: "commun   propre", targets: ["propre"],  piege: { "commun": "« LFM » est un nom propre : c'est le sigle d'une école particulière." } },
-      {
-        instruction: "Quel nom répond à cette devinette ? On y range les livres de la classe.",
-        sentence: "bibliothèque ranger grand table",
-        targets: ["bibliothèque"],
-        piege: {
-          "ranger": "« ranger » est un verbe à l'infinitif, pas un nom.",
-          "grand": "« grand » est un adjectif, pas un nom.",
-          "table": "« table » est un nom, mais on ne range pas des livres sur une table... réfléchis !"
-        }
-      },
-      {
-        instruction: "Quel nom répond à cette devinette ? Il apporte la lumière pendant la journée.",
-        sentence: "soleil briller chaud nuit",
-        targets: ["soleil"],
-        piege: {
-          "briller": "« briller » est un verbe.",
-          "chaud": "« chaud » est un adjectif.",
-          "nuit": "« nuit » est aussi un nom, mais elle n'apporte pas la lumière !"
-        }
-      },
-      {
-        instruction: "Quel nom répond à cette devinette ? On y joue avec ses camarades à la récréation.",
-        sentence: "terrain jouer amusant ballon",
-        targets: ["terrain"],
-        piege: {
-          "jouer": "« jouer » est un verbe.",
-          "amusant": "« amusant » est un adjectif.",
-          "ballon": "« ballon » est un nom, mais on joue AVEC un ballon, pas SUR un ballon !"
-        }
-      },
-      {
-        instruction: "Quel nom répond à cette devinette ? Elle coule de la montagne vers la mer.",
-        sentence: "rivière couler froide cascade",
-        targets: ["rivière"],
-        piege: {
-          "couler": "« couler » est un verbe.",
-          "froide": "« froide » est un adjectif.",
-          "cascade": "« cascade » coule aussi, mais c'est une chute d'eau verticale, pas une rivière !"
-        }
-      }
+    type:       "homophones-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+    levelDescs: {
+      "CM1": "Repérer un nom parmi plusieurs mots",
+      "CM2": "Trouver tous les noms dans une phrase",
+      "6e":  "Distinguer nom commun et nom propre, y compris les cas particuliers"
+    },
+    homoShuffle: [false, true, false],
+
+    /* Refonte en 3 niveaux (level1Bank/level2Bank/level3Bank), moteur
+       générique "homophones-niveaux" (aucun nouveau moteur : chaque item
+       porte son propre `type`, dispatché dans showQuestion() vers les
+       renderers standards choix-etiquette / mots-cliquables /
+       classification-etapes déjà utilisés ailleurs sur le site).
+       Niveau 1 : mots isolés (choix-etiquette), l'élève choisit le nom
+       parmi 3 distracteurs d'une autre nature (verbe/adjectif/adverbe) —
+       volontairement sans piège adjectif/nom pour rester simple.
+       Niveau 2 : mots-cliquables, l'élève clique tous les noms d'une
+       phrase ; la position du nom par rapport au déterminant varie (collé
+       ou avec un adjectif intercalé) pour éviter un repérage purement
+       positionnel.
+       Niveau 3 : classification-etapes (Nom commun / Nom propre) sur des
+       phrases plus riches, incluant des gentilés substantivés (Français,
+       Parisiens, Italiens, Espagnols) opposés dans la même phrase à leur
+       emploi adjectival (français, parisien...) pour travailler
+       l'ambiguïté adjectif qualificatif / nom propre substantivé. */
+
+    level1Bank: [
+      { type:"choix-etiquette", instruction:"Clique sur le nom parmi ces mots.",
+        word:"table · manger · bleu · doucement", choices:["table","manger","bleu","doucement"], answer:"table",
+        hint:"« table » est un nom : on peut dire « la table », « une table »." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom parmi ces mots.",
+        word:"chien · courir · rapide · joyeusement", choices:["chien","courir","rapide","joyeusement"], answer:"chien",
+        hint:"« chien » est un nom (il désigne un animal) : on peut dire « le chien », « un chien »." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom parmi ces mots.",
+        word:"bonheur · chanter · triste · vite", choices:["bonheur","chanter","triste","vite"], answer:"bonheur",
+        hint:"« bonheur » est un nom abstrait : on peut dire « le bonheur », « un grand bonheur »." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom parmi ces mots.",
+        word:"professeur · enseigner · gentil · lentement", choices:["professeur","enseigner","gentil","lentement"], answer:"professeur",
+        hint:"« professeur » est un nom (il désigne une personne) : on peut dire « le professeur », « un professeur »." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom parmi ces mots.",
+        word:"liberté · libérer · libre · librement", choices:["liberté","libérer","libre","librement"], answer:"liberté",
+        hint:"« liberté » est un nom abstrait : on peut dire « la liberté »." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom parmi ces mots.",
+        word:"montagne · grimper · haute · difficilement", choices:["montagne","grimper","haute","difficilement"], answer:"montagne",
+        hint:"« montagne » est un nom : on peut dire « la montagne », « une montagne »." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom parmi ces mots.",
+        word:"oiseau · voler · léger · silencieusement", choices:["oiseau","voler","léger","silencieusement"], answer:"oiseau",
+        hint:"« oiseau » est un nom (il désigne un animal) : on peut dire « l'oiseau », « un oiseau »." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom parmi ces mots.",
+        word:"courage · oser · courageux · courageusement", choices:["courage","oser","courageux","courageusement"], answer:"courage",
+        hint:"« courage » est un nom abstrait : on peut dire « le courage », « du courage »." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom parmi ces mots.",
+        word:"voiture · rouler · rapide · vite", choices:["voiture","rouler","rapide","vite"], answer:"voiture",
+        hint:"« voiture » est un nom : on peut dire « la voiture », « une voiture »." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom parmi ces mots.",
+        word:"enfant · jouer · petit · joyeusement", choices:["enfant","jouer","petit","joyeusement"], answer:"enfant",
+        hint:"« enfant » est un nom (il désigne une personne) : on peut dire « l'enfant », « un enfant »." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom parmi ces mots.",
+        word:"amitié · aimer · amical · amicalement", choices:["amitié","aimer","amical","amicalement"], answer:"amitié",
+        hint:"« amitié » est un nom abstrait : on peut dire « l'amitié », « une grande amitié »." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom parmi ces mots.",
+        word:"fleur · pousser · jolie · doucement", choices:["fleur","pousser","jolie","doucement"], answer:"fleur",
+        hint:"« fleur » est un nom : on peut dire « la fleur », « une fleur »." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom parmi ces mots.",
+        word:"poisson · nager · argenté · silencieusement", choices:["poisson","nager","argenté","silencieusement"], answer:"poisson",
+        hint:"« poisson » est un nom (il désigne un animal) : on peut dire « le poisson », « un poisson »." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom parmi ces mots.",
+        word:"tristesse · pleurer · triste · tristement", choices:["tristesse","pleurer","triste","tristement"], answer:"tristesse",
+        hint:"« tristesse » est un nom abstrait : on peut dire « la tristesse »." }
+    ],
+
+    level2Bank: [
+      { type:"mots-cliquables", instruction:"Clique sur tous les noms de la phrase.",
+        sentence:"Le chien mange sa gamelle .", targets:["chien","gamelle"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur tous les noms de la phrase.",
+        sentence:"Le petit chat dort sur le tapis .", targets:["chat","tapis"],
+        piege:{ "petit": "« petit » est un adjectif : il décrit le nom « chat », il n'est pas un nom lui-même." } },
+      { type:"mots-cliquables", instruction:"Clique sur tous les noms de la phrase.",
+        sentence:"Les enfants lisent une belle histoire .", targets:["enfants","histoire"],
+        piege:{ "belle": "« belle » est un adjectif : il décrit le nom « histoire »." } },
+      { type:"mots-cliquables", instruction:"Clique sur tous les noms de la phrase.",
+        sentence:"Ma grande sœur prépare le repas .", targets:["sœur","repas"],
+        piege:{ "grande": "« grande » est un adjectif : il décrit le nom « sœur »." } },
+      { type:"mots-cliquables", instruction:"Clique sur tous les noms de la phrase.",
+        sentence:"Un vieux marin raconte son histoire .", targets:["marin","histoire"],
+        piege:{ "vieux": "« vieux » est un adjectif : il décrit le nom « marin »." } },
+      { type:"mots-cliquables", instruction:"Clique sur tous les noms de la phrase.",
+        sentence:"Le professeur explique la leçon difficile .", targets:["professeur","leçon"],
+        piege:{ "difficile": "« difficile » est un adjectif : il décrit le nom « leçon »." } },
+      { type:"mots-cliquables", instruction:"Clique sur tous les noms de la phrase.",
+        sentence:"Cette jolie maison a un grand jardin .", targets:["maison","jardin"],
+        piege:{ "jolie": "« jolie » est un adjectif : il décrit le nom « maison ».", "grand": "« grand » est un adjectif : il décrit le nom « jardin »." } },
+      { type:"mots-cliquables", instruction:"Clique sur tous les noms de la phrase.",
+        sentence:"Les élèves rangent leurs cahiers .", targets:["élèves","cahiers"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur tous les noms de la phrase.",
+        sentence:"Mon jeune frère adore les animaux sauvages .", targets:["frère","animaux"],
+        piege:{ "jeune": "« jeune » est un adjectif : il décrit le nom « frère ».", "sauvages": "« sauvages » est un adjectif : il décrit le nom « animaux »." } },
+      { type:"mots-cliquables", instruction:"Clique sur tous les noms de la phrase.",
+        sentence:"La vieille dame nourrit les oiseaux du parc .", targets:["dame","oiseaux","parc"],
+        piege:{ "vieille": "« vieille » est un adjectif : il décrit le nom « dame »." } }
+    ],
+
+    level3Bank: [
+      { type:"classification-etapes",
+        instruction:"Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre.",
+        sentence:"Les Français apprécient ce fromage typiquement français .",
+        step1Instruction:"Clique sur le mot qui désigne les habitants de la France (le nom, pas l'adjectif).",
+        step1Targets:["Français"],
+        step2Instruction:"Ce mot est-il un nom commun ou un nom propre ?",
+        classifyChoices:["Nom commun","Nom propre"], step2Answer:"Nom propre" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre.",
+        sentence:"Les Parisiens aiment se promener , mais leur voisin a un accent parisien très fort .",
+        step1Instruction:"Clique sur le mot qui désigne les habitants de Paris (le nom, pas l'adjectif).",
+        step1Targets:["Parisiens"],
+        step2Instruction:"Ce mot est-il un nom commun ou un nom propre ?",
+        classifyChoices:["Nom commun","Nom propre"], step2Answer:"Nom propre" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre.",
+        sentence:"Les Italiens cuisinent de bons plats , et ce restaurant italien est réputé .",
+        step1Instruction:"Clique sur le mot qui désigne les habitants de l'Italie (le nom, pas l'adjectif).",
+        step1Targets:["Italiens"],
+        step2Instruction:"Ce mot est-il un nom commun ou un nom propre ?",
+        classifyChoices:["Nom commun","Nom propre"], step2Answer:"Nom propre" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre.",
+        sentence:"Les Espagnols dansent le flamenco , et ce guitariste espagnol est très doué .",
+        step1Instruction:"Clique sur le mot qui désigne les habitants de l'Espagne (le nom, pas l'adjectif).",
+        step1Targets:["Espagnols"],
+        step2Instruction:"Ce mot est-il un nom commun ou un nom propre ?",
+        classifyChoices:["Nom commun","Nom propre"], step2Answer:"Nom propre" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre.",
+        sentence:"Le vieux libraire range soigneusement les nombreux livres sur la grande étagère .",
+        step1Instruction:"Clique sur le mot qui désigne la personne qui vend des livres.",
+        step1Targets:["libraire"],
+        step2Instruction:"Ce mot est-il un nom commun ou un nom propre ?",
+        classifyChoices:["Nom commun","Nom propre"], step2Answer:"Nom commun" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre.",
+        sentence:"Chaque été , la famille Dupont part en vacances à Madrid pour visiter le musée .",
+        step1Instruction:"Clique sur le nom de la ville visitée.",
+        step1Targets:["Madrid"],
+        step2Instruction:"Ce mot est-il un nom commun ou un nom propre ?",
+        classifyChoices:["Nom commun","Nom propre"], step2Answer:"Nom propre" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre.",
+        sentence:"Pendant la récréation , Léa raconte une histoire drôle à ses camarades de classe .",
+        step1Instruction:"Clique sur le prénom de l'élève qui raconte l'histoire.",
+        step1Targets:["Léa"],
+        step2Instruction:"Ce mot est-il un nom commun ou un nom propre ?",
+        classifyChoices:["Nom commun","Nom propre"], step2Answer:"Nom propre" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre.",
+        sentence:"Malgré la fatigue , cette athlète a montré un courage remarquable devant le public .",
+        step1Instruction:"Clique sur le mot qui désigne cette qualité, malgré la fatigue.",
+        step1Targets:["courage"],
+        step2Instruction:"Ce mot est-il un nom commun ou un nom propre ?",
+        classifyChoices:["Nom commun","Nom propre"], step2Answer:"Nom commun" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre.",
+        sentence:"Le bateau descend lentement la Seine avant de rejoindre la grande cathédrale .",
+        step1Instruction:"Clique sur le nom du fleuve traversé par le bateau.",
+        step1Targets:["Seine"],
+        step2Instruction:"Ce mot est-il un nom commun ou un nom propre ?",
+        classifyChoices:["Nom commun","Nom propre"], step2Answer:"Nom propre" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre.",
+        sentence:"Au fond du jardin , un jeune renard cherche de la nourriture près de la vieille cabane .",
+        step1Instruction:"Clique sur le mot qui désigne l'animal qui cherche de la nourriture.",
+        step1Targets:["renard"],
+        step2Instruction:"Ce mot est-il un nom commun ou un nom propre ?",
+        classifyChoices:["Nom commun","Nom propre"], step2Answer:"Nom commun" }
     ]
   },
 
@@ -453,14 +536,9 @@ Object.assign(window.EXERCISE_DATA, {
         template: "Il pleut ___ nous restons à la maison."
       },
       {
-        sentence1: "Tom est content.", sentence2: "Il a gagné le match.",
+        sentence1: "Tom saute de joie.", sentence2: "Il vient de gagner le match.",
         choices: ["car", "donc", "quand"], connector: "car",
-        template: "Tom est content ___ il a gagné le match."
-      },
-      {
-        sentence1: "Le chien aboie.", sentence2: "Le facteur arrive.",
-        choices: ["quand", "parce que", "qui"], connector: "quand",
-        template: "Le chien aboie ___ le facteur arrive."
+        template: "Tom saute de joie ___ il vient de gagner le match."
       },
       {
         sentence1: "Les enfants applaudissent.", sentence2: "Le clown entre en scène.",
@@ -468,14 +546,9 @@ Object.assign(window.EXERCISE_DATA, {
         template: "Les enfants applaudissent ___ le clown entre en scène."
       },
       {
-        sentence1: "Zoé pleure.", sentence2: "Son ballon s'est envolé.",
-        choices: ["parce que", "et", "lorsque"], connector: "parce que",
-        template: "Zoé pleure ___ son ballon s'est envolé."
-      },
-      {
-        sentence1: "Nous restons chez nous.", sentence2: "Le temps est mauvais.",
+        sentence1: "Nous restons chez nous.", sentence2: "Le temps s'est brusquement dégradé.",
         choices: ["parce que", "quand", "si"], connector: "parce que",
-        template: "Nous restons chez nous ___ le temps est mauvais."
+        template: "Nous restons chez nous ___ le temps s'est brusquement dégradé."
       },
       {
         sentence1: "J'ai un chat.", sentence2: "Il miaule beaucoup.",
@@ -483,14 +556,14 @@ Object.assign(window.EXERCISE_DATA, {
         template: "J'ai un chat ___ miaule beaucoup."
       },
       {
-        sentence1: "Les oiseaux rentrent au nid.", sentence2: "Le soleil se couche.",
-        choices: ["lorsque", "donc", "car"], connector: "lorsque",
-        template: "Les oiseaux rentrent au nid ___ le soleil se couche."
+        sentence1: "Le facteur passe.", sentence2: "Les enfants sont à l'école.",
+        choices: ["quand", "car", "donc"], connector: "quand",
+        template: "Le facteur passe ___ les enfants sont à l'école."
       },
       {
-        sentence1: "Tu ranges ta chambre.", sentence2: "Tu pourras jouer dehors.",
+        sentence1: "Tu pourras peut-être jouer dehors.", sentence2: "Tu ranges ta chambre.",
         choices: ["si", "quand", "donc"], connector: "si",
-        template: "Tu pourras jouer dehors ___ tu ranges ta chambre."
+        template: "Tu pourras peut-être jouer dehors ___ tu ranges ta chambre."
       },
       {
         sentence1: "Le vent souffle fort.", sentence2: "Les feuilles tombent des arbres.",
