@@ -7191,20 +7191,24 @@
       let allCorrect  = true;
       let foundInStep = new Set();
 
+      function finish() {
+        document.getElementById("mce-instr").classList.add("ex-hidden");
+        if (allCorrect) {
+          score++;
+          setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+        } else {
+          setFeedback("feedback1", `<div class="ex-feedback-wrong">❌ Regarde les mots surlignés dans l'ordre : nom, adjectif attribut, verbe d'état.</div>`);
+        }
+        showNextBtn();
+      }
+
       function advance() {
         stepIdx++;
         foundInStep = new Set();
         if (stepIdx < q.steps.length) {
           document.getElementById("mce-instr").textContent = q.steps[stepIdx].instruction;
         } else {
-          document.getElementById("mce-instr").classList.add("ex-hidden");
-          if (allCorrect) {
-            score++;
-            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
-          } else {
-            setFeedback("feedback1", `<div class="ex-feedback-wrong">❌ Regarde les mots surlignés dans l'ordre : nom, adjectif attribut, verbe d'état.</div>`);
-          }
-          showNextBtn();
+          finish();
         }
       }
 
@@ -7228,10 +7232,20 @@
           } else {
             allCorrect = false;
             btn.classList.add("is-wrong");
-            wordsEl.querySelectorAll(".ex-word-btn").forEach(b => {
-              if (step.targets.includes(b.dataset.clean)) { b.classList.add(step.cssClass); b.disabled = true; }
-            });
-            advance();
+            /* Révèle d'un coup les cibles de CETTE étape et de toutes les
+               suivantes (au lieu de continuer étape par étape) : une erreur
+               ici peut porter sur un mot qui est justement la cible d'une
+               étape à venir (ex. cliquer le verbe pendant l'étape adjectif)
+               — le laisser cliquable pour la suite serait incohérent avec
+               le "pas de retry", et le désactiver ferait perdre à l'élève
+               tout moyen de valider cette étape suivante. */
+            for (let i = stepIdx; i < q.steps.length; i++) {
+              const s = q.steps[i];
+              wordsEl.querySelectorAll(".ex-word-btn").forEach(b => {
+                if (s.targets.includes(b.dataset.clean)) { b.classList.add(s.cssClass); b.disabled = true; }
+              });
+            }
+            finish();
           }
         });
         wordsEl.appendChild(btn);

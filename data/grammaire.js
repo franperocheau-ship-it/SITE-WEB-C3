@@ -473,7 +473,7 @@ Object.assign(window.EXERCISE_DATA, {
       { type:"classification-etapes",
         instruction:"Clique sur l'adverbe de la phrase, puis indique sa catégorie.",
         sentence:"Il n' arrive jamais en retard .",
-        step1Instruction:"Clique sur l'adverbe.", step1Targets:["jamais"],
+        step1Instruction:"Clique sur l'adverbe.", step1Targets:["n","jamais"],
         step2Instruction:"Quelle est sa catégorie ?",
         classifyChoices:["Manière","Temps","Lieu","Quantité","Négation"], step2Answer:"Négation" }
     ],
@@ -498,7 +498,7 @@ Object.assign(window.EXERCISE_DATA, {
       { type:"mots-cliquables", instruction:"Clique sur tous les adverbes de la phrase.",
         sentence:"Demain , nous irons dehors .", targets:["Demain","dehors"], piege:{} },
       { type:"mots-cliquables", instruction:"Clique sur tous les adverbes de la phrase.",
-        sentence:"Elle ne mange jamais de bonbons .", targets:["jamais"], piege:{} },
+        sentence:"Elle ne mange jamais de bonbons .", targets:["ne","jamais"], piege:{} },
       { type:"mots-cliquables", instruction:"Clique sur tous les adverbes de la phrase.",
         sentence:"Le gouvernement a annoncé une réforme importante hier .", targets:["hier"],
         piege:{ "gouvernement": "« gouvernement » est un nom qui se termine par -ment, mais ce n'est pas un adverbe." } }
@@ -613,7 +613,7 @@ Object.assign(window.EXERCISE_DATA, {
         classifyChoices:["Lieu","Temps","Manière","Moyen"], step2Answer:"Manière" },
       { type:"classification-etapes",
         instruction:"Clique sur la préposition de la phrase, puis indique ce qu'elle exprime.",
-        sentence:"Ils voyagent par le train .",
+        sentence:"Ils voyagent par bateau .",
         step1Instruction:"Clique sur la préposition.", step1Targets:["par"],
         step2Instruction:"Qu'exprime-t-elle ?",
         classifyChoices:["Lieu","Temps","Manière","Moyen"], step2Answer:"Moyen" },
