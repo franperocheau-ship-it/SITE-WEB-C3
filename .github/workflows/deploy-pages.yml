@@ -37,6 +37,7 @@ jobs:
             --exclude 'supabase' \
             --exclude '*.md'
           du -sh _site
+          du -sh _site/* | sort -h
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
