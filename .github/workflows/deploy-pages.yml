@@ -35,7 +35,9 @@ jobs:
             --exclude 'seo-drafts' \
             --exclude 'scripts' \
             --exclude 'supabase' \
-            --exclude '*.md'
+            --exclude 'supabase-go' \
+            --exclude '*.md' \
+            --exclude '*.bak'
           du -sh _site
           du -sh _site/* | sort -h
 
