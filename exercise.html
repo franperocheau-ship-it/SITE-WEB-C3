@@ -1205,6 +1205,35 @@
       color: #e67e22;
     }
 
+    /* ── Type : identifier-attribut-sujet (nom / adjectif attribut / verbe
+       d'état / épithète colorés) — couleurs de rôle réutilisables par toute
+       future compétence via renderMotsCliquables (q.steps) : jaune pour le
+       nom, turquoise pour l'adjectif attribut, navy encadré pour le verbe
+       d'état, gold pour les adjectifs épithètes (jamais rouge, réservé au
+       code erreur du site). ──────────────────────────────────────────────── */
+    .ex-word-btn.attr-nom {
+      border-color: #eab308;
+      background: rgba(234,179,8,0.15);
+      color: #854d0e;
+    }
+    .ex-word-btn.attr-adj {
+      border-color: #1DBFA0;
+      background: rgba(29,191,160,0.14);
+      color: #0d9488;
+    }
+    .ex-word-btn.attr-verbe {
+      border-color: #1A2D6B;
+      border-width: 2.5px;
+      background: transparent;
+      color: #1A2D6B;
+      font-weight: 700;
+    }
+    .ex-word-btn.attr-epithete {
+      border-color: #F5A623;
+      background: rgba(245,166,35,0.16);
+      color: #9a5b0a;
+    }
+
     /* ── Type : reperer-propositions-niveaux (jusqu'à 4 propositions) ─────── */
     .ex-word-btn.rp-prop3 {
       border-color: #ca8a04;
@@ -7070,6 +7099,7 @@
     /* ── Type : mots-cliquables ─────────────────────────────────────────── */
 
     function renderMotsCliquables(card, q) {
+      if (q.steps) { renderMotsCliquablesEtapes(card, q); return; }
       card.innerHTML = `
         <p class="ex-question-label">${q.instruction}</p>
         <div class="ex-sentence-words" id="mc-words"></div>
@@ -7141,6 +7171,75 @@
             </div>${noteHtml}`);
         }
         showNextBtn();
+      });
+    }
+
+    /* ── Variante : mots-cliquables en plusieurs étapes séquentielles ────────
+       Extension générique de mots-cliquables (q.steps: [{ instruction,
+       targets, cssClass }, …]), réutilisable par toute compétence qui doit
+       faire cliquer plusieurs rôles dans l'ordre (ex. nom → adjectif
+       attribut → verbe d'état pour identifier-attribut-sujet). Un seul
+       essai par étape : le mot cliqué est évalué immédiatement, et en cas
+       d'erreur le(s) mot(s) attendu(s) sont révélés avant de passer à
+       l'étape suivante — même logique que dcsRenderLevel1 (distinguer-
+       coordination-subordination-niveaux), pas de retry. N'affecte pas le
+       comportement de renderMotsCliquables pour les items sans q.steps. ── */
+    function renderMotsCliquablesEtapes(card, q) {
+      card.innerHTML = `
+        <p class="ex-question-label" id="mce-instr">${q.steps[0].instruction}</p>
+        <div class="ex-sentence-words" id="mce-words"></div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+      const wordsEl = document.getElementById("mce-words");
+      let stepIdx     = 0;
+      let allCorrect  = true;
+      let foundInStep = new Set();
+
+      function advance() {
+        stepIdx++;
+        foundInStep = new Set();
+        if (stepIdx < q.steps.length) {
+          document.getElementById("mce-instr").textContent = q.steps[stepIdx].instruction;
+        } else {
+          document.getElementById("mce-instr").classList.add("ex-hidden");
+          if (allCorrect) {
+            score++;
+            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+          } else {
+            setFeedback("feedback1", `<div class="ex-feedback-wrong">❌ Regarde les mots surlignés dans l'ordre : nom, adjectif attribut, verbe d'état.</div>`);
+          }
+          showNextBtn();
+        }
+      }
+
+      q.sentence.split(/\s+/).forEach(token => {
+        const clean = token.replace(/[.,!?;:«»"""]/g, "").replace(/['']/g, "'");
+        if (!clean) return;
+        const btn = document.createElement("button");
+        btn.className     = "ex-word-btn";
+        btn.textContent   = token;
+        btn.dataset.clean = clean;
+
+        btn.addEventListener("click", () => {
+          if (btn.disabled || stepIdx >= q.steps.length) return;
+          const step = q.steps[stepIdx];
+          btn.disabled = true;
+
+          if (step.targets.includes(clean) && !foundInStep.has(clean)) {
+            foundInStep.add(clean);
+            btn.classList.add(step.cssClass);
+            if (foundInStep.size >= step.targets.length) advance();
+          } else {
+            allCorrect = false;
+            btn.classList.add("is-wrong");
+            wordsEl.querySelectorAll(".ex-word-btn").forEach(b => {
+              if (step.targets.includes(b.dataset.clean)) { b.classList.add(step.cssClass); b.disabled = true; }
+            });
+            advance();
+          }
+        });
+        wordsEl.appendChild(btn);
       });
     }
 

@@ -151,6 +151,207 @@ Object.assign(window.EXERCISE_DATA, {
     ]
   },
 
+  "identifier-attribut-sujet": {
+    title: "Identifier un attribut du sujet",
+    domaine:    "Français",
+    competence: "Grammaire — L'attribut du sujet",
+    type:       "homophones-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+    levelDescs: {
+      "CM1": "Reconnaître un verbe d'état parmi des verbes d'action",
+      "CM2": "Relier dans l'ordre le nom, l'adjectif attribut et le verbe d'état",
+      "6e":  "Distinguer l'adjectif attribut du sujet de l'adjectif épithète"
+    },
+    homoShuffle: [false, true, false],
+
+    /* Refonte en 3 niveaux (level1Bank/level2Bank/level3Bank), moteur
+       générique "homophones-niveaux" — même schéma qu'identifier-adjectif/
+       identifier-nom-phrase (aucun nouveau moteur dédié : chaque item porte
+       son propre `type`, dispatché dans showQuestion() vers les renderers
+       standards). Niveaux 2 et 3 s'appuient tous deux sur une extension
+       générique et rétrocompatible ajoutée pour cette compétence :
+       renderMotsCliquables accepte désormais un champ `steps` optionnel
+       (liste ordonnée de { instruction, targets, cssClass }) pour un
+       enchaînement de clics à rôles distincts — sans `steps`, un item
+       "mots-cliquables" se comporte exactement comme avant. Réutilisable
+       par toute future compétence.
+
+       Niveau 1 : choix-etiquette — trouver le verbe d'état parmi 3 verbes
+       d'action, temps variés (présent/imparfait/passé composé) pour ne pas
+       faire reposer la reconnaissance sur la terminaison plutôt que sur le
+       sens.
+       Niveau 2 : mots-cliquables en 3 étapes séquentielles (nom → jaune,
+       adjectif attribut → turquoise, verbe d'état → navy encadré) sur des
+       phrases à un seul GN sujet et un seul adjectif candidat (pas de piège
+       nom/adjectif à ce niveau, l'enjeu est l'enchaînement des 3 rôles).
+       Niveau 3 : mots-cliquables en 3 étapes (nom → jaune, adjectif attribut
+       → turquoise, TOUS les adjectifs épithètes de la phrase → gold) sur des
+       phrases contenant 1 ou 2 épithètes en plus de l'attribut — l'étape 3
+       accepte plusieurs cibles (cf. `targets` à 2 éléments) et l'attribut
+       déjà trouvé à l'étape 2 est verrouillé (disabled), donc jamais
+       re-cliquable par erreur à l'étape 3. */
+
+    level1Bank: [
+      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"est · court · joue · mange", choices:["est","court","joue","mange"], answer:"est",
+        hint:"« être » est un verbe d'état : il ne montre pas une action, il relie le sujet à ce qu'on dit de lui." },
+      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"semble · dessine · chante · saute", choices:["semble","dessine","chante","saute"], answer:"semble",
+        hint:"« sembler » est un verbe d'état : il indique une apparence, pas une action." },
+      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"deviennent · parlent · écoutent · lisent", choices:["deviennent","parlent","écoutent","lisent"], answer:"deviennent",
+        hint:"« devenir » est un verbe d'état : il indique un changement d'état, pas une action." },
+      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"paraît · travaille · nage · écrit", choices:["paraît","travaille","nage","écrit"], answer:"paraît",
+        hint:"« paraître » est un verbe d'état : il indique une apparence, pas une action." },
+      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"reste · marche · dort · crie", choices:["reste","marche","dort","crie"], answer:"reste",
+        hint:"« rester » est un verbe d'état ici : le sujet garde un état, il ne fait pas d'action." },
+      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes (ou groupes de mots).",
+        word:"ont l'air · construisent · réparent · jettent", choices:["ont l'air","construisent","réparent","jettent"], answer:"ont l'air",
+        hint:"« avoir l'air » est une expression verbale d'état : elle indique une apparence, comme « sembler »." },
+      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"étaient · couraient · dansaient · pleuraient", choices:["étaient","couraient","dansaient","pleuraient"], answer:"étaient",
+        hint:"« être » à l'imparfait reste un verbe d'état : il ne montre pas d'action." },
+      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"semblait · regardait · tombait · criait", choices:["semblait","regardait","tombait","criait"], answer:"semblait",
+        hint:"« sembler » à l'imparfait est un verbe d'état : il indique une apparence." },
+      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes (ou groupes de mots).",
+        word:"est devenu · a grandi · a couru · a sauté", choices:["est devenu","a grandi","a couru","a sauté"], answer:"est devenu",
+        hint:"« devenir » au passé composé reste un verbe d'état : il indique un changement d'état, pas une action." },
+      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"restent · jouent · mangent · dessinent", choices:["restent","jouent","mangent","dessinent"], answer:"restent",
+        hint:"« rester » est un verbe d'état ici : le sujet garde un état, il ne fait pas d'action." }
+    ],
+
+    level2Bank: [
+      { type:"mots-cliquables", sentence:"Le ciel est gris .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["ciel"], cssClass:"attr-nom" },
+          { instruction:"Clique maintenant sur l'adjectif attribut du sujet.", targets:["gris"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le verbe d'état.", targets:["est"], cssClass:"attr-verbe" }
+        ] },
+      { type:"mots-cliquables", sentence:"Cette soupe semble délicieuse .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["soupe"], cssClass:"attr-nom" },
+          { instruction:"Clique maintenant sur l'adjectif attribut du sujet.", targets:["délicieuse"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le verbe d'état.", targets:["semble"], cssClass:"attr-verbe" }
+        ] },
+      { type:"mots-cliquables", sentence:"Mes cousins paraissent fatigués .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["cousins"], cssClass:"attr-nom" },
+          { instruction:"Clique maintenant sur l'adjectif attribut du sujet.", targets:["fatigués"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le verbe d'état.", targets:["paraissent"], cssClass:"attr-verbe" }
+        ] },
+      { type:"mots-cliquables", sentence:"La forêt reste silencieuse .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["forêt"], cssClass:"attr-nom" },
+          { instruction:"Clique maintenant sur l'adjectif attribut du sujet.", targets:["silencieuse"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le verbe d'état.", targets:["reste"], cssClass:"attr-verbe" }
+        ] },
+      { type:"mots-cliquables", sentence:"Les élèves ont l'air contents .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["élèves"], cssClass:"attr-nom" },
+          { instruction:"Clique maintenant sur l'adjectif attribut du sujet.", targets:["contents"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le verbe d'état (2 mots).", targets:["ont","l'air"], cssClass:"attr-verbe" }
+        ] },
+      { type:"mots-cliquables", sentence:"Ce livre est devenu célèbre .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["livre"], cssClass:"attr-nom" },
+          { instruction:"Clique maintenant sur l'adjectif attribut du sujet.", targets:["célèbre"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le verbe d'état (2 mots).", targets:["est","devenu"], cssClass:"attr-verbe" }
+        ] },
+      { type:"mots-cliquables", sentence:"La maison paraissait abandonnée .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["maison"], cssClass:"attr-nom" },
+          { instruction:"Clique maintenant sur l'adjectif attribut du sujet.", targets:["abandonnée"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le verbe d'état.", targets:["paraissait"], cssClass:"attr-verbe" }
+        ] },
+      { type:"mots-cliquables", sentence:"Les enfants semblaient heureux .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["enfants"], cssClass:"attr-nom" },
+          { instruction:"Clique maintenant sur l'adjectif attribut du sujet.", targets:["heureux"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le verbe d'état.", targets:["semblaient"], cssClass:"attr-verbe" }
+        ] },
+      { type:"mots-cliquables", sentence:"Le repas semble savoureux .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["repas"], cssClass:"attr-nom" },
+          { instruction:"Clique maintenant sur l'adjectif attribut du sujet.", targets:["savoureux"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le verbe d'état.", targets:["semble"], cssClass:"attr-verbe" }
+        ] },
+      { type:"mots-cliquables", sentence:"Les acteurs paraissent nerveux .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["acteurs"], cssClass:"attr-nom" },
+          { instruction:"Clique maintenant sur l'adjectif attribut du sujet.", targets:["nerveux"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le verbe d'état.", targets:["paraissent"], cssClass:"attr-verbe" }
+        ] }
+    ],
+
+    level3Bank: [
+      { type:"mots-cliquables", sentence:"Le grand chat noir est agile .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["chat"], cssClass:"attr-nom" },
+          { instruction:"Clique sur l'adjectif attribut du sujet.", targets:["agile"], cssClass:"attr-adj" },
+          { instruction:"Clique sur tous les adjectifs épithètes de la phrase.", targets:["grand","noir"], cssClass:"attr-epithete" }
+        ] },
+      { type:"mots-cliquables", sentence:"Cette jolie fleur rouge semble fanée .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["fleur"], cssClass:"attr-nom" },
+          { instruction:"Clique sur l'adjectif attribut du sujet.", targets:["fanée"], cssClass:"attr-adj" },
+          { instruction:"Clique sur tous les adjectifs épithètes de la phrase.", targets:["jolie","rouge"], cssClass:"attr-epithete" }
+        ] },
+      { type:"mots-cliquables", sentence:"Le vieux pont paraît solide .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["pont"], cssClass:"attr-nom" },
+          { instruction:"Clique sur l'adjectif attribut du sujet.", targets:["solide"], cssClass:"attr-adj" },
+          { instruction:"Clique sur tous les adjectifs épithètes de la phrase.", targets:["vieux"], cssClass:"attr-epithete" }
+        ] },
+      { type:"mots-cliquables", sentence:"Ma petite sœur est timide .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["sœur"], cssClass:"attr-nom" },
+          { instruction:"Clique sur l'adjectif attribut du sujet.", targets:["timide"], cssClass:"attr-adj" },
+          { instruction:"Clique sur tous les adjectifs épithètes de la phrase.", targets:["petite"], cssClass:"attr-epithete" }
+        ] },
+      { type:"mots-cliquables", sentence:"Ce long voyage était fatigant .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["voyage"], cssClass:"attr-nom" },
+          { instruction:"Clique sur l'adjectif attribut du sujet.", targets:["fatigant"], cssClass:"attr-adj" },
+          { instruction:"Clique sur tous les adjectifs épithètes de la phrase.", targets:["long"], cssClass:"attr-epithete" }
+        ] },
+      { type:"mots-cliquables", sentence:"Les belles montagnes restent majestueuses .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["montagnes"], cssClass:"attr-nom" },
+          { instruction:"Clique sur l'adjectif attribut du sujet.", targets:["majestueuses"], cssClass:"attr-adj" },
+          { instruction:"Clique sur tous les adjectifs épithètes de la phrase.", targets:["belles"], cssClass:"attr-epithete" }
+        ] },
+      { type:"mots-cliquables", sentence:"Un jeune chien curieux semble effrayé .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["chien"], cssClass:"attr-nom" },
+          { instruction:"Clique sur l'adjectif attribut du sujet.", targets:["effrayé"], cssClass:"attr-adj" },
+          { instruction:"Clique sur tous les adjectifs épithètes de la phrase.", targets:["jeune","curieux"], cssClass:"attr-epithete" }
+        ] },
+      { type:"mots-cliquables", sentence:"La nouvelle élève paraît sympathique .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["élève"], cssClass:"attr-nom" },
+          { instruction:"Clique sur l'adjectif attribut du sujet.", targets:["sympathique"], cssClass:"attr-adj" },
+          { instruction:"Clique sur tous les adjectifs épithètes de la phrase.", targets:["nouvelle"], cssClass:"attr-epithete" }
+        ] },
+      { type:"mots-cliquables", sentence:"Ce vieux professeur patient reste calme .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["professeur"], cssClass:"attr-nom" },
+          { instruction:"Clique sur l'adjectif attribut du sujet.", targets:["calme"], cssClass:"attr-adj" },
+          { instruction:"Clique sur tous les adjectifs épithètes de la phrase.", targets:["vieux","patient"], cssClass:"attr-epithete" }
+        ] },
+      { type:"mots-cliquables", sentence:"Ma jeune cousine timide semble ravie .",
+        steps: [
+          { instruction:"Clique sur le nom.", targets:["cousine"], cssClass:"attr-nom" },
+          { instruction:"Clique sur l'adjectif attribut du sujet.", targets:["ravie"], cssClass:"attr-adj" },
+          { instruction:"Clique sur tous les adjectifs épithètes de la phrase.", targets:["jeune","timide"], cssClass:"attr-epithete" }
+        ] }
+    ]
+  },
+
   "identifier-adverbe-frequent": {
     title:   "Identifier les adverbes",
     domaine:    "Français",
