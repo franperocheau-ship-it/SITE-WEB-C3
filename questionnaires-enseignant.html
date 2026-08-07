@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/favicon/favicon.ico?v=1" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png?v=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png?v=1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/favicon-192x192.png?v=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512x512.png?v=1">
+  <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
+  <link rel="manifest" href="site.webmanifest?v=1">
+  <title>Questionnaires de lecture — Espace enseignant — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="css/questionnaires.css?v=1">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/teacher.js?v=2"></script>
+  <script src="js/questionnaires-teacher.js?v=1"></script>
+  <style>
+    .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
+    .dash-content { max-width: 960px; margin: 0 auto; }
+
+    .breadcrumb {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 24px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
+    }
+    .breadcrumb a { color: var(--blue); text-decoration: none; font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .bc-sep { color: var(--border); user-select: none; }
+    .bc-current { font-weight: 600; color: var(--text); }
+
+    .main-tabs {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      background: var(--card-bg); border-radius: 14px; box-shadow: var(--shadow-sm);
+      padding: 5px; margin-bottom: 20px; width: fit-content;
+    }
+    .main-tab {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: 10px;
+      font-family: inherit; font-size: 13px; font-weight: 700;
+      color: var(--muted); text-decoration: none;
+      transition: background 180ms, color 180ms;
+    }
+    .main-tab.is-active { background: var(--blue); color: #fff; }
+    .main-tab:hover:not(.is-active) { background: rgba(16,43,106,0.06); color: var(--blue); }
+
+    .section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+    .section-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <div class="dash-wrap">
+    <div class="dash-content">
+
+      <nav class="breadcrumb" aria-label="Fil d'Ariane">
+        <a href="dashboard-enseignant.html">Espace enseignant</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-current">Questionnaires de lecture</span>
+      </nav>
+
+      <nav class="main-tabs" aria-label="Navigation espace enseignant">
+        <a class="main-tab" href="classes-enseignant.html">🏫 Mes classes</a>
+        <a class="main-tab" href="pilotage-enseignant.html">🎯 Pilotage des compétences</a>
+        <a class="main-tab" href="resultats-enseignant.html">📊 Résultats</a>
+        <a class="main-tab" href="remediations-enseignant.html">🧩 Remédiations</a>
+        <a class="main-tab" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
+        <a class="main-tab" href="dictees-enseignant.html">📖 Dictées préparées</a>
+        <a class="main-tab is-active" href="questionnaires-enseignant.html">📚 Questionnaires de lecture</a>
+      </nav>
+
+      <div class="section-header">
+        <h1 class="section-title">Questionnaires de lecture</h1>
+        <button type="button" class="qz-btn qz-btn-primary" id="qz-new-btn">+ Nouveau questionnaire</button>
+      </div>
+      <p style="color:var(--muted);font-size:13px;margin:-10px 0 20px;">
+        Une fois publié, un questionnaire est visible et jouable par tous les élèves du site — pas seulement les tiens.
+      </p>
+
+      <!-- ── Formulaire de création/édition ── -->
+      <div id="qz-form-card" class="qz-form-card" style="display:none">
+        <div class="qz-form-title" id="qz-form-title">Nouveau questionnaire</div>
+
+        <label class="qz-form-label" for="qz-form-titre">Titre de l'œuvre</label>
+        <input type="text" id="qz-form-titre" class="qz-form-input" placeholder="Ex. Le Petit Prince">
+
+        <label class="qz-form-label" for="qz-form-auteur">Auteur de l'œuvre</label>
+        <input type="text" id="qz-form-auteur" class="qz-form-input" placeholder="Ex. Antoine de Saint-Exupéry">
+
+        <label class="qz-form-label">Questions</label>
+        <p class="qz-form-hint">Chaque question propose jusqu'à 4 réponses, avec une ou plusieurs bonnes réponses cochées.</p>
+        <div class="qz-questions-list" id="qz-questions-list"></div>
+        <button type="button" class="qz-add-question-btn" id="qz-add-question-btn">+ Ajouter une question</button>
+
+        <div class="qz-form-actions">
+          <button type="button" class="qz-btn qz-btn-primary" id="qz-save-btn">Enregistrer</button>
+          <button type="button" class="qz-btn qz-btn-outline" id="qz-cancel-btn">Annuler</button>
+        </div>
+      </div>
+
+      <!-- ── Liste de mes questionnaires ── -->
+      <div id="qz-list"><div class="qz-empty">Chargement…</div></div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="js/menu.js"></script>
+  <script>
+    let _teacherProfile = null;
+    let _questionnaires = [];
+    let _editingId = null;
+    let _formQuestions = []; // [{ enonce, explication, reponses: [{ texte, est_correcte }] }]
+
+    const STATUT_LABEL = { brouillon: 'Brouillon', publie: 'Publié', masque: 'Masqué (signalé)' };
+
+    function escHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function emptyQuestion() {
+      return { enonce: '', explication: '', reponses: [{ texte: '', est_correcte: false }, { texte: '', est_correcte: false }] };
+    }
+
+    /* ── Éditeur de questions ── */
+    function renderQuestionsEditor() {
+      const list = document.getElementById('qz-questions-list');
+      if (_formQuestions.length === 0) {
+        list.innerHTML = '<div class="qz-form-hint">Aucune question pour l\'instant.</div>';
+        return;
+      }
+      list.innerHTML = _formQuestions.map((q, qi) => `
+        <div class="qz-question-card" data-q="${qi}">
+          <div class="qz-question-card-head">
+            <span class="qz-question-num">Question ${qi + 1}</span>
+            <button type="button" class="qz-question-remove" data-remove-question="${qi}">Supprimer</button>
+          </div>
+          <textarea class="qz-form-textarea qz-enonce" data-q-idx="${qi}" rows="2" placeholder="Énoncé de la question">${escHtml(q.enonce)}</textarea>
+          <div class="qz-reponses-list">
+            ${q.reponses.map((r, ri) => `
+              <div class="qz-reponse-row">
+                <input type="checkbox" data-q-idx="${qi}" data-r-idx="${ri}" class="qz-correcte-check" ${r.est_correcte ? 'checked' : ''} title="Bonne réponse">
+                <input type="text" class="qz-form-input qz-reponse-texte" data-q-idx="${qi}" data-r-idx="${ri}" value="${escHtml(r.texte)}" placeholder="Réponse ${ri + 1}">
+                <button type="button" class="qz-reponse-remove" data-remove-reponse-q="${qi}" data-remove-reponse-r="${ri}" title="Supprimer cette réponse">✕</button>
+              </div>
+            `).join('')}
+          </div>
+          ${q.reponses.length < 4 ? `<button type="button" class="qz-add-reponse-btn" data-add-reponse="${qi}">+ Ajouter une réponse</button>` : ''}
+          <label class="qz-form-label" style="margin-top:12px;">Explication (facultatif, affichée à l'élève après correction)</label>
+          <textarea class="qz-form-textarea qz-explication" data-q-idx="${qi}" rows="2" placeholder="Ex. Le texte précise que...">${escHtml(q.explication)}</textarea>
+        </div>
+      `).join('');
+
+      list.querySelectorAll('.qz-enonce').forEach(el => el.addEventListener('input', e => {
+        _formQuestions[+e.target.dataset.qIdx].enonce = e.target.value;
+      }));
+      list.querySelectorAll('.qz-explication').forEach(el => el.addEventListener('input', e => {
+        _formQuestions[+e.target.dataset.qIdx].explication = e.target.value;
+      }));
+      list.querySelectorAll('.qz-reponse-texte').forEach(el => el.addEventListener('input', e => {
+        _formQuestions[+e.target.dataset.qIdx].reponses[+e.target.dataset.rIdx].texte = e.target.value;
+      }));
+      list.querySelectorAll('.qz-correcte-check').forEach(el => el.addEventListener('change', e => {
+        _formQuestions[+e.target.dataset.qIdx].reponses[+e.target.dataset.rIdx].est_correcte = e.target.checked;
+      }));
+      list.querySelectorAll('[data-remove-question]').forEach(btn => btn.addEventListener('click', () => {
+        _formQuestions.splice(+btn.dataset.removeQuestion, 1);
+        renderQuestionsEditor();
+      }));
+      list.querySelectorAll('[data-add-reponse]').forEach(btn => btn.addEventListener('click', () => {
+        _formQuestions[+btn.dataset.addReponse].reponses.push({ texte: '', est_correcte: false });
+        renderQuestionsEditor();
+      }));
+      list.querySelectorAll('[data-remove-reponse-q]').forEach(btn => btn.addEventListener('click', () => {
+        _formQuestions[+btn.dataset.removeReponseQ].reponses.splice(+btn.dataset.removeReponseR, 1);
+        renderQuestionsEditor();
+      }));
+    }
+
+    /* ── Formulaire ── */
+    function openForm(questionnaire, questions) {
+      _editingId = questionnaire ? questionnaire.id : null;
+      document.getElementById('qz-form-title').textContent = questionnaire ? 'Modifier le questionnaire' : 'Nouveau questionnaire';
+      document.getElementById('qz-form-titre').value = questionnaire ? questionnaire.titre_oeuvre : '';
+      document.getElementById('qz-form-auteur').value = questionnaire ? (questionnaire.auteur_oeuvre || '') : '';
+      _formQuestions = questions
+        ? questions.map(q => ({
+            enonce: q.enonce, explication: q.explication || '',
+            reponses: q.reponses.map(r => ({ texte: r.texte, est_correcte: r.est_correcte }))
+          }))
+        : [];
+      renderQuestionsEditor();
+      document.getElementById('qz-form-card').style.display = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeForm() {
+      document.getElementById('qz-form-card').style.display = 'none';
+      _editingId = null;
+      _formQuestions = [];
+    }
+
+    function validateForm(titre, questions) {
+      if (!titre) return 'Le titre de l\'œuvre est obligatoire.';
+      if (questions.length === 0) return 'Ajoute au moins une question.';
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        if (!q.enonce.trim()) return `La question ${i + 1} n'a pas d'énoncé.`;
+        const reponses = q.reponses.filter(r => r.texte.trim());
+        if (reponses.length < 2) return `La question ${i + 1} doit avoir au moins 2 réponses.`;
+        if (!reponses.some(r => r.est_correcte)) return `La question ${i + 1} doit avoir au moins une bonne réponse cochée.`;
+      }
+      return null;
+    }
+
+    async function saveForm() {
+      const titre = document.getElementById('qz-form-titre').value.trim();
+      const auteur = document.getElementById('qz-form-auteur').value.trim();
+      const cleanedQuestions = _formQuestions.map(q => ({
+        enonce: q.enonce, explication: q.explication,
+        reponses: q.reponses.filter(r => r.texte.trim())
+      }));
+
+      const err = validateForm(titre, cleanedQuestions);
+      if (err) { alert(err); return; }
+
+      const saveBtn = document.getElementById('qz-save-btn');
+      saveBtn.disabled = true;
+      try {
+        let questionnaireId = _editingId;
+        if (_editingId) {
+          await lfmQuestionnairesTeacher.updateQuestionnaireMeta(_editingId, titre, auteur);
+        } else {
+          const created = await lfmQuestionnairesTeacher.createQuestionnaire(_teacherProfile.id, titre, auteur);
+          questionnaireId = created.id;
+        }
+        await lfmQuestionnairesTeacher.replaceQuestions(questionnaireId, cleanedQuestions);
+        closeForm();
+        await loadQuestionnaires();
+      } catch (e) {
+        alert('Erreur : ' + e.message);
+      } finally {
+        saveBtn.disabled = false;
+      }
+    }
+
+    /* ── Liste ── */
+    function renderList() {
+      const wrap = document.getElementById('qz-list');
+      if (_questionnaires.length === 0) {
+        wrap.innerHTML = '<div class="qz-empty">Aucun questionnaire créé pour l\'instant.</div>';
+        return;
+      }
+      wrap.innerHTML = _questionnaires.map(q => {
+        const toggleBtn = q.statut === 'publie'
+          ? `<button type="button" class="qz-btn qz-btn-outline qz-btn-sm" data-unpublish="${q.id}">Repasser en brouillon</button>`
+          : `<button type="button" class="qz-btn qz-btn-gold qz-btn-sm" data-publish="${q.id}" ${q.nb_questions === 0 ? 'disabled title="Ajoute au moins une question avant de publier"' : ''}>Publier</button>`;
+        return `
+        <div class="qz-teacher-card">
+          <div class="qz-teacher-card-top">
+            <div>
+              <div class="qz-teacher-card-title">${escHtml(q.titre_oeuvre)}</div>
+              ${q.auteur_oeuvre ? `<div class="qz-card-auteur">${escHtml(q.auteur_oeuvre)}</div>` : ''}
+              <span class="qz-statut-pill qz-statut-pill--${q.statut}">${STATUT_LABEL[q.statut]}</span>
+              <div class="qz-teacher-card-meta">${q.nb_questions} question${q.nb_questions !== 1 ? 's' : ''}</div>
+            </div>
+            <div class="qz-teacher-card-actions">
+              <button type="button" class="qz-btn qz-btn-outline qz-btn-sm" data-edit="${q.id}">Modifier</button>
+              ${toggleBtn}
+              <button type="button" class="qz-btn qz-btn-danger qz-btn-sm" data-delete="${q.id}">Supprimer</button>
+            </div>
+          </div>
+        </div>
+      `; }).join('');
+
+      wrap.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', async () => {
+        const { questionnaire, questions } = await lfmQuestionnairesTeacher.getQuestionnaire(btn.dataset.edit);
+        openForm(questionnaire, questions);
+      }));
+      wrap.querySelectorAll('[data-publish]').forEach(btn => btn.addEventListener('click', async () => {
+        await lfmQuestionnairesTeacher.setStatut(btn.dataset.publish, 'publie');
+        await loadQuestionnaires();
+      }));
+      wrap.querySelectorAll('[data-unpublish]').forEach(btn => btn.addEventListener('click', async () => {
+        await lfmQuestionnairesTeacher.setStatut(btn.dataset.unpublish, 'brouillon');
+        await loadQuestionnaires();
+      }));
+      wrap.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', async () => {
+        if (!confirm('Supprimer définitivement ce questionnaire ?')) return;
+        await lfmQuestionnairesTeacher.deleteQuestionnaire(btn.dataset.delete);
+        await loadQuestionnaires();
+      }));
+    }
+
+    async function loadQuestionnaires() {
+      document.getElementById('qz-list').innerHTML = '<div class="qz-empty">Chargement…</div>';
+      _questionnaires = await lfmQuestionnairesTeacher.getMyQuestionnaires(_teacherProfile.id);
+      renderList();
+    }
+
+    /* ── Init ── */
+    async function init() {
+      _teacherProfile = await lfmAuth.requireRole('enseignant');
+      if (!_teacherProfile) return;
+
+      document.getElementById('qz-new-btn').addEventListener('click', () => openForm(null, [emptyQuestion()]));
+      document.getElementById('qz-add-question-btn').addEventListener('click', () => {
+        _formQuestions.push(emptyQuestion());
+        renderQuestionsEditor();
+      });
+      document.getElementById('qz-cancel-btn').addEventListener('click', closeForm);
+      document.getElementById('qz-save-btn').addEventListener('click', saveForm);
+
+      loadQuestionnaires();
+    }
+
+    init();
+  </script>
+</body>
+</html>

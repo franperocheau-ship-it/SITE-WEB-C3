@@ -304,6 +304,31 @@
       cursor: help;
     }
 
+    /* ── Colonne "DYS" dans le tableau élèves ─────────────────────────────────── */
+    .dys-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 44px;
+      border-radius: 100px;
+      padding: 4px 10px;
+      font-family: inherit;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      transition: background 150ms, border-color 150ms, color 150ms, opacity 150ms;
+    }
+    .dys-badge:hover { border-color: #1DBFA0; color: #0f7a67; }
+    .dys-badge.is-active {
+      background: #1DBFA0;
+      border-color: #1DBFA0;
+      color: #fff;
+    }
+    .dys-badge.is-active:hover { background: #17a58a; }
+    .dys-badge:disabled { opacity: 0.6; cursor: default; }
+
     /* ── Lien vers le pilotage des exercices (déménagé, Lot C) ──────────────── */
     .pilotage-link-card {
       display: flex;
@@ -626,6 +651,7 @@
         <a class="main-tab" href="remediations-enseignant.html">🧩 Remédiations</a>
         <a class="main-tab" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
         <a class="main-tab" href="dictees-enseignant.html">📖 Dictées préparées</a>
+        <a class="main-tab" href="questionnaires-enseignant.html">📚 Questionnaires de lecture</a>
       </nav>
 
       <!-- Sous-onglets (cachés en vue détail) -->
@@ -731,6 +757,9 @@
                 <th>Groupe
                   <span class="th-info" title="Ce groupe détermine aussi les exercices proposés en parcours guidé.">ⓘ</span>
                 </th>
+                <th>DYS
+                  <span class="th-info" title="Active un bouton de lecture audio pour l'élève sur les questionnaires de lecture.">ⓘ</span>
+                </th>
                 <th class="th-actions">Actions</th>
               </tr>
             </thead>
@@ -819,6 +848,15 @@
         <p style="font-size:12px;color:var(--muted);margin:0">
           L'identifiant et le mot de passe seront générés automatiquement.
         </p>
+        <div class="form-field">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer">
+            <input type="checkbox" id="fs-dyslexique" style="width:18px;height:18px;accent-color:var(--blue);cursor:pointer">
+            Dyslexie
+          </label>
+          <p style="font-size:12px;color:var(--muted);margin:4px 0 0">
+            Active un bouton de lecture audio pour cet élève sur les questionnaires de lecture.
+          </p>
+        </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-ghost" onclick="closeModal()">Annuler</button>
           <button type="submit"  class="btn btn-primary" id="ms-submit">Ajouter</button>
@@ -1266,6 +1304,11 @@
           </div>
         </td>
         <td>
+          <button type="button" class="dys-badge ${s.est_dyslexique ? 'is-active' : ''}" id="dys-badge-${s.id}"
+            data-action="toggle-dys" data-sid="${s.id}"
+            title="${s.est_dyslexique ? 'Dyslexie activée — cliquer pour désactiver' : 'Dyslexie désactivée — cliquer pour activer'}">DYS</button>
+        </td>
+        <td>
           <div class="td-actions">
             <button class="btn btn-outline btn-sm btn-icon" data-action="edit"   data-sid="${s.id}" title="Modifier le nom">✏️</button>
             <button class="btn btn-ghost  btn-sm btn-icon" data-action="reset"  data-sid="${s.id}" title="Réinitialiser le mot de passe">🔄</button>
@@ -1315,7 +1358,30 @@
     if (action === 'delete')      confirmDeleteById('student', id, student.display_name);
     if (action === 'reset-perso') await resetPersoList(student, btn);
     if (action === 'retry-auth')  await retryStudentAuth(student, btn);
+    if (action === 'toggle-dys')  await toggleDysStatus(student, btn);
   });
+
+  /* Badge "DYS" du tableau : bascule directe sans passer par la modale
+     d'édition (feedback optimiste, revert si l'update échoue). La case à
+     cocher de la modale (#fs-dyslexique) lit le même _students[].est_dyslexique
+     à l'ouverture, donc les deux restent synchronisés. */
+  async function toggleDysStatus(student, btn) {
+    const newValue = !student.est_dyslexique;
+    btn.disabled = true;
+    btn.classList.toggle('is-active', newValue);
+    btn.title = newValue ? 'Dyslexie activée — cliquer pour désactiver' : 'Dyslexie désactivée — cliquer pour activer';
+    try {
+      await lfmTeacher.updateStudent(student.id, { est_dyslexique: newValue });
+      student.est_dyslexique = newValue;
+      showToast(newValue ? 'Dyslexie activée pour ' + student.display_name : 'Dyslexie désactivée pour ' + student.display_name);
+    } catch (err) {
+      btn.classList.toggle('is-active', student.est_dyslexique);
+      btn.title = student.est_dyslexique ? 'Dyslexie activée — cliquer pour désactiver' : 'Dyslexie désactivée — cliquer pour activer';
+      showToast('Erreur : ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
 
   /* Rattrapage : la création du compte auth.users à l'inscription peut
      échouer silencieusement (js/teacher.js, createStudent) — l'élève reste
@@ -1441,6 +1507,7 @@
     document.getElementById('ms-title').textContent  = 'Ajouter un élève';
     document.getElementById('ms-submit').textContent = 'Ajouter';
     document.getElementById('form-student').reset();
+    document.getElementById('fs-dyslexique').checked = false;
     openModal('student');
     setTimeout(() => document.getElementById('fs-name').focus(), 80);
   }
@@ -1450,6 +1517,7 @@
     document.getElementById('ms-title').textContent  = 'Modifier l\'élève';
     document.getElementById('ms-submit').textContent = 'Enregistrer';
     document.getElementById('fs-name').value = student.display_name;
+    document.getElementById('fs-dyslexique').checked = !!student.est_dyslexique;
     openModal('student');
     setTimeout(() => document.getElementById('fs-name').focus(), 80);
   }
@@ -1458,20 +1526,21 @@
     e.preventDefault();
     const btn  = document.getElementById('ms-submit');
     const name = document.getElementById('fs-name').value.trim();
+    const estDyslexique = document.getElementById('fs-dyslexique').checked;
     if (!name) return;
 
     btn.disabled = true;
     btn.textContent = 'En cours…';
     try {
       if (_editingStudentId) {
-        await lfmTeacher.updateStudent(_editingStudentId, { display_name: name });
+        await lfmTeacher.updateStudent(_editingStudentId, { display_name: name, est_dyslexique: estDyslexique });
         const s = _students.find(s => s.id === _editingStudentId);
-        if (s) s.display_name = name;
+        if (s) { s.display_name = name; s.est_dyslexique = estDyslexique; }
         renderDetailStudents();
         closeModal();
         showToast('Élève modifié');
       } else {
-        const created = await lfmTeacher.createStudent(name, _currentClass.id);
+        const created = await lfmTeacher.createStudent(name, _currentClass.id, estDyslexique);
         _students.push(created);
         const idx = _classes.findIndex(c => c.id === _currentClass.id);
         if (idx !== -1) _classes[idx].student_count++;

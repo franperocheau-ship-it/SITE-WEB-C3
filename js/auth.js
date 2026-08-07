@@ -58,6 +58,21 @@ const lfmAuth = (() => {
     return data;
   }
 
+  /* Fiche élève (students) de l'utilisateur connecté — porte les infos
+     pédagogiques par élève (ex. est_dyslexique), absentes de profiles.
+     Policy RLS "students_select_own" (auth_user_id = auth.uid()). */
+  async function getMyStudentRecord() {
+    const session = await getSession();
+    if (!session) return null;
+    const { data, error } = await db
+      .from('students')
+      .select('*')
+      .eq('auth_user_id', session.user.id)
+      .maybeSingle();
+    if (error) return null;
+    return data;
+  }
+
   /* Redirection vers le dashboard selon le rôle ───────────────────────────── */
   function redirectToDashboard(role) {
     const map = {
@@ -105,5 +120,5 @@ const lfmAuth = (() => {
     if (error) throw error;
   }
 
-  return { signIn, signUp, signOut, getSession, getProfile, redirectToDashboard, requireRole, resetPassword, updatePassword };
+  return { signIn, signUp, signOut, getSession, getProfile, getMyStudentRecord, redirectToDashboard, requireRole, resetPassword, updatePassword };
 })();

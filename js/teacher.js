@@ -462,7 +462,7 @@ const lfmTeacher = (() => {
     return newPassword;
   }
 
-  async function createStudent(displayName, classId) {
+  async function createStudent(displayName, classId, estDyslexique = false) {
     const { data: { session } } = await db.auth.getSession();
     const username = await generateUsername(displayName);
     const password = generatePassword();
@@ -476,12 +476,13 @@ const lfmTeacher = (() => {
     }
 
     const { data, error } = await db.from('students').insert({
-      display_name: displayName,
+      display_name:   displayName,
       username,
       password,
-      class_id:     classId || null,
-      teacher_id:   session.user.id,
-      auth_user_id: authUserId || null
+      class_id:       classId || null,
+      teacher_id:     session.user.id,
+      auth_user_id:   authUserId || null,
+      est_dyslexique: estDyslexique
     }).select().single();
     if (error) throw error;
     return data;
