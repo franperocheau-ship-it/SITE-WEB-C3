@@ -66,6 +66,10 @@ const lfmAnalytics = (() => {
          catalogMap[slug] dans metaFor() ci-dessous, plus besoin d'entrée ici. */
       'ecrire-fraction-sous-forme-decimale': { domaine: 'Mathématiques', competence: 'Nombres décimaux — Écrire une fraction sous forme décimale' },
       'ecrire-decimal-sous-forme-fraction':  { domaine: 'Mathématiques', competence: 'Nombres décimaux — Écrire un décimal sous forme de fraction' },
+      /* Slug partagé par tous les questionnaires de lecture (voir
+         js/exercise-catalog.js et la migration 20260807150000) — même
+         entrée que côté dashboard élève. */
+      'questionnaire-lecture':               { domaine: 'Français', competence: 'Lecture — Compréhension de lecture' },
     },
     prefixes: [
       /* Les 10 pages ortho-distinguer-*.html ont toutes exactement 3 niveaux,

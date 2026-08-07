@@ -31,7 +31,16 @@ const EXERCISE_CATALOG_AUTONOMOUS = [
 
   /* ── Algèbre (pages autonomes dédiées, hub algebre.html) ─────────────────── */
   { slug: "algebre-symboles-mysteres",   title: "Symboles mystères",        category: "Mathématiques", subCategory: "Algèbre" },
-  { slug: "algebre-systemes-equations",  title: "Systèmes d'équations",     category: "Mathématiques", subCategory: "Algèbre" }
+  { slug: "algebre-systemes-equations",  title: "Systèmes d'équations",     category: "Mathématiques", subCategory: "Algèbre" },
+
+  /* ── Lecture — Questionnaires de lecture (questionnaires-lecture.html) ────
+     Un seul slug partagé par tous les questionnaires créés par les
+     enseignants (bibliothèque dynamique, pas une liste figée d'exercices) —
+     voir le commentaire d'en-tête de la migration
+     20260807150000_questionnaires_link_exercise_results.sql pour le détail
+     de ce choix. exercise_results.exercise_title porte le titre du livre
+     réellement passé, exercise_type l'id du questionnaire. */
+  { slug: "questionnaire-lecture",       title: "Compréhension de lecture", category: "Français",      subCategory: "Lecture" }
 
 ];
 
