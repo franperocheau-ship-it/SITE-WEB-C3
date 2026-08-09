@@ -226,6 +226,27 @@
       line-height: 1.45;
     }
 
+    /* ── Bannière Questionnaires de lecture (module dédié, hors du système de
+       compétences/parcours guidé ci-dessus — bibliothèque de questionnaires
+       créés par les enseignants, sans notion de palier). ──────────────────── */
+    .ql-entry-banner {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, rgba(29,191,160,0.10), rgba(245,166,35,0.08));
+      border: 1.5px solid rgba(29,191,160,0.30);
+      border-radius: var(--radius-card);
+      padding: 20px 24px;
+      margin-bottom: 28px;
+      text-decoration: none;
+      transition: transform 200ms ease, box-shadow 200ms ease;
+    }
+    .ql-entry-banner:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .ql-entry-banner-icon { font-size: 38px; flex-shrink: 0; }
+    .ql-entry-banner-title { font-family: var(--font-display); font-weight: 800; font-size: 16px; color: var(--text); }
+    .ql-entry-banner-desc { font-size: 13px; color: var(--muted); margin-top: 3px; }
+    .ql-entry-banner-cta { margin-left: auto; font-weight: 700; font-size: 13px; color: var(--blue); white-space: nowrap; }
+
     /* ── Empty states ───────────────────────────────────────── */
     .empty-state {
       text-align: center;
@@ -312,19 +333,6 @@
         <p class="page-subtitle">Choisis une compétence à travailler.</p>
       </div>
 
-      <!-- Questionnaires de lecture : module à part, non filtré par niveau et
-           volontairement hors du système de compétences/parcours guidé
-           ci-dessous (bibliothèque de questionnaires créés par les
-           enseignants, sans notion de palier). -->
-      <div style="margin-bottom:28px;">
-        <a href="questionnaires-lecture.html" class="skill-card" style="max-width:480px;">
-          <div class="skill-badges">
-            <span class="badge badge-cm1">CM1</span><span class="badge badge-cm2">CM2</span><span class="badge badge-6e">6e</span>
-          </div>
-          <div class="skill-title">📚 Questionnaires de lecture — teste ta compréhension des livres étudiés en classe</div>
-        </a>
-      </div>
-
       <!-- Filter bar -->
       <div class="filter-bar">
         <div class="search-wrap">
@@ -348,6 +356,19 @@
           <button class="level-btn" data-level="6e">6e</button>
         </div>
       </div>
+
+      <!-- Questionnaires de lecture : module à part, non filtré par niveau et
+           volontairement hors du système de compétences/parcours guidé
+           ci-dessus (bibliothèque de questionnaires créés par les
+           enseignants, sans notion de palier). -->
+      <a href="questionnaires-lecture.html" class="ql-entry-banner">
+        <div class="ql-entry-banner-icon">📚</div>
+        <div>
+          <div class="ql-entry-banner-title">Questionnaires de lecture</div>
+          <div class="ql-entry-banner-desc">Teste ta compréhension des livres étudiés en classe</div>
+        </div>
+        <div class="ql-entry-banner-cta">Découvrir →</div>
+      </a>
 
       <!-- Skills container (rendered by JS) -->
       <div class="skill-sections" id="skills-container"></div>
