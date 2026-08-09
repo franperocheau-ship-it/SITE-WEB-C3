@@ -112,8 +112,48 @@ const lfmQuestionnairesTeacher = (() => {
     if (error) throw error;
   }
 
+  /* Résultats bruts de TOUS les questionnaires (exercise_results, où chaque
+     questionnaire a son propre exercise_slug 'questionnaire-lecture-<id>' —
+     voir supabase/migrations/20260807160000). La RLS (results_select_teacher
+     = is_my_student()) restreint déjà aux seuls élèves de l'enseignant
+     connecté ; un questionnaire publié par un collègue mais passé par un de
+     ces élèves peut donc apparaître ici — filtré côté appelant sur les
+     questionnaires réellement possédés par l'enseignant (voir
+     groupResultsByQuestionnaire ci-dessous). */
+  async function getResultsForMyQuestionnaires() {
+    const { data, error } = await db.from('exercise_results')
+      .select('student_id, exercise_slug, score, total, pct, completed_at')
+      .like('exercise_slug', 'questionnaire-lecture-%');
+    if (error) throw error;
+    return data || [];
+  }
+
+  /* Regroupe les résultats bruts par questionnaire_id (extrait du slug) et
+     calcule, pour chaque questionnaire fourni, nb d'élèves + moyenne de
+     classe — via lfmAnalytics.dedupeBestBySlug (js/teacher-analytics.js) :
+     un seul (meilleur) score par élève et par questionnaire, même logique
+     que le reste du site plutôt qu'un dédoublonnage réécrit ici. */
+  function groupResultsByQuestionnaire(questionnaires, rows) {
+    const bySlug = new Map();
+    rows.forEach(r => {
+      if (!bySlug.has(r.exercise_slug)) bySlug.set(r.exercise_slug, []);
+      bySlug.get(r.exercise_slug).push(r);
+    });
+
+    const summaries = new Map(); // questionnaire.id -> { count, avgPct, students: [...] }
+    questionnaires.forEach(q => {
+      const slug = 'questionnaire-lecture-' + q.id;
+      const slugRows = bySlug.get(slug) || [];
+      const best = (typeof lfmAnalytics !== 'undefined') ? lfmAnalytics.dedupeBestBySlug(slugRows) : slugRows;
+      const avgPct = best.length ? Math.round(best.reduce((s, r) => s + parseFloat(r.pct), 0) / best.length) : null;
+      summaries.set(q.id, { count: best.length, avgPct, students: best });
+    });
+    return summaries;
+  }
+
   return {
     getMyQuestionnaires, getQuestionnaire, createQuestionnaire,
-    updateQuestionnaireMeta, replaceQuestions, setStatut, deleteQuestionnaire
+    updateQuestionnaireMeta, replaceQuestions, setStatut, deleteQuestionnaire,
+    getResultsForMyQuestionnaires, groupResultsByQuestionnaire
   };
 })();

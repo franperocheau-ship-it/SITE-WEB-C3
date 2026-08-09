@@ -17,7 +17,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=2"></script>
-  <script src="js/teacher-analytics.js?v=2"></script>
+  <script src="js/teacher-analytics.js?v=4"></script>
   <script src="js/niveau-pastilles.js?v=1"></script>
   <script src="js/level-badge.js?v=1"></script>
   <script src="js/bilan-nav.js?v=1"></script>
@@ -457,6 +457,17 @@
     .consolider-item .ci-meta { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
     .consolider-item .ci-flag { font-size: 10.5px; font-weight: 700; color: #E0765C; }
 
+    /* ── Questionnaires de lecture (fiche élève) — mêmes classes que
+       dashboard-eleve.html, pour un rendu identique. ── */
+    .qz-hist-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .qz-hist-row:last-child { border-bottom: none; }
+    .qz-hist-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .qz-hist-date  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .qz-hist-score { font-size: 15px; font-weight: 800; color: var(--blue); flex-shrink: 0; text-align: right; }
+
     /* ── Bilan par compétences (pastilles) — composant partagé écran + PDF +
        dashboard élève, voir css/niveau-pastilles.css et js/niveau-pastilles.js.
        Tailles par défaut = écran ; la synthèse imprimée ci-dessous surcharge
@@ -531,6 +542,18 @@
     .bulletin-jauges .bcp-pastille { min-width: 22px; height: 14px; padding: 0 3px; border-radius: 7px; font-size: 6.5pt; }
     .bulletin-jauges .bcp-pastille.bcp-empty { min-width: 11px; width: 11px; height: 11px; }
 
+    /* 5bis. Questionnaires de lecture — même titre que les jauges, liste
+       compacte titre/score/date (pas de tableau, une ligne par tentative). */
+    .bulletin-questionnaires { margin-bottom: 18px; }
+    .bulletin-qz-row {
+      display: flex; justify-content: space-between; gap: 10px;
+      font-size: 9pt; padding: 4px 0; border-bottom: 0.5pt solid #E8EDF3;
+    }
+    .bulletin-qz-row:last-child { border-bottom: none; }
+    .bulletin-qz-row .bqz-title { font-weight: 700; }
+    .bulletin-qz-row .bqz-date  { font-size: 7.5pt; color: #9AA3B2; }
+    .bulletin-qz-row .bqz-score { font-weight: 700; color: #1A2D6B; white-space: nowrap; }
+
     /* 6. Pied de page */
     .bulletin-footer {
       display: flex; justify-content: space-between; gap: 12px;
@@ -554,6 +577,7 @@
       body.printing-bulletin .student-header, body.printing-bulletin .stats-row-4,
       body.printing-bulletin #laurels-root, body.printing-bulletin #student-niveaux,
       body.printing-bulletin #student-consolider, body.printing-bulletin #student-reussies,
+      body.printing-bulletin #student-questionnaires,
       body.printing-bulletin .nav-footer,
       body.printing-bulletin .navbar {
         display: none !important;
@@ -769,6 +793,18 @@
           <div id="niveaux-content"></div>
         </div>
 
+        <!-- Mes questionnaires de lecture — même présentation que le
+             dashboard élève (détail par questionnaire + moyenne générale),
+             voir computeQuestionnairesSummary/renderStudentQuestionnaires. -->
+        <div class="overview-card" id="student-questionnaires" style="margin-bottom:20px;display:none">
+          <div class="overview-card-title">Questionnaires de lecture</div>
+          <div style="display:flex;gap:24px;margin-bottom:14px;">
+            <div><span style="font-size:22px;font-weight:800;color:var(--blue)" id="student-qz-avg">—</span> <span style="font-size:12px;color:var(--muted)">moyenne générale</span></div>
+            <div><span style="font-size:22px;font-weight:800;color:var(--blue)" id="student-qz-total">0</span> <span style="font-size:12px;color:var(--muted)">questionnaire(s) passé(s)</span></div>
+          </div>
+          <div id="student-qz-list"></div>
+        </div>
+
         <div class="nav-footer" id="student-nav-footer"></div>
       </div>
 
@@ -841,14 +877,16 @@
   }
   /* Diagnostic (Problème 1, point 2) : signale les exercise_slug enregistrés
      dans exercise_results qui ne correspondent à aucune clé d'EXERCISE_DATA
-     (exercice renommé/retiré du catalogue depuis) — ces lignes tombent dans
-     UNKNOWN_META ('Autres') côté teacher-analytics.js et disparaissent
-     silencieusement du bulletin, qui ne boucle que sur Français/Mathématiques.
+     NI à une entrée STANDALONE_META (ortho-, lex-, questionnaire-lecture-,
+     voir js/teacher-analytics.js) — donc un exercice réellement renommé/
+     retiré du catalogue. Passe par metaFor() (et non catalogMap[slug] direct)
+     pour ne pas signaler à tort les slugs standalone, résolus ailleurs.
      Une seule fois par jeu de données, pas à chaque rendu. */
   function logUnmatchedCatalogSlugs(rows, catalogMap) {
     const unmatched = new Map();
     rows.forEach(r => {
-      if (!catalogMap[r.exercise_slug]) unmatched.set(r.exercise_slug, r.exercise_title || '(sans titre)');
+      const meta = lfmAnalytics.metaFor(catalogMap, r.exercise_slug);
+      if (meta.competence === UNKNOWN_META.competence) unmatched.set(r.exercise_slug, r.exercise_title || '(sans titre)');
     });
     if (unmatched.size > 0) {
       console.warn('[LFM] exercise_slug absents du catalogue exercise-data.js (' + unmatched.size + ') :',
@@ -1083,7 +1121,12 @@
       const byDomaine    = {};
 
       for (const r of latest) {
-        const meta = _catalogMap[r.exercise_slug] || UNKNOWN_META;
+        /* metaFor() (et non catalogMap[slug] direct) : seul catalogMap[slug]
+           couvre EXERCISE_DATA — les slugs STANDALONE_META (ortho-*, lex-*,
+           questionnaire-lecture-<id>, ...) y étaient invisibles et tombaient
+           silencieusement dans "Autres", hors de DOMAIN_ORDER (Français/
+           Mathématiques) donc jamais affichés dans ce Bilan. */
+        const meta = lfmAnalytics.metaFor(_catalogMap, r.exercise_slug);
         const { domaine, competence } = meta;
         const sep         = competence.indexOf(' — ');
         const sousDomaine = sep >= 0 ? competence.slice(0, sep)      : competence;
@@ -1545,7 +1588,7 @@
     _studentRows    = [];
     document.getElementById('student-rank-line').innerHTML = '';
     document.getElementById('print-student-btn').style.display = 'none';
-    ['student-consolider', 'student-reussies', 'student-niveaux'].forEach(id => {
+    ['student-consolider', 'student-reussies', 'student-niveaux', 'student-questionnaires'].forEach(id => {
       document.getElementById(id).style.display = 'none';
     });
 
@@ -1568,11 +1611,20 @@
       renderConsoliderList(profile.consolider);
       renderReussiesList(profile.reussies);
       renderStudentNiveaux(profile);
+      renderStudentQuestionnaires(rows);
 
       document.getElementById('print-student-btn').style.display = '';
     } catch (e) {
       console.warn('[LFM] renderStudentProfile:', e.message);
     }
+  }
+
+  /* Lien "Revoir" : exercise.html?slug=... suppose un slug EXERCISE_DATA.
+     Les slugs STANDALONE_META (ortho-*, lex-*, questionnaire-lecture-<id>)
+     n'y correspondent à rien — on les fait pointer vers leur page dédiée. */
+  function reviewHrefFor(exampleSlug) {
+    if (exampleSlug.startsWith('questionnaire-lecture-')) return 'questionnaires-lecture.html';
+    return `exercise.html?slug=${encodeURIComponent(exampleSlug)}`;
   }
 
   function renderConsoliderList(consolider) {
@@ -1585,7 +1637,7 @@
           <div class="ci-comp">${escHtml(c.competence)}</div>
           <div class="ci-meta">${escHtml(c.domaine)} · moyenne ${c.avgPct}%${c.hasRepeatedFailure ? ' · <span class="ci-flag">échecs répétés</span>' : ''}</div>
         </div>
-        <a class="btn btn-outline btn-sm" href="exercise.html?slug=${encodeURIComponent(c.exampleSlug)}" target="_blank">Revoir →</a>
+        <a class="btn btn-outline btn-sm" href="${reviewHrefFor(c.exampleSlug)}" target="_blank">Revoir →</a>
       </div>`).join('');
   }
 
@@ -1610,6 +1662,39 @@
     if (!html) { el.style.display = 'none'; return; }
     el.style.display = '';
     document.getElementById('niveaux-content').innerHTML = html;
+  }
+
+  /* ── Mes questionnaires de lecture — même présentation (détail par
+     questionnaire + moyenne générale) que dashboard-eleve.html, réutilisée
+     ici pour l'écran ET la synthèse PDF (voir printStudentBilan). Calculé
+     directement sur les rows brutes (pas via computeStudentProfile/
+     dedupeBestBySlug) : contrairement à "réussies/consolider", on veut ici
+     CHAQUE tentative distincte, pas seulement la meilleure par slug. */
+  function computeQuestionnairesSummary(rows) {
+    const qzRows = (rows || [])
+      .filter(r => typeof r.exercise_slug === 'string' && r.exercise_slug.startsWith('questionnaire-lecture-'))
+      .sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at));
+    if (qzRows.length === 0) return null;
+    const avg = Math.round(qzRows.reduce((s, r) => s + parseFloat(r.pct), 0) / qzRows.length);
+    return { avg, count: qzRows.length, list: qzRows };
+  }
+
+  function renderStudentQuestionnaires(rows) {
+    const el = document.getElementById('student-questionnaires');
+    const summary = computeQuestionnairesSummary(rows);
+    if (!summary) { el.style.display = 'none'; return; }
+    el.style.display = '';
+    document.getElementById('student-qz-avg').textContent = summary.avg + ' %';
+    document.getElementById('student-qz-total').textContent = summary.count;
+    document.getElementById('student-qz-list').innerHTML = summary.list.map(r => `
+      <div class="qz-hist-row">
+        <div>
+          <div class="qz-hist-title">${escHtml(r.exercise_title || 'Questionnaire de lecture')}</div>
+          <div class="qz-hist-date">${new Date(r.completed_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</div>
+        </div>
+        <div class="qz-hist-score">${r.score} / ${r.total}<br><span style="font-size:12px;font-weight:600;color:var(--muted);">${Math.round(r.pct)} %</span></div>
+      </div>
+    `).join('');
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -1670,6 +1755,23 @@
     const jaugesHtml = lfmNiveauPastilles.renderTable(profile)
       || '<div style="font-size:9.5pt;color:#888">Pas assez de données.</div>';
 
+    /* Questionnaires de lecture — même donnée/logique que l'écran (voir
+       computeQuestionnairesSummary), simplement absente du PDF si vide. */
+    const qzSummary = computeQuestionnairesSummary(_studentRows);
+    const qzHtml = qzSummary ? `
+      <div class="bulletin-questionnaires">
+        <div class="bulletin-jauges-title">Questionnaires de lecture — moyenne ${qzSummary.avg}% (${qzSummary.count})</div>
+        ${qzSummary.list.map(r => `
+          <div class="bulletin-qz-row">
+            <div>
+              <span class="bqz-title">${escHtml(r.exercise_title || 'Questionnaire de lecture')}</span>
+              <span class="bqz-date"> — ${new Date(r.completed_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+            </div>
+            <div class="bqz-score">${r.score} / ${r.total} (${Math.round(r.pct)}%)</div>
+          </div>
+        `).join('')}
+      </div>` : '';
+
     const html = `<div class="bulletin-page">
       <div class="bulletin-header">
         <div>
@@ -1715,6 +1817,8 @@
         <div class="bulletin-jauges-title">Jauges de niveau par domaine et sous-domaine</div>
         ${jaugesHtml}
       </div>
+
+      ${qzHtml}
 
       <div class="bulletin-footer">
         <span>proficiamus.eu</span>

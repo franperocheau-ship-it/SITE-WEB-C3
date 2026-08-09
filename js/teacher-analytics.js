@@ -66,10 +66,6 @@ const lfmAnalytics = (() => {
          catalogMap[slug] dans metaFor() ci-dessous, plus besoin d'entrée ici. */
       'ecrire-fraction-sous-forme-decimale': { domaine: 'Mathématiques', competence: 'Nombres décimaux — Écrire une fraction sous forme décimale' },
       'ecrire-decimal-sous-forme-fraction':  { domaine: 'Mathématiques', competence: 'Nombres décimaux — Écrire un décimal sous forme de fraction' },
-      /* Slug partagé par tous les questionnaires de lecture (voir
-         js/exercise-catalog.js et la migration 20260807150000) — même
-         entrée que côté dashboard élève. */
-      'questionnaire-lecture':               { domaine: 'Français', competence: 'Lecture — Compréhension de lecture' },
     },
     prefixes: [
       /* Les 10 pages ortho-distinguer-*.html ont toutes exactement 3 niveaux,
@@ -79,6 +75,12 @@ const lfmAnalytics = (() => {
          lex-* (data-levels variable selon la compétence, pas de badge
          CM1/CM2/6e) qui reste donc sans `levels` ci-dessous. */
       { prefix: 'ortho-', meta: { domaine: 'Français', competence: 'Orthographe — Homophones grammaticaux', levels: ['CM1', 'CM2', '6e'], paliers: 3 } },
+      /* Un slug par questionnaire ('questionnaire-lecture-<id>', voir la
+         migration 20260807160000) : préfixe plutôt qu'entrée exacte, pour ne
+         pas avoir à maintenir une ligne par questionnaire créé par les
+         enseignants. Pas de `levels` : aucune notion de niveau sur un
+         questionnaire en Phase 1 (exclu des jauges CM1/CM2/6e, comme lex-*). */
+      { prefix: 'questionnaire-lecture-', meta: { domaine: 'Français', competence: 'Lecture — Compréhension de lecture' } },
       { prefix: 'lex-',   meta: { domaine: 'Français', competence: 'Vocabulaire' } },
     ],
   };
@@ -478,7 +480,7 @@ const lfmAnalytics = (() => {
     Object.values(sousDomaineJauges).forEach(list => list.sort((a, b) => a.sousDomaine.localeCompare(b.sousDomaine, 'fr')));
 
     /* ── Compétences à consolider / réussies ──────────────────────────────
-       Consolider : moyenne <60% OU échec répété (≥2 tentatives sur un même
+       Consolider : moyenne ≤60% OU échec répété (≥2 tentatives sur un même
        exercice sans jamais atteindre 80%). Réussies : moyenne ≥80%. */
     const attemptsBySlug = new Map();
     rows.forEach(r => {
@@ -511,7 +513,7 @@ const lfmAnalytics = (() => {
         exampleSlug: agg.slugs[0],
         levels: levelsPctFor(key)
       };
-      if (avgPct < 60 || hasRepeatedFailure) consolider.push(entry);
+      if (avgPct <= 60 || hasRepeatedFailure) consolider.push(entry);
       else if (avgPct >= SUCCESS_THRESHOLD) reussies.push(entry);
     });
     consolider.sort((a, b) => (b.hasRepeatedFailure - a.hasRepeatedFailure) || (a.avgPct - b.avgPct));
@@ -575,6 +577,7 @@ const lfmAnalytics = (() => {
   return {
     SUCCESS_THRESHOLD, JAUGE_LEVELS, DOMAIN_ORDER, MIN_STUDENTS_COMP,
     buildCatalogMap, dedupeBestBySlug, computeSousDomaineRates,
-    computeClassOverview, computeStudentProfile, computeCompetenceStats
+    computeClassOverview, computeStudentProfile, computeCompetenceStats,
+    metaFor
   };
 })();

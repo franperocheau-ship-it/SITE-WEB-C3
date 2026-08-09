@@ -23,7 +23,7 @@
   <script src="js/guided-access.js?v=1"></script>
   <script src="data/index.js?v=2"></script>
   <script src="js/exercise-catalog.js?v=6"></script>
-  <script src="js/teacher-analytics.js?v=2"></script>
+  <script src="js/teacher-analytics.js?v=4"></script>
   <script src="js/niveau-pastilles.js?v=1"></script>
   <script src="js/laurels.js?v=7"></script>
   <script src="js/jogging-data.js?v=1"></script>
@@ -209,6 +209,20 @@
 
     .bar-francais      { background: linear-gradient(90deg, var(--blue) 0%, #1b4db0 100%); }
     .bar-mathematiques { background: linear-gradient(90deg, #F5A623 0%, #E0951A 100%); }
+
+    /* ── Mes questionnaires de lecture (liste par tentative) ── */
+    .qz-hist-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .qz-hist-row:last-child { border-bottom: none; }
+    .qz-hist-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .qz-hist-date  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .qz-hist-score { font-size: 15px; font-weight: 800; color: var(--blue); flex-shrink: 0; text-align: right; }
 
     /* ── Bilan par compétences (pastilles) — composant partagé avec la fiche
        élève enseignant / synthèse PDF, voir css/niveau-pastilles.css. */
@@ -541,6 +555,25 @@
           <div id="niveaux-content"></div>
         </div>
 
+        <!-- Mes questionnaires de lecture — détail par questionnaire, la
+             moyenne générale alimente aussi "Lecture — Compréhension de
+             lecture" ci-dessus (Points forts/À consolider, Bilan par
+             compétences), via competenceInfoFor(). -->
+        <div class="dash-section" id="section-questionnaires" style="display:none">
+          <div class="dash-section-title">Mes questionnaires de lecture</div>
+          <div class="dash-stats" id="qz-dash-stats" style="margin-bottom:18px;">
+            <div class="dash-stat">
+              <div class="dash-stat-label">Moyenne générale</div>
+              <div class="dash-stat-value" id="qz-stat-avg">—<span class="dash-stat-unit">%</span></div>
+            </div>
+            <div class="dash-stat">
+              <div class="dash-stat-label">Questionnaires passés</div>
+              <div class="dash-stat-value" id="qz-stat-total">0</div>
+            </div>
+          </div>
+          <div id="qz-dash-list"></div>
+        </div>
+
         <!-- État vide (premier usage) -->
         <div class="dash-section" id="section-empty" style="display:none">
           <div class="dash-empty">
@@ -728,6 +761,11 @@
     let _resNavBar = null;
     let _catalogMap = null; /* lfmAnalytics.buildCatalogMap(), mémorisé — voir renderDashboard() */
 
+    function escHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     function activateTab(tabName) {
       document.querySelectorAll('.dash-tab').forEach(btn => {
         btn.classList.toggle('dash-tab--active', btn.dataset.tab === tabName);
@@ -823,12 +861,27 @@
     }
 
     /* ── Taux de réussite moyen par compétence, à partir des résultats ──────── */
+    function competenceInfoFor(competenceMap, slug) {
+      const local = competenceMap.get(slug);
+      if (local) return local;
+      /* Repli sur le registre partagé de js/teacher-analytics.js
+         (STANDALONE_META, exact + préfixes) — couvre entre autres les
+         questionnaires de lecture ('questionnaire-lecture-<id>', un slug
+         par questionnaire, impossible à lister ici à la main). Réutilisé
+         plutôt que dupliqué : voir commentaire de js/exercise-catalog.js. */
+      if (typeof lfmAnalytics === 'undefined') return null;
+      if (!_catalogMap) _catalogMap = lfmAnalytics.buildCatalogMap();
+      const meta = lfmAnalytics.metaFor(_catalogMap, slug);
+      if (!meta || meta.competence === 'Exercice retiré du catalogue') return null;
+      return { competence: meta.competence, domaine: meta.domaine };
+    }
+
     function computeCompetenceStats(results) {
       const competenceMap = buildCompetenceMap();
       const byCompetence = new Map();
 
       for (const r of results) {
-        const info = competenceMap.get(r.exercise_slug);
+        const info = competenceInfoFor(competenceMap, r.exercise_slug);
         if (!info) continue; /* slug hors catalogue : ignoré, comme pour les badges */
 
         let entry = byCompetence.get(info.competence);
@@ -859,6 +912,35 @@
             <div class="competence-bar-fill ${barCls}" style="width:${entry.avg}%"></div>
           </div>
         </div>`;
+    }
+
+    /* ── Mes questionnaires de lecture : détail par questionnaire + moyenne
+       générale en tête. Filtré sur le préfixe de exercise_slug plutôt que
+       sur `category` (voir commentaire de buildCompetenceMap ci-dessus, la
+       colonne n'est pas fiable) — chaque tentative reste une ligne
+       distincte (pas de dédoublonnage), pour un historique complet. ────── */
+    function renderQuestionnairesSection(results) {
+      const section = document.getElementById('section-questionnaires');
+      const qzResults = results
+        .filter(r => typeof r.exercise_slug === 'string' && r.exercise_slug.startsWith('questionnaire-lecture-'))
+        .sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at));
+
+      if (qzResults.length === 0) { section.style.display = 'none'; return; }
+      section.style.display = '';
+
+      const avg = Math.round(qzResults.reduce((s, r) => s + parseFloat(r.pct), 0) / qzResults.length);
+      document.getElementById('qz-stat-avg').innerHTML = avg + '<span class="dash-stat-unit">%</span>';
+      document.getElementById('qz-stat-total').textContent = qzResults.length;
+
+      document.getElementById('qz-dash-list').innerHTML = qzResults.map(r => `
+        <div class="qz-hist-row">
+          <div>
+            <div class="qz-hist-title">${escHtml(r.exercise_title || 'Questionnaire de lecture')}</div>
+            <div class="qz-hist-date">${new Date(r.completed_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</div>
+          </div>
+          <div class="qz-hist-score">${r.score} / ${r.total}<br><span style="font-size:12px;font-weight:600;color:var(--muted);">${Math.round(r.pct)} %</span></div>
+        </div>
+      `).join('');
     }
 
     /* ── Rendu du dashboard ────────────────────────────────────────────────── */
@@ -913,6 +995,9 @@
         ? weaknesses.map(renderCompetenceRow).join('')
         : '<div class="dash-empty" style="padding:8px 0;">Pas encore de résultat.</div>';
       document.getElementById('section-weaknesses').style.display = '';
+
+      /* ── Mes questionnaires de lecture (détail + moyenne) ── */
+      renderQuestionnairesSection(results);
 
       /* ── Bilan par compétences (pastilles) ── même composant que la fiche
          élève côté enseignant et la synthèse PDF, voir js/niveau-pastilles.js.

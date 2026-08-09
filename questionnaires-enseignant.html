@@ -17,7 +17,8 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=2"></script>
-  <script src="js/questionnaires-teacher.js?v=1"></script>
+  <script src="js/teacher-analytics.js?v=4"></script>
+  <script src="js/questionnaires-teacher.js?v=2"></script>
   <style>
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
     .dash-content { max-width: 960px; margin: 0 auto; }
@@ -48,6 +49,28 @@
 
     .section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
     .section-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text); }
+
+    /* ── Résultats par questionnaire ── */
+    .qz-results-summary {
+      display: flex; align-items: center; gap: 16px; margin-top: 10px;
+      padding-top: 10px; border-top: 1px solid var(--border);
+      font-size: 13px; color: var(--text);
+    }
+    .qz-results-summary strong { color: var(--blue); }
+    .qz-results-details summary { cursor: pointer; list-style: none; }
+    .qz-results-details summary::-webkit-details-marker { display: none; }
+    .qz-results-toggle { color: var(--blue); font-size: 12.5px; font-weight: 700; }
+    .qz-results-details summary:hover .qz-results-toggle { text-decoration: underline; }
+    .qz-results-details[open] .qz-results-toggle-closed { display: none; }
+    .qz-results-details:not([open]) .qz-results-toggle-open { display: none; }
+    .qz-results-detail { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .qz-results-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 7px 10px; background: var(--bg); border-radius: 8px; font-size: 12.5px;
+    }
+    .qz-results-row-name { font-weight: 700; color: var(--text); }
+    .qz-results-row-date { color: var(--muted); font-size: 11.5px; }
+    .qz-results-row-score { font-weight: 700; color: var(--blue); flex-shrink: 0; }
   </style>
 </head>
 <body>
@@ -148,6 +171,8 @@
     let _questionnaires = [];
     let _editingId = null;
     let _formQuestions = []; // [{ enonce, explication, reponses: [{ texte, est_correcte }] }]
+    let _resultSummaries = new Map(); // questionnaire.id -> { count, avgPct, students }
+    let _studentNameById = new Map(); // auth_user_id -> display_name
 
     const STATUT_LABEL = { brouillon: 'Brouillon', publie: 'Publié', masque: 'Masqué (signalé)' };
 
@@ -282,6 +307,39 @@
       }
     }
 
+    /* ── Résultats par questionnaire — nb d'élèves + moyenne de classe,
+       détail par élève dans un <details> natif (dépliable au clic, sans JS
+       supplémentaire). Calculé via lfmQuestionnairesTeacher.groupResultsByQuestionnaire
+       (qui délègue le dédoublonnage à lfmAnalytics.dedupeBestBySlug). ── */
+    function renderResultsBlock(questionnaireId) {
+      const summary = _resultSummaries.get(questionnaireId);
+      if (!summary || summary.count === 0) {
+        return `<div class="qz-results-summary" style="color:var(--muted)">Aucun résultat pour l'instant.</div>`;
+      }
+      const detailRows = summary.students
+        .slice()
+        .sort((a, b) => b.pct - a.pct)
+        .map(r => `
+          <div class="qz-results-row">
+            <span class="qz-results-row-name">${escHtml(_studentNameById.get(r.student_id) || 'Élève')}</span>
+            <span class="qz-results-row-date">${new Date(r.completed_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+            <span class="qz-results-row-score">${r.score} / ${r.total} (${Math.round(r.pct)}%)</span>
+          </div>
+        `).join('');
+      return `
+        <details class="qz-results-details">
+          <summary class="qz-results-summary">
+            <span>👥 <strong>${summary.count}</strong> élève${summary.count > 1 ? 's ont' : ' a'} passé ce questionnaire · moyenne de classe <strong>${summary.avgPct}%</strong></span>
+            <span class="qz-results-toggle">
+              <span class="qz-results-toggle-closed">Voir le détail ▾</span>
+              <span class="qz-results-toggle-open">Masquer le détail ▴</span>
+            </span>
+          </summary>
+          <div class="qz-results-detail">${detailRows}</div>
+        </details>
+      `;
+    }
+
     /* ── Liste ── */
     function renderList() {
       const wrap = document.getElementById('qz-list');
@@ -308,6 +366,7 @@
               <button type="button" class="qz-btn qz-btn-danger qz-btn-sm" data-delete="${q.id}">Supprimer</button>
             </div>
           </div>
+          ${renderResultsBlock(q.id)}
         </div>
       `; }).join('');
 
@@ -333,7 +392,19 @@
     async function loadQuestionnaires() {
       document.getElementById('qz-list').innerHTML = '<div class="qz-empty">Chargement…</div>';
       _questionnaires = await lfmQuestionnairesTeacher.getMyQuestionnaires(_teacherProfile.id);
+
+      const resultsRows = await lfmQuestionnairesTeacher.getResultsForMyQuestionnaires();
+      _resultSummaries = lfmQuestionnairesTeacher.groupResultsByQuestionnaire(_questionnaires, resultsRows);
+
       renderList();
+    }
+
+    /* Noms des élèves pour le détail par questionnaire (chargé une seule
+       fois — la liste d'élèves d'un enseignant ne change pas pendant la
+       session sur cette page). */
+    async function loadStudentNames() {
+      const students = await lfmTeacher.getAllStudents();
+      _studentNameById = new Map(students.filter(s => s.auth_user_id).map(s => [s.auth_user_id, s.display_name]));
     }
 
     /* ── Init ── */
@@ -349,6 +420,7 @@
       document.getElementById('qz-cancel-btn').addEventListener('click', closeForm);
       document.getElementById('qz-save-btn').addEventListener('click', saveForm);
 
+      await loadStudentNames();
       loadQuestionnaires();
     }
 
