@@ -73,6 +73,14 @@ const lfmQuestionnairesTeacher = (() => {
     if (error) throw error;
   }
 
+  /* Bascule tous <-> mes_eleves, indépendamment du statut brouillon/publié —
+     bouton dédié sur chaque carte plutôt qu'un champ du formulaire titre/
+     auteur/questions, pour rester modifiable en un clic à tout moment. */
+  async function setVisibilite(questionnaireId, visibilite) {
+    const { error } = await db.from('questionnaires').update({ visibilite }).eq('id', questionnaireId);
+    if (error) throw error;
+  }
+
   /* Remplace intégralement les questions (et leurs réponses) d'un
      questionnaire — le formulaire enseignant ressaisit la liste entière à
      chaque enregistrement, comme dictees-teacher.js/replaceMots. Insertion
@@ -153,7 +161,7 @@ const lfmQuestionnairesTeacher = (() => {
 
   return {
     getMyQuestionnaires, getQuestionnaire, createQuestionnaire,
-    updateQuestionnaireMeta, replaceQuestions, setStatut, deleteQuestionnaire,
+    updateQuestionnaireMeta, replaceQuestions, setStatut, setVisibilite, deleteQuestionnaire,
     getResultsForMyQuestionnaires, groupResultsByQuestionnaire
   };
 })();

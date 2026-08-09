@@ -18,7 +18,7 @@
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=2"></script>
   <script src="js/teacher-analytics.js?v=4"></script>
-  <script src="js/questionnaires-teacher.js?v=2"></script>
+  <script src="js/questionnaires-teacher.js?v=4"></script>
   <style>
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
     .dash-content { max-width: 960px; margin: 0 auto; }
@@ -49,6 +49,15 @@
 
     .section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
     .section-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text); }
+
+    .qz-visibilite-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 700;
+      border-radius: 20px; padding: 3px 10px;
+      margin-left: 6px;
+    }
+    .qz-visibilite-pill--tous { color: var(--muted); background: rgba(16,43,106,0.06); }
+    .qz-visibilite-pill--mes-eleves { color: var(--color-brand-gold); background: rgba(245,166,35,0.10); }
 
     /* ── Résultats par questionnaire ── */
     .qz-results-summary {
@@ -114,7 +123,7 @@
         <button type="button" class="qz-btn qz-btn-primary" id="qz-new-btn">+ Nouveau questionnaire</button>
       </div>
       <p style="color:var(--muted);font-size:13px;margin:-10px 0 20px;">
-        Une fois publié, un questionnaire est visible et jouable par tous les élèves du site — pas seulement les tiens.
+        Une fois publié, ton questionnaire est proposé à tous les élèves du site par défaut. Tu peux le réserver à tes seuls élèves quand tu veux, en un clic.
       </p>
 
       <!-- ── Formulaire de création/édition ── -->
@@ -351,6 +360,9 @@
         const toggleBtn = q.statut === 'publie'
           ? `<button type="button" class="qz-btn qz-btn-outline qz-btn-sm" data-unpublish="${q.id}">Repasser en brouillon</button>`
           : `<button type="button" class="qz-btn qz-btn-gold qz-btn-sm" data-publish="${q.id}" ${q.nb_questions === 0 ? 'disabled title="Ajoute au moins une question avant de publier"' : ''}>Publier</button>`;
+        const visibiliteBtn = q.visibilite === 'mes_eleves'
+          ? `<button type="button" class="qz-btn qz-btn-outline qz-btn-sm" data-visibilite="${q.id}" data-next="tous">🌐 Rendre visible à tous</button>`
+          : `<button type="button" class="qz-btn qz-btn-outline qz-btn-sm" data-visibilite="${q.id}" data-next="mes_eleves">🔒 Réserver à mes élèves</button>`;
         return `
         <div class="qz-teacher-card">
           <div class="qz-teacher-card-top">
@@ -358,10 +370,12 @@
               <div class="qz-teacher-card-title">${escHtml(q.titre_oeuvre)}</div>
               ${q.auteur_oeuvre ? `<div class="qz-card-auteur">${escHtml(q.auteur_oeuvre)}</div>` : ''}
               <span class="qz-statut-pill qz-statut-pill--${q.statut}">${STATUT_LABEL[q.statut]}</span>
+              <span class="qz-visibilite-pill ${q.visibilite === 'mes_eleves' ? 'qz-visibilite-pill--mes-eleves' : 'qz-visibilite-pill--tous'}">${q.visibilite === 'mes_eleves' ? '🔒 Réservé à mes élèves' : '🌐 Visible à tous'}</span>
               <div class="qz-teacher-card-meta">${q.nb_questions} question${q.nb_questions !== 1 ? 's' : ''}</div>
             </div>
             <div class="qz-teacher-card-actions">
               <button type="button" class="qz-btn qz-btn-outline qz-btn-sm" data-edit="${q.id}">Modifier</button>
+              ${visibiliteBtn}
               ${toggleBtn}
               <button type="button" class="qz-btn qz-btn-danger qz-btn-sm" data-delete="${q.id}">Supprimer</button>
             </div>
@@ -373,6 +387,14 @@
       wrap.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', async () => {
         const { questionnaire, questions } = await lfmQuestionnairesTeacher.getQuestionnaire(btn.dataset.edit);
         openForm(questionnaire, questions);
+      }));
+      wrap.querySelectorAll('[data-visibilite]').forEach(btn => btn.addEventListener('click', async () => {
+        try {
+          await lfmQuestionnairesTeacher.setVisibilite(btn.dataset.visibilite, btn.dataset.next);
+          await loadQuestionnaires();
+        } catch (e) {
+          alert('Erreur : ' + e.message);
+        }
       }));
       wrap.querySelectorAll('[data-publish]').forEach(btn => btn.addEventListener('click', async () => {
         await lfmQuestionnairesTeacher.setStatut(btn.dataset.publish, 'publie');
