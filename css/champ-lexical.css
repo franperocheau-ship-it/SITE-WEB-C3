@@ -1,0 +1,406 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   css/champ-lexical.css — Module Vocabulaire, Corpus lexical / Champ lexical
+   (Phase 1). Chargé uniquement sur vocabulaire-corpus.html, champ-lexical.html,
+   vocabulaire-corpus-enseignant.html et depuis dashboard-eleve.html (bandeau
+   réactivation + section vocabulaire) — jamais sur le reste du site.
+
+   Valeurs visuelles recopiées de css/jogging.css (même convention du site :
+   pas de composant carte/bouton centralisé, voir son propre en-tête).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── Catalogue (vocabulaire-corpus.html) ─────────────────────────────── */
+.cl-corpus-block { margin-bottom: 28px; }
+.cl-corpus-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--blue);
+  margin-bottom: 12px;
+}
+
+.cl-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 768px) { .cl-cards-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .cl-cards-grid { grid-template-columns: 1fr; } }
+
+.cl-card {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-decoration: none;
+  transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms;
+  position: relative;
+}
+.cl-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(16,43,106,0.18);
+}
+.cl-card-illustration {
+  width: 100%;
+  height: 64px;
+  border-radius: 10px;
+  background: rgba(29,191,160,0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+}
+.cl-card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.35;
+}
+.cl-card-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: var(--blue);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 9px 16px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  margin-top: 4px;
+}
+.cl-card a.cl-card-btn::after { content: ''; position: absolute; inset: 0; }
+
+.cl-badge-reactivation {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffffff;
+  background: #F5A623;
+  border-radius: 20px;
+  padding: 3px 10px;
+  align-self: flex-start;
+}
+
+/* ─── Contextualisation ─────────────────────────────────────────────────── */
+.cl-context-box {
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 22px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: 20px;
+  font-style: italic;
+}
+.cl-context-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--muted);
+  margin-bottom: 8px;
+  font-style: normal;
+}
+
+.cl-niveau-picker {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+.cl-niveau-btn {
+  border: 2px solid var(--border);
+  background: var(--bg);
+  border-radius: 14px;
+  padding: 16px 22px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  min-width: 140px;
+  transition: transform 150ms ease, border-color 150ms ease;
+}
+.cl-niveau-btn:hover { transform: translateY(-2px); border-color: var(--blue); }
+.cl-niveau-btn-label { display: block; font-size: 16px; margin-bottom: 4px; }
+.cl-niveau-btn-desc { display: block; font-size: 11px; font-weight: 600; color: var(--muted); }
+.cl-niveau-btn-status { display: block; font-size: 11px; font-weight: 800; color: #16a34a; margin-top: 6px; min-height: 14px; }
+
+/* ─── Collecte ───────────────────────────────────────────────────────────── */
+.cl-points-counter {
+  position: sticky;
+  top: 8px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--blue);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  padding: 8px 18px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+}
+
+.cl-categorie-block {
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  background: var(--card-bg);
+}
+.cl-categorie-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--blue);
+  margin-bottom: 10px;
+}
+.cl-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.cl-input {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+  background: #fff;
+}
+.cl-input:focus { outline: none; border-color: var(--blue); }
+.cl-add-btn {
+  border: none;
+  background: var(--turquoise, #1DBFA0);
+  color: #fff;
+  border-radius: 10px;
+  padding: 0 16px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+.cl-input-feedback { font-size: 12px; font-weight: 700; min-height: 16px; margin-bottom: 6px; }
+.cl-input-feedback--ok { color: #16a34a; }
+.cl-input-feedback--deja { color: var(--muted); }
+.cl-input-feedback--non { color: var(--red); }
+
+.cl-pill-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.cl-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(22,163,74,0.10);
+  border: 1.5px solid rgba(22,163,74,0.35);
+  color: #15803d;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.cl-pill-points { font-size: 10.5px; color: #16a34a; opacity: .85; }
+
+.cl-terminer-wrap { text-align: center; margin: 24px 0; }
+.cl-terminer-btn {
+  border: none;
+  background: var(--blue);
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 28px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* ─── Correction ─────────────────────────────────────────────────────────── */
+.cl-correction-total {
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--blue);
+  margin-bottom: 20px;
+}
+/* .cl-correction-cat / .cl-correction-cat-title : encore utilisés par
+   showTermineState() (revisite d'un niveau déjà terminé, hors périmètre de
+   la refonte grille de cartes — rendu volontairement resté simple). */
+.cl-correction-cat { margin-bottom: 18px; }
+.cl-correction-cat-title { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: var(--text); margin-bottom: 8px; }
+.cl-correction-actions { text-align: center; margin-top: 24px; }
+
+/* ─── Bandeau de défi (écran de correction) ─────────────────────────────── */
+.cl-defi-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, rgba(245,166,35,0.14), rgba(29,191,160,0.10));
+  border: 1.5px solid rgba(245,166,35,0.35);
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+}
+.cl-defi-banner-icon { font-size: 26px; flex-shrink: 0; }
+.cl-defi-banner-text { font-size: 13.5px; font-weight: 700; color: var(--text); line-height: 1.4; }
+
+/* ─── Grille de cartes par catégorie ─────────────────────────────────────── */
+.cl-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+.cl-cat-card {
+  border: 1.5px solid var(--border);
+  border-top: 4px solid var(--cl-cat-color, var(--blue));
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: var(--card-bg);
+}
+.cl-cat-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.cl-cat-card-icon { font-size: 18px; line-height: 1; }
+.cl-cat-card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--text);
+  flex: 1;
+}
+.cl-cat-card-count {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--muted);
+  background: var(--bg);
+  border-radius: 20px;
+  padding: 2px 9px;
+}
+.cl-chip-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.cl-chip-empty { color: var(--muted); font-size: 12px; }
+
+/* ─── Chips (mots trouvés/manqués) ───────────────────────────────────────── */
+.cl-chip {
+  border-radius: 10px;
+  font-size: 12.5px;
+  animation: cl-chip-in 320ms ease both;
+  overflow: hidden;
+}
+@keyframes cl-chip-in {
+  from { opacity: 0; transform: translateY(6px) scale(.96); }
+  to   { opacity: 1; transform: none; }
+}
+.cl-chip-front { display: flex; align-items: center; gap: 6px; padding: 6px 10px; }
+/* Couleur/fond réels posés inline par JS (background/border-color, une
+   teinte par catégorie) — cohérent avec le reste du site, qui mélange ses
+   teintes en rgba() à la main plutôt qu'avec color-mix(). */
+.cl-chip--trouve { border: 1.5px solid var(--border); }
+.cl-chip--trouve .cl-chip-word { font-weight: 700; color: var(--text); }
+.cl-chip-points { font-size: 10.5px; font-weight: 800; margin-left: 2px; }
+.cl-chip--manque {
+  background: transparent;
+  border: 1.5px dashed var(--border);
+}
+.cl-chip--manque .cl-chip-word { color: var(--muted); }
+
+/* ─── Flashcard (expressions avec exemple de phrase) ─────────────────────── */
+.cl-chip--flippable .cl-chip-front { cursor: pointer; }
+.cl-chip--flippable .cl-chip-word::after { content: ' 💭'; font-size: 10px; }
+.cl-chip-back {
+  max-height: 0;
+  padding: 0 10px;
+  font-size: 11.5px;
+  font-style: italic;
+  color: var(--muted);
+  background: var(--bg);
+  transition: max-height 220ms ease, padding 220ms ease;
+}
+.cl-chip--flipped .cl-chip-back {
+  max-height: 80px;
+  padding: 8px 10px;
+}
+
+/* ─── Rappel (réactivation espacée) ─────────────────────────────────────── */
+.cl-recall-prompt { margin-bottom: 14px; }
+.cl-recall-prompt-label { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.cl-recall-result { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; font-size: 13px; }
+.cl-recall-result--ok  { background: rgba(22,163,74,0.10); color: #15803d; }
+.cl-recall-result--non { background: rgba(214,40,57,0.08); color: var(--red); }
+
+/* ─── Bandeau réactivation (dashboard-eleve.html) ───────────────────────── */
+.cl-reactivation-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, rgba(245,166,35,0.14), rgba(29,191,160,0.10));
+  border: 1.5px solid rgba(245,166,35,0.35);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.cl-reactivation-icon { font-size: 28px; flex-shrink: 0; }
+.cl-reactivation-text { flex: 1; font-size: 14px; font-weight: 700; color: var(--text); }
+.cl-reactivation-list { font-size: 12.5px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+.cl-reactivation-btn {
+  border: none;
+  background: var(--blue);
+  color: #fff;
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* ─── Carnet de mots (dashboard-eleve.html) ─────────────────────────────── */
+.cl-carnet-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  margin-bottom: 8px;
+}
+.cl-carnet-card-word { font-weight: 700; font-size: 14px; color: var(--text); }
+.cl-carnet-card-meta { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.cl-carnet-remove-btn {
+  border: 1.5px solid var(--border);
+  background: #fff;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--red);
+  cursor: pointer;
+}
+.cl-word-add-btn {
+  border: 1.5px solid var(--blue);
+  background: rgba(26,45,107,0.06);
+  color: var(--blue);
+  border-radius: 8px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-left: 8px;
+}
+.cl-word-add-btn:disabled { opacity: 0.6; cursor: default; }

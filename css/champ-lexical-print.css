@@ -1,0 +1,108 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   champ-lexical-print.css — Affiche imprimable d'un champ lexical (module
+   Corpus lexical, Phase 1, enseignant uniquement). Chargé uniquement par
+   vocabulaire-corpus-enseignant.html.
+
+   Mécanique d'impression identique à css/jogging-print.css :
+   #cl-print-root est rempli par js/champ-lexical-print.js puis basculé en
+   display:block via la classe body.printing-cl-affiche, tout le reste de la
+   page étant masqué pendant l'impression.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+#cl-print-root { display: none; }
+
+.clp-page {
+  font-family: 'Nunito Sans', system-ui, sans-serif;
+  color: #1E2532;
+}
+
+.clp-header {
+  display: flex;
+  align-items: center;
+  gap: 14pt;
+  border-bottom: 2.5pt solid #1A2D6B;
+  padding-bottom: 10pt;
+  margin-bottom: 16pt;
+}
+.clp-logo { height: 24pt; width: auto; display: block; }
+.clp-header-corpus { font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #5F6368; }
+.clp-header-theme { font-family: 'Fredoka', sans-serif; font-weight: 800; font-size: 22pt; color: #1A2D6B; }
+
+.clp-contexte {
+  font-size: 11pt;
+  font-style: italic;
+  line-height: 1.5;
+  color: #333;
+  background: #F8FAFC;
+  border-left: 3pt solid #F5A623;
+  padding: 8pt 12pt;
+  margin-bottom: 18pt;
+}
+
+.clp-categories {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10pt 16pt;
+}
+
+.clp-categorie {
+  border-left: 3pt solid #F5A623;
+  padding-left: 10pt;
+  break-inside: avoid;
+  margin-bottom: 8pt;
+}
+.clp-categorie--turquoise { border-left-color: #1DBFA0; }
+.clp-categorie--rouge     { border-left-color: #D62839; }
+
+.clp-categorie-title {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 11pt;
+  color: #1A2D6B;
+  margin-bottom: 5pt;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+}
+
+.clp-mots-grid { display: flex; flex-direction: column; gap: 4pt; }
+.clp-mot { font-size: 10.5pt; line-height: 1.4; }
+.clp-mot-text { font-weight: 700; }
+.clp-mot-exemple { display: block; font-size: 8.5pt; font-style: italic; color: #5F6368; margin-top: 1pt; }
+
+body.printing-cl-affiche #cl-print-root { display: block !important; }
+
+@media print {
+  @page { size: A4 portrait; margin: 15mm; }
+
+  body.printing-cl-affiche #cl-print-root {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* <body> porte son propre fond (var(--bg)) et un padding-top pour
+     compenser la navbar fixe — reset nécessaire, même raison que
+     jogging-print.css. */
+  body.printing-cl-affiche {
+    padding-top: 0 !important;
+    background: #fff !important;
+  }
+
+  /* Liste blanche plutôt que liste noire (voir commentaire détaillé dans
+     jogging-print.css) : masque tout ce qui n'est pas #cl-print-root. */
+  body.printing-cl-affiche .navbar,
+  body.printing-cl-affiche footer,
+  body.printing-cl-affiche .bc-bar,
+  body.printing-cl-affiche .page-content > *:not(#cl-print-root) {
+    display: none !important;
+  }
+
+  body.printing-cl-affiche .page-wrap {
+    padding: 0;
+    background: #fff;
+    min-height: unset;
+  }
+  body.printing-cl-affiche .page-content {
+    max-width: 100%;
+    padding: 0;
+  }
+}

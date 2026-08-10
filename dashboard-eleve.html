@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="css/jogging-print.css?v=1">
   <link rel="stylesheet" href="css/dictees.css?v=1">
   <link rel="stylesheet" href="css/niveau-pastilles.css?v=1">
+  <link rel="stylesheet" href="css/champ-lexical.css?v=4">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
@@ -30,8 +31,10 @@
   <script src="js/jogging-badges.js?v=1"></script>
   <script src="js/jogging-print.js?v=1"></script>
   <script src="js/dictees-badges.js?v=1"></script>
+  <script src="js/carnet-widget.js?v=2"></script>
   <script src="js/jogging-student-space.js?v=1"></script>
   <script src="js/dictees-student-space.js?v=1"></script>
+  <script src="js/vocab-student-space.js?v=2"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=1">
   <script src="js/resultats-nav.js?v=1"></script>
   <style>
@@ -479,6 +482,12 @@
 
       <!-- ── Tab 1 : Faire des exercices ── -->
       <div id="tab-exercices" class="dash-tab-pane">
+
+        <!-- Réactivation espacée (module Corpus lexical) : invitation à
+             réviser un champ lexical déjà terminé, pas une statistique donc
+             volontairement hors du hub "Mes résultats" — voir js/vocab-student-space.js. -->
+        <div id="vocab-reactivation-section" style="display:none"></div>
+
         <div class="subject-cards-grid">
 
           <a href="français.html" class="subject-card subject-card--fr">
@@ -572,6 +581,24 @@
             </div>
           </div>
           <div id="qz-dash-list"></div>
+        </div>
+
+        <!-- Module Corpus lexical : stats + carnet de mots personnel, voir
+             js/vocab-student-space.js. -->
+        <div class="dash-section" id="section-vocabulaire" style="display:none">
+          <div class="dash-section-title">Corpus lexical</div>
+          <div class="dash-stats" style="margin-bottom:18px;">
+            <div class="dash-stat">
+              <div class="dash-stat-label">Niveaux terminés</div>
+              <div class="dash-stat-value" id="vocab-stat-champs">0</div>
+            </div>
+            <div class="dash-stat">
+              <div class="dash-stat-label">Points cumulés</div>
+              <div class="dash-stat-value" id="vocab-stat-points">0</div>
+            </div>
+          </div>
+          <div class="dash-section-title" style="font-size:14px;">Mon carnet de mots</div>
+          <div id="vocab-carnet-list"></div>
         </div>
 
         <!-- État vide (premier usage) -->
@@ -999,6 +1026,9 @@
       /* ── Mes questionnaires de lecture (détail + moyenne) ── */
       renderQuestionnairesSection(results);
 
+      /* ── Module Corpus lexical (stats + carnet de mots) ── */
+      if (typeof VocabStudentSpace !== 'undefined') VocabStudentSpace.renderSection(profile.id);
+
       /* ── Bilan par compétences (pastilles) ── même composant que la fiche
          élève côté enseignant et la synthèse PDF, voir js/niveau-pastilles.js.
          computeStudentProfile() attend les lignes exercise_results brutes
@@ -1063,6 +1093,7 @@
       _profile = profile;
 
       maybeRenderGuidedCard();
+      if (typeof VocabStudentSpace !== 'undefined') VocabStudentSpace.renderReactivationBanner(profile.id);
 
       /* Déconnexion */
       document.getElementById('dash-logout-btn').addEventListener('click', () => {
@@ -1085,7 +1116,10 @@
        resteraient figées sur leur état d'avant l'exercice qui vient d'être
        terminé. */
     window.addEventListener('pageshow', e => {
-      if (e.persisted) activateResultsSub(_currentResSub);
+      if (e.persisted) {
+        activateResultsSub(_currentResSub);
+        if (_profile && typeof VocabStudentSpace !== 'undefined') VocabStudentSpace.renderReactivationBanner(_profile.id);
+      }
     });
   </script>
 <style>

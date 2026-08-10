@@ -108,6 +108,36 @@ const lfmAuth = (() => {
     return profile;
   }
 
+  /* Variante de requireRole() pour une page utilisable par plusieurs rôles
+     (ex. enseignant + admin) — même logique (session → profil → statut
+     pending/rejected → redirection), sauf que le test devient une
+     appartenance à la liste plutôt qu'une correspondance exacte. requireRole
+     reste inchangée pour ne rien risquer sur les pages qui l'utilisent déjà. */
+  async function requireAnyRole(roles) {
+    const primaryRole = roles[0];
+    const session = await getSession();
+    if (!session) {
+      window.location.href = 'auth.html?role=' + primaryRole;
+      return null;
+    }
+    const profile = await getProfile();
+    if (!profile || !roles.includes(profile.role)) {
+      window.location.href = 'auth.html?role=' + primaryRole;
+      return null;
+    }
+    if (profile.status === 'pending') {
+      await signOut();
+      window.location.href = 'auth.html?role=' + primaryRole + '&status=pending';
+      return null;
+    }
+    if (profile.status === 'rejected') {
+      await signOut();
+      window.location.href = 'auth.html?role=' + primaryRole + '&status=rejected';
+      return null;
+    }
+    return profile;
+  }
+
   /* Envoie un e-mail de réinitialisation de mot de passe ──────────────────── */
   async function resetPassword(email, redirectTo) {
     const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo });
@@ -120,5 +150,5 @@ const lfmAuth = (() => {
     if (error) throw error;
   }
 
-  return { signIn, signUp, signOut, getSession, getProfile, getMyStudentRecord, redirectToDashboard, requireRole, resetPassword, updatePassword };
+  return { signIn, signUp, signOut, getSession, getProfile, getMyStudentRecord, redirectToDashboard, requireRole, requireAnyRole, resetPassword, updatePassword };
 })();

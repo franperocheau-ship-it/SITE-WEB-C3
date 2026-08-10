@@ -330,53 +330,44 @@ const JoggingStudentSpace = (() => {
   }
 
   async function renderCarnet(studentId, sessionsById, versionsBySession) {
-    const listEl = document.getElementById('jog-carnet-list');
-    const printBtn = document.getElementById('jog-carnet-print-btn');
-    if (!listEl || !window.lfmDb) return;
+    if (typeof CarnetWidget === 'undefined' || !window.lfmDb) return;
 
-    const { data: carnetRows } = await window.lfmDb
-      .from('jogging_carnet')
-      .select('*')
-      .eq('student_id', studentId)
-      .order('added_at', { ascending: true })
-      .limit(2000);
-
-    const rows = carnetRows || [];
-
-    if (rows.length === 0) {
-      listEl.innerHTML = `<div class="dash-empty"><em>Aucun jogging ajouté à ton carnet pour l'instant. Depuis un jogging terminé, clique sur « ⭐ Ajouter à mon carnet ».</em></div>`;
-      if (printBtn) printBtn.style.display = 'none';
-      return;
-    }
-
-    listEl.innerHTML = rows.map(row => {
-      const session = sessionsById.get(row.session_id);
-      const jog = (session && typeof JOGGING_DATA !== 'undefined') ? JOGGING_DATA[session.jogging_id] : null;
-      const title = jog ? jog.title : (session ? session.jogging_id : 'Jogging');
-      return `
-        <div class="jog-carnet-card">
-          <div>
-            <div class="jog-carnet-card-title">${escapeHtml(title)}</div>
-            <div class="jog-carnet-card-meta">Ajouté ${formatDate(row.added_at)}</div>
-          </div>
-          <button type="button" class="jog-carnet-remove-btn" data-session-id="${row.session_id}">Retirer</button>
-        </div>`;
-    }).join('');
-
-    listEl.querySelectorAll('.jog-carnet-remove-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        btn.disabled = true;
+    await CarnetWidget.render({
+      listElId: 'jog-carnet-list',
+      printBtnElId: 'jog-carnet-print-btn',
+      emptyMessage: "Aucun jogging ajouté à ton carnet pour l'instant. Depuis un jogging terminé, clique sur « ⭐ Ajouter à mon carnet ».",
+      rowKey: row => row.session_id,
+      fetchRows: async () => {
+        const { data } = await window.lfmDb
+          .from('jogging_carnet')
+          .select('*')
+          .eq('student_id', studentId)
+          .order('added_at', { ascending: true })
+          .limit(2000);
+        return data || [];
+      },
+      renderCard: row => {
+        const session = sessionsById.get(row.session_id);
+        const jog = (session && typeof JOGGING_DATA !== 'undefined') ? JOGGING_DATA[session.jogging_id] : null;
+        const title = jog ? jog.title : (session ? session.jogging_id : 'Jogging');
+        return `
+          <div class="jog-carnet-card">
+            <div>
+              <div class="jog-carnet-card-title">${escapeHtml(title)}</div>
+              <div class="jog-carnet-card-meta">Ajouté ${formatDate(row.added_at)}</div>
+            </div>
+            <button type="button" class="jog-carnet-remove-btn" data-carnet-remove="${row.session_id}">Retirer</button>
+          </div>`;
+      },
+      removeRow: async row => {
         await window.lfmDb.from('jogging_carnet').delete()
-          .eq('student_id', studentId).eq('session_id', btn.dataset.sessionId);
-        renderCarnet(studentId, sessionsById, versionsBySession);
-      });
+          .eq('student_id', studentId).eq('session_id', row.session_id);
+      },
+      onPrint: rows => {
+        const studentName = document.getElementById('dash-name') ? document.getElementById('dash-name').textContent : '';
+        printCarnet(rows, sessionsById, versionsBySession, studentName);
+      }
     });
-
-    if (printBtn) {
-      printBtn.style.display = '';
-      const studentName = document.getElementById('dash-name') ? document.getElementById('dash-name').textContent : '';
-      printBtn.onclick = () => printCarnet(rows, sessionsById, versionsBySession, studentName);
-    }
   }
 
   async function render(studentId) {
