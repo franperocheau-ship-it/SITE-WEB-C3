@@ -405,6 +405,17 @@
         <div id="pending-body"></div>
       </div>
 
+      <!-- Section : Contenu en attente de validation (Champ lexical + Questionnaires) -->
+      <div class="pending-card" id="content-pending-section" style="display:none">
+        <div class="pending-header">
+          <div class="pending-title">
+            🕐 Contenu en attente de validation
+            <span class="pending-badge" id="content-pending-count">0</span>
+          </div>
+        </div>
+        <div id="content-pending-body"></div>
+      </div>
+
       <!-- Section : Enseignants -->
       <div class="section-card">
         <div class="section-card-header">
@@ -438,6 +449,23 @@
         </div>
         <div id="comp-stats-body" style="padding:20px 24px">
           <div class="tbl-loading">Chargement…</div>
+        </div>
+      </div>
+
+      <!-- Section : Corpus lexical (module Vocabulaire) — lien vers la page
+           dédiée, qui accepte déjà les comptes admin (création, modification
+           et suppression de tout champ partagé, en plus des siens). Pas de
+           gestion intégrée ici pour éviter de dupliquer cette UI. -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-card-title">Corpus lexical</div>
+        </div>
+        <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div style="font-size:13px;color:var(--muted);max-width:520px">
+            Créer, modifier ou supprimer un corpus/champ lexical (synonymes, antonymes, expressions…),
+            y compris ceux partagés par les enseignants.
+          </div>
+          <a href="vocabulaire-corpus-enseignant.html" class="btn btn-outline">Ouvrir →</a>
         </div>
       </div>
 
@@ -619,7 +647,83 @@
       else document.getElementById('pending-count').textContent = remaining;
     }
 
+    /* ── Contenu en attente de validation (Champ lexical + Questionnaires) ── */
+    async function loadPendingContent() {
+      try {
+        const [champs, questionnaires] = await Promise.all([
+          lfmAdmin.getPendingChamps(),
+          lfmAdmin.getPendingQuestionnaires()
+        ]);
+        const section = document.getElementById('content-pending-section');
+        const body    = document.getElementById('content-pending-body');
+        const badge   = document.getElementById('content-pending-count');
+
+        const total = champs.length + questionnaires.length;
+        if (total === 0) {
+          section.style.display = 'none';
+          return;
+        }
+        section.style.display = 'block';
+        badge.textContent = total;
+
+        const champRows = champs.map(c => `<div class="pending-row" id="cp-champ-${c.id}">
+          <div>
+            <div class="pending-name">📖 ${escHtml(c.theme)} <span style="font-weight:400;color:var(--muted)">— ${escHtml(c.corpus_lexicaux ? c.corpus_lexicaux.titre : '')}</span></div>
+            <div class="pending-date">Proposé par ${escHtml(c.profiles ? c.profiles.display_name : '—')} le ${new Date(c.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}</div>
+          </div>
+          <div class="pending-actions">
+            <button class="btn-approve" onclick="doModerateContent('champ','${c.id}','publie')">✓ Valider</button>
+            <button class="btn-reject" onclick="doModerateContent('champ','${c.id}','brouillon')">✗ Refuser</button>
+          </div>
+        </div>`);
+
+        const qzRows = questionnaires.map(q => `<div class="pending-row" id="cp-qz-${q.id}">
+          <div>
+            <div class="pending-name">📚 ${escHtml(q.titre_oeuvre)} <span style="font-weight:400;color:var(--muted)">${q.auteur_oeuvre ? '— ' + escHtml(q.auteur_oeuvre) : ''}</span></div>
+            <div class="pending-date">Proposé par ${escHtml(q.profiles ? q.profiles.display_name : '—')} le ${new Date(q.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}</div>
+          </div>
+          <div class="pending-actions">
+            <button class="btn-approve" onclick="doModerateContent('questionnaire','${q.id}','publie')">✓ Valider</button>
+            <button class="btn-reject" onclick="doModerateContent('questionnaire','${q.id}','brouillon')">✗ Refuser</button>
+          </div>
+        </div>`);
+
+        body.innerHTML = champRows.join('') + qzRows.join('');
+      } catch (e) {
+        console.warn('[LFM] contenu en attente :', e.message);
+      }
+    }
+
+    window.doModerateContent = async function(kind, id, decision) {
+      const rowId = kind === 'champ' ? 'cp-champ-' + id : 'cp-qz-' + id;
+      const row = document.getElementById(rowId);
+      let motif = null;
+      if (decision === 'brouillon') {
+        motif = window.prompt('Motif du refus (visible par l\'enseignant) :', '');
+        if (motif === null) return; // annulé
+      }
+      row.querySelectorAll('button').forEach(b => b.disabled = true);
+      try {
+        if (kind === 'champ') await lfmAdmin.moderateChamp(id, decision, motif);
+        else await lfmAdmin.moderateQuestionnaire(id, decision, motif);
+        row.innerHTML = decision === 'publie'
+          ? `<div style="padding:0;flex:1"><span style="color:#15803d;font-weight:600">✓ Validé, désormais public</span></div>`
+          : `<div style="padding:0;flex:1"><span style="color:var(--red);font-weight:600">✗ Refusé</span></div>`;
+        setTimeout(() => {
+          row.remove();
+          const remaining = document.getElementById('content-pending-body').querySelectorAll('.pending-row').length;
+          if (remaining === 0) document.getElementById('content-pending-section').style.display = 'none';
+          else document.getElementById('content-pending-count').textContent = remaining;
+        }, 1800);
+        showToast(decision === 'publie' ? 'Contenu validé' : 'Contenu refusé');
+      } catch (e) {
+        row.querySelectorAll('button').forEach(b => b.disabled = false);
+        showToast('Erreur : ' + e.message, 'error');
+      }
+    };
+
     await loadPending();
+    await loadPendingContent();
 
     /* ── Enseignants actifs ──────────────────────────────────────────────── */
     async function loadTeachers() {

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/favicon/favicon.ico?v=1" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png?v=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png?v=1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/favicon-192x192.png?v=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512x512.png?v=1">
+  <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
+  <link rel="manifest" href="site.webmanifest?v=1">
+  <title>Corpus lexical — Vocabulaire — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="breadcrumb.css?v=1">
+  <link rel="stylesheet" href="css/champ-lexical.css?v=4">
+  <script src="js/breadcrumb.js?v=1"></script>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <!-- MAIN -->
+  <div class="page-wrap">
+    <div class="page-content">
+
+      <script>Breadcrumb.render({ category: { href: "français-lexique.html", label: "Vocabulaire" }, current: 'Corpus lexical' });</script>
+
+      <div class="page-header">
+        <div class="page-header-icon" style="font-size:56px;line-height:1;">📖</div>
+        <h1 class="page-title">CORPUS LEXICAL</h1>
+        <div class="page-title-rule"></div>
+        <p class="page-subtitle">Choisis un champ lexical et trouve le plus de mots possible !</p>
+      </div>
+
+      <div id="cl-catalogue-root"></div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js?v=1"></script>
+  <script src="js/menu.js"></script>
+
+  <script>
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function renderChampCard(champ, dueForReview) {
+      const badge = dueForReview ? `<span class="cl-badge-reactivation">🔁 À réviser</span>` : '';
+      return `
+        <a class="cl-card" href="champ-lexical.html?champ=${encodeURIComponent(champ.id)}">
+          <div class="cl-card-illustration">📚</div>
+          ${badge}
+          <div class="cl-card-title">${escapeHtml(champ.theme)}</div>
+          <span class="cl-card-btn">Découvrir →</span>
+        </a>
+      `;
+    }
+
+    (async function renderCatalogue() {
+      const root = document.getElementById('cl-catalogue-root');
+
+      const { data: corpusList, error: corpusErr } = await window.lfmDb
+        .from('corpus_lexicaux')
+        .select('id, titre, ordre, champs_lexicaux(id, theme, slug, ordre, statut)')
+        .eq('statut', 'publie')
+        .order('ordre', { ascending: true });
+
+      if (corpusErr || !corpusList || corpusList.length === 0) {
+        root.innerHTML = `<div class="dash-empty"><em>Aucun corpus lexical disponible pour l'instant.</em></div>`;
+        return;
+      }
+
+      // « À réviser » : uniquement si un élève est connecté (repli silencieux
+      // sinon — le catalogue reste consultable sans compte, comme redaction.html).
+      let dueChampIds = new Set();
+      try {
+        const profile = await lfmAuth.getProfile();
+        if (profile && profile.role === 'eleve') {
+          const { data: dueSessions } = await window.lfmDb
+            .from('champ_lexical_sessions')
+            .select('champ_id, next_review_at')
+            .eq('student_id', profile.id)
+            .eq('status', 'termine');
+          const now = new Date();
+          (dueSessions || []).forEach(s => {
+            if (s.next_review_at && new Date(s.next_review_at) <= now) dueChampIds.add(s.champ_id);
+          });
+        }
+      } catch (e) {
+        // repli : pas de badge de réactivation, catalogue quand même affiché
+      }
+
+      root.innerHTML = corpusList.map(corpus => {
+        // 'en_attente' accepté ici : la policy RLS champs_lexicaux_select_
+        // pending_own_students ne retourne déjà que les champs en attente
+        // de MON PROPRE enseignant — tout ce qui arrive jusqu'ici est
+        // légitimement visible, qu'il soit publié ou encore en attente.
+        const champs = (corpus.champs_lexicaux || [])
+          .filter(c => c.statut === 'publie' || c.statut === 'en_attente')
+          .sort((a, b) => a.ordre - b.ordre);
+        if (champs.length === 0) return '';
+        return `
+          <div class="cl-corpus-block">
+            <div class="cl-corpus-title">${escapeHtml(corpus.titre)}</div>
+            <div class="cl-cards-grid">
+              ${champs.map(c => renderChampCard(c, dueChampIds.has(c.id))).join('')}
+            </div>
+          </div>`;
+      }).join('');
+    })();
+  </script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

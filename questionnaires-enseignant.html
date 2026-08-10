@@ -12,7 +12,7 @@
   <link rel="manifest" href="site.webmanifest?v=1">
   <title>Questionnaires de lecture — Espace enseignant — LFM</title>
   <link rel="stylesheet" href="styles.css?v=12">
-  <link rel="stylesheet" href="css/questionnaires.css?v=1">
+  <link rel="stylesheet" href="css/questionnaires.css?v=2">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
@@ -123,7 +123,7 @@
         <button type="button" class="qz-btn qz-btn-primary" id="qz-new-btn">+ Nouveau questionnaire</button>
       </div>
       <p style="color:var(--muted);font-size:13px;margin:-10px 0 20px;">
-        Une fois publié, ton questionnaire est proposé à tous les élèves du site par défaut. Tu peux le réserver à tes seuls élèves quand tu veux, en un clic.
+        Dès que tu proposes un questionnaire à la publication, tes élèves y ont accès immédiatement. Sa visibilité dans la banque publique, consultable par les autres enseignants, nécessite en plus une validation par l'administrateur.
       </p>
 
       <!-- ── Formulaire de création/édition ── -->
@@ -183,7 +183,7 @@
     let _resultSummaries = new Map(); // questionnaire.id -> { count, avgPct, students }
     let _studentNameById = new Map(); // auth_user_id -> display_name
 
-    const STATUT_LABEL = { brouillon: 'Brouillon', publie: 'Publié', masque: 'Masqué (signalé)' };
+    const STATUT_LABEL = { brouillon: 'Brouillon', en_attente: 'En attente de validation', publie: 'Publié', masque: 'Masqué (signalé)' };
 
     function escHtml(str) {
       return String(str == null ? '' : str)
@@ -357,12 +357,23 @@
         return;
       }
       wrap.innerHTML = _questionnaires.map(q => {
-        const toggleBtn = q.statut === 'publie'
+        // "Publier" ne pose jamais directement 'publie' — seul un admin le
+        // peut (voir la file de modération). Repasser en brouillon reste
+        // possible aussi bien depuis 'en_attente' que depuis 'publie'.
+        const toggleBtn = (q.statut === 'publie' || q.statut === 'en_attente')
           ? `<button type="button" class="qz-btn qz-btn-outline qz-btn-sm" data-unpublish="${q.id}">Repasser en brouillon</button>`
-          : `<button type="button" class="qz-btn qz-btn-gold qz-btn-sm" data-publish="${q.id}" ${q.nb_questions === 0 ? 'disabled title="Ajoute au moins une question avant de publier"' : ''}>Publier</button>`;
-        const visibiliteBtn = q.visibilite === 'mes_eleves'
+          : `<button type="button" class="qz-btn qz-btn-gold qz-btn-sm" data-publish="${q.id}" ${q.nb_questions === 0 ? 'disabled title="Ajoute au moins une question avant de proposer"' : ''}>Proposer à la publication</button>`;
+        // La visibilité ne prend effet qu'une fois validé par un admin —
+        // masquée avant, pour ne pas laisser croire qu'elle joue déjà.
+        const visibiliteBtn = q.statut !== 'publie' ? '' : (q.visibilite === 'mes_eleves'
           ? `<button type="button" class="qz-btn qz-btn-outline qz-btn-sm" data-visibilite="${q.id}" data-next="tous">🌐 Rendre visible à tous</button>`
-          : `<button type="button" class="qz-btn qz-btn-outline qz-btn-sm" data-visibilite="${q.id}" data-next="mes_eleves">🔒 Réserver à mes élèves</button>`;
+          : `<button type="button" class="qz-btn qz-btn-outline qz-btn-sm" data-visibilite="${q.id}" data-next="mes_eleves">🔒 Réserver à mes élèves</button>`);
+        const visibilitePill = q.statut === 'publie'
+          ? `<span class="qz-visibilite-pill ${q.visibilite === 'mes_eleves' ? 'qz-visibilite-pill--mes-eleves' : 'qz-visibilite-pill--tous'}">${q.visibilite === 'mes_eleves' ? '🔒 Réservé à mes élèves' : '🌐 Visible à tous'}</span>`
+          : '';
+        const motifHtml = q.motif_refus
+          ? `<div class="qz-motif-refus">Refusé par l'administrateur : ${escHtml(q.motif_refus)}</div>`
+          : '';
         return `
         <div class="qz-teacher-card">
           <div class="qz-teacher-card-top">
@@ -370,8 +381,9 @@
               <div class="qz-teacher-card-title">${escHtml(q.titre_oeuvre)}</div>
               ${q.auteur_oeuvre ? `<div class="qz-card-auteur">${escHtml(q.auteur_oeuvre)}</div>` : ''}
               <span class="qz-statut-pill qz-statut-pill--${q.statut}">${STATUT_LABEL[q.statut]}</span>
-              <span class="qz-visibilite-pill ${q.visibilite === 'mes_eleves' ? 'qz-visibilite-pill--mes-eleves' : 'qz-visibilite-pill--tous'}">${q.visibilite === 'mes_eleves' ? '🔒 Réservé à mes élèves' : '🌐 Visible à tous'}</span>
+              ${visibilitePill}
               <div class="qz-teacher-card-meta">${q.nb_questions} question${q.nb_questions !== 1 ? 's' : ''}</div>
+              ${motifHtml}
             </div>
             <div class="qz-teacher-card-actions">
               <button type="button" class="qz-btn qz-btn-outline qz-btn-sm" data-edit="${q.id}">Modifier</button>
@@ -397,7 +409,7 @@
         }
       }));
       wrap.querySelectorAll('[data-publish]').forEach(btn => btn.addEventListener('click', async () => {
-        await lfmQuestionnairesTeacher.setStatut(btn.dataset.publish, 'publie');
+        await lfmQuestionnairesTeacher.setStatut(btn.dataset.publish, 'en_attente');
         await loadQuestionnaires();
       }));
       wrap.querySelectorAll('[data-unpublish]').forEach(btn => btn.addEventListener('click', async () => {

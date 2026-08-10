@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/favicon/favicon.ico?v=1" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png?v=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png?v=1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/favicon-192x192.png?v=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512x512.png?v=1">
+  <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
+  <link rel="manifest" href="site.webmanifest?v=1">
+  <title>Corpus lexical — Espace enseignant — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="css/champ-lexical.css?v=4">
+  <link rel="stylesheet" href="css/champ-lexical-print.css?v=2">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js?v=1"></script>
+  <script src="js/champ-lexical-print.js?v=2"></script>
+  <script src="js/champ-lexical-teacher.js?v=3"></script>
+  <style>
+    .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
+    .dash-content { max-width: 960px; margin: 0 auto; }
+
+    .breadcrumb {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 24px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
+    }
+    .breadcrumb a { color: var(--blue); text-decoration: none; font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .bc-sep { color: var(--border); user-select: none; }
+    .bc-current { font-weight: 600; color: var(--text); }
+
+    .section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+    .section-title { font-family: var(--font-display); font-weight: 800; font-size: 22px; color: var(--text); }
+
+    .cl-ens-new-btn {
+      border: none; background: var(--blue); color: #fff; border-radius: 10px;
+      padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer;
+    }
+
+    .cl-ens-champ-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 14px 18px; border: 1.5px solid var(--border); border-radius: 12px;
+      background: var(--card-bg); margin-bottom: 10px;
+    }
+    .cl-ens-champ-title { font-weight: 700; font-size: 14px; color: var(--text); }
+    .cl-ens-champ-corpus { font-size: 11.5px; color: var(--muted); }
+    .cl-ens-champ-author { font-size: 11.5px; color: var(--muted); font-style: italic; }
+    .cl-ens-champ-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .cl-ens-affiche-btn, .cl-ens-edit-btn, .cl-ens-fork-btn {
+      border: none; background: var(--blue); color: #fff; border-radius: 10px;
+      padding: 8px 14px; font-size: 12.5px; font-weight: 700; cursor: pointer;
+    }
+    .cl-ens-delete-btn {
+      border: 1.5px solid var(--border); background: #fff; color: var(--red);
+      border-radius: 10px; padding: 8px 14px; font-size: 12.5px; font-weight: 700; cursor: pointer;
+    }
+    .cl-ens-fork-btn { background: var(--turquoise, #1DBFA0); }
+
+    .cl-ens-badge { display: inline-block; font-size: 10.5px; font-weight: 800; border-radius: 20px; padding: 2px 9px; margin-left: 6px; }
+    .cl-ens-badge--publie { background: rgba(22,163,74,0.12); color: #16a34a; }
+    .cl-ens-badge--brouillon { background: rgba(0,0,0,0.06); color: var(--muted); }
+    .cl-ens-badge--en_attente { background: rgba(245,158,11,0.14); color: #92400e; }
+
+    .cl-ens-motif-refus {
+      margin-top: 6px; font-size: 12px; color: #b91c1c; background: rgba(220,38,38,0.06);
+      border-radius: 8px; padding: 6px 10px;
+    }
+
+    .cl-ens-empty { color: var(--muted); font-size: 13px; padding: 8px 2px 18px; }
+
+    .cl-ens-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+    .cl-ens-table th, .cl-ens-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+    .cl-ens-table th { font-size: 11px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); }
+    .cl-ens-status--termine { color: #16a34a; font-weight: 700; }
+    .cl-ens-status--en_cours { color: var(--muted); font-weight: 700; }
+
+    /* ── Formulaire champ lexical ─────────────────────────────────────────── */
+    .cl-form-card {
+      background: var(--card-bg); border: 1.5px solid var(--border); border-radius: var(--radius-card);
+      padding: 22px 24px; margin-bottom: 28px;
+    }
+    .cl-form-title { font-family: var(--font-display); font-weight: 800; font-size: 17px; color: var(--text); margin-bottom: 16px; }
+    .cl-form-field { margin-bottom: 16px; }
+    .cl-form-label { display: block; font-size: 12.5px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
+    .cl-form-input, .cl-form-textarea, .cl-form-select {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 9px 12px; font-family: inherit; font-size: 14px; color: var(--text); background: #fff;
+    }
+    .cl-form-textarea { resize: vertical; min-height: 70px; }
+    .cl-form-hint { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+    .cl-form-corpus-row { display: flex; gap: 8px; align-items: flex-start; }
+    .cl-form-corpus-row .cl-form-select { flex: 1; }
+    .cl-form-new-corpus-btn {
+      border: 1.5px solid var(--blue); background: rgba(26,45,107,0.06); color: var(--blue);
+      border-radius: 10px; padding: 9px 14px; font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap;
+    }
+    .cl-new-corpus-box {
+      border: 1.5px dashed var(--border); border-radius: 10px; padding: 14px; margin-top: 10px; display: none;
+    }
+    .cl-new-corpus-box.is-open { display: block; }
+
+    .cl-categorie-fieldset {
+      border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px;
+    }
+    .cl-categorie-fieldset legend { font-size: 12.5px; font-weight: 700; color: var(--blue); padding: 0 6px; }
+
+    .cl-row-editor-item { display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-start; }
+    .cl-row-editor-item .cl-form-input { flex: 1; }
+    .cl-row-remove-btn {
+      border: 1.5px solid var(--border); background: #fff; color: var(--red);
+      border-radius: 8px; padding: 8px 10px; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0;
+    }
+    .cl-row-add-btn {
+      border: 1.5px dashed var(--blue); background: none; color: var(--blue);
+      border-radius: 8px; padding: 7px 12px; font-size: 12.5px; font-weight: 700; cursor: pointer;
+    }
+
+    .cl-form-checkbox-row { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+    .cl-form-actions { display: flex; gap: 10px; }
+    .cl-form-save-btn {
+      border: none; background: var(--blue); color: #fff; border-radius: 10px;
+      padding: 10px 20px; font-size: 13.5px; font-weight: 700; cursor: pointer;
+    }
+    .cl-form-cancel-btn {
+      border: 1.5px solid var(--border); background: #fff; color: var(--text);
+      border-radius: 10px; padding: 10px 20px; font-size: 13.5px; font-weight: 700; cursor: pointer;
+    }
+    .cl-form-error { color: var(--red); font-size: 12.5px; font-weight: 700; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <!-- CONTENU -->
+  <div class="dash-wrap">
+    <div class="dash-content">
+
+      <nav class="breadcrumb" aria-label="Fil d'Ariane">
+        <a href="dashboard-enseignant.html" id="cl-ens-breadcrumb-home">Espace enseignant</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-current">Corpus lexical</span>
+      </nav>
+
+      <div class="section-header">
+        <h1 class="section-title">📖 Corpus lexical</h1>
+        <button type="button" class="cl-ens-new-btn" id="cl-new-champ-btn">+ Créer un champ lexical</button>
+      </div>
+
+      <div id="cl-ens-loading" class="view-loading">Chargement…</div>
+
+      <div id="cl-ens-content" style="display:none">
+
+        <!-- ── Formulaire de création/édition ── -->
+        <div class="cl-form-card" id="cl-form-card" style="display:none">
+          <div class="cl-form-title" id="cl-form-title">Nouveau champ lexical</div>
+          <div class="cl-form-error" id="cl-form-error" style="display:none"></div>
+
+          <div class="cl-form-field">
+            <label class="cl-form-label" for="cl-form-corpus">Corpus lexical</label>
+            <div class="cl-form-corpus-row">
+              <select class="cl-form-select" id="cl-form-corpus"></select>
+              <button type="button" class="cl-form-new-corpus-btn" id="cl-toggle-new-corpus-btn">+ Nouveau corpus…</button>
+            </div>
+            <div class="cl-new-corpus-box" id="cl-new-corpus-box">
+              <div class="cl-form-field">
+                <label class="cl-form-label" for="cl-new-corpus-titre">Titre du nouveau corpus</label>
+                <input type="text" class="cl-form-input" id="cl-new-corpus-titre" placeholder="Ex. Les émotions">
+              </div>
+              <div class="cl-form-field" style="margin-bottom:10px;">
+                <label class="cl-form-label" for="cl-new-corpus-desc">Description (optionnel)</label>
+                <input type="text" class="cl-form-input" id="cl-new-corpus-desc">
+              </div>
+              <button type="button" class="cl-form-new-corpus-btn" id="cl-create-corpus-btn">Créer ce corpus</button>
+            </div>
+          </div>
+
+          <div class="cl-form-field">
+            <label class="cl-form-label" for="cl-form-theme">Thème</label>
+            <input type="text" class="cl-form-input" id="cl-form-theme" placeholder="Ex. avoir peur">
+          </div>
+
+          <div class="cl-form-field">
+            <label class="cl-form-label" for="cl-form-contexte">Texte de contextualisation (optionnel)</label>
+            <textarea class="cl-form-textarea" id="cl-form-contexte" placeholder="Une courte phrase ou un mini-texte où le thème apparaît en contexte naturel…"></textarea>
+          </div>
+
+          <div id="cl-form-categories"></div>
+
+          <div class="cl-form-checkbox-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="checkbox" id="cl-form-brouillon">
+              <label for="cl-form-brouillon" style="font-size:13px;font-weight:600;color:var(--text);">Garder privé (brouillon)</label>
+            </div>
+            <div class="cl-form-hint">Si tu ne coches pas cette case, tes élèves y ont accès immédiatement. La visibilité dans la bibliothèque partagée, consultable et copiable par les autres enseignants, nécessite en plus une validation par l'administrateur.</div>
+          </div>
+
+          <div class="cl-form-actions">
+            <button type="button" class="cl-form-save-btn" id="cl-form-save-btn">Enregistrer</button>
+            <button type="button" class="cl-form-cancel-btn" id="cl-form-cancel-btn">Annuler</button>
+          </div>
+        </div>
+
+        <!-- ── Mes champs lexicaux ── -->
+        <div class="section-header" style="margin-top:8px;">
+          <h1 class="section-title" style="font-size:18px;">Mes champs lexicaux</h1>
+        </div>
+        <div id="cl-ens-mes-champs"></div>
+
+        <!-- ── Bibliothèque partagée ── -->
+        <div class="section-header" style="margin-top:24px;">
+          <h1 class="section-title" style="font-size:18px;">Bibliothèque partagée</h1>
+        </div>
+        <div id="cl-ens-bibliotheque"></div>
+
+        <div class="section-header" style="margin-top:32px;">
+          <h1 class="section-title" style="font-size:18px;">Résultats de mes élèves</h1>
+        </div>
+        <div id="cl-ens-resultats"></div>
+      </div>
+
+      <div id="cl-print-root"></div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="js/menu.js"></script>
+  <script>
+    const CATEGORIE_LABELS = {
+      synonyme: 'Synonymes', antonyme: 'Antonymes', adjectif: 'Adjectifs associés',
+      derive: 'Mots dérivés', expression: 'Expressions et proverbes',
+      soutenu: 'Registre soutenu', familier: 'Registre familier'
+    };
+    const SIMPLE_CATEGORIES = ['synonyme', 'antonyme', 'adjectif', 'derive', 'soutenu', 'familier'];
+    const ROW_CATEGORIES = ['expression'];
+
+    let _profile = null;
+    let _isAdmin = false;
+    let _corpusOptions = [];
+    let _editingChampId = null;
+    let _editingChampStatut = null;
+    let _rowState = { expression: [] };
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str == null ? '' : String(str);
+      return div.innerHTML;
+    }
+
+    function slugify(str) {
+      return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'champ';
+    }
+
+    /* ── Affiche PDF (Phase 1, inchangé) ─────────────────────────────────────── */
+    async function generateAffiche(champ, btn) {
+      btn.disabled = true;
+      btn.textContent = 'Génération…';
+      const { data: mots, error } = await window.lfmDb
+        .from('champ_lexical_mots')
+        .select('categorie, mot, exemple_phrase, ordre')
+        .eq('champ_id', champ.id)
+        .order('ordre', { ascending: true });
+
+      btn.disabled = false;
+      btn.textContent = '🖨️ Affiche';
+      if (error || !mots) return;
+
+      const motsByCategorie = {};
+      mots.forEach(m => {
+        motsByCategorie[m.categorie] = motsByCategorie[m.categorie] || [];
+        motsByCategorie[m.categorie].push({ mot: m.mot, exemple_phrase: m.exemple_phrase });
+      });
+
+      ChampLexicalPrint.generate({
+        corpusTitre: champ.corpusTitre,
+        theme: champ.theme,
+        contextualisation: champ.contextualisation,
+        motsByCategorie
+      });
+    }
+
+    /* ── Formulaire : blocs de catégories ────────────────────────────────────── */
+    // Construit uniquement le HTML des lignes d'UNE catégorie à lignes
+    // répétables — jamais le conteneur entier, voir renderRowsOnly() ci-dessous.
+    function buildRowsHtml(categorie) {
+      return _rowState[categorie].map((r, i) => `
+        <div class="cl-row-editor-item">
+          <input type="text" class="cl-form-input" placeholder="Mot ou expression" data-row-mot="${categorie}:${i}" value="${escapeHtml(r.mot)}">
+          <input type="text" class="cl-form-input" placeholder="Exemple de phrase (optionnel)" data-row-exemple="${categorie}:${i}" value="${escapeHtml(r.exemple)}">
+          <button type="button" class="cl-row-remove-btn" data-row-remove="${categorie}:${i}">✕</button>
+        </div>`).join('');
+    }
+
+    function renderRowEditor(categorie) {
+      return `
+        <fieldset class="cl-categorie-fieldset">
+          <legend>${escapeHtml(CATEGORIE_LABELS[categorie])}</legend>
+          <div id="cl-rows-${categorie}">${buildRowsHtml(categorie)}</div>
+          <button type="button" class="cl-row-add-btn" data-row-add="${categorie}">+ Ajouter</button>
+        </fieldset>`;
+    }
+
+    // Rebranche les événements des lignes d'UNE catégorie (mot/exemple/retirer).
+    // Le bouton "+ Ajouter" n'est pas concerné : il vit en dehors de
+    // #cl-rows-${categorie} et n'est donc jamais recréé par renderRowsOnly().
+    function bindRowContainerEvents(categorie) {
+      const container = document.getElementById('cl-rows-' + categorie);
+      container.querySelectorAll('[data-row-remove]').forEach(btn => {
+        btn.onclick = () => {
+          const [cat, idx] = btn.dataset.rowRemove.split(':');
+          _rowState[cat].splice(Number(idx), 1);
+          renderRowsOnly(cat);
+        };
+      });
+      container.querySelectorAll('[data-row-mot]').forEach(input => {
+        input.oninput = () => {
+          const [cat, idx] = input.dataset.rowMot.split(':');
+          _rowState[cat][Number(idx)].mot = input.value;
+        };
+      });
+      container.querySelectorAll('[data-row-exemple]').forEach(input => {
+        input.oninput = () => {
+          const [cat, idx] = input.dataset.rowExemple.split(':');
+          _rowState[cat][Number(idx)].exemple = input.value;
+        };
+      });
+    }
+
+    // Réécrit SEULEMENT #cl-rows-${categorie} — jamais #cl-form-categories en
+    // entier. C'est la correction du vrai bug : l'ancienne version appelait
+    // renderFormCategories() au moindre "+ Ajouter"/"✕", qui reconstruisait
+    // aussi les 6 textarea des catégories simples (sans état hors du DOM) et
+    // effaçait donc silencieusement tout ce que l'enseignant y avait déjà
+    // saisi — perte de données constatée en base sur "avoir peur".
+    function renderRowsOnly(categorie) {
+      document.getElementById('cl-rows-' + categorie).innerHTML = buildRowsHtml(categorie);
+      bindRowContainerEvents(categorie);
+    }
+
+    function bindAddButtons() {
+      document.querySelectorAll('[data-row-add]').forEach(btn => {
+        btn.onclick = () => {
+          _rowState[btn.dataset.rowAdd].push({ mot: '', exemple: '' });
+          renderRowsOnly(btn.dataset.rowAdd);
+        };
+      });
+    }
+
+    // Construction complète du bloc catégories — uniquement à l'ouverture
+    // d'un nouveau formulaire, au chargement d'une édition, ou à une
+    // réinitialisation. Jamais déclenchée par une interaction normale de
+    // saisie (voir renderRowsOnly ci-dessus).
+    function renderFormCategories() {
+      const simpleHtml = SIMPLE_CATEGORIES.map(cat => `
+        <fieldset class="cl-categorie-fieldset">
+          <legend>${escapeHtml(CATEGORIE_LABELS[cat])}</legend>
+          <textarea class="cl-form-textarea" id="cl-form-cat-${cat}" placeholder="Un mot par ligne…"></textarea>
+        </fieldset>`).join('');
+      const rowsHtml = ROW_CATEGORIES.map(renderRowEditor).join('');
+      document.getElementById('cl-form-categories').innerHTML = simpleHtml + rowsHtml;
+      bindAddButtons();
+      ROW_CATEGORIES.forEach(bindRowContainerEvents);
+    }
+
+    /* ── Formulaire : corpus ─────────────────────────────────────────────────── */
+    function renderCorpusSelect(selectedId) {
+      const select = document.getElementById('cl-form-corpus');
+      select.innerHTML = _corpusOptions.map(c =>
+        `<option value="${c.id}" ${c.id === selectedId ? 'selected' : ''}>${escapeHtml(c.titre)}</option>`
+      ).join('');
+    }
+
+    async function reloadCorpusOptions(selectAfterId) {
+      _corpusOptions = await lfmChampLexicalTeacher.getCorpusOptions(_profile.id);
+      renderCorpusSelect(selectAfterId || (_corpusOptions[0] && _corpusOptions[0].id));
+    }
+
+    document.getElementById('cl-toggle-new-corpus-btn').addEventListener('click', () => {
+      document.getElementById('cl-new-corpus-box').classList.toggle('is-open');
+    });
+
+    document.getElementById('cl-create-corpus-btn').addEventListener('click', async () => {
+      const titre = document.getElementById('cl-new-corpus-titre').value.trim();
+      if (!titre) return;
+      const desc = document.getElementById('cl-new-corpus-desc').value;
+      const btn = document.getElementById('cl-create-corpus-btn');
+      btn.disabled = true;
+      try {
+        const corpus = await lfmChampLexicalTeacher.createCorpus(_profile.id, titre, desc, slugify(titre));
+        await reloadCorpusOptions(corpus.id);
+        document.getElementById('cl-new-corpus-titre').value = '';
+        document.getElementById('cl-new-corpus-desc').value = '';
+        document.getElementById('cl-new-corpus-box').classList.remove('is-open');
+      } catch (e) {
+        showFormError("Impossible de créer ce corpus. Réessaie dans un instant.");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    /* ── Formulaire : ouverture / fermeture ──────────────────────────────────── */
+    function showFormError(msg) {
+      const el = document.getElementById('cl-form-error');
+      el.textContent = msg;
+      el.style.display = msg ? '' : 'none';
+    }
+
+    function resetForm() {
+      _editingChampId = null;
+      _editingChampStatut = null;
+      _rowState = { expression: [] };
+      document.getElementById('cl-form-title').textContent = 'Nouveau champ lexical';
+      document.getElementById('cl-form-theme').value = '';
+      document.getElementById('cl-form-contexte').value = '';
+      document.getElementById('cl-form-brouillon').checked = false;
+      renderFormCategories();
+      renderCorpusSelect(_corpusOptions[0] && _corpusOptions[0].id);
+      showFormError('');
+    }
+
+    function openNewChampForm() {
+      resetForm();
+      document.getElementById('cl-form-card').style.display = '';
+      document.getElementById('cl-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    async function openEditChampForm(champId) {
+      resetForm();
+      document.getElementById('cl-form-title').textContent = 'Modifier ce champ lexical';
+      document.getElementById('cl-form-card').style.display = '';
+      document.getElementById('cl-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      const { champ, mots } = await lfmChampLexicalTeacher.getChampFull(champId);
+      _editingChampId = champ.id;
+      _editingChampStatut = champ.statut;
+      document.getElementById('cl-form-theme').value = champ.theme;
+      document.getElementById('cl-form-contexte').value = champ.contextualisation || '';
+      document.getElementById('cl-form-brouillon').checked = champ.statut === 'brouillon';
+      renderCorpusSelect(champ.corpus_id);
+
+      ROW_CATEGORIES.forEach(cat => {
+        _rowState[cat] = mots.filter(m => m.categorie === cat).map(m => ({ mot: m.mot, exemple: m.exemple_phrase || '' }));
+      });
+      renderFormCategories();
+
+      // Doit s'exécuter APRÈS renderFormCategories() : ce render reconstruit
+      // #cl-form-categories depuis zéro (textarea vides) — le remplir avant
+      // écrasait silencieusement ce préremplissage pour les 6 catégories
+      // simples (seule expression survivait, pilotée par _rowState relu au
+      // moment du render, pas par une valeur DOM directe).
+      SIMPLE_CATEGORIES.forEach(cat => {
+        const words = mots.filter(m => m.categorie === cat).map(m => m.mot);
+        const el = document.getElementById('cl-form-cat-' + cat);
+        if (el) el.value = words.join('\n');
+      });
+    }
+
+    function closeForm() {
+      document.getElementById('cl-form-card').style.display = 'none';
+    }
+
+    document.getElementById('cl-new-champ-btn').addEventListener('click', openNewChampForm);
+    document.getElementById('cl-form-cancel-btn').addEventListener('click', closeForm);
+
+    /* ── Formulaire : collecte + validation + enregistrement ────────────────── */
+    function collectMotsRows() {
+      const rows = [];
+      SIMPLE_CATEGORIES.forEach(cat => {
+        const raw = document.getElementById('cl-form-cat-' + cat).value;
+        raw.split('\n').map(w => w.trim()).filter(Boolean).forEach(mot => {
+          rows.push({ categorie: cat, mot, exemple_phrase: null });
+        });
+      });
+      ROW_CATEGORIES.forEach(cat => {
+        _rowState[cat].forEach(r => {
+          const mot = (r.mot || '').trim();
+          if (!mot) return;
+          rows.push({ categorie: cat, mot, exemple_phrase: (r.exemple || '').trim() || null });
+        });
+      });
+      return rows;
+    }
+
+    async function saveChampForm() {
+      const theme = document.getElementById('cl-form-theme').value.trim();
+      const corpusId = document.getElementById('cl-form-corpus').value;
+      const contexte = document.getElementById('cl-form-contexte').value;
+      // Décoché = "partager" : jamais directement 'publie' (réservé à la
+      // validation admin), sauf si le champ était déjà publié — éditer son
+      // contenu ne doit pas le dépublier silencieusement.
+      const brouillonChecked = document.getElementById('cl-form-brouillon').checked;
+      const statut = brouillonChecked ? 'brouillon' : (_editingChampStatut === 'publie' ? 'publie' : 'en_attente');
+      const motsRows = collectMotsRows();
+
+      if (!theme) return showFormError('Le thème est obligatoire.');
+      if (!corpusId) return showFormError('Choisis (ou crée) un corpus lexical.');
+      if (motsRows.length === 0) return showFormError('Ajoute au moins un mot dans une catégorie.');
+      showFormError('');
+
+      const saveBtn = document.getElementById('cl-form-save-btn');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Enregistrement…';
+
+      try {
+        const payload = { corpusId, theme, slug: slugify(theme), contextualisation: contexte, statut };
+        let champId = _editingChampId;
+        if (champId) {
+          // Mots d'abord, statut ensuite : un admin qui dépublie ET modifie
+          // les mots d'un champ partagé dans le même enregistrement verrait
+          // sinon la policy champ_lexical_mots_*_via_parent (qui relit le
+          // statut COURANT du parent) rejeter l'écriture des mots si le
+          // statut avait déjà basculé en 'brouillon' juste avant.
+          await lfmChampLexicalTeacher.replaceMots(champId, motsRows);
+          await lfmChampLexicalTeacher.updateChampMeta(champId, payload);
+        } else {
+          const created = await lfmChampLexicalTeacher.createChamp(_profile.id, payload);
+          champId = created.id;
+          await lfmChampLexicalTeacher.replaceMots(champId, motsRows);
+        }
+
+        closeForm();
+        await reloadLists();
+      } catch (e) {
+        showFormError("Impossible d'enregistrer ce champ lexical. Réessaie dans un instant.");
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Enregistrer';
+      }
+    }
+
+    document.getElementById('cl-form-save-btn').addEventListener('click', saveChampForm);
+
+    /* ── Suppression / fork ──────────────────────────────────────────────────── */
+    async function deleteChampWithConfirm(champId, theme) {
+      if (!confirm(`Supprimer définitivement « ${theme} » ? Cette action est irréversible.`)) return;
+      try {
+        await lfmChampLexicalTeacher.deleteChamp(champId);
+        await reloadLists();
+      } catch (e) {
+        alert("Impossible de supprimer ce champ lexical. Réessaie dans un instant.");
+      }
+    }
+
+    async function forkChampAndEdit(champId, btn) {
+      btn.disabled = true;
+      btn.textContent = 'Copie…';
+      try {
+        const forked = await lfmChampLexicalTeacher.forkChamp(champId, _profile.id);
+        await reloadLists();
+        await openEditChampForm(forked.id);
+      } catch (e) {
+        alert('Impossible de copier ce champ lexical. Réessaie dans un instant.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '📋 Copier pour ma classe';
+      }
+    }
+
+    /* ── Listes ───────────────────────────────────────────────────────────────── */
+    const CHAMP_STATUT_LABELS = { brouillon: 'Brouillon', en_attente: 'En attente de validation', publie: 'Partagé' };
+
+    function renderMesChampsCard(champ) {
+      const badgeLabel = CHAMP_STATUT_LABELS[champ.statut] || champ.statut;
+      const motifHtml = champ.motif_refus
+        ? `<div class="cl-ens-motif-refus">Refusé par l'administrateur : ${escapeHtml(champ.motif_refus)}</div>`
+        : '';
+      const row = document.createElement('div');
+      row.className = 'cl-ens-champ-row';
+      row.innerHTML = `
+        <div>
+          <div class="cl-ens-champ-title">${escapeHtml(champ.theme)} <span class="cl-ens-badge cl-ens-badge--${champ.statut}">${badgeLabel}</span></div>
+          <div class="cl-ens-champ-corpus">${escapeHtml(champ.corpus_lexicaux ? champ.corpus_lexicaux.titre : '')}</div>
+          ${motifHtml}
+        </div>
+        <div class="cl-ens-champ-actions">
+          <button type="button" class="cl-ens-edit-btn">✏️ Modifier</button>
+          <button type="button" class="cl-ens-affiche-btn">🖨️ Affiche</button>
+          <button type="button" class="cl-ens-delete-btn">🗑️ Supprimer</button>
+        </div>
+      `;
+      row.querySelector('.cl-ens-edit-btn').addEventListener('click', () => openEditChampForm(champ.id));
+      row.querySelector('.cl-ens-affiche-btn').addEventListener('click', (e) => generateAffiche({
+        id: champ.id, theme: champ.theme, contextualisation: champ.contextualisation,
+        corpusTitre: champ.corpus_lexicaux ? champ.corpus_lexicaux.titre : ''
+      }, e.target));
+      row.querySelector('.cl-ens-delete-btn').addEventListener('click', () => deleteChampWithConfirm(champ.id, champ.theme));
+      return row;
+    }
+
+    function renderBibliothequeCard(champ) {
+      const row = document.createElement('div');
+      row.className = 'cl-ens-champ-row';
+      // Modifier/Supprimer : réservés à l'admin, en plus du fork disponible
+      // pour tous — un champ de la bibliothèque partagée n'appartient jamais
+      // à l'enseignant connecté, donc RLS rejetterait de toute façon une
+      // tentative d'édition/suppression pour un compte non-admin (défense en
+      // profondeur), mais on ne montre même pas les boutons dans ce cas.
+      const adminActions = _isAdmin ? `
+          <button type="button" class="cl-ens-edit-btn">✏️ Modifier</button>
+          <button type="button" class="cl-ens-delete-btn">🗑️ Supprimer</button>` : '';
+      row.innerHTML = `
+        <div>
+          <div class="cl-ens-champ-title">${escapeHtml(champ.theme)}</div>
+          <div class="cl-ens-champ-corpus">${escapeHtml(champ.corpus_lexicaux ? champ.corpus_lexicaux.titre : '')}</div>
+          <div class="cl-ens-champ-author">par ${escapeHtml(champ.profiles ? champ.profiles.display_name : 'un collègue')}</div>
+        </div>
+        <div class="cl-ens-champ-actions">
+          <button type="button" class="cl-ens-fork-btn">📋 Copier pour ma classe</button>
+          ${adminActions}
+        </div>
+      `;
+      row.querySelector('.cl-ens-fork-btn').addEventListener('click', (e) => forkChampAndEdit(champ.id, e.target));
+      const editBtn = row.querySelector('.cl-ens-edit-btn');
+      if (editBtn) editBtn.addEventListener('click', () => openEditChampForm(champ.id));
+      const deleteBtn = row.querySelector('.cl-ens-delete-btn');
+      if (deleteBtn) deleteBtn.addEventListener('click', () => deleteChampWithConfirm(champ.id, champ.theme));
+      return row;
+    }
+
+    let _champsForResults = [];
+
+    async function reloadLists() {
+      const [mesChamps, bibliotheque] = await Promise.all([
+        lfmChampLexicalTeacher.getMyChamps(_profile.id),
+        lfmChampLexicalTeacher.getSharedChamps(_profile.id)
+      ]);
+
+      const mesEl = document.getElementById('cl-ens-mes-champs');
+      mesEl.innerHTML = '';
+      if (mesChamps.length === 0) {
+        mesEl.innerHTML = `<div class="cl-ens-empty">Tu n'as pas encore créé de champ lexical.</div>`;
+      } else {
+        mesChamps.forEach(c => mesEl.appendChild(renderMesChampsCard(c)));
+      }
+
+      const bibEl = document.getElementById('cl-ens-bibliotheque');
+      bibEl.innerHTML = '';
+      if (bibliotheque.length === 0) {
+        bibEl.innerHTML = `<div class="cl-ens-empty">Aucun champ lexical partagé par d'autres enseignants pour l'instant.</div>`;
+      } else {
+        bibliotheque.forEach(c => bibEl.appendChild(renderBibliothequeCard(c)));
+      }
+
+      _champsForResults = [...mesChamps, ...bibliotheque];
+
+      const [{ data: students }, { data: classes }] = await Promise.all([
+        window.lfmDb.from('students').select('id, auth_user_id, display_name, class_id').eq('teacher_id', _profile.id),
+        window.lfmDb.from('classes').select('id, name').eq('teacher_id', _profile.id)
+      ]);
+      await loadResultats(_champsForResults, students || [], classes || []);
+    }
+
+    /* ── Résultats de mes élèves (Phase 1, inchangé) ─────────────────────────── */
+    async function loadResultats(champs, students, classes) {
+      const container = document.getElementById('cl-ens-resultats');
+      const { data: sessions, error } = await window.lfmDb
+        .from('champ_lexical_sessions')
+        .select('id, student_id, champ_id, niveau, status, total_points, completed_at')
+        .order('completed_at', { ascending: false });
+
+      if (error || !sessions || sessions.length === 0) {
+        container.innerHTML = `<div class="dash-empty"><em>Aucun résultat pour l'instant.</em></div>`;
+        return;
+      }
+
+      const studentByAuthId = new Map(students.map(s => [s.auth_user_id, s]));
+      const classById = new Map(classes.map(c => [c.id, c]));
+      const champById = new Map(champs.map(c => [c.id, c]));
+
+      const rows = sessions.map(s => {
+        const student = studentByAuthId.get(s.student_id);
+        const classe = student ? classById.get(student.class_id) : null;
+        const champ = champById.get(s.champ_id);
+        return `
+          <tr>
+            <td>${escapeHtml(student ? student.display_name : '—')}</td>
+            <td>${escapeHtml(classe ? classe.name : '—')}</td>
+            <td>${escapeHtml(champ ? champ.theme : '—')}</td>
+            <td>Niveau ${s.niveau}</td>
+            <td>${s.total_points}</td>
+            <td class="cl-ens-status--${s.status}">${s.status === 'termine' ? 'Terminé' : 'En cours'}</td>
+          </tr>`;
+      }).join('');
+
+      container.innerHTML = `
+        <table class="cl-ens-table">
+          <thead><tr><th>Élève</th><th>Classe</th><th>Champ lexical</th><th>Niveau</th><th>Points</th><th>Statut</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    }
+
+    (async function init() {
+      // Tout le corps de init() est protégé, y compris requireAnyRole lui-même :
+      // une exception non rattrapée ici (cache navigateur périmé, réseau,
+      // Supabase indisponible…) laissait sinon la page bloquée indéfiniment
+      // sur "Chargement…", sans aucun message ni indice — #cl-ens-content
+      // (qui contient le formulaire, donc le bouton "+ Créer un champ lexical")
+      // restait caché, et le fil d'Ariane n'était jamais repointé vers
+      // dashboard-admin.html pour un compte admin.
+      try {
+        const profile = await lfmAuth.requireAnyRole(['enseignant', 'admin']);
+        if (!profile) return;
+        _profile = profile;
+        _isAdmin = profile.role === 'admin';
+
+        // dashboard-enseignant.html est gardée par requireRole('enseignant')
+        // strict : un compte admin y serait rebondi vers auth.html. Le fil
+        // d'Ariane doit donc pointer vers dashboard-admin.html dans ce cas.
+        if (_isAdmin) {
+          const homeLink = document.getElementById('cl-ens-breadcrumb-home');
+          homeLink.href = 'dashboard-admin.html';
+          homeLink.textContent = 'Espace administrateur';
+        }
+
+        await reloadCorpusOptions();
+        await reloadLists();
+
+        document.getElementById('cl-ens-loading').style.display = 'none';
+        document.getElementById('cl-ens-content').style.display = '';
+      } catch (e) {
+        document.getElementById('cl-ens-loading').textContent = 'Impossible de charger le corpus lexical. Réessaie dans un instant.';
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -13,12 +13,17 @@
 const lfmQuestionnairesStudent = (() => {
   const db = window.lfmDb;
 
-  /* Bibliothèque des questionnaires publiés (métadonnées seules — titre,
-     auteur de l'œuvre, nombre de questions). */
+  /* Bibliothèque des questionnaires visibles (métadonnées seules — titre,
+     auteur de l'œuvre, nombre de questions) : publiés, plus ceux en attente
+     de validation de mon propre enseignant. Cette page n'exige pas de rôle
+     précis (consultable par un enseignant aussi) : le filtre .in() reste
+     nécessaire même si RLS a déjà tranché la visibilité — sinon un
+     enseignant qui visite cette page verrait ses propres brouillons/
+     questionnaires masqués s'y mélanger via questionnaires_select_own. */
   async function listPublished() {
     const { data, error } = await db.from('questionnaires')
       .select('id, titre_oeuvre, auteur_oeuvre, nb_questions, created_at')
-      .eq('statut', 'publie')
+      .in('statut', ['publie', 'en_attente'])
       .order('created_at', { ascending: false });
     if (error) throw error;
     return data || [];

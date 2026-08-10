@@ -56,6 +56,44 @@ const lfmAdmin = (() => {
     if (error) throw error;
   }
 
+  /* ── Contenu en attente de validation (Champ lexical + Questionnaires) ──────
+     RLS (champs_lexicaux_update_own_or_admin / questionnaires_update_own_or_
+     admin, voir supabase/migrations/20260818100000) autorise déjà l'admin à
+     modifier un contenu 'en_attente' — decision = 'publie' (valide) ou
+     'brouillon' (refuse, motif visible par l'enseignant sur sa propre
+     carte). */
+  async function getPendingChamps() {
+    const { data, error } = await db.from('champs_lexicaux')
+      .select('id, theme, created_at, corpus_lexicaux(titre), profiles(display_name)')
+      .eq('statut', 'en_attente')
+      .order('created_at');
+    if (error) throw error;
+    return data || [];
+  }
+
+  async function getPendingQuestionnaires() {
+    const { data, error } = await db.from('questionnaires')
+      .select('id, titre_oeuvre, auteur_oeuvre, created_at, profiles(display_name)')
+      .eq('statut', 'en_attente')
+      .order('created_at');
+    if (error) throw error;
+    return data || [];
+  }
+
+  async function moderateChamp(id, decision, motif) {
+    const { error } = await db.from('champs_lexicaux')
+      .update({ statut: decision, motif_refus: decision === 'publie' ? null : (motif || null) })
+      .eq('id', id);
+    if (error) throw error;
+  }
+
+  async function moderateQuestionnaire(id, decision, motif) {
+    const { error } = await db.from('questionnaires')
+      .update({ statut: decision, motif_refus: decision === 'publie' ? null : (motif || null) })
+      .eq('id', id);
+    if (error) throw error;
+  }
+
   /* ── Liste des enseignants actifs avec email et stats ────────────────────── */
   /* Utilise la fonction SQL get_teachers_with_email() (voir migration V5 du schéma) */
   async function getTeachers() {
@@ -175,6 +213,7 @@ const lfmAdmin = (() => {
   return {
     getGlobalStats,
     getPendingTeachers, approveTeacher, rejectTeacher,
+    getPendingChamps, getPendingQuestionnaires, moderateChamp, moderateQuestionnaire,
     getTeachers, getAllClasses, getClassesWithStats, exportAllStudents,
     deleteTeacher, deleteClasses, getAllResultsRaw
   };
