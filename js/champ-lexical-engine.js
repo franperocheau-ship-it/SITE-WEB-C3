@@ -68,6 +68,7 @@ let foundByCategorie = {}; // categorie -> [{mot, points}]
 let totalPoints = 0;
 let recallReviewId = null;
 let recallPrompts = [];
+let speechEnabled = false; // lecture audio (dyslexie) — résolu une fois dans init()
 
 function escapeHtml(str) {
   const div = document.createElement('div');
@@ -139,7 +140,11 @@ function updateBreadcrumbForNiveau(niveau) {
 
 function showNiveauSelectState() {
   updateBreadcrumbForNiveau(null);
-  document.getElementById('cl-context-text').textContent = champ.contextualisation || '';
+  const contextText = champ.contextualisation || '';
+  document.getElementById('cl-context-text').textContent = contextText;
+  if (speechEnabled && contextText && typeof attachSpeechButton === 'function') {
+    attachSpeechButton(document.getElementById('cl-context-text'), contextText);
+  }
   renderNiveauStatuses();
   showState('contextualisation');
 }
@@ -442,6 +447,12 @@ async function startRecall() {
       <input type="text" class="cl-input" data-recall-idx="${idx}" autocomplete="off">
     </div>`).join('');
 
+  if (speechEnabled && typeof attachSpeechButton === 'function') {
+    document.querySelectorAll('#cl-recall-prompts .cl-recall-prompt-label').forEach(el => {
+      attachSpeechButton(el, el.textContent.trim());
+    });
+  }
+
   showState('recall');
 }
 
@@ -499,7 +510,11 @@ async function onRecallSubmit() {
   profile = await lfmAuth.requireRole('eleve');
   if (!profile) return;
 
-  const sessions = await loadAllSessions(profile.id, champ.id);
+  const [sessions, studentRecord] = await Promise.all([
+    loadAllSessions(profile.id, champ.id),
+    lfmAuth.getMyStudentRecord()
+  ]);
+  speechEnabled = !!(studentRecord && studentRecord.est_dyslexique);
   sessionsByNiveau = { 1: null, 2: null, 3: null };
   sessions.forEach(s => { sessionsByNiveau[s.niveau] = s; });
 

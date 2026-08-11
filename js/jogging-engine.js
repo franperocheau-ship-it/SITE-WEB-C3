@@ -575,6 +575,17 @@ async function showCompletedState() {
   Breadcrumb.setCategory({ href: 'redaction.html', label: 'Rédaction' });
   Breadcrumb.setCurrent(jogging.title);
 
+  /* Accessibilité (dyslexie) : lecture audio de la consigne, même logique
+     que questionnaires-lecture.html / exercise.html — jamais injectée si
+     l'élève n'est pas marqué est_dyslexique. */
+  if (typeof attachSpeechButton === 'function') {
+    lfmAuth.getMyStudentRecord().then(student => {
+      if (student && student.est_dyslexique) {
+        attachSpeechButton(document.getElementById('jog-intro-consigne'), jogging.consigne);
+      }
+    }).catch(() => {});
+  }
+
   const { data: existing, error: selErr } = await window.lfmDb
     .from('jogging_sessions')
     .select('*')

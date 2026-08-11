@@ -322,6 +322,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/text-to-speech.js?v=1"></script>
   <script src="js/results.js"></script>
   <script src="js/niveau-mode.js?v=1"></script>
   <script src="js/level-unlock.js?v=1"></script>
@@ -383,6 +384,33 @@
   let currentLevel  = 1;
   let cdLevelSelect = null;
   let st            = null; /* état du niveau en cours */
+
+  /* ── Accessibilité : lecture audio de la consigne (dyslexie) ──────────────
+     Même pattern que exercise.html : observer attaché tout de suite (coût
+     nul), actif seulement une fois le statut est_dyslexique connu. */
+  let speechEnabled = false;
+
+  function initSpeechAccessibility() {
+    if (typeof attachSpeechButton !== 'function' || typeof lfmAuth === 'undefined') return;
+    const body = document.getElementById('lc-body');
+    if (!body) return;
+
+    new MutationObserver(() => {
+      if (!speechEnabled) return;
+      const label = body.querySelector('.sub-label');
+      if (label && !label.querySelector('.lfm-speech-btn') && label.textContent.trim()) {
+        attachSpeechButton(label, label.textContent.trim());
+      }
+    }).observe(body, { childList: true, subtree: true, characterData: true });
+
+    lfmAuth.getMyStudentRecord().then(student => {
+      speechEnabled = !!(student && student.est_dyslexique);
+      const label = body.querySelector('.sub-label');
+      if (speechEnabled && label && !label.querySelector('.lfm-speech-btn') && label.textContent.trim()) {
+        attachSpeechButton(label, label.textContent.trim());
+      }
+    }).catch(() => {});
+  }
 
   /* ════════════════════════════════════════════════════════════════════
      LEVEL SELECT
@@ -627,6 +655,7 @@
   /* ════════════════════════════════════════════════════════════════════
      INIT
   ════════════════════════════════════════════════════════════════════ */
+  initSpeechAccessibility();
   initLevelSelect();
   </script>
 

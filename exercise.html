@@ -18,6 +18,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/text-to-speech.js?v=1"></script>
   <script src="js/results.js"></script>
   <script src="js/guided-access.js?v=1"></script>
   <script src="js/niveau-mode.js?v=1"></script>
@@ -4887,6 +4888,52 @@
       "word-order":        { icon: "🔀", name: "Remets les mots dans l'ordre",  desc: "Reconstruit la phrase dans le bon ordre" }
     };
 
+    /* ── Accessibilité : lecture audio de la consigne (dyslexie) ─────────────
+       Tous les types d'exercice de ce fichier rendent leur consigne dans
+       #ex-card, mais via ~70 fonctions de rendu distinctes sans dispatcheur
+       central — impossible d'appeler attachSpeechButton() à un seul endroit
+       "après le rendu". On observe donc #ex-card et on injecte le bouton sur
+       tout élément de consigne qui apparaît, quel que soit le type. Couvre
+       la consigne principale (.ex-question-label, .cd-q-prompt) et les
+       consignes secondaires de certaines familles (.aa-enonce = énoncé du
+       problème en maths, .pl-prompt, .ct-instruction, .ecn-prompt,
+       .rd-followup-prompt, .ex-classify-step-title). Jamais les réponses.
+       Statut est_dyslexique récupéré via lfmAuth.getMyStudentRecord() —
+       même source que questionnaires-lecture.html, pas de duplication. */
+    let speechEnabled = false;
+
+    const SPEECH_TARGET_SELECTOR = [
+      '.ex-question-label', '.cd-q-prompt', '.aa-enonce', '.pl-prompt',
+      '.ct-instruction', '.ecn-prompt', '.rd-followup-prompt', '.ex-classify-step-title'
+    ].join(', ');
+
+    function injectSpeechButtons(root) {
+      if (!speechEnabled || !root) return;
+      root.querySelectorAll(SPEECH_TARGET_SELECTOR).forEach(el => {
+        if (el.querySelector('.lfm-speech-btn')) return;
+        const text = el.textContent.trim();
+        if (!text) return;
+        attachSpeechButton(el, text);
+      });
+    }
+
+    function initSpeechAccessibility() {
+      if (typeof attachSpeechButton !== 'function' || typeof lfmAuth === 'undefined') return;
+      const card = document.getElementById('ex-card');
+      if (!card) return;
+
+      /* Observer attaché tout de suite (coût nul) mais inactif tant que
+         speechEnabled n'est pas résolu — évite de retarder le rendu de
+         l'exercice pour tout le monde le temps de l'aller-retour réseau. */
+      new MutationObserver(() => injectSpeechButtons(card))
+        .observe(card, { childList: true, subtree: true, characterData: true });
+
+      lfmAuth.getMyStudentRecord().then(student => {
+        speechEnabled = !!(student && student.est_dyslexique);
+        if (speechEnabled) injectSpeechButtons(card);
+      }).catch(() => {});
+    }
+
     /* ── Init ─────────────────────────────────────────────────────────────── */
 
     async function init() {
@@ -4895,6 +4942,7 @@
          disponible, y compris sur les chemins d'erreur (slug invalide,
          accès non autorisé). Complété via setCategory()/setCurrent(). */
       Breadcrumb.render({ current: 'Chargement…' });
+      initSpeechAccessibility();
 
       const params = new URLSearchParams(window.location.search);
       const slug   = params.get("slug");
