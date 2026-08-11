@@ -297,125 +297,73 @@
       text-decoration: none;
     }
 
-    /* ── Tab bar ── */
-    .dash-tabs {
-      display: flex;
-      gap: 4px;
+    /* ── Cards navigation (grille façon tableau de bord enseignant,
+       voir dashboard-enseignant.html — même classes .dash-grid/.dash-card
+       réutilisées ici plutôt que dupliquées) ── */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .dash-card {
       background: var(--card-bg);
       border-radius: var(--radius-card);
       box-shadow: var(--shadow-sm);
-      padding: 8px;
-      margin-bottom: 24px;
-    }
-
-    .dash-tab {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 12px;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      background: none;
-      color: var(--muted);
-      transition: background 180ms, color 180ms;
-    }
-
-    .dash-tab:hover { background: var(--bg); color: var(--text); }
-
-    .dash-tab--active { background: var(--blue); color: #fff; }
-
-    .dash-tab--active:hover { background: #0d2255; }
-
-    /* ── Subject cards (Tab 1 : Faire des exercices) ── */
-    .subject-cards-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    .subject-card {
+      padding: 24px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      background: var(--card-bg);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-sm);
-      padding: 32px 24px 24px;
+      gap: 10px;
       text-decoration: none;
-      border-top: 4px solid transparent;
-      transition: transform 200ms, box-shadow 200ms;
-    }
-
-    .subject-card:hover { transform: translateY(-4px); }
-
-    .subject-card--fr { border-top-color: var(--blue); }
-    .subject-card--fr:hover { box-shadow: 0 8px 32px rgba(16,43,106,0.15); }
-
-    .subject-card--ma { border-top-color: #F5A623; }
-    .subject-card--ma:hover { box-shadow: 0 8px 32px rgba(245,166,35,0.20); }
-
-    .subject-card--guide { border-top-color: #603AAA; }
-    .subject-card--guide:hover { box-shadow: 0 8px 32px rgba(96,58,170,0.20); }
-
-    .subject-card__icon { display: flex; align-items: center; justify-content: center; }
-
-    .subject-card__icon img { width: 64px; height: 64px; object-fit: contain; }
-
-    /* Illustration circulaire (carte "Mes exercices") */
-    .subject-card--guide .subject-card__icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: #603AAA;
+      border: 2px solid transparent;
+      transition: border-color 200ms, box-shadow 200ms, transform 140ms;
+      position: relative;
       overflow: hidden;
     }
 
-    .subject-card--guide .subject-card__icon img { width: 100%; height: 100%; object-fit: cover; }
-
-    .subject-card__title {
-      font-size: 20px;
-      font-weight: 800;
-      text-align: center;
+    .dash-card--active:hover {
+      border-color: rgba(16,43,106,0.2);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
     }
 
-    .subject-card--fr .subject-card__title { color: var(--blue); }
-    .subject-card--ma .subject-card__title { color: #7a4f00; }
-    .subject-card--guide .subject-card__title { color: #603AAA; }
+    .dash-card-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
+    .dash-card-icon img { width: 100%; height: 100%; object-fit: contain; }
+    .dash-card-icon--placeholder { font-size: 26px; }
 
-    .subject-card__desc {
+    .dash-card-title {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--blue);
+    }
+
+    .dash-card-desc {
       font-size: 13px;
       color: var(--muted);
-      text-align: center;
       line-height: 1.5;
+      flex: 1;
     }
 
-    .subject-card__cta {
-      margin-top: auto;
-      font-size: 13px;
+    .dash-card-action {
+      font-size: 12px;
       font-weight: 700;
-      padding: 10px 24px;
-      border-radius: 100px;
+      color: var(--blue);
+      letter-spacing: 0.03em;
     }
 
-    .subject-card--fr .subject-card__cta { background: var(--blue); color: #fff; }
-    .subject-card--ma .subject-card__cta { background: #F5A623; color: #6b420a; }
-    .subject-card--guide .subject-card__cta { background: #603AAA; color: #fff; }
+    .dash-card-accent {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 3px;
+      background: var(--blue);
+    }
 
-    .subject-cards-grid--guided { grid-template-columns: repeat(3, 1fr); }
+    .dash-card--active .dash-card-accent { opacity: 0.35; }
 
     @media (max-width: 600px) {
       .dash-header  { padding: 20px; }
       .dash-section { padding: 20px; }
-      .subject-cards-grid { grid-template-columns: 1fr; }
       .competence-cols { grid-template-columns: 1fr; }
-      .dash-tab { font-size: 13px; padding: 10px 12px; }
     }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -474,13 +422,8 @@
         </div>
       </div>
 
-      <!-- ── Tab bar ── -->
-      <div class="dash-tabs">
-        <button class="dash-tab dash-tab--active" data-tab="exercices">🎯 Faire des exercices</button>
-        <button class="dash-tab" data-tab="resultats">📊 Mes résultats</button>
-      </div>
-
-      <!-- ── Tab 1 : Faire des exercices ── -->
+      <!-- ── Tab 1 : Faire des exercices (grille de cartes, même
+           composant que dashboard-enseignant.html) ── -->
       <div id="tab-exercices" class="dash-tab-pane">
 
         <!-- Réactivation espacée (module Corpus lexical) : invitation à
@@ -488,24 +431,62 @@
              volontairement hors du hub "Mes résultats" — voir js/vocab-student-space.js. -->
         <div id="vocab-reactivation-section" style="display:none"></div>
 
-        <div class="subject-cards-grid">
+        <div class="dash-grid" id="student-dash-grid">
 
-          <a href="français.html" class="subject-card subject-card--fr">
-            <div class="subject-card__icon">
-              <img src="assets/iconefrancais.png?v=2" alt="Français">
-            </div>
-            <div class="subject-card__title">Français</div>
-            <div class="subject-card__desc">Grammaire, conjugaison, orthographe, vocabulaire</div>
-            <div class="subject-card__cta">Choisir un exercice →</div>
+          <a href="français.html" class="dash-card dash-card--active">
+            <div class="dash-card-icon"><img src="assets/iconefrancais.png?v=2" alt=""></div>
+            <div class="dash-card-title">Français</div>
+            <div class="dash-card-desc">Grammaire, conjugaison, orthographe, vocabulaire.</div>
+            <div class="dash-card-action">Choisir un exercice →</div>
+            <div class="dash-card-accent"></div>
           </a>
 
-          <a href="mathématiques.html" class="subject-card subject-card--ma">
-            <div class="subject-card__icon">
-              <img src="assets/iconemaths.png?v=2" alt="Mathématiques">
-            </div>
-            <div class="subject-card__title">Mathématiques</div>
-            <div class="subject-card__desc">Nombres, calcul, géométrie, mesures</div>
-            <div class="subject-card__cta">Choisir un exercice →</div>
+          <a href="mathématiques.html" class="dash-card dash-card--active">
+            <div class="dash-card-icon"><img src="assets/iconemaths.png?v=2" alt=""></div>
+            <div class="dash-card-title">Mathématiques</div>
+            <div class="dash-card-desc">Nombres, calcul, géométrie, mesures.</div>
+            <div class="dash-card-action">Choisir un exercice →</div>
+            <div class="dash-card-accent"></div>
+          </a>
+
+          <a href="dashboard-eleve.html?tab=resultats" class="dash-card dash-card--active">
+            <div class="dash-card-icon"><img src="assets/logos panneau de controle/Résultats.png" alt=""></div>
+            <div class="dash-card-title">Mes résultats</div>
+            <div class="dash-card-desc">Suis tes scores, tes lauriers et ta progression par compétence.</div>
+            <div class="dash-card-action">Voir mes résultats →</div>
+            <div class="dash-card-accent"></div>
+          </a>
+
+          <a href="redaction.html" class="dash-card dash-card--active">
+            <div class="dash-card-icon"><img src="assets/logos panneau de controle/Jogging d'écriture.png" alt=""></div>
+            <div class="dash-card-title">Joggings d'écriture</div>
+            <div class="dash-card-desc">Entraîne-toi à rédiger en t'aidant du code champion et progresse à ton rythme.</div>
+            <div class="dash-card-action">Écrire →</div>
+            <div class="dash-card-accent"></div>
+          </a>
+
+          <a href="dictees-catalogue.html" class="dash-card dash-card--active">
+            <div class="dash-card-icon"><img src="assets/logos panneau de controle/dictées préparées.png" alt=""></div>
+            <div class="dash-card-title">Dictées préparées</div>
+            <div class="dash-card-desc">Prépare tes dictées en révisant l'orthographe des mots difficiles.</div>
+            <div class="dash-card-action">S'entraîner →</div>
+            <div class="dash-card-accent"></div>
+          </a>
+
+          <a href="questionnaires-lecture.html" class="dash-card dash-card--active">
+            <div class="dash-card-icon"><img src="assets/logos panneau de controle/Questionnaire de lecture.png" alt=""></div>
+            <div class="dash-card-title">Questionnaires de lecture</div>
+            <div class="dash-card-desc">Vérifie ta compréhension des œuvres étudiées en classe.</div>
+            <div class="dash-card-action">Répondre →</div>
+            <div class="dash-card-accent"></div>
+          </a>
+
+          <a href="vocabulaire-corpus.html" class="dash-card dash-card--active">
+            <div class="dash-card-icon"><img src="assets/logos panneau de controle/corpus lexical.png" alt=""></div>
+            <div class="dash-card-title">Corpus lexical</div>
+            <div class="dash-card-desc">Enrichis ton vocabulaire et engrange des points !</div>
+            <div class="dash-card-action">Découvrir →</div>
+            <div class="dash-card-accent"></div>
           </a>
 
         </div>
@@ -513,6 +494,13 @@
 
       <!-- ── Tab 2 : Mes résultats (hub Général / Joggings / Dictées) ── -->
       <div id="tab-resultats" class="dash-tab-pane" style="display:none">
+
+      <!-- Retour à la grille de cartes — plus de barre d'onglets visible
+           depuis la refonte en grille, cette section n'est plus atteinte
+           qu'en cliquant la carte "Mes résultats" (dashboard-eleve.html?tab=resultats). -->
+      <div style="margin-bottom:16px;">
+        <a href="dashboard-eleve.html?tab=exercices" class="dash-back-link">← Retour à mon espace</a>
+      </div>
 
       <!-- Sous-navigation résultats -->
       <div id="resultats-nav-mount"></div>
@@ -794,9 +782,6 @@
     }
 
     function activateTab(tabName) {
-      document.querySelectorAll('.dash-tab').forEach(btn => {
-        btn.classList.toggle('dash-tab--active', btn.dataset.tab === tabName);
-      });
       document.querySelectorAll('.dash-tab-pane').forEach(pane => {
         pane.style.display = (pane.id === 'tab-' + tabName) ? '' : 'none';
       });
@@ -806,10 +791,6 @@
          un exercice) plutôt qu'un calcul figé au chargement initial. */
       if (tabName === 'resultats' && _profile) activateResultsSub(_currentResSub);
     }
-
-    document.querySelectorAll('.dash-tab').forEach(btn => {
-      btn.addEventListener('click', () => activateTab(btn.dataset.tab));
-    });
 
     /* ── Hub "Mes résultats" (Général / Joggings / Dictées) ──────────────────
        Sous-navigation partagée (resultats-nav) qui bascule entre 3 sections
@@ -1061,29 +1042,34 @@
       initLaurels(_profile.id);
     }
 
-    /* ── Carte "Mes exercices" (mode guidé uniquement) ───────────────────────
-       En mode libre (ou en cas d'échec de get_my_guided_access), la carte
-       n'est pas ajoutée au DOM. */
+    /* ── Carte "Mode guidé" (mode_acces = 'guide' uniquement) ────────────────
+       Même pattern RPC SECURITY DEFINER que le reste du site pour lire le
+       mode d'accès côté élève (lfmGuidedAccess.get() → get_my_guided_access(),
+       voir js/guided-access.js) — jamais de lecture RLS directe sur classes.
+       En mode libre (ou en cas d'échec), la carte n'est pas ajoutée au DOM.
+       Ajoutée en dernier enfant du DOM (pas de CSS `order`) pour que l'ordre
+       DOM et l'ordre visuel restent identiques au reste de la grille.
+       TODO : pas d'illustration dédiée pour l'instant, remplacer le
+       placeholder 🧭 par une vraie icône quand elle sera disponible. */
     async function maybeRenderGuidedCard() {
       if (typeof lfmGuidedAccess === 'undefined') return;
       const access = await lfmGuidedAccess.get();
       if (access.mode !== 'guide') return;
 
-      const grid = document.querySelector('.subject-cards-grid');
-      grid.classList.add('subject-cards-grid--guided');
+      const grid = document.getElementById('student-dash-grid');
+      if (!grid) return;
 
       const card = document.createElement('a');
-      card.href = 'exercices-prioritaires.html';
-      card.className = 'subject-card subject-card--guide';
+      card.href = 'redaction.html';
+      card.className = 'dash-card dash-card--active';
       card.innerHTML = `
-        <div class="subject-card__icon">
-          <img src="assets/prof.png?v=1" alt="Mes exercices">
-        </div>
-        <div class="subject-card__title">Mes exercices</div>
-        <div class="subject-card__desc">Sélectionnés par ton professeur</div>
-        <div class="subject-card__cta">Choisir un exercice →</div>
+        <div class="dash-card-icon dash-card-icon--placeholder">🧭</div>
+        <div class="dash-card-title">Mode guidé</div>
+        <div class="dash-card-desc">Retrouve les activités sélectionnées par ton professeur.</div>
+        <div class="dash-card-action">Continuer →</div>
+        <div class="dash-card-accent"></div>
       `;
-      grid.insertBefore(card, grid.firstChild);
+      grid.appendChild(card);
     }
 
     /* ── Initialisation ────────────────────────────────────────────────────── */
