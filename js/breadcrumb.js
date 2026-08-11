@@ -102,6 +102,8 @@ const Breadcrumb = (() => {
         <a class="bc-link" id="bc-link" href="${category ? category.href : '#'}"${category ? '' : ' hidden'}>${category ? escapeHTML(category.label) : ''}</a>
         <span class="bc-sep" id="bc-sep-cur"${current ? '' : ' hidden'}>›</span>
         <span class="bc-current" id="bc-current"${current ? '' : ' hidden'}>${escapeHTML(current)}</span>
+        <span class="bc-sep" id="bc-sep-sub" hidden>›</span>
+        <span class="bc-sub" id="bc-sub" hidden></span>
       </div>
     `;
     document.body.insertBefore(bar, document.body.firstChild);
@@ -130,5 +132,47 @@ const Breadcrumb = (() => {
     if (SUBJECT_BY_LABEL[text]) applySubject(resolveSubject(null, text));
   }
 
-  return { render, setCategory, setCurrent };
+  /* Maillon terminal optionnel après #bc-current — ex. champ-lexical.html,
+     qui affiche le niveau en cours après le nom du champ lexical. Rien
+     n'appelle setSub()/clearSub() ailleurs : sans effet sur les autres pages. */
+  function setSub(text) {
+    const el  = document.getElementById('bc-sub');
+    const sep = document.getElementById('bc-sep-sub');
+    if (!el || !sep) return;
+    el.textContent = text;
+    el.hidden  = false;
+    sep.hidden = false;
+  }
+
+  function clearSub() {
+    const el  = document.getElementById('bc-sub');
+    const sep = document.getElementById('bc-sep-sub');
+    if (!el || !sep) return;
+    el.hidden  = true;
+    sep.hidden = true;
+  }
+
+  /* Rend #bc-current cliquable (ex. revenir à l'écran de choix du niveau
+     sans recharger la page) — reste un <span>, pas besoin d'un <a> : le
+     clic déclenche un changement d'écran en place, pas une navigation. */
+  let _currentClickHandler = null;
+
+  function setCurrentClickable(onClick) {
+    const el = document.getElementById('bc-current');
+    if (!el) return;
+    if (_currentClickHandler) el.removeEventListener('click', _currentClickHandler);
+    _currentClickHandler = onClick;
+    el.addEventListener('click', _currentClickHandler);
+    el.classList.add('is-clickable');
+  }
+
+  function clearCurrentClickable() {
+    const el = document.getElementById('bc-current');
+    if (!el || !_currentClickHandler) return;
+    el.removeEventListener('click', _currentClickHandler);
+    _currentClickHandler = null;
+    el.classList.remove('is-clickable');
+  }
+
+  return { render, setCategory, setCurrent, setSub, clearSub, setCurrentClickable, clearCurrentClickable };
 })();

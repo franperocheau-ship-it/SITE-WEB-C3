@@ -123,7 +123,22 @@ function renderNiveauStatuses() {
   });
 }
 
+/* Fil d'Ariane : "Regarder" devient cliquable (retour à ce hub, sans
+   rechargement) et un maillon "Niveau N" s'ajoute dès qu'un niveau est
+   actif ; niveau = null repasse le fil d'Ariane à l'état "pas de niveau
+   choisi" — l'état par défaut de ce hub. */
+function updateBreadcrumbForNiveau(niveau) {
+  if (niveau) {
+    Breadcrumb.setCurrentClickable(() => showNiveauSelectState());
+    Breadcrumb.setSub('Niveau ' + niveau);
+  } else {
+    Breadcrumb.clearCurrentClickable();
+    Breadcrumb.clearSub();
+  }
+}
+
 function showNiveauSelectState() {
+  updateBreadcrumbForNiveau(null);
   document.getElementById('cl-context-text').textContent = champ.contextualisation || '';
   renderNiveauStatuses();
   showState('contextualisation');
@@ -137,6 +152,7 @@ function bindNiveauButtons() {
 
 async function selectNiveau(niveau) {
   currentNiveau = niveau;
+  updateBreadcrumbForNiveau(niveau);
   const existing = sessionsByNiveau[niveau];
 
   if (existing && existing.status === 'termine') {
@@ -496,6 +512,7 @@ async function onRecallSubmit() {
       return;
     }
     currentNiveau = niveauParam;
+    updateBreadcrumbForNiveau(niveauParam);
     sessionRow = s;
     document.getElementById('cl-recall-submit-btn').addEventListener('click', onRecallSubmit);
     await startRecall();
