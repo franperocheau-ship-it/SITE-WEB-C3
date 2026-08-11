@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="styles.css?v=12">
   <link rel="stylesheet" href="level-select.css?v=1">
   <link rel="stylesheet" href="breadcrumb.css?v=1">
-  <script src="js/breadcrumb.js?v=1"></script>
+  <script src="js/breadcrumb.js?v=3"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
@@ -1108,6 +1108,16 @@
       padding: 2px 8px;
       font-weight: 900;
       border: 1.5px solid rgba(16,43,106,0.25);
+    }
+    .ex-teal-hl {
+      background: rgba(29,191,160,0.18);
+      color: #0f8a76;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-weight: 900;
+      border: 1.5px solid rgba(29,191,160,0.40);
+      text-transform: none;
+      letter-spacing: normal;
     }
     .psc-fn-row {
       display: flex;
@@ -7381,18 +7391,20 @@
           });
           if (!isRight) btn.classList.add("is-wrong");
 
+          const rewriteHtml = q.rewriteSentence ? `<div class="ex-note">📝 « ${q.rewriteSentence} »</div>` : "";
+
           if (isRight && step1Correct) {
             score++;
-            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}${rewriteHtml}</div>`);
           } else if (isRight) {
             setFeedback("feedback1",
               `<div class="ex-feedback-correct" style="opacity:0.8">
-                ✓ Bonne réponse à l'étape 2 (mais l'étape 1 était incomplète).
+                ✓ Bonne réponse à l'étape 2 (mais l'étape 1 était incomplète).${rewriteHtml}
               </div>`);
           } else {
             setFeedback("feedback1", `
               <div class="ex-feedback-wrong">
-                ❌ La bonne réponse est : <strong>${q.step2Answer}</strong>.
+                ❌ La bonne réponse est : <strong>${q.step2Answer}</strong>.${rewriteHtml}
               </div>`);
           }
           showNextBtn();
@@ -13384,7 +13396,8 @@
         try { used = JSON.parse(localStorage.getItem(lsKey) || '[]'); } catch {}
         if (used.length >= allQ.length) { used = []; localStorage.removeItem(lsKey); }
         const avail  = allQ.filter((_, i) => !used.includes(i));
-        const picked = pscShuffle(avail).slice(0, Math.min(6, avail.length));
+        const cap    = sessionData.questionsPerSession || avail.length;
+        const picked = pscShuffle(avail).slice(0, Math.min(cap, avail.length));
         localStorage.setItem(lsKey, JSON.stringify([...used, ...picked.map(q => allQ.indexOf(q))]));
         pscState = { level: 3, questions: picked, idx: 0, score: 0, total: picked.length };
         document.getElementById('q-total').textContent = picked.length;
@@ -13545,7 +13558,7 @@
           ${fnBadge}
         </div>
         <div class="psc-sentence-display" style="font-size:19px">${q.displayHtml}</div>
-        <p style="font-size:13px;color:var(--muted);margin:-8px 0 18px;text-align:center">Remplace <strong>« ${q.group} »</strong> par le bon pronom et réécris la phrase entière.</p>
+        <p style="font-size:13px;color:var(--muted);margin:-8px 0 18px;text-align:center">Remplace <strong>« ${q.group} »</strong> par le bon pronom : écris la phrase entière, ou juste le pronom.</p>
         <div class="ex-input-row">
           <input type="text" id="psc-input" class="ex-text-input"
                  autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
@@ -13567,14 +13580,18 @@
         valBtn.disabled = true;
         input.disabled  = true;
 
-        const norm    = pscNorm(raw);
-        const correct = q.answers.some(a => pscNorm(a) === norm);
+        const norm         = pscNorm(raw);
+        const pronounOnly  = pscNorm(q.targetPronoun) === norm;
+        const correct      = pronounOnly || q.answers.some(a => pscNorm(a) === norm);
 
         if (correct) {
           input.classList.add('is-correct');
           pscState.score++;
+          const correctMsg = pronounOnly
+            ? `✓ ${pscPos()} C'est le bon pronom !`
+            : `✓ ${pscPos()} La phrase est correcte !`;
           document.getElementById('psc-fb').innerHTML =
-            `<div class="ex-feedback-correct">✓ ${pscPos()} La phrase est correcte !
+            `<div class="ex-feedback-correct">${correctMsg}
               <div class="ex-note">📌 Le pronom <strong>${q.targetPronoun}</strong> (${q.fn === 'subject' ? 'sujet' : 'complément'}) remplace « ${q.group} » et se place ${q.fn === 'subject' ? 'avant le verbe à la place du sujet' : 'avant le verbe « ' + q.verb + ' »'}.</div>
             </div>`;
         } else {

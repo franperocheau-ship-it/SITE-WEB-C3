@@ -1,8 +1,10 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    questionnaires-teacher.js — Accès aux données du module Questionnaires de
-   lecture côté enseignant. Dépend de : supabase-client.js (window.lfmDb).
+   lecture côté enseignant. Dépend de : supabase-client.js (window.lfmDb) ;
+   getClassQuestionnaireReport() dépend en plus de js/teacher.js (lfmTeacher).
 
-   Utilisé par questionnaires-enseignant.html. Pas d'Edge Function : les
+   Utilisé par questionnaires-enseignant.html et resultats-questionnaires-
+   enseignant.html. Pas d'Edge Function : les
    lectures/écritures passent directement par le SDK Supabase, protégées par
    RLS (voir supabase/migrations/20260807120000_questionnaires_lecture.sql).
 
@@ -159,9 +161,53 @@ const lfmQuestionnairesTeacher = (() => {
     return summaries;
   }
 
+  /* Rapport pour le hub "Résultats" enseignant (resultats-questionnaires-
+     enseignant.html) : mêmes questionnaires/résultats que ci-dessus, mais
+     restreints aux élèves d'UNE classe — un questionnaire n'appartenant à
+     aucune classe (voir commentaire en tête de fichier), le filtrage se
+     fait ici sur les résultats plutôt que sur getMyQuestionnaires(). Seuls
+     les questionnaires ayant au moins un résultat dans cette classe sont
+     conservés, pour ne pas lister toute la bibliothèque de l'enseignant à
+     chaque classe. */
+  async function getClassQuestionnaireReport(teacherId, classId) {
+    const [questionnaires, students, rows] = await Promise.all([
+      getMyQuestionnaires(teacherId),
+      lfmTeacher.getStudents(classId),
+      getResultsForMyQuestionnaires()
+    ]);
+
+    const authIds = new Set(students.map(s => s.auth_user_id).filter(Boolean));
+    const studentById = new Map(students.map(s => [s.auth_user_id, s]));
+    const classRows = rows.filter(r => authIds.has(r.student_id));
+    const summaries = groupResultsByQuestionnaire(questionnaires, classRows);
+
+    const perQuestionnaire = questionnaires
+      .map(q => {
+        const summary = summaries.get(q.id) || { count: 0, avgPct: null, students: [] };
+        return {
+          id: q.id,
+          titre: q.titre_oeuvre,
+          auteur: q.auteur_oeuvre,
+          count: summary.count,
+          avgPct: summary.avgPct,
+          students: summary.students
+            .map(r => ({
+              student: studentById.get(r.student_id),
+              score: r.score, total: r.total,
+              pct: Math.round(parseFloat(r.pct)),
+              completed_at: r.completed_at
+            }))
+            .filter(s => s.student)
+        };
+      })
+      .filter(q => q.count > 0);
+
+    return { perQuestionnaire };
+  }
+
   return {
     getMyQuestionnaires, getQuestionnaire, createQuestionnaire,
     updateQuestionnaireMeta, replaceQuestions, setStatut, setVisibilite, deleteQuestionnaire,
-    getResultsForMyQuestionnaires, groupResultsByQuestionnaire
+    getResultsForMyQuestionnaires, groupResultsByQuestionnaire, getClassQuestionnaireReport
   };
 })();

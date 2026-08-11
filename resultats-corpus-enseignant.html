@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/favicon/favicon.ico?v=1" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png?v=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png?v=1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/favicon-192x192.png?v=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512x512.png?v=1">
+  <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
+  <link rel="manifest" href="site.webmanifest?v=1">
+  <title>Résultats du corpus lexical — Espace enseignant — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/teacher.js?v=2"></script>
+  <script src="js/champ-lexical-teacher.js?v=4"></script>
+  <link rel="stylesheet" href="resultats-nav.css?v=2">
+  <script src="js/resultats-nav.js?v=2"></script>
+  <style>
+    .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
+    .dash-content { max-width: 900px; margin: 0 auto; }
+
+    .breadcrumb {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 24px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
+    }
+    .breadcrumb a { color: var(--blue); text-decoration: none; font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .bc-sep { color: var(--border); user-select: none; }
+    .bc-current { font-weight: 600; color: var(--text); }
+
+    .main-tabs {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      background: var(--card-bg); border-radius: 14px; box-shadow: var(--shadow-sm);
+      padding: 5px; margin-bottom: 20px; width: fit-content;
+    }
+    .main-tab {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: 10px;
+      font-family: inherit; font-size: 13px; font-weight: 700;
+      color: var(--muted); text-decoration: none;
+      transition: background 180ms, color 180ms;
+    }
+    .main-tab.is-active { background: var(--blue); color: #fff; }
+    .main-tab:hover:not(.is-active) { background: rgba(16,43,106,0.06); color: var(--blue); }
+
+    .section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+    .section-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text); }
+
+    .cl-filter-field { margin-bottom: 6px; }
+    .cl-filter-field label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+    select.cl-select {
+      border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 12px;
+      font-family: inherit; font-size: 14px; color: var(--text); background: var(--card-bg); min-width: 220px;
+    }
+
+    /* ── Vue à deux temps, même pattern que resultats-dictees-enseignant.html
+       et resultats-questionnaires-enseignant.html : 1) liste des champs
+       lexicaux avec résultats dans la classe, 2) au clic, détail par élève
+       (niveau, points, statut). ──────────────────────────────────────────── */
+    .cl-report-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
+    .empty-inline { color: var(--muted); font-size: 13px; padding: 8px 0; }
+
+    .cl-report-list-row {
+      display: flex; align-items: center; gap: 14px; padding: 15px 18px;
+      border: 1.5px solid var(--border); border-radius: 12px; margin-bottom: 10px;
+      background: var(--card-bg); cursor: pointer; transition: background 150ms, border-color 150ms;
+    }
+    .cl-report-list-row:hover, .cl-report-list-row:focus-visible { background: rgba(16,43,106,0.05); border-color: var(--blue); outline: none; }
+    .cl-report-list-title { flex: 1; font-weight: 700; font-size: 15px; color: var(--text); }
+    .cl-report-list-corpus { font-size: 12px; color: var(--muted); }
+    .cl-report-list-meta { font-size: 13px; color: var(--text); font-weight: 600; flex-shrink: 0; }
+    .cl-report-chevron { color: var(--blue); font-size: 18px; flex-shrink: 0; }
+
+    .cl-report-back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(16,43,106,0.06); color: var(--blue);
+      border: 1.5px solid rgba(16,43,106,0.2); border-radius: 10px;
+      padding: 9px 18px; font-family: inherit; font-size: 13.5px; font-weight: 700;
+      cursor: pointer; margin-bottom: 22px; transition: background 150ms;
+    }
+    .cl-report-back-btn:hover { background: rgba(16,43,106,0.12); }
+
+    .cl-report-detail-title { font-family: var(--font-display); font-size: 19px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+
+    .cl-report-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .cl-report-table th, .cl-report-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+    .cl-report-table th { font-size: 11px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); }
+    .cl-report-status--termine { color: #16a34a; font-weight: 700; }
+    .cl-report-status--en_cours { color: var(--muted); font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <div class="dash-wrap">
+    <div class="dash-content">
+
+      <nav class="breadcrumb" aria-label="Fil d'Ariane">
+        <a href="dashboard-enseignant.html">Espace enseignant</a>
+        <span class="bc-sep">›</span>
+        <a href="vocabulaire-corpus-enseignant.html">Corpus lexical</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-current">Résultats</span>
+      </nav>
+
+      <nav class="main-tabs" aria-label="Navigation espace enseignant">
+        <a class="main-tab" href="classes-enseignant.html">🏫 Mes classes</a>
+        <a class="main-tab" href="pilotage-enseignant.html">🎯 Pilotage des compétences</a>
+        <a class="main-tab" href="resultats-enseignant.html">📊 Résultats</a>
+        <a class="main-tab" href="remediations-enseignant.html">🧩 Remédiations</a>
+        <a class="main-tab" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
+        <a class="main-tab" href="dictees-enseignant.html">📖 Dictées préparées</a>
+        <a class="main-tab" href="questionnaires-enseignant.html">📚 Questionnaires de lecture</a>
+        <a class="main-tab is-active" href="vocabulaire-corpus-enseignant.html">🔤 Corpus lexical</a>
+      </nav>
+
+      <!-- Sous-navigation résultats -->
+      <div id="resultats-nav-mount"></div>
+      <script>
+        ResultatsNav.render(document.getElementById('resultats-nav-mount'), {
+          active: 'corpus',
+          items: {
+            general:        { href: 'resultats-enseignant.html' },
+            joggings:       { href: 'resultats-joggings-enseignant.html' },
+            dictees:        { href: 'resultats-dictees-enseignant.html' },
+            questionnaires: { href: 'resultats-questionnaires-enseignant.html' },
+            corpus:         { href: 'resultats-corpus-enseignant.html' },
+          }
+        });
+      </script>
+
+      <div class="section-header">
+        <h1 class="section-title">Résultats du corpus lexical</h1>
+      </div>
+
+      <div class="cl-filter-field" style="margin-bottom:20px;">
+        <label for="cl-class-select">Classe</label>
+        <select id="cl-class-select" class="cl-select"></select>
+      </div>
+
+      <div id="cl-stats-body"><div class="cl-report-empty">Chargement…</div></div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="js/menu.js"></script>
+  <script>
+    let _teacherProfile = null;
+    let _classes = [];
+    let _currentClassId = null;
+    let _currentReport = null; // { perChamp: [{ id, theme, corpusTitre, sessions }] }
+
+    function escHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    /* ── Vue 1 : liste des champs lexicaux ayant des résultats dans la
+       classe sélectionnée (ordre alphabétique, voir getClassSessionsReport). */
+    function renderReportList() {
+      const body = document.getElementById('cl-stats-body');
+      if (!_currentReport || _currentReport.perChamp.length === 0) {
+        body.innerHTML = '<div class="cl-report-empty">Aucun résultat pour l\'instant.</div>';
+        return;
+      }
+      body.innerHTML = _currentReport.perChamp.map((c, i) => `
+        <div class="cl-report-list-row" data-cl-idx="${i}" tabindex="0" role="button"
+             aria-label="Voir les résultats de ${escHtml(c.theme)}">
+          <div>
+            <div class="cl-report-list-title">${escHtml(c.theme)}</div>
+            <div class="cl-report-list-corpus">${escHtml(c.corpusTitre)}</div>
+          </div>
+          <div class="cl-report-list-meta">${c.sessions.length} résultat${c.sessions.length !== 1 ? 's' : ''}</div>
+          <div class="cl-report-chevron">›</div>
+        </div>
+      `).join('');
+      document.querySelectorAll('.cl-report-list-row').forEach(row => {
+        const idx = parseInt(row.dataset.clIdx, 10);
+        row.addEventListener('click', () => renderReportDetail(idx));
+        row.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); renderReportDetail(idx); }
+        });
+      });
+    }
+
+    /* ── Vue 2 : au clic sur un champ lexical, le détail par élève (niveau,
+       points, statut) — un élève peut apparaître sur plusieurs lignes, un
+       niveau étant suivi indépendamment (voir champ_lexical_sessions). ──── */
+    function renderReportDetail(idx) {
+      const c = _currentReport.perChamp[idx];
+      if (!c) return;
+      const body = document.getElementById('cl-stats-body');
+
+      const rows = [...c.sessions]
+        .sort((a, b) => a.student.display_name.localeCompare(b.student.display_name) || a.niveau - b.niveau)
+        .map(s => `
+          <tr>
+            <td>${escHtml(s.student.display_name)}</td>
+            <td>Niveau ${s.niveau}</td>
+            <td>${s.totalPoints}</td>
+            <td class="cl-report-status--${s.status}">${s.status === 'termine' ? 'Terminé' : 'En cours'}</td>
+          </tr>`)
+        .join('');
+
+      body.innerHTML = `
+        <button type="button" class="cl-report-back-btn" id="cl-report-back-btn">← Retour aux champs lexicaux</button>
+        <div class="cl-report-detail-title">${escHtml(c.theme)}</div>
+        ${rows
+          ? `<table class="cl-report-table">
+               <thead><tr><th>Élève</th><th>Niveau</th><th>Points</th><th>Statut</th></tr></thead>
+               <tbody>${rows}</tbody>
+             </table>`
+          : '<div class="empty-inline">Aucun élève n\'a encore de résultat pour ce champ lexical.</div>'}
+      `;
+      document.getElementById('cl-report-back-btn').addEventListener('click', renderReportList);
+    }
+
+    async function loadStats() {
+      if (!_currentClassId) return;
+      document.getElementById('cl-stats-body').innerHTML = '<div class="cl-report-empty">Chargement…</div>';
+      try {
+        _currentReport = await lfmChampLexicalTeacher.getClassSessionsReport(_teacherProfile.id, _currentClassId);
+      } catch (e) {
+        document.getElementById('cl-stats-body').innerHTML = `<div class="cl-report-empty">Erreur : ${escHtml(e.message)}</div>`;
+        return;
+      }
+      renderReportList();
+    }
+
+    async function init() {
+      _teacherProfile = await lfmAuth.requireRole('enseignant');
+      if (!_teacherProfile) return;
+
+      _classes = await lfmTeacher.getClasses();
+      const classSel = document.getElementById('cl-class-select');
+      if (_classes.length === 0) {
+        document.getElementById('cl-stats-body').innerHTML = '<div class="cl-report-empty">Crée d\'abord une classe dans « Mes classes ».</div>';
+        return;
+      }
+      classSel.innerHTML = _classes.map(c => `<option value="${c.id}">${escHtml(c.name)} (${escHtml(c.level)})</option>`).join('');
+
+      /* ?class= transmis depuis un lien croisé, sinon première classe. */
+      const classParam = new URLSearchParams(window.location.search).get('class');
+      _currentClassId = (classParam && _classes.some(c => c.id === classParam))
+        ? classParam
+        : _classes[0].id;
+      classSel.value = _currentClassId;
+
+      classSel.addEventListener('change', () => {
+        _currentClassId = classSel.value;
+        loadStats();
+      });
+
+      loadStats();
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,11 +1,13 @@
 /* ═══════════════════════════════════════════════════════════════════════
    Composant partagé — Sous-navigation "Résultats"
 
-   Barre de 3 pastilles (Général / Joggings d'écriture / Dictées préparées)
-   utilisée par le hub de résultats, côté enseignant (resultats-enseignant.html,
-   resultats-joggings-enseignant.html, resultats-dictees-enseignant.html) et
-   côté élève (dashboard-eleve.html, onglet "Mes résultats"). L'onglet actif
-   est en fond navy / texte blanc ; les autres en outline gris.
+   Barre de 5 pastilles (Général / Joggings d'écriture / Dictées préparées /
+   Questionnaires de lecture / Corpus lexical) utilisée par le hub de
+   résultats, côté enseignant (resultats-enseignant.html,
+   resultats-joggings-enseignant.html, resultats-dictees-enseignant.html,
+   resultats-questionnaires-enseignant.html, resultats-corpus-enseignant.html)
+   et côté élève (dashboard-eleve.html, onglet "Mes résultats"). L'onglet
+   actif est en fond navy / texte blanc ; les autres en outline gris.
 
    Chaque pastille pointe soit vers une page (config.items[key].href, rendu
    en <a>), soit déclenche un callback in-page (config.items[key].onClick,
@@ -20,9 +22,11 @@
 
 const ResultatsNav = (() => {
   const TABS = [
-    { key: 'general',  icon: '📊', label: 'Général' },
-    { key: 'joggings', icon: '✍️', label: "Joggings d'écriture" },
-    { key: 'dictees',  icon: '✏️', label: 'Dictées préparées' },
+    { key: 'general',        icon: '📊', label: 'Général' },
+    { key: 'joggings',       icon: '✍️', label: "Joggings d'écriture" },
+    { key: 'dictees',        icon: '✏️', label: 'Dictées préparées' },
+    { key: 'questionnaires', icon: '📚', label: 'Questionnaires de lecture' },
+    { key: 'corpus',         icon: '🔤', label: 'Corpus lexical' },
   ];
 
   function escapeHTML(str) {
@@ -34,8 +38,8 @@ const ResultatsNav = (() => {
   /**
    * @param {HTMLElement} mountEl  Point de montage — remplacé par la barre.
    * @param {object} config
-   * @param {'general'|'joggings'|'dictees'} config.active
-   * @param {object} config.items  { general: {href}|{onClick}, joggings: {...}, dictees: {...} }
+   * @param {'general'|'joggings'|'dictees'|'questionnaires'|'corpus'} config.active
+   * @param {object} config.items  { general: {href}|{onClick}, joggings: {...}, dictees: {...}, questionnaires: {...}, corpus: {...} }
    * @returns {HTMLElement} la barre insérée (à repasser à un futur appel de render()).
    */
   function render(mountEl, config = {}) {

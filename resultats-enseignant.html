@@ -17,14 +17,21 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=2"></script>
-  <script src="js/teacher-analytics.js?v=4"></script>
-  <script src="js/niveau-pastilles.js?v=1"></script>
+  <script src="js/teacher-analytics.js?v=6"></script>
+  <script src="js/niveau-pastilles.js?v=2"></script>
   <script src="js/level-badge.js?v=1"></script>
   <script src="js/bilan-nav.js?v=1"></script>
+  <!-- Sources de données réutilisées pour la synthèse PDF (dictées/corpus/
+       joggings) — voir printStudentBilan(), aucune de ces sections n'est
+       affichée à l'écran ici, uniquement à l'impression. -->
+  <script src="js/dictees-teacher.js?v=7"></script>
+  <script src="js/champ-lexical-teacher.js?v=4"></script>
+  <script src="js/jogging-data.js?v=1"></script>
+  <script src="js/jogging-teacher.js?v=1"></script>
   <link rel="stylesheet" href="laurels.css?v=5">
   <script src="js/laurels.js?v=7"></script>
-  <link rel="stylesheet" href="resultats-nav.css?v=1">
-  <script src="js/resultats-nav.js?v=1"></script>
+  <link rel="stylesheet" href="resultats-nav.css?v=2">
+  <script src="js/resultats-nav.js?v=2"></script>
   <style>
     /* ── Layout ──────────────────────────────────────────────────────────────── */
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
@@ -554,6 +561,45 @@
     .bulletin-qz-row .bqz-date  { font-size: 7.5pt; color: #9AA3B2; }
     .bulletin-qz-row .bqz-score { font-weight: 700; color: #1A2D6B; white-space: nowrap; }
 
+    /* 5ter. Dictées préparées — même présentation compacte que les
+       questionnaires ci-dessus (titre de section + une ligne par dictée). */
+    .bulletin-dictees { margin-bottom: 18px; }
+    .bulletin-dic-row {
+      display: flex; justify-content: space-between; gap: 10px;
+      font-size: 9pt; padding: 4px 0; border-bottom: 0.5pt solid #E8EDF3;
+    }
+    .bulletin-dic-row:last-child { border-bottom: none; }
+    .bulletin-dic-row .bdic-title { font-weight: 700; }
+    .bulletin-dic-row .bdic-score { font-weight: 700; color: #1A2D6B; white-space: nowrap; text-align: right; }
+
+    /* 5quater. Corpus lexical — une ligne par champ/niveau travaillé. */
+    .bulletin-corpus { margin-bottom: 18px; }
+    .bulletin-cl-row {
+      display: flex; justify-content: space-between; gap: 10px;
+      font-size: 9pt; padding: 4px 0; border-bottom: 0.5pt solid #E8EDF3;
+    }
+    .bulletin-cl-row:last-child { border-bottom: none; }
+    .bulletin-cl-row .bcl-title  { font-weight: 700; }
+    .bulletin-cl-row .bcl-niveau { font-weight: 400; color: #5F6368; }
+    .bulletin-cl-row .bcl-score  { font-weight: 700; color: #1A2D6B; white-space: nowrap; }
+
+    /* 5quinquies. Joggings d'écriture — une ligne par jogging terminé. */
+    .bulletin-jogging { margin-bottom: 18px; }
+    .bulletin-jog-row {
+      display: flex; justify-content: space-between; gap: 10px;
+      font-size: 9pt; padding: 4px 0; border-bottom: 0.5pt solid #E8EDF3;
+    }
+    .bulletin-jog-row:last-child { border-bottom: none; }
+    .bulletin-jog-row .bjog-title { font-weight: 700; }
+    .bulletin-jog-row .bjog-date  { font-size: 7.5pt; color: #9AA3B2; }
+    .bulletin-jog-row .bjog-score { font-weight: 700; color: #1A2D6B; white-space: nowrap; }
+
+    /* Une ligne ne doit jamais être coupée par un saut de page — les
+       sections elles-mêmes peuvent en revanche s'étaler sur plusieurs
+       pages si la liste est longue (même choix que .bulletin-jauges/
+       .bulletin-questionnaires, non contraintes non plus). */
+    .bulletin-qz-row, .bulletin-dic-row, .bulletin-cl-row, .bulletin-jog-row { break-inside: avoid; }
+
     /* 6. Pied de page */
     .bulletin-footer {
       display: flex; justify-content: space-between; gap: 12px;
@@ -669,6 +715,8 @@
             general:  { href: 'resultats-enseignant.html' },
             joggings: { href: 'resultats-joggings-enseignant.html' },
             dictees:  { href: 'resultats-dictees-enseignant.html' },
+            questionnaires: { href: 'resultats-questionnaires-enseignant.html' },
+            corpus:   { href: 'resultats-corpus-enseignant.html' },
           }
         });
       </script>
@@ -841,6 +889,7 @@
   /* ═══════════════════════════════════════════════════════════════════════════
      STATE
   ═══════════════════════════════════════════════════════════════════════════ */
+  let _teacherProfile = null;   // profil enseignant connecté — voir getStudentCorpusForPrint()
   let _classes        = [];
   let _currentClass   = null;   // { id, name, level, school_year, student_count }
   let _currentStudent = null;   // { auth_user_id, display_name, class_name }
@@ -922,6 +971,7 @@
   (async () => {
     const profile = await lfmAuth.requireRole('enseignant');
     if (!profile) return;
+    _teacherProfile = profile;
     document.title = 'Résultats — ' + profile.display_name + ' — LFM';
 
     try {
@@ -1699,15 +1749,109 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
+     SOURCES DE DONNÉES — Dictées / Corpus lexical / Joggings, pour la
+     synthèse PDF uniquement (aucune de ces sections n'est affichée à l'écran
+     dans la fiche élève). Chacune réutilise la fonction déjà en place pour
+     l'onglet correspondant du hub Résultats enseignant, sans dupliquer la
+     logique de récupération/agrégation — seul le filtrage sur l'élève
+     courant et la mise en forme compacte pour l'impression sont ajoutés ici.
+  ═══════════════════════════════════════════════════════════════════════════ */
+
+  /* Même donnée que resultats-dictees-enseignant.html, voir
+     js/dictees-teacher.js:getClassDicteeReport(classId). */
+  async function getStudentDicteesForPrint(classId, authUserId) {
+    if (!classId) return [];
+    try {
+      const { perDictee } = await lfmDicteesTeacher.getClassDicteeReport(classId);
+      return perDictee
+        .map(d => ({ titre: d.titre, entry: d.students.find(s => s.student.auth_user_id === authUserId) }))
+        .filter(d => d.entry);
+    } catch (e) {
+      console.warn('[LFM] getStudentDicteesForPrint:', e.message);
+      return [];
+    }
+  }
+  const GRAM_TYPE_LABELS_PRINT = { classification: 'Classification', trous: 'Texte à trous', transformation: 'Transformation' };
+
+  /* Même donnée que resultats-corpus-enseignant.html, voir
+     js/champ-lexical-teacher.js:getClassSessionsReport(teacherId, classId) —
+     une ligne par champ lexical ET par niveau (suivis indépendamment). */
+  async function getStudentCorpusForPrint(teacherId, classId, authUserId) {
+    if (!classId || !teacherId) return [];
+    try {
+      const { perChamp } = await lfmChampLexicalTeacher.getClassSessionsReport(teacherId, classId);
+      const rows = [];
+      perChamp.forEach(c => {
+        c.sessions
+          .filter(s => s.student.auth_user_id === authUserId)
+          .forEach(s => rows.push({ theme: c.theme, niveau: s.niveau, totalPoints: s.totalPoints, status: s.status }));
+      });
+      return rows;
+    } catch (e) {
+      console.warn('[LFM] getStudentCorpusForPrint:', e.message);
+      return [];
+    }
+  }
+
+  /* Même fetch que resultats-joggings-enseignant.html, voir
+     js/jogging-teacher.js:getStudentJoggings(authUserId). Le comptage des
+     feux verts (AUTO_CODES) reprend le même calcul que printStudentJoggingBilan()
+     de cette page — pas de fonction partagée existante pour ce petit tally,
+     réimplémenté ici en 5 lignes plutôt que d'importer tout le bilan PDF
+     joggings (mise en page/CSS multi-pages incompatible avec ce bulletin). */
+  const JOG_AUTO_CODES_PRINT = ['C', 'H', 'A', 'M', 'P', 'O', 'S'];
+  async function getStudentJoggingSummaryForPrint(authUserId) {
+    try {
+      const data = await lfmJoggingTeacher.getStudentJoggings(authUserId);
+      const completed = data.filter(d => d.session.status === 'completed');
+      if (completed.length === 0) return null;
+
+      let totalVerts = 0;
+      const rows = completed.map(d => {
+        const last = d.versions[d.versions.length - 1];
+        const verts = last ? JOG_AUTO_CODES_PRINT.filter(c => (last['feu_' + c.toLowerCase()] || 'blanc') === 'vert').length : 0;
+        totalVerts += verts;
+        const title = (typeof JOGGING_DATA !== 'undefined' && JOGGING_DATA[d.session.jogging_id])
+          ? JOGGING_DATA[d.session.jogging_id].title : d.session.jogging_id;
+        return { title, date: d.session.created_at, verts };
+      }).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      const tauxReussite = Math.round((totalVerts / (completed.length * JOG_AUTO_CODES_PRINT.length)) * 100);
+      return { count: completed.length, tauxReussite, rows };
+    } catch (e) {
+      console.warn('[LFM] getStudentJoggingSummaryForPrint:', e.message);
+      return null;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
      SYNTHÈSE PDF — reflet imprimable de la fiche élève à l'écran (identité,
      taux, couronne de lauriers, réussies/consolider, jauges domaine +
-     sous-domaine). Aucune requête ni recalcul : entièrement dérivé de
+     sous-domaine) complété par 4 sections absentes de l'écran (dictées,
+     questionnaires, corpus lexical, joggings), dans cet ordre. Bilan de
+     compétences : aucune requête ni recalcul, entièrement dérivé de
      _studentProfile (déjà calculé par renderStudentProfile) et du DOM déjà
      rendu (#laurels-root, cloné tel quel — pas de logique lauriers dupliquée).
+     Les 3 autres sections nouvelles sont récupérées à la demande, au clic
+     (pas de préchargement au rendu de la fiche élève, ces données n'étant
+     jamais affichées à l'écran) — voir les 3 fonctions ci-dessus.
   ═══════════════════════════════════════════════════════════════════════════ */
-  function printStudentBilan() {
+  async function printStudentBilan() {
     if (!_studentProfile) return;
     const profile = _studentProfile;
+
+    const printBtn = document.getElementById('print-student-btn');
+    const printBtnLabel = printBtn.textContent;
+    printBtn.disabled = true;
+    printBtn.textContent = 'Génération…';
+
+    const classId    = new URLSearchParams(window.location.search).get('class');
+    const authUserId = _currentStudent.auth_user_id;
+    const [dictees, corpusRows, joggingSummary] = await Promise.all([
+      getStudentDicteesForPrint(classId, authUserId),
+      getStudentCorpusForPrint(_teacherProfile?.id, classId, authUserId),
+      getStudentJoggingSummaryForPrint(authUserId)
+    ]);
 
     const name  = document.getElementById('student-header-name').textContent;
     const meta  = document.getElementById('student-header-meta').textContent;
@@ -1756,8 +1900,34 @@
     const jaugesHtml = lfmNiveauPastilles.renderTable(profile)
       || '<div style="font-size:9.5pt;color:#888">Pas assez de données.</div>';
 
+    /* Dictées préparées — même donnée que resultats-dictees-enseignant.html
+       (voir getStudentDicteesForPrint ci-dessus), filtrée sur l'élève. */
+    const dicteesHtml = dictees.length > 0 ? `
+      <div class="bulletin-dictees">
+        <div class="bulletin-jauges-title">Dictées préparées (${dictees.length})</div>
+        ${dictees.map(d => {
+          const gramParts = Object.entries(d.entry.gramByType)
+            .filter(([, pct]) => pct !== null)
+            .map(([type, pct]) => `${GRAM_TYPE_LABELS_PRINT[type]} : ${pct}%`);
+          const scoreParts = [
+            d.entry.lexicalPct !== null ? `Lexical : ${d.entry.lexicalPct}%` : null,
+            ...gramParts
+          ].filter(Boolean);
+          return `
+          <div class="bulletin-dic-row">
+            <div class="bdic-title">${escHtml(d.titre)}</div>
+            <div class="bdic-score">${scoreParts.join(' · ') || 'Aucun résultat'}</div>
+          </div>`;
+        }).join('')}
+      </div>` : `
+      <div class="bulletin-dictees">
+        <div class="bulletin-jauges-title">Dictées préparées</div>
+        <div style="font-size:9.5pt;color:#888">Aucun résultat pour l'instant.</div>
+      </div>`;
+
     /* Questionnaires de lecture — même donnée/logique que l'écran (voir
-       computeQuestionnairesSummary), simplement absente du PDF si vide. */
+       computeQuestionnairesSummary). Section toujours affichée, avec un
+       message dédié si vide (comme les 4 autres sections de la synthèse). */
     const qzSummary = computeQuestionnairesSummary(_studentRows);
     const qzHtml = qzSummary ? `
       <div class="bulletin-questionnaires">
@@ -1771,7 +1941,48 @@
             <div class="bqz-score">${r.score} / ${r.total} (${Math.round(r.pct)}%)</div>
           </div>
         `).join('')}
-      </div>` : '';
+      </div>` : `
+      <div class="bulletin-questionnaires">
+        <div class="bulletin-jauges-title">Questionnaires de lecture</div>
+        <div style="font-size:9.5pt;color:#888">Aucun résultat pour l'instant.</div>
+      </div>`;
+
+    /* Corpus lexical — même donnée que resultats-corpus-enseignant.html
+       (voir getStudentCorpusForPrint ci-dessus), une ligne par champ/niveau. */
+    const corpusHtml = corpusRows.length > 0 ? `
+      <div class="bulletin-corpus">
+        <div class="bulletin-jauges-title">Corpus lexical (${corpusRows.length})</div>
+        ${corpusRows.map(r => `
+          <div class="bulletin-cl-row">
+            <div class="bcl-title">${escHtml(r.theme)} <span class="bcl-niveau">— Niveau ${r.niveau}</span></div>
+            <div class="bcl-score">${r.totalPoints} pt${r.totalPoints > 1 ? 's' : ''}${r.status === 'termine' ? '' : ' (en cours)'}</div>
+          </div>
+        `).join('')}
+      </div>` : `
+      <div class="bulletin-corpus">
+        <div class="bulletin-jauges-title">Corpus lexical</div>
+        <div style="font-size:9.5pt;color:#888">Aucun résultat pour l'instant.</div>
+      </div>`;
+
+    /* Joggings d'écriture — même donnée que resultats-joggings-enseignant.html
+       (voir getStudentJoggingSummaryForPrint ci-dessus). */
+    const joggingHtml = joggingSummary ? `
+      <div class="bulletin-jogging">
+        <div class="bulletin-jauges-title">Joggings d'écriture — taux de réussite ${joggingSummary.tauxReussite}% (${joggingSummary.count})</div>
+        ${joggingSummary.rows.map(r => `
+          <div class="bulletin-jog-row">
+            <div>
+              <span class="bjog-title">${escHtml(r.title)}</span>
+              <span class="bjog-date"> — ${new Date(r.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+            </div>
+            <div class="bjog-score">${r.verts} / ${JOG_AUTO_CODES_PRINT.length}</div>
+          </div>
+        `).join('')}
+      </div>` : `
+      <div class="bulletin-jogging">
+        <div class="bulletin-jauges-title">Joggings d'écriture</div>
+        <div style="font-size:9.5pt;color:#888">Aucun résultat pour l'instant.</div>
+      </div>`;
 
     const html = `<div class="bulletin-page">
       <div class="bulletin-header">
@@ -1819,7 +2030,13 @@
         ${jaugesHtml}
       </div>
 
+      ${dicteesHtml}
+
       ${qzHtml}
+
+      ${corpusHtml}
+
+      ${joggingHtml}
 
       <div class="bulletin-footer">
         <span>proficiamus.eu</span>
@@ -1831,6 +2048,9 @@
     document.body.classList.add('printing-bulletin');
     window.print();
     document.body.classList.remove('printing-bulletin');
+
+    printBtn.disabled = false;
+    printBtn.textContent = printBtnLabel;
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════

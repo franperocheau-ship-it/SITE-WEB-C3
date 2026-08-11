@@ -1,9 +1,11 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    champ-lexical-teacher.js — Accès aux données du module Corpus lexical /
    Champ lexical côté enseignant (Phase 2 : création, édition, fork). Dépend
-   de : supabase-client.js (window.lfmDb).
+   de : supabase-client.js (window.lfmDb) ; getClassSessionsReport() dépend
+   en plus de js/teacher.js (lfmTeacher).
 
-   Utilisé par vocabulaire-corpus-enseignant.html. Pas d'Edge Function : les
+   Utilisé par vocabulaire-corpus-enseignant.html et resultats-corpus-
+   enseignant.html. Pas d'Edge Function : les
    lectures/écritures passent directement par le SDK Supabase, protégées par
    RLS (voir supabase/migrations/20260809120000_corpus_lexicaux.sql — les
    policies insert/update/delete auteur-ou-admin y existaient déjà depuis la
@@ -164,10 +166,58 @@ const lfmChampLexicalTeacher = (() => {
     return forked;
   }
 
+  /* Rapport pour le hub "Résultats" enseignant (resultats-corpus-
+     enseignant.html) : mêmes sessions que loadResultats() de
+     vocabulaire-corpus-enseignant.html (Phase 1, non dupliquée ici),
+     regroupées par champ lexical et restreintes aux élèves d'UNE classe. */
+  async function getClassSessionsReport(teacherId, classId) {
+    const [mesChamps, bibliotheque, students] = await Promise.all([
+      getMyChamps(teacherId),
+      getSharedChamps(teacherId),
+      lfmTeacher.getStudents(classId)
+    ]);
+
+    const champById = new Map([...mesChamps, ...bibliotheque].map(c => [c.id, c]));
+    const authIds = students.map(s => s.auth_user_id).filter(Boolean);
+    const studentById = new Map(students.map(s => [s.auth_user_id, s]));
+
+    if (authIds.length === 0) return { perChamp: [] };
+
+    const { data: sessions, error } = await db.from('champ_lexical_sessions')
+      .select('id, student_id, champ_id, niveau, status, total_points, completed_at')
+      .in('student_id', authIds)
+      .order('completed_at', { ascending: false });
+    if (error) throw error;
+
+    const byChamp = new Map();
+    (sessions || []).forEach(s => {
+      const student = studentById.get(s.student_id);
+      const champ = champById.get(s.champ_id);
+      if (!student || !champ) return;
+      if (!byChamp.has(s.champ_id)) byChamp.set(s.champ_id, { champ, sessions: [] });
+      byChamp.get(s.champ_id).sessions.push({
+        student, niveau: s.niveau, status: s.status,
+        totalPoints: s.total_points, completed_at: s.completed_at
+      });
+    });
+
+    const perChamp = Array.from(byChamp.values())
+      .map(({ champ, sessions }) => ({
+        id: champ.id,
+        theme: champ.theme,
+        corpusTitre: champ.corpus_lexicaux ? champ.corpus_lexicaux.titre : '',
+        sessions
+      }))
+      .sort((a, b) => a.theme.localeCompare(b.theme));
+
+    return { perChamp };
+  }
+
   return {
     CATEGORIES,
     getCorpusOptions, createCorpus,
     getMyChamps, getSharedChamps, getChampFull,
-    createChamp, updateChampMeta, replaceMots, deleteChamp, forkChamp
+    createChamp, updateChampMeta, replaceMots, deleteChamp, forkChamp,
+    getClassSessionsReport
   };
 })();

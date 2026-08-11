@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="laurels.css?v=5">
   <link rel="stylesheet" href="css/jogging.css?v=1">
   <link rel="stylesheet" href="css/jogging-print.css?v=1">
-  <link rel="stylesheet" href="css/dictees.css?v=1">
+  <link rel="stylesheet" href="css/dictees.css?v=12">
   <link rel="stylesheet" href="css/niveau-pastilles.css?v=1">
   <link rel="stylesheet" href="css/champ-lexical.css?v=4">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -24,8 +24,8 @@
   <script src="js/guided-access.js?v=1"></script>
   <script src="data/index.js?v=2"></script>
   <script src="js/exercise-catalog.js?v=6"></script>
-  <script src="js/teacher-analytics.js?v=4"></script>
-  <script src="js/niveau-pastilles.js?v=1"></script>
+  <script src="js/teacher-analytics.js?v=6"></script>
+  <script src="js/niveau-pastilles.js?v=2"></script>
   <script src="js/laurels.js?v=7"></script>
   <script src="js/jogging-data.js?v=1"></script>
   <script src="js/jogging-badges.js?v=1"></script>
@@ -33,10 +33,10 @@
   <script src="js/dictees-badges.js?v=1"></script>
   <script src="js/carnet-widget.js?v=2"></script>
   <script src="js/jogging-student-space.js?v=1"></script>
-  <script src="js/dictees-student-space.js?v=1"></script>
-  <script src="js/vocab-student-space.js?v=2"></script>
-  <link rel="stylesheet" href="resultats-nav.css?v=1">
-  <script src="js/resultats-nav.js?v=1"></script>
+  <script src="js/dictees-student-space.js?v=2"></script>
+  <script src="js/vocab-student-space.js?v=3"></script>
+  <link rel="stylesheet" href="resultats-nav.css?v=2">
+  <script src="js/resultats-nav.js?v=2"></script>
   <style>
     .dash-wrap {
       min-height: calc(100vh - 88px - 74px);
@@ -552,43 +552,6 @@
           <div id="niveaux-content"></div>
         </div>
 
-        <!-- Mes questionnaires de lecture — détail par questionnaire, la
-             moyenne générale alimente aussi "Lecture — Compréhension de
-             lecture" ci-dessus (Points forts/À consolider, Bilan par
-             compétences), via competenceInfoFor(). -->
-        <div class="dash-section" id="section-questionnaires" style="display:none">
-          <div class="dash-section-title">Mes questionnaires de lecture</div>
-          <div class="dash-stats" id="qz-dash-stats" style="margin-bottom:18px;">
-            <div class="dash-stat">
-              <div class="dash-stat-label">Moyenne générale</div>
-              <div class="dash-stat-value" id="qz-stat-avg">—<span class="dash-stat-unit">%</span></div>
-            </div>
-            <div class="dash-stat">
-              <div class="dash-stat-label">Questionnaires passés</div>
-              <div class="dash-stat-value" id="qz-stat-total">0</div>
-            </div>
-          </div>
-          <div id="qz-dash-list"></div>
-        </div>
-
-        <!-- Module Corpus lexical : stats + carnet de mots personnel, voir
-             js/vocab-student-space.js. -->
-        <div class="dash-section" id="section-vocabulaire" style="display:none">
-          <div class="dash-section-title">Corpus lexical</div>
-          <div class="dash-stats" style="margin-bottom:18px;">
-            <div class="dash-stat">
-              <div class="dash-stat-label">Niveaux terminés</div>
-              <div class="dash-stat-value" id="vocab-stat-champs">0</div>
-            </div>
-            <div class="dash-stat">
-              <div class="dash-stat-label">Points cumulés</div>
-              <div class="dash-stat-value" id="vocab-stat-points">0</div>
-            </div>
-          </div>
-          <div class="dash-section-title" style="font-size:14px;">Mon carnet de mots</div>
-          <div id="vocab-carnet-list"></div>
-        </div>
-
         <!-- État vide (premier usage) -->
         <div class="dash-section" id="section-empty" style="display:none">
           <div class="dash-empty">
@@ -605,6 +568,52 @@
         </div>
 
       </div><!-- /res-sub-general -->
+
+      <!-- ── Sous-section : Questionnaires de lecture — détail par
+           questionnaire, la moyenne générale alimente aussi "Lecture —
+           Compréhension de lecture" dans l'onglet Général (Points forts/À
+           consolider, Bilan par compétences), via competenceInfoFor() sur
+           les mêmes lignes exercise_results. ── -->
+      <div id="res-sub-questionnaires" style="display:none">
+
+        <div class="dash-section" id="section-questionnaires" style="display:none">
+          <div class="dash-section-title">Mes questionnaires de lecture</div>
+          <div class="dash-stats" id="qz-dash-stats" style="margin-bottom:18px;">
+            <div class="dash-stat">
+              <div class="dash-stat-label">Moyenne générale</div>
+              <div class="dash-stat-value" id="qz-stat-avg">—<span class="dash-stat-unit">%</span></div>
+            </div>
+            <div class="dash-stat">
+              <div class="dash-stat-label">Questionnaires passés</div>
+              <div class="dash-stat-value" id="qz-stat-total">0</div>
+            </div>
+          </div>
+          <div id="qz-dash-list"></div>
+        </div>
+
+      </div><!-- /res-sub-questionnaires -->
+
+      <!-- ── Sous-section : Corpus lexical — stats + carnet de mots
+           personnel, voir js/vocab-student-space.js. ── -->
+      <div id="res-sub-corpus" style="display:none">
+
+        <div class="dash-section" id="section-vocabulaire" style="display:none">
+          <div class="dash-section-title">Corpus lexical</div>
+          <div class="dash-stats" style="margin-bottom:18px;">
+            <div class="dash-stat">
+              <div class="dash-stat-label">Niveaux terminés</div>
+              <div class="dash-stat-value" id="vocab-stat-champs">0</div>
+            </div>
+            <div class="dash-stat">
+              <div class="dash-stat-label">Points cumulés</div>
+              <div class="dash-stat-value" id="vocab-stat-points">0</div>
+            </div>
+          </div>
+          <div class="dash-section-title" style="font-size:14px;">Mon carnet de mots</div>
+          <div id="vocab-carnet-list"></div>
+        </div>
+
+      </div><!-- /res-sub-corpus -->
 
       <!-- ── Sous-section : Joggings d'écriture ── -->
       <div id="res-sub-joggings" style="display:none">
@@ -701,6 +710,12 @@
           </div>
         </div>
 
+        <!-- Mes dictées — détail par dictée (lexical + orthographe grammaticale) -->
+        <div class="dash-section" id="dic-dash-mesdictees-section" style="display:none">
+          <div class="dash-section-title">Mes dictées</div>
+          <div id="dic-dash-mesdictees-list"></div>
+        </div>
+
         <!-- Mon évolution -->
         <div class="dash-section" id="dic-dash-evolution-section" style="display:none">
           <div class="dash-section-title">Mon évolution</div>
@@ -766,13 +781,17 @@
   <script>
     /* ── Tabs ─────────────────────────────────────────────────────────────── */
     const TAB_KEY = 'dash-active-tab';
-    const RES_SUB_KEY = 'dash-resultats-sub';
 
     /* Profil courant, mémorisé pour permettre un refetch de l'onglet
        "Mes résultats" (résultats + lauriers) sans recharger toute la page —
        voir refreshResultsTab() plus bas. */
     let _profile   = null;
-    let _currentResSub = sessionStorage.getItem(RES_SUB_KEY) || 'general';
+    /* Onglet actif du hub "Mes résultats" : jamais persisté (ni sessionStorage
+       ni localStorage) — chaque arrivée/retour sur la page rouvre toujours
+       "Général", même si un autre onglet était consulté avant. Navigation
+       normale en cours de visite (clic sur un onglet) inchangée : voir
+       activateResultsSub() ci-dessous. */
+    let _currentResSub = 'general';
     let _resNavBar = null;
     let _catalogMap = null; /* lfmAnalytics.buildCatalogMap(), mémorisé — voir renderDashboard() */
 
@@ -792,8 +811,9 @@
       if (tabName === 'resultats' && _profile) activateResultsSub(_currentResSub);
     }
 
-    /* ── Hub "Mes résultats" (Général / Joggings / Dictées) ──────────────────
-       Sous-navigation partagée (resultats-nav) qui bascule entre 3 sections
+    /* ── Hub "Mes résultats" (Général / Joggings / Dictées / Questionnaires
+       de lecture / Corpus lexical) ────────────────────────────────────────
+       Sous-navigation partagée (resultats-nav) qui bascule entre 5 sections
        internes, sans rechargement de page — mêmes IDs qu'avant la fusion des
        anciens onglets "Mes joggings d'écriture" / "Mes dictées préparées",
        donc JoggingStudentSpace.render()/DicteesStudentSpace.render() n'ont
@@ -803,25 +823,30 @@
       _resNavBar = ResultatsNav.render(mount, {
         active: _currentResSub,
         items: {
-          general:  { onClick: () => activateResultsSub('general') },
-          joggings: { onClick: () => activateResultsSub('joggings') },
-          dictees:  { onClick: () => activateResultsSub('dictees') },
+          general:        { onClick: () => activateResultsSub('general') },
+          joggings:       { onClick: () => activateResultsSub('joggings') },
+          dictees:        { onClick: () => activateResultsSub('dictees') },
+          questionnaires: { onClick: () => activateResultsSub('questionnaires') },
+          corpus:         { onClick: () => activateResultsSub('corpus') },
         }
       });
     }
 
     function activateResultsSub(sub) {
       _currentResSub = sub;
-      sessionStorage.setItem(RES_SUB_KEY, sub);
       renderResultsNav();
-      document.getElementById('res-sub-general').style.display  = sub === 'general'  ? '' : 'none';
-      document.getElementById('res-sub-joggings').style.display = sub === 'joggings' ? '' : 'none';
-      document.getElementById('res-sub-dictees').style.display  = sub === 'dictees'  ? '' : 'none';
+      document.getElementById('res-sub-general').style.display        = sub === 'general'        ? '' : 'none';
+      document.getElementById('res-sub-joggings').style.display       = sub === 'joggings'       ? '' : 'none';
+      document.getElementById('res-sub-dictees').style.display        = sub === 'dictees'        ? '' : 'none';
+      document.getElementById('res-sub-questionnaires').style.display = sub === 'questionnaires' ? '' : 'none';
+      document.getElementById('res-sub-corpus').style.display         = sub === 'corpus'         ? '' : 'none';
 
       if (!_profile) return;
-      if (sub === 'general')  refreshResultsTab();
-      if (sub === 'joggings') JoggingStudentSpace.render(_profile.id);
-      if (sub === 'dictees')  DicteesStudentSpace.render(_profile.id);
+      if (sub === 'general')        refreshResultsTab();
+      if (sub === 'joggings')       JoggingStudentSpace.render(_profile.id);
+      if (sub === 'dictees')        DicteesStudentSpace.render(_profile.id);
+      if (sub === 'questionnaires') refreshQuestionnairesTab();
+      if (sub === 'corpus')         VocabStudentSpace.renderSection(_profile.id);
     }
 
     /* Le paramètre ?tab= (utilisé par le fil d'Ariane, "🏠 Mon espace")
@@ -836,31 +861,37 @@
     /* Rendu immédiat de la sous-navigation résultats (pastilles) — son
        contenu dépend de _profile et sera (re)chargé par activateResultsSub()
        une fois le profil disponible (cf. IIFE d'initialisation plus bas). */
-    document.getElementById('res-sub-general').style.display  = _currentResSub === 'general'  ? '' : 'none';
-    document.getElementById('res-sub-joggings').style.display = _currentResSub === 'joggings' ? '' : 'none';
-    document.getElementById('res-sub-dictees').style.display  = _currentResSub === 'dictees'  ? '' : 'none';
+    document.getElementById('res-sub-general').style.display        = _currentResSub === 'general'        ? '' : 'none';
+    document.getElementById('res-sub-joggings').style.display       = _currentResSub === 'joggings'       ? '' : 'none';
+    document.getElementById('res-sub-dictees').style.display        = _currentResSub === 'dictees'        ? '' : 'none';
+    document.getElementById('res-sub-questionnaires').style.display = _currentResSub === 'questionnaires' ? '' : 'none';
+    document.getElementById('res-sub-corpus').style.display         = _currentResSub === 'corpus'         ? '' : 'none';
     renderResultsNav();
 
-    /* ── Table de correspondance slug → compétence/domaine ───────────────────
+    /* ── Table de correspondance slug → compétence/domaine/titre ─────────────
        La colonne `category` de exercise_results n'est pas fiable (saveExerciseResult
        l'enregistre à 'général' la plupart du temps) : la compétence réelle vient
        du catalogue, comme pour les badges de laurels (voir buildLaurelNotionMap
-       dans js/laurels.js). Ici on garde le nom de compétence complet (pas juste
-       le préfixe de notion) pour un regroupement plus fin. ───────────────────── */
+       dans js/laurels.js). `title` est gardé séparément de `competence` (bucket) :
+       une compétence du catalogue peut regrouper plusieurs exercices (ex.
+       "Pronoms personnels" = 3 exercices), et computeCompetenceStats() doit
+       afficher l'intitulé exact de CHAQUE exercice, jamais le libellé de
+       compétence — voir exerciseTitleFor() dans js/teacher-analytics.js,
+       réutilisé ici plutôt que dupliqué. ───────────────────────────────────── */
     function buildCompetenceMap() {
       const map = new Map();
 
       if (typeof EXERCISE_DATA !== 'undefined') {
         Object.keys(EXERCISE_DATA).forEach(slug => {
           const ex = EXERCISE_DATA[slug];
-          map.set(slug, { competence: ex.competence, domaine: ex.domaine });
+          map.set(slug, { competence: ex.competence, domaine: ex.domaine, title: ex.title || null });
         });
       }
 
       if (typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined') {
         EXERCISE_CATALOG_AUTONOMOUS.forEach(({ slug, title, category, subCategory }) => {
           if (!map.has(slug)) {
-            map.set(slug, { competence: subCategory + ' — ' + title, domaine: category });
+            map.set(slug, { competence: subCategory + ' — ' + title, domaine: category, title });
           }
         });
       }
@@ -881,39 +912,45 @@
       if (!_catalogMap) _catalogMap = lfmAnalytics.buildCatalogMap();
       const meta = lfmAnalytics.metaFor(_catalogMap, slug);
       if (!meta || meta.competence === 'Exercice retiré du catalogue') return null;
-      return { competence: meta.competence, domaine: meta.domaine };
+      return { competence: meta.competence, domaine: meta.domaine, title: meta.title };
     }
 
+    /* Clé par exercise_slug (et non par compétence/bucket) : "Mes points
+       forts"/"À consolider en priorité" doivent lister des exercices avec
+       leur intitulé exact, jamais le libellé générique d'une compétence qui
+       peut en regrouper plusieurs — même principe que le "Bilan par
+       compétences" (lfmAnalytics.computeStudentProfile), voir aussi
+       aggregateByCompetence() côté enseignant/admin. */
     function computeCompetenceStats(results) {
       const competenceMap = buildCompetenceMap();
-      const byCompetence = new Map();
+      const bySlug = new Map();
 
       for (const r of results) {
         const info = competenceInfoFor(competenceMap, r.exercise_slug);
         if (!info) continue; /* slug hors catalogue : ignoré, comme pour les badges */
 
-        let entry = byCompetence.get(info.competence);
+        let entry = bySlug.get(r.exercise_slug);
         if (!entry) {
-          entry = { competence: info.competence, domaine: info.domaine, count: 0, sumPct: 0 };
-          byCompetence.set(info.competence, entry);
+          entry = { title: lfmAnalytics.exerciseTitleFor(info.title, r), domaine: info.domaine, count: 0, sumPct: 0 };
+          bySlug.set(r.exercise_slug, entry);
         }
         entry.count++;
         entry.sumPct += parseFloat(r.pct);
       }
 
-      return Array.from(byCompetence.values()).map(e => ({
+      return Array.from(bySlug.values()).map(e => ({
         ...e,
         avg: Math.round(e.sumPct / e.count)
       }));
     }
 
-    /* ── Rendu d'une ligne de compétence (barre colorée selon le domaine) ────── */
+    /* ── Rendu d'une ligne d'exercice (barre colorée selon le domaine) ──────── */
     function renderCompetenceRow(entry) {
       const barCls = entry.domaine === 'Mathématiques' ? 'bar-mathematiques' : 'bar-francais';
       return `
         <div class="competence-row">
           <div class="competence-row-top">
-            <span class="competence-name">${entry.competence}</span>
+            <span class="competence-name">${escHtml(entry.title)}</span>
             <span class="competence-meta">${entry.avg} %</span>
           </div>
           <div class="competence-bar-bg">
@@ -926,7 +963,12 @@
        générale en tête. Filtré sur le préfixe de exercise_slug plutôt que
        sur `category` (voir commentaire de buildCompetenceMap ci-dessus, la
        colonne n'est pas fiable) — chaque tentative reste une ligne
-       distincte (pas de dédoublonnage), pour un historique complet. ────── */
+       distincte (pas de dédoublonnage), pour un historique complet.
+       Appelé par refreshQuestionnairesTab() (onglet dédié), indépendamment
+       du calcul de "Lecture — Compréhension de lecture" dans le Bilan par
+       compétences de l'onglet Général, qui continue de lire l'intégralité
+       de exercise_results via computeCompetenceStats()/computeStudentProfile()
+       plus bas. ────────────────────────────────────────────────────────── */
     function renderQuestionnairesSection(results) {
       const section = document.getElementById('section-questionnaires');
       const qzResults = results
@@ -949,6 +991,23 @@
           <div class="qz-hist-score">${r.score} / ${r.total}<br><span style="font-size:12px;font-weight:600;color:var(--muted);">${Math.round(r.pct)} %</span></div>
         </div>
       `).join('');
+    }
+
+    /* ── Rechargement de l'onglet "Questionnaires de lecture" — ne fetch que
+       les lignes utiles (préfixe questionnaire-lecture-) plutôt que tout
+       exercise_results comme refreshResultsTab(), même filtre que côté
+       enseignant (js/questionnaires-teacher.js:getResultsForMyQuestionnaires). ── */
+    async function refreshQuestionnairesTab() {
+      if (!_profile) return;
+
+      const { data: results, error } = await window.lfmDb
+        .from('exercise_results')
+        .select('*')
+        .like('exercise_slug', 'questionnaire-lecture-%')
+        .order('completed_at', { ascending: false });
+
+      if (error) console.warn('[LFM] refreshQuestionnairesTab:', error.message);
+      renderQuestionnairesSection(results || []);
     }
 
     /* ── Rendu du dashboard ────────────────────────────────────────────────── */
@@ -1003,12 +1062,6 @@
         ? weaknesses.map(renderCompetenceRow).join('')
         : '<div class="dash-empty" style="padding:8px 0;">Pas encore de résultat.</div>';
       document.getElementById('section-weaknesses').style.display = '';
-
-      /* ── Mes questionnaires de lecture (détail + moyenne) ── */
-      renderQuestionnairesSection(results);
-
-      /* ── Module Corpus lexical (stats + carnet de mots) ── */
-      if (typeof VocabStudentSpace !== 'undefined') VocabStudentSpace.renderSection(profile.id);
 
       /* ── Bilan par compétences (pastilles) ── même composant que la fiche
          élève côté enseignant et la synthèse PDF, voir js/niveau-pastilles.js.

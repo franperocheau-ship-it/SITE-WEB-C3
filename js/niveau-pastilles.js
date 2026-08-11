@@ -1,9 +1,10 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    niveau-pastilles.js — Rendu partagé du "Bilan par compétences" : arborescence
-   Domaine > Sous-domaine > Compétence, une pastille par niveau scolaire
-   (Niveau 1/2/3), colorée + % si travaillée, grise vide sinon. Ne montre que
-   ce qui a été effectivement travaillé — aucune ligne pour un sous-domaine
-   jamais abordé.
+   Domaine > Sous-domaine > Exercice (intitulé exact, une compétence du
+   catalogue pouvant regrouper plusieurs exercices), une pastille par niveau
+   scolaire (Niveau 1/2/3), colorée + % si travaillée, grise vide sinon. Ne
+   montre que ce qui a été effectivement travaillé — aucune ligne pour un
+   sous-domaine jamais abordé.
 
    Pure fonction de rendu (pas de DOM, pas de réseau) : reçoit un `profile`
    déjà calculé par lfmAnalytics.computeStudentProfile() (js/teacher-analytics.js,
@@ -40,7 +41,7 @@ const lfmNiveauPastilles = (() => {
 
   function renderCompetenceRow(c) {
     return `<tr class="bjt-comp">
-      <td>${escHtml(c.compLabel)}</td>
+      <td>${escHtml(c.title)}</td>
       ${lfmAnalytics.JAUGE_LEVELS.map(level => {
         const pct   = c.levels[level];
         const label = NIVEAU_LABEL[level] || level;

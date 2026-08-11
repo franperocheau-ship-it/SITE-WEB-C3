@@ -91,6 +91,23 @@ const lfmAnalytics = (() => {
     return rule ? rule.meta : null;
   }
 
+  /* ── Titre d'affichage d'un exercice individuel ──────────────────────────
+     Jamais le libellé de compétence (bucket, ex. "Grammaire — L'adjectif") :
+     une compétence du catalogue peut regrouper plusieurs exercices (ex.
+     "Pronoms personnels" = 3 exercices), et tout affichage par exercice
+     (bilan par compétences, compétences à consolider/réussies, points forts
+     élève, tops/flops classe et plateforme) doit montrer l'intitulé exact de
+     CET exercice. Priorité : titre catalogue (EXERCISE_DATA) → titre brut
+     stocké sur la ligne de résultat (exercise_title) → slug humanisé en
+     dernier recours. Exportée pour être réutilisée telle quelle par
+     dashboard-eleve.html (computeCompetenceStats), qui a son propre registre
+     slug→catalogue mais doit appliquer la même règle plutôt que d'en
+     dupliquer une variante. */
+  function exerciseTitleFor(catalogTitle, row) {
+    const raw = catalogTitle || row.exercise_title || row.exercise_slug.replace(/-/g, ' ');
+    return raw.charAt(0).toUpperCase() + raw.slice(1);
+  }
+
   function splitCompetence(competence) {
     const sep = competence.indexOf(' — ');
     return {
@@ -263,23 +280,31 @@ const lfmAnalytics = (() => {
     });
   }
 
-  /* ── Agrégation par compétence : moyenne + volume ─────────────────────────
+  /* ── Agrégation par exercice : moyenne + volume ────────────────────────────
      Factorisé pour être utilisé à la fois par computeClassOverview (vue
      classe) et computeCompetenceStats (vue plateforme, admin) — même forme
-     { domaine, competence, avgPct, attemptCount, studentCount } par
-     compétence, à partir de `best` (dédoublonné élève × exercice). */
+     { domaine, competence, avgPct, attemptCount, studentCount } par ligne,
+     à partir de `best` (dédoublonné élève × exercice). Champ `competence`
+     conservé par nom pour ne pas retoucher les templates appelants, mais
+     contient désormais l'intitulé exact de l'exercice (exerciseTitleFor),
+     jamais le libellé de compétence du catalogue : une compétence peut
+     regrouper plusieurs exercices (ex. "Pronoms personnels" = 3 exercices),
+     donc la clé d'agrégation est exercise_slug et non plus compLabel — même
+     principe que niveauAggByComp/compAgg dans computeStudentProfile(). */
   function aggregateByCompetence(best, catalogMap) {
     const compAgg = new Map();
     best.forEach(r => {
       const meta = metaFor(catalogMap, r.exercise_slug);
-      const key  = meta.domaine + '||' + meta.sousDomaine + '||' + meta.compLabel;
-      if (!compAgg.has(key)) compAgg.set(key, { meta, sum: 0, count: 0, students: new Set() });
+      const key  = meta.domaine + '||' + meta.sousDomaine + '||' + r.exercise_slug;
+      if (!compAgg.has(key)) {
+        compAgg.set(key, { meta, title: exerciseTitleFor(meta.title, r), sum: 0, count: 0, students: new Set() });
+      }
       const agg = compAgg.get(key);
       agg.sum += r.pct; agg.count++; agg.students.add(r.student_id);
     });
     return Array.from(compAgg.values()).map(agg => ({
       domaine: agg.meta.domaine,
-      competence: agg.meta.competence,
+      competence: agg.title,
       avgPct: Math.round(agg.sum / agg.count),
       attemptCount: agg.count,
       studentCount: agg.students.size
@@ -409,18 +434,24 @@ const lfmAnalytics = (() => {
     const best        = dedupeBestBySlug(rows);
     const bestByNiveau = dedupeBestByNiveau(rows, catalogMap);
 
-    /* ── Détail par niveau scolaire (CM1/CM2/6e) pour chaque compétence ────
+    /* ── Détail par niveau scolaire (CM1/CM2/6e) pour chaque exercice ──────
        Réutilise bestByNiveau (déjà calculé pour les jauges) plutôt que de
        relire les rows brutes ; chaque niveau reste indépendant (moyenne des
-       meilleurs pct des exercices résolus à ce niveau pour cette
-       compétence), sans déduction depuis un niveau supérieur. Alimente à la
-       fois consolider/reussies (champ `levels`) et l'arborescence des jauges
-       sous-domaine (champ `competences`, voir plus bas). */
+       meilleurs pct des exercices résolus à ce niveau), sans déduction
+       depuis un niveau supérieur. Alimente à la fois consolider/reussies
+       (champ `levels`) et l'arborescence des jauges sous-domaine (champ
+       `competences`, voir plus bas). Clé par exercise_slug (et non par
+       compLabel) : une compétence du catalogue peut regrouper plusieurs
+       exercices (ex. "Pronoms personnels" = 3 exercices) et le tableau
+       "Bilan par compétences" affiche l'intitulé exact de chaque exercice
+       (exerciseTitleFor) plutôt que le libellé générique de la compétence. */
     const niveauAggByComp = new Map();
     bestByNiveau.forEach(r => {
       const meta = metaFor(catalogMap, r.exercise_slug);
-      const key  = meta.domaine + '||' + meta.sousDomaine + '||' + meta.compLabel;
-      if (!niveauAggByComp.has(key)) niveauAggByComp.set(key, { meta, byLevel: {} });
+      const key  = meta.domaine + '||' + meta.sousDomaine + '||' + r.exercise_slug;
+      if (!niveauAggByComp.has(key)) {
+        niveauAggByComp.set(key, { meta, title: exerciseTitleFor(meta.title, r), byLevel: {} });
+      }
       const byLevel = niveauAggByComp.get(key).byLevel;
       if (!byLevel[r.niveau]) byLevel[r.niveau] = { sum: 0, count: 0 };
       byLevel[r.niveau].sum += r.pct;
@@ -456,20 +487,22 @@ const lfmAnalytics = (() => {
     computeSousDomaineRates(rows, catalogMap).forEach(({ domaine, sousDomaine }) => {
       if (!sousDomaineJauges[domaine]) sousDomaineJauges[domaine] = [];
       const matchFn = m => m.domaine === domaine && m.sousDomaine === sousDomaine;
-      /* Compétences de ce sous-domaine effectivement travaillées (au moins
-         un niveau résolu dans bestByNiveau) — pour le détail par pastilles
-         du bulletin, une ligne par compétence sous chaque sous-domaine. */
+      /* Exercices de ce sous-domaine effectivement travaillés (au moins un
+         niveau résolu dans bestByNiveau) — pour le détail par pastilles du
+         bulletin, une ligne par exercice (intitulé exact) sous chaque
+         sous-domaine, plutôt qu'une ligne par compétence du catalogue
+         (qui peut regrouper plusieurs exercices, voir niveauAggByComp). */
       const competences = [];
       niveauAggByComp.forEach((entry, key) => {
         if (entry.meta.domaine === domaine && entry.meta.sousDomaine === sousDomaine) {
           competences.push({
-            compLabel: entry.meta.compLabel,
+            title: entry.title,
             competence: entry.meta.competence,
             levels: levelsPctFor(key)
           });
         }
       });
-      competences.sort((a, b) => a.compLabel.localeCompare(b.compLabel, 'fr'));
+      competences.sort((a, b) => a.title.localeCompare(b.title, 'fr'));
       sousDomaineJauges[domaine].push({
         sousDomaine,
         exerciseCount: countExercisesTravailles(bestByNiveau, catalogMap, matchFn),
@@ -481,7 +514,13 @@ const lfmAnalytics = (() => {
 
     /* ── Compétences à consolider / réussies ──────────────────────────────
        Consolider : moyenne ≤60% OU échec répété (≥2 tentatives sur un même
-       exercice sans jamais atteindre 80%). Réussies : moyenne ≥80%. */
+       exercice sans jamais atteindre 80%). Réussies : moyenne ≥80%.
+       Clé par exercise_slug (même principe que niveauAggByComp ci-dessus,
+       et même clé exacte) — pas par compLabel : une compétence du catalogue
+       peut regrouper plusieurs exercices, chacun listé séparément avec son
+       propre titre (exerciseTitleFor) plutôt que fusionnés sous le libellé
+       générique de la compétence. La clé doit correspondre exactement à
+       celle de niveauAggByComp pour que `levels` ci-dessous ne soit pas vide. */
     const attemptsBySlug = new Map();
     rows.forEach(r => {
       if (!attemptsBySlug.has(r.exercise_slug)) attemptsBySlug.set(r.exercise_slug, []);
@@ -491,26 +530,24 @@ const lfmAnalytics = (() => {
     const compAgg = new Map();
     best.forEach(r => {
       const meta = metaFor(catalogMap, r.exercise_slug);
-      const key  = meta.domaine + '||' + meta.sousDomaine + '||' + meta.compLabel;
-      if (!compAgg.has(key)) compAgg.set(key, { meta, sum: 0, count: 0, slugs: [] });
+      const key  = meta.domaine + '||' + meta.sousDomaine + '||' + r.exercise_slug;
+      if (!compAgg.has(key)) compAgg.set(key, { meta, slug: r.exercise_slug, title: exerciseTitleFor(meta.title, r), sum: 0, count: 0 });
       const agg = compAgg.get(key);
-      agg.sum += r.pct; agg.count++; agg.slugs.push(r.exercise_slug);
+      agg.sum += r.pct; agg.count++;
     });
 
     const consolider = [];
     const reussies    = [];
     compAgg.forEach((agg, key) => {
       const avgPct = agg.sum / agg.count;
-      const hasRepeatedFailure = agg.slugs.some(slug => {
-        const attempts = attemptsBySlug.get(slug) || [];
-        return attempts.length >= 2 && Math.max(...attempts) < SUCCESS_THRESHOLD;
-      });
+      const attempts = attemptsBySlug.get(agg.slug) || [];
+      const hasRepeatedFailure = attempts.length >= 2 && Math.max(...attempts) < SUCCESS_THRESHOLD;
       const entry = {
         domaine: agg.meta.domaine,
-        competence: agg.meta.competence,
+        competence: agg.title,
         avgPct: Math.round(avgPct),
         hasRepeatedFailure,
-        exampleSlug: agg.slugs[0],
+        exampleSlug: agg.slug,
         levels: levelsPctFor(key)
       };
       if (avgPct <= 60 || hasRepeatedFailure) consolider.push(entry);
@@ -578,6 +615,6 @@ const lfmAnalytics = (() => {
     SUCCESS_THRESHOLD, JAUGE_LEVELS, DOMAIN_ORDER, MIN_STUDENTS_COMP,
     buildCatalogMap, dedupeBestBySlug, computeSousDomaineRates,
     computeClassOverview, computeStudentProfile, computeCompetenceStats,
-    metaFor
+    metaFor, exerciseTitleFor
   };
 })();

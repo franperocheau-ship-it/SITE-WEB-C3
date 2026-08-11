@@ -2,8 +2,8 @@
    vocab-student-space.js — Sections dashboard-eleve.html du module
    Corpus lexical / Champ lexical (Phase 1) : bandeau de réactivation espacée
    (#tab-exercices) + section vocabulaire (stats + carnet de mots, dans
-   #res-sub-general). Dépend de : supabase-client.js (window.lfmDb),
-   js/carnet-widget.js.
+   l'onglet dédié #res-sub-corpus du hub "Mes résultats"). Dépend de :
+   supabase-client.js (window.lfmDb), js/carnet-widget.js.
    ───────────────────────────────────────────────────────────────────────────── */
 
 const VocabStudentSpace = (() => {

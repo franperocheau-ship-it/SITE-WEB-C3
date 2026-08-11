@@ -8,8 +8,11 @@
    élève (dashboard-eleve.html?tab=exercices — voir la lecture du paramètre
    `tab` dans dashboard-eleve.html, prioritaire sur le dernier onglet
    mémorisé en sessionStorage). « Choisir la matière » renvoie vers
-   visiteur.html (sélecteur Français/Mathématiques) et est toujours présent,
-   qu'une matière ait pu être déduite ou non. Les maillons Choisir la
+   visiteur.html (sélecteur Français/Mathématiques) ; ce maillon n'a de sens
+   qu'en mode visiteur (pas encore de compte identifié), il est donc masqué
+   dès qu'une session élève/enseignant est détectée (via lfmAuth.getSession()
+   — voir hideChooseSubjectIfLoggedIn()) et reste affiché sinon (visiteur
+   anonyme, ou auth.js absent/pas encore chargé). Les maillons Choisir la
    matière, Matière et Catégorie sont cliquables ; le dernier maillon (page
    courante) ne l'est jamais.
 
@@ -94,8 +97,8 @@ const Breadcrumb = (() => {
     bar.innerHTML = `
       <div class="bc-inner">
         <a href="${HOME_HREF}" class="bc-home">🏠 <span class="bc-home-label">Mon espace</span></a>
-        <span class="bc-sep">›</span>
-        <a class="bc-link" href="${CHOOSE_SUBJECT.href}">${escapeHTML(CHOOSE_SUBJECT.label)}</a>
+        <span class="bc-sep" id="bc-sep-choose">›</span>
+        <a class="bc-link" id="bc-link-choose" href="${CHOOSE_SUBJECT.href}">${escapeHTML(CHOOSE_SUBJECT.label)}</a>
         <span class="bc-sep" id="bc-sep-subj"${subject ? '' : ' hidden'}>›</span>
         <a class="bc-link" id="bc-link-subject" href="${subject ? subject.href : '#'}"${subject ? '' : ' hidden'}>${subject ? escapeHTML(subject.label) : ''}</a>
         <span class="bc-sep" id="bc-sep-cat"${category ? '' : ' hidden'}>›</span>
@@ -107,6 +110,41 @@ const Breadcrumb = (() => {
       </div>
     `;
     document.body.insertBefore(bar, document.body.firstChild);
+    hideChooseSubjectIfLoggedIn();
+  }
+
+  /* Masque « Choisir la matière » dès qu'une session (élève ou enseignant)
+     est détectée — ce maillon ne concerne que le visiteur anonyme. Reste
+     affiché en cas d'erreur réseau (repli côté visiteur, jamais de
+     rupture).
+
+     render() est appelé par un <script> inline situé n'importe où dans le
+     <body> selon les pages (parfois avant, parfois après supabase-client.js
+     et auth.js dans le HTML) : `lfmAuth` peut donc ne pas encore exister au
+     moment de l'appel. On attend DOMContentLoaded — qui ne se déclenche
+     qu'une fois tous les <script> synchrones du document exécutés — avant
+     de tester sa présence, pour ne jamais dépendre de l'ordre des balises
+     d'une page à l'autre. */
+  function hideChooseSubjectIfLoggedIn() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', doCheck, { once: true });
+    } else {
+      doCheck();
+    }
+
+    async function doCheck() {
+      if (typeof lfmAuth === 'undefined') return;
+      try {
+        const session = await lfmAuth.getSession();
+        if (!session) return;
+        const link = document.getElementById('bc-link-choose');
+        const sep  = document.getElementById('bc-sep-choose');
+        if (link) link.hidden = true;
+        if (sep)  sep.hidden  = true;
+      } catch (err) {
+        console.warn('[Breadcrumb] hideChooseSubjectIfLoggedIn():', err.message);
+      }
+    }
   }
 
   /** À appeler après render() une fois la catégorie connue (ex: après résolution du slug dans exercise.html). */

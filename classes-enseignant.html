@@ -658,7 +658,6 @@
       <!-- Sous-onglets (cachés en vue détail) -->
       <div class="page-tabs" id="page-tabs">
         <button class="page-tab" id="tab-classes" onclick="navigate({})">Mes classes</button>
-        <button class="page-tab" id="tab-eleves"  onclick="navigate({view:'eleves'})">Mes élèves</button>
       </div>
 
       <!-- ────────────────────────────────────────────────────────────────────
@@ -674,33 +673,6 @@
           <div class="empty-icon">🏫</div>
           <div class="empty-text">Aucune classe pour l'instant.</div>
           <button class="btn btn-primary" onclick="openModalClass()">Créer ma première classe</button>
-        </div>
-      </div>
-
-      <!-- ────────────────────────────────────────────────────────────────────
-           VUE : TOUS LES ÉLÈVES
-      ──────────────────────────────────────────────────────────────────────── -->
-      <div id="view-eleves" style="display:none">
-        <div class="section-header">
-          <span class="section-title">Tous mes élèves</span>
-        </div>
-        <div class="table-wrap" id="all-students-wrap" style="display:none">
-          <table class="students-table">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Identifiant</th>
-                <th>Mot de passe</th>
-                <th>Classe</th>
-              </tr>
-            </thead>
-            <tbody id="all-students-tbody"></tbody>
-          </table>
-        </div>
-        <div id="empty-eleves" class="empty-state" style="display:none">
-          <div class="empty-icon">👤</div>
-          <div class="empty-text">Aucun élève pour l'instant.</div>
-          <p style="font-size:13px;color:var(--muted)">Créez d'abord une classe, puis ajoutez vos élèves.</p>
         </div>
       </div>
 
@@ -739,9 +711,7 @@
           <span class="section-title">Élèves</span>
           <div class="section-actions">
             <button class="btn btn-outline btn-sm" onclick="openModalGroups()">👥 Gérer les groupes</button>
-            <button class="btn btn-ghost btn-sm" id="btn-print" onclick="printCredentials()">🖨 Imprimer</button>
-            <button class="btn btn-ghost btn-sm" id="btn-pdf"   onclick="downloadPDF()">📄 PDF</button>
-            <button class="btn btn-ghost btn-sm" id="btn-csv"   onclick="doExportCSV()">⬇ CSV</button>
+            <button class="btn btn-ghost btn-sm" id="btn-pdf"   onclick="downloadPDF()">📄 Télécharger étiquettes identifiants</button>
             <button class="btn btn-outline btn-sm" onclick="openModalBulk()">+ Ajout en masse</button>
             <button class="btn btn-primary btn-sm" onclick="openModalAddStudent()">+ Ajouter un élève</button>
           </div>
@@ -1030,7 +1000,6 @@
   let _classes          = [];
   let _currentClass     = null;
   let _students         = [];
-  let _allStudents      = [];
   let _editingClassId   = null;
   let _editingStudentId = null;
   let _movingStudentId  = null;
@@ -1075,16 +1044,11 @@
   async function applyView() {
     const p       = new URLSearchParams(window.location.search);
     const classId = p.get('class');
-    const view    = p.get('view');
 
     hideAll();
 
     if (classId) {
       await showDetail(classId);
-    } else if (view === 'eleves') {
-      setTab('eleves');
-      updateBreadcrumb('eleves');
-      await showEleves();
     } else {
       setTab('classes');
       updateBreadcrumb('classes');
@@ -1093,7 +1057,7 @@
   }
 
   function hideAll() {
-    ['view-classes', 'view-eleves', 'view-detail'].forEach(id => {
+    ['view-classes', 'view-detail'].forEach(id => {
       document.getElementById(id).style.display = 'none';
     });
   }
@@ -1101,7 +1065,6 @@
   function setTab(which) {
     document.getElementById('page-tabs').style.display = 'flex';
     document.getElementById('tab-classes').classList.toggle('is-active', which === 'classes');
-    document.getElementById('tab-eleves').classList.toggle('is-active', which === 'eleves');
   }
 
   function updateBreadcrumb(which) {
@@ -1116,7 +1079,7 @@
       cls.style.display  = 'inline';
       cls.textContent    = _currentClass.name;
     } else {
-      sec.textContent    = which === 'eleves' ? 'Mes élèves' : 'Mes classes';
+      sec.textContent    = 'Mes classes';
       sec.onclick        = null;
       sep2.style.display = 'none';
       cls.style.display  = 'none';
@@ -1174,45 +1137,6 @@
   });
 
   /* ═══════════════════════════════════════════════════════════════════════════
-     VUE : TOUS LES ÉLÈVES
-  ═══════════════════════════════════════════════════════════════════════════ */
-  async function showEleves() {
-    try {
-      _allStudents = await lfmTeacher.getAllStudents();
-    } catch (e) {
-      showToast('Erreur lors du chargement des élèves', 'error');
-    }
-    renderAllStudents();
-    document.getElementById('view-eleves').style.display = 'block';
-  }
-
-  function renderAllStudents() {
-    const wrap  = document.getElementById('all-students-wrap');
-    const empty = document.getElementById('empty-eleves');
-    const tbody = document.getElementById('all-students-tbody');
-    if (_allStudents.length === 0) {
-      wrap.style.display  = 'none';
-      empty.style.display = 'block';
-      return;
-    }
-    empty.style.display = 'none';
-    wrap.style.display  = 'block';
-    tbody.innerHTML = _allStudents.map(s => {
-      const clsCell = s.classes
-        ? `<span class="badge badge-${badgeClass(s.classes.level)}">${esc(s.classes.level)}</span> ${esc(s.classes.name)}`
-        : '<em style="color:var(--muted)">Sans classe</em>';
-      return `
-        <tr>
-          <td class="td-name">${esc(s.display_name)}</td>
-          <td><span class="td-cred">${esc(s.username)}</span></td>
-          <td><span class="td-cred">${esc(s.password)}</span></td>
-          <td>${clsCell}</td>
-        </tr>
-      `;
-    }).join('');
-  }
-
-  /* ═══════════════════════════════════════════════════════════════════════════
      VUE : DÉTAIL CLASSE
   ═══════════════════════════════════════════════════════════════════════════ */
   async function showDetail(classId) {
@@ -1268,9 +1192,7 @@
       `${_students.length} élève${_students.length !== 1 ? 's' : ''}`;
 
     const hasStudents = _students.length > 0;
-    document.getElementById('btn-print').disabled = !hasStudents;
     document.getElementById('btn-pdf').disabled   = !hasStudents;
-    document.getElementById('btn-csv').disabled   = !hasStudents;
 
     if (!hasStudents) {
       wrap.style.display  = 'none';
@@ -1867,10 +1789,11 @@
   /* ═══════════════════════════════════════════════════════════════════════════
      IMPRESSION & EXPORT
   ═══════════════════════════════════════════════════════════════════════════ */
-  function downloadPDF() {
+  async function downloadPDF() {
     if (!_students.length || !window.jspdf) return;
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const logo = await _getLabelLogo();
 
     const PAGE_W = 210, PAGE_H = 297;
     const MX = 12, MY = 12;
@@ -1882,9 +1805,6 @@
     const SCHOOL    = 'Lycée Français de Madrid';
     const className = _currentClass.name + ' — ' + _currentClass.school_year;
     const today     = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
-    const LOGIN_URL = window.location.origin
-      + (window.location.pathname.replace(/\/[^/]*$/, '') || '')
-      + '/auth.html';
 
     // ── En-tête compact (page 1 uniquement) ──
     doc.setFont('helvetica', 'bold');
@@ -1913,7 +1833,7 @@
         }
         firstRow = false;
       }
-      _drawLabel(doc, MX + col * (LABEL_W + COL_GAP), labelY, LABEL_W, LABEL_H, s, LOGIN_URL);
+      _drawLabel(doc, MX + col * (LABEL_W + COL_GAP), labelY, LABEL_W, LABEL_H, s, logo);
     });
 
     // ── Numéros de page ──
@@ -1930,7 +1850,7 @@
     doc.save(filename);
   }
 
-  function _drawLabel(doc, x, y, w, h, student, loginUrl) {
+  function _drawLabel(doc, x, y, w, h, student, logo) {
     // Bordure pointillée
     doc.setLineDash([1.5, 1.5], 0);
     doc.setDrawColor(50, 50, 50);
@@ -1979,17 +1899,35 @@
     doc.setLineWidth(0.25);
     doc.line(x + 3, y + h - 10, x + w - 3, y + h - 10);
 
-    // URL de connexion
+    // Logo Proficiamus + site, centrés
+    if (logo) {
+      const logoW = 30;
+      const logoH = logoW * (logo.h / logo.w);
+      doc.addImage(logo.dataUrl, 'PNG', x + (w - logoW) / 2, y + h - 8.5, logoW, logoH);
+    }
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.5);
     doc.setTextColor(110, 110, 110);
-    doc.text('Connexion : ' + loginUrl, x + 4, y + h - 4.5);
+    doc.text('www.proficiamus.eu', x + w / 2, y + h - 1.5, { align: 'center' });
   }
 
-  function printCredentials() {
-    if (!_students.length) return;
-    buildLabelZone(_students, `Identifiants — ${_currentClass.name} (${_currentClass.school_year})`);
-    window.print();
+  let _labelLogoPromise = null;
+  function _getLabelLogo() {
+    if (!_labelLogoPromise) {
+      _labelLogoPromise = new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width  = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          canvas.getContext('2d').drawImage(img, 0, 0);
+          resolve({ dataUrl: canvas.toDataURL('image/png'), w: img.naturalWidth, h: img.naturalHeight });
+        };
+        img.onerror = reject;
+        img.src = 'assets/proficiamuspetit.png';
+      }).catch(() => null);
+    }
+    return _labelLogoPromise;
   }
 
   function printOneCred() {
@@ -2000,11 +1938,6 @@
     };
     buildPrintZone([student], 'Identifiant élève — LFM');
     window.print();
-  }
-
-  function doExportCSV() {
-    if (!_students.length) return;
-    lfmTeacher.exportCSV(_students, _currentClass.name);
   }
 
   function buildPrintZone(students, title) {
@@ -2024,24 +1957,6 @@
           `).join('')}
         </tbody>
       </table>
-    `;
-  }
-
-  function buildLabelZone(students, title) {
-    const loginUrl = window.location.origin + (window.location.pathname.replace(/\/[^/]*$/, '') || '') + '/auth.html';
-    const cards = students.map(s => `
-      <div class="label-card">
-        <span class="label-scissors">✂</span>
-        <div class="label-name">${esc(s.display_name)}</div>
-        <div class="label-field">Identifiant :<span class="label-value">${esc(s.username)}</span></div>
-        <div class="label-field">Code :<span class="label-value">${esc(s.password)}</span></div>
-        <div class="label-url">Connexion : ${loginUrl}</div>
-      </div>
-    `).join('');
-    document.getElementById('print-zone').innerHTML = `
-      <div class="label-print-title">${esc(title)}</div>
-      <div class="label-print-sub">Lycée Français de Madrid — ${new Date().toLocaleDateString('fr-FR')}</div>
-      <div class="label-sheet">${cards}</div>
     `;
   }
 

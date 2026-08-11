@@ -175,7 +175,7 @@ const lfmAdmin = (() => {
     while (true) {
       const { data, error } = await db
         .from('exercise_results')
-        .select('student_id, exercise_slug, pct')
+        .select('student_id, exercise_slug, exercise_title, pct')
         .order('completed_at', { ascending: false })
         .range(offset, offset + PAGE - 1);
       if (error) throw error;
