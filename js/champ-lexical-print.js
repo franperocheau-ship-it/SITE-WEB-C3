@@ -28,7 +28,13 @@ const ChampLexicalPrint = (() => {
     soutenu: 'rouge', familier: 'rouge'
   };
 
-  const CATEGORIE_ORDER = ['synonyme', 'antonyme', 'adjectif', 'derive', 'expression', 'soutenu', 'familier'];
+  // Ordre propre à l'affiche imprimée (indépendant de NIVEAU_CATEGORIES dans
+  // champ-lexical-engine.js, qui pilote une progression pédagogique par
+  // niveau, pas une mise en page) : expression est la seule catégorie en
+  // pleine largeur (voir clp-categorie--full ci-dessous) — la placer en
+  // dernier évite qu'elle ne casse une ligne de 3 colonnes en cours de
+  // remplissage.
+  const CATEGORIE_ORDER = ['synonyme', 'antonyme', 'adjectif', 'derive', 'soutenu', 'familier', 'expression'];
 
   function escapeHtml(str) {
     const div = document.createElement('div');
@@ -39,13 +45,17 @@ const ChampLexicalPrint = (() => {
   function categorieBlockHtml(categorie, mots) {
     if (!mots || mots.length === 0) return '';
     const accent = CATEGORIE_ACCENT[categorie] || 'or';
+    // Seule catégorie à porter un exemple de phrase par mot — trop long pour
+    // une colonne étroite, occupe toute la largeur de la grille (voir
+    // .clp-categorie--full dans champ-lexical-print.css).
+    const fullCls = categorie === 'expression' ? ' clp-categorie--full' : '';
     const motsHtml = mots.map(m => `
       <div class="clp-mot">
         <span class="clp-mot-text">${escapeHtml(m.mot)}</span>
         ${m.exemple_phrase ? `<span class="clp-mot-exemple">${escapeHtml(m.exemple_phrase)}</span>` : ''}
       </div>`).join('');
     return `
-      <div class="clp-categorie clp-categorie--${accent}">
+      <div class="clp-categorie clp-categorie--${accent}${fullCls}">
         <div class="clp-categorie-title">${escapeHtml(CATEGORIE_LABELS[categorie] || categorie)}</div>
         <div class="clp-mots-grid">${motsHtml}</div>
       </div>`;
@@ -61,11 +71,11 @@ const ChampLexicalPrint = (() => {
     return `
       <div class="clp-page">
         <div class="clp-header">
-          <img src="${LOGO_SRC}" alt="Proficiamus" class="clp-logo">
           <div>
             <div class="clp-header-corpus">${escapeHtml(data.corpusTitre || '')}</div>
             <div class="clp-header-theme">${escapeHtml(data.theme)}</div>
           </div>
+          <img src="${LOGO_SRC}" alt="Proficiamus" class="clp-logo">
         </div>
         ${data.contextualisation ? `<div class="clp-contexte">${escapeHtml(data.contextualisation)}</div>` : ''}
         <div class="clp-categories">${categoriesHtml}</div>

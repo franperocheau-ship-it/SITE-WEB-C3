@@ -19,6 +19,7 @@
 .clp-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 14pt;
   border-bottom: 2.5pt solid #1A2D6B;
   padding-bottom: 10pt;
@@ -41,7 +42,7 @@
 
 .clp-categories {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10pt 16pt;
 }
 
@@ -53,6 +54,16 @@
 }
 .clp-categorie--turquoise { border-left-color: #1DBFA0; }
 .clp-categorie--rouge     { border-left-color: #D62839; }
+
+/* Expressions/proverbes : seule catégorie à porter un exemple de phrase par
+   mot (CATEGORIE_HAS_EXEMPLE dans js/champ-lexical-engine.js) — trop long
+   pour une colonne étroite, reste sur toute la largeur. */
+.clp-categorie--full { grid-column: 1 / -1; }
+.clp-categorie--full .clp-mots-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4pt 20pt;
+}
 
 .clp-categorie-title {
   font-family: 'Fredoka', sans-serif;
@@ -88,20 +99,28 @@ body.printing-cl-affiche #cl-print-root { display: block !important; }
   }
 
   /* Liste blanche plutôt que liste noire (voir commentaire détaillé dans
-     jogging-print.css) : masque tout ce qui n'est pas #cl-print-root. */
+     jogging-print.css) : masque tout ce qui n'est pas #cl-print-root.
+     vocabulaire-corpus-enseignant.html utilise .dash-wrap/.dash-content
+     (pas .page-wrap/.page-content) — les deux variantes sont listées ici,
+     comme dans jogging-print.css, qui sert la même mécanique à des pages
+     utilisant l'une ou l'autre convention de wrapper. C'était l'oubli de la
+     variante .dash-* qui laissait toute la page visible à l'impression. */
   body.printing-cl-affiche .navbar,
   body.printing-cl-affiche footer,
   body.printing-cl-affiche .bc-bar,
-  body.printing-cl-affiche .page-content > *:not(#cl-print-root) {
+  body.printing-cl-affiche .page-content > *:not(#cl-print-root),
+  body.printing-cl-affiche .dash-content > *:not(#cl-print-root) {
     display: none !important;
   }
 
-  body.printing-cl-affiche .page-wrap {
+  body.printing-cl-affiche .page-wrap,
+  body.printing-cl-affiche .dash-wrap {
     padding: 0;
     background: #fff;
     min-height: unset;
   }
-  body.printing-cl-affiche .page-content {
+  body.printing-cl-affiche .page-content,
+  body.printing-cl-affiche .dash-content {
     max-width: 100%;
     padding: 0;
   }
