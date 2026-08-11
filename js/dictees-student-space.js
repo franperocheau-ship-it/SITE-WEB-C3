@@ -18,14 +18,98 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 const DicteesStudentSpace = (() => {
+  const GRAM_TYPE_LABELS = { classification: 'Classification', trous: 'Texte à trous', transformation: 'Transformation' };
+
   function formatDate(iso) {
     return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+  }
+
+  function escHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function pillClassFor(pct) {
+    if (pct >= 80) return 'dic-mydictees-pill--good';
+    if (pct >= 50) return 'dic-mydictees-pill--ok';
+    return 'dic-mydictees-pill--low';
+  }
+
+  /* La dernière tentative par clé (dictée, ou dictée+type pour le
+     grammatical) — un élève peut refaire une dictée plusieurs fois, seule la
+     plus récente est affichée dans la liste "Mes dictées". */
+  function latestByKey(rows, keyFn) {
+    const map = new Map();
+    rows.forEach(r => {
+      const k = keyFn(r);
+      const prev = map.get(k);
+      if (!prev || new Date(r.completed_at) > new Date(prev.completed_at)) map.set(k, r);
+    });
+    return map;
+  }
+
+  /* ── Liste "Mes dictées" — une ligne par dictée faite, avec le résultat
+     lexical (ex.1) ET les résultats grammaticaux (un par type tenté), pour
+     que l'élève retrouve d'un coup d'œil ce qu'il a fait sur CETTE dictée
+     précise plutôt que des moyennes globales (voir §3 du retour utilisateur :
+     structure auparavant confuse, mélangeait tout). */
+  async function renderMesDictees(studentId, lexicalResults) {
+    const section = document.getElementById('dic-dash-mesdictees-section');
+    const list = document.getElementById('dic-dash-mesdictees-list');
+    if (!section || !list) return;
+
+    let gramResults = [];
+    if (window.lfmDb) {
+      const { data, error } = await window.lfmDb
+        .from('dictee_gram_results').select('*').eq('student_id', studentId).limit(2000);
+      if (!error) gramResults = data || [];
+    }
+
+    const ex1 = lexicalResults.filter(r => r.exercice === 1);
+    const dicteeIds = [...new Set([...ex1.map(r => r.dictee_id), ...gramResults.map(r => r.dictee_id)])];
+    if (dicteeIds.length === 0) { section.style.display = 'none'; return; }
+
+    let titresById = new Map();
+    if (window.lfmDb) {
+      const { data, error } = await window.lfmDb.from('dictees').select('id,titre').in('id', dicteeIds);
+      if (!error) titresById = new Map((data || []).map(d => [d.id, d.titre]));
+    }
+
+    const lexLatest = latestByKey(ex1, r => r.dictee_id);
+    const gramLatest = latestByKey(gramResults, r => r.dictee_id + '|' + r.type);
+
+    const rows = dicteeIds.map(id => {
+      const lex = lexLatest.get(id);
+      const gramTypes = ['classification', 'trous', 'transformation']
+        .map(type => gramLatest.get(id + '|' + type))
+        .filter(Boolean);
+      const lastActivity = [lex, ...gramTypes].filter(Boolean)
+        .reduce((max, r) => Math.max(max, new Date(r.completed_at).getTime()), 0);
+      return { id, titre: titresById.get(id) || '—', lex, gramTypes, lastActivity };
+    }).sort((a, b) => b.lastActivity - a.lastActivity);
+
+    list.innerHTML = rows.map(r => {
+      const lexPill = r.lex
+        ? `<span class="dic-mydictees-pill ${pillClassFor(Math.round(r.lex.score / r.lex.total * 100))}">Lexical : ${Math.round(r.lex.score / r.lex.total * 100)}%</span>`
+        : '';
+      const gramPills = r.gramTypes.map(g => {
+        const pct = Math.round(g.score / g.total * 100);
+        return `<span class="dic-mydictees-pill ${pillClassFor(pct)}">${GRAM_TYPE_LABELS[g.type]} : ${pct}%</span>`;
+      }).join('');
+      return `
+        <div class="dic-mydictees-row">
+          <div class="dic-mydictees-title">${escHtml(r.titre)}</div>
+          <div class="dic-mydictees-pills">${lexPill}${gramPills}</div>
+        </div>`;
+    }).join('');
+    section.style.display = '';
   }
 
   async function render(studentId) {
     const statsEl = document.getElementById('dic-dash-stats');
     const emptySection = document.getElementById('dic-dash-empty-section');
     const evoSection = document.getElementById('dic-dash-evolution-section');
+    const mesDicteesSection = document.getElementById('dic-dash-mesdictees-section');
     const badgesGrid = document.getElementById('dic-dash-badges-grid');
     if (!statsEl || !window.lfmDb || !studentId) return;
 
@@ -33,10 +117,14 @@ const DicteesStudentSpace = (() => {
       .from('dictee_results').select('*').eq('student_id', studentId).limit(2000);
     const safeResults = (error || !results) ? [] : results;
 
+    await renderMesDictees(studentId, safeResults);
+
     if (safeResults.length === 0) {
       statsEl.style.display = 'none';
       if (evoSection) evoSection.style.display = 'none';
-      emptySection.style.display = '';
+      /* mesDicteesSection reste piloté par renderMesDictees (peut avoir des
+         résultats grammaticaux même sans aucun résultat lexical). */
+      emptySection.style.display = mesDicteesSection && mesDicteesSection.style.display !== 'none' ? 'none' : '';
       if (badgesGrid && typeof DicteesBadges !== 'undefined') {
         badgesGrid.innerHTML = renderBadgesGrid(await DicteesBadges.syncBadges(studentId, []));
       }

@@ -17,8 +17,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=2"></script>
-  <script src="js/dictees-teacher.js?v=2"></script>
-  <script src="js/dictees-colors.js?v=1"></script>
+  <script src="js/dictees-teacher.js?v=6"></script>
   <style>
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
     .dash-content { max-width: 960px; margin: 0 auto; }
@@ -83,7 +82,7 @@
     .dic-form-title { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--blue); margin-bottom: 16px; }
     .dic-form-label { display: block; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; margin-top: 16px; }
     .dic-form-label:first-child { margin-top: 0; }
-    .dic-form-hint { font-size: 12px; color: var(--muted); margin-top: 4px; margin-bottom: 0; }
+    .dic-form-hint { font-size: 13.5px; color: #3F4552; line-height: 1.55; margin-top: 8px; margin-bottom: 6px; }
     .dic-form-input, .dic-form-textarea {
       width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px;
       font-family: inherit; font-size: 14px; color: var(--text); background: var(--bg);
@@ -109,6 +108,62 @@
 
     .dic-form-actions { display: flex; gap: 10px; margin-top: 22px; }
     .dic-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
+
+    /* ── Séparation visuelle lexical / grammatical : deux blocs teintés
+       distincts (bleu = lexical, ambre = grammatical), pour que l'enseignant
+       ne les confonde jamais en créant une dictée. Même paire de couleurs
+       reprise côté élève (dictee.html/css/dictees.css, .dic-step--gram). ── */
+    .dic-lexical-section {
+      background: rgba(16,43,106,0.045);
+      border: 1.5px solid rgba(16,43,106,0.16);
+      border-left: 4px solid var(--blue);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 22px;
+    }
+    .dic-lexical-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--blue); margin-bottom: 4px; }
+
+    .dic-gram-section {
+      background: rgba(245,166,35,0.07);
+      border: 1.5px solid rgba(245,166,35,0.32);
+      border-left: 4px solid #F5A623;
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-top: 24px;
+    }
+    .dic-gram-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #7A4D0A; margin-bottom: 4px; }
+    .dic-gram-subsection { margin-top: 20px; }
+    .dic-gram-subtitle { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+
+    .dic-mot-nature-select {
+      border: 1.5px solid var(--border); border-radius: 100px; padding: 5px 12px;
+      font-family: inherit; font-size: 12px; font-weight: 600; color: var(--text); background: #fff; cursor: pointer;
+    }
+    .dic-mot-nature-select:disabled { opacity: 0.5; cursor: not-allowed; background: var(--bg); }
+    .dic-mot-multiword-note { font-size: 12.5px; color: #3F4552; font-style: italic; white-space: nowrap; cursor: help; }
+
+    .dic-trou-item { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+    .dic-trou-item-top { display: flex; gap: 8px; align-items: flex-start; }
+    .dic-trou-item-top .dic-form-input { margin: 0; }
+    .dic-trou-tokens { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .dic-trou-token {
+      border: 1.5px solid var(--border); border-radius: 8px; padding: 4px 10px;
+      font-family: inherit; font-size: 13px; color: var(--text); background: #fff; cursor: pointer;
+      transition: background 150ms, border-color 150ms;
+    }
+    .dic-trou-token:hover { border-color: var(--blue); }
+    .dic-trou-token.is-tagged { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .dic-trou-hint { font-size: 13.5px; color: #3F4552; line-height: 1.55; margin-top: 10px; }
+    .dic-trou-tag-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+    .dic-trou-tag-row .dic-form-input { margin: 0; width: auto; flex: 1; min-width: 140px; }
+    .dic-trou-tag-word { font-size: 12px; font-weight: 700; color: var(--blue); flex-shrink: 0; }
+
+    .dic-transfo-row { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+    .dic-transfo-row .dic-form-label { margin-top: 10px; font-size: 12px; }
+    .dic-transfo-row .dic-form-label:first-child { margin-top: 0; }
+    .dic-transfo-row-top { display: flex; justify-content: flex-end; }
+
+    .dic-extra-note { font-size: 13px; color: #3F4552; line-height: 1.5; margin: 8px 0 4px; }
   </style>
 </head>
 <body>
@@ -175,17 +230,48 @@
         <label class="dic-form-label" for="dic-form-titre">Titre</label>
         <input type="text" id="dic-form-titre" class="dic-form-input" placeholder="Ex. La rentrée des classes">
 
-        <label class="dic-form-label" for="dic-form-points">Points grammaticaux travaillés</label>
-        <textarea id="dic-form-points" class="dic-form-textarea" style="min-height:50px;"
-          placeholder="Séparés par des points-virgules : Accord sujet-verbe ; Homophones a/à"></textarea>
-        <p class="dic-form-hint">Chaque point grammatical reçoit automatiquement une couleur de pastille (toujours la même pour un même libellé).</p>
-        <div class="dic-preview-badges" id="dic-points-preview"></div>
+        <!-- ── Orthographe lexicale ── -->
+        <div class="dic-lexical-section">
+          <div class="dic-lexical-title">📘 Orthographe lexicale</div>
 
-        <label class="dic-form-label" for="dic-form-mots">Mots ou groupes de mots difficiles</label>
-        <textarea id="dic-form-mots" class="dic-form-textarea"
-          placeholder="Séparés par des points-virgules : un aéroport ; les enfants jouaient ; malheureusement"></textarea>
-        <p class="dic-form-hint">Un niveau de difficulté (1, 2 ou 3) est assigné à chaque mot ci-dessous, pour différencier selon les besoins des élèves. La dictée elle-même n'affiche aucun badge de niveau.</p>
-        <div class="dic-mots-list" id="dic-mots-list"></div>
+          <label class="dic-form-label" for="dic-form-mots">Mots ou groupes de mots difficiles</label>
+          <textarea id="dic-form-mots" class="dic-form-textarea"
+            placeholder="Séparés par des points-virgules : un aéroport ; les enfants jouaient ; malheureusement"></textarea>
+          <p class="dic-form-hint">Un niveau de difficulté (1, 2 ou 3) est assigné à chaque mot ci-dessous, pour différencier selon les besoins des élèves. La dictée elle-même n'affiche aucun badge de niveau. La nature grammaticale (optionnelle) sert à l'exercice de classification ci-dessous.</p>
+          <div class="dic-mots-list" id="dic-mots-list"></div>
+        </div>
+
+        <!-- ── Orthographe grammaticale ── -->
+        <div class="dic-gram-section">
+          <div class="dic-gram-title">✏️ Orthographe grammaticale</div>
+          <p class="dic-form-hint">Exercices interactifs à partir des phrases de la dictée, en plus des mots difficiles ci-dessus. Chaque exercice est facultatif : l'élève ne verra que ceux que tu as remplis.</p>
+
+          <!-- Texte à trous taggé -->
+          <div class="dic-gram-subsection">
+            <div class="dic-gram-subtitle">Texte à trous taggé</div>
+            <p class="dic-form-hint">Saisis une phrase, puis clique sur le ou les mots à travailler pour leur assigner une règle (affichée comme indice à l'élève).</p>
+            <div id="dic-trous-list"></div>
+            <button type="button" class="dic-btn dic-btn-outline dic-btn-sm" id="dic-add-trou-btn">+ Ajouter une phrase à trous</button>
+          </div>
+
+          <!-- Transformation de phrase -->
+          <div class="dic-gram-subsection">
+            <div class="dic-gram-subtitle">Transformation de phrase</div>
+            <p class="dic-form-hint">Saisis une phrase de départ, choisis une transformation, puis saisis la phrase attendue (l'élève sera corrigé par comparaison stricte à ta saisie).</p>
+            <div id="dic-transfos-list"></div>
+            <button type="button" class="dic-btn dic-btn-outline dic-btn-sm" id="dic-add-transfo-btn">+ Ajouter une transformation</button>
+          </div>
+
+          <!-- Classification par nature grammaticale -->
+          <div class="dic-gram-subsection">
+            <div class="dic-gram-subtitle">Classification — mots supplémentaires</div>
+            <p class="dic-form-hint">L'exercice de classification réutilise automatiquement les mots difficiles ci-dessus ayant une nature grammaticale renseignée. Ajoute ici des mots propres à cet exercice si besoin.</p>
+            <textarea id="dic-form-extra-mots" class="dic-form-textarea" style="min-height:50px;"
+              placeholder="Séparés par des points-virgules : le chat ; rapidement ; ces"></textarea>
+            <p class="dic-extra-note">Ces mots ne s'ajoutent pas à la liste des mots difficiles — ils n'existent que pour l'exercice de classification.</p>
+            <div class="dic-mots-list" id="dic-extra-mots-list"></div>
+          </div>
+        </div>
 
         <div class="dic-form-actions">
           <button type="button" class="dic-btn dic-btn-primary" id="dic-save-btn">Enregistrer</button>
@@ -227,7 +313,10 @@
     let _currentClassId = null;
     let _dictees = [];
     let _editingId = null;
-    let _formMots = []; // [{ contenu, niveau }] — état du formulaire en cours
+    let _formMots = []; // [{ contenu, niveau, nature_grammaticale }] — état du formulaire en cours
+    let _formTrous = []; // [{ phrase, tags: [{ position, mot_attendu, regle }] }]
+    let _formTransfos = []; // [{ phrase_depart, type_transformation, phrase_attendue }]
+    let _formExtraMots = []; // [{ contenu, nature_grammaticale }] — mots propres à la classification
 
     /* var(--ls-color-N) (level-select.css) n'est pas chargé sur cette page —
        la variable était alors non définie, le fond du select restait
@@ -235,6 +324,25 @@
        On référence directement les tokens de styles.css (toujours chargés),
        dont --ls-color-N n'est de toute façon qu'un alias. */
     const NIVEAU_VAR = { 1: 'var(--color-niveau-cm1)', 2: 'var(--color-niveau-cm2)', 3: 'var(--color-niveau-6e)' };
+
+    /* Liste fixe des natures grammaticales (partagée par duplication avec
+       js/dictees-engine.js — le module n'a pas de fichier utilitaire commun,
+       cohérent avec son style actuel de fichiers autonomes). */
+    const NATURE_OPTIONS = ['nom commun', 'nom propre', 'verbe', 'adjectif', 'adverbe', 'déterminant', 'article défini',
+      'article indéfini', 'déterminant possessif', 'déterminant démonstratif', 'préposition', 'conjonction', 'autre'];
+
+    const TRANSFO_TYPES = [
+      { value: 'singulier_pluriel', label: 'Singulier → pluriel' },
+      { value: 'pluriel_singulier', label: 'Pluriel → singulier' },
+      { value: 'masculin_feminin', label: 'Masculin → féminin' },
+      { value: 'feminin_masculin', label: 'Féminin → masculin' },
+      { value: 'present_futur', label: 'Présent → futur' },
+      { value: 'futur_present', label: 'Futur → présent' },
+      { value: 'present_passe', label: 'Présent → passé' },
+      { value: 'passe_present', label: 'Passé → présent' }
+    ];
+
+    function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
 
     function escHtml(str) {
       return String(str == null ? '' : str)
@@ -245,38 +353,50 @@
       return (raw || '').split(';').map(s => s.trim()).filter(Boolean);
     }
 
-    /* ── Points grammaticaux : aperçu des pastilles ── */
-    function renderPointsPreview() {
-      const points = parseList(document.getElementById('dic-form-points').value);
-      document.getElementById('dic-points-preview').innerHTML = points.map(p =>
-        `<span class="dic-point-pastille" style="--dic-color:${DicteesColors.colorFor(p)}">${escHtml(p)}</span>`
-      ).join('');
+    /* Une entrée lexicale de plusieurs mots (ex. "une rentrée") combine
+       plusieurs natures (article + nom) — un seul champ nature ne peut pas
+       les porter. Ces entrées sont exclues de la classification automatique ;
+       le prof ajoute séparément "une" et "rentrée" dans les mots
+       supplémentaires de classification (nature par mot possible là). */
+    function isMultiWord(contenu) {
+      return contenu.trim().split(/\s+/).length > 1;
     }
 
-    /* ── Mots difficiles : reparse en conservant le niveau des mots déjà connus ── */
+    /* ── Mots difficiles : reparse en conservant le niveau et la nature des mots déjà connus ── */
     function reparseMots() {
       const raw = parseList(document.getElementById('dic-form-mots').value);
-      const previousByContent = new Map(_formMots.map(m => [m.contenu.toLowerCase(), m.niveau]));
-      _formMots = raw.map(contenu => ({
-        contenu,
-        niveau: previousByContent.get(contenu.toLowerCase()) || 1
-      }));
+      const previousByContent = new Map(_formMots.map(m => [m.contenu.toLowerCase(), m]));
+      _formMots = raw.map(contenu => {
+        const prev = previousByContent.get(contenu.toLowerCase());
+        const nature = (!isMultiWord(contenu) && prev) ? prev.nature_grammaticale : null;
+        return { contenu, niveau: prev ? prev.niveau : 1, nature_grammaticale: nature };
+      });
       renderMotsList();
     }
 
     function renderMotsList() {
       const list = document.getElementById('dic-mots-list');
       if (_formMots.length === 0) { list.innerHTML = ''; return; }
-      list.innerHTML = _formMots.map((m, i) => `
+      list.innerHTML = _formMots.map((m, i) => {
+        const multiWord = isMultiWord(m.contenu);
+        const title = multiWord
+          ? 'Mot composé de plusieurs mots : impossible d\'assigner une seule nature grammaticale. Ajoute les mots séparément dans « Classification — mots supplémentaires » ci-dessous.'
+          : '';
+        return `
         <div class="dic-mot-row">
           <div class="dic-mot-content">${escHtml(m.contenu)}</div>
+          <select class="dic-mot-nature-select" data-mot-idx="${i}" ${multiWord ? 'disabled' : ''} title="${escHtml(title)}">
+            <option value="">— nature —</option>
+            ${NATURE_OPTIONS.map(n => `<option value="${n}" ${m.nature_grammaticale === n ? 'selected' : ''}>${capitalize(n)}</option>`).join('')}
+          </select>
+          ${multiWord ? `<span class="dic-mot-multiword-note" title="${escHtml(title)}">ⓘ plusieurs mots</span>` : ''}
           <select class="dic-mot-niveau-select" data-mot-idx="${i}" style="background:${NIVEAU_VAR[m.niveau]}">
             <option value="1" ${m.niveau === 1 ? 'selected' : ''}>Niveau 1</option>
             <option value="2" ${m.niveau === 2 ? 'selected' : ''}>Niveau 2</option>
             <option value="3" ${m.niveau === 3 ? 'selected' : ''}>Niveau 3</option>
           </select>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
       list.querySelectorAll('.dic-mot-niveau-select').forEach(sel => {
         sel.addEventListener('change', () => {
           const idx = parseInt(sel.dataset.motIdx, 10);
@@ -284,18 +404,210 @@
           sel.style.background = NIVEAU_VAR[_formMots[idx].niveau];
         });
       });
+      list.querySelectorAll('.dic-mot-nature-select').forEach(sel => {
+        sel.addEventListener('change', () => {
+          const idx = parseInt(sel.dataset.motIdx, 10);
+          _formMots[idx].nature_grammaticale = sel.value || null;
+        });
+      });
+    }
+
+    /* ── Classification : mots supplémentaires (mêmes mécaniques que renderMotsList,
+       nature obligatoire ici puisque le mot n'existe que pour cet exercice) ── */
+    function reparseExtraMots() {
+      const raw = parseList(document.getElementById('dic-form-extra-mots').value);
+      const previousByContent = new Map(_formExtraMots.map(m => [m.contenu.toLowerCase(), m.nature_grammaticale]));
+      _formExtraMots = raw.map(contenu => ({
+        contenu,
+        nature_grammaticale: previousByContent.get(contenu.toLowerCase()) || NATURE_OPTIONS[0]
+      }));
+      renderExtraMotsList();
+    }
+
+    function renderExtraMotsList() {
+      const list = document.getElementById('dic-extra-mots-list');
+      if (_formExtraMots.length === 0) { list.innerHTML = ''; return; }
+      list.innerHTML = _formExtraMots.map((m, i) => `
+        <div class="dic-mot-row">
+          <div class="dic-mot-content">${escHtml(m.contenu)}</div>
+          <select class="dic-mot-nature-select" data-extra-idx="${i}">
+            ${NATURE_OPTIONS.map(n => `<option value="${n}" ${m.nature_grammaticale === n ? 'selected' : ''}>${capitalize(n)}</option>`).join('')}
+          </select>
+        </div>
+      `).join('');
+      list.querySelectorAll('.dic-mot-nature-select').forEach(sel => {
+        sel.addEventListener('change', () => {
+          _formExtraMots[parseInt(sel.dataset.extraIdx, 10)].nature_grammaticale = sel.value;
+        });
+      });
+    }
+
+    /* ── Texte à trous taggé ─────────────────────────────────────────────
+       Clic sur un mot de la phrase = ajoute/retire un tag à cette position.
+       Le mot attendu et la règle restent éditables une fois le tag posé. */
+    function renderTrousList() {
+      const list = document.getElementById('dic-trous-list');
+      list.innerHTML = _formTrous.map((t, ti) => {
+        const tokens = t.phrase.trim().length ? t.phrase.trim().split(/\s+/) : [];
+        return `
+        <div class="dic-trou-item">
+          <div class="dic-trou-item-top">
+            <input type="text" class="dic-form-input dic-trou-phrase-input" data-trou-idx="${ti}"
+              value="${escHtml(t.phrase)}" placeholder="Saisis la phrase de la dictée…">
+            <button type="button" class="dic-btn dic-btn-danger dic-btn-sm" data-remove-trou="${ti}">✕</button>
+          </div>
+          ${tokens.length ? `
+            <div class="dic-trou-tokens">
+              ${tokens.map((tok, pos) => `<button type="button" class="dic-trou-token ${t.tags.some(g => g.position === pos) ? 'is-tagged' : ''}"
+                data-trou-idx="${ti}" data-pos="${pos}">${escHtml(tok)}</button>`).join('')}
+            </div>
+            <p class="dic-trou-hint">Clique sur un ou plusieurs mots pour les transformer en trou à compléter.</p>
+          ` : ''}
+          ${t.tags.map((tag, gi) => `
+            <div class="dic-trou-tag-row">
+              <span class="dic-trou-tag-word">${escHtml(tokens[tag.position] || tag.mot_attendu)}</span>
+              <input type="text" class="dic-form-input dic-trou-tag-answer" data-trou-idx="${ti}" data-tag-idx="${gi}"
+                value="${escHtml(tag.mot_attendu)}" placeholder="Réponse attendue">
+              <input type="text" class="dic-form-input dic-trou-tag-alt" data-trou-idx="${ti}" data-tag-idx="${gi}"
+                value="${escHtml(tag.alt_raw || '')}" placeholder="Autres réponses acceptées, séparées par ;">
+              <input type="text" class="dic-form-input dic-trou-tag-regle" data-trou-idx="${ti}" data-tag-idx="${gi}"
+                value="${escHtml(tag.regle)}" placeholder="Règle (facultatif, ex. accord adjectif — jamais montrée à l'élève)">
+              <button type="button" class="dic-btn dic-btn-outline dic-btn-sm" data-untag-trou="${ti}" data-untag-tag="${gi}">Retirer</button>
+            </div>
+          `).join('')}
+        </div>`;
+      }).join('');
+
+      list.querySelectorAll('.dic-trou-phrase-input').forEach(inp => {
+        inp.addEventListener('input', () => {
+          _formTrous[parseInt(inp.dataset.trouIdx, 10)].phrase = inp.value;
+        });
+        // Le découpage en mots (et donc les tags) ne peut être recalculé qu'au
+        // blur, sinon le champ perdrait le focus à chaque frappe.
+        inp.addEventListener('blur', () => {
+          const t = _formTrous[parseInt(inp.dataset.trouIdx, 10)];
+          const tokenCount = t.phrase.trim().length ? t.phrase.trim().split(/\s+/).length : 0;
+          t.tags = t.tags.filter(g => g.position < tokenCount);
+          renderTrousList();
+        });
+      });
+      list.querySelectorAll('[data-remove-trou]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          _formTrous.splice(parseInt(btn.dataset.removeTrou, 10), 1);
+          renderTrousList();
+        });
+      });
+      list.querySelectorAll('.dic-trou-token').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const t = _formTrous[parseInt(btn.dataset.trouIdx, 10)];
+          const pos = parseInt(btn.dataset.pos, 10);
+          const existingIdx = t.tags.findIndex(g => g.position === pos);
+          if (existingIdx >= 0) {
+            t.tags.splice(existingIdx, 1);
+          } else {
+            const tokens = t.phrase.trim().split(/\s+/);
+            t.tags.push({ position: pos, mot_attendu: tokens[pos], regle: '', alt_raw: '' });
+          }
+          renderTrousList();
+        });
+      });
+      list.querySelectorAll('[data-untag-trou]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          _formTrous[parseInt(btn.dataset.untagTrou, 10)].tags.splice(parseInt(btn.dataset.untagTag, 10), 1);
+          renderTrousList();
+        });
+      });
+      list.querySelectorAll('.dic-trou-tag-answer').forEach(inp => {
+        inp.addEventListener('input', () => {
+          _formTrous[parseInt(inp.dataset.trouIdx, 10)].tags[parseInt(inp.dataset.tagIdx, 10)].mot_attendu = inp.value;
+        });
+      });
+      list.querySelectorAll('.dic-trou-tag-alt').forEach(inp => {
+        inp.addEventListener('input', () => {
+          _formTrous[parseInt(inp.dataset.trouIdx, 10)].tags[parseInt(inp.dataset.tagIdx, 10)].alt_raw = inp.value;
+        });
+      });
+      list.querySelectorAll('.dic-trou-tag-regle').forEach(inp => {
+        inp.addEventListener('input', () => {
+          _formTrous[parseInt(inp.dataset.trouIdx, 10)].tags[parseInt(inp.dataset.tagIdx, 10)].regle = inp.value;
+        });
+      });
+    }
+
+    /* ── Transformation de phrase ── */
+    function renderTransfosList() {
+      const list = document.getElementById('dic-transfos-list');
+      list.innerHTML = _formTransfos.map((t, i) => `
+        <div class="dic-transfo-row">
+          <div class="dic-transfo-row-top">
+            <button type="button" class="dic-btn dic-btn-danger dic-btn-sm" data-remove-transfo="${i}">✕</button>
+          </div>
+          <label class="dic-form-label">Phrase de départ</label>
+          <textarea class="dic-form-textarea dic-transfo-depart" data-idx="${i}" style="min-height:44px;">${escHtml(t.phrase_depart)}</textarea>
+          <label class="dic-form-label">Transformation</label>
+          <select class="dic-select dic-transfo-type" data-idx="${i}">
+            ${TRANSFO_TYPES.map(tt => `<option value="${tt.value}" ${t.type_transformation === tt.value ? 'selected' : ''}>${tt.label}</option>`).join('')}
+          </select>
+          <label class="dic-form-label">Phrase attendue (transformée)</label>
+          <textarea class="dic-form-textarea dic-transfo-attendue" data-idx="${i}" style="min-height:44px;">${escHtml(t.phrase_attendue)}</textarea>
+          <label class="dic-form-label">Autres formulations acceptées (séparées par ;, facultatif)</label>
+          <textarea class="dic-form-textarea dic-transfo-alt" data-idx="${i}" style="min-height:36px;"
+            placeholder="Ex. une autre phrase tout aussi correcte ; encore une autre">${escHtml(t.phrase_attendue_alt_raw || '')}</textarea>
+        </div>
+      `).join('');
+
+      list.querySelectorAll('[data-remove-transfo]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          _formTransfos.splice(parseInt(btn.dataset.removeTransfo, 10), 1);
+          renderTransfosList();
+        });
+      });
+      list.querySelectorAll('.dic-transfo-depart').forEach(el => {
+        el.addEventListener('input', () => { _formTransfos[parseInt(el.dataset.idx, 10)].phrase_depart = el.value; });
+      });
+      list.querySelectorAll('.dic-transfo-alt').forEach(el => {
+        el.addEventListener('input', () => { _formTransfos[parseInt(el.dataset.idx, 10)].phrase_attendue_alt_raw = el.value; });
+      });
+      list.querySelectorAll('.dic-transfo-attendue').forEach(el => {
+        el.addEventListener('input', () => { _formTransfos[parseInt(el.dataset.idx, 10)].phrase_attendue = el.value; });
+      });
+      list.querySelectorAll('.dic-transfo-type').forEach(el => {
+        el.addEventListener('change', () => { _formTransfos[parseInt(el.dataset.idx, 10)].type_transformation = el.value; });
+      });
     }
 
     /* ── Formulaire ── */
-    function openForm(dictee, mots) {
+    function openForm(dictee, extra) {
+      const mots = extra ? extra.mots : null;
       _editingId = dictee ? dictee.id : null;
       document.getElementById('dic-form-title').textContent = dictee ? 'Modifier la dictée' : 'Nouvelle dictée';
       document.getElementById('dic-form-titre').value = dictee ? dictee.titre : '';
-      document.getElementById('dic-form-points').value = dictee ? dictee.points_grammaticaux.join(' ; ') : '';
       document.getElementById('dic-form-mots').value = mots ? mots.map(m => m.contenu).join(' ; ') : '';
-      _formMots = mots ? mots.map(m => ({ contenu: m.contenu, niveau: m.niveau })) : [];
-      renderPointsPreview();
+      _formMots = mots ? mots.map(m => ({ contenu: m.contenu, niveau: m.niveau, nature_grammaticale: m.nature_grammaticale || null })) : [];
+
+      const trous = extra ? extra.trous : null;
+      _formTrous = trous ? trous.map(t => ({
+        phrase: t.phrase,
+        tags: (t.dictee_trous_mots || []).map(g => ({
+          position: g.position, mot_attendu: g.mot_attendu, regle: g.regle,
+          alt_raw: (g.reponses_alt || []).join(' ; ')
+        }))
+      })) : [];
+
+      const transformations = extra ? extra.transformations : null;
+      _formTransfos = transformations ? transformations.map(t => ({
+        phrase_depart: t.phrase_depart, type_transformation: t.type_transformation, phrase_attendue: t.phrase_attendue,
+        phrase_attendue_alt_raw: (t.phrase_attendue_alt || []).join(' ; ')
+      })) : [];
+
+      const extraMots = extra ? extra.extraMots : null;
+      document.getElementById('dic-form-extra-mots').value = extraMots ? extraMots.map(m => m.contenu).join(' ; ') : '';
+      _formExtraMots = extraMots ? extraMots.map(m => ({ contenu: m.contenu, nature_grammaticale: m.nature_grammaticale })) : [];
+
       renderMotsList();
+      renderTrousList();
+      renderTransfosList();
+      renderExtraMotsList();
       document.getElementById('dic-form-card').style.display = '';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -304,21 +616,59 @@
       document.getElementById('dic-form-card').style.display = 'none';
       _editingId = null;
       _formMots = [];
+      _formTrous = [];
+      _formTransfos = [];
+      _formExtraMots = [];
     }
 
     async function saveForm() {
       const titre = document.getElementById('dic-form-titre').value.trim();
-      const points = parseList(document.getElementById('dic-form-points').value);
       if (!titre) { alert('Le titre est obligatoire.'); return; }
       if (_formMots.length === 0) { alert('Ajoute au moins un mot difficile.'); return; }
+
+      // Filet de sécurité : une entrée de plusieurs mots ne peut jamais
+      // porter de nature grammaticale (cf. isMultiWord/renderMotsList), même
+      // si un état UI incohérent venait à en laisser une.
+      const mots = _formMots.map(m => ({
+        ...m,
+        nature_grammaticale: isMultiWord(m.contenu) ? null : m.nature_grammaticale
+      }));
+
+      // Ne garder que les phrases à trous avec au moins un mot taggé (réponse
+      // renseignée) — une phrase vide ou sans tag n'a pas de sens pour
+      // l'élève. La règle reste facultative (jamais affichée à l'élève, cf.
+      // renderTrousExercise) : l'exiger ici faisait disparaître silencieusement
+      // toute phrase où l'enseignant l'avait laissée vide (bug corrigé —
+      // l'exercice n'apparaissait plus du tout côté élève). alt_raw ("autres
+      // réponses acceptées") est parsé ici en tableau reponses_alt, dédupliqué
+      // contre la réponse principale.
+      const trous = _formTrous
+        .map(t => ({
+          phrase: t.phrase.trim(),
+          tags: t.tags.filter(g => g.mot_attendu.trim()).map(g => ({
+            position: g.position,
+            mot_attendu: g.mot_attendu,
+            regle: g.regle || '',
+            reponses_alt: parseList(g.alt_raw).filter(a => a.toLowerCase() !== g.mot_attendu.trim().toLowerCase())
+          }))
+        }))
+        .filter(t => t.phrase && t.tags.length > 0);
+      const transformations = _formTransfos
+        .filter(t => t.phrase_depart.trim() && t.phrase_attendue.trim() && t.type_transformation)
+        .map(t => ({
+          ...t,
+          phrase_attendue_alt: parseList(t.phrase_attendue_alt_raw)
+            .filter(a => a.toLowerCase() !== t.phrase_attendue.trim().toLowerCase())
+        }));
+      const extraMots = _formExtraMots.filter(m => m.contenu.trim() && m.nature_grammaticale);
 
       const saveBtn = document.getElementById('dic-save-btn');
       saveBtn.disabled = true;
       try {
         if (_editingId) {
-          await lfmDicteesTeacher.updateDictee(_editingId, titre, points, _formMots);
+          await lfmDicteesTeacher.updateDictee(_editingId, titre, mots, trous, transformations, extraMots);
         } else {
-          await lfmDicteesTeacher.createDictee(_currentClassId, _teacherProfile.id, titre, points, _formMots);
+          await lfmDicteesTeacher.createDictee(_currentClassId, _teacherProfile.id, titre, mots, trous, transformations, extraMots);
         }
         closeForm();
         await loadDictees();
@@ -341,11 +691,6 @@
           <div class="dic-teacher-card-top">
             <div>
               <div class="dic-teacher-card-title">${escHtml(d.titre)}</div>
-              <div class="dic-teacher-card-badges">
-                ${(d.points_grammaticaux || []).map(p =>
-                  `<span class="dic-point-pastille" style="--dic-color:${DicteesColors.colorFor(p)}">${escHtml(p)}</span>`
-                ).join('')}
-              </div>
               <div class="dic-teacher-card-meta">${d.mot_count} mot${d.mot_count !== 1 ? 's' : ''} difficile${d.mot_count !== 1 ? 's' : ''}</div>
             </div>
             <div class="dic-teacher-card-actions">
@@ -357,8 +702,8 @@
       `).join('');
 
       wrap.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', async () => {
-        const { dictee, mots } = await lfmDicteesTeacher.getDictee(btn.dataset.edit);
-        openForm(dictee, mots);
+        const { dictee, mots, trous, transformations, extraMots } = await lfmDicteesTeacher.getDictee(btn.dataset.edit);
+        openForm(dictee, { mots, trous, transformations, extraMots });
       }));
       wrap.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', async () => {
         if (!confirm('Supprimer définitivement cette dictée ?')) return;
@@ -409,8 +754,16 @@
       document.getElementById('dic-new-btn').addEventListener('click', () => openForm(null, null));
       document.getElementById('dic-cancel-btn').addEventListener('click', closeForm);
       document.getElementById('dic-save-btn').addEventListener('click', saveForm);
-      document.getElementById('dic-form-points').addEventListener('input', renderPointsPreview);
       document.getElementById('dic-form-mots').addEventListener('input', reparseMots);
+      document.getElementById('dic-form-extra-mots').addEventListener('input', reparseExtraMots);
+      document.getElementById('dic-add-trou-btn').addEventListener('click', () => {
+        _formTrous.push({ phrase: '', tags: [] });
+        renderTrousList();
+      });
+      document.getElementById('dic-add-transfo-btn').addEventListener('click', () => {
+        _formTransfos.push({ phrase_depart: '', type_transformation: TRANSFO_TYPES[0].value, phrase_attendue: '', phrase_attendue_alt_raw: '' });
+        renderTransfosList();
+      });
 
       loadDictees();
     }

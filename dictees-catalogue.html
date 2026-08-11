@@ -23,8 +23,7 @@
   <link rel="stylesheet" href="styles.css?v=12">
   <link rel="stylesheet" href="breadcrumb.css?v=1">
   <link rel="stylesheet" href="css/dictees.css?v=1">
-  <script src="js/breadcrumb.js?v=1"></script>
-  <script src="js/dictees-colors.js?v=1"></script>
+  <script src="js/breadcrumb.js?v=3"></script>
 </head>
 <body>
 
@@ -95,10 +94,11 @@
        Contrairement au catalogue de joggings (redaction.html, catalogue
        statique JOGGING_LIST), les dictées sont entièrement créées par
        l'enseignant pour sa classe — pas de badge de niveau ici (le niveau ne
-       s'applique qu'aux mots, dans l'exercice), seulement les pastilles de
-       points grammaticaux (couleur déterministe, js/dictees-colors.js).
-       Logique reprise telle quelle de français-orthographe.html (déplacée
-       ici avec le retrait de la grille complète de cette page). */
+       s'applique qu'aux mots, dans l'exercice). Les pastilles de points
+       grammaticaux (points_grammaticaux, ex-js/dictees-colors.js) ont été
+       retirées de l'affichage (retour utilisateur : présentation jugée trop
+       dense côté enseignant, retirée partout par cohérence — la colonne
+       reste en base mais n'est plus lue ici). */
     function escapeHtml(str) {
       const div = document.createElement('div');
       div.textContent = str;
@@ -106,13 +106,9 @@
     }
 
     function renderDicteeCard(dictee) {
-      const badges = (dictee.points_grammaticaux || []).map(p =>
-        `<span class="dic-point-pastille" style="--dic-color:${DicteesColors.colorFor(p)}">${escapeHtml(p)}</span>`
-      ).join('');
       return `
         <a class="dic-card" href="dictee.html?id=${dictee.id}">
           <div class="dic-card-illustration">📖</div>
-          <div class="dic-card-badges">${badges}</div>
           <div class="dic-card-title">${escapeHtml(dictee.titre)}</div>
           <span class="dic-card-btn">Commencer →</span>
         </a>

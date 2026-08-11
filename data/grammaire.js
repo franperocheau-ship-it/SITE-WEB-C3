@@ -156,74 +156,41 @@ Object.assign(window.EXERCISE_DATA, {
     domaine:    "Français",
     competence: "Grammaire — L'attribut du sujet",
     type:       "homophones-niveaux",
-    levels:     ["CM1", "CM2", "6e"],
+    levels:     ["CM2", "6e"],
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
     levelDescs: {
-      "CM1": "Reconnaître un verbe d'état parmi des verbes d'action",
       "CM2": "Relier dans l'ordre le nom, l'adjectif attribut et le verbe d'état",
       "6e":  "Distinguer l'adjectif attribut du sujet de l'adjectif épithète"
     },
     homoShuffle: [false, true, false],
 
-    /* Refonte en 3 niveaux (level1Bank/level2Bank/level3Bank), moteur
-       générique "homophones-niveaux" — même schéma qu'identifier-adjectif/
+    /* Refonte en niveaux CM2/6e (level2Bank/level3Bank), moteur générique
+       "homophones-niveaux" — même schéma qu'identifier-adjectif/
        identifier-nom-phrase (aucun nouveau moteur dédié : chaque item porte
        son propre `type`, dispatché dans showQuestion() vers les renderers
-       standards). Niveaux 2 et 3 s'appuient tous deux sur une extension
-       générique et rétrocompatible ajoutée pour cette compétence :
-       renderMotsCliquables accepte désormais un champ `steps` optionnel
-       (liste ordonnée de { instruction, targets, cssClass }) pour un
-       enchaînement de clics à rôles distincts — sans `steps`, un item
-       "mots-cliquables" se comporte exactement comme avant. Réutilisable
-       par toute future compétence.
+       standards). Les deux niveaux s'appuient sur une extension générique
+       et rétrocompatible ajoutée pour cette compétence : renderMotsCliquables
+       accepte désormais un champ `steps` optionnel (liste ordonnée de
+       { instruction, targets, cssClass }) pour un enchaînement de clics à
+       rôles distincts — sans `steps`, un item "mots-cliquables" se comporte
+       exactement comme avant. Réutilisable par toute future compétence.
 
-       Niveau 1 : choix-etiquette — trouver le verbe d'état parmi 3 verbes
-       d'action, temps variés (présent/imparfait/passé composé) pour ne pas
-       faire reposer la reconnaissance sur la terminaison plutôt que sur le
-       sens.
-       Niveau 2 : mots-cliquables en 3 étapes séquentielles (nom → jaune,
-       adjectif attribut → turquoise, verbe d'état → navy encadré) sur des
-       phrases à un seul GN sujet et un seul adjectif candidat (pas de piège
-       nom/adjectif à ce niveau, l'enjeu est l'enchaînement des 3 rôles).
-       Niveau 3 : mots-cliquables en 3 étapes (nom → jaune, adjectif attribut
-       → turquoise, TOUS les adjectifs épithètes de la phrase → gold) sur des
-       phrases contenant 1 ou 2 épithètes en plus de l'attribut — l'étape 3
-       accepte plusieurs cibles (cf. `targets` à 2 éléments) et l'attribut
-       déjà trouvé à l'étape 2 est verrouillé (disabled), donc jamais
-       re-cliquable par erreur à l'étape 3. */
+       Notion introduite au programme à partir du CM2 (pas de niveau CM1) :
+       bankKeyMap dans exercise.html mappe les clés de niveau par leur nom
+       ("CM2"→level2Bank, "6e"→level3Bank), donc les clés de banque restent
+       level2Bank/level3Bank même si level1Bank n'existe plus.
 
-    level1Bank: [
-      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
-        word:"est · court · joue · mange", choices:["est","court","joue","mange"], answer:"est",
-        hint:"« être » est un verbe d'état : il ne montre pas une action, il relie le sujet à ce qu'on dit de lui." },
-      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
-        word:"semble · dessine · chante · saute", choices:["semble","dessine","chante","saute"], answer:"semble",
-        hint:"« sembler » est un verbe d'état : il indique une apparence, pas une action." },
-      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
-        word:"deviennent · parlent · écoutent · lisent", choices:["deviennent","parlent","écoutent","lisent"], answer:"deviennent",
-        hint:"« devenir » est un verbe d'état : il indique un changement d'état, pas une action." },
-      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
-        word:"paraît · travaille · nage · écrit", choices:["paraît","travaille","nage","écrit"], answer:"paraît",
-        hint:"« paraître » est un verbe d'état : il indique une apparence, pas une action." },
-      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
-        word:"reste · marche · dort · crie", choices:["reste","marche","dort","crie"], answer:"reste",
-        hint:"« rester » est un verbe d'état ici : le sujet garde un état, il ne fait pas d'action." },
-      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes (ou groupes de mots).",
-        word:"ont l'air · construisent · réparent · jettent", choices:["ont l'air","construisent","réparent","jettent"], answer:"ont l'air",
-        hint:"« avoir l'air » est une expression verbale d'état : elle indique une apparence, comme « sembler »." },
-      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
-        word:"étaient · couraient · dansaient · pleuraient", choices:["étaient","couraient","dansaient","pleuraient"], answer:"étaient",
-        hint:"« être » à l'imparfait reste un verbe d'état : il ne montre pas d'action." },
-      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
-        word:"semblait · regardait · tombait · criait", choices:["semblait","regardait","tombait","criait"], answer:"semblait",
-        hint:"« sembler » à l'imparfait est un verbe d'état : il indique une apparence." },
-      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes (ou groupes de mots).",
-        word:"est devenu · a grandi · a couru · a sauté", choices:["est devenu","a grandi","a couru","a sauté"], answer:"est devenu",
-        hint:"« devenir » au passé composé reste un verbe d'état : il indique un changement d'état, pas une action." },
-      { type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
-        word:"restent · jouent · mangent · dessinent", choices:["restent","jouent","mangent","dessinent"], answer:"restent",
-        hint:"« rester » est un verbe d'état ici : le sujet garde un état, il ne fait pas d'action." }
-    ],
+       Niveau CM2 (level2Bank) : mots-cliquables en 3 étapes séquentielles
+       (nom → jaune, adjectif attribut → turquoise, verbe d'état → navy
+       encadré) sur des phrases à un seul GN sujet et un seul adjectif
+       candidat (pas de piège nom/adjectif à ce niveau, l'enjeu est
+       l'enchaînement des 3 rôles).
+       Niveau 6e (level3Bank) : mots-cliquables en 3 étapes (nom → jaune,
+       adjectif attribut → turquoise, TOUS les adjectifs épithètes de la
+       phrase → gold) sur des phrases contenant 1 ou 2 épithètes en plus de
+       l'attribut — l'étape 3 accepte plusieurs cibles (cf. `targets` à 2
+       éléments) et l'attribut déjà trouvé à l'étape 2 est verrouillé
+       (disabled), donc jamais re-cliquable par erreur à l'étape 3. */
 
     level2Bank: [
       { type:"mots-cliquables", sentence:"Le ciel est gris .",
@@ -2556,6 +2523,189 @@ Object.assign(window.EXERCISE_DATA, {
     ]
   },
 
+  "identifier-nom-noyau-gn": {
+    title: "Identifier le nom noyau d'un groupe nominal",
+    domaine:    "Français",
+    competence: "Grammaire — Le groupe nominal",
+    type:       "homophones-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+    levelDescs: {
+      "CM1": "Repérer le nom noyau dans un groupe nominal isolé",
+      "CM2": "Trouver le nom noyau d'un groupe nominal dans une phrase",
+      "6e":  "Identifier le nom noyau de plusieurs groupes nominaux dans une phrase riche"
+    },
+    homoShuffle: [false, true, false],
+
+    /* Moteur générique "homophones-niveaux" — aucun moteur dédié : chaque
+       item porte son propre `type`, dispatché dans showQuestion() vers les
+       renderers standards choix-etiquette / classification-etapes /
+       mots-cliquables déjà utilisés ailleurs sur le site (même schéma que
+       identifier-adjectif / identifier-nom-phrase).
+       Niveau 1 : choix-etiquette, un GN isolé est affiché mot à mot,
+       l'élève clique sur le nom noyau parmi déterminant/adjectif/nom.
+       Niveau 2 : classification-etapes, l'élève clique d'abord tous les
+       mots du GN cible dans une phrase complète (étape 1), puis désigne
+       son nom noyau parmi ces mots (étape 2) — même schéma que
+       remplacer-gn-complement-pronom/level2Bank.
+       Niveau 3 : mots-cliquables, phrase riche à 3 groupes nominaux
+       (sujet/COD/CC, sans étiquette de fonction) : l'élève clique
+       directement le nom noyau de chacun des 3 groupes ; les compléments
+       du nom emboîtés (ex. « de papa », « de soleil ») sont un piège
+       classique signalé au clic. */
+
+    level1Bank: [
+      { type:"choix-etiquette", instruction:"Clique sur le nom noyau de ce groupe nominal.",
+        word:"le · chat", choices:["le","chat"], answer:"chat",
+        hint:"« chat » est le nom noyau : c'est lui qui commande l'accord du groupe (le chat → les chats)." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom noyau de ce groupe nominal.",
+        word:"une · jolie · plage", choices:["une","jolie","plage"], answer:"plage",
+        hint:"« plage » est le nom noyau : « une » et « jolie » ne font que le préciser." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom noyau de ce groupe nominal.",
+        word:"des · enfants · sages", choices:["des","enfants","sages"], answer:"enfants",
+        hint:"« enfants » est le nom noyau : « sages » est l'adjectif qui le décrit." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom noyau de ce groupe nominal.",
+        word:"ma · voiture", choices:["ma","voiture"], answer:"voiture",
+        hint:"« voiture » est le nom noyau : « ma » est le déterminant qui l'accompagne." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom noyau de ce groupe nominal.",
+        word:"un · grand · jardin", choices:["un","grand","jardin"], answer:"jardin",
+        hint:"« jardin » est le nom noyau : « grand » le précise, mais ne le remplace pas." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom noyau de ce groupe nominal.",
+        word:"les · leçons · difficiles", choices:["les","leçons","difficiles"], answer:"leçons",
+        hint:"« leçons » est le nom noyau : « difficiles » est l'adjectif qui le qualifie." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom noyau de ce groupe nominal.",
+        word:"cette · histoire", choices:["cette","histoire"], answer:"histoire",
+        hint:"« histoire » est le nom noyau : « cette » est le déterminant démonstratif." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom noyau de ce groupe nominal.",
+        word:"un · vieux · pont", choices:["un","vieux","pont"], answer:"pont",
+        hint:"« pont » est le nom noyau : « vieux » est l'adjectif qui le décrit." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom noyau de ce groupe nominal.",
+        word:"des · fleurs · colorées", choices:["des","fleurs","colorées"], answer:"fleurs",
+        hint:"« fleurs » est le nom noyau : « colorées » précise seulement leur couleur." },
+      { type:"choix-etiquette", instruction:"Clique sur le nom noyau de ce groupe nominal.",
+        word:"notre · maison", choices:["notre","maison"], answer:"maison",
+        hint:"« maison » est le nom noyau : « notre » est le déterminant possessif." }
+    ],
+
+    level2Bank: [
+      { type:"classification-etapes",
+        instruction:"Repère les mots du groupe nominal indiqué, puis trouve son nom noyau.",
+        sentence:"Le petit garçon joue dans le jardin .",
+        step1Instruction:"Clique sur tous les mots du groupe nominal « Le petit garçon ».",
+        step1Targets:["Le","petit","garçon"],
+        step2Instruction:"Quel est le nom noyau de ce groupe ?",
+        classifyChoices:["Le","petit","garçon"], step2Answer:"garçon" },
+      { type:"classification-etapes",
+        instruction:"Repère les mots du groupe nominal indiqué, puis trouve son nom noyau.",
+        sentence:"Ma sœur a offert un joli cadeau à sa meilleure amie .",
+        step1Instruction:"Clique sur tous les mots du groupe nominal « un joli cadeau ».",
+        step1Targets:["un","joli","cadeau"],
+        step2Instruction:"Quel est le nom noyau de ce groupe ?",
+        classifyChoices:["un","joli","cadeau"], step2Answer:"cadeau" },
+      { type:"classification-etapes",
+        instruction:"Repère les mots du groupe nominal indiqué, puis trouve son nom noyau.",
+        sentence:"Les élèves attentifs écoutent la maîtresse .",
+        step1Instruction:"Clique sur tous les mots du groupe nominal « Les élèves attentifs ».",
+        step1Targets:["Les","élèves","attentifs"],
+        step2Instruction:"Quel est le nom noyau de ce groupe ?",
+        classifyChoices:["Les","élèves","attentifs"], step2Answer:"élèves" },
+      { type:"classification-etapes",
+        instruction:"Repère les mots du groupe nominal indiqué, puis trouve son nom noyau.",
+        sentence:"Le vieux marin raconte une longue histoire .",
+        step1Instruction:"Clique sur tous les mots du groupe nominal « une longue histoire ».",
+        step1Targets:["une","longue","histoire"],
+        step2Instruction:"Quel est le nom noyau de ce groupe ?",
+        classifyChoices:["une","longue","histoire"], step2Answer:"histoire" },
+      { type:"classification-etapes",
+        instruction:"Repère les mots du groupe nominal indiqué, puis trouve son nom noyau.",
+        sentence:"Cette belle forêt abrite de nombreux animaux .",
+        step1Instruction:"Clique sur tous les mots du groupe nominal « Cette belle forêt ».",
+        step1Targets:["Cette","belle","forêt"],
+        step2Instruction:"Quel est le nom noyau de ce groupe ?",
+        classifyChoices:["Cette","belle","forêt"], step2Answer:"forêt" },
+      { type:"classification-etapes",
+        instruction:"Repère les mots du groupe nominal indiqué, puis trouve son nom noyau.",
+        sentence:"Nous avons visité un magnifique château médiéval .",
+        step1Instruction:"Clique sur tous les mots du groupe nominal « un magnifique château médiéval ».",
+        step1Targets:["un","magnifique","château","médiéval"],
+        step2Instruction:"Quel est le nom noyau de ce groupe ?",
+        classifyChoices:["un","magnifique","château","médiéval"], step2Answer:"château" },
+      { type:"classification-etapes",
+        instruction:"Repère les mots du groupe nominal indiqué, puis trouve son nom noyau.",
+        sentence:"Le facteur distribue le courrier chaque matin .",
+        step1Instruction:"Clique sur tous les mots du groupe nominal « Le facteur ».",
+        step1Targets:["Le","facteur"],
+        step2Instruction:"Quel est le nom noyau de ce groupe ?",
+        classifyChoices:["Le","facteur"], step2Answer:"facteur" },
+      { type:"classification-etapes",
+        instruction:"Repère les mots du groupe nominal indiqué, puis trouve son nom noyau.",
+        sentence:"Les gros nuages noirs annoncent l'orage .",
+        step1Instruction:"Clique sur tous les mots du groupe nominal « Les gros nuages noirs ».",
+        step1Targets:["Les","gros","nuages","noirs"],
+        step2Instruction:"Quel est le nom noyau de ce groupe ?",
+        classifyChoices:["Les","gros","nuages","noirs"], step2Answer:"nuages" },
+      { type:"classification-etapes",
+        instruction:"Repère les mots du groupe nominal indiqué, puis trouve son nom noyau.",
+        sentence:"Mon petit frère collectionne les timbres anciens .",
+        step1Instruction:"Clique sur tous les mots du groupe nominal « les timbres anciens ».",
+        step1Targets:["les","timbres","anciens"],
+        step2Instruction:"Quel est le nom noyau de ce groupe ?",
+        classifyChoices:["les","timbres","anciens"], step2Answer:"timbres" },
+      { type:"classification-etapes",
+        instruction:"Repère les mots du groupe nominal indiqué, puis trouve son nom noyau.",
+        sentence:"La directrice accueille les nouveaux élèves .",
+        step1Instruction:"Clique sur tous les mots du groupe nominal « les nouveaux élèves ».",
+        step1Targets:["les","nouveaux","élèves"],
+        step2Instruction:"Quel est le nom noyau de ce groupe ?",
+        classifyChoices:["les","nouveaux","élèves"], step2Answer:"élèves" }
+    ],
+
+    level3Bank: [
+      { type:"mots-cliquables",
+        instruction:"Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.",
+        sentence:"Le vieux jardinier arrose ses belles roses tous les matins .",
+        targets:["jardinier","roses","matins"], piege:{} },
+      { type:"mots-cliquables",
+        instruction:"Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.",
+        sentence:"Cette petite fille dessine un magnifique paysage dans son cahier .",
+        targets:["fille","paysage","cahier"], piege:{} },
+      { type:"mots-cliquables",
+        instruction:"Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.",
+        sentence:"Les enfants curieux observent les fourmis rouges sous une grosse pierre .",
+        targets:["enfants","fourmis","pierre"], piege:{} },
+      { type:"mots-cliquables",
+        instruction:"Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.",
+        sentence:"Le vieux pêcheur répare son filet abîmé près de la rivière .",
+        targets:["pêcheur","filet","rivière"], piege:{} },
+      { type:"mots-cliquables",
+        instruction:"Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.",
+        sentence:"Ma grande sœur prépare un délicieux gâteau pour la fête de papa .",
+        targets:["sœur","gâteau","fête"],
+        piege:{ "papa": "« papa » fait partie du complément du nom « de papa » : le nom noyau du groupe est « fête »." } },
+      { type:"mots-cliquables",
+        instruction:"Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.",
+        sentence:"Les nouveaux élèves rangent leurs affaires dans le grand couloir .",
+        targets:["élèves","affaires","couloir"], piege:{} },
+      { type:"mots-cliquables",
+        instruction:"Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.",
+        sentence:"Le petit chien poursuit un gros papillon jaune dans le jardin .",
+        targets:["chien","papillon","jardin"], piege:{} },
+      { type:"mots-cliquables",
+        instruction:"Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.",
+        sentence:"Cette jeune institutrice explique la nouvelle leçon avec beaucoup de patience .",
+        targets:["institutrice","leçon","patience"], piege:{} },
+      { type:"mots-cliquables",
+        instruction:"Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.",
+        sentence:"Le grand voilier affronte une violente tempête au large de la côte .",
+        targets:["voilier","tempête","côte"], piege:{} },
+      { type:"mots-cliquables",
+        instruction:"Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.",
+        sentence:"Les touristes fatigués admirent un splendide coucher de soleil depuis la terrasse .",
+        targets:["touristes","coucher","terrasse"],
+        piege:{ "soleil": "« soleil » fait partie du complément du nom « de soleil » : le nom noyau du groupe est « coucher »." } }
+    ]
+  },
+
   "distinguer-pronom-sujet-complement": {
     title: "Distinguer le pronom personnel sujet et le pronom personnel complément",
     domaine:    "Français",
@@ -3031,7 +3181,8 @@ Object.assign(window.EXERCISE_DATA, {
     ],
 
     /* ════════════════════════════════════════════════════════════════════
-       NIVEAU 3 — Réécris la phrase (6 phrases, production écrite)
+       NIVEAU 3 — Réécris la phrase (10 phrases, production écrite)
+       Réponse acceptée : phrase complète OU pronom seul
        ════════════════════════════════════════════════════════════════════ */
     lvl3Bank: [
       {
@@ -3039,7 +3190,7 @@ Object.assign(window.EXERCISE_DATA, {
         displayHtml: "<span class='psc-pronoun-hl'>Les enfants</span> jouent dans le jardin .",
         gns: "Les enfants", pronoun: "Ils", verb: "jouent",
         solution: "Ils jouent dans le jardin .",
-        answers:  ["ils jouent dans le jardin", "ils jouent dans le jardin ."],
+        answers:  ["ils jouent dans le jardin", "ils jouent dans le jardin .", "ils"],
         noteOk:   "« Les enfants » est masculin pluriel → « Ils »."
       },
       {
@@ -3047,7 +3198,7 @@ Object.assign(window.EXERCISE_DATA, {
         displayHtml: "<span class='psc-pronoun-hl'>La directrice de l'école</span> parle aux parents .",
         gns: "La directrice de l'école", pronoun: "Elle", verb: "parle",
         solution: "Elle parle aux parents .",
-        answers:  ["elle parle aux parents", "elle parle aux parents ."],
+        answers:  ["elle parle aux parents", "elle parle aux parents .", "elle"],
         noteOk:   "Le nom-noyau du GNS long est « directrice » (féminin singulier) → « Elle »."
       },
       {
@@ -3055,7 +3206,7 @@ Object.assign(window.EXERCISE_DATA, {
         displayHtml: "<span class='psc-pronoun-hl'>Paul et Marie</span> chantent ensemble .",
         gns: "Paul et Marie", pronoun: "Ils", verb: "chantent",
         solution: "Ils chantent ensemble .",
-        answers:  ["ils chantent ensemble", "ils chantent ensemble ."],
+        answers:  ["ils chantent ensemble", "ils chantent ensemble .", "ils"],
         noteOk:   "Genres mélangés (Paul masculin, Marie féminin) → « Ils »."
       },
       {
@@ -3063,23 +3214,270 @@ Object.assign(window.EXERCISE_DATA, {
         displayHtml: "<span class='psc-pronoun-hl'>Les danseuses</span> montent sur scène .",
         gns: "Les danseuses", pronoun: "Elles", verb: "montent",
         solution: "Elles montent sur scène .",
-        answers:  ["elles montent sur scene", "elles montent sur scène", "elles montent sur scène ."]
+        answers:  ["elles montent sur scene", "elles montent sur scène", "elles montent sur scène .", "elles"]
       },
       {
         sentence:    "Mon petit frère regarde un film .",
         displayHtml: "<span class='psc-pronoun-hl'>Mon petit frère</span> regarde un film .",
         gns: "Mon petit frère", pronoun: "Il", verb: "regarde",
         solution: "Il regarde un film .",
-        answers:  ["il regarde un film", "il regarde un film ."]
+        answers:  ["il regarde un film", "il regarde un film .", "il"]
       },
       {
         sentence:    "Les grands arbres du parc donnent de l'ombre .",
         displayHtml: "<span class='psc-pronoun-hl'>Les grands arbres du parc</span> donnent de l'ombre .",
         gns: "Les grands arbres du parc", pronoun: "Ils", verb: "donnent",
         solution: "Ils donnent de l'ombre .",
-        answers:  ["ils donnent de l'ombre", "ils donnent de l ombre", "ils donnent de l'ombre ."],
+        answers:  ["ils donnent de l'ombre", "ils donnent de l ombre", "ils donnent de l'ombre .", "ils"],
         noteOk:   "Le nom-noyau du GNS long est « arbres » (masculin pluriel) → « Ils »."
+      },
+      {
+        sentence:    "Le facteur du quartier distribue le courrier .",
+        displayHtml: "<span class='psc-pronoun-hl'>Le facteur du quartier</span> distribue le courrier .",
+        gns: "Le facteur du quartier", pronoun: "Il", verb: "distribue",
+        solution: "Il distribue le courrier .",
+        answers:  ["il distribue le courrier", "il distribue le courrier .", "il"],
+        noteOk:   "Le nom-noyau du GNS long est « facteur » (masculin singulier) → « Il »."
+      },
+      {
+        sentence:    "Ma cousine et son frère habitent à Paris .",
+        displayHtml: "<span class='psc-pronoun-hl'>Ma cousine et son frère</span> habitent à Paris .",
+        gns: "Ma cousine et son frère", pronoun: "Ils", verb: "habitent",
+        solution: "Ils habitent à Paris .",
+        answers:  ["ils habitent a paris", "ils habitent à paris", "ils habitent à paris .", "ils"],
+        noteOk:   "Genres mélangés (cousine féminin, frère masculin) → « Ils »."
+      },
+      {
+        sentence:    "Les fleurs du jardin embaument la maison .",
+        displayHtml: "<span class='psc-pronoun-hl'>Les fleurs du jardin</span> embaument la maison .",
+        gns: "Les fleurs du jardin", pronoun: "Elles", verb: "embaument",
+        solution: "Elles embaument la maison .",
+        answers:  ["elles embaument la maison", "elles embaument la maison .", "elles"],
+        noteOk:   "Le nom-noyau est « fleurs » (féminin pluriel) ; « du jardin » est complément du nom."
+      },
+      {
+        sentence:    "Le vieux chat du voisin dort toute la journée .",
+        displayHtml: "<span class='psc-pronoun-hl'>Le vieux chat du voisin</span> dort toute la journée .",
+        gns: "Le vieux chat du voisin", pronoun: "Il", verb: "dort",
+        solution: "Il dort toute la journée .",
+        answers:  ["il dort toute la journee", "il dort toute la journée", "il dort toute la journée .", "il"],
+        noteOk:   "Le nom-noyau est « chat » (masculin singulier), pas « voisin » qui est complément du nom."
       }
+    ]
+  },
+
+  "remplacer-gn-complement-pronom": {
+    title: "Remplacer un groupe nominal complément par un pronom personnel",
+    domaine:    "Français",
+    competence: "Grammaire — Pronoms personnels",
+    type:       "homophones-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    paliers:    3,
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+    levelDescs: {
+      "CM1": "Choisir le bon pronom complément (le, la, les)",
+      "CM2": "Repérer le complément (COD ou COI) puis choisir son pronom",
+      "6e":  "Réécrire la phrase avec le ou les pronoms compléments"
+    },
+    homoShuffle: [false, true, false],
+
+    /* Moteur générique "homophones-niveaux" (aucun nouveau moteur : chaque
+       item porte son propre `type`, dispatché dans showQuestion() vers les
+       renderers standards choix-etiquette / classification-etapes /
+       texte-a-trous déjà utilisés ailleurs sur le site).
+       Niveau 1 : choix-etiquette — phrase affichée avec le GN complément
+       surligné (.psc-pronoun-hl, même classe que distinguer-pronom-sujet-
+       complement / remplacer-gn-sujet-pronom), 4 pronoms au choix.
+       Niveau 2 : classification-etapes — clique d'abord le GN complément
+       dans la phrase (étape 1, comme mots-cliquables), puis choisit le bon
+       pronom parmi le/la/les/lui/leur (étape 2). Le champ optionnel
+       `rewriteSentence` (ajouté ici au renderer partagé renderClassification-
+       Etapes, exercise.html — purement additif, ignoré par les ~30 items
+       classification-etapes existants qui ne le renseignent pas) affiche la
+       phrase réécrite avec le pronom en note après réponse.
+       Niveau 3 : texte-a-trous — saisie libre du ou des pronoms avant le
+       verbe ; comparaison stricte (trim+lowercase, sans tolérance), donc
+       aucune tolérance sur l'ordre d'un pronom double (ex. « le lui » ≠
+       « lui le »). 4 phrases à double complément (COD+COI) et 6 à
+       complément unique. */
+
+    level1Bank: [
+      { type:"choix-etiquette", instruction:"Quel pronom personnel remplace le groupe surligné ?",
+        word:"Le chat mange <span class='psc-pronoun-hl'>la souris</span> .",
+        choices:["la","le","les","lui"], answer:"la",
+        hint:"« la souris » est féminin singulier → on la remplace par « la »." },
+      { type:"choix-etiquette", instruction:"Quel pronom personnel remplace le groupe surligné ?",
+        word:"Paul regarde <span class='psc-pronoun-hl'>le film</span> .",
+        choices:["le","la","les","lui"], answer:"le",
+        hint:"« le film » est masculin singulier → on le remplace par « le »." },
+      { type:"choix-etiquette", instruction:"Quel pronom personnel remplace le groupe surligné ?",
+        word:"Les enfants ramassent <span class='psc-pronoun-hl'>les feuilles</span> .",
+        choices:["les","le","la","lui"], answer:"les",
+        hint:"« les feuilles » est pluriel → on le remplace par « les »." },
+      { type:"choix-etiquette", instruction:"Quel pronom personnel remplace le groupe surligné ?",
+        word:"Elle range <span class='psc-pronoun-hl'>ses jouets</span> .",
+        choices:["les","le","la","lui"], answer:"les",
+        hint:"« ses jouets » est pluriel → on le remplace par « les »." },
+      { type:"choix-etiquette", instruction:"Quel pronom personnel remplace le groupe surligné ?",
+        word:"Nous rencontrons <span class='psc-pronoun-hl'>notre voisine</span> .",
+        choices:["la","le","les","lui"], answer:"la",
+        hint:"« notre voisine » est féminin singulier → on la remplace par « la »." },
+      { type:"choix-etiquette", instruction:"Quel pronom personnel remplace le groupe surligné ?",
+        word:"Tu fermes <span class='psc-pronoun-hl'>la fenêtre</span> .",
+        choices:["la","le","les","lui"], answer:"la",
+        hint:"« la fenêtre » est féminin singulier → on la remplace par « la »." },
+      { type:"choix-etiquette", instruction:"Quel pronom personnel remplace le groupe surligné ?",
+        word:"Le boulanger vend <span class='psc-pronoun-hl'>des croissants</span> .",
+        choices:["les","le","la","lui"], answer:"les",
+        hint:"« des croissants » est pluriel → on le remplace par « les »." },
+      { type:"choix-etiquette", instruction:"Quel pronom personnel remplace le groupe surligné ?",
+        word:"Le directeur salue <span class='psc-pronoun-hl'>la maîtresse</span> .",
+        choices:["la","le","les","lui"], answer:"la",
+        hint:"« la maîtresse » est féminin singulier → on la remplace par « la »." },
+      { type:"choix-etiquette", instruction:"Quel pronom personnel remplace le groupe surligné ?",
+        word:"Marc répare <span class='psc-pronoun-hl'>le vélo</span> .",
+        choices:["le","la","les","lui"], answer:"le",
+        hint:"« le vélo » est masculin singulier → on le remplace par « le »." },
+      { type:"choix-etiquette", instruction:"Quel pronom personnel remplace le groupe surligné ?",
+        word:"Les élèves corrigent <span class='psc-pronoun-hl'>leurs erreurs</span> .",
+        choices:["les","le","la","lui"], answer:"les",
+        hint:"« leurs erreurs » est pluriel → on le remplace par « les »." }
+    ],
+
+    level2Bank: [
+      { type:"classification-etapes",
+        instruction:"Clique sur le groupe complément de la phrase, puis choisis le bon pronom.",
+        sentence:"Marie offre un cadeau à sa sœur .",
+        step1Instruction:"Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « à qui ? »</span>).",
+        step1Targets:["à","sa","sœur"],
+        step2Instruction:"Quel pronom remplace « à sa sœur » ?",
+        classifyChoices:["le","la","les","lui","leur"], step2Answer:"lui",
+        rewriteSentence:"Marie lui offre un cadeau." },
+      { type:"classification-etapes",
+        instruction:"Clique sur le groupe complément de la phrase, puis choisis le bon pronom.",
+        sentence:"Le fermier nourrit les poules .",
+        step1Instruction:"Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « qui ? »</span>).",
+        step1Targets:["les","poules"],
+        step2Instruction:"Quel pronom remplace « les poules » ?",
+        classifyChoices:["le","la","les","lui","leur"], step2Answer:"les",
+        rewriteSentence:"Le fermier les nourrit." },
+      { type:"classification-etapes",
+        instruction:"Clique sur le groupe complément de la phrase, puis choisis le bon pronom.",
+        sentence:"Le professeur explique la leçon aux élèves .",
+        step1Instruction:"Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « à qui ? »</span>).",
+        step1Targets:["aux","élèves"],
+        step2Instruction:"Quel pronom remplace « aux élèves » ?",
+        classifyChoices:["le","la","les","lui","leur"], step2Answer:"leur",
+        rewriteSentence:"Le professeur leur explique la leçon." },
+      { type:"classification-etapes",
+        instruction:"Clique sur le groupe complément de la phrase, puis choisis le bon pronom.",
+        sentence:"Julie prête son livre à Léo .",
+        step1Instruction:"Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « à qui ? »</span>).",
+        step1Targets:["à","Léo"],
+        step2Instruction:"Quel pronom remplace « à Léo » ?",
+        classifyChoices:["le","la","les","lui","leur"], step2Answer:"lui",
+        rewriteSentence:"Julie lui prête son livre." },
+      { type:"classification-etapes",
+        instruction:"Clique sur le groupe complément de la phrase, puis choisis le bon pronom.",
+        sentence:"Les pompiers sauvent le chat .",
+        step1Instruction:"Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « qui ? »</span>).",
+        step1Targets:["le","chat"],
+        step2Instruction:"Quel pronom remplace « le chat » ?",
+        classifyChoices:["le","la","les","lui","leur"], step2Answer:"le",
+        rewriteSentence:"Les pompiers le sauvent." },
+      { type:"classification-etapes",
+        instruction:"Clique sur le groupe complément de la phrase, puis choisis le bon pronom.",
+        sentence:"La médecin soigne le patient .",
+        step1Instruction:"Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « qui ? »</span>).",
+        step1Targets:["le","patient"],
+        step2Instruction:"Quel pronom remplace « le patient » ?",
+        classifyChoices:["le","la","les","lui","leur"], step2Answer:"le",
+        rewriteSentence:"La médecin le soigne." },
+      { type:"classification-etapes",
+        instruction:"Clique sur le groupe complément de la phrase, puis choisis le bon pronom.",
+        sentence:"Nous écrivons une lettre à nos grands-parents .",
+        step1Instruction:"Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « à qui ? »</span>).",
+        step1Targets:["à","nos","grands-parents"],
+        step2Instruction:"Quel pronom remplace « à nos grands-parents » ?",
+        classifyChoices:["le","la","les","lui","leur"], step2Answer:"leur",
+        rewriteSentence:"Nous leur écrivons une lettre." },
+      { type:"classification-etapes",
+        instruction:"Clique sur le groupe complément de la phrase, puis choisis le bon pronom.",
+        sentence:"Tu ranges tes affaires .",
+        step1Instruction:"Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « quoi ? »</span>).",
+        step1Targets:["tes","affaires"],
+        step2Instruction:"Quel pronom remplace « tes affaires » ?",
+        classifyChoices:["le","la","les","lui","leur"], step2Answer:"les",
+        rewriteSentence:"Tu les ranges." },
+      { type:"classification-etapes",
+        instruction:"Clique sur le groupe complément de la phrase, puis choisis le bon pronom.",
+        sentence:"Le vendeur donne le paquet à la cliente .",
+        step1Instruction:"Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « à qui ? »</span>).",
+        step1Targets:["à","la","cliente"],
+        step2Instruction:"Quel pronom remplace « à la cliente » ?",
+        classifyChoices:["le","la","les","lui","leur"], step2Answer:"lui",
+        rewriteSentence:"Le vendeur lui donne le paquet." },
+      { type:"classification-etapes",
+        instruction:"Clique sur le groupe complément de la phrase, puis choisis le bon pronom.",
+        sentence:"Paul dessine un portrait .",
+        step1Instruction:"Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « quoi ? »</span>).",
+        step1Targets:["un","portrait"],
+        step2Instruction:"Quel pronom remplace « un portrait » ?",
+        classifyChoices:["le","la","les","lui","leur"], step2Answer:"le",
+        rewriteSentence:"Paul le dessine." }
+    ],
+
+    level3Bank: [
+      { type:"texte-a-trous",
+        instruction:"Récris la phrase en remplaçant le ou les compléments par le(s) pronom(s) qui conviennent :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Le facteur apporte le colis à Mme Dupont . »</span>",
+        sentence:"Le facteur ___ apporte .",
+        blanks:[{ answer:"le lui",
+          hint:"COD « le colis » → le ; COI « à Mme Dupont » → lui ; le COD se place avant le COI." }] },
+      { type:"texte-a-trous",
+        instruction:"Récris la phrase en remplaçant le ou les compléments par le(s) pronom(s) qui conviennent :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Les enfants racontent leur journée à leurs parents . »</span>",
+        sentence:"Les enfants ___ racontent .",
+        blanks:[{ answer:"la leur",
+          hint:"COD « leur journée » (féminin singulier) → la ; COI « à leurs parents » → leur ; le COD se place avant le COI." }] },
+      { type:"texte-a-trous",
+        instruction:"Récris la phrase en remplaçant le complément par le pronom qui convient :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« La bibliothécaire range les livres . »</span>",
+        sentence:"La bibliothécaire ___ range .",
+        blanks:[{ answer:"les",
+          hint:"COD « les livres » (pluriel) → les." }] },
+      { type:"texte-a-trous",
+        instruction:"Récris la phrase en remplaçant le ou les compléments par le(s) pronom(s) qui conviennent :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« J'envoie un message à mon ami . »</span>",
+        sentence:"Je ___ envoie .",
+        blanks:[{ answer:"le lui",
+          hint:"COD « un message » → le ; COI « à mon ami » → lui ; le COD se place avant le COI." }] },
+      { type:"texte-a-trous",
+        instruction:"Récris la phrase en remplaçant le complément par le pronom qui convient :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Le chef cuisinier prépare le dessert . »</span>",
+        sentence:"Le chef cuisinier ___ prépare .",
+        blanks:[{ answer:"le",
+          hint:"COD « le dessert » (masculin singulier) → le." }] },
+      { type:"texte-a-trous",
+        instruction:"Récris la phrase en remplaçant le ou les compléments par le(s) pronom(s) qui conviennent :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Elle confie son secret à sa meilleure amie . »</span>",
+        sentence:"Elle ___ confie .",
+        blanks:[{ answer:"le lui",
+          hint:"COD « son secret » → le ; COI « à sa meilleure amie » → lui ; le COD se place avant le COI." }] },
+      { type:"texte-a-trous",
+        instruction:"Récris la phrase en remplaçant le complément par le pronom qui convient :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Nous rendons visite à nos cousins . »</span>",
+        sentence:"Nous ___ rendons visite .",
+        blanks:[{ answer:"leur",
+          hint:"COI « à nos cousins » (pluriel) → leur." }] },
+      { type:"texte-a-trous",
+        instruction:"Récris la phrase en remplaçant le complément par le pronom qui convient :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Le maître corrige les exercices des élèves . »</span>",
+        sentence:"Le maître ___ corrige .",
+        blanks:[{ answer:"les",
+          hint:"Le GN complet « les exercices des élèves » (COD, pluriel) → les." }] },
+      { type:"texte-a-trous",
+        instruction:"Récris la phrase en remplaçant le ou les compléments par le(s) pronom(s) qui conviennent :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Tu donnes ta réponse au professeur . »</span>",
+        sentence:"Tu ___ donnes .",
+        blanks:[{ answer:"la lui",
+          hint:"COD « ta réponse » (féminin singulier) → la ; COI « au professeur » → lui ; le COD se place avant le COI." }] },
+      { type:"texte-a-trous",
+        instruction:"Récris la phrase en remplaçant le ou les compléments par le(s) pronom(s) qui conviennent :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Les voisins prêtent leur tondeuse à mon père . »</span>",
+        sentence:"Les voisins ___ prêtent .",
+        blanks:[{ answer:"la lui",
+          hint:"COD « leur tondeuse » (féminin singulier) → la ; COI « à mon père » → lui ; le COD se place avant le COI." }] }
     ]
   },
 

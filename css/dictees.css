@@ -145,6 +145,17 @@
   outline: none;
 }
 
+/* Écran "que veux-tu travailler en premier ?" — mêmes boutons que le choix de
+   niveau, coloration reprise du code couleur lexical (bleu) / grammatical
+   (ambre) déjà établi ailleurs dans le module. */
+.dic-ordre-choice-btn { font-size: 16px; font-weight: 700; min-width: 210px; }
+.dic-ordre-choice-btn[data-ordre="lexical"] { color: var(--blue); }
+.dic-ordre-choice-btn[data-ordre="lexical"]:hover,
+.dic-ordre-choice-btn[data-ordre="lexical"]:focus-visible { border-color: var(--blue); }
+.dic-ordre-choice-btn[data-ordre="grammatical"] { color: #7A4D0A; }
+.dic-ordre-choice-btn[data-ordre="grammatical"]:hover,
+.dic-ordre-choice-btn[data-ordre="grammatical"]:focus-visible { border-color: #F5A623; }
+
 /* ─── Écran de dictée (dictee.html) — bandeau d'étape et consigne ──────── */
 .dic-intro-consigne {
   background: var(--card-bg);
@@ -162,6 +173,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 18px;
 }
@@ -174,24 +186,50 @@
   border: 2px solid var(--border);
   color: var(--muted);
   background: var(--card-bg);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .dic-step--active { border-color: var(--blue); color: var(--blue); }
 .dic-step--done { background: var(--blue); border-color: var(--blue); color: #fff; }
+/* Paliers grammaticaux (2/3/4) : ambre plutôt que bleu — même code couleur
+   que .dic-section-label--gram et le formulaire enseignant
+   (dictees-enseignant.html, .dic-gram-section), pour que l'élève identifie
+   tout de suite le changement de bloc de travail. */
+.dic-step--gram.dic-step--active { border-color: #F5A623; color: #7A4D0A; }
+.dic-step--gram.dic-step--done { background: #F5A623; border-color: #F5A623; color: #fff; }
+
+/* Bandeau "Orthographe lexicale" / "Orthographe grammaticale" au-dessus de
+   chaque exercice — sépare visuellement les deux blocs pour l'élève. */
+.dic-section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: 6px 16px;
+  border-radius: 100px;
+  margin-bottom: 18px;
+}
+.dic-section-label--lexical { background: rgba(16,43,106,0.08); color: var(--blue); }
+.dic-section-label--gram { background: rgba(245,166,35,0.16); color: #7A4D0A; }
 
 .dic-progress-msg {
   text-align: center;
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 18px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: #3F4552;
+  margin-bottom: 20px;
 }
 
 /* ─── Item de dictée : capsule sonore + saisie (adapté de l'exercice
    "mots invariables" d'exercise.html, mécanique de dictée déjà éprouvée) ── */
 .dic-counters { text-align: center; margin-bottom: 20px; }
 .dic-word-count {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
-  color: var(--muted);
+  color: #3F4552;
 }
 
 .dic-listen-row {
@@ -326,8 +364,8 @@
 }
 .dic-final-detail {
   text-align: center;
-  font-size: 14px;
-  color: var(--muted);
+  font-size: 15px;
+  color: #3F4552;
   margin-bottom: 22px;
 }
 .dic-actions {
@@ -338,9 +376,188 @@
   flex-wrap: wrap;
 }
 
+/* ─── Orthographe grammaticale (paliers 2/3/4) ──────────────────────────── */
+
+/* Palier 2 — classification par nature grammaticale : mots restants affichés
+   en tokens cliquables, puis choix de la nature une fois un mot sélectionné
+   (même famille d'interaction que classification-etapes d'exercise.html). */
+.dic-classify-words {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: 560px;
+  margin: 0 auto 16px;
+}
+.dic-classify-word {
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--card-bg);
+  cursor: pointer;
+  transition: border-color 150ms, background 150ms;
+}
+.dic-classify-word:hover:not(:disabled) { border-color: var(--blue); }
+.dic-classify-word.is-selected { border-color: var(--blue); background: rgba(16,43,106,0.08); color: var(--blue); }
+.dic-classify-word.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.10); color: #15803d; }
+.dic-classify-word.is-wrong { border-color: var(--red); background: rgba(214,40,57,0.10); color: var(--red); }
+.dic-classify-word:disabled { cursor: default; }
+
+.dic-classify-choices {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: 560px;
+  margin: 0 auto 16px;
+}
+.dic-classify-choice {
+  border: 1.5px solid rgba(16,43,106,0.25);
+  border-radius: 100px;
+  padding: 7px 16px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue);
+  background: rgba(16,43,106,0.05);
+  cursor: pointer;
+  transition: background 150ms, transform 150ms;
+}
+.dic-classify-choice:hover:not(:disabled) { background: rgba(16,43,106,0.12); transform: translateY(-1px); }
+.dic-classify-choice.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.15); color: #15803d; }
+.dic-classify-choice.is-wrong { border-color: var(--red); background: rgba(214,40,57,0.15); color: var(--red); }
+.dic-classify-choice:disabled { cursor: default; }
+
+/* Tableau de synthèse cumulatif — voir classificationTableHtml() dans
+   js/dictees-engine.js pour la logique de regroupement. */
+.dic-classify-table-wrap { margin-top: 24px; padding-top: 18px; border-top: 1.5px solid var(--border); }
+.dic-classify-table-title { text-align: center; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 12px; }
+.dic-classify-table { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.dic-classify-col { flex: 1 1 120px; max-width: 170px; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; background: var(--card-bg); }
+.dic-classify-col-header { font-family: var(--font-display); font-weight: 700; font-size: 12px; color: #7A4D0A; margin-bottom: 8px; text-align: center; }
+.dic-classify-col-body { display: flex; flex-direction: column; gap: 5px; align-items: center; min-height: 20px; }
+.dic-classify-chip { font-size: 12px; font-weight: 600; color: var(--text); background: rgba(245,166,35,0.12); border-radius: 8px; padding: 4px 9px; }
+.dic-classify-col-empty { font-size: 12px; color: var(--muted); }
+
+.dic-trou-hint { text-align: center; font-size: 14.5px; line-height: 1.5; color: #3F4552; margin: 0 0 18px; }
+
+/* Palier 3 — texte à trous taggé : phrase en flux avec des inputs inline aux
+   positions masquées. Le tag de règle n'est jamais affiché à l'écran (reste
+   en base pour l'enseignant, voir dictee-grammar-print.css pour son seul
+   affichage restant, sur le PDF). Présentation en carte aérée, fort
+   contraste et interlignage/espacement généreux — pensée pour un élève
+   dyslexique (retour utilisateur) ; pas de police "dys" dédiée introduite,
+   aucune n'est utilisée ailleurs sur le site (vérifié). */
+.dic-trou-card {
+  max-width: 640px;
+  margin: 0 auto 20px;
+  padding: 30px 26px;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+}
+.dic-trou-sentence {
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 2.9;
+  letter-spacing: 0.01em;
+  word-spacing: 0.14em;
+  text-align: center;
+  color: var(--text);
+}
+.dic-trou-blank-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  vertical-align: middle;
+  margin: 0 4px;
+}
+.dic-trou-blank-input {
+  vertical-align: middle;
+  text-align: center;
+  border: 2.5px solid var(--blue);
+  border-radius: 10px;
+  padding: 7px 10px;
+  min-height: 40px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  background: #fff;
+  outline: none;
+  transition: border-color 200ms, background 200ms, box-shadow 200ms;
+}
+.dic-trou-blank-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(16,43,106,0.15); }
+.dic-trou-blank-input.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.08); color: #15803d; }
+.dic-trou-blank-input.is-wrong { border-color: var(--red); background: rgba(214,40,57,0.08); color: var(--red); }
+
+/* Haut-parleur par trou — lit le mot attendu à voix haute
+   (DicteesSpeech.speak). Compact : à côté d'un input plutôt qu'un gros
+   bouton pilule comme .dic-listen-btn (réservé au palier "dictée audio"). */
+.dic-trou-speak-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(16,43,106,0.22);
+  background: rgba(16,43,106,0.06);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 150ms;
+}
+.dic-trou-speak-btn:hover:not(:disabled) { background: rgba(16,43,106,0.12); }
+.dic-trou-speak-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* Palier 4 — transformation de phrase : réutilise .dic-input/.dic-input-row,
+   juste plus large (phrase entière, pas un seul mot). Consigne ("Réécris
+   cette phrase au pluriel.") mise en évidence — remplace l'ancien
+   .dic-trou-hint (13px, gris sur clair) trop peu contrasté/trop petit,
+   notamment pour un·e élève dys. Couleur ambre : même famille que le reste
+   du volet grammatical (voir .dic-step--gram plus bas). */
+.dic-transfo-consigne {
+  max-width: 480px;
+  margin: 0 auto 18px;
+  padding: 12px 22px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.4;
+  color: #7A4D0A;
+  background: rgba(245,166,35,0.16);
+  border: 1.5px solid rgba(245,166,35,0.4);
+  border-radius: 12px;
+}
+.dic-transfo-input-row { max-width: 640px; }
+.dic-transfo-input { font-size: 16px; }
+
 @media (max-width: 480px) {
   .dic-input { font-size: 17px; }
+  .dic-trou-card { padding: 22px 16px; }
+  .dic-trou-sentence { font-size: 18px; }
 }
+
+/* ─── "Mes dictées" (dashboard-eleve.html) — une ligne par dictée faite, avec
+   le résultat lexical et les résultats grammaticaux tentés, plutôt qu'une
+   moyenne globale. ──────────────────────────────────────────────────────── */
+.dic-mydictees-row {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px; margin-bottom: 8px;
+}
+.dic-mydictees-title { font-weight: 700; font-size: 13.5px; color: var(--text); flex: 1; min-width: 140px; }
+.dic-mydictees-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.dic-mydictees-pill { font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 100px; white-space: nowrap; }
+.dic-mydictees-pill--good { background: rgba(29,191,160,0.12); color: #0E7A66; }
+.dic-mydictees-pill--ok   { background: rgba(245,166,35,0.14); color: #7A4D0A; }
+.dic-mydictees-pill--low  { background: rgba(214,40,57,0.10); color: var(--red); }
 
 /* ─── Mon évolution (dashboard-eleve.html, onglet "Mes dictées préparées") —
    valeurs recopiées de .jog-evo-bars (css/jogging.css) : même composant

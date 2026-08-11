@@ -31,7 +31,10 @@ const lfmDicteesTeacher = (() => {
     return (dictees || []).map(d => ({ ...d, mot_count: countMap[d.id] || 0 }));
   }
 
-  /* Dictée complète (pour édition), avec ses mots triés par ordre. */
+  /* Dictée complète (pour édition), avec ses mots triés par ordre, ainsi que
+     les 3 collections du volet Orthographe grammaticale (§2 du cahier des
+     charges) — chargées en parallèle, aucune n'est requise (une dictée peut
+     n'avoir aucun exercice grammatical). */
   async function getDictee(dicteeId) {
     const { data: dictee, error } = await db.from('dictees').select('*')
       .eq('id', dicteeId).single();
@@ -41,42 +44,65 @@ const lfmDicteesTeacher = (() => {
       .eq('dictee_id', dicteeId).order('ordre', { ascending: true });
     if (motsErr) throw motsErr;
 
-    return { dictee, mots: mots || [] };
+    const [trous, transformations, extraMots] = await Promise.all([
+      getTrous(dicteeId),
+      getTransformations(dicteeId),
+      getGramExtraMots(dicteeId)
+    ]);
+
+    return { dictee, mots: mots || [], trous, transformations, extraMots };
   }
 
   /**
-   * Crée une dictée et ses mots en une opération.
-   * `mots` : [{ contenu, niveau }] — l'ordre est déduit de la position dans
-   * le tableau (correspond à l'ordre de saisie dans la zone de texte).
+   * Crée une dictée et ses mots/exercices grammaticaux en une opération.
+   * `mots` : [{ contenu, niveau, nature_grammaticale }] — l'ordre est déduit
+   * de la position dans le tableau (correspond à l'ordre de saisie dans la
+   * zone de texte). `trous`/`transformations`/`extraMots` : voir §2/§1 des
+   * fonctions replaceX ci-dessous.
+   *
+   * Ne touche plus `points_grammaticaux` (champ retiré de l'interface —
+   * présentation jugée trop dense pour son utilité, retour utilisateur) :
+   * la colonne existe toujours en base et d'éventuelles valeurs antérieures
+   * sont conservées telles quelles, mais plus jamais lues/écrites/affichées
+   * par le client (voir aussi dictees-catalogue.html, épuré de même).
    */
-  async function createDictee(classId, teacherId, titre, pointsGrammaticaux, mots) {
+  async function createDictee(classId, teacherId, titre, mots, trous, transformations, extraMots) {
     const { data: dictee, error } = await db.from('dictees').insert({
       class_id: classId,
       teacher_id: teacherId,
-      titre: titre.trim(),
-      points_grammaticaux: pointsGrammaticaux
+      titre: titre.trim()
     }).select().single();
     if (error) throw error;
 
-    await replaceMots(dictee.id, mots);
+    await Promise.all([
+      replaceMots(dictee.id, mots),
+      replaceTrous(dictee.id, trous),
+      replaceTransformations(dictee.id, transformations),
+      replaceGramExtraMots(dictee.id, extraMots)
+    ]);
     return dictee;
   }
 
-  async function updateDictee(dicteeId, titre, pointsGrammaticaux, mots) {
+  async function updateDictee(dicteeId, titre, mots, trous, transformations, extraMots) {
     const { error } = await db.from('dictees').update({
       titre: titre.trim(),
-      points_grammaticaux: pointsGrammaticaux,
       updated_at: new Date().toISOString()
     }).eq('id', dicteeId);
     if (error) throw error;
 
-    await replaceMots(dicteeId, mots);
+    await Promise.all([
+      replaceMots(dicteeId, mots),
+      replaceTrous(dicteeId, trous),
+      replaceTransformations(dicteeId, transformations),
+      replaceGramExtraMots(dicteeId, extraMots)
+    ]);
   }
 
   /* Remplace intégralement la liste des mots d'une dictée (le formulaire
      enseignant ressaisit la liste entière à chaque modification — plus
      simple et plus sûr qu'un diff fin, et cohérent avec la zone de texte
-     unique en points-virgules côté saisie). */
+     unique en points-virgules côté saisie). `nature_grammaticale` est
+     optionnel (volet classification, §3). */
   async function replaceMots(dicteeId, mots) {
     const { error: delErr } = await db.from('dictee_mots').delete().eq('dictee_id', dicteeId);
     if (delErr) throw delErr;
@@ -86,10 +112,105 @@ const lfmDicteesTeacher = (() => {
       dictee_id: dicteeId,
       contenu: m.contenu.trim(),
       niveau: m.niveau,
+      nature_grammaticale: m.nature_grammaticale || null,
       ordre: i
     }));
     const { error: insErr } = await db.from('dictee_mots').insert(rows);
     if (insErr) throw insErr;
+  }
+
+  /* Texte à trous taggé (§1) : une phrase par item, `tags` = mots
+     sélectionnés dans cette phrase, chacun avec sa position (index dans
+     phrase.split(/\s+/)), sa réponse attendue et son tag de règle. Même
+     delete-then-reinsert que replaceMots ; le delete sur dictee_trous
+     cascade sur dictee_trous_mots. */
+  async function replaceTrous(dicteeId, trous) {
+    const { error: delErr } = await db.from('dictee_trous').delete().eq('dictee_id', dicteeId);
+    if (delErr) throw delErr;
+
+    if (!trous || trous.length === 0) return;
+
+    const trouRows = trous.map((t, i) => ({
+      dictee_id: dicteeId,
+      phrase: t.phrase.trim(),
+      ordre: i
+    }));
+    const { data: insertedTrous, error: insErr } = await db.from('dictee_trous').insert(trouRows).select();
+    if (insErr) throw insErr;
+
+    const motRows = [];
+    insertedTrous.forEach((row, i) => {
+      (trous[i].tags || []).forEach(tag => {
+        motRows.push({
+          trou_id: row.id,
+          mot_attendu: tag.mot_attendu.trim(),
+          position: tag.position,
+          regle: tag.regle.trim(),
+          reponses_alt: tag.reponses_alt || []
+        });
+      });
+    });
+    if (motRows.length > 0) {
+      const { error: motsErr } = await db.from('dictee_trous_mots').insert(motRows);
+      if (motsErr) throw motsErr;
+    }
+  }
+
+  async function getTrous(dicteeId) {
+    const { data, error } = await db.from('dictee_trous')
+      .select('*, dictee_trous_mots(*)')
+      .eq('dictee_id', dicteeId).order('ordre', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  }
+
+  /* Transformation de phrase (§2). */
+  async function replaceTransformations(dicteeId, transformations) {
+    const { error: delErr } = await db.from('dictee_transformations').delete().eq('dictee_id', dicteeId);
+    if (delErr) throw delErr;
+
+    if (!transformations || transformations.length === 0) return;
+    const rows = transformations.map((t, i) => ({
+      dictee_id: dicteeId,
+      phrase_depart: t.phrase_depart.trim(),
+      type_transformation: t.type_transformation,
+      phrase_attendue: t.phrase_attendue.trim(),
+      phrase_attendue_alt: t.phrase_attendue_alt || [],
+      ordre: i
+    }));
+    const { error: insErr } = await db.from('dictee_transformations').insert(rows);
+    if (insErr) throw insErr;
+  }
+
+  async function getTransformations(dicteeId) {
+    const { data, error } = await db.from('dictee_transformations').select('*')
+      .eq('dictee_id', dicteeId).order('ordre', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  }
+
+  /* Mots supplémentaires de classification (§3) — n'existent que pour cet
+     exercice, jamais fusionnés dans dictee_mots. */
+  async function replaceGramExtraMots(dicteeId, extraMots) {
+    const { error: delErr } = await db.from('dictee_gram_extra_mots').delete().eq('dictee_id', dicteeId);
+    if (delErr) throw delErr;
+
+    if (!extraMots || extraMots.length === 0) return;
+    const rows = extraMots.map((m, i) => ({
+      dictee_id: dicteeId,
+      contenu: m.contenu.trim(),
+      nature_grammaticale: m.nature_grammaticale,
+      ordre: i
+    }));
+    const { error: insErr } = await db.from('dictee_gram_extra_mots').insert(rows);
+    if (insErr) throw insErr;
+  }
+
+  async function getGramExtraMots(dicteeId) {
+    const { data, error } = await db.from('dictee_gram_extra_mots').select('*')
+      .eq('dictee_id', dicteeId).order('ordre', { ascending: true });
+    if (error) throw error;
+    return data || [];
   }
 
   async function deleteDictee(dicteeId) {
@@ -97,117 +218,94 @@ const lfmDicteesTeacher = (() => {
     if (error) throw error;
   }
 
-  /* Tally générique mot→nb de fois raté (wrong_mot_ids), résolu contre
-     dictee_mots.contenu et trié du plus au moins raté — utilisé aussi bien
-     pour le tally global de la classe que pour le tally d'un seul élève
-     (même mots, même méthode, juste un sous-ensemble de `results` différent
-     en entrée). */
-  function tallyMissedWords(resultsList, motById) {
-    const missTally = new Map();
-    resultsList.forEach(r => (r.wrong_mot_ids || []).forEach(motId => {
-      missTally.set(motId, (missTally.get(motId) || 0) + 1);
-    }));
-    return [...missTally.entries()]
-      .map(([motId, count]) => ({ contenu: motById.get(motId) ? motById.get(motId).contenu : '—', count }))
-      .sort((a, b) => b.count - a.count);
-  }
-
-  /* Seuil minimal avant d'inclure un élève dans "Élèves à suivre" : on
-     retient tout élève ayant au moins une tentative d'exercice 1, plutôt
-     qu'un seuil élevé façon MIN_ATTEMPTS_RANKING (js/teacher-analytics.js,
-     10 exercices) — inadapté ici, une classe n'a en pratique que quelques
-     dictées au total. `missedWords` (mots ratés de CET élève, toutes
-     dictées/sessions confondues) n'est calculé que pour les élèves déjà
-     retenus ici — pas de vue par élève indépendante, la liste "à suivre"
-     sert aussi de point d'entrée pour le détail par élève côté page. */
-  function computeStudentsToWatch(students, resultsByStudent, motById) {
-    const rows = students.map(st => {
-      const results = resultsByStudent.get(st.auth_user_id) || [];
-      const ex1 = results.filter(r => r.exercice === 1);
-      const completedCount = new Set(results.filter(r => r.exercice === 2).map(r => r.dictee_id)).size;
-      const ex1ScoreSum = ex1.reduce((s, r) => s + (r.score || 0), 0);
-      const ex1TotalSum = ex1.reduce((s, r) => s + (r.total || 0), 0);
-      const avgPct = ex1TotalSum > 0 ? Math.round((ex1ScoreSum / ex1TotalSum) * 100) : null;
-      return { student: st, completedCount, avgPct, results };
-    });
-
-    const withData = rows.filter(r => r.completedCount > 0 || r.avgPct !== null);
-    if (withData.length === 0) return [];
-
-    const avgCompleted = withData.reduce((s, r) => s + r.completedCount, 0) / withData.length;
-    return rows
-      .filter(r => r.completedCount < avgCompleted || (r.avgPct !== null && r.avgPct < 60))
-      .sort((a, b) => (a.avgPct ?? 0) - (b.avgPct ?? 0) || a.completedCount - b.completedCount)
-      .slice(0, 8)
-      .map(r => ({ ...r, missedWords: tallyMissedWords(r.results, motById) }));
-  }
-
   /**
-   * Statistiques de classe (calculées à la volée à partir de dictee_results/
-   * dictee_mots — aucune table précalculée, cf. §4 du cahier des charges).
+   * Rapport de résultats de la classe — structure "une dictée → qui l'a
+   * faite → avec quel résultat", calculée à la volée (pas de table
+   * précalculée). Remplace l'ancien duo getClassDicteeStats/getClassGramStats
+   * (moyennes globales + "mots les plus ratés" + "élèves à suivre" séparés,
+   * jugé confus — retour utilisateur) par la vue simple à deux temps attendue
+   * côté page : liste des dictées, puis au clic la liste des élèves avec
+   * leur résultat lexical (ex.1 de dictee_results, pastille bleue) et
+   * grammatical par type (dictee_gram_results, pastilles jaunes) — plus
+   * aucun agrégat de classe intermédiaire.
    *
-   *  - perDictee : taux de réussite moyen ex.1, tentatives moyennes par mot
-   *    à l'ex.2 (indicateur de difficulté — normalisé par le nombre de mots
-   *    pour rester comparable entre dictées de longueurs différentes).
-   *  - mostMissed : mots les plus ratés toutes dictées confondues (dérivé de
-   *    dictee_results.wrong_mot_ids).
-   *  - studentsToWatch : peu de dictées complétées ou taux ex.1 bas ; chaque
-   *    entrée porte aussi `missedWords` (mots ratés de CET élève, même tally
-   *    que mostMissed mais restreint à ses propres résultats).
+   * `perDictee` ne contient QUE les dictées ayant au moins un résultat
+   * (lexical OU grammatical), triées comme getClassDictees (created_at
+   * desc). `students` : triés par nom, un élève par entrée dès qu'il a au
+   * moins un résultat sur CETTE dictée ; `lexicalPct` = dernière tentative
+   * ex.1 (null si jamais tentée) ; `gramByType` = dernière tentative par
+   * type classification/trous/transformation (null si jamais tenté) — la
+   * page n'affiche une pastille que pour les types réellement tentés.
    */
-  async function getClassDicteeStats(classId) {
+  async function getClassDicteeReport(classId) {
     const dictees = await getClassDictees(classId);
     const students = await lfmTeacher.getStudents(classId);
     const authIds = students.map(s => s.auth_user_id).filter(Boolean);
     const dicteeIds = dictees.map(d => d.id);
+    const studentById = new Map(students.map(s => [s.auth_user_id, s]));
 
-    let results = [];
+    let lexResults = [], gramResults = [];
     if (dicteeIds.length > 0 && authIds.length > 0) {
-      const { data, error } = await db.from('dictee_results').select('*')
-        .in('dictee_id', dicteeIds).in('student_id', authIds).limit(5000);
-      if (error) throw error;
-      results = data || [];
+      const [lexRes, gramRes] = await Promise.all([
+        db.from('dictee_results').select('*')
+          .in('dictee_id', dicteeIds).in('student_id', authIds).eq('exercice', 1).limit(5000),
+        db.from('dictee_gram_results').select('*')
+          .in('dictee_id', dicteeIds).in('student_id', authIds).limit(5000)
+      ]);
+      if (lexRes.error) throw lexRes.error;
+      if (gramRes.error) throw gramRes.error;
+      lexResults = lexRes.data || [];
+      gramResults = gramRes.data || [];
     }
 
-    let mots = [];
-    if (dicteeIds.length > 0) {
-      const { data, error } = await db.from('dictee_mots').select('id, dictee_id, contenu')
-        .in('dictee_id', dicteeIds);
-      if (error) throw error;
-      mots = data || [];
-    }
-    const motById = new Map(mots.map(m => [m.id, m]));
+    const TYPES = ['classification', 'trous', 'transformation'];
 
-    /* ── Par dictée ── */
-    const perDictee = dictees.map(d => {
-      const dResults = results.filter(r => r.dictee_id === d.id);
-      const ex1 = dResults.filter(r => r.exercice === 1);
-      const ex2 = dResults.filter(r => r.exercice === 2 && r.attempts != null);
-
-      const ex1ScoreSum = ex1.reduce((s, r) => s + (r.score || 0), 0);
-      const ex1TotalSum = ex1.reduce((s, r) => s + (r.total || 0), 0);
-      const ex1AvgPct = ex1TotalSum > 0 ? Math.round((ex1ScoreSum / ex1TotalSum) * 100) : null;
-
-      const ex2AttemptsPerWord = (ex2.length > 0 && d.mot_count > 0)
-        ? Math.round((ex2.reduce((s, r) => s + r.attempts, 0) / ex2.length / d.mot_count) * 10) / 10
-        : null;
-
-      return { id: d.id, titre: d.titre, motCount: d.mot_count, ex1AvgPct, ex2AttemptsPerWord };
+    /* Dernière tentative par clé — un élève peut refaire un même exercice
+       plusieurs fois, on n'affiche que la plus récente. */
+    const lexLatest = new Map();
+    lexResults.forEach(r => {
+      const k = `${r.student_id}|${r.dictee_id}`;
+      const prev = lexLatest.get(k);
+      if (!prev || new Date(r.completed_at) > new Date(prev.completed_at)) lexLatest.set(k, r);
+    });
+    const gramLatest = new Map();
+    gramResults.forEach(r => {
+      const k = `${r.student_id}|${r.dictee_id}|${r.type}`;
+      const prev = gramLatest.get(k);
+      if (!prev || new Date(r.completed_at) > new Date(prev.completed_at)) gramLatest.set(k, r);
     });
 
-    /* ── Mots les plus ratés (toute la classe) ── */
-    const mostMissed = tallyMissedWords(results, motById).slice(0, 8);
+    const perDictee = dictees
+      .map(d => {
+        const studentIds = new Set([
+          ...lexResults.filter(r => r.dictee_id === d.id).map(r => r.student_id),
+          ...gramResults.filter(r => r.dictee_id === d.id).map(r => r.student_id)
+        ]);
+        if (studentIds.size === 0) return null;
 
-    /* ── Élèves à suivre (+ mots ratés par élève, voir computeStudentsToWatch) ── */
-    const resultsByStudent = new Map();
-    results.forEach(r => {
-      if (!resultsByStudent.has(r.student_id)) resultsByStudent.set(r.student_id, []);
-      resultsByStudent.get(r.student_id).push(r);
-    });
-    const studentsToWatch = computeStudentsToWatch(students, resultsByStudent, motById);
+        const studentsList = [...studentIds].map(studentId => {
+          const lex = lexLatest.get(`${studentId}|${d.id}`);
+          const gramByType = {};
+          TYPES.forEach(type => {
+            const r = gramLatest.get(`${studentId}|${d.id}|${type}`);
+            gramByType[type] = r ? Math.round((r.score / r.total) * 100) : null;
+          });
+          return {
+            student: studentById.get(studentId) || { display_name: 'Élève inconnu' },
+            lexicalPct: lex ? Math.round((lex.score / lex.total) * 100) : null,
+            gramByType
+          };
+        }).sort((a, b) => a.student.display_name.localeCompare(b.student.display_name, 'fr'));
 
-    return { perDictee, mostMissed, studentsToWatch };
+        return { id: d.id, titre: d.titre, students: studentsList };
+      })
+      .filter(Boolean);
+
+    return { perDictee };
   }
 
-  return { getClassDictees, getDictee, createDictee, updateDictee, deleteDictee, getClassDicteeStats };
+  return {
+    getClassDictees, getDictee, createDictee, updateDictee, deleteDictee,
+    getClassDicteeReport
+  };
 })();

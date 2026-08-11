@@ -28,8 +28,40 @@
           paliers la correction est automatique (DicteesSpeech.normalize),
           seulement différée à la fin du lot. Un mot encore faux après
           repêchage réapparaît dans un lot ultérieur (jamais le suivant
-          immédiat). Dernier palier du parcours : son écran de fin
-          (showExercice1Results) est l'écran de fin du module entier.
+          immédiat).
+
+   Puis, si la dictée en a été pourvue par l'enseignant, jusqu'à 3 paliers
+   Orthographe grammaticale (state.step 2/3/4, chacun sauté si aucune donnée
+   n'existe pour lui — voir gramSteps()/advanceAfter()) :
+     2.   Classification par nature grammaticale — mots difficiles taggés
+          (nature_grammaticale) + mots ajoutés spécifiquement pour cet
+          exercice (dictee_gram_extra_mots). Interaction "clic mot → clic
+          nature", même famille que classification-etapes dans exercise.html
+          (pas de drag-and-drop). Tableau de synthèse cumulatif sous la zone
+          active (classificationTableHtml) : les mots bien classés en
+          sortent mais restent visibles, rangés par nature.
+     3.   Texte à trous taggé — phrases de dictee_trous, mots masqués par
+          dictee_trous_mots. Le tag de règle (regle) n'est jamais affiché à
+          l'écran élève (reste en base pour l'enseignant/le PDF uniquement,
+          cf. renderTrousExercise). Correction tolérante à la ponctuation
+          (un oubli de virgule/point ne compte jamais faux) et à plusieurs
+          réponses acceptées par trou (DicteesSpeech.normalizeSentence +
+          answerMatchesAny).
+     4.   Transformation de phrase — phrase de départ + consigne de
+          transformation, réponse(s) attendue(s) saisie(s) par l'enseignant
+          (pas calculées) ; même comparaison tolérante qu'au palier 3.
+
+   Bloc lexical (0/0.5/1) et bloc grammatical (2/3/4) sont chacun un tout :
+   l'ordre INTERNE à chaque bloc est fixe, mais l'élève choisit lequel des
+   deux blocs passe en premier juste après le niveau (écran
+   dic-state-ordre-choice, voir showOrdreChoice/chooseOrdre/currentSequence)
+   — sauté directement en lexical si la dictée n'a aucun contenu grammatical.
+   Dernier palier de la séquence choisie : son écran de fin est l'écran de
+   fin du module entier (cf. advanceAfter).
+
+   Les résultats des 3 paliers grammaticaux vont dans dictee_gram_results
+   (jamais dictee_results ni exercise_results — cf. submitGramResult), lus
+   uniquement par resultats-dictees-enseignant.html.
 
    Le palier 0 et 0.5 sont purement formatifs : aucune écriture en base (voir
    submitResult, appelé uniquement pour l'exercice 1 ci-dessus).
@@ -40,21 +72,44 @@
    auth.js (lfmAuth), dictees-speech.js (DicteesSpeech), breadcrumb.js.
 
    SCHEMA_VERSION : la forme/les règles de `state` ont changé plusieurs fois
-   (dernier changement : palier "dictée finale" — state.step 2, `ex2` — retiré
-   entièrement du parcours ; une session sauvegardée sous l'ancien schéma
-   pourrait encore avoir step=2). Toute session sessionStorage sauvegardée
-   sous un schéma différent est ignorée au chargement (redémarrage propre sur
-   l'écran de choix du niveau) plutôt que de risquer un état incohérent — à
-   bumper à chaque futur changement de forme/règles de state.
+   (dernier changement : ajout de `ordreChoisi` et de l'écran de choix
+   d'ordre — `step` peut désormais démarrer sur n'importe quel palier du
+   bloc choisi en premier, plus seulement 0 ; une session sauvegardée sous un
+   schéma antérieur n'a pas ce champ et suppose toujours un démarrage en
+   lexical). Toute session sessionStorage sauvegardée sous un schéma
+   différent est ignorée au chargement (redémarrage propre sur l'écran de
+   choix du niveau) plutôt que de risquer un état incohérent — à bumper à
+   chaque futur changement de forme/règles de state.
    ───────────────────────────────────────────────────────────────────────────── */
 
 const DicteesEngine = (() => {
   const LOT_SIZE = 5;        // nb de mots par lot pour le palier 1 (dictée audio à correction retardée)
-  const SCHEMA_VERSION = 6;  // voir note ci-dessus
+  const SCHEMA_VERSION = 8;  // voir note ci-dessus
+
+  /* Liste fixe des natures grammaticales (dupliquée depuis
+     dictees-enseignant.html — pas de fichier utilitaire commun sur ce
+     module, cohérent avec son style actuel de fichiers autonomes). */
+  const NATURE_OPTIONS = ['nom commun', 'nom propre', 'verbe', 'adjectif', 'adverbe', 'déterminant', 'article défini',
+    'article indéfini', 'déterminant possessif', 'déterminant démonstratif', 'préposition', 'conjonction', 'autre'];
+
+  const TRANSFO_TYPE_LABELS = {
+    singulier_pluriel: 'Réécris cette phrase au pluriel.',
+    pluriel_singulier: 'Réécris cette phrase au singulier.',
+    masculin_feminin: 'Réécris cette phrase au féminin.',
+    feminin_masculin: 'Réécris cette phrase au masculin.',
+    present_futur: 'Réécris cette phrase au futur.',
+    futur_present: 'Réécris cette phrase au présent.',
+    present_passe: 'Réécris cette phrase au passé.',
+    passe_present: 'Réécris cette phrase au présent.'
+  };
 
   let dictee = null;
   let allMots = [];  // tous les mots de la dictée, non filtrés
   let mots = [];      // mots effectivement travaillés (filtrés selon le niveau choisi)
+  let gramTrous = [];             // dictee_trous + dictee_trous_mots imbriqués
+  let gramTransformations = [];   // dictee_transformations
+  let gramExtraMots = [];         // dictee_gram_extra_mots
+  let classificationPool = [];    // dictee_mots taggés + gramExtraMots, forme unifiée {id, contenu, nature_grammaticale}
   let studentId = null;
   let state = null;
   let exStartTime = null;
@@ -91,28 +146,33 @@ const DicteesEngine = (() => {
     return div.innerHTML;
   }
 
-  function freshState(niveauChoisi) {
-    const ids = mots.map(m => m.id);
+  function capitalizeFr(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
+
+  /* Volet grammatical uniquement (texte à trous, transformation) : ignore
+     totalement la ponctuation (oubli de virgule/point toléré, cf.
+     DicteesSpeech.normalizeSentence) ET accepte n'importe laquelle des
+     réponses/formulations que l'enseignant a déclarées valables pour cet
+     item, pas seulement la réponse principale. */
+  function answerMatchesAny(typed, accepted) {
+    const t = DicteesSpeech.normalizeSentence(typed);
+    return accepted.some(a => DicteesSpeech.normalizeSentence(a) === t);
+  }
+
+  /* `step` démarre à null : le palier de départ dépend désormais de
+     `ordreChoisi` ('lexical' ou 'grammatical', choisi par l'élève juste
+     après le niveau — voir showOrdreChoice/chooseOrdre) et est fixé par le
+     premier start() de currentSequence(), pas ici. */
+  function freshState(niveauChoisi, ordreChoisi) {
     return {
       niveauChoisi,
-      step: 0,
-      /* Mécanique de tirage differé (deck mélangé, unmastered = mots pas
-         encore réussis, réutilisée par les autres paliers) : un mot raté
-         reste hors du deck courant et ne revient qu'au réapprovisionnement
-         (mélange des mots restants), donc jamais immédiatement après. Pas de
-         champ submitted/wrongAny : ce palier n'écrit jamais en base (voir
-         en-tête du fichier). */
-      ex0: {
-        unmastered: ids,
-        deck: shuffle(ids),
-        current: null,
-        phase: 'photo',   // 'photo' (mot affiché) → 'input' (saisie, correction automatique)
-        correct: 0,
-        attempts: 0,
-        wrongIds: []
-      },
+      ordreChoisi,
+      step: null,
+      ex0: null,
       ex05: null,
       ex1: null,
+      classification: null,
+      trous: null,
+      transfo: null,
       schemaVersion: SCHEMA_VERSION
     };
   }
@@ -139,6 +199,11 @@ const DicteesEngine = (() => {
     if (!session) return showError("Connecte-toi pour faire cette dictée.");
     studentId = session.user.id;
 
+    // Rejoue en tâche de fond d'éventuels résultats mis en attente lors d'un
+    // précédent échec d'envoi (voir submitResult/submitGramResult) — jamais
+    // bloquant pour le chargement de la dictée en cours.
+    flushPendingResults();
+
     try {
       const { data: d, error: dErr } = await window.lfmDb
         .from('dictees').select('*').eq('id', dicteeId).single();
@@ -154,6 +219,35 @@ const DicteesEngine = (() => {
     } catch (e) {
       return showError();
     }
+
+    /* Volet Orthographe grammaticale : facultatif, échec isolé (ex. migration
+       pas encore appliquée) ne doit jamais bloquer le chargement du volet
+       lexical déjà fonctionnel — repli sur des listes vides plutôt que
+       showError(). */
+    try {
+      const [trousRes, transfoRes, extraRes] = await Promise.all([
+        window.lfmDb.from('dictee_trous').select('*, dictee_trous_mots(*)').eq('dictee_id', dicteeId).order('ordre', { ascending: true }),
+        window.lfmDb.from('dictee_transformations').select('*').eq('dictee_id', dicteeId).order('ordre', { ascending: true }),
+        window.lfmDb.from('dictee_gram_extra_mots').select('*').eq('dictee_id', dicteeId).order('ordre', { ascending: true })
+      ]);
+      if (trousRes.error) throw trousRes.error;
+      if (transfoRes.error) throw transfoRes.error;
+      if (extraRes.error) throw extraRes.error;
+      gramTrous = (trousRes.data || []).filter(t => (t.dictee_trous_mots || []).length > 0);
+      gramTransformations = transfoRes.data || [];
+      gramExtraMots = extraRes.data || [];
+    } catch (e) {
+      console.warn('[LFM] DicteesEngine: volet orthographe grammaticale indisponible:', e.message);
+      gramTrous = []; gramTransformations = []; gramExtraMots = [];
+    }
+    /* Filet de sécurité : une entrée de plusieurs mots (ex. "une rentrée")
+       combine plusieurs natures, un seul champ ne peut pas les porter — elle
+       est exclue même si une nature s'y trouvait par erreur (donnée
+       antérieure à cette règle, cf. dictees-enseignant.html/isMultiWord). */
+    classificationPool = allMots
+      .filter(m => m.nature_grammaticale && m.contenu.trim().split(/\s+/).length === 1)
+      .map(m => ({ id: m.id, contenu: m.contenu, nature_grammaticale: m.nature_grammaticale }))
+      .concat(gramExtraMots.map(m => ({ id: m.id, contenu: m.contenu, nature_grammaticale: m.nature_grammaticale })));
 
     document.title = dictee.titre + ' — Dictée préparée — LFM';
     document.getElementById('dic-title').textContent = dictee.titre;
@@ -175,19 +269,44 @@ const DicteesEngine = (() => {
       mots = filterByChosenNiveau(allMots, saved.niveauChoisi);
       state = saved;
       exStartTime = Date.now();
+      trapBackToNiveauChoice();
       render();
     } else {
       showNiveauChoice();
     }
   }
 
+  /* ── Piège "un niveau de retour" pour le bouton retour du navigateur ────
+     Sans ceci, un appui sur retour depuis un exercice quittait carrément
+     dictee.html (vers la fiche dictée d'où l'élève venait) au lieu de
+     revenir à l'écran de choix du niveau qui précède les exercices — retour
+     utilisateur. On pousse une entrée d'historique dès qu'on quitte l'écran
+     de choix du niveau (ici et dans chooseNiveau) ; le popstate déclenché
+     par le bouton retour consomme cette entrée sans changer d'URL et
+     ramène sur ce même écran plutôt que de quitter la page. Un second appui
+     retour (aucune entrée piège encore posée à ce moment-là) quitte alors
+     la page normalement, comme attendu. */
+  function trapBackToNiveauChoice() {
+    history.pushState({ dicteeExercise: true }, '', location.href);
+  }
+
+  window.addEventListener('popstate', () => {
+    if (!dictee) return;
+    showNiveauChoice();
+  });
+
   /* ── Choix libre du niveau ───────────────────────────────────────────── */
   function showNiveauChoice() {
+    DicteesSpeech.cancel(); // coupe une éventuelle lecture audio en cours si on y revient depuis un exercice
     document.getElementById('dic-state-loading').style.display = 'none';
+    document.getElementById('dic-state-error').style.display = 'none';
+    document.getElementById('dic-state-ordre-choice').style.display = 'none';
+    document.getElementById('dic-state-exercise').style.display = 'none';
+    document.getElementById('dic-state-results').style.display = 'none';
     document.getElementById('dic-state-niveau-choice').style.display = '';
     document.getElementById('dic-niveau-choice-grid').innerHTML = [1, 2, 3].map(n => `
       <button type="button" class="dic-niveau-choice-btn" data-niveau="${n}">
-        <span class="ls-pastille" style="--ls-color:var(--ls-color-${n})">Niveau ${n}</span>
+        <span class="ls-pastille" style="--ls-color:var(--ls-color-${n})">Niveau de difficulté n°${n}</span>
       </button>
     `).join('');
     document.querySelectorAll('.dic-niveau-choice-btn').forEach(btn =>
@@ -195,13 +314,37 @@ const DicteesEngine = (() => {
     );
   }
 
+  /* Après le niveau, l'élève choisit ce qu'il veut travailler en premier
+     (lexical ou grammatical) — mais seulement si la dictée a effectivement
+     un volet grammatical à proposer ; sinon on démarre directement en
+     lexical, sans écran de choix inutile (comportement identique à avant
+     cette fonctionnalité). */
   function chooseNiveau(niveauChoisi) {
+    trapBackToNiveauChoice();
     mots = filterByChosenNiveau(allMots, niveauChoisi);
     document.getElementById('dic-state-niveau-choice').style.display = 'none';
-    state = freshState(niveauChoisi);
-    exStartTime = Date.now();
-    saveState();
-    render();
+    const hasGramContent = classificationPool.length > 0 || gramTrous.length > 0 || gramTransformations.length > 0;
+    if (hasGramContent) {
+      showOrdreChoice(niveauChoisi);
+    } else {
+      chooseOrdre(niveauChoisi, 'lexical');
+    }
+  }
+
+  function showOrdreChoice(niveauChoisi) {
+    document.getElementById('dic-state-ordre-choice').style.display = '';
+    document.querySelectorAll('.dic-ordre-choice-btn').forEach(btn => {
+      btn.onclick = () => chooseOrdre(niveauChoisi, btn.dataset.ordre);
+    });
+  }
+
+  function chooseOrdre(niveauChoisi, ordreChoisi) {
+    document.getElementById('dic-state-ordre-choice').style.display = 'none';
+    // Pas de saveState() ici : currentSequence()[0].start() (startExercice0
+    // ou l'un des startX grammaticaux) fixe `step` et sauvegarde tout de
+    // suite — état jamais persisté avec step encore à null.
+    state = freshState(niveauChoisi, ordreChoisi);
+    currentSequence()[0].start();
   }
 
   function showError(msg) {
@@ -211,24 +354,108 @@ const DicteesEngine = (() => {
   }
 
   /* ── Rendu général ───────────────────────────────────────────────────── */
+  /* Étapes du volet grammatical, calculées à partir des données réellement
+     chargées : une dictée n'a pas forcément les 3 exercices renseignés, dans
+     ce cas l'étape correspondante n'apparaît ni dans le bandeau ni dans le
+     parcours (voir finishGramStep). */
+  function gramSteps() {
+    const steps = [];
+    if (classificationPool.length > 0) steps.push({ step: 2, label: 'Classification', start: startClassification });
+    if (gramTrous.length > 0) steps.push({ step: 3, label: 'Texte à trous', start: startTrous });
+    if (gramTransformations.length > 0) steps.push({ step: 4, label: 'Transformation', start: startTransformation });
+    return steps;
+  }
+
+  /* Ordre interne au bloc lexical (0 → 0.5 → 1) toujours fixe — seul l'ordre
+     RELATIF entre le bloc lexical entier et le bloc grammatical entier varie
+     selon ce que l'élève a choisi sur l'écran "que veux-tu travailler en
+     premier ?" (voir chooseOrdre/showOrdreChoice). */
+  function lexicalSteps() {
+    return [
+      { step: 0, label: 'Photographie le mot', start: startExercice0 },
+      { step: 0.5, label: 'Effacement progressif', start: startPalier05 },
+      { step: 1, label: 'Dictée audio', start: startExercice1 }
+    ];
+  }
+
+  function currentSequence() {
+    const gram = gramSteps();
+    return state.ordreChoisi === 'grammatical' ? [...gram, ...lexicalSteps()] : [...lexicalSteps(), ...gram];
+  }
+
+  /* Chaque pastille d'étape porte aussi dic-step--gram pour les paliers 2/3/4
+     (classification/trous/transformation) : coloration ambre distincte du
+     bleu lexical (voir css/dictees.css), pour que l'élève voie tout de suite
+     à quel bloc de travail il est en train de passer.
+
+     "Fait"/"en cours" se détermine par POSITION dans currentSequence(), pas
+     par comparaison numérique de step (s.step < state.step) : quand le bloc
+     grammatical (2/3/4) passe avant le bloc lexical (0/0.5/1), un step
+     numériquement plus petit (ex. 0) peut très bien être APRÈS des steps
+     numériquement plus grands (2/3/4) déjà terminés — la comparaison
+     numérique donnerait alors un bandeau incohérent. */
+  /* Bandeau restreint au SEUL module en cours (lexical OU grammatical, jamais
+     les deux à la suite) — retour utilisateur : afficher toute la séquence
+     mélangeait les deux blocs et perdait le bénéfice de la séparation
+     visuelle lexical/grammatical déjà en place ailleurs. "Fait"/"en cours" se
+     détermine par position dans le sous-ensemble du module courant (mêmes
+     raisons qu'avant : un step numériquement plus petit peut être après dans
+     currentSequence() si le grammatical passe en premier). */
   function renderStepBanner() {
     const banner = document.getElementById('dic-step-banner');
-    banner.innerHTML = [0, 0.5, 1].map(n => {
-      const cls = n < state.step ? 'dic-step--done' : n === state.step ? 'dic-step--active' : '';
-      const label = n === 0 ? 'Photographie le mot'
-        : n === 0.5 ? 'Effacement progressif'
-        : 'Dictée audio';
-      return `<span class="dic-step ${cls}">${label}</span>`;
-    }).join('') + `<span class="ls-pastille" style="--ls-color:var(--ls-color-${state.niveauChoisi})">Niveau ${state.niveauChoisi}</span>`;
+    const isGramNow = state.step >= 2;
+    const moduleSteps = currentSequence().filter(s => (s.step >= 2) === isGramNow);
+    const currentIdx = moduleSteps.findIndex(s => s.step === state.step);
+    banner.innerHTML = moduleSteps.map((s, i) => {
+      const cls = i < currentIdx ? 'dic-step--done' : i === currentIdx ? 'dic-step--active' : '';
+      const gramCls = isGramNow ? 'dic-step--gram' : '';
+      return `<span class="dic-step ${cls} ${gramCls}">${s.label}</span>`;
+    }).join('') + `<span class="ls-pastille" style="--ls-color:var(--ls-color-${state.niveauChoisi})">Niveau de difficulté n°${state.niveauChoisi}</span>`;
+  }
+
+  function renderSectionLabel() {
+    const el = document.getElementById('dic-section-label');
+    if (!el) return;
+    const isGram = state.step >= 2;
+    el.className = 'dic-section-label ' + (isGram ? 'dic-section-label--gram' : 'dic-section-label--lexical');
+    el.textContent = isGram ? '✏️ Orthographe grammaticale' : '📘 Orthographe lexicale';
   }
 
   function render() {
     document.getElementById('dic-state-loading').style.display = 'none';
     document.getElementById('dic-state-error').style.display = 'none';
     renderStepBanner();
+    renderSectionLabel();
     if (state.step === 0) renderExercice0();
     else if (state.step === 0.5) renderPalier05();
-    else renderExercice1();
+    else if (state.step === 1) renderExercice1();
+    else if (state.step === 2) renderClassification();
+    else if (state.step === 3) renderTrousExercise();
+    else renderTransformation();
+  }
+
+  /* Fin d'un palier (lexical 1, ou grammatical 2/3/4) : enchaîne sur le
+     palier suivant dans currentSequence() — qui reflète l'ordre choisi par
+     l'élève (lexical d'abord ou grammatical d'abord, voir chooseOrdre) —
+     sinon affiche l'écran de fin du module entier. Remplace l'ancien
+     finishGramStep (qui ne connaissait que l'ordre lexical→grammatical figé,
+     incompatible avec le choix d'ordre). */
+  function advanceAfter(step, title, detail) {
+    const seq = currentSequence();
+    const idx = seq.findIndex(s => s.step === step);
+    const next = idx >= 0 ? seq[idx + 1] : undefined;
+    document.getElementById('dic-state-exercise').style.display = 'none';
+    document.getElementById('dic-state-results').style.display = '';
+    document.getElementById('dic-final-message').textContent = title;
+    document.getElementById('dic-final-detail').textContent = detail;
+    if (next) {
+      document.getElementById('dic-final-actions').innerHTML =
+        `<button type="button" class="dic-card-btn" id="dic-next-ex-btn" style="width:auto;padding:12px 28px;">Continuer vers ${next.label} →</button>`;
+      document.getElementById('dic-next-ex-btn').addEventListener('click', next.start);
+    } else {
+      document.getElementById('dic-final-actions').innerHTML =
+        `<a href="français-orthographe.html" class="dic-card-btn" style="width:auto;padding:12px 28px;">← Retour à l'Orthographe</a>`;
+    }
   }
 
   function renderListenAndInputHTML(counterHTML) {
@@ -262,6 +489,31 @@ const DicteesEngine = (() => {
   }
 
   /* ── Exercice 0 : photographie le mot ────────────────────────────────── */
+  /* Point d'entrée du bloc lexical — appelé soit tout de suite après le
+     choix du niveau (bloc lexical choisi en premier), soit après le bloc
+     grammatical entier (bloc grammatical choisi en premier), voir
+     currentSequence()/chooseOrdre(). Mécanique de tirage differé identique à
+     avant (deck mélangé, unmastered = mots pas encore réussis) : un mot
+     raté reste hors du deck courant et ne revient qu'au réapprovisionnement,
+     donc jamais immédiatement après. Pas de champ submitted/wrongAny : ce
+     palier n'écrit jamais en base (voir en-tête du fichier). */
+  function startExercice0() {
+    state.step = 0;
+    const ids = mots.map(m => m.id);
+    state.ex0 = {
+      unmastered: ids,
+      deck: shuffle(ids),
+      current: null,
+      phase: 'photo',   // 'photo' (mot affiché) → 'input' (saisie, correction automatique)
+      correct: 0,
+      attempts: 0,
+      wrongIds: []
+    };
+    exStartTime = Date.now();
+    saveState();
+    render();
+  }
+
   function drawNextExercice0() {
     if (state.ex0.deck.length === 0) state.ex0.deck = shuffle(state.ex0.unmastered);
     state.ex0.current = state.ex0.deck.shift();
@@ -490,8 +742,16 @@ const DicteesEngine = (() => {
     document.getElementById('dic-final-message').textContent = 'Effacement progressif terminé !';
     document.getElementById('dic-final-detail').textContent =
       `${total} mot${total !== 1 ? 's' : ''} maîtrisé${total !== 1 ? 's' : ''}.`;
+    /* "Continuer vers l'exercice 1" (ancienne numérotation, cf. commentaire
+       d'en-tête historique) n'a plus de sens dans le nouveau parcours et
+       laissait croire à tort que le bloc lexical était déjà terminé — retour
+       utilisateur. Reste bien dirigé vers startExercice1 (Dictée audio,
+       toujours le 3e et dernier palier lexical) : seul le libellé change,
+       la vraie fin du bloc lexical est gérée par showExercice1Results/
+       advanceAfter, qui propose déjà correctement la suite vers le module
+       grammatical. */
     document.getElementById('dic-final-actions').innerHTML =
-      `<button type="button" class="dic-card-btn" id="dic-next-ex-btn" style="width:auto;padding:12px 28px;">Continuer vers l'exercice 1 →</button>`;
+      `<button type="button" class="dic-card-btn" id="dic-next-ex-btn" style="width:auto;padding:12px 28px;">Continuer vers la dictée audio →</button>`;
     document.getElementById('dic-next-ex-btn').addEventListener('click', startExercice1);
   }
 
@@ -691,24 +951,463 @@ const DicteesEngine = (() => {
     render();
   }
 
-  /* Dernier palier du parcours : cet écran est désormais l'écran de fin du
-     module entier (plus de palier "dictée finale" à la suite). */
+  /* Fin du palier 1 : enchaîne vers le premier palier grammatical disponible
+     (classification → texte à trous → transformation), sinon c'est l'écran
+     de fin du module entier (cf. finishGramStep). */
   function showExercice1Results() {
     const total = mots.length;
     const score = state.ex1.correctFirstTry;
-    document.getElementById('dic-state-exercise').style.display = 'none';
-    document.getElementById('dic-state-results').style.display = '';
-    document.getElementById('dic-final-message').textContent = 'Dictée audio terminée !';
-    document.getElementById('dic-final-detail').textContent =
-      `${score} mot${score !== 1 ? 's' : ''} juste${score !== 1 ? 's' : ''} du premier coup sur ${total}.`;
-    document.getElementById('dic-final-actions').innerHTML =
-      `<a href="français-orthographe.html" class="dic-card-btn" style="width:auto;padding:12px 28px;">← Retour à l'Orthographe</a>`;
+    advanceAfter(1, 'Dictée audio terminée !',
+      `${score} mot${score !== 1 ? 's' : ''} juste${score !== 1 ? 's' : ''} du premier coup sur ${total}.`);
+  }
+
+  /* ── Palier 2 : classification par nature grammaticale ──────────────────
+     Interaction "clic mot → clic nature" (même famille que
+     classification-etapes de exercise.html, pas de drag-and-drop) : tous les
+     mots restants sont affichés en même temps, l'élève en sélectionne un
+     puis clique sa nature. `coolingDown` = mots ratés du cycle d'affichage
+     courant, exclus tant que d'autres mots restent visibles (retiré
+     seulement quand ils ont tous été retentés — jamais retenté
+     immédiatement). `order` fixe l'ordre d'affichage pour toute la durée du
+     palier (pas de remélange à chaque rendu, sinon les mots sauteraient). */
+  function classificationWordById(id) { return classificationPool.find(w => w.id === id); }
+
+  /* Tableau de synthèse cumulatif, sous la zone de classification : les mots
+     correctement classés disparaissent de la zone active (moins de clutter)
+     mais restent visibles ici, rangés par nature, pour que l'élève garde une
+     vue d'ensemble de sa correction au fil de l'exercice (retour
+     utilisateur — l'ancien comportement les faisait disparaître sans trace).
+     Colonnes fixes dès le départ (toutes les natures présentes dans le lot,
+     pas seulement celles déjà rencontrées) pour ne pas faire "sauter" la
+     mise en page à chaque bonne réponse. */
+  function classificationTableHtml(cs) {
+    const masteredIds = cs.order.filter(id => !cs.unmastered.includes(id));
+    const natures = [...new Set(cs.order.map(id => classificationWordById(id).nature_grammaticale))]
+      .sort((a, b) => a.localeCompare(b, 'fr'));
+    const byNature = new Map(natures.map(n => [n, []]));
+    masteredIds.forEach(id => {
+      const w = classificationWordById(id);
+      byNature.get(w.nature_grammaticale).push(w);
+    });
+    return `
+      <div class="dic-classify-table-wrap">
+        <div class="dic-classify-table-title">Ton tableau de classification</div>
+        <div class="dic-classify-table">
+          ${natures.map(n => `
+            <div class="dic-classify-col">
+              <div class="dic-classify-col-header">${capitalizeFr(n)}</div>
+              <div class="dic-classify-col-body">
+                ${byNature.get(n).length
+                  ? byNature.get(n).map(w => `<span class="dic-classify-chip">${escapeHtml(w.contenu)}</span>`).join('')
+                  : '<span class="dic-classify-col-empty">—</span>'}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+  }
+
+  function startClassification() {
+    state.step = 2;
+    const order = shuffle(classificationPool.map(w => w.id));
+    state.classification = { order, unmastered: order.slice(), coolingDown: [], selected: null, correct: 0, attempts: 0, submitted: false };
+    exStartTime = Date.now();
+    saveState();
+    render();
+  }
+
+  function renderClassification() {
+    document.getElementById('dic-state-results').style.display = 'none';
+    document.getElementById('dic-state-exercise').style.display = '';
+    document.getElementById('dic-intro-consigne').textContent =
+      "Clique sur un mot, puis clique sur sa nature grammaticale. La correction est automatique.";
+
+    const cs = state.classification;
+    if (cs.unmastered.length === 0) return finishClassification();
+
+    let visible = cs.order.filter(id => cs.unmastered.includes(id) && !cs.coolingDown.includes(id));
+    if (visible.length === 0) {
+      cs.coolingDown = [];
+      saveState();
+      visible = cs.order.filter(id => cs.unmastered.includes(id));
+    }
+
+    const remaining = cs.unmastered.length;
+    const counterHTML = `<div class="dic-counters"><div class="dic-word-count">Il reste ${remaining} mot${remaining !== 1 ? 's' : ''} à classer</div></div>`;
+    const tokensHTML = visible.map(id => {
+      const w = classificationWordById(id);
+      return `<button type="button" class="dic-classify-word ${cs.selected === id ? 'is-selected' : ''}" data-word-id="${id}">${escapeHtml(w.contenu)}</button>`;
+    }).join('');
+    const choicesHTML = cs.selected
+      ? `<div class="dic-classify-choices">${NATURE_OPTIONS.map(n => `<button type="button" class="dic-classify-choice" data-nature="${n}">${capitalizeFr(n)}</button>`).join('')}</div>`
+      : `<p class="dic-trou-hint">Sélectionne d'abord un mot ci-dessus.</p>`;
+
+    document.getElementById('dic-item').innerHTML = `
+      ${counterHTML}
+      <div class="dic-classify-words">${tokensHTML}</div>
+      ${choicesHTML}
+      <div class="dic-feedback-area" id="dic-feedback"></div>
+      ${classificationTableHtml(cs)}
+    `;
+
+    document.querySelectorAll('.dic-classify-word').forEach(btn => {
+      btn.addEventListener('click', () => {
+        cs.selected = cs.selected === btn.dataset.wordId ? null : btn.dataset.wordId;
+        saveState();
+        render();
+      });
+    });
+    document.querySelectorAll('.dic-classify-choice').forEach(btn => {
+      btn.addEventListener('click', () => validateClassification(btn.dataset.nature));
+    });
+  }
+
+  function validateClassification(chosenNature) {
+    const cs = state.classification;
+    const wordId = cs.selected;
+    if (!wordId) return;
+    const word = classificationWordById(wordId);
+    const isRight = chosenNature === word.nature_grammaticale;
+    cs.attempts++;
+
+    document.querySelectorAll('.dic-classify-word, .dic-classify-choice').forEach(b => { b.disabled = true; });
+    const wordBtn = document.querySelector(`.dic-classify-word[data-word-id="${wordId}"]`);
+    if (wordBtn) wordBtn.classList.add(isRight ? 'is-correct' : 'is-wrong');
+    const choiceBtn = document.querySelector(`.dic-classify-choice[data-nature="${chosenNature}"]`);
+    if (choiceBtn) choiceBtn.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+    document.getElementById('dic-feedback').innerHTML = isRight
+      ? '<div class="dic-feedback-correct">✅ Correct</div>'
+      : `<div class="dic-feedback-wrong">❌ Incorrect — nature attendue : <span class="dic-correct-word">${capitalizeFr(word.nature_grammaticale)}</span></div>`;
+
+    if (isRight) {
+      cs.correct++;
+      cs.unmastered = cs.unmastered.filter(id => id !== wordId);
+    } else if (!cs.coolingDown.includes(wordId)) {
+      cs.coolingDown.push(wordId);
+    }
+    cs.selected = null;
+    saveState();
+    setTimeout(render, isRight ? 900 : 2200);
+  }
+
+  function finishClassification() {
+    const cs = state.classification;
+    if (!cs.submitted) {
+      cs.submitted = true;
+      saveState();
+      submitGramResult('classification', cs.correct, cs.order.length, Math.round((Date.now() - exStartTime) / 1000));
+    }
+    renderClassificationFinished(cs);
+  }
+
+  /* Contrairement aux autres paliers, l'écran de fin de la classification ne
+     bascule PAS sur #dic-state-results (via advanceAfter) : le tableau de
+     synthèse doit rester affiché une fois l'exercice terminé, pas disparaître
+     — retour utilisateur, c'est le moment où l'élève mémorise visuellement
+     son classement complet. On reste donc dans #dic-item avec le même
+     tableau, plus le message de fin et le bouton "continuer" (même logique
+     de séquence qu'advanceAfter, dupliquée ici car le conteneur DOM cible
+     est différent). */
+  function renderClassificationFinished(cs) {
+    document.getElementById('dic-state-results').style.display = 'none';
+    document.getElementById('dic-state-exercise').style.display = '';
+    document.getElementById('dic-intro-consigne').textContent = 'Classification terminée !';
+
+    const seq = currentSequence();
+    const idx = seq.findIndex(s => s.step === 2);
+    const next = idx >= 0 ? seq[idx + 1] : undefined;
+    const actionsHTML = next
+      ? `<button type="button" class="dic-card-btn" id="dic-next-ex-btn" style="width:auto;padding:12px 28px;">Continuer vers ${next.label} →</button>`
+      : `<a href="français-orthographe.html" class="dic-card-btn" style="width:auto;padding:12px 28px;">← Retour à l'Orthographe</a>`;
+
+    document.getElementById('dic-item').innerHTML = `
+      <div class="dic-final-message" style="margin-bottom:6px;">Classification terminée !</div>
+      <div class="dic-final-detail" style="margin-bottom:10px;">${cs.correct} mot${cs.correct !== 1 ? 's' : ''} bien classé${cs.correct !== 1 ? 's' : ''} sur ${cs.order.length}.</div>
+      ${classificationTableHtml(cs)}
+      <div class="dic-actions" style="margin-top:20px;">${actionsHTML}</div>
+    `;
+    if (next) document.getElementById('dic-next-ex-btn').addEventListener('click', next.start);
+  }
+
+  /* ── Palier 3 : texte à trous taggé ──────────────────────────────────────
+     Une phrase = un item du deck (même tirage differé unmastered/deck que le
+     palier 0) ; une phrase reste dans le deck tant qu'un de ses blancs est
+     faux. Score conservé au niveau du blanc (masteredBlankIds, dédupliqué)
+     pour ne pas compter deux fois un blanc déjà réussi lors d'une nouvelle
+     tentative de la même phrase. */
+  function trouById(id) { return gramTrous.find(t => t.id === id); }
+
+  function drawNextTrou() {
+    if (state.trous.deck.length === 0) state.trous.deck = shuffle(state.trous.unmastered);
+    state.trous.current = state.trous.deck.shift();
+  }
+
+  function startTrous() {
+    state.step = 3;
+    const ids = gramTrous.map(t => t.id);
+    state.trous = {
+      unmastered: ids,
+      deck: shuffle(ids),
+      current: null,
+      masteredBlankIds: [],
+      totalBlanks: gramTrous.reduce((s, t) => s + t.dictee_trous_mots.length, 0),
+      attempts: 0,
+      submitted: false
+    };
+    exStartTime = Date.now();
+    saveState();
+    render();
+  }
+
+  function renderTrousExercise() {
+    document.getElementById('dic-state-results').style.display = 'none';
+    document.getElementById('dic-state-exercise').style.display = '';
+    document.getElementById('dic-intro-consigne').textContent =
+      "Complète les mots manquants. La correction est automatique.";
+
+    if (state.trous.unmastered.length === 0) return finishTrous();
+    if (state.trous.current == null) { drawNextTrou(); saveState(); }
+
+    const trou = trouById(state.trous.current);
+    const tags = trou.dictee_trous_mots.slice().sort((a, b) => a.position - b.position);
+    const tokens = trou.phrase.trim().split(/\s+/);
+    const remaining = state.trous.unmastered.length;
+    const counterHTML = `<div class="dic-counters"><div class="dic-word-count">Il reste ${remaining} phrase${remaining !== 1 ? 's' : ''} à compléter</div></div>`;
+
+    /* Le tag de règle (regle) n'est jamais affiché ici — surchargeait
+       l'écran (retour utilisateur). Il reste en base (dictee_trous_mots.regle)
+       pour l'enseignant (création + stats), voir uniquement
+       js/dictee-grammar-print.js pour l'affichage imprimé, hors écran élève.
+       Présentation en carte aérée + contraste renforcé (bordure bleue pleine
+       sur les trous plutôt qu'un gris discret, interlignage large,
+       espacement des mots) : lisibilité pensée pour un élève dyslexique,
+       cf. retour utilisateur — aucune police "dys" dédiée n'est utilisée
+       ailleurs sur le site (vérifié), on s'appuie donc uniquement sur
+       contraste/taille/espacement avec la police existante du site.
+       Chaque trou porte aussi un bouton haut-parleur qui lit le mot attendu
+       à voix haute (DicteesSpeech.speak, même moteur que le reste du
+       module) — retour utilisateur, support supplémentaire pour retrouver
+       l'orthographe à l'oreille. */
+    const sentenceHTML = tokens.map((tok, pos) => {
+      const tag = tags.find(g => g.position === pos);
+      if (!tag) return escapeHtml(tok);
+      const width = Math.max(70, tag.mot_attendu.length * 14);
+      return `<span class="dic-trou-blank-group">
+        <input type="text" class="dic-input dic-trou-blank-input" data-blank-id="${tag.id}"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:${width}px">
+        <button type="button" class="dic-trou-speak-btn" data-blank-id="${tag.id}" aria-label="Écouter le mot" title="Écouter le mot">🔊</button>
+      </span>`;
+    }).join(' ');
+
+    document.getElementById('dic-item').innerHTML = `
+      ${counterHTML}
+      <div class="dic-trou-card">
+        <div class="dic-trou-sentence">${sentenceHTML}</div>
+      </div>
+      <div class="dic-actions" style="margin-top:16px;">
+        <button type="button" class="dic-validate-btn" id="dic-val-btn">Valider</button>
+      </div>
+      <div class="dic-feedback-area" id="dic-feedback"></div>
+    `;
+
+    const blankInputs = Array.from(document.querySelectorAll('.dic-trou-blank-input'));
+    document.getElementById('dic-val-btn').addEventListener('click', () => validateTrou(tags));
+    blankInputs.forEach((inp, i) => {
+      inp.addEventListener('keydown', e => {
+        if (e.key !== 'Enter') return;
+        if (i < blankInputs.length - 1) blankInputs[i + 1].focus();
+        else validateTrou(tags);
+      });
+    });
+    document.querySelectorAll('.dic-trou-speak-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tag = tags.find(g => g.id === btn.dataset.blankId);
+        if (!tag) return;
+        btn.disabled = true;
+        DicteesSpeech.speak(tag.mot_attendu, () => { btn.disabled = false; });
+      });
+    });
+    if (blankInputs[0]) setTimeout(() => blankInputs[0].focus(), 80);
+  }
+
+  function validateTrou(tags) {
+    const inputs = Array.from(document.querySelectorAll('.dic-trou-blank-input'));
+    if (inputs.length === 0 || inputs[0].disabled) return;
+    if (inputs.some(inp => !inp.value.trim())) return;
+
+    let allRight = true;
+    const wrongTags = [];
+    inputs.forEach(inp => {
+      const tag = tags.find(g => g.id === inp.dataset.blankId);
+      const isRight = answerMatchesAny(inp.value, [tag.mot_attendu, ...(tag.reponses_alt || [])]);
+      inp.disabled = true;
+      inp.classList.add(isRight ? 'is-correct' : 'is-wrong');
+      if (isRight) {
+        if (!state.trous.masteredBlankIds.includes(tag.id)) state.trous.masteredBlankIds.push(tag.id);
+      } else {
+        allRight = false;
+        wrongTags.push(tag);
+      }
+    });
+    document.getElementById('dic-val-btn').disabled = true;
+    state.trous.attempts++;
+
+    document.getElementById('dic-feedback').innerHTML = allRight
+      ? '<div class="dic-feedback-correct">✅ Correct</div>'
+      : `<div class="dic-feedback-wrong">❌ Réponse${wrongTags.length > 1 ? 's' : ''} attendue${wrongTags.length > 1 ? 's' : ''} : ${wrongTags.map(t => `<span class="dic-correct-word">${escapeHtml(t.mot_attendu)}</span>`).join(', ')}</div>`;
+
+    if (allRight) {
+      state.trous.unmastered = state.trous.unmastered.filter(id => id !== state.trous.current);
+      state.trous.deck = state.trous.deck.filter(id => id !== state.trous.current);
+    }
+    state.trous.current = null;
+    saveState();
+    setTimeout(render, allRight ? 900 : 2600);
+  }
+
+  function finishTrous() {
+    if (!state.trous.submitted) {
+      state.trous.submitted = true;
+      saveState();
+      submitGramResult('trous', state.trous.masteredBlankIds.length, state.trous.totalBlanks, Math.round((Date.now() - exStartTime) / 1000));
+    }
+    advanceAfter(3, 'Texte à trous terminé !',
+      `${state.trous.masteredBlankIds.length} mot${state.trous.masteredBlankIds.length !== 1 ? 's' : ''} bien complété${state.trous.masteredBlankIds.length !== 1 ? 's' : ''} sur ${state.trous.totalBlanks}.`);
+  }
+
+  /* ── Palier 4 : transformation de phrase ─────────────────────────────────
+     Comparaison stricte de la phrase entière (DicteesSpeech.normalize),
+     réponse attendue saisie par l'enseignant — même tirage differé
+     unmastered/deck que le palier 0. Dernier palier possible du parcours. */
+  function transfoById(id) { return gramTransformations.find(t => t.id === id); }
+
+  function drawNextTransfo() {
+    if (state.transfo.deck.length === 0) state.transfo.deck = shuffle(state.transfo.unmastered);
+    state.transfo.current = state.transfo.deck.shift();
+  }
+
+  function startTransformation() {
+    state.step = 4;
+    const ids = gramTransformations.map(t => t.id);
+    state.transfo = { unmastered: ids, deck: shuffle(ids), current: null, correct: 0, attempts: 0, submitted: false };
+    exStartTime = Date.now();
+    saveState();
+    render();
+  }
+
+  function renderTransformation() {
+    document.getElementById('dic-state-results').style.display = 'none';
+    document.getElementById('dic-state-exercise').style.display = '';
+    document.getElementById('dic-intro-consigne').textContent =
+      "Réécris la phrase selon la consigne. La correction est automatique.";
+
+    if (state.transfo.unmastered.length === 0) return finishTransformation();
+    if (state.transfo.current == null) { drawNextTransfo(); saveState(); }
+
+    const t = transfoById(state.transfo.current);
+    const remaining = state.transfo.unmastered.length;
+    const counterHTML = `<div class="dic-counters"><div class="dic-word-count">Il reste ${remaining} phrase${remaining !== 1 ? 's' : ''}</div></div>`;
+
+    document.getElementById('dic-item').innerHTML = `
+      ${counterHTML}
+      <div class="dic-flash-wrap"><div class="dic-flash-word" style="font-size:20px;">${escapeHtml(t.phrase_depart)}</div></div>
+      <p class="dic-transfo-consigne">${escapeHtml(TRANSFO_TYPE_LABELS[t.type_transformation] || '')}</p>
+      <div class="dic-input-row dic-transfo-input-row">
+        <input type="text" class="dic-input dic-transfo-input" id="dic-input"
+               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+               placeholder="Écris la phrase transformée…">
+        <button type="button" class="dic-validate-btn" id="dic-val-btn">Valider</button>
+      </div>
+      <div class="dic-feedback-area" id="dic-feedback"></div>
+    `;
+    const input = document.getElementById('dic-input');
+    const onValidate = () => {
+      if (!input || !input.value.trim() || input.disabled) return;
+      const typed = input.value;
+      const isRight = answerMatchesAny(typed, [t.phrase_attendue, ...(t.phrase_attendue_alt || [])]);
+      input.disabled = true;
+      document.getElementById('dic-val-btn').disabled = true;
+      input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+      state.transfo.attempts++;
+
+      if (isRight) {
+        state.transfo.correct++;
+        state.transfo.unmastered = state.transfo.unmastered.filter(id => id !== t.id);
+        state.transfo.deck = state.transfo.deck.filter(id => id !== t.id);
+      }
+
+      document.getElementById('dic-feedback').innerHTML = isRight
+        ? '<div class="dic-feedback-correct">✅ Correct</div>'
+        : `<div class="dic-feedback-wrong">❌ Phrase attendue : <span class="dic-correct-word">${escapeHtml(t.phrase_attendue)}</span></div>`;
+      state.transfo.current = null;
+      saveState();
+      setTimeout(render, isRight ? 900 : 2600);
+    };
+    document.getElementById('dic-val-btn').addEventListener('click', onValidate);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') onValidate(); });
+    setTimeout(() => document.getElementById('dic-input')?.focus(), 80);
+  }
+
+  function finishTransformation() {
+    if (!state.transfo.submitted) {
+      state.transfo.submitted = true;
+      saveState();
+      submitGramResult('transformation', state.transfo.correct, gramTransformations.length, Math.round((Date.now() - exStartTime) / 1000));
+    }
+    advanceAfter(4, 'Transformation terminée !',
+      `${state.transfo.correct} phrase${state.transfo.correct !== 1 ? 's' : ''} juste${state.transfo.correct !== 1 ? 's' : ''} sur ${gramTransformations.length}.`);
   }
 
   /* ── Enregistrement du résultat ──────────────────────────────────────── */
+  /* ── Filet de secours contre les insertions silencieusement perdues ─────
+     Un élève (Andreas) a terminé les 3 paliers lexicaux sans qu'aucune ligne
+     n'apparaisse ensuite dans dictee_results, côté élève comme enseignant.
+     Vérification directe (supabase db query --linked, insert simulé sous
+     l'identité de l'élève via request.jwt.claim.sub) : le schéma et les
+     policies RLS acceptent l'insert sans problème — la cause n'est donc pas
+     côté base. Le point de défaillance le plus probable est côté client :
+     le palier "Dictée audio" peut prendre plusieurs minutes (plusieurs lots,
+     TTS, saisie), le temps qu'un token de session expire sans que le
+     rafraîchissement automatique du SDK Supabase ait pu jouer (veille de
+     tablette, wifi de classe instable) — l'insert échoue alors avec une
+     erreur PostgREST normale, mais `submitResult` ne faisait que la logguer
+     en console (déjà le patron d'échec silencieux rencontré par le passé
+     sur ce module) sans jamais retenter ni conserver le résultat perdu.
+     Filet à deux niveaux : 1) une nouvelle tentative immédiate après avoir
+     relu la session (récupère un token rafraîchi si c'était bien la cause) ;
+     2) si ça échoue encore, mise en file d'attente locale (localStorage,
+     survit à la fermeture de l'onglet) rejouée au chargement de la
+     prochaine dictée (flushPendingResults, appelée depuis init()). */
+  const PENDING_RESULT_PREFIX = 'dictee_pending_result_';
+
+  function queuePendingResult(table, payload) {
+    try {
+      const key = PENDING_RESULT_PREFIX + Date.now() + '_' + Math.random().toString(36).slice(2);
+      localStorage.setItem(key, JSON.stringify({ table, payload }));
+    } catch (e) { /* localStorage indisponible (navigation privée, quota) — rien de plus à faire */ }
+  }
+
+  async function flushPendingResults() {
+    if (!window.lfmDb) return;
+    let keys;
+    try { keys = Object.keys(localStorage).filter(k => k.startsWith(PENDING_RESULT_PREFIX)); }
+    catch (e) { return; }
+    for (const key of keys) {
+      let entry;
+      try { entry = JSON.parse(localStorage.getItem(key)); } catch (e) { entry = null; }
+      if (!entry || !entry.table || !entry.payload) { localStorage.removeItem(key); continue; }
+      const { error } = await window.lfmDb.from(entry.table).insert(entry.payload);
+      if (!error) localStorage.removeItem(key);
+      // Sinon (échec encore, ex. élève différent connecté sur ce poste :
+      // RLS rejette un student_id qui n'est pas auth.uid()) : entrée
+      // laissée en attente pour un prochain essai, jamais perdue.
+    }
+  }
+
   async function submitResult(exercice, score, total, sansFaute, durationSecs, attempts, wrongMotIds) {
     if (!studentId || !window.lfmDb) return;
-    const { error } = await window.lfmDb.from('dictee_results').insert({
+    const payload = {
       student_id: studentId,
       dictee_id: dictee.id,
       exercice,
@@ -718,8 +1417,53 @@ const DicteesEngine = (() => {
       duration_secs: durationSecs,
       attempts: attempts,
       wrong_mot_ids: wrongMotIds || []
-    });
-    if (error) console.warn('[LFM] DicteesEngine.submitResult:', error.message);
+    };
+    const { error } = await window.lfmDb.from('dictee_results').insert(payload);
+    if (!error) return;
+    console.warn('[LFM] DicteesEngine.submitResult:', error.message);
+
+    const session = await lfmAuth.getSession().catch(() => null);
+    if (session && session.user && session.user.id) {
+      studentId = session.user.id;
+      payload.student_id = studentId;
+    }
+    const retry = await window.lfmDb.from('dictee_results').insert(payload);
+    if (retry.error) {
+      console.warn('[LFM] DicteesEngine.submitResult (nouvel essai):', retry.error.message);
+      queuePendingResult('dictee_results', payload);
+    }
+  }
+
+  /* Distinct de submitResult : dictee_gram_results a ses propres colonnes
+     (pas de sans_faute/attempts/wrong_mot_ids) et reste strictement cantonné
+     à l'espace dictée de l'enseignant (jamais exercise_results ni le bilan
+     général — cf. resultats-dictees-enseignant.html). Même filet de secours
+     (nouvel essai + file d'attente) que submitResult, voir commentaire
+     ci-dessus. */
+  async function submitGramResult(type, score, total, durationSecs) {
+    if (!studentId || !window.lfmDb) return;
+    const payload = {
+      student_id: studentId,
+      dictee_id: dictee.id,
+      type,
+      score,
+      total,
+      duration_secs: durationSecs
+    };
+    const { error } = await window.lfmDb.from('dictee_gram_results').insert(payload);
+    if (!error) return;
+    console.warn('[LFM] DicteesEngine.submitGramResult:', error.message);
+
+    const session = await lfmAuth.getSession().catch(() => null);
+    if (session && session.user && session.user.id) {
+      studentId = session.user.id;
+      payload.student_id = studentId;
+    }
+    const retry = await window.lfmDb.from('dictee_gram_results').insert(payload);
+    if (retry.error) {
+      console.warn('[LFM] DicteesEngine.submitGramResult (nouvel essai):', retry.error.message);
+      queuePendingResult('dictee_gram_results', payload);
+    }
   }
 
   return { init };

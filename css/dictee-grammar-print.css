@@ -1,0 +1,160 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   dictee-grammar-print.css — Export PDF recto/verso du volet Orthographe
+   grammaticale d'une dictée préparée. Chargé uniquement par
+   dictees-enseignant.html.
+
+   Même mécanique que css/champ-lexical-print.css : #dgp-print-root est
+   rempli par js/dictee-grammar-print.js puis basculé en display:block via la
+   classe body.printing-dgp, tout le reste de la page étant masqué pendant
+   l'impression. Nouveauté : le recto/verso (aucun précédent sur ce site) via
+   page-break-before sur .dgp-side.dgp-verso.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+#dgp-print-root { display: none; }
+
+.dgp-page { page-break-after: always; }
+.dgp-page:last-child { page-break-after: auto; }
+
+.dgp-side {
+  font-family: 'Nunito Sans', system-ui, sans-serif;
+  color: #1E2532;
+}
+.dgp-side.dgp-verso { page-break-before: always; }
+
+.dgp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14pt;
+  border-bottom: 2.5pt solid #1A2D6B;
+  padding-bottom: 10pt;
+  margin-bottom: 18pt;
+}
+.dgp-logo { height: 24pt; width: auto; display: block; }
+.dgp-header-sub { font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #5F6368; }
+.dgp-header-dictee { font-family: 'Fredoka', sans-serif; font-weight: 800; font-size: 20pt; color: #1A2D6B; }
+
+.dgp-answer-highlight {
+  font-weight: 800;
+  color: #1A2D6B;
+  background: rgba(245,166,35,0.28);
+  padding: 1pt 5pt;
+  border-radius: 3pt;
+}
+
+/* ── Texte à trous ── */
+.dgp-trou-sentence {
+  font-size: 13pt;
+  line-height: 2.8;
+  margin-bottom: 6pt;
+  break-inside: avoid;
+}
+.dgp-blank-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: bottom;
+  margin: 0 3pt;
+}
+.dgp-blank-line {
+  display: inline-block;
+  height: 13pt;
+  border-bottom: 1.5pt solid #1A2D6B;
+}
+.dgp-regle-badge {
+  font-size: 7.5pt;
+  font-style: italic;
+  color: #5F6368;
+  white-space: nowrap;
+}
+
+/* ── Transformation de phrase ── */
+.dgp-transfo-block {
+  margin-bottom: 16pt;
+  padding-bottom: 12pt;
+  border-bottom: 0.75pt solid #E2E6ED;
+  break-inside: avoid;
+}
+.dgp-transfo-depart { font-size: 12.5pt; font-weight: 700; margin-bottom: 3pt; }
+.dgp-transfo-consigne { font-size: 10pt; font-style: italic; color: #5F6368; margin-bottom: 8pt; }
+.dgp-transfo-lines { display: flex; flex-direction: column; gap: 10pt; }
+.dgp-transfo-line { display: block; height: 1pt; border-bottom: 1pt solid #C7CDD9; }
+.dgp-transfo-answer { display: block; font-size: 12.5pt; }
+.dgp-alt-answers { font-size: 9pt; font-style: italic; color: #5F6368; margin-top: 3pt; }
+
+/* ── Classification par nature grammaticale ── */
+.dgp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10pt;
+  break-inside: avoid;
+}
+.dgp-table th {
+  text-align: left;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 10pt;
+  color: #1A2D6B;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  border-bottom: 2pt solid #F5A623;
+  padding: 5pt 8pt;
+}
+.dgp-table--turquoise th { border-bottom-color: #1DBFA0; }
+.dgp-table--rouge th { border-bottom-color: #D62839; }
+.dgp-table td {
+  font-size: 11pt;
+  padding: 5pt 8pt;
+  border-bottom: 0.5pt solid #E2E6ED;
+}
+.dgp-table-word { font-weight: 600; }
+.dgp-table-blank { width: 45%; }
+
+.dgp-table-groups {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0 20pt;
+}
+
+body.printing-dgp #dgp-print-root { display: block !important; }
+
+@media print {
+  @page { size: A4 portrait; margin: 15mm; }
+
+  body.printing-dgp #dgp-print-root {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* <body> porte son propre fond et un padding-top pour compenser la navbar
+     fixe — reset nécessaire, même raison que champ-lexical-print.css. */
+  body.printing-dgp {
+    padding-top: 0 !important;
+    background: #fff !important;
+  }
+
+  /* Liste blanche plutôt que liste noire : masque tout ce qui n'est pas
+     #dgp-print-root. dictees-enseignant.html utilise .dash-wrap/.dash-content
+     — les deux variantes .page-*/.dash-* sont listées ici comme dans
+     champ-lexical-print.css, pour éviter l'oubli qui laissait toute la page
+     visible à l'impression sur un module précédent. */
+  body.printing-dgp .navbar,
+  body.printing-dgp footer,
+  body.printing-dgp .bc-bar,
+  body.printing-dgp .page-content > *:not(#dgp-print-root),
+  body.printing-dgp .dash-content > *:not(#dgp-print-root) {
+    display: none !important;
+  }
+
+  body.printing-dgp .page-wrap,
+  body.printing-dgp .dash-wrap {
+    padding: 0;
+    background: #fff;
+    min-height: unset;
+  }
+  body.printing-dgp .page-content,
+  body.printing-dgp .dash-content {
+    max-width: 100%;
+    padding: 0;
+  }
+}

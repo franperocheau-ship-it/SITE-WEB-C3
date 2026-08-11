@@ -93,6 +93,23 @@ const DicteesSpeech = (() => {
     return (str || '').trim().toLowerCase().replace(/\s+/g, ' ');
   }
 
+  /* Variante utilisée uniquement par le volet Orthographe grammaticale
+     (texte à trous, transformation de phrase — jamais les paliers lexicaux
+     ci-dessus, dont la ponctuation reste volontairement stricte) : en plus
+     de `normalize`, la ponctuation de fin/liaison de phrase (. , ; : ! ? …
+     « » " ") est totalement ignorée dans la comparaison — un oubli de
+     ponctuation ne doit jamais faire échouer une réponse par ailleurs
+     correcte (retour utilisateur, surtout sensible sur le texte à trous, où
+     l'élève ne retape qu'un mot isolé et oublie facilement la virgule/le
+     point qui l'entoure). Les apostrophes et traits d'union restent
+     significatifs (élision, mots composés) et ne sont jamais retirés. */
+  function normalizeSentence(str) {
+    return normalize(str)
+      .replace(/[.,;:!?…«»""]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
   /* Met en évidence, dans le mot correct, la zone qui diffère de la saisie
      (alignement par préfixe/suffixe communs) — même mécanique que
      l'exercice « mots invariables ». */
@@ -114,5 +131,5 @@ const DicteesSpeech = (() => {
       c.slice(midEnd);
   }
 
-  return { speak, cancel, normalize, diffHighlight };
+  return { speak, cancel, normalize, normalizeSentence, diffHighlight };
 })();
