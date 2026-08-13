@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/favicon/favicon.ico?v=1" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png?v=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png?v=1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/favicon-192x192.png?v=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512x512.png?v=1">
+  <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
+  <link rel="manifest" href="site.webmanifest?v=1">
+  <title>Évaluations — Espace enseignant — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="css/evaluations-print.css?v=11">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/evaluations-teacher.js?v=1"></script>
+  <script src="js/evaluations-print.js?v=9"></script>
+  <script src="js/evaluations-banque.js?v=2"></script>
+  <style>
+    .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
+    .dash-content { max-width: 960px; margin: 0 auto; }
+
+    .breadcrumb {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 24px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
+    }
+    .breadcrumb a { color: var(--blue); text-decoration: none; font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .bc-sep { color: var(--border); user-select: none; }
+    .bc-current { font-weight: 600; color: var(--text); }
+
+    .main-tabs {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      background: var(--card-bg); border-radius: 14px; box-shadow: var(--shadow-sm);
+      padding: 5px; margin-bottom: 20px; width: fit-content;
+    }
+    .main-tab {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: 10px;
+      font-family: inherit; font-size: 13px; font-weight: 700;
+      color: var(--muted); text-decoration: none;
+      transition: background 180ms, color 180ms;
+    }
+    .main-tab.is-active { background: var(--blue); color: #fff; }
+    .main-tab:hover:not(.is-active) { background: rgba(16,43,106,0.06); color: var(--blue); }
+
+    .section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+    .section-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text); }
+
+    .ev-btn {
+      border: none; border-radius: 10px; padding: 9px 16px; font-family: inherit;
+      font-size: 13px; font-weight: 700; cursor: pointer; transition: background 180ms, transform 180ms;
+    }
+    .ev-btn-primary { background: var(--blue); color: #fff; }
+    .ev-btn-primary:hover { background: #0d2255; }
+    .ev-btn-gold { background: #F5A623; color: #1E2532; }
+    .ev-btn-gold:hover { background: #e0951a; }
+    .ev-btn-outline { background: rgba(26,45,107,0.06); color: var(--blue); border: 1.5px solid rgba(26,45,107,0.2); }
+    .ev-btn-outline:hover { background: rgba(26,45,107,0.12); }
+    .ev-btn-danger { background: rgba(214,40,57,0.08); color: var(--red); border: 1.5px solid rgba(214,40,57,0.25); }
+    .ev-btn-danger:hover { background: rgba(214,40,57,0.16); }
+    .ev-btn-sm { padding: 6px 12px; font-size: 12px; }
+    .ev-btn-icon { padding: 6px 10px; font-size: 13px; line-height: 1; }
+    .ev-btn:disabled { opacity: 0.4; cursor: default; }
+
+    .ev-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
+
+    /* ── Liste des évaluations ── */
+    .ev-card {
+      background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 14px;
+      padding: 16px 18px; margin-bottom: 12px;
+    }
+    .ev-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .ev-card-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 6px; }
+    .ev-card-meta { font-size: 12.5px; color: var(--muted); margin-bottom: 2px; }
+    .ev-card-date { font-size: 11.5px; color: var(--muted); }
+    .ev-card-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+
+    /* ── Formulaire ── */
+    .ev-form-card { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 14px; padding: 22px 24px; margin-bottom: 20px; }
+    .ev-form-title { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--blue); margin-bottom: 16px; }
+    .ev-form-label { display: block; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; margin-top: 16px; }
+    .ev-form-label:first-child { margin-top: 0; }
+    .ev-form-input, .ev-form-textarea, .ev-select {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px;
+      font-family: inherit; font-size: 14px; color: var(--text); background: var(--bg);
+      outline: none; transition: border-color 200ms; box-sizing: border-box;
+    }
+    .ev-form-input:focus, .ev-form-textarea:focus, .ev-select:focus { border-color: var(--blue); }
+    .ev-form-textarea { min-height: 70px; resize: vertical; }
+
+    .ev-subsection { margin-top: 26px; }
+    .ev-subsection-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--blue); margin-bottom: 4px; }
+    .ev-subsection-hint { font-size: 13px; color: #3F4552; line-height: 1.5; margin-bottom: 10px; }
+
+    .ev-critere-row {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 8px 10px; margin-bottom: 8px;
+    }
+    .ev-critere-num { font-weight: 800; color: var(--blue); font-size: 13px; flex-shrink: 0; width: 20px; text-align: right; }
+    .ev-critere-row .ev-form-input { margin: 0; }
+    .ev-row-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+    .ev-exercice-item {
+      background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 14px; margin-bottom: 10px;
+    }
+    .ev-exercice-item-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    .ev-exercice-item-title { font-weight: 800; color: #1DBFA0; font-size: 13px; text-transform: uppercase; letter-spacing: .03em; }
+
+    /* ── Sélecteur de type d'exercice : grille d'icônes ── */
+    .ev-ex-type-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    }
+    @media (min-width: 640px) { .ev-ex-type-grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (min-width: 900px) { .ev-ex-type-grid { grid-template-columns: repeat(5, 1fr); } }
+    .ev-ex-type-option {
+      background: var(--card-bg); border: 2px solid var(--border); border-radius: 10px;
+      padding: 8px; cursor: pointer; font-family: inherit; display: flex;
+      align-items: center; justify-content: center;
+      transition: border-color 160ms, background 160ms, transform 120ms;
+    }
+    .ev-ex-type-option:hover { border-color: var(--color-brand-gold); transform: translateY(-1px); }
+    .ev-ex-type-option img { width: 100%; height: auto; display: block; }
+    .ev-ex-type-option.is-selected {
+      border-color: var(--blue); background: rgba(16,43,106,0.06);
+      box-shadow: inset 0 0 0 1px var(--blue);
+    }
+
+    /* ── Aperçu d'un exercice (rendu fidèle au PDF via evaluations-print.css) ── */
+    .ev-preview-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .ev-preview-backdrop { position: absolute; inset: 0; background: rgba(16,43,106,0.45); }
+    .ev-preview-panel {
+      position: relative; background: #fff; border-radius: 14px; box-shadow: var(--shadow-md);
+      max-width: 640px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 36px 32px;
+    }
+    .ev-preview-close {
+      position: absolute; top: 12px; right: 12px; width: 30px; height: 30px; border-radius: 50%;
+      border: 1.5px solid var(--border); background: var(--card-bg); color: var(--muted);
+      font-size: 14px; cursor: pointer; line-height: 1;
+    }
+    .ev-preview-close:hover { border-color: var(--red); color: var(--red); }
+    .ev-preview-page .evp-exercice { margin-bottom: 0; }
+
+    .ev-form-actions { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+
+
+    .ev-form-checkbox-row {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; color: var(--text);
+      margin-top: 16px; cursor: pointer;
+    }
+    .ev-form-checkbox-row input { accent-color: var(--blue); width: 15px; height: 15px; cursor: pointer; }
+
+    /* ── Type Texte à trous : une phrase par bloc ── */
+    .ev-trous-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+    .ev-trou-item {
+      background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .ev-trou-item-top { display: flex; gap: 8px; align-items: center; }
+    .ev-trou-item-top .ev-form-input { margin: 0; }
+
+    /* ── Type Répondre/classer : pronoms à cocher (mode conjugaison) ── */
+    .ev-pronoms-list {
+      display: flex; flex-wrap: wrap; gap: 4px 16px;
+      margin-top: 8px; padding: 10px 12px;
+      background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px;
+    }
+    .ev-pronoms-list .ev-form-checkbox-row { font-size: 13px; }
+    .ev-classement-lignes-info { font-size: 13px; color: var(--muted); margin-top: 14px; margin-bottom: 8px; }
+
+    /* ── Vue choix de mode ── */
+    .ev-mode-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .ev-mode-card {
+      background: var(--card-bg); border: 2px solid var(--border); border-radius: var(--radius-card);
+      padding: 24px; text-align: left; cursor: pointer; font-family: inherit;
+      transition: border-color 180ms, transform 140ms, box-shadow 180ms;
+    }
+    .ev-mode-card:hover { border-color: var(--blue); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+    .ev-mode-card-icon { font-size: 28px; margin-bottom: 10px; }
+    .ev-mode-card-title { font-family: var(--font-display); font-weight: 700; font-size: 17px; color: var(--blue); margin-bottom: 8px; }
+    .ev-mode-card-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* ── Vue sélection assistée ── */
+    .ev-assist-groupe { margin-bottom: 18px; }
+    .ev-assist-groupe-title {
+      font-family: var(--font-display); font-weight: 700; font-size: 12px; color: var(--blue);
+      text-transform: uppercase; letter-spacing: .05em;
+      margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
+    }
+    .ev-assist-competence-row {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 6px 0; font-size: 14px; color: var(--text); cursor: pointer;
+    }
+    .ev-assist-competence-row input { margin-top: 3px; accent-color: var(--blue); cursor: pointer; flex-shrink: 0; }
+  </style>
+  <!-- NAVBAR-PROFICIAMUS-CSS -->
+  <style>
+  body{padding-top:50px;}
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+  .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+  .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+  .navbar__brand img{height:34px;width:auto;}
+  .navbar__nav{display:flex;align-items:center;gap:24px;}
+  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-size:14px;font-weight:700;transition:color .2s;}
+  .navbar__nav a:hover{color:#1B4EBF;}
+  .navbar__nav a.active{color:#2D9C3C;border-bottom:2px solid #2D9C3C;padding-bottom:2px;}
+  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;}
+  .navbar__nav .btn-login{color:#fff!important;}
+  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+  .btn-login:hover{background:#0b1e4d;}
+  @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <div class="dash-wrap">
+    <div class="dash-content">
+
+      <nav class="breadcrumb" aria-label="Fil d'Ariane">
+        <a href="dashboard-enseignant.html">Espace enseignant</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-current">Évaluations</span>
+      </nav>
+
+      <nav class="main-tabs" aria-label="Navigation espace enseignant">
+        <a class="main-tab" href="classes-enseignant.html">🏫 Mes classes</a>
+        <a class="main-tab" href="pilotage-enseignant.html">🎯 Pilotage des compétences</a>
+        <a class="main-tab" href="resultats-enseignant.html">📊 Résultats</a>
+        <a class="main-tab" href="remediations-enseignant.html">🧩 Remédiations</a>
+        <a class="main-tab" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
+        <a class="main-tab" href="dictees-enseignant.html">📖 Dictées préparées</a>
+        <a class="main-tab" href="questionnaires-enseignant.html">📚 Questionnaires de lecture</a>
+        <a class="main-tab" href="vocabulaire-corpus-enseignant.html">🔤 Corpus lexical</a>
+        <a class="main-tab is-active" href="evaluations-enseignant.html">📝 Évaluations</a>
+      </nav>
+
+      <!-- ── Vue liste (par défaut) ── -->
+      <div id="ev-view-list">
+        <div class="section-header">
+          <h1 class="section-title">Évaluations</h1>
+          <button type="button" class="ev-btn ev-btn-primary" id="ev-new-btn">+ Nouvelle évaluation</button>
+        </div>
+        <div id="ev-list"><div class="ev-empty">Chargement…</div></div>
+      </div>
+
+      <!-- ── Vue choix de mode (1ʳᵉ étape avant le formulaire) ── -->
+      <div id="ev-view-mode-choice" style="display:none">
+        <div class="section-header">
+          <h1 class="section-title">Nouvelle évaluation</h1>
+        </div>
+        <div class="ev-mode-grid">
+          <button type="button" class="ev-mode-card" id="ev-mode-seul-btn">
+            <div class="ev-mode-card-icon">✏️</div>
+            <div class="ev-mode-card-title">Je crée seul</div>
+            <div class="ev-mode-card-desc">Composez votre évaluation à la main : classe, titre, critères, exercices — exactement comme aujourd'hui.</div>
+          </button>
+          <button type="button" class="ev-mode-card" id="ev-mode-assiste-btn">
+            <div class="ev-mode-card-icon">🤝</div>
+            <div class="ev-mode-card-title">Je crée avec Proficiamus</div>
+            <div class="ev-mode-card-desc">Choisissez des compétences dans une banque déjà prête : critères et exercices sont pré-remplis, à ajuster ensuite librement.</div>
+          </button>
+        </div>
+        <button type="button" class="ev-btn ev-btn-outline" id="ev-mode-cancel-btn" style="margin-top:20px">← Retour</button>
+      </div>
+
+      <!-- ── Vue sélection assistée (domaine > compétences à cocher) ── -->
+      <div id="ev-view-assist" style="display:none">
+        <div class="section-header">
+          <h1 class="section-title">Je crée avec Proficiamus</h1>
+        </div>
+        <label class="ev-form-label" style="margin-top:0" for="ev-assist-domaine">Domaine</label>
+        <select id="ev-assist-domaine" class="ev-select" style="max-width:320px"></select>
+        <div id="ev-assist-competences" style="margin-top:20px"><div class="ev-empty">Chargement…</div></div>
+        <div class="ev-form-actions">
+          <button type="button" class="ev-btn ev-btn-primary" id="ev-assist-generer-btn">Générer la trame</button>
+          <button type="button" class="ev-btn ev-btn-outline" id="ev-assist-cancel-btn">← Retour</button>
+        </div>
+      </div>
+
+      <!-- ── Formulaire de création/édition (mode seul ou trame générée) ── -->
+      <div id="ev-form-card" class="ev-form-card" style="display:none">
+        <div class="ev-form-title" id="ev-form-title">Nouvelle évaluation</div>
+
+        <label class="ev-form-label" for="ev-form-classe">Classe</label>
+        <input type="text" id="ev-form-classe" class="ev-form-input" placeholder="Ex. CM2 A">
+
+        <label class="ev-form-label" for="ev-form-titre">Titre de l'évaluation</label>
+        <input type="text" id="ev-form-titre" class="ev-form-input" placeholder="Ex. Évaluation de Grammaire N°1">
+
+        <!-- ── Grille de critères d'évaluation ── -->
+        <div class="ev-subsection">
+          <div class="ev-subsection-title">Grille de critères d'évaluation</div>
+          <div id="ev-criteres-list"></div>
+          <button type="button" class="ev-btn ev-btn-outline ev-btn-sm" id="ev-add-critere-btn">+ Ajouter un critère d'évaluation</button>
+        </div>
+
+        <!-- ── Exercices ── -->
+        <div class="ev-subsection">
+          <div class="ev-subsection-title">Exercices</div>
+          <div id="ev-exercices-list"></div>
+          <button type="button" class="ev-btn ev-btn-outline ev-btn-sm" id="ev-add-exercice-btn">+ Ajouter un exercice</button>
+        </div>
+
+        <div class="ev-form-actions">
+          <button type="button" class="ev-btn ev-btn-primary" id="ev-save-btn">Enregistrer</button>
+          <button type="button" class="ev-btn ev-btn-gold" id="ev-pdf-btn">📄 Générer le PDF</button>
+          <button type="button" class="ev-btn ev-btn-outline" id="ev-cancel-btn">Annuler</button>
+        </div>
+      </div>
+
+      <!-- ── Racine d'impression (voir css/evaluations-print.css) ── -->
+      <div id="ev-print-root"></div>
+
+      <!-- ── Aperçu d'un exercice (rendu fidèle au PDF, sans export complet) ── -->
+      <div id="ev-preview-modal" class="ev-preview-modal" style="display:none">
+        <div class="ev-preview-backdrop" id="ev-preview-backdrop"></div>
+        <div class="ev-preview-panel">
+          <button type="button" class="ev-preview-close" id="ev-preview-close" title="Fermer">✕</button>
+          <div class="evp-page ev-preview-page" id="ev-preview-body"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="js/menu.js"></script>
+  <script>
+    let _teacherProfile = null;
+    let _evaluations = [];
+    let _editingId = null;
+    let _formCriteres = [];   // [string]
+    let _formExercices = [];  // [{type, consigne, ...champs propres au type}]
+    let _currentMode = 'seul'; // 'seul' | 'assiste' — traçabilité, voir buildExercicePayload/saveForm
+    let _assistDomaineChargee = null; // value du domaine dont les compétences sont affichées
+    let _assistValides = [];  // compétences de banque avec correspondance trouvée (voir chargerAssistDomaine)
+
+    /* Bascule entre les 4 vues de la page (liste, choix de mode, sélection
+       assistée, formulaire) — une seule visible à la fois. */
+    function showView(name) {
+      const vues = {
+        list: 'ev-view-list',
+        modeChoice: 'ev-view-mode-choice',
+        assist: 'ev-view-assist',
+        form: 'ev-form-card'
+      };
+      Object.entries(vues).forEach(([key, id]) => {
+        document.getElementById(id).style.display = key === name ? '' : 'none';
+      });
+    }
+
+    /* Charge un <script> classique une fois (même patron que loadScript dans
+       dashboard-admin.html) — utilisé pour data/conjugaison.js, qui
+       s'enregistre lui-même dans window.EXERCISE_DATA au chargement. */
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error(`Impossible de charger ${src}.`));
+        document.head.appendChild(script);
+      });
+    }
+
+    /* ── Types d'exercice ─────────────────────────────────────────────────
+       Un exercice porte tous les champs de tous les types en état de
+       formulaire (raw, non filtré) — seuls ceux du type courant sont
+       affichés/édités, ce qui évite de perdre la saisie en cas d'aller-
+       retour entre types. Le nettoyage (ne garder que les champs du type
+       choisi, parser les listes) se fait à l'enregistrement, dans
+       buildExercicePayload(). */
+    const EXERCICE_TYPES = [
+      { value: 'marquage',       label: 'Marquage (souligner / entourer / cocher / barrer)' },
+      { value: 'texte_trous',    label: 'Texte à trous (guidé)' },
+      { value: 'mots_souligne',  label: 'Mots soulignés + réponse' },
+      { value: 'mot_grille',     label: 'Mot à transformer (grille)' },
+      { value: 'reecriture',     label: 'Réécriture' },
+      { value: 'classement',     label: 'Répondre / classer dans un tableau' },
+      { value: 'relier',         label: 'Relier' },
+      { value: 'qcm',            label: 'QCM' },
+      { value: 'reponse_courte', label: 'Réponse courte' },
+      { value: 'vrai_faux',      label: 'Vrai/Faux' }
+    ];
+
+    /* Repère littéral inséré dans le champ Phrase par "+ Insérer un trou" —
+       remplacé au rendu PDF par un blanc (voir js/evaluations-print.js
+       texteTrouHtml). */
+    const TROU_MARQUEUR = '[[trou]]';
+
+    const PRONOMS_CONJUGAISON = ['je', 'tu', 'il/elle/on', 'nous', 'vous', 'ils/elles'];
+
+    function parseLines(raw) {
+      return (raw || '').split('\n').map(s => s.trim()).filter(Boolean);
+    }
+
+    function parseCommaList(raw) {
+      return (raw || '').split(',').map(s => s.trim()).filter(Boolean);
+    }
+
+    function joinLines(arr) {
+      return (arr || []).join('\n');
+    }
+
+    /* État de formulaire par défaut pour un nouvel exercice, ou pour
+       recharger un exercice persisté (tableaux -> texte multi-lignes). */
+    function exerciceFormState(e) {
+      e = e || {};
+      return {
+        type: e.type || 'marquage',
+        consigne: e.consigne || '',
+        contenu: e.contenu || '',
+        phrases: joinLines(e.phrases),
+        banqueMots: e.banqueMots || '',
+        categories: joinLines(e.categories),
+        utiliserTableauConjugaison: !!e.utiliserTableauConjugaison,
+        verbesConjugaison: (e.verbes || []).join(', '),
+        // Coché par défaut pour chaque pronom — y compris quand e.pronoms
+        // est absent (évaluations créées avant cette case à cocher).
+        pronomsCoches: PRONOMS_CONJUGAISON.map(p => !e.pronoms || e.pronoms.includes(p)),
+        colonneGauche: joinLines(e.colonneGauche),
+        colonneDroite: joinLines(e.colonneDroite),
+        question: e.question || '',
+        propositions: joinLines(e.propositions),
+        nombreDeLignes: e.nombreDeLignes || 2,
+        affirmations: joinLines(e.affirmations),
+        // texte_trous : reste un tableau d'objets en état de formulaire
+        // (pas une chaîne multi-lignes) — un item par phrase. Plus
+        // d'indices (retirés) ; tailleTrous s'applique à tout l'exercice.
+        trousItems: (e.items || []).map(it => ({ texte: it.texte || '' })),
+        tailleTrous: e.tailleTrous || 'moyen',
+        texte: e.texte || '',
+        // mot_grille
+        mots: joinLines(e.mots),
+        nbColonnes: e.nbColonnes || 2,
+        // classement (mode catégories libres) : nb de lignes vides du tableau
+        nbLignesClassement: e.nbLignes || 5
+      };
+    }
+
+    /* Ne garde que type + consigne + champs propres au type choisi, listes
+       parsées — c'est cette forme nettoyée qui est persistée en jsonb. */
+    function buildExercicePayload(ex) {
+      const base = { type: ex.type, consigne: (ex.consigne || '').trim() };
+      switch (ex.type) {
+        case 'reecriture':
+          return { ...base, phrases: parseLines(ex.phrases), banqueMots: (ex.banqueMots || '').trim() || null };
+        case 'classement':
+          return ex.utiliserTableauConjugaison
+            ? {
+                ...base,
+                utiliserTableauConjugaison: true,
+                verbes: parseCommaList(ex.verbesConjugaison),
+                pronoms: PRONOMS_CONJUGAISON.filter((p, pi) => ex.pronomsCoches[pi])
+              }
+            : {
+                ...base,
+                utiliserTableauConjugaison: false,
+                categories: parseLines(ex.categories),
+                banqueMots: (ex.banqueMots || '').trim() || null,
+                nbLignes: Math.max(1, ex.nbLignesClassement || 5)
+              };
+        case 'relier':
+          return { ...base, colonneGauche: parseLines(ex.colonneGauche), colonneDroite: parseLines(ex.colonneDroite) };
+        case 'qcm':
+          return { ...base, question: (ex.question || '').trim() || null, propositions: parseLines(ex.propositions) };
+        case 'reponse_courte':
+          return { ...base, question: (ex.question || '').trim(), nombreDeLignes: Math.max(1, parseInt(ex.nombreDeLignes, 10) || 2) };
+        case 'vrai_faux':
+          return { ...base, affirmations: parseLines(ex.affirmations) };
+        case 'texte_trous':
+          return {
+            ...base,
+            tailleTrous: ex.tailleTrous || 'moyen',
+            items: (ex.trousItems || [])
+              .filter(it => it.texte.trim())
+              .map(it => ({ texte: it.texte.trim() }))
+          };
+        case 'mots_souligne':
+          return { ...base, texte: (ex.texte || '').trim() };
+        case 'mot_grille':
+          return { ...base, mots: parseLines(ex.mots), nbColonnes: ex.nbColonnes === 3 ? 3 : 2 };
+        case 'marquage':
+        default:
+          return { ...base, type: 'marquage', contenu: (ex.contenu || '').trim() };
+      }
+    }
+
+    function exercicePayloadHasContent(p) {
+      if (p.consigne) return true;
+      switch (p.type) {
+        case 'reecriture':     return p.phrases.length > 0;
+        case 'classement':     return p.utiliserTableauConjugaison ? p.verbes.length > 0 : p.categories.length > 0;
+        case 'relier':         return p.colonneGauche.length > 0 || p.colonneDroite.length > 0;
+        case 'qcm':            return p.propositions.length > 0 || !!p.question;
+        case 'texte_trous':    return p.items.length > 0;
+        case 'mots_souligne':  return !!p.texte;
+        case 'mot_grille':     return p.mots.length > 0;
+        case 'reponse_courte': return !!p.question;
+        case 'vrai_faux':      return p.affirmations.length > 0;
+        case 'marquage':
+        default:                return !!p.contenu;
+      }
+    }
+
+    /* ── Critères ── */
+    function renderCriteresList() {
+      const list = document.getElementById('ev-criteres-list');
+      if (_formCriteres.length === 0) { list.innerHTML = ''; return; }
+      list.innerHTML = _formCriteres.map((c, i) => `
+        <div class="ev-critere-row">
+          <span class="ev-critere-num">${i + 1}.</span>
+          <input type="text" class="ev-form-input ev-critere-input" data-idx="${i}"
+            value="${escHtml(c)}" placeholder="Ex. Identifier le sujet du verbe">
+          <div class="ev-row-actions">
+            <button type="button" class="ev-btn ev-btn-outline ev-btn-icon" data-crit-up="${i}" ${i === 0 ? 'disabled' : ''} title="Monter">↑</button>
+            <button type="button" class="ev-btn ev-btn-outline ev-btn-icon" data-crit-down="${i}" ${i === _formCriteres.length - 1 ? 'disabled' : ''} title="Descendre">↓</button>
+            <button type="button" class="ev-btn ev-btn-danger ev-btn-icon" data-crit-remove="${i}" title="Supprimer">✕</button>
+          </div>
+        </div>`).join('');
+
+      list.querySelectorAll('.ev-critere-input').forEach(inp => {
+        inp.addEventListener('input', () => { _formCriteres[parseInt(inp.dataset.idx, 10)] = inp.value; });
+      });
+      list.querySelectorAll('[data-crit-up]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const i = parseInt(btn.dataset.critUp, 10);
+          [_formCriteres[i - 1], _formCriteres[i]] = [_formCriteres[i], _formCriteres[i - 1]];
+          renderCriteresList();
+        });
+      });
+      list.querySelectorAll('[data-crit-down]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const i = parseInt(btn.dataset.critDown, 10);
+          [_formCriteres[i + 1], _formCriteres[i]] = [_formCriteres[i], _formCriteres[i + 1]];
+          renderCriteresList();
+        });
+      });
+      list.querySelectorAll('[data-crit-remove]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          _formCriteres.splice(parseInt(btn.dataset.critRemove, 10), 1);
+          renderCriteresList();
+        });
+      });
+    }
+
+    /* ── Exercices ─────────────────────────────────────────────────────────
+       Champs propres au type choisi, sous la consigne (commune à tous). */
+
+    /* Insère TROU_MARQUEUR à la position du curseur dans le champ Phrase,
+       puis restaure le focus + la position du curseur après le re-rendu
+       (sinon la saisie perd le focus à chaque clic). */
+    function insererTrouAt(input, exIdx, phraseIdx) {
+      const start = input.selectionStart != null ? input.selectionStart : input.value.length;
+      const end = input.selectionEnd != null ? input.selectionEnd : input.value.length;
+      const item = _formExercices[exIdx].trousItems[phraseIdx];
+      item.texte = input.value.slice(0, start) + TROU_MARQUEUR + input.value.slice(end);
+      renderExercicesList();
+      requestAnimationFrame(() => {
+        const newInput = document.querySelector(`.ev-trou-texte[data-ex-idx="${exIdx}"][data-phrase-idx="${phraseIdx}"]`);
+        if (!newInput) return;
+        const pos = start + TROU_MARQUEUR.length;
+        newInput.focus();
+        newInput.setSelectionRange(pos, pos);
+      });
+    }
+
+    function trouItemHtml(exIdx, item, phraseIdx) {
+      return `
+        <div class="ev-trou-item">
+          <div class="ev-trou-item-top">
+            <input type="text" class="ev-form-input ev-trou-texte" data-ex-idx="${exIdx}" data-phrase-idx="${phraseIdx}"
+              value="${escHtml(item.texte)}" placeholder="Tape ta phrase, puis clique sur « Insérer un trou ».">
+            <button type="button" class="ev-btn ev-btn-outline ev-btn-sm" data-insert-trou-ex="${exIdx}" data-insert-trou-phrase="${phraseIdx}">+ Insérer un trou</button>
+            <button type="button" class="ev-btn ev-btn-danger ev-btn-icon" data-remove-trou-ex="${exIdx}" data-remove-trou-phrase="${phraseIdx}" title="Supprimer">✕</button>
+          </div>
+        </div>`;
+    }
+
+    function typeFieldsHtml(ex, i) {
+      switch (ex.type) {
+        case 'texte_trous':
+          return `
+            <label class="ev-form-label">Taille des trous</label>
+            <select class="ev-select ev-ex-tailleTrous" data-idx="${i}" style="max-width:160px">
+              <option value="petit" ${ex.tailleTrous === 'petit' ? 'selected' : ''}>Petit</option>
+              <option value="moyen" ${ex.tailleTrous === 'moyen' ? 'selected' : ''}>Moyen</option>
+              <option value="grand" ${ex.tailleTrous === 'grand' ? 'selected' : ''}>Grand</option>
+            </select>
+            <label class="ev-form-label">Phrases</label>
+            <div class="ev-trous-list" data-idx="${i}">
+              ${ex.trousItems.map((item, ti) => trouItemHtml(i, item, ti)).join('')}
+            </div>
+            <button type="button" class="ev-btn ev-btn-outline ev-btn-sm" data-add-trou="${i}">+ Ajouter une phrase</button>`;
+
+        case 'mots_souligne':
+          return `
+            <label class="ev-form-label">Texte (encadre les mots à marquer entre crochets, ex. « Le [chat] noir [dort]. »)</label>
+            <textarea class="ev-form-textarea ev-ex-texte" data-idx="${i}"
+              placeholder="Le [chat] noir [dort] sur le canapé.">${escHtml(ex.texte)}</textarea>`;
+
+        case 'mot_grille':
+          return `
+            <label class="ev-form-label">Liste de mots (un par ligne)</label>
+            <textarea class="ev-form-textarea ev-ex-mots" data-idx="${i}"
+              placeholder="chat&#10;souris&#10;joli">${escHtml(ex.mots)}</textarea>
+            <label class="ev-form-label">Nombre de colonnes</label>
+            <select class="ev-select ev-ex-nbColonnes" data-idx="${i}" style="max-width:120px">
+              <option value="2" ${ex.nbColonnes === 2 ? 'selected' : ''}>2</option>
+              <option value="3" ${ex.nbColonnes === 3 ? 'selected' : ''}>3</option>
+            </select>`;
+
+        case 'reecriture':
+          return `
+            <label class="ev-form-label">Liste de phrases à transformer (une par ligne)</label>
+            <textarea class="ev-form-textarea ev-ex-phrases" data-idx="${i}"
+              placeholder="Il était content.&#10;Ils seront prêts.">${escHtml(ex.phrases)}</textarea>
+            <label class="ev-form-label">Banque de mots (optionnel)</label>
+            <input type="text" class="ev-form-input ev-ex-banqueMots" data-idx="${i}"
+              value="${escHtml(ex.banqueMots)}" placeholder="Ex. était, sera, seront">`;
+
+        case 'classement':
+          return `
+            <label class="ev-form-checkbox-row">
+              <input type="checkbox" class="ev-ex-conjugaison-toggle" data-idx="${i}" ${ex.utiliserTableauConjugaison ? 'checked' : ''}>
+              Utiliser le modèle tableau de conjugaison
+            </label>
+            ${ex.utiliserTableauConjugaison ? `
+            <label class="ev-form-label">Verbes à conjuguer</label>
+            <input type="text" class="ev-form-input ev-ex-verbesConjugaison" data-idx="${i}"
+              value="${escHtml(ex.verbesConjugaison)}" placeholder="Ex. aller, avoir, être...">
+            <label class="ev-form-label">Pronoms à inclure</label>
+            <div class="ev-pronoms-list">
+              ${PRONOMS_CONJUGAISON.map((p, pi) => `
+                <label class="ev-form-checkbox-row" style="margin-top:0">
+                  <input type="checkbox" class="ev-ex-pronom-toggle" data-idx="${i}" data-pronom-idx="${pi}" ${ex.pronomsCoches[pi] ? 'checked' : ''}>
+                  ${p}
+                </label>`).join('')}
+            </div>` : `
+            <label class="ev-form-label">Catégories (une par ligne)</label>
+            <textarea class="ev-form-textarea ev-ex-categories" data-idx="${i}"
+              placeholder="Noms&#10;Adjectifs&#10;Verbes">${escHtml(ex.categories)}</textarea>
+            <label class="ev-form-label">Texte de support ou mots à classer</label>
+            <input type="text" class="ev-form-input ev-ex-banqueMots" data-idx="${i}"
+              value="${escHtml(ex.banqueMots)}" placeholder="Ex. rapide, chanter, maison">
+            <div class="ev-classement-lignes-info">Lignes vides sur le PDF : <strong>${ex.nbLignesClassement}</strong></div>
+            <button type="button" class="ev-btn ev-btn-outline ev-btn-sm" data-add-ligne-classement="${i}">+ Insérer une ligne</button>`}`;
+
+        case 'relier':
+          return `
+            <label class="ev-form-label">Liste colonne gauche (une par ligne)</label>
+            <textarea class="ev-form-textarea ev-ex-colonneGauche" data-idx="${i}">${escHtml(ex.colonneGauche)}</textarea>
+            <label class="ev-form-label">Liste colonne droite (une par ligne)</label>
+            <textarea class="ev-form-textarea ev-ex-colonneDroite" data-idx="${i}">${escHtml(ex.colonneDroite)}</textarea>`;
+
+        case 'qcm':
+          return `
+            <label class="ev-form-label">Question (optionnel si la consigne suffit)</label>
+            <input type="text" class="ev-form-input ev-ex-question" data-idx="${i}" value="${escHtml(ex.question)}">
+            <label class="ev-form-label">Liste de propositions (une par ligne)</label>
+            <textarea class="ev-form-textarea ev-ex-propositions" data-idx="${i}">${escHtml(ex.propositions)}</textarea>`;
+
+        case 'reponse_courte':
+          return `
+            <label class="ev-form-label">Question</label>
+            <input type="text" class="ev-form-input ev-ex-question" data-idx="${i}" value="${escHtml(ex.question)}">
+            <label class="ev-form-label">Nombre de lignes de réponse</label>
+            <input type="number" class="ev-form-input ev-ex-nombreDeLignes" data-idx="${i}" min="1" max="10"
+              value="${ex.nombreDeLignes}" style="max-width:100px">`;
+
+        case 'vrai_faux':
+          return `
+            <label class="ev-form-label">Liste d'affirmations (une par ligne)</label>
+            <textarea class="ev-form-textarea ev-ex-affirmations" data-idx="${i}">${escHtml(ex.affirmations)}</textarea>`;
+
+        case 'marquage':
+        default:
+          return `
+            <label class="ev-form-label">Contenu de l'exercice</label>
+            <textarea class="ev-form-textarea ev-ex-contenu" data-idx="${i}"
+              placeholder="La phrase, la liste ou la question à faire apparaître…">${escHtml(ex.contenu)}</textarea>`;
+      }
+    }
+
+    function renderExercicesList() {
+      const list = document.getElementById('ev-exercices-list');
+      if (_formExercices.length === 0) { list.innerHTML = ''; return; }
+      list.innerHTML = _formExercices.map((ex, i) => `
+        <div class="ev-exercice-item">
+          <div class="ev-exercice-item-top">
+            <span class="ev-exercice-item-title">Exercice ${i + 1}</span>
+            <div class="ev-row-actions">
+              <button type="button" class="ev-btn ev-btn-outline ev-btn-icon" data-ex-preview="${i}" title="Aperçu">👁</button>
+              <button type="button" class="ev-btn ev-btn-outline ev-btn-icon" data-ex-up="${i}" ${i === 0 ? 'disabled' : ''} title="Monter">↑</button>
+              <button type="button" class="ev-btn ev-btn-outline ev-btn-icon" data-ex-down="${i}" ${i === _formExercices.length - 1 ? 'disabled' : ''} title="Descendre">↓</button>
+              <button type="button" class="ev-btn ev-btn-danger ev-btn-icon" data-ex-remove="${i}" title="Supprimer">✕</button>
+            </div>
+          </div>
+          <label class="ev-form-label" style="margin-top:0">Type d'exercice</label>
+          <div class="ev-ex-type-grid">
+            ${EXERCICE_TYPES.map(t => `
+              <button type="button" class="ev-ex-type-option ${ex.type === t.value ? 'is-selected' : ''}"
+                data-idx="${i}" data-type="${t.value}" title="${escHtml(t.label)}">
+                <img src="assets/evaluations-icones/${t.value}.png" alt="${escHtml(t.label)}">
+              </button>`).join('')}
+          </div>
+          <label class="ev-form-label">Consigne</label>
+          <input type="text" class="ev-form-input ev-ex-consigne" data-idx="${i}"
+            value="${escHtml(ex.consigne)}" placeholder="Ex. Souligne le verbe conjugué dans chaque phrase.">
+          ${typeFieldsHtml(ex, i)}
+        </div>`).join('');
+
+      list.querySelectorAll('.ev-ex-type-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          _formExercices[parseInt(btn.dataset.idx, 10)].type = btn.dataset.type;
+          renderExercicesList();
+        });
+      });
+      list.querySelectorAll('.ev-ex-conjugaison-toggle').forEach(cb => {
+        cb.addEventListener('change', () => {
+          _formExercices[parseInt(cb.dataset.idx, 10)].utiliserTableauConjugaison = cb.checked;
+          renderExercicesList();
+        });
+      });
+      list.querySelectorAll('.ev-ex-pronom-toggle').forEach(cb => {
+        cb.addEventListener('change', () => {
+          const exIdx = parseInt(cb.dataset.idx, 10);
+          const pronomIdx = parseInt(cb.dataset.pronomIdx, 10);
+          _formExercices[exIdx].pronomsCoches[pronomIdx] = cb.checked;
+        });
+      });
+      list.querySelectorAll('[data-add-ligne-classement]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const exIdx = parseInt(btn.dataset.addLigneClassement, 10);
+          _formExercices[exIdx].nbLignesClassement = (_formExercices[exIdx].nbLignesClassement || 5) + 1;
+          renderExercicesList();
+        });
+      });
+      // Champs texte/textarea/nombre communs à un ou plusieurs types : simple
+      // affectation directe sur 'input', sans re-rendu (pas de perte de
+      // focus pendant la frappe) — seuls les changements structurels
+      // (type, case à cocher) ci-dessus déclenchent un re-rendu.
+      ['consigne', 'contenu', 'phrases', 'banqueMots', 'categories', 'verbesConjugaison',
+        'colonneGauche', 'colonneDroite', 'question', 'propositions', 'affirmations', 'texte', 'mots'].forEach(field => {
+        list.querySelectorAll(`.ev-ex-${field}`).forEach(el => {
+          el.addEventListener('input', () => { _formExercices[parseInt(el.dataset.idx, 10)][field] = el.value; });
+        });
+      });
+      list.querySelectorAll('.ev-ex-nombreDeLignes').forEach(el => {
+        el.addEventListener('input', () => { _formExercices[parseInt(el.dataset.idx, 10)].nombreDeLignes = parseInt(el.value, 10) || 2; });
+      });
+      list.querySelectorAll('.ev-ex-nbColonnes').forEach(el => {
+        el.addEventListener('change', () => { _formExercices[parseInt(el.dataset.idx, 10)].nbColonnes = parseInt(el.value, 10) === 3 ? 3 : 2; });
+      });
+      list.querySelectorAll('.ev-ex-tailleTrous').forEach(el => {
+        el.addEventListener('change', () => { _formExercices[parseInt(el.dataset.idx, 10)].tailleTrous = el.value; });
+      });
+
+      /* ── Texte à trous : phrase (simple affectation sur 'input', pas de
+         re-rendu déclenché au blur) + insertion de repère + ajout/
+         suppression de phrase.
+         Pas de reparse/re-rendu au blur (contrairement au patron habituel,
+         ex. dictees-enseignant.html) : cliquer sur "+ Insérer un trou" fait
+         d'abord perdre le focus du champ Phrase (blur), qui elle-même
+         appelait renderExercicesList() — reconstruisant tout le DOM
+         (listeners inclus) EN PLEIN MILIEU du geste de clic, avant que le
+         'click' n'ait eu l'occasion de se déclencher sur le bouton :
+         l'insertion ne se produisait alors jamais (bug constaté et
+         reproduit). Le bouton gère lui-même sa propre reparse + re-rendu
+         (insererTrouAt) ; c'est l'unique point d'entrée pour ajouter un
+         trou, donc pas besoin d'une synchronisation redondante au blur. ── */
+      list.querySelectorAll('.ev-trou-texte').forEach(inp => {
+        inp.addEventListener('input', () => {
+          const exIdx = parseInt(inp.dataset.exIdx, 10);
+          const phraseIdx = parseInt(inp.dataset.phraseIdx, 10);
+          _formExercices[exIdx].trousItems[phraseIdx].texte = inp.value;
+        });
+      });
+      list.querySelectorAll('[data-insert-trou-ex]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const exIdx = parseInt(btn.dataset.insertTrouEx, 10);
+          const phraseIdx = parseInt(btn.dataset.insertTrouPhrase, 10);
+          const input = list.querySelector(`.ev-trou-texte[data-ex-idx="${exIdx}"][data-phrase-idx="${phraseIdx}"]`);
+          insererTrouAt(input, exIdx, phraseIdx);
+        });
+      });
+      list.querySelectorAll('[data-remove-trou-ex]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const exIdx = parseInt(btn.dataset.removeTrouEx, 10);
+          const phraseIdx = parseInt(btn.dataset.removeTrouPhrase, 10);
+          _formExercices[exIdx].trousItems.splice(phraseIdx, 1);
+          renderExercicesList();
+        });
+      });
+      list.querySelectorAll('[data-add-trou]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const exIdx = parseInt(btn.dataset.addTrou, 10);
+          _formExercices[exIdx].trousItems.push({ texte: '' });
+          renderExercicesList();
+        });
+      });
+
+      list.querySelectorAll('[data-ex-up]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const i = parseInt(btn.dataset.exUp, 10);
+          [_formExercices[i - 1], _formExercices[i]] = [_formExercices[i], _formExercices[i - 1]];
+          renderExercicesList();
+        });
+      });
+      list.querySelectorAll('[data-ex-down]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const i = parseInt(btn.dataset.exDown, 10);
+          [_formExercices[i + 1], _formExercices[i]] = [_formExercices[i], _formExercices[i + 1]];
+          renderExercicesList();
+        });
+      });
+      list.querySelectorAll('[data-ex-remove]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          _formExercices.splice(parseInt(btn.dataset.exRemove, 10), 1);
+          renderExercicesList();
+        });
+      });
+      list.querySelectorAll('[data-ex-preview]').forEach(btn => {
+        btn.addEventListener('click', () => openPreview(parseInt(btn.dataset.exPreview, 10)));
+      });
+    }
+
+    /* ── Aperçu d'un exercice : réutilise le même convertisseur que
+       l'enregistrement (buildExercicePayload) et le même générateur de bloc
+       HTML que l'export PDF (EvaluationsPrint.exerciceBlockHtml) — rendu
+       garanti identique, sans passer par window.print(). ── */
+    async function openPreview(idx) {
+      const payload = buildExercicePayload(_formExercices[idx]);
+      const body = document.getElementById('ev-preview-body');
+      body.innerHTML = EvaluationsPrint.exerciceBlockHtml(payload, idx);
+      document.getElementById('ev-preview-modal').style.display = 'flex';
+      await document.fonts.ready;
+    }
+
+    function closePreview() {
+      document.getElementById('ev-preview-modal').style.display = 'none';
+    }
+
+    /* ── Formulaire ── */
+    /* prefill (optionnel) : { criteres, exercices } déjà au format payload
+       (voir buildExercicePayload) — utilisé par "Générer la trame" (mode
+       assisté) pour préremplir un formulaire de nouvelle évaluation, sinon
+       ignoré. */
+    function openForm(evaluation, prefill) {
+      _editingId = evaluation ? evaluation.id : null;
+      _currentMode = evaluation ? (evaluation.mode || 'seul') : (prefill ? 'assiste' : 'seul');
+      document.getElementById('ev-form-title').textContent = evaluation ? 'Modifier l\'évaluation' : 'Nouvelle évaluation';
+      document.getElementById('ev-form-classe').value = evaluation ? evaluation.classe : '';
+      document.getElementById('ev-form-titre').value = evaluation ? evaluation.titre : '';
+      _formCriteres = evaluation ? [...(evaluation.criteres || [])] : (prefill ? [...prefill.criteres] : []);
+      _formExercices = evaluation ? (evaluation.exercices || []).map(exerciceFormState)
+        : (prefill ? prefill.exercices.map(exerciceFormState) : []);
+      renderCriteresList();
+      renderExercicesList();
+      showView('form');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeForm() {
+      _editingId = null;
+      _currentMode = 'seul';
+      _formCriteres = [];
+      _formExercices = [];
+      showView('list');
+    }
+
+    /* ── Mode assisté ("Je crée avec Proficiamus") ───────────────────────────
+       Charge la banque JSON du domaine choisi + data/conjugaison.js (source
+       des vrais slugs, pour la correspondance — chargé une seule fois, à la
+       demande, pas au chargement de la page), affiche les compétences avec
+       correspondance trouvée, groupées par regroupement pédagogique. */
+    async function chargerAssistDomaine(domaineValue) {
+      const wrap = document.getElementById('ev-assist-competences');
+      wrap.innerHTML = '<div class="ev-empty">Chargement…</div>';
+      try {
+        const banque = await EvaluationsBanque.chargerDomaine(domaineValue);
+        await loadScript('data/conjugaison.js?v=2');
+        const exerciseIndex = Object.entries(window.EXERCISE_DATA || {})
+          .map(([slug, ex]) => ({ slug, title: ex.title, competence: ex.competence }));
+        const { valides, exclues } = EvaluationsBanque.indexerBanque(banque, exerciseIndex);
+        _assistValides = valides;
+        _assistDomaineChargee = domaineValue;
+        if (exclues.length) {
+          console.warn(`[Évaluations] ${exclues.length} compétence(s) de la banque sans correspondance, exclue(s) de la sélection (voir détail ci-dessus).`);
+        }
+        renderAssistCompetences();
+      } catch (e) {
+        wrap.innerHTML = `<div class="ev-empty" style="color:var(--red)">Erreur : ${escHtml(e.message)}</div>`;
+      }
+    }
+
+    function renderAssistCompetences() {
+      const wrap = document.getElementById('ev-assist-competences');
+      if (_assistValides.length === 0) {
+        wrap.innerHTML = '<div class="ev-empty">Aucune compétence disponible pour ce domaine.</div>';
+        return;
+      }
+      // Regroupées dans l'ordre d'apparition de la banque (déjà un ordre
+      // pédagogique cohérent — pas de tri alphabétique).
+      const groupes = [];
+      const parRegroupement = new Map();
+      _assistValides.forEach((entry, idx) => {
+        const cle = entry.regroupement || '';
+        if (!parRegroupement.has(cle)) {
+          const g = { titre: cle, items: [] };
+          parRegroupement.set(cle, g);
+          groupes.push(g);
+        }
+        parRegroupement.get(cle).items.push({ entry, idx });
+      });
+
+      wrap.innerHTML = groupes.map(g => `
+        <div class="ev-assist-groupe">
+          <div class="ev-assist-groupe-title">${escHtml(g.titre)}</div>
+          ${g.items.map(({ entry, idx }) => `
+            <label class="ev-assist-competence-row">
+              <input type="checkbox" class="ev-assist-competence-toggle" data-idx="${idx}">
+              <span>${escHtml(entry.titre)}</span>
+            </label>`).join('')}
+        </div>`).join('');
+    }
+
+    /* Une ligne de critère (titre exact) + les items convertis en exercices
+       par compétence cochée, puis ouverture du même formulaire que le mode
+       manuel, déjà prérempli — tout y reste modifiable normalement. */
+    function genererTrame() {
+      const indices = [...document.querySelectorAll('.ev-assist-competence-toggle:checked')].map(cb => parseInt(cb.dataset.idx, 10));
+      if (indices.length === 0) { alert('Sélectionne au moins une compétence.'); return; }
+
+      const criteres = [];
+      const exercices = [];
+      indices.forEach(idx => {
+        const entry = _assistValides[idx];
+        criteres.push(entry.titre);
+        (entry.items || []).forEach(item => {
+          exercices.push(EvaluationsBanque.convertirItem(item));
+        });
+      });
+
+      openForm(null, { criteres, exercices });
+    }
+
+    function collectFormData() {
+      const classe = document.getElementById('ev-form-classe').value.trim();
+      const titre = document.getElementById('ev-form-titre').value.trim();
+      const criteres = _formCriteres.map(c => c.trim()).filter(Boolean);
+      const exercices = _formExercices
+        .map(buildExercicePayload)
+        .filter(exercicePayloadHasContent);
+      return { classe, titre, criteres, exercices };
+    }
+
+    async function saveForm(thenGeneratePdf) {
+      const { classe, titre, criteres, exercices } = collectFormData();
+      if (!classe) { alert('La classe est obligatoire.'); return; }
+      if (!titre) { alert('Le titre est obligatoire.'); return; }
+
+      const saveBtn = document.getElementById('ev-save-btn');
+      const pdfBtn  = document.getElementById('ev-pdf-btn');
+      saveBtn.disabled = true;
+      pdfBtn.disabled   = true;
+      try {
+        let saved;
+        if (_editingId) {
+          saved = await lfmEvaluationsTeacher.updateEvaluation(_editingId, classe, titre, criteres, exercices, _currentMode);
+        } else {
+          saved = await lfmEvaluationsTeacher.createEvaluation(_teacherProfile.id, classe, titre, criteres, exercices, _currentMode);
+          _editingId = saved.id;
+        }
+        await loadEvaluations();
+        if (thenGeneratePdf) {
+          EvaluationsPrint.generate({ ...saved, enseignantNom: _teacherProfile.display_name });
+        } else {
+          closeForm();
+        }
+      } catch (e) {
+        alert('Erreur : ' + e.message);
+      } finally {
+        saveBtn.disabled = false;
+        pdfBtn.disabled   = false;
+      }
+    }
+
+    /* ── Liste ── */
+    function renderList() {
+      const wrap = document.getElementById('ev-list');
+      if (_evaluations.length === 0) {
+        wrap.innerHTML = '<div class="ev-empty">Aucune évaluation créée pour l\'instant.</div>';
+        return;
+      }
+      wrap.innerHTML = _evaluations.map(e => {
+        const date = new Date(e.updated_at || e.created_at).toLocaleDateString('fr-FR',
+          { day: '2-digit', month: 'long', year: 'numeric' });
+        return `
+        <div class="ev-card">
+          <div class="ev-card-top">
+            <div>
+              <div class="ev-card-title">${escHtml(e.titre)}</div>
+              <div class="ev-card-meta">${escHtml(e.classe)} · ${(e.criteres || []).length} critère(s) · ${(e.exercices || []).length} exercice(s)</div>
+              <div class="ev-card-date">Modifiée le ${date}</div>
+            </div>
+            <div class="ev-card-actions">
+              <button type="button" class="ev-btn ev-btn-outline ev-btn-sm" data-edit="${e.id}">Modifier</button>
+              <button type="button" class="ev-btn ev-btn-gold ev-btn-sm" data-pdf="${e.id}">📄 Générer le PDF</button>
+              <button type="button" class="ev-btn ev-btn-danger ev-btn-sm" data-delete="${e.id}">Supprimer</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+      wrap.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', async () => {
+        const evaluation = await lfmEvaluationsTeacher.getEvaluation(btn.dataset.edit);
+        openForm(evaluation);
+      }));
+      wrap.querySelectorAll('[data-pdf]').forEach(btn => btn.addEventListener('click', async () => {
+        const evaluation = await lfmEvaluationsTeacher.getEvaluation(btn.dataset.pdf);
+        EvaluationsPrint.generate({ ...evaluation, enseignantNom: _teacherProfile.display_name });
+      }));
+      wrap.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', async () => {
+        if (!confirm('Supprimer définitivement cette évaluation ?')) return;
+        await lfmEvaluationsTeacher.deleteEvaluation(btn.dataset.delete);
+        await loadEvaluations();
+      }));
+    }
+
+    async function loadEvaluations() {
+      document.getElementById('ev-list').innerHTML = '<div class="ev-empty">Chargement…</div>';
+      _evaluations = await lfmEvaluationsTeacher.getEvaluations();
+      renderList();
+    }
+
+    /* ── Init ── */
+    async function init() {
+      _teacherProfile = await lfmAuth.requireRole('enseignant');
+      if (!_teacherProfile) return;
+
+      document.getElementById('ev-new-btn').addEventListener('click', () => showView('modeChoice'));
+      document.getElementById('ev-mode-cancel-btn').addEventListener('click', () => showView('list'));
+      document.getElementById('ev-mode-seul-btn').addEventListener('click', () => openForm(null));
+      document.getElementById('ev-mode-assiste-btn').addEventListener('click', () => {
+        showView('assist');
+        chargerAssistDomaine(document.getElementById('ev-assist-domaine').value);
+      });
+      document.getElementById('ev-assist-cancel-btn').addEventListener('click', () => showView('modeChoice'));
+      document.getElementById('ev-assist-generer-btn').addEventListener('click', genererTrame);
+
+      const domSel = document.getElementById('ev-assist-domaine');
+      domSel.innerHTML = EvaluationsBanque.DOMAINES.map(d => `<option value="${d.value}">${escHtml(d.label)}</option>`).join('');
+      domSel.addEventListener('change', () => chargerAssistDomaine(domSel.value));
+
+      document.getElementById('ev-cancel-btn').addEventListener('click', closeForm);
+      document.getElementById('ev-preview-close').addEventListener('click', closePreview);
+      document.getElementById('ev-preview-backdrop').addEventListener('click', closePreview);
+      document.getElementById('ev-save-btn').addEventListener('click', () => saveForm(false));
+      document.getElementById('ev-pdf-btn').addEventListener('click', () => saveForm(true));
+      document.getElementById('ev-add-critere-btn').addEventListener('click', () => {
+        _formCriteres.push('');
+        renderCriteresList();
+      });
+      document.getElementById('ev-add-exercice-btn').addEventListener('click', () => {
+        _formExercices.push(exerciceFormState());
+        renderExercicesList();
+      });
+
+      await loadEvaluations();
+    }
+
+    init();
+  </script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

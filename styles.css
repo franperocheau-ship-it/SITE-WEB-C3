@@ -1530,6 +1530,17 @@ body.home-page .cards-grid {
   background: rgba(29,191,160,0.14);
   animation: lfm-speech-pulse 1.1s ease-in-out infinite;
 }
+
+/* Variante imbriquée dans un bouton de réponse existant (QCM, choix,
+   mots-cliquables…) — plus compacte, avec un espacement à gauche pour ne
+   pas coller au texte du choix. */
+.lfm-speech-btn--inline {
+  width: 19px;
+  height: 19px;
+  font-size: 10px;
+  margin-left: 7px;
+  vertical-align: middle;
+}
 @keyframes lfm-speech-pulse {
   0%, 100% { transform: scale(1); }
   50%      { transform: scale(1.08); }

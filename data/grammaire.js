@@ -2080,6 +2080,146 @@ Object.assign(window.EXERCISE_DATA, {
     ]
   },
 
+  "identifier-conjonction-subordination": {
+    title:      "Identifier une conjonction de subordination",
+    domaine:    "Français",
+    competence: "Grammaire — Conjonctions de subordination",
+    type:       "homophones-niveaux",
+    levels:     ["CM2", "6e"],
+    paliers:    3,
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+    levelDescs: {
+      "niveau1": "Repérer la conjonction de subordination dans une phrase",
+      "niveau2": "Repérer la conjonction de subordination sans se laisser piéger par un adverbe",
+      "niveau3": "Retrouver l'endroit où insérer la conjonction manquante"
+    },
+    homoShuffle: [false, true, false],
+
+    /* Compétence réservée à CM2/6e (levels:["CM2","6e"], pas de pastille
+       CM1), même schéma qu'identifier-conjonction-coordination : 3 paliers
+       de difficulté internes (onglets génériques "niveau1/niveau2/niveau3",
+       paliers !== levels.length) plutôt que du contenu propre à chaque classe.
+
+       Niveau 1 (mots-cliquables) : la conjonction est à cliquer dans une
+       phrase complète, en position médiane (items 1,3,5,7,9) ou initiale
+       (items 2,4,6,8,10). Les conjonctions élidées ("qu'") sont écrites avec
+       une espace après l'apostrophe (ex. "parce qu' il") afin que le
+       tokenizer de renderMotsCliquables (split sur les espaces) les isole en
+       mot cliquable à part — même convention que la ligne "Le compliment
+       qu' elle a reçu…" d'identifier-adverbe. Les conjonctions à deux mots
+       ("bien que", "pendant que", "parce qu'", "après qu'") ont donc un
+       targets à deux entrées, comme q.targets:["ont","l'air"] dans
+       identifier-attribut-sujet.
+       Niveau 2 (mots-cliquables, même mécanique) : chaque phrase contient en
+       plus un ADVERBE de liaison (jamais une conjonction de coordination,
+       pour ne pas empiéter sur distinguer-coordination-subordination) comme
+       piège ; cliquer dessus déclenche le message dédié via q.piege (même
+       mécanisme que identifier-adjectif/identifier-nom-phrase), sans retirer
+       le point si l'élève ne le sélectionne pas au final.
+       Niveau 3 (gap-saisie) : comme identifier-conjonction-coordination
+       Niveau 3, avec deux extensions génériques ajoutées à renderGapSaisie
+       (exercise.html) pour cette compétence :
+         - q.before:"" → gap ajouté avant le premier mot (conjonction en tout
+           début de phrase, items 9-10) ;
+         - q.acceptedAnswers → synonymes acceptés en plus de q.answer (items
+           9-10 : "Comme" ou "Parce que" ; items 5-6 : "quand" ou "parce que",
+           les deux étant des réponses naturellement valables pour ces deux
+           phrases — cause et répétition temporelle sont toutes deux
+           plausibles) ;
+         - q.confusableAnswers → si l'élève saisit "car" (conjonction de
+           COORDINATION), un message dédié l'explique au lieu du simple
+           message d'erreur générique, sur les 10 items. */
+
+    level1Bank: [
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination.",
+        sentence:"Je pense que tu as raison .", targets:["que"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination.",
+        sentence:"Si tu veux , nous partons .", targets:["Si"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination.",
+        sentence:"Il reste à la maison quand il pleut .", targets:["quand"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination.",
+        sentence:"Comme il était fatigué , il est parti tôt .", targets:["Comme"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination.",
+        sentence:"Les oiseaux chantent lorsque le soleil se lève .", targets:["lorsque"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination.",
+        sentence:"Puisque tu insistes , j'accepte .", targets:["Puisque"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination (2 mots).",
+        sentence:"Nous sortons bien qu' il pleuve .", targets:["bien","qu'"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination (2 mots).",
+        sentence:"Parce qu' il est malade , il reste couché .", targets:["Parce","qu'"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination (2 mots).",
+        sentence:"Je travaille pendant que tu dors .", targets:["pendant","que"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination (2 mots).",
+        sentence:"Après qu' il est parti , elle a pleuré .", targets:["Après","qu'"] }
+    ],
+
+    level2Bank: [
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination. Attention, un adverbe se cache dans la phrase !",
+        sentence:"Comme il faisait beau , nous avons finalement décidé de sortir .", targets:["Comme"],
+        piege:{ "finalement":"« finalement » est un adverbe : il ne relie pas deux propositions, contrairement à une conjonction de subordination." } },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination. Attention, un adverbe se cache dans la phrase !",
+        sentence:"Je pars quand la cloche sonne , généralement vers seize heures .", targets:["quand"],
+        piege:{ "généralement":"« généralement » est un adverbe : il ne relie pas deux propositions, contrairement à une conjonction de subordination." } },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination (2 mots). Attention, un adverbe se cache dans la phrase !",
+        sentence:"Il travaille pendant que ses collègues déjeunent ; il finit ainsi plus tôt .", targets:["pendant","que"],
+        piege:{ "ainsi":"« ainsi » est un adverbe : il ne relie pas deux propositions, contrairement à une conjonction de subordination." } },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination. Attention, un adverbe se cache dans la phrase !",
+        sentence:"Elle sourit puisque son examen s'est bien passé ; elle semblait pourtant inquiète ce matin .", targets:["puisque"],
+        piege:{ "pourtant":"« pourtant » est un adverbe : il ne relie pas deux propositions, contrairement à une conjonction de subordination." } },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination. Attention, un adverbe se cache dans la phrase !",
+        sentence:"Nous partirons si tu es prêt ; il commence bientôt à faire nuit .", targets:["si"],
+        piege:{ "bientôt":"« bientôt » est un adverbe : il ne relie pas deux propositions, contrairement à une conjonction de subordination." } },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination (2 mots). Attention, un adverbe se cache dans la phrase !",
+        sentence:"Il pleure parce qu' il a mal ; il refuse cependant de le dire .", targets:["parce","qu'"],
+        piege:{ "cependant":"« cependant » est un adverbe : il ne relie pas deux propositions, contrairement à une conjonction de subordination." } },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination (2 mots). Attention, un adverbe se cache dans la phrase !",
+        sentence:"Elle chante bien qu' elle soit enrhumée ; sa voix reste néanmoins belle .", targets:["bien","qu'"],
+        piege:{ "néanmoins":"« néanmoins » est un adverbe : il ne relie pas deux propositions, contrairement à une conjonction de subordination." } },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination. Attention, un adverbe se cache dans la phrase !",
+        sentence:"Ils jouent lorsque la cloche sonne , puis ils rentrent aussitôt en classe .", targets:["lorsque"],
+        piege:{ "puis":"« puis » est un adverbe : il ne relie pas deux propositions, contrairement à une conjonction de subordination." } },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination (2 mots). Attention, un adverbe se cache dans la phrase !",
+        sentence:"Tu dors pendant qu' il travaille ; il avance désormais plus vite seul .", targets:["pendant","qu'"],
+        piege:{ "désormais":"« désormais » est un adverbe : il ne relie pas deux propositions, contrairement à une conjonction de subordination." } },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de subordination (2 mots). Attention, un adverbe se cache dans la phrase !",
+        sentence:"Il rentre après qu' il a fini son travail , parfois tard le soir .", targets:["après","qu'"],
+        piege:{ "parfois":"« parfois » est un adverbe : il ne relie pas deux propositions, contrairement à une conjonction de subordination." } }
+    ],
+
+    level3Bank: [
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.",
+        before:"Je crois", after:"tu as raison .", answer:"que",
+        confusableAnswers:{ "car":"« car » est une conjonction de COORDINATION, pas de subordination : essaie une autre conjonction." } },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.",
+        before:"Il sait", after:"tu lui as menti .", answer:"que",
+        confusableAnswers:{ "car":"« car » est une conjonction de COORDINATION, pas de subordination : essaie une autre conjonction." } },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.",
+        before:"Nous sortirons", after:"la météo s'améliore .", answer:"si",
+        confusableAnswers:{ "car":"« car » est une conjonction de COORDINATION, pas de subordination : essaie une autre conjonction." } },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.",
+        before:"Tu réussiras", after:"tu travailles bien .", answer:"si",
+        confusableAnswers:{ "car":"« car » est une conjonction de COORDINATION, pas de subordination : essaie une autre conjonction." } },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.",
+        before:"Le chien aboie", after:"quelqu'un frappe à la porte .", answer:"quand", acceptedAnswers:["parce que"],
+        confusableAnswers:{ "car":"« car » est une conjonction de COORDINATION, pas de subordination : essaie une autre conjonction." } },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.",
+        before:"Les enfants applaudissent", after:"le spectacle commence .", answer:"quand", acceptedAnswers:["parce que"],
+        confusableAnswers:{ "car":"« car » est une conjonction de COORDINATION, pas de subordination : essaie une autre conjonction." } },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.",
+        before:"Elle est absente", after:"elle est malade .", answer:"parce qu'",
+        confusableAnswers:{ "car":"« car » est une conjonction de COORDINATION, pas de subordination : essaie une autre conjonction." } },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.",
+        before:"Il reste chez lui", after:"il est fatigué .", answer:"parce qu'",
+        confusableAnswers:{ "car":"« car » est une conjonction de COORDINATION, pas de subordination : essaie une autre conjonction." } },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de subordination (en tout début de phrase), puis écris-la.",
+        before:"", after:"il faisait nuit , nous avons allumé la lampe .", answer:"Comme", acceptedAnswers:["Parce que"],
+        confusableAnswers:{ "car":"« car » est une conjonction de COORDINATION, pas de subordination : essaie une autre conjonction." } },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de subordination (en tout début de phrase), puis écris-la.",
+        before:"", after:"il était en retard , il a couru jusqu'à l'école .", answer:"Comme", acceptedAnswers:["Parce que"],
+        confusableAnswers:{ "car":"« car » est une conjonction de COORDINATION, pas de subordination : essaie une autre conjonction." } }
+    ]
+  },
+
   "produire-formes-interrogatives": {
     title: "Produire différentes formes de phrases interrogatives",
     domaine:    "Français",

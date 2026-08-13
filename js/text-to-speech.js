@@ -1,11 +1,19 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    text-to-speech.js — Bouton de lecture audio (accessibilité dyslexie).
 
-   Expose attachSpeechButton(element, texte) : insère un bouton 🔊 discret
-   dans `element`, qui lit `texte` à voix haute via la Web Speech API du
-   navigateur au clic (jamais automatique). Un second clic pendant la
-   lecture l'arrête. Fallback silencieux si la synthèse vocale n'est pas
+   Expose attachSpeechButton(element, texte, opts) : insère un bouton 🔊
+   discret dans `element`, qui lit `texte` à voix haute via la Web Speech
+   API du navigateur au clic (jamais automatique). Un second clic pendant
+   la lecture l'arrête. Fallback silencieux si la synthèse vocale n'est pas
    disponible — aucune erreur visible, le bouton n'est simplement pas inséré.
+
+   opts.inline (défaut false) : `element` est lui-même un <button> existant
+   (ex. un choix de QCM) — imbriquer un <button> y serait invalide en HTML.
+   Dans ce cas, l'icône est un <span role="button" tabindex="0"> à la place,
+   et son clic appelle stopPropagation() pour ne jamais déclencher le choix
+   parent (bouton direct, onclick inline, ou délégation sur un ancêtre —
+   les trois cas s'arrêtent à stopPropagation, appelé avant que l'événement
+   ne remonte).
 
    Sélection de voix et gestion cancel()/speak() reprises de
    js/dictees-speech.js (même bug Chrome connu : speak() juste après
@@ -71,13 +79,19 @@ const attachSpeechButton = (() => {
     }
   }
 
-  return function attachSpeechButton(element, texte) {
+  return function attachSpeechButton(element, texte, opts) {
     if (!element || !texte) return null;
     if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') return null;
 
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'lfm-speech-btn';
+    const inline = !!(opts && opts.inline);
+    const btn = document.createElement(inline ? 'span' : 'button');
+    if (inline) {
+      btn.setAttribute('role', 'button');
+      btn.setAttribute('tabindex', '0');
+    } else {
+      btn.type = 'button';
+    }
+    btn.className = inline ? 'lfm-speech-btn lfm-speech-btn--inline' : 'lfm-speech-btn';
     btn.title = 'Écouter';
     btn.setAttribute('aria-label', 'Écouter le texte');
     btn.textContent = '🔊';
@@ -97,7 +111,8 @@ const attachSpeechButton = (() => {
       btn.setAttribute('aria-label', 'Arrêter la lecture');
     }
 
-    btn.addEventListener('click', () => {
+    function activate(e) {
+      if (inline) { e.stopPropagation(); e.preventDefault(); }
       if (btn.classList.contains('is-playing')) {
         window.speechSynthesis.cancel();
         setIdle();
@@ -106,7 +121,14 @@ const attachSpeechButton = (() => {
       if (resetActiveButton) resetActiveButton();
       resetActiveButton = setIdle;
       speak(texte, { onStart: setPlaying, onEnd: setIdle });
-    });
+    }
+
+    btn.addEventListener('click', activate);
+    if (inline) {
+      btn.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') activate(e);
+      });
+    }
 
     element.appendChild(btn);
     return btn;

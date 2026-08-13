@@ -8081,10 +8081,19 @@
        manquant.
        Étape 3 : validation en un seul essai (bouton ou touche Entrée),
        comparaison insensible à la casse à q.answer — même convention "un
-       seul essai" que texte-a-trous. */
+       seul essai" que texte-a-trous.
+       Extensions (identifier-conjonction-subordination) : q.before peut être
+       une chaîne vide ("") pour une conjonction en tout début de phrase — un
+       gap supplémentaire est alors ajouté avant le premier mot. q.acceptedAnswers
+       (tableau, optionnel) liste des synonymes également acceptés en plus de
+       q.answer (même convention que q.acceptedAnswers ailleurs dans le
+       fichier, ex. renderChoixEtiquette nombre décimal). q.confusableAnswers
+       (objet, optionnel) associe une saisie fautive précise (en minuscules) à
+       un message d'erreur dédié — même principe que q.piege (mots-cliquables)
+       mais pour une saisie libre. */
     function renderGapSaisie(card, q, ctx) {
       ctx = ctx || defaultQuestionCtx();
-      const beforeWords   = q.before.trim().split(/\s+/);
+      const beforeWords   = q.before.trim() ? q.before.trim().split(/\s+/) : [];
       const afterWords    = q.after.trim().split(/\s+/);
       const words         = beforeWords.concat(afterWords);
       const correctGapIdx = beforeWords.length - 1;
@@ -8099,6 +8108,7 @@
 
       const gapsEl      = document.getElementById('gs-gaps');
       const validateBtn = document.getElementById('gs-validate');
+      const accepted    = (q.acceptedAnswers ? [q.answer, ...q.acceptedAnswers] : [q.answer]).map(a => a.toLowerCase());
       let resolved = false;
       let input    = null;
 
@@ -8108,17 +8118,57 @@
         if (!val) { input.focus(); return; }
         input.disabled       = true;
         validateBtn.disabled = true;
-        const ok = val.toLowerCase() === q.answer.toLowerCase();
+        const ok = accepted.includes(val.toLowerCase());
         input.classList.add(ok ? 'is-correct' : 'is-wrong');
         if (ok) {
           ctx.addScore(1);
           setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
         } else {
-          setFeedback("feedback1", `<div class="ex-feedback-wrong">❌ La bonne réponse était <strong>${q.answer}</strong>.</div>`);
+          const confusableMsg = q.confusableAnswers && q.confusableAnswers[val.toLowerCase()];
+          if (confusableMsg) {
+            setFeedback("feedback1", `<div class="ex-feedback-wrong">❌ ${confusableMsg}</div>`);
+          } else {
+            setFeedback("feedback1", `<div class="ex-feedback-wrong">❌ La bonne réponse était <strong>${q.answer}</strong>.</div>`);
+          }
         }
         ctx.showNext();
       }
       validateBtn.addEventListener('click', doValidate);
+
+      function makeGapBtn(i) {
+        const gapBtn = document.createElement('button');
+        gapBtn.type      = 'button';
+        gapBtn.className = 'ex-gap-btn';
+        gapBtn.setAttribute('aria-label', 'Insérer le mot manquant ici');
+        gapBtn.addEventListener('click', () => {
+          if (resolved) return;
+          if (i !== correctGapIdx) {
+            gapBtn.classList.add('is-wrong');
+            setTimeout(() => gapBtn.classList.remove('is-wrong'), 450);
+            return;
+          }
+          resolved = true;
+          gapsEl.querySelectorAll('.ex-gap-btn').forEach(b => b.disabled = true);
+          gapBtn.classList.add('is-correct');
+
+          input = document.createElement('input');
+          input.type            = 'text';
+          input.className       = 'tt-input';
+          input.autocomplete    = 'off';
+          input.autocorrect     = 'off';
+          input.autocapitalize  = 'off';
+          input.spellcheck      = false;
+          input.placeholder     = '?';
+          input.setAttribute('aria-label', 'mot manquant');
+          input.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
+          gapBtn.replaceWith(input);
+          validateBtn.classList.remove('ex-hidden');
+          input.focus();
+        });
+        return gapBtn;
+      }
+
+      if (beforeWords.length === 0) gapsEl.appendChild(makeGapBtn(-1));
 
       words.forEach((w, i) => {
         const span = document.createElement('span');
@@ -8126,38 +8176,7 @@
         span.textContent = w;
         gapsEl.appendChild(span);
 
-        if (i < words.length - 1) {
-          const gapBtn = document.createElement('button');
-          gapBtn.type      = 'button';
-          gapBtn.className = 'ex-gap-btn';
-          gapBtn.setAttribute('aria-label', 'Insérer le mot manquant ici');
-          gapBtn.addEventListener('click', () => {
-            if (resolved) return;
-            if (i !== correctGapIdx) {
-              gapBtn.classList.add('is-wrong');
-              setTimeout(() => gapBtn.classList.remove('is-wrong'), 450);
-              return;
-            }
-            resolved = true;
-            gapsEl.querySelectorAll('.ex-gap-btn').forEach(b => b.disabled = true);
-            gapBtn.classList.add('is-correct');
-
-            input = document.createElement('input');
-            input.type            = 'text';
-            input.className       = 'tt-input';
-            input.autocomplete    = 'off';
-            input.autocorrect     = 'off';
-            input.autocapitalize  = 'off';
-            input.spellcheck      = false;
-            input.placeholder     = '?';
-            input.setAttribute('aria-label', 'mot manquant');
-            input.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
-            gapBtn.replaceWith(input);
-            validateBtn.classList.remove('ex-hidden');
-            input.focus();
-          });
-          gapsEl.appendChild(gapBtn);
-        }
+        if (i < words.length - 1) gapsEl.appendChild(makeGapBtn(i));
       });
     }
 

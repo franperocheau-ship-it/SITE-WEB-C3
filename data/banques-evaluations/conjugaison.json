@@ -1,0 +1,898 @@
+[
+  {
+    "titre": "Retrouver l'infinitif d'un verbe conjugué puis son groupe",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Le verbe > Identifier le verbe",
+    "competenceSlug": "retrouver-l-infinitif-d-un-verbe-conjugue-puis-son-groupe",
+    "typeExercice": "Marquage",
+    "items": [
+      {
+        "numero": 1,
+        "type": "Marquage",
+        "consigne": "Souligne le verbe conjugué dans chaque phrase, puis donne son infinitif et son groupe.",
+        "contenu": [
+          "Les enfants jouent dans la cour.",
+          "Nous choisissons un livre.",
+          "Tu prends ton manteau.",
+          "Elles grandissent rapidement.",
+          "Vous écrivez une lettre."
+        ],
+        "reponse": [
+          "jouent → jouer → 1er groupe",
+          "choisissons → choisir → 2e groupe",
+          "prends → prendre → 3e groupe",
+          "grandissent → grandir → 2e groupe",
+          "écrivez → écrire → 3e groupe"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "Réponse courte",
+        "consigne": "Pour chaque verbe conjugué, indique son infinitif et son groupe.",
+        "contenu": [
+          "Le chat dort sur le canapé.",
+          "Je regarde la pluie.",
+          "Nous finissons notre travail.",
+          "Ils font un dessin.",
+          "Vous venez demain."
+        ],
+        "reponse": [
+          "dormir → 3e groupe",
+          "regarder → 1er groupe",
+          "finir → 2e groupe",
+          "faire → 3e groupe",
+          "venir → 3e groupe"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Conjuguer être au présent",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les temps de l'indicatif > Présent",
+    "competenceSlug": "conjuguer-etre-au-present",
+    "typeExercice": "Répondre / classer dans un tableau",
+    "items": [
+      {
+        "numero": 1,
+        "type": "Répondre / classer dans un tableau",
+        "consigne": "Conjugue le verbe être au présent avec les six pronoms.",
+        "contenu": [
+          "je / tu / il-elle-on / nous / vous / ils-elles"
+        ],
+        "reponse": [
+          "je suis ; tu es ; il-elle-on est ; nous sommes ; vous êtes ; ils-elles sont"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "Texte à trous",
+        "consigne": "Complète chaque phrase avec la forme correcte du verbe être au présent.",
+        "contenu": [
+          "Je ___ dans la classe.",
+          "Tu ___ en avance.",
+          "Nous ___ prêts.",
+          "Vous ___ attentifs.",
+          "Elles ___ heureuses."
+        ],
+        "reponse": [
+          "suis",
+          "es",
+          "sommes",
+          "êtes",
+          "sont"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Conjuguer avoir au présent",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les temps de l'indicatif > Présent",
+    "competenceSlug": "conjuguer-avoir-au-present",
+    "typeExercice": "Relier",
+    "items": [
+      {
+        "numero": 1,
+        "type": "Relier",
+        "consigne": "Relie chaque sujet à la forme correcte du verbe avoir.",
+        "contenu": [
+          "Je → a / ai / avons",
+          "Tu → avez / as / ont",
+          "Nous → ont / avons / a",
+          "Vous → as / avez / avons",
+          "Elles → ai / avez / ont"
+        ],
+        "reponse": [
+          "Je → ai",
+          "Tu → as",
+          "Nous → avons",
+          "Vous → avez",
+          "Elles → ont"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "QCM",
+        "consigne": "Choisis la bonne forme du verbe avoir.",
+        "contenu": [
+          "Nous ___ une grande carte.",
+          "Tu ___ un nouveau cahier.",
+          "Ils ___ faim.",
+          "J'___ une idée.",
+          "Vous ___ deux minutes."
+        ],
+        "reponse": [
+          "avons",
+          "as",
+          "ont",
+          "ai",
+          "avez"
+        ],
+        "distracteurs": [
+          "avons / avez / ont",
+          "as / a / ai",
+          "ont / avons / avez",
+          "ai / a / as",
+          "avez / avons / ont"
+        ],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Conjuguer les verbes du 1er groupe au présent",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les temps de l'indicatif > Présent",
+    "competenceSlug": "conjuguer-les-verbes-du-1er-groupe-au-present",
+    "typeExercice": "Texte à trous",
+    "items": [
+      {
+        "numero": 1,
+        "type": "Texte à trous",
+        "consigne": "Complète chaque phrase avec le verbe entre parenthèses au présent.",
+        "contenu": [
+          "Je ___ une photo. (regarder)",
+          "Tu ___ ton vélo. (réparer)",
+          "Nous ___ dans la cour. (jouer)",
+          "Vous ___ la réponse. (chercher)",
+          "Ils ___ leur travail. (terminer)"
+        ],
+        "reponse": [
+          "regarde",
+          "répares",
+          "jouons",
+          "cherchez",
+          "terminent"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "Réécriture",
+        "consigne": "Réécris chaque phrase en changeant le sujet indiqué.",
+        "contenu": [
+          "Je dessine un arbre. → Nous",
+          "Tu marches vite. → Vous",
+          "Il écoute la consigne. → Ils",
+          "Nous préparons le sac. → Elle",
+          "Elles chantent ensemble. → Je"
+        ],
+        "reponse": [
+          "Nous dessinons un arbre.",
+          "Vous marchez vite.",
+          "Ils écoutent la consigne.",
+          "Elle prépare le sac.",
+          "Je chante ensemble."
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Conjuguer les verbes particuliers du 1er groupe (verbes en -cer, -ger, -yer, -eler, -eter, avec modification du radical)",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les temps de l'indicatif > Présent",
+    "competenceSlug": "conjuguer-les-verbes-particuliers-du-1er-groupe-verbes-en-cer-ger-yer-eler-eter-avec-modification-du-radical",
+    "typeExercice": "QCM",
+    "items": [
+      {
+        "numero": 1,
+        "type": "QCM",
+        "consigne": "Choisis la forme correcte du verbe au présent.",
+        "contenu": [
+          "Nous ___ la leçon. (commencer)",
+          "Nous ___ une affiche. (manger)",
+          "J'___ mon sac. (essuyer)",
+          "Elle ___ son voisin. (appeler)",
+          "Il ___ la balle. (jeter)"
+        ],
+        "reponse": [
+          "commençons",
+          "mangeons",
+          "essuie",
+          "appelle",
+          "jette"
+        ],
+        "distracteurs": [
+          "commencons / commençons / commencez",
+          "mangeons / mangons / mangez",
+          "essuis / essuie / essuyons",
+          "apelle / appelle / appelons",
+          "jète / jette / jetons"
+        ],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "Marquage",
+        "consigne": "Entoure la forme correctement conjuguée dans chaque série.",
+        "contenu": [
+          "nous commençons / nous commencons",
+          "nous mangeons / nous mangons",
+          "j'essaie / j'essaye",
+          "elle appelle / elle apelle",
+          "il jette / il jète"
+        ],
+        "reponse": [
+          "nous commençons",
+          "nous mangeons",
+          "j'essaie",
+          "elle appelle",
+          "il jette"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Conjuguer les verbes du 2e groupe au présent",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les temps de l'indicatif > Présent",
+    "competenceSlug": "conjuguer-les-verbes-du-2e-groupe-au-present",
+    "typeExercice": "Répondre / classer dans un tableau",
+    "items": [
+      {
+        "numero": 1,
+        "type": "Répondre / classer dans un tableau",
+        "consigne": "Conjugue le verbe finir au présent avec les six pronoms.",
+        "contenu": [
+          "je / tu / il-elle-on / nous / vous / ils-elles"
+        ],
+        "reponse": [
+          "je finis ; tu finis ; il-elle-on finit ; nous finissons ; vous finissez ; ils-elles finissent"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "Réponse courte",
+        "consigne": "Écris la forme correcte du verbe indiqué.",
+        "contenu": [
+          "Nous ___ notre repas. (finir)",
+          "Tu ___ vite. (grandir)",
+          "Elles ___ leur travail. (choisir)",
+          "Je ___ le formulaire. (remplir)",
+          "Vous ___ à la lumière. (réfléchir)"
+        ],
+        "reponse": [
+          "finissons",
+          "grandis",
+          "choisissent",
+          "remplis",
+          "réfléchissez"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Conjuguer les verbes fréquents du 3e groupe au présent",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les temps de l'indicatif > Présent",
+    "competenceSlug": "conjuguer-les-verbes-frequents-du-3e-groupe-au-present",
+    "typeExercice": "Relier",
+    "items": [
+      {
+        "numero": 1,
+        "type": "Relier",
+        "consigne": "Relie chaque sujet à la forme correcte du verbe.",
+        "contenu": [
+          "Je → vais / va / allons",
+          "Tu → fais / fait / font",
+          "Elle → vient / venons / viennent",
+          "Nous → prenons / prends / prennent",
+          "Vous → dites / dit / dis"
+        ],
+        "reponse": [
+          "Je → vais",
+          "Tu → fais",
+          "Elle → vient",
+          "Nous → prenons",
+          "Vous → dites"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "Texte à trous",
+        "consigne": "Complète les phrases avec le verbe entre parenthèses au présent.",
+        "contenu": [
+          "Je ___ à l'école à pied. (aller)",
+          "Tu ___ ton exercice. (faire)",
+          "Nous ___ le bus. (prendre)",
+          "Ils ___ demain matin. (venir)",
+          "Vous ___ la vérité. (dire)"
+        ],
+        "reponse": [
+          "vais",
+          "fais",
+          "prenons",
+          "viennent",
+          "dites"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Conjuguer à l'imparfait",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les temps de l'indicatif > Imparfait",
+    "competenceSlug": "conjuguer-a-l-imparfait",
+    "typeExercice": "Réécriture",
+    "items": [
+      {
+        "numero": 1,
+        "type": "Réécriture",
+        "consigne": "Réécris chaque phrase à l'imparfait.",
+        "contenu": [
+          "Je joue dans le jardin.",
+          "Nous regardons les étoiles.",
+          "Tu finis ton dessin.",
+          "Ils prennent le train.",
+          "Vous êtes en vacances."
+        ],
+        "reponse": [
+          "Je jouais dans le jardin.",
+          "Nous regardions les étoiles.",
+          "Tu finissais ton dessin.",
+          "Ils prenaient le train.",
+          "Vous étiez en vacances."
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "QCM",
+        "consigne": "Choisis la forme correcte à l'imparfait.",
+        "contenu": [
+          "Quand j'étais petit, je ___ souvent ici. (jouer)",
+          "Nous ___ chaque matin. (marcher)",
+          "Tu ___ toujours la même histoire. (raconter)",
+          "Elles ___ leurs devoirs après le goûter. (finir)",
+          "Vous ___ très attentifs. (être)"
+        ],
+        "reponse": [
+          "jouais",
+          "marchions",
+          "racontais",
+          "finissaient",
+          "étiez"
+        ],
+        "distracteurs": [
+          "jouais / jouait / jouer",
+          "marchions / marchiez / marchons",
+          "racontais / racontait / racontiez",
+          "finissaient / finissions / finissaient",
+          "étiez / êtes / es"
+        ],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Conjuguer au futur",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les temps de l'indicatif > Futur simple",
+    "competenceSlug": "conjuguer-au-futur",
+    "typeExercice": "Texte à trous",
+    "items": [
+      {
+        "numero": 1,
+        "type": "Texte à trous",
+        "consigne": "Complète chaque phrase avec le verbe entre parenthèses au futur simple.",
+        "contenu": [
+          "Demain, je ___ une promenade. (faire)",
+          "Tu ___ ton projet lundi. (terminer)",
+          "Nous ___ le musée. (visiter)",
+          "Vous ___ votre valise. (préparer)",
+          "Ils ___ à Madrid. (venir)"
+        ],
+        "reponse": [
+          "ferai",
+          "termineras",
+          "visiterons",
+          "préparerez",
+          "viendront"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "Marquage",
+        "consigne": "Souligne les verbes conjugués au futur simple.",
+        "contenu": [
+          "Nous partirons demain matin.",
+          "Je regarde la carte.",
+          "Ils construiront une cabane.",
+          "Vous avez un rendez-vous.",
+          "Tu choisiras un livre."
+        ],
+        "reponse": [
+          "partirons",
+          "aucun",
+          "construiront",
+          "aucun",
+          "choisiras"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Conjuguer au passé composé avec avoir",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les temps de l'indicatif > Passé composé",
+    "competenceSlug": "conjuguer-au-passe-compose-avec-avoir",
+    "typeExercice": "Répondre / classer dans un tableau",
+    "items": [
+      {
+        "numero": 1,
+        "type": "Répondre / classer dans un tableau",
+        "consigne": "Conjugue le verbe regarder au passé composé avec les six pronoms.",
+        "contenu": [
+          "je / tu / il-elle-on / nous / vous / ils-elles"
+        ],
+        "reponse": [
+          "j'ai regardé ; tu as regardé ; il-elle-on a regardé ; nous avons regardé ; vous avez regardé ; ils-elles ont regardé"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "Réécriture",
+        "consigne": "Réécris chaque phrase au passé composé.",
+        "contenu": [
+          "Je range ma chambre.",
+          "Tu regardes le film.",
+          "Nous visitons le musée.",
+          "Vous préparez le repas.",
+          "Ils terminent leur travail."
+        ],
+        "reponse": [
+          "J'ai rangé ma chambre.",
+          "Tu as regardé le film.",
+          "Nous avons visité le musée.",
+          "Vous avez préparé le repas.",
+          "Ils ont terminé leur travail."
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Choisir l'auxiliaire être ou avoir au passé composé",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les temps de l'indicatif > Passé composé",
+    "competenceSlug": "choisir-l-auxiliaire-etre-ou-avoir-au-passe-compose",
+    "typeExercice": "QCM",
+    "items": [
+      {
+        "numero": 1,
+        "type": "QCM",
+        "consigne": "Choisis l'auxiliaire correct.",
+        "contenu": [
+          "Léa ___ arrivée tôt.",
+          "Nous ___ mangé dehors.",
+          "Ils ___ partis à huit heures.",
+          "Tu ___ pris le train.",
+          "Vous ___ venus hier."
+        ],
+        "reponse": [
+          "est",
+          "avons",
+          "sont",
+          "as",
+          "êtes"
+        ],
+        "distracteurs": [
+          "est / a",
+          "avons / sommes",
+          "sont / ont",
+          "as / es",
+          "êtes / avez"
+        ],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "Marquage",
+        "consigne": "Entoure l'auxiliaire utilisé dans chaque phrase.",
+        "contenu": [
+          "Nous avons joué au ballon.",
+          "Elle est tombée dans la cour.",
+          "Ils ont choisi un livre.",
+          "Tu es parti rapidement.",
+          "Vous avez écrit une lettre."
+        ],
+        "reponse": [
+          "avons",
+          "est",
+          "ont",
+          "es",
+          "avez"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Conjuguer au passé composé avec être",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les temps de l'indicatif > Passé composé",
+    "competenceSlug": "conjuguer-au-passe-compose-avec-etre",
+    "typeExercice": "Texte à trous",
+    "items": [
+      {
+        "numero": 1,
+        "type": "Texte à trous",
+        "consigne": "Complète avec le verbe entre parenthèses au passé composé avec être.",
+        "contenu": [
+          "Elle ___ à huit heures. (arriver)",
+          "Ils ___ très tôt. (partir)",
+          "Nous ___ au sommet. (monter)",
+          "Tu ___ dans la cour. (tomber)",
+          "Elles ___ à la maison. (rentrer)"
+        ],
+        "reponse": [
+          "est arrivée",
+          "sont partis",
+          "sommes montés",
+          "es tombé(e)",
+          "sont rentrées"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "Relier",
+        "consigne": "Relie chaque sujet à la forme correcte.",
+        "contenu": [
+          "Elle → est sortie / a sorti",
+          "Ils → sont descendus / ont descendu",
+          "Nous → sommes arrivés / avons arrivé",
+          "Tu → es venu(e) / as venu(e)",
+          "Elles → sont restées / ont restées"
+        ],
+        "reponse": [
+          "Elle → est sortie",
+          "Ils → sont descendus",
+          "Nous → sommes arrivés",
+          "Tu → es venu(e)",
+          "Elles → sont restées"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Accorder le participe passé avec le COD (auxiliaire avoir)",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les temps de l'indicatif > Passé composé",
+    "competenceSlug": "accorder-le-participe-passe-avec-le-cod-auxiliaire-avoir",
+    "typeExercice": "Mots soulignés + réponse dessous",
+    "items": [
+      {
+        "numero": 1,
+        "type": "Mots soulignés + réponse dessous",
+        "consigne": "Observe le COD souligné et écris le participe passé correctement accordé.",
+        "contenu": [
+          "J'ai rangé les chaussures que j'ai trouvé___ sous le lit.",
+          "Elle a lu les histoires qu'elle a choisi___ .",
+          "Nous avons acheté les pommes que tu as lavé___ .",
+          "Ils ont pris les photos qu'ils ont imprimé___ .",
+          "Vous avez vu les affiches que nous avons préparé___ ."
+        ],
+        "reponse": [
+          "trouvées",
+          "choisies",
+          "lavées",
+          "imprimées",
+          "préparées"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "Réécriture",
+        "consigne": "Réécris chaque phrase en plaçant le COD avant le verbe comme indiqué.",
+        "contenu": [
+          "J'ai rangé les valises. → Les valises...",
+          "Elle a préparé les tartes. → Les tartes...",
+          "Nous avons choisi les chansons. → Les chansons...",
+          "Ils ont réparé les bicyclettes. → Les bicyclettes...",
+          "Vous avez acheté les fleurs. → Les fleurs..."
+        ],
+        "reponse": [
+          "Les valises que j'ai rangées.",
+          "Les tartes qu'elle a préparées.",
+          "Les chansons que nous avons choisies.",
+          "Les bicyclettes qu'ils ont réparées.",
+          "Les fleurs que vous avez achetées."
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Conjuguer au passé simple",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les temps de l'indicatif > Passé simple",
+    "competenceSlug": "conjuguer-au-passe-simple",
+    "typeExercice": "QCM",
+    "items": [
+      {
+        "numero": 1,
+        "type": "QCM",
+        "consigne": "Choisis la bonne forme au passé simple.",
+        "contenu": [
+          "Le chevalier ___ la porte. (ouvrir)",
+          "Il ___ dans la cour. (entrer)",
+          "Nous ___ le spectacle. (regarder)",
+          "Ils ___ leur voyage. (commencer)",
+          "Elle ___ un grand bruit. (entendre)"
+        ],
+        "reponse": [
+          "ouvrit",
+          "entra",
+          "regardâmes",
+          "commencèrent",
+          "entendit"
+        ],
+        "distracteurs": [
+          "ouvrit / ouvrait / ouvrira",
+          "entra / entrait / entrer",
+          "regardâmes / regardions / regarderons",
+          "commencèrent / commençaient / commenceront",
+          "entendit / entendait / entendra"
+        ],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "Texte à trous",
+        "consigne": "Complète avec le verbe entre parenthèses au passé simple.",
+        "contenu": [
+          "Le roi ___ son cheval. (monter)",
+          "Les enfants ___ dans la forêt. (courir)",
+          "Elle ___ la bonne réponse. (trouver)",
+          "Nous ___ le château. (visiter)",
+          "Ils ___ la porte. (fermer)"
+        ],
+        "reponse": [
+          "monta",
+          "coururent",
+          "trouva",
+          "visitâmes",
+          "fermèrent"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Conjuguer au plus-que-parfait",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les temps de l'indicatif > Plus-que-parfait",
+    "competenceSlug": "conjuguer-au-plus-que-parfait",
+    "typeExercice": "Réécriture",
+    "items": [
+      {
+        "numero": 1,
+        "type": "Réécriture",
+        "consigne": "Réécris chaque phrase au plus-que-parfait.",
+        "contenu": [
+          "Je termine mon travail avant de sortir.",
+          "Nous visitons déjà le musée quand le groupe arrive.",
+          "Tu ranges ta chambre avant le dîner.",
+          "Ils partent avant notre arrivée.",
+          "Elle lit le livre avant le cours."
+        ],
+        "reponse": [
+          "J'avais terminé mon travail avant de sortir.",
+          "Nous avions déjà visité le musée quand le groupe est arrivé.",
+          "Tu avais rangé ta chambre avant le dîner.",
+          "Ils étaient partis avant notre arrivée.",
+          "Elle avait lu le livre avant le cours."
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "Répondre / classer dans un tableau",
+        "consigne": "Conjugue le verbe entre parenthèses au plus-que-parfait.",
+        "contenu": [
+          "Je ___ le message. (lire)",
+          "Tu ___ ton sac. (préparer)",
+          "Il ___ avant midi. (partir)",
+          "Nous ___ la porte. (fermer)",
+          "Elles ___ leur travail. (finir)"
+        ],
+        "reponse": [
+          "avais lu",
+          "avais préparé",
+          "était parti",
+          "avions fermé",
+          "avaient fini"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Conjuguer à l'impératif présent",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les autres modes > Impératif",
+    "competenceSlug": "conjuguer-a-l-imperatif-present",
+    "typeExercice": "Marquage",
+    "items": [
+      {
+        "numero": 1,
+        "type": "Marquage",
+        "consigne": "Souligne les verbes conjugués à l'impératif présent.",
+        "contenu": [
+          "Ferme la porte, s'il te plaît.",
+          "Vous fermez la porte.",
+          "Écoute attentivement.",
+          "Nous écoutons la consigne.",
+          "Prenez vos cahiers."
+        ],
+        "reponse": [
+          "Ferme",
+          "aucun",
+          "Écoute",
+          "aucun",
+          "Prenez"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "Texte à trous",
+        "consigne": "Complète chaque consigne avec le verbe à l'impératif présent.",
+        "contenu": [
+          "___ la lumière ! (éteindre)",
+          "___ ton cahier ! (prendre)",
+          "___ doucement ! (parler)",
+          "___ vos affaires ! (ranger)",
+          "___ patient ! (être)"
+        ],
+        "reponse": [
+          "Éteins",
+          "Prends",
+          "Parle",
+          "Rangez",
+          "Sois"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  },
+  {
+    "titre": "Conjuguer au conditionnel présent",
+    "domaine": "Français",
+    "sousDomaine": "Conjugaison",
+    "regroupement": "Les autres modes > Conditionnel",
+    "competenceSlug": "conjuguer-au-conditionnel-present",
+    "typeExercice": "Réponse courte",
+    "items": [
+      {
+        "numero": 1,
+        "type": "Réponse courte",
+        "consigne": "Conjugue le verbe indiqué au conditionnel présent.",
+        "contenu": [
+          "Je ___ plus souvent si j'avais le temps. (lire)",
+          "Tu ___ avec nous. (venir)",
+          "Elle ___ un gâteau. (faire)",
+          "Nous ___ cette idée. (choisir)",
+          "Vous ___ la vérité. (dire)"
+        ],
+        "reponse": [
+          "lirais",
+          "viendrais",
+          "ferait",
+          "choisirions",
+          "diriez"
+        ],
+        "distracteurs": [],
+        "notePapier": "Aucune adaptation nécessaire"
+      },
+      {
+        "numero": 2,
+        "type": "QCM",
+        "consigne": "Choisis la forme correcte au conditionnel présent.",
+        "contenu": [
+          "Je ___ volontiers ce livre. (lire)",
+          "Nous ___ demain. (partir)",
+          "Ils ___ plus tôt. (venir)",
+          "Tu ___ cette veste. (prendre)",
+          "Vous ___ nous aider. (pouvoir)"
+        ],
+        "reponse": [
+          "lirais",
+          "partirions",
+          "viendraient",
+          "prendrais",
+          "pourriez"
+        ],
+        "distracteurs": [
+          "lirais / lirai / lisais",
+          "partirions / partirons / partions",
+          "viendraient / viendront / venaient",
+          "prendrais / prendras / prenais",
+          "pourriez / pourrez / pouviez"
+        ],
+        "notePapier": "Aucune adaptation nécessaire"
+      }
+    ]
+  }
+]

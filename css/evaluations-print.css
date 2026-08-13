@@ -1,0 +1,405 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   evaluations-print.css — Export PDF d'une évaluation (module Évaluations,
+   MVP, enseignant uniquement). Chargé uniquement par evaluations-enseignant.html.
+
+   Mécanique d'impression identique à css/champ-lexical-print.css :
+   #ev-print-root est rempli par js/evaluations-print.js puis basculé en
+   display:block via la classe body.printing-evaluation, tout le reste de la
+   page étant masqué pendant l'impression (liste blanche, voir plus bas).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+#ev-print-root { display: none; }
+
+.evp-page {
+  font-family: 'Nunito Sans', system-ui, sans-serif;
+  color: #1E2532;
+}
+
+/* ── Bandeau classe + nom/date ────────────────────────────────────────────
+   Nom/prénom et Date côte à côte sur une seule ligne (evp-bandeau-info en
+   row, pas column) : gardent le bandeau compact — l'empilement sur 2 lignes
+   doublait sa hauteur inutilement. Pas de min-height : la hauteur s'aligne
+   sur le contenu (align-items:stretch fait correspondre les deux colonnes). */
+.evp-bandeau {
+  display: flex;
+  align-items: stretch;
+  margin-bottom: 14pt;
+  border: 1pt solid #1A2D6B;
+}
+/* flex:0 0 auto + width:fit-content (pas flex:0 0 34% fixe) : le bandeau
+   s'ajuste au texte de la classe ("CM1D" ne doit pas occuper la même
+   largeur qu'un nom de classe bien plus long). max-width en filet de
+   sécurité pour un nom de classe inhabituellement long. */
+.evp-bandeau-classe {
+  background: #1A2D6B;
+  color: #fff;
+  font-weight: 800;
+  font-size: 15pt;
+  flex: 0 0 auto;
+  width: fit-content;
+  max-width: 55%;
+  display: flex;
+  align-items: flex-end;
+  padding: 8pt 18pt;
+}
+.evp-bandeau-info {
+  background: #F7F8FA;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12pt;
+  padding: 10pt 16pt;
+  font-size: 10pt;
+  color: #1E2532;
+}
+/* Sans nowrap, ces champs repassaient sur 2 lignes dès que leur largeur
+   naturelle dépassait celle de la colonne. Le blanc à remplir est un trait
+   dessiné en CSS (border-bottom, largeur fixe) plutôt qu'une suite de
+   tirets bas dans le texte — plus lisible, et surtout la longueur du trait
+   devient directement réglable ici (evp-bandeau-ligne--nom/--date) sans
+   dépendre des métriques d'une police. Le bandeau classe étant maintenant
+   en largeur fit-content (voir .evp-bandeau-classe), l'essentiel de la
+   largeur du bandeau revient à cette zone pour un nom de classe court
+   ("CM1D" etc.), laissant de la marge pour des traits confortables. */
+/* align-items:baseline (pas center) : aligne le trait sur la ligne de base
+   du texte, puis translateY le redescend légèrement en dessous — sans quoi
+   le trait apparaissait au niveau des ":" plutôt qu'en dessous du texte. */
+.evp-bandeau-champ { display: inline-flex; align-items: baseline; white-space: nowrap; }
+.evp-bandeau-ligne {
+  display: inline-block;
+  border-bottom: 1pt solid #1E2532;
+  margin-left: 5pt;
+  transform: translateY(3pt);
+}
+.evp-bandeau-ligne--nom { width: 200pt; }
+.evp-bandeau-ligne--date { width: 65pt; }
+
+/* ── Filets gold + titre ──────────────────────────────────────────────────
+   <div>+background plutôt que <hr>+border : plus fiable au rendu impression
+   (bordures fines parfois perdues au passage HTML→PDF selon le moteur). */
+.evp-filet { height: 2pt; background: #F5A623; }
+.evp-titre {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 800;
+  font-size: 16pt;
+  color: #1A2D6B;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  padding: 10pt 8pt 2pt 8pt;
+  margin: 0;
+}
+/* Ligne d'attribution — déplacée du pied de page (retiré) vers ici, entre
+   le titre et le second filet gold. Reste discrète : petite, grise,
+   normale (pas grasse). */
+.evp-attribution {
+  text-align: center;
+  font-size: 8pt;
+  font-weight: 400;
+  color: #8A93A3;
+  margin: 0 0 10pt 0;
+}
+
+/* ── Grille de critères ───────────────────────────────────────────────── */
+.evp-grille {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 18pt;
+  break-inside: avoid;
+}
+/* Espace entre le filet gold et le tableau — sans lui, l'en-tête navy de la
+   grille touchait quasiment le filet. Ciblé sur la grille de critères
+   uniquement (.evp-table-classement, plus bas dans le flux, ne suit jamais
+   directement le filet). */
+.evp-grille-criteres { margin-top: 18pt; }
+.evp-grille th {
+  background: #1A2D6B;
+  color: #fff;
+  font-size: 9pt;
+  font-weight: 700;
+  padding: 7pt 8pt;
+  text-align: center;
+  border: 0.75pt solid #1A2D6B;
+}
+.evp-grille th:first-child { text-align: left; width: 40%; }
+.evp-grille td {
+  background: #fff;
+  border: 0.75pt solid #1A2D6B;
+  padding: 8pt;
+  font-size: 10pt;
+}
+.evp-grille td:first-child { text-align: left; }
+.evp-grille td:not(:first-child) { width: 15%; }
+
+/* ── Exercices ─────────────────────────────────────────────────────────────
+   Pas de break-inside:avoid sur .evp-exercice lui-même : un exercice trop
+   long pour l'espace restant en bas de page peut être coupé en cours de
+   contenu (évite un grand blanc résiduel). En revanche
+   .evp-exercice-groupe-tete (consigne + 1ʳᵉ ligne de contenu) le porte : la
+   consigne ne doit jamais se retrouver seule en fin de page, sans aucune
+   ligne de contenu visible sous elle. */
+.evp-exercice {
+  background: #F7F8FA;
+  border-radius: 4pt;
+  padding: 10pt 14pt;
+  margin-bottom: 12pt;
+}
+.evp-exercice-groupe-tete { break-inside: avoid; }
+.evp-exercice-head { font-size: 11pt; line-height: 1.5; margin-bottom: 6pt; }
+.evp-exercice-num { color: #1DBFA0; font-weight: 800; }
+.evp-exercice-mot { text-decoration: underline; }
+/* -webkit-text-stroke en renfort de font-weight:700 : Nunito Sans n'est
+   chargée qu'aux graisses 400 et 600 (voir @import dans styles.css), donc
+   700 retombe déjà sur la graisse 600 la plus proche disponible — pas de
+   graisse plus élevée à charger, d'où ce contour fin pour épaissir
+   visuellement le texte sans dépendre d'un poids de police absent. Chrome
+   uniquement (moteur d'impression de cette fonctionnalité), pas de repli
+   nécessaire. ── */
+.evp-exercice-consigne {
+  color: #1E2532;
+  font-weight: 700;
+  -webkit-text-stroke: 0.3pt #1E2532;
+}
+.evp-exercice-ligne {
+  font-size: 11pt;
+  line-height: 1.5;
+  color: #1E2532;
+  margin: 0 0 8pt 0;
+}
+.evp-exercice-ligne:last-child { margin-bottom: 0; }
+
+/* ── Type Marquage : interligne élargi ───────────────────────────────────
+   Vise ~2 à 2.2 : espace nécessaire pour souligner/entourer un mot à la
+   main sans toucher la ligne suivante. Ciblé sur ce type uniquement (les
+   autres réutilisent .evp-exercice-ligne sans ce besoin). */
+.evp-exercice-ligne--marquage { line-height: 2.1; }
+
+/* ── Type Réécriture : banque de mots + ligne pointillée de réponse ────── */
+.evp-banque-mots {
+  border: 1pt dashed #1A2D6B;
+  border-radius: 4pt;
+  padding: 6pt 10pt;
+  font-size: 10pt;
+  font-style: italic;
+  color: #1E2532;
+  background: #fff;
+  margin-bottom: 10pt;
+}
+.evp-reecriture-item { margin-bottom: 10pt; }
+.evp-reecriture-item:last-child { margin-bottom: 0; }
+.evp-dotted-answer {
+  border-bottom: 1pt dotted #1A2D6B;
+  height: 16pt;
+}
+/* Marge au-dessus de la phrase elle-même (pas seulement en dessous de la
+   ligne pointillée précédente, via evp-reecriture-item ci-dessus) : sans
+   ça, la séparation entre la ligne de réponse d'un item et la phrase
+   suivante restait trop fine. Pas de marge sur la toute première phrase
+   (déjà séparée de la consigne par le sous-conteneur groupe-tête). */
+.evp-reecriture-phrase { margin-top: 10pt; }
+.evp-reecriture-item:first-child .evp-reecriture-phrase { margin-top: 0; }
+
+/* ── Type "Répondre / classer dans un tableau" : catégories libres ──────
+   Réutilise .evp-grille (même en-tête navy que la grille de critères) ;
+   lignes plus hautes que la grille de critères pour laisser la place à
+   l'écriture manuscrite. table-layout:fixed + reset du th:first-child
+   (dont .evp-grille impose width:40%, pensé pour la grille de critères où
+   la 1ʳᵉ colonne est plus large) : toutes les colonnes strictement égales,
+   comme demandé — sans ce reset, la 1ʳᵉ catégorie héritait des 40% et les
+   suivantes se partageaient le reste, inégal. ── */
+.evp-table-classement { table-layout: fixed; }
+.evp-table-classement td { height: 22pt; }
+.evp-table-classement th:first-child,
+.evp-table-classement td:first-child {
+  width: auto;
+  text-align: center;
+}
+.evp-table-classement td:first-child { text-align: left; }
+.evp-classement-pronom { font-weight: 700; background: #F7F8FA; }
+
+/* ── Variante conjugaison : colonne des pronoms ajustée à son contenu ────
+   width:1% + white-space:nowrap (table-layout:auto) : classique CSS pour
+   qu'une colonne se réduise à son contenu le plus long ("il/elle/on") au
+   lieu de partager la largeur également avec les colonnes de verbes —
+   celles-ci absorbent alors tout l'espace restant. Sélecteur à 2 classes
+   pour l'emporter sur .evp-grille th:first-child (width:40%, pensé pour le
+   mode catégories libres, pas pertinent ici). ── */
+.evp-grille.evp-table-conjugaison td { height: 22pt; }
+.evp-grille.evp-table-conjugaison th:first-child,
+.evp-grille.evp-table-conjugaison td:first-child {
+  width: 1%;
+  white-space: nowrap;
+  text-align: left;
+}
+
+/* ── Type Mot à transformer (grille) ─────────────────────────────────────
+   Mots courts (pas des phrases) répartis en 2 ou 3 colonnes plutôt qu'une
+   longue colonne verticale unique. ── */
+.evp-motgrille-grid {
+  display: grid;
+  gap: 10pt 20pt;
+}
+.evp-motgrille-grid--2col { grid-template-columns: repeat(2, 1fr); }
+.evp-motgrille-grid--3col { grid-template-columns: repeat(3, 1fr); }
+.evp-motgrille-item {
+  display: flex;
+  align-items: center;
+  gap: 6pt;
+  font-size: 11pt;
+}
+.evp-motgrille-fleche { color: #1A2D6B; font-weight: 700; flex-shrink: 0; }
+.evp-motgrille-ligne {
+  flex: 1;
+  border-bottom: 1pt dotted #1A2D6B;
+  height: 14pt;
+}
+
+/* ── Type Relier : deux colonnes espacées + repères points ───────────────
+   Le point reste collé à son mot (petit gap ci-dessous), pas à l'écart
+   central — chaque colonne pack son contenu vers son propre bord extérieur
+   (flex-start à gauche, flex-end à droite, voir evp-relier-col--*) plutôt
+   que d'utiliser space-between (qui éloignait le point du texte quand le
+   mot était court). L'espace pour tracer le trait à la main vient
+   uniquement du gap entre les deux colonnes ci-dessous, resté généreux. ── */
+.evp-relier-wrap {
+  display: flex;
+  justify-content: space-between;
+  gap: 56pt;
+}
+.evp-relier-col { flex: 1; }
+.evp-relier-item {
+  display: flex;
+  align-items: center;
+  gap: 4pt;
+  font-size: 11pt;
+  padding: 4pt 0;
+  margin-bottom: 14pt;
+}
+.evp-relier-item:last-child { margin-bottom: 0; }
+.evp-relier-col--gauche .evp-relier-item { justify-content: flex-start; }
+.evp-relier-col--droite .evp-relier-item { justify-content: flex-end; }
+.evp-relier-dot { font-weight: 800; color: #1A2D6B; flex-shrink: 0; }
+
+/* ── Case à cocher dessinée en CSS (QCM, Vrai/Faux) ──────────────────────
+   Pas de glyphe unicode (☐) : le sous-ensemble latin de la police Google
+   Fonts chargée (voir styles.css) ne l'inclut pas forcément, même risque de
+   bascule vers une police système que le bug de titre déjà rencontré. ── */
+.evp-checkbox {
+  display: inline-block;
+  width: 9pt;
+  height: 9pt;
+  border: 1.25pt solid #1E2532;
+  vertical-align: middle;
+  margin-right: 5pt;
+}
+
+/* ── Type QCM ─────────────────────────────────────────────────────────── */
+.evp-qcm-question { font-weight: 700; }
+.evp-qcm-option { padding-left: 2pt; }
+
+/* ── Type Vrai/Faux ───────────────────────────────────────────────────── */
+.evp-vf-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16pt;
+  margin-bottom: 10pt;
+  font-size: 11pt;
+}
+.evp-vf-row:last-child { margin-bottom: 0; }
+.evp-vf-text { flex: 1; }
+.evp-vf-choices { flex-shrink: 0; white-space: nowrap; }
+
+/* ── Type Texte à trous (guidé) ───────────────────────────────────────────
+   Classe dédiée evp-trou-ligne (pas evp-exercice-ligne, partagée par
+   d'autres types) : interligne + marge propres, mêmes valeurs que
+   evp-reecriture-phrase (Réécriture) pour un rythme visuel harmonisé entre
+   les deux types, comme demandé. vertical-align:baseline (pas middle,
+   l'ancien réglage) sur le blanc : middle décale le blanc par rapport à la
+   ligne de base du texte, source probable de l'interligne perçu comme
+   irrégulier d'une phrase à l'autre selon le nombre de blancs qu'elle
+   contient — baseline aligne le blanc comme un caractère de texte normal,
+   sans influence sur la hauteur de ligne. ── */
+.evp-trou-ligne {
+  font-size: 11pt;
+  line-height: 1.8;
+  color: #1E2532;
+  margin: 10pt 0 0 0;
+}
+.evp-trou-ligne:first-child { margin-top: 0; }
+.evp-trou-blanc {
+  display: inline-block;
+  border-bottom: 1pt solid #1E2532;
+  margin: 0 3pt;
+  vertical-align: baseline;
+}
+/* 3 tailles au choix (par exercice, pas par trou individuel) — même la
+   plus petite doit rester nettement plus large que l'ancien réglage fixe
+   (48pt), jugé trop étroit. */
+.evp-trou-blanc--petit { width: 65pt; }
+.evp-trou-blanc--moyen { width: 90pt; }
+.evp-trou-blanc--grand { width: 120pt; }
+
+/* ── Type Mots soulignés + réponse ────────────────────────────────────────
+   Numérotation en chiffres (pas de glyphe ①②③, même risque d'absence dans
+   le sous-ensemble de police chargé que pour les cases à cocher). Grille de
+   réponses en repli automatique (auto-fit) : 4-5 items tiennent sur une
+   ligne, au-delà ça repasse naturellement sur plusieurs lignes. ── */
+.evp-souligne-mot { text-decoration: underline; text-underline-offset: 2pt; }
+.evp-souligne-exposant { font-size: 7pt; font-weight: 800; color: #1A2D6B; margin-left: 1pt; }
+.evp-souligne-texte { margin-bottom: 12pt; }
+.evp-souligne-reponses {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130pt, 1fr));
+  gap: 10pt 20pt;
+}
+.evp-souligne-reponse-item {
+  display: flex;
+  align-items: center;
+  gap: 6pt;
+}
+.evp-souligne-reponse-num { font-weight: 800; color: #1A2D6B; font-size: 10pt; flex-shrink: 0; }
+.evp-souligne-reponse-ligne {
+  flex: 1;
+  border-bottom: 1pt solid #1E2532;
+  height: 14pt;
+}
+
+body.printing-evaluation #ev-print-root { display: block !important; }
+
+@media print {
+  /* Plus de pied de page fixe (déplacé sous le titre, voir .evp-attribution)
+     — la marge basse redevient symétrique aux 3 autres côtés, elle ne
+     réserve plus une grande zone de sécurité pour un pied de page qui
+     n'existe plus. */
+  @page { size: A4 portrait; margin: 15mm; }
+
+  body.printing-evaluation #ev-print-root {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body.printing-evaluation {
+    padding-top: 0 !important;
+    background: #fff !important;
+  }
+
+  /* Liste blanche (voir commentaire détaillé dans champ-lexical-print.css) :
+     masque tout ce qui n'est pas #ev-print-root. */
+  body.printing-evaluation .navbar,
+  body.printing-evaluation footer,
+  body.printing-evaluation .dash-content > *:not(#ev-print-root) {
+    display: none !important;
+  }
+
+  body.printing-evaluation .dash-wrap {
+    padding: 0;
+    background: #fff;
+    min-height: unset;
+  }
+  body.printing-evaluation .dash-content {
+    max-width: 100%;
+    padding: 0;
+  }
+}
