@@ -1949,6 +1949,137 @@ Object.assign(window.EXERCISE_DATA, {
     ]
   },
 
+  "identifier-conjonction-coordination": {
+    title:      "Identifier une conjonction de coordination",
+    domaine:    "Français",
+    competence: "Grammaire — Conjonctions de coordination",
+    type:       "homophones-niveaux",
+    levels:     ["CM2", "6e"],
+    paliers:    3,
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+    levelDescs: {
+      "niveau1": "Repérer la conjonction de coordination dans une phrase",
+      "niveau2": "Distinguer une conjonction de coordination d'une préposition",
+      "niveau3": "Retrouver l'endroit où insérer la conjonction manquante"
+    },
+    homoShuffle: [false, true, false],
+
+    /* Compétence réservée à CM2/6e (levels:["CM2","6e"], pas de pastille
+       CM1) avec 3 paliers de difficulté internes (progression de repérage,
+       pas de contenu propre à chaque classe) : mêmes onglets génériques
+       "niveau1/niveau2/niveau3" qu'identifier-pronom-complement-objet.
+       Moteur générique "homophones-niveaux" pour les niveaux 1 et 2 (aucun
+       moteur dédié) ; niveau 3 introduit un nouveau type d'item générique
+       "gap-saisie" (renderGapSaisie, exercise.html) — clic pour localiser la
+       frontière entre les deux propositions, puis saisie du mot manquant.
+       Voir le commentaire au-dessus de renderGapSaisie pour le détail du
+       mécanisme (réutilise .ex-sentence-gaps/.ex-gap-btn de reperer-
+       propositions-niveaux Niveau 2 et .tt-input de texte-a-trous).
+
+       Niveau 1 (mots-cliquables) : la conjonction est un des 7 mots
+       invariables du programme (mais/ou/et/donc/ni/car/or), toujours seule
+       dans la phrase (ni « ni…ni » : les deux occurrences sont ciblées, ce
+       sont bien deux conjonctions).
+       Niveau 2 (choix-etiquette, boutons fixes) : phrase avec un mot
+       surligné, qui est soit une préposition soit une conjonction de
+       coordination — l'élève choisit entre les deux natures. Boutons en
+       position fixe (« préposition » toujours à gauche, « conjonction »
+       toujours à droite) via q.fixedChoiceOrder, comme identifier-pronom-
+       complement-objet.
+       Niveau 3 (gap-saisie) : la phrase est affichée sans sa conjonction ;
+       l'élève clique la frontière entre les deux propositions puis tape la
+       conjonction attendue. */
+
+    level1Bank: [
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de coordination.",
+        sentence:"Il pleut , mais je sors quand même .", targets:["mais"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de coordination.",
+        sentence:"Tu veux du thé ou du café ?", targets:["ou"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de coordination.",
+        sentence:"Elle chante et danse .", targets:["et"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de coordination.",
+        sentence:"Il est fatigué , donc il se repose .", targets:["donc"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de coordination.",
+        sentence:"Je n'aime ni les épinards ni les carottes .", targets:["ni"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de coordination.",
+        sentence:"Il fait froid , car l'hiver arrive .", targets:["car"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de coordination.",
+        sentence:"Le magasin est fermé , or nous devons acheter du pain .", targets:["or"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de coordination.",
+        sentence:"Nous marchons ou nous courons .", targets:["ou"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de coordination.",
+        sentence:"Elle lit mais ne comprend pas .", targets:["mais"] },
+      { type:"mots-cliquables", instruction:"Clique sur la conjonction de coordination.",
+        sentence:"Il a faim , donc il mange .", targets:["donc"] }
+    ],
+
+    level2Bank: [
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une préposition ou une conjonction de coordination ?",
+        word:"Il joue <span class='ex-teal-hl'>avec</span> son frère .", choices:["préposition","conjonction"], fixedChoiceOrder:true, answer:"préposition",
+        wrongFeedback:"Une préposition introduit un complément (nom, groupe nominal…) ; une conjonction de coordination relie deux mots, groupes ou phrases.",
+        hint:"« avec » introduit le complément « son frère » : c'est une préposition." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une préposition ou une conjonction de coordination ?",
+        word:"Elle chante <span class='ex-teal-hl'>et</span> danse .", choices:["préposition","conjonction"], fixedChoiceOrder:true, answer:"conjonction",
+        wrongFeedback:"Une préposition introduit un complément (nom, groupe nominal…) ; une conjonction de coordination relie deux mots, groupes ou phrases.",
+        hint:"« et » relie les deux verbes « chante » et « danse » : c'est une conjonction de coordination." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une préposition ou une conjonction de coordination ?",
+        word:"Je pars <span class='ex-teal-hl'>sans</span> toi .", choices:["préposition","conjonction"], fixedChoiceOrder:true, answer:"préposition",
+        wrongFeedback:"Une préposition introduit un complément (nom, groupe nominal…) ; une conjonction de coordination relie deux mots, groupes ou phrases.",
+        hint:"« sans » introduit le complément « toi » : c'est une préposition." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une préposition ou une conjonction de coordination ?",
+        word:"Il est fatigué , <span class='ex-teal-hl'>donc</span> il se repose .", choices:["préposition","conjonction"], fixedChoiceOrder:true, answer:"conjonction",
+        wrongFeedback:"Une préposition introduit un complément (nom, groupe nominal…) ; une conjonction de coordination relie deux mots, groupes ou phrases.",
+        hint:"« donc » relie les deux phrases « il est fatigué » et « il se repose » : c'est une conjonction de coordination." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une préposition ou une conjonction de coordination ?",
+        word:"Nous marchons <span class='ex-teal-hl'>pour</span> arriver à temps .", choices:["préposition","conjonction"], fixedChoiceOrder:true, answer:"préposition",
+        wrongFeedback:"Une préposition introduit un complément (nom, groupe nominal…) ; une conjonction de coordination relie deux mots, groupes ou phrases.",
+        hint:"« pour » introduit le complément « arriver à temps » : c'est une préposition." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une préposition ou une conjonction de coordination ?",
+        word:"Tu veux du thé <span class='ex-teal-hl'>ou</span> du café ?", choices:["préposition","conjonction"], fixedChoiceOrder:true, answer:"conjonction",
+        wrongFeedback:"Une préposition introduit un complément (nom, groupe nominal…) ; une conjonction de coordination relie deux mots, groupes ou phrases.",
+        hint:"« ou » relie « du thé » et « du café » : c'est une conjonction de coordination." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une préposition ou une conjonction de coordination ?",
+        word:"Le chat dort <span class='ex-teal-hl'>sous</span> la table .", choices:["préposition","conjonction"], fixedChoiceOrder:true, answer:"préposition",
+        wrongFeedback:"Une préposition introduit un complément (nom, groupe nominal…) ; une conjonction de coordination relie deux mots, groupes ou phrases.",
+        hint:"« sous » introduit le complément « la table » : c'est une préposition." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une préposition ou une conjonction de coordination ?",
+        word:"Il fait froid , <span class='ex-teal-hl'>car</span> l'hiver arrive .", choices:["préposition","conjonction"], fixedChoiceOrder:true, answer:"conjonction",
+        wrongFeedback:"Une préposition introduit un complément (nom, groupe nominal…) ; une conjonction de coordination relie deux mots, groupes ou phrases.",
+        hint:"« car » relie les deux phrases « il fait froid » et « l'hiver arrive » : c'est une conjonction de coordination." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une préposition ou une conjonction de coordination ?",
+        word:"Elle habite <span class='ex-teal-hl'>chez</span> sa tante .", choices:["préposition","conjonction"], fixedChoiceOrder:true, answer:"préposition",
+        wrongFeedback:"Une préposition introduit un complément (nom, groupe nominal…) ; une conjonction de coordination relie deux mots, groupes ou phrases.",
+        hint:"« chez » introduit le complément « sa tante » : c'est une préposition." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une préposition ou une conjonction de coordination ?",
+        word:"Je n'aime <span class='ex-teal-hl'>ni</span> les épinards ni les carottes .", choices:["préposition","conjonction"], fixedChoiceOrder:true, answer:"conjonction",
+        wrongFeedback:"Une préposition introduit un complément (nom, groupe nominal…) ; une conjonction de coordination relie deux mots, groupes ou phrases.",
+        hint:"« ni » relie les deux compléments « les épinards » et « les carottes » : c'est une conjonction de coordination." }
+    ],
+
+    level3Bank: [
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.",
+        before:"Elle chante", after:"elle danse .", answer:"et" },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.",
+        before:"Il mange une pomme", after:"boit un jus .", answer:"et" },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.",
+        before:"Il fait beau", after:"il fait froid le matin .", answer:"mais" },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.",
+        before:"Elle est petite", after:"très forte .", answer:"mais" },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.",
+        before:"Tu préfères le thé", after:"le café ?", answer:"ou" },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.",
+        before:"Nous partons demain", after:"après-demain .", answer:"ou" },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.",
+        before:"Il est tard", after:"je dois partir .", answer:"donc" },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.",
+        before:"Elle a bien travaillé", after:"elle a réussi .", answer:"donc" },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.",
+        before:"Je reste chez moi", after:"il pleut .", answer:"car" },
+      { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.",
+        before:"Il est content", after:"il a gagné .", answer:"car" }
+    ]
+  },
+
   "produire-formes-interrogatives": {
     title: "Produire différentes formes de phrases interrogatives",
     domaine:    "Français",
@@ -3478,6 +3609,377 @@ Object.assign(window.EXERCISE_DATA, {
         sentence:"Les voisins ___ prêtent .",
         blanks:[{ answer:"la lui",
           hint:"COD « leur tondeuse » (féminin singulier) → la ; COI « à mon père » → lui ; le COD se place avant le COI." }] }
+    ]
+  },
+
+  "identifier-pronom-complement-objet": {
+    title:      "Identifier un pronom personnel complément d'objet",
+    domaine:    "Français",
+    competence: "Grammaire — Pronoms personnels compléments",
+    type:       "homophones-niveaux",
+    levels:     ["CM2", "6e"],
+    paliers:    3,
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+    levelDescs: {
+      "niveau1": "Distinguer l'article défini du pronom personnel complément",
+      "niveau2": "Repérer le pronom personnel complément parmi des articles",
+      "niveau3": "Classer chaque pronom complément : COD ou COI ?"
+    },
+    homoShuffle: [false, true, false],
+
+    /* Compétence réservée à CM2/6e (levels:["CM2","6e"], pas de pastille
+       CM1) mais avec 3 paliers de difficulté internes (progression de
+       repérage, pas de contenu propre à chaque classe) : mêmes onglets
+       génériques "niveau1/niveau2/niveau3" que pronom-antecedent (6e
+       seule), mais ici pour 2 classes. showHomoLevelSelect() (exercise.html)
+       a été généralisée en conséquence : les onglets génériques s'activent
+       dès que `paliers` (ici 3) diffère du nombre de classes de `levels`
+       (ici 2), pas seulement quand `levels.length === 1`. sessionData.levels
+       reste ["CM2","6e"] pour les badges/laurels/analytics — teacher-
+       analytics.js répartit déjà les 3 paliers sur les 2 classes par
+       interpolation proportionnelle (niveauForPalier), aucune autre
+       modification nécessaire. Moteur générique "homophones-niveaux" —
+       aucun moteur dédié.
+
+       Niveau 1 (choix-etiquette) : phrase avec le/la/les en gras, QCM à 2
+       choix « article défini » / « pronom personnel complément » — jamais
+       de piège de forme (le mot en gras est soit strictement l'un, soit
+       strictement l'autre), l'enjeu est la position (collé au verbe, sans
+       nom après) plutôt que la forme du mot.
+       Niveau 2 (mots-cliquables) : phrase contenant à la fois le pronom
+       complément cible et un ou deux articles définis homographes (le/la/
+       les), piège informatif au clic. Quand le pronom cible et un article
+       partagent exactement la même chaîne (casse identique), le moteur
+       (targets.includes(clean), string uniquement, pas de position) ne
+       peut pas distinguer les deux occurrences — cf. item 8 reformulé
+       (« la boutique » → « le magasin ») pour éviter ce doublon, comme
+       documenté pour classification-etapes/mots-cliquables-etapes.
+       Niveau 3 (classification COD/COI) : items à un seul pronom → QCM
+       choix-etiquette (phrase avec pronom en gras, choix COD/COI) — le
+       moteur ne permet qu'une seule réponse par item. Items à double
+       pronom (le lui / te le / me le / nous les) → mots-cliquables en 2
+       étapes (q.steps), une étape par pronom dans l'ordre où il apparaît
+       dans la phrase, chaque étape révélant la fonction dans son
+       instruction ; couleurs de rôle réutilisées (attr-adj turquoise =
+       COD, attr-epithete gold = COI), aucune nouvelle classe CSS. */
+
+    level1Bank: [
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il un article défini ou un pronom personnel complément ?",
+        word:"Il <span class='pco-gold-hl'>le</span> mange .", choices:["pronom personnel complément","article défini"], fixedChoiceOrder:true, answer:"pronom personnel complément", wrongFeedback:"Regarde la position du mot : un article défini est toujours suivi d'un nom, un pronom complément est collé au verbe.",
+        hint:"« le » est collé au verbe et remplace un nom : c'est un pronom personnel complément." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il un article défini ou un pronom personnel complément ?",
+        word:"Il mange <span class='pco-gold-hl'>le</span> gâteau .", choices:["pronom personnel complément","article défini"], fixedChoiceOrder:true, answer:"article défini", wrongFeedback:"Regarde la position du mot : un article défini est toujours suivi d'un nom, un pronom complément est collé au verbe.",
+        hint:"« le » est suivi du nom « gâteau » : c'est un article défini." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il un article défini ou un pronom personnel complément ?",
+        word:"Elle <span class='pco-gold-hl'>la</span> regarde .", choices:["pronom personnel complément","article défini"], fixedChoiceOrder:true, answer:"pronom personnel complément", wrongFeedback:"Regarde la position du mot : un article défini est toujours suivi d'un nom, un pronom complément est collé au verbe.",
+        hint:"« la » est collé au verbe et remplace un nom : c'est un pronom personnel complément." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il un article défini ou un pronom personnel complément ?",
+        word:"Elle regarde <span class='pco-gold-hl'>la</span> maison .", choices:["pronom personnel complément","article défini"], fixedChoiceOrder:true, answer:"article défini", wrongFeedback:"Regarde la position du mot : un article défini est toujours suivi d'un nom, un pronom complément est collé au verbe.",
+        hint:"« la » est suivi du nom « maison » : c'est un article défini." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il un article défini ou un pronom personnel complément ?",
+        word:"Ils <span class='pco-gold-hl'>les</span> invitent .", choices:["pronom personnel complément","article défini"], fixedChoiceOrder:true, answer:"pronom personnel complément", wrongFeedback:"Regarde la position du mot : un article défini est toujours suivi d'un nom, un pronom complément est collé au verbe.",
+        hint:"« les » est collé au verbe et remplace un nom : c'est un pronom personnel complément." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il un article défini ou un pronom personnel complément ?",
+        word:"Ils invitent <span class='pco-gold-hl'>les</span> voisins .", choices:["pronom personnel complément","article défini"], fixedChoiceOrder:true, answer:"article défini", wrongFeedback:"Regarde la position du mot : un article défini est toujours suivi d'un nom, un pronom complément est collé au verbe.",
+        hint:"« les » est suivi du nom « voisins » : c'est un article défini." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il un article défini ou un pronom personnel complément ?",
+        word:"Tu <span class='pco-gold-hl'>le</span> lis .", choices:["pronom personnel complément","article défini"], fixedChoiceOrder:true, answer:"pronom personnel complément", wrongFeedback:"Regarde la position du mot : un article défini est toujours suivi d'un nom, un pronom complément est collé au verbe.",
+        hint:"« le » est collé au verbe et remplace un nom : c'est un pronom personnel complément." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il un article défini ou un pronom personnel complément ?",
+        word:"Tu lis <span class='pco-gold-hl'>le</span> journal .", choices:["pronom personnel complément","article défini"], fixedChoiceOrder:true, answer:"article défini", wrongFeedback:"Regarde la position du mot : un article défini est toujours suivi d'un nom, un pronom complément est collé au verbe.",
+        hint:"« le » est suivi du nom « journal » : c'est un article défini." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il un article défini ou un pronom personnel complément ?",
+        word:"Nous <span class='pco-gold-hl'>la</span> connaissons .", choices:["pronom personnel complément","article défini"], fixedChoiceOrder:true, answer:"pronom personnel complément", wrongFeedback:"Regarde la position du mot : un article défini est toujours suivi d'un nom, un pronom complément est collé au verbe.",
+        hint:"« la » est collé au verbe et remplace un nom : c'est un pronom personnel complément." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il un article défini ou un pronom personnel complément ?",
+        word:"Nous connaissons <span class='pco-gold-hl'>la</span> vérité .", choices:["pronom personnel complément","article défini"], fixedChoiceOrder:true, answer:"article défini", wrongFeedback:"Regarde la position du mot : un article défini est toujours suivi d'un nom, un pronom complément est collé au verbe.",
+        hint:"« la » est suivi du nom « vérité » : c'est un article défini." }
+    ],
+
+    level2Bank: [
+      { type:"mots-cliquables", instruction:"Clique uniquement sur le pronom personnel complément (pas sur les articles).",
+        sentence:"Le facteur lui donne le colis .", targets:["lui"],
+        piege:{ "Le":"« Le » est un article défini ici : il est suivi du nom « facteur ».",
+                "le":"« le » est un article défini ici : il est suivi du nom « colis »." } },
+      { type:"mots-cliquables", instruction:"Clique uniquement sur le pronom personnel complément (pas sur les articles).",
+        sentence:"La maîtresse les félicite après la leçon .", targets:["les"],
+        piege:{ "La":"« La » est un article défini ici : il est suivi du nom « maîtresse ».",
+                "la":"« la » est un article défini ici : il est suivi du nom « leçon »." } },
+      { type:"mots-cliquables", instruction:"Clique uniquement sur le pronom personnel complément (pas sur les articles).",
+        sentence:"Le chien la suit dans le jardin .", targets:["la"],
+        piege:{ "Le":"« Le » est un article défini ici : il est suivi du nom « chien ».",
+                "le":"« le » est un article défini ici : il est suivi du nom « jardin »." } },
+      { type:"mots-cliquables", instruction:"Clique uniquement sur le pronom personnel complément (pas sur les articles).",
+        sentence:"Les enfants leur offrent les fleurs .", targets:["leur"],
+        piege:{ "Les":"« Les » est un article défini ici : il est suivi du nom « enfants ».",
+                "les":"« les » est un article défini ici : il est suivi du nom « fleurs »." } },
+      { type:"mots-cliquables", instruction:"Clique uniquement sur le pronom personnel complément (pas sur les articles).",
+        sentence:"Le professeur le félicite devant la classe .", targets:["le"],
+        piege:{ "Le":"« Le » (1ᵉʳ mot) est un article défini ici : il est suivi du nom « professeur ».",
+                "la":"« la » est un article défini ici : elle est suivie du nom « classe »." } },
+      { type:"mots-cliquables", instruction:"Clique uniquement sur le pronom personnel complément (pas sur les articles).",
+        sentence:"La directrice lui parle dans le couloir .", targets:["lui"],
+        piege:{ "La":"« La » est un article défini ici : il est suivi du nom « directrice ».",
+                "le":"« le » est un article défini ici : il est suivi du nom « couloir »." } },
+      { type:"mots-cliquables", instruction:"Clique uniquement sur le pronom personnel complément (pas sur les articles).",
+        sentence:"Les voisins les invitent pour la fête .", targets:["les"],
+        piege:{ "Les":"« Les » (1ᵉʳ mot) est un article défini ici : il est suivi du nom « voisins ».",
+                "la":"« la » est un article défini ici : elle est suivie du nom « fête »." } },
+      { type:"mots-cliquables", instruction:"Clique uniquement sur le pronom personnel complément (pas sur les articles).",
+        sentence:"Le vendeur la conseille dans le magasin .", targets:["la"],
+        piege:{ "Le":"« Le » (1ᵉʳ mot) est un article défini ici : il est suivi du nom « vendeur ».",
+                "le":"« le » (avant « magasin ») est un article défini ici : il est suivi du nom « magasin »." } },
+      { type:"mots-cliquables", instruction:"Clique uniquement sur le pronom personnel complément (pas sur les articles).",
+        sentence:"La fermière leur donne le grain .", targets:["leur"],
+        piege:{ "La":"« La » est un article défini ici : il est suivi du nom « fermière ».",
+                "le":"« le » est un article défini ici : il est suivi du nom « grain »." } },
+      { type:"mots-cliquables", instruction:"Clique uniquement sur le pronom personnel complément (pas sur les articles).",
+        sentence:"Le maître les corrige avant la récréation .", targets:["les"],
+        piege:{ "Le":"« Le » est un article défini ici : il est suivi du nom « maître ».",
+                "la":"« la » est un article défini ici : elle est suivie du nom « récréation »." } }
+    ],
+
+    level3Bank: [
+      { type:"mots-cliquables", sentence:"Elle le lui donne .", wrongFeedback:"Le COD répond à la question « quoi ? » ou « qui ? », le COI répond à « à qui ? » ou « à quoi ? ».",
+        steps: [
+          { instruction:"Clique sur le pronom complément d'objet direct (COD).", targets:["le"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le pronom complément d'objet indirect (COI).", targets:["lui"], cssClass:"attr-epithete" }
+        ] },
+      { type:"mots-cliquables", sentence:"Je te le prête .", wrongFeedback:"Le COD répond à la question « quoi ? » ou « qui ? », le COI répond à « à qui ? » ou « à quoi ? ».",
+        steps: [
+          { instruction:"Clique sur le pronom complément d'objet indirect (COI).", targets:["te"], cssClass:"attr-epithete" },
+          { instruction:"Clique maintenant sur le pronom complément d'objet direct (COD).", targets:["le"], cssClass:"attr-adj" }
+        ] },
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du pronom surligné ?",
+        word:"Il <span class='pco-gold-hl'>la</span> regarde .", choices:["COD (complément d'objet direct)","COI (complément d'objet indirect)"], answer:"COD (complément d'objet direct)", wrongFeedback:"Le COD répond à la question « quoi ? » ou « qui ? », le COI répond à « à qui ? » ou « à quoi ? ».",
+        hint:"« la » remplace un COD : Il regarde qui ? → la." },
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du pronom surligné ?",
+        word:"Tu <span class='pco-gold-hl'>lui</span> souris .", choices:["COD (complément d'objet direct)","COI (complément d'objet indirect)"], answer:"COI (complément d'objet indirect)", wrongFeedback:"Le COD répond à la question « quoi ? » ou « qui ? », le COI répond à « à qui ? » ou « à quoi ? ».",
+        hint:"« lui » répond à « à qui ? » : Tu souris à qui ? → lui. C'est un COI." },
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du pronom surligné ?",
+        word:"Nous <span class='pco-gold-hl'>les</span> invitons .", choices:["COD (complément d'objet direct)","COI (complément d'objet indirect)"], answer:"COD (complément d'objet direct)", wrongFeedback:"Le COD répond à la question « quoi ? » ou « qui ? », le COI répond à « à qui ? » ou « à quoi ? ».",
+        hint:"« les » remplace un COD : Nous invitons qui ? → les." },
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du pronom surligné ?",
+        word:"Vous <span class='pco-gold-hl'>leur</span> répondez .", choices:["COD (complément d'objet direct)","COI (complément d'objet indirect)"], answer:"COI (complément d'objet indirect)", wrongFeedback:"Le COD répond à la question « quoi ? » ou « qui ? », le COI répond à « à qui ? » ou « à quoi ? ».",
+        hint:"« leur » répond à « à qui ? » : Vous répondez à qui ? → leur. C'est un COI." },
+      { type:"mots-cliquables", sentence:"Elle me le raconte .", wrongFeedback:"Le COD répond à la question « quoi ? » ou « qui ? », le COI répond à « à qui ? » ou « à quoi ? ».",
+        steps: [
+          { instruction:"Clique sur le pronom complément d'objet indirect (COI).", targets:["me"], cssClass:"attr-epithete" },
+          { instruction:"Clique maintenant sur le pronom complément d'objet direct (COD).", targets:["le"], cssClass:"attr-adj" }
+        ] },
+      { type:"mots-cliquables", sentence:"Ils nous les envoient .", wrongFeedback:"Le COD répond à la question « quoi ? » ou « qui ? », le COI répond à « à qui ? » ou « à quoi ? ».",
+        steps: [
+          { instruction:"Clique sur le pronom complément d'objet indirect (COI).", targets:["nous"], cssClass:"attr-epithete" },
+          { instruction:"Clique maintenant sur le pronom complément d'objet direct (COD).", targets:["les"], cssClass:"attr-adj" }
+        ] },
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du pronom surligné ?",
+        word:"Le maître <span class='pco-gold-hl'>le</span> félicite .", choices:["COD (complément d'objet direct)","COI (complément d'objet indirect)"], answer:"COD (complément d'objet direct)", wrongFeedback:"Le COD répond à la question « quoi ? » ou « qui ? », le COI répond à « à qui ? » ou « à quoi ? ».",
+        hint:"« le » remplace un COD : Le maître félicite qui ? → le." },
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du pronom surligné ?",
+        word:"La directrice <span class='pco-gold-hl'>leur</span> parle .", choices:["COD (complément d'objet direct)","COI (complément d'objet indirect)"], answer:"COI (complément d'objet indirect)", wrongFeedback:"Le COD répond à la question « quoi ? » ou « qui ? », le COI répond à « à qui ? » ou « à quoi ? ».",
+        hint:"« leur » répond à « à qui ? » : La directrice parle à qui ? → leur. C'est un COI." }
+    ]
+  },
+
+  "pronom-antecedent": {
+    title:      "Mettre en relation un pronom personnel avec son antécédent",
+    domaine:    "Français",
+    competence: "Grammaire — Pronoms personnels",
+    type:       "homophones-niveaux",
+    levels:     ["6e"],
+    paliers:    3,
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+    levelDescs: {
+      "niveau1": "Repérer le pronom personnel parmi des mots isolés",
+      "niveau2": "Relier le pronom à son antécédent dans une phrase",
+      "niveau3": "Relier le pronom à son antécédent dans un mini-texte, avec un intrus à écarter"
+    },
+    homoShuffle: [false, true, false],
+
+    /* Compétence réservée à la 6e (levels:["6e"], une seule pastille) mais
+       avec 3 paliers de difficulté internes — pas de progression CM1→6e.
+       Utilise l'extension "mono-niveau scolaire" ajoutée à showHomoLevelSelect
+       (exercise.html) : quand sessionData.levels ne contient qu'une seule
+       classe, le sélecteur de niveau bascule automatiquement sur des onglets
+       génériques "niveau1/niveau2/niveau3" (déjà connus de LEVEL_LABELS,
+       même convention que probabilite-chances) mappés positionnellement sur
+       level1Bank/level2Bank/level3Bank — sessionData.levels reste ["6e"]
+       pour les badges/laurels/analytics (niveauForPalier renvoie "6e" quel
+       que soit le palier atteint, cf. teacher-analytics.js). Moteur générique
+       "homophones-niveaux" — aucun moteur dédié : chaque item porte son
+       propre `type`, dispatché dans showQuestion() vers les renderers
+       standards choix-etiquette / mots-cliquables (renderMotsCliquablesEtapes
+       via q.steps pour l'enchaînement pronom → antécédent, cf.
+       identifier-attribut-sujet). Couleurs de rôle réutilisées telles
+       quelles : attr-adj (turquoise) pour le pronom, attr-nom (jaune) pour
+       l'antécédent.
+
+       Niveau 1 : choix-etiquette — repérer le pronom personnel parmi 3 mots
+       d'une autre nature (nom/adjectif/verbe), jamais le/la/les (ambigus
+       avec l'article défini isolé).
+       Niveau 2 : mots-cliquables en 2 étapes (pronom puis antécédent),
+       phrase unique, antécédent dans la même phrase. Cible = le nom-tête
+       seul (comme identifier-attribut-sujet), ou les deux mots d'un sujet
+       coordonné (« Paul et Léo », « Tom et moi »). Pour ces antécédents
+       coordonnés, `optionalTargets:["et"]` (extension générique et
+       rétrocompatible de renderMotsCliquablesEtapes, exercise.html) accepte
+       la conjonction si l'élève la clique aussi, sans jamais l'exiger — les
+       deux sélections « Paul Léo » et « Paul et Léo » sont donc valides
+       (bug remonté le 2026-08-12 : seule la forme sans « et » passait).
+       Niveau 3 : mini-texte de 2 phrases, antécédent dans la phrase
+       précédente, avec un second nom candidat de même genre ET même nombre
+       pour empêcher un repérage purement grammatical (désambiguïsation par
+       le sens). 5 items ont un second couple pronom/antécédent (steps à 4
+       éléments) ; item 9 cible le token fusionné « l'ont » (le tokenizer
+       découpe uniquement sur les espaces, pas sur l'apostrophe). */
+
+    level1Bank: [
+      { type:"choix-etiquette", instruction:"Clique sur le pronom personnel parmi ces mots.",
+        word:"chat · il · doucement · joue", choices:["chat","il","doucement","joue"], answer:"il",
+        hint:"« il » est un pronom personnel : il remplace un nom masculin singulier." },
+      { type:"choix-etiquette", instruction:"Clique sur le pronom personnel parmi ces mots.",
+        word:"nous · jardin · beau · courons", choices:["nous","jardin","beau","courons"], answer:"nous",
+        hint:"« nous » est un pronom personnel : il représente plusieurs personnes, dont celui qui parle." },
+      { type:"choix-etiquette", instruction:"Clique sur le pronom personnel parmi ces mots.",
+        word:"elle · table · verte · dort", choices:["elle","table","verte","dort"], answer:"elle",
+        hint:"« elle » est un pronom personnel : il remplace un nom féminin singulier." },
+      { type:"choix-etiquette", instruction:"Clique sur le pronom personnel parmi ces mots.",
+        word:"chantent · ils · musique · joyeuse", choices:["chantent","ils","musique","joyeuse"], answer:"ils",
+        hint:"« ils » est un pronom personnel : il remplace plusieurs noms masculins (ou mixtes)." },
+      { type:"choix-etiquette", instruction:"Clique sur le pronom personnel parmi ces mots.",
+        word:"tu · crayon · rouge · dessines", choices:["tu","crayon","rouge","dessines"], answer:"tu",
+        hint:"« tu » est un pronom personnel : il désigne la personne à qui l'on parle." },
+      { type:"choix-etiquette", instruction:"Clique sur le pronom personnel parmi ces mots.",
+        word:"vous · classe · grande · travaillez", choices:["vous","classe","grande","travaillez"], answer:"vous",
+        hint:"« vous » est un pronom personnel : il désigne la ou les personnes à qui l'on parle." },
+      { type:"choix-etiquette", instruction:"Clique sur le pronom personnel parmi ces mots.",
+        word:"elles · fleurs · jolies · cueillent", choices:["elles","fleurs","jolies","cueillent"], answer:"elles",
+        hint:"« elles » est un pronom personnel : il remplace plusieurs noms féminins." },
+      { type:"choix-etiquette", instruction:"Clique sur le pronom personnel parmi ces mots.",
+        word:"on · plage · chaude · se baigne", choices:["on","plage","chaude","se baigne"], answer:"on",
+        hint:"« on » est un pronom personnel : il peut remplacer « nous » ou désigner des personnes indéterminées." },
+      { type:"choix-etiquette", instruction:"Clique sur le pronom personnel parmi ces mots.",
+        word:"lui · cadeau · offert · sourit", choices:["lui","cadeau","offert","sourit"], answer:"lui",
+        hint:"« lui » est un pronom personnel : il remplace une personne." },
+      { type:"choix-etiquette", instruction:"Clique sur le pronom personnel parmi ces mots.",
+        word:"eux · voyage · lointain · partent", choices:["eux","voyage","lointain","partent"], answer:"eux",
+        hint:"« eux » est un pronom personnel : il remplace plusieurs personnes (masculin pluriel)." }
+    ],
+
+    level2Bank: [
+      { type:"mots-cliquables", sentence:"Le chien aboie car il a peur .",
+        steps: [
+          { instruction:"Clique sur le pronom personnel de cette phrase.", targets:["il"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le mot qu'il remplace (son antécédent).", targets:["chien"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Marie chante bien , elle adore la musique .",
+        steps: [
+          { instruction:"Clique sur le pronom personnel de cette phrase.", targets:["elle"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le mot qu'il remplace (son antécédent).", targets:["Marie"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Les enfants jouent , ils sont contents .",
+        steps: [
+          { instruction:"Clique sur le pronom personnel de cette phrase.", targets:["ils"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le mot qu'il remplace (son antécédent).", targets:["enfants"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Paul et Léo courent , ils sont rapides .",
+        steps: [
+          { instruction:"Clique sur le pronom personnel de cette phrase.", targets:["ils"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur les mots qu'il remplace (son antécédent).", targets:["Paul","Léo"], optionalTargets:["et"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"La maîtresse explique , elle est patiente .",
+        steps: [
+          { instruction:"Clique sur le pronom personnel de cette phrase.", targets:["elle"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le mot qu'il remplace (son antécédent).", targets:["maîtresse"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Le vent souffle fort , il casse les branches .",
+        steps: [
+          { instruction:"Clique sur le pronom personnel de cette phrase.", targets:["il"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le mot qu'il remplace (son antécédent).", targets:["vent"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Les fleurs poussent , elles sentent bon .",
+        steps: [
+          { instruction:"Clique sur le pronom personnel de cette phrase.", targets:["elles"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le mot qu'il remplace (son antécédent).", targets:["fleurs"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Tom et moi partons , nous sommes pressés .",
+        steps: [
+          { instruction:"Clique sur le pronom personnel de cette phrase.", targets:["nous"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur les mots qu'il remplace (son antécédent).", targets:["Tom","moi"], optionalTargets:["et"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Le facteur arrive , il apporte le courrier .",
+        steps: [
+          { instruction:"Clique sur le pronom personnel de cette phrase.", targets:["il"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le mot qu'il remplace (son antécédent).", targets:["facteur"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Les oiseaux chantent , ils annoncent le printemps .",
+        steps: [
+          { instruction:"Clique sur le pronom personnel de cette phrase.", targets:["ils"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur le mot qu'il remplace (son antécédent).", targets:["oiseaux"], cssClass:"attr-nom" }
+        ] }
+    ],
+
+    level3Bank: [
+      { type:"mots-cliquables", sentence:"Léa a offert un livre à sa cousine . Elle l'a beaucoup aimé .",
+        steps: [
+          { instruction:"Clique sur le pronom personnel de la 2ᵉ phrase.", targets:["Elle"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur son antécédent dans la 1ʳᵉ phrase (attention à l'intrus !).", targets:["cousine"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Le vase est tombé du meuble . Il s'est cassé en morceaux .",
+        steps: [
+          { instruction:"Clique sur le pronom personnel de la 2ᵉ phrase.", targets:["Il"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur son antécédent dans la 1ʳᵉ phrase (attention à l'intrus !).", targets:["vase"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Paul a caressé le chien de son voisin . Il aboyait fort .",
+        steps: [
+          { instruction:"Clique sur le pronom personnel de la 2ᵉ phrase.", targets:["Il"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur son antécédent dans la 1ʳᵉ phrase (attention à l'intrus !).", targets:["chien"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Les enfants ont ramassé des cailloux dans le chemin . Ils les ont mis dans un seau .",
+        steps: [
+          { instruction:"Clique sur le 1ᵉʳ pronom personnel de la 2ᵉ phrase.", targets:["Ils"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur son antécédent dans la 1ʳᵉ phrase.", targets:["enfants"], cssClass:"attr-nom" },
+          { instruction:"Clique sur le 2ᵉ pronom personnel de la 2ᵉ phrase.", targets:["les"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur son antécédent dans la 1ʳᵉ phrase.", targets:["cailloux"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"La maîtresse a corrigé des copies de la directrice . Elle les a rendues le lendemain .",
+        steps: [
+          { instruction:"Clique sur le 1ᵉʳ pronom personnel de la 2ᵉ phrase.", targets:["Elle"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur son antécédent dans la 1ʳᵉ phrase (attention à l'intrus !).", targets:["maîtresse"], cssClass:"attr-nom" },
+          { instruction:"Clique sur le 2ᵉ pronom personnel de la 2ᵉ phrase.", targets:["les"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur son antécédent dans la 1ʳᵉ phrase.", targets:["copies"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Mon frère a prêté ses outils à son cousin . Il les a rangés dans le garage .",
+        steps: [
+          { instruction:"Clique sur le 1ᵉʳ pronom personnel de la 2ᵉ phrase.", targets:["Il"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur son antécédent dans la 1ʳᵉ phrase (attention à l'intrus !).", targets:["frère"], cssClass:"attr-nom" },
+          { instruction:"Clique sur le 2ᵉ pronom personnel de la 2ᵉ phrase.", targets:["les"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur son antécédent dans la 1ʳᵉ phrase.", targets:["outils"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Les hirondelles ont quitté leur nid pour rejoindre les cigognes . Elles sont parties vers le sud .",
+        steps: [
+          { instruction:"Clique sur le pronom personnel de la 2ᵉ phrase.", targets:["Elles"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur son antécédent dans la 1ʳᵉ phrase (attention à l'intrus !).", targets:["hirondelles"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Julie a écrit une lettre à sa grand-mère . Elle lui a répondu aussitôt .",
+        steps: [
+          { instruction:"Clique sur le 1ᵉʳ pronom personnel de la 2ᵉ phrase.", targets:["Elle"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur son antécédent dans la 1ʳᵉ phrase (attention à l'intrus !).", targets:["grand-mère"], cssClass:"attr-nom" },
+          { instruction:"Clique sur le 2ᵉ pronom personnel de la 2ᵉ phrase.", targets:["lui"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur son antécédent dans la 1ʳᵉ phrase.", targets:["Julie"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Les élèves ont terminé leur exposé avec leurs camarades . Ils l'ont présenté avec fierté .",
+        steps: [
+          { instruction:"Clique sur le 1ᵉʳ pronom personnel de la 2ᵉ phrase.", targets:["Ils"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur son antécédent dans la 1ʳᵉ phrase.", targets:["élèves"], cssClass:"attr-nom" },
+          { instruction:"Clique sur le mot qui contient le 2ᵉ pronom personnel (« l' ») de la 2ᵉ phrase.", targets:["l'ont"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur son antécédent dans la 1ʳᵉ phrase.", targets:["exposé"], cssClass:"attr-nom" }
+        ] },
+      { type:"mots-cliquables", sentence:"Le fermier a nourri ses vaches à côté des chèvres . Elles semblaient affamées .",
+        steps: [
+          { instruction:"Clique sur le pronom personnel de la 2ᵉ phrase.", targets:["Elles"], cssClass:"attr-adj" },
+          { instruction:"Clique maintenant sur son antécédent dans la 1ʳᵉ phrase (attention à l'intrus !).", targets:["vaches"], cssClass:"attr-nom" }
+        ] }
     ]
   },
 

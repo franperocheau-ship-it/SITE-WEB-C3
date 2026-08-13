@@ -11,14 +11,14 @@
   <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
   <link rel="manifest" href="site.webmanifest?v=1">
   <title>Exercice — Français — Lycée Français de Madrid</title>
-  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="styles.css?v=13">
   <link rel="stylesheet" href="level-select.css?v=1">
   <link rel="stylesheet" href="breadcrumb.css?v=1">
   <script src="js/breadcrumb.js?v=3"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/text-to-speech.js?v=1"></script>
+  <script src="js/text-to-speech.js?v=2"></script>
   <script src="js/results.js"></script>
   <script src="js/guided-access.js?v=1"></script>
   <script src="js/niveau-mode.js?v=1"></script>
@@ -1109,6 +1109,14 @@
       padding: 2px 8px;
       font-weight: 900;
       border: 1.5px solid rgba(16,43,106,0.25);
+    }
+    .pco-gold-hl {
+      background: rgba(234,179,8,0.22);
+      color: #854d0e;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-weight: 900;
+      border: 1.5px solid rgba(234,179,8,0.45);
     }
     .ex-teal-hl {
       background: rgba(29,191,160,0.18);
@@ -4888,16 +4896,33 @@
       "word-order":        { icon: "🔀", name: "Remets les mots dans l'ordre",  desc: "Reconstruit la phrase dans le bon ordre" }
     };
 
-    /* ── Accessibilité : lecture audio de la consigne (dyslexie) ─────────────
-       Tous les types d'exercice de ce fichier rendent leur consigne dans
+    /* ── Accessibilité : lecture audio de la consigne + des réponses (dyslexie) ──
+       Tous les types d'exercice de ce fichier rendent leur contenu dans
        #ex-card, mais via ~70 fonctions de rendu distinctes sans dispatcheur
        central — impossible d'appeler attachSpeechButton() à un seul endroit
-       "après le rendu". On observe donc #ex-card et on injecte le bouton sur
-       tout élément de consigne qui apparaît, quel que soit le type. Couvre
-       la consigne principale (.ex-question-label, .cd-q-prompt) et les
-       consignes secondaires de certaines familles (.aa-enonce = énoncé du
-       problème en maths, .pl-prompt, .ct-instruction, .ecn-prompt,
-       .rd-followup-prompt, .ex-classify-step-title). Jamais les réponses.
+       "après le rendu". On observe donc #ex-card et on injecte un bouton sur
+       tout élément pertinent qui apparaît, quel que soit le type :
+         - consigne principale (.ex-question-label, .cd-q-prompt) et
+           consignes secondaires de certaines familles (.aa-enonce = énoncé
+           du problème en maths, .pl-prompt, .ct-instruction, .ecn-prompt,
+           .rd-followup-prompt, .ex-classify-step-title) ;
+         - item central à traiter (le verbe/la phrase/le nombre affiché
+           sous la consigne, ex. .ex-verb-display "Ils finissaient.") —
+           liste large car ~50 familles conjugaison-niveaux + décimaux/
+           fractions partagent ce pattern sous des noms de classe différents ;
+         - propositions de réponse (.ex-choice, .match-chip, .ex-word-btn,
+           .cs-chip, .col-sort-btn) — ce sont déjà des <button>, donc le
+           bouton audio y est imbriqué en <span role="button"> (option
+           `inline` de attachSpeechButton) plutôt qu'un <button> imbriqué,
+           invalide en HTML ; son clic fait stopPropagation() pour ne
+           jamais déclencher le choix parent.
+       Hors périmètre pour l'instant : rdRenderDragOrder (cartes-nombres
+       glisser-déposer, décision reportée), les familles sans consigne
+       complète déjà exclues (cd-q-type-badge, af-sub-label), et
+       .ex-conj-table — volontairement PAS dans ITEM_TARGET_SELECTOR : cette
+       classe est réutilisée par eoaConjTableHtml() pour un tableau de
+       correction affiché en cas d'erreur (dans .ex-feedback-wrong), pas
+       seulement pour l'item central ; l'ajouter lirait de la correction.
        Statut est_dyslexique récupéré via lfmAuth.getMyStudentRecord() —
        même source que questionnaires-lecture.html, pas de duplication. */
     let speechEnabled = false;
@@ -4907,13 +4932,37 @@
       '.ct-instruction', '.ecn-prompt', '.rd-followup-prompt', '.ex-classify-step-title'
     ].join(', ');
 
+    const ITEM_TARGET_SELECTOR = [
+      '.ex-verb-display', '.ex-sentence-display', '.tt-sentence', '.db-sentence',
+      '.pqp-sentence-display', '.psc-sentence-display', '.ea-sentence-display',
+      '.si-sentence-display', '.faire-phrase-display', '.ct-phrase-text',
+      '.vb-word-display', '.ex-label-word', '.cne-number', '.cd-sign-display',
+      '.cni-decomp-display', '.eni-number-display', '.ani-number-display',
+      '.vp-number-display', '.vp-decomp-number', '.cp-decomp-display',
+      '.frac-display-area', '.af-display-box', '.pd-nombre-display',
+      '.ic-intercal-bound', '.ex-sentence-gaps', '.col-sort-text', '.dict-headword'
+    ].join(', ');
+
+    const CHOICE_TARGET_SELECTOR = [
+      '.ex-choice', '.match-chip', '.ex-word-btn', '.cs-chip', '.col-sort-btn'
+    ].join(', ');
+
     function injectSpeechButtons(root) {
       if (!speechEnabled || !root) return;
-      root.querySelectorAll(SPEECH_TARGET_SELECTOR).forEach(el => {
+      root.querySelectorAll(SPEECH_TARGET_SELECTOR + ', ' + ITEM_TARGET_SELECTOR).forEach(el => {
         if (el.querySelector('.lfm-speech-btn')) return;
         const text = el.textContent.trim();
         if (!text) return;
         attachSpeechButton(el, text);
+      });
+      root.querySelectorAll(CHOICE_TARGET_SELECTOR).forEach(btn => {
+        if (btn.querySelector('.lfm-speech-btn')) return;
+        const text = (btn.dataset.value || btn.dataset.word || btn.dataset.clean || btn.textContent || '').trim();
+        if (!text) return;
+        /* .ex-choice est aussi réutilisé (pour le style) par des boutons
+           "Valider l'étape…" — ce ne sont pas des propositions de réponse. */
+        if (/^Valider\b/.test(text)) return;
+        attachSpeechButton(btn, text, { inline: true });
       });
     }
 
@@ -5181,10 +5230,29 @@
       document.getElementById("exercise-screen").classList.add("ex-hidden");
       document.getElementById("results-screen").classList.add("ex-hidden");
 
-      const levels     = sessionData.levels || ["CM1", "CM2", "6e"];
+      const gradeLevels = sessionData.levels || ["CM1", "CM2", "6e"];
+      /* Compétence avec des paliers de difficulté internes qui ne
+         correspondent pas 1:1 aux classes de `levels` (mono-niveau scolaire
+         type pronom-antecedent, levels:["6e"] + paliers:3 ; ou multi-classe
+         type identifier-pronom-complement-objet, levels:["CM2","6e"] +
+         paliers:3) : onglets génériques "niveau1/2/3" (déjà utilisés par
+         probabilite-chances, cf. LEVEL_LABELS) plutôt que des onglets par
+         classe. sessionData.levels reste inchangé pour les badges/laurels/
+         analytics (teacher-analytics.js répartit les paliers sur les
+         classes par interpolation, cf. niveauForPalier) — seul le
+         sélecteur de niveau interne (onglets + banque chargée) change ici. */
+      const paliers    = sessionData.paliers;
+      const useGenericTabs = gradeLevels.length === 1 || (paliers && paliers !== gradeLevels.length);
+      const levels     = useGenericTabs ? ["niveau1", "niveau2", "niveau3"] : gradeLevels;
       const descs      = sessionData.levelDescs || {};
-      const bankKeyMap = { "CM1": "level1Bank", "CM2": "level2Bank", "6e": "level3Bank" };
-      const shuffleIdx = { "CM1": 0, "CM2": 1, "6e": 2 };
+      const bankKeyMap = {
+        "CM1": "level1Bank", "CM2": "level2Bank", "6e": "level3Bank",
+        "niveau1": "level1Bank", "niveau2": "level2Bank", "niveau3": "level3Bank"
+      };
+      const shuffleIdx = {
+        "CM1": 0, "CM2": 1, "6e": 2,
+        "niveau1": 0, "niveau2": 1, "niveau3": 2
+      };
       const doShuffle  = sessionData.homoShuffle || [false, true, false];
 
       const loadLevel = (lv) => {
@@ -6137,7 +6205,8 @@
           "classification-etapes": renderClassificationEtapes,
           "texte-a-trous":        renderTexteATrous,
           "production-libre":     renderProductionLibre,
-          "double-blanc":         renderDoubleBlanc
+          "double-blanc":         renderDoubleBlanc,
+          "gap-saisie":           renderGapSaisie
         };
         HOMO_RENDERERS[q.type](card, q);
       } else if (currentType === "probabilite-chances") {
@@ -7255,7 +7324,12 @@
           score++;
           setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
         } else {
-          setFeedback("feedback1", `<div class="ex-feedback-wrong">❌ Regarde les mots surlignés dans l'ordre : nom, adjectif attribut, verbe d'état.</div>`);
+          /* q.wrongFeedback : message par défaut pensé pour identifier-attribut-
+             sujet (seul usage d'origine de ce renderer) — optionnel et
+             rétrocompatible, à définir pour toute compétence dont les rôles
+             cliqués ne sont pas nom/adjectif attribut/verbe d'état. */
+          const wrongMsg = q.wrongFeedback || "Regarde les mots surlignés dans l'ordre : nom, adjectif attribut, verbe d'état.";
+          setFeedback("feedback1", `<div class="ex-feedback-wrong">❌ ${wrongMsg}</div>`);
         }
         showNextBtn();
       }
@@ -7287,6 +7361,12 @@
             foundInStep.add(clean);
             btn.classList.add(step.cssClass);
             if (foundInStep.size >= step.targets.length) advance();
+          } else if (step.optionalTargets && step.optionalTargets.includes(clean)) {
+            /* Mot optionnel (ex. « et » dans un antécédent coordonné « Tom et
+               moi ») : accepté et surligné comme les mots requis, mais ne
+               compte pas dans foundInStep — l'étape se complète aussi bien
+               avec que sans ce mot, et le cliquer n'est jamais une erreur. */
+            btn.classList.add(step.cssClass);
           } else {
             allCorrect = false;
             btn.classList.add("is-wrong");
@@ -7322,7 +7402,13 @@
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
       const grid = document.getElementById("ex-choices-grid");
-      shuffle(q.choices).forEach(c => {
+      /* q.fixedChoiceOrder : ignore le mélange aléatoire par défaut et
+         affiche q.choices dans leur ordre déclaré — utile quand la position
+         doit rester stable d'une question à l'autre (ex. toujours le même
+         choix à gauche/droite), sans toucher au comportement mélangé des
+         autres compétences en choix-etiquette. */
+      const orderedChoices = q.fixedChoiceOrder ? q.choices : shuffle(q.choices);
+      orderedChoices.forEach(c => {
         const btn = document.createElement("button");
         btn.className  = "ex-choice";
         btn.textContent = c;
@@ -7337,9 +7423,16 @@
             score++;
             setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}${q.hint ? `<br>${q.hint}` : ''}</div>`);
           } else {
+            /* q.wrongFeedback : remplace l'intro générique "On dit : <réponse>
+               <mot>" — pensée pour un item nom isolé + article (ex. "le
+               chat"), incohérente quand q.word est une phrase complète
+               (concaténation illisible). Optionnel et rétrocompatible :
+               sans ce champ, comportement inchangé pour les compétences
+               existantes en choix-etiquette. */
+            const wrongIntro = q.wrongFeedback || `On dit : <strong>${q.answer} ${q.word}</strong>.`;
             setFeedback("feedback1", `
               <div class="ex-feedback-wrong">
-                ❌ On dit : <strong>${q.answer} ${q.word}</strong>.${q.hint ? `<br>${q.hint}` : ''}
+                ❌ ${wrongIntro}${q.hint ? `<br>${q.hint}` : ''}
               </div>`);
           }
           showNextBtn();
@@ -7966,6 +8059,105 @@
           setFeedback("feedback1", `<div class="ex-feedback-wrong">${lines.join('<br>')}</div>`);
         }
         ctx.showNext();
+      });
+    }
+
+    /* ── Type : gap-saisie ─────────────────────────────────────────────────
+       Nouvelle primitive générique (introduite pour identifier-conjonction-
+       coordination Niveau 3, réutilisable par toute future compétence
+       nécessitant de localiser un mot manquant entre deux propositions PUIS
+       de le saisir). Réutilise les classes déjà existantes .ex-sentence-gaps/
+       .ex-word-static/.ex-gap-btn (primitive "curseur de séparation" créée
+       pour reperer-propositions-niveaux Niveau 2, cf. rpRenderLevel2) et
+       .tt-input (texte-a-trous) : aucune nouvelle classe CSS.
+       Étape 1 : q.before + q.after (la phrase sans le mot manquant) est
+       affichée en mots statiques séparés par un fin bouton-gap cliquable
+       entre chaque paire de mots. Un clic sur un mauvais gap n'est PAS
+       pénalisé (aucun score touché, aucun blocage) : léger flash rouge, puis
+       réessai libre jusqu'à trouver la frontière correcte (déduite du nombre
+       de mots de q.before, donc toujours celle entre before et after).
+       Étape 2 : dès le bon gap trouvé, tous les gaps sont désactivés et un
+       champ texte (.tt-input) apparaît à sa place ; l'élève y saisit le mot
+       manquant.
+       Étape 3 : validation en un seul essai (bouton ou touche Entrée),
+       comparaison insensible à la casse à q.answer — même convention "un
+       seul essai" que texte-a-trous. */
+    function renderGapSaisie(card, q, ctx) {
+      ctx = ctx || defaultQuestionCtx();
+      const beforeWords   = q.before.trim().split(/\s+/);
+      const afterWords    = q.after.trim().split(/\s+/);
+      const words         = beforeWords.concat(afterWords);
+      const correctGapIdx = beforeWords.length - 1;
+
+      card.innerHTML = `
+        <p class="ex-question-label">${q.instruction || "Clique à l'endroit où le mot manque, puis écris-le."}</p>
+        <div class="ex-sentence-gaps" id="gs-gaps"></div>
+        <button class="ex-choice ex-hidden" id="gs-validate" style="margin-top:10px;width:100%">Valider ma réponse</button>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const gapsEl      = document.getElementById('gs-gaps');
+      const validateBtn = document.getElementById('gs-validate');
+      let resolved = false;
+      let input    = null;
+
+      function doValidate() {
+        if (!input || input.disabled) return;
+        const val = input.value.trim();
+        if (!val) { input.focus(); return; }
+        input.disabled       = true;
+        validateBtn.disabled = true;
+        const ok = val.toLowerCase() === q.answer.toLowerCase();
+        input.classList.add(ok ? 'is-correct' : 'is-wrong');
+        if (ok) {
+          ctx.addScore(1);
+          setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+        } else {
+          setFeedback("feedback1", `<div class="ex-feedback-wrong">❌ La bonne réponse était <strong>${q.answer}</strong>.</div>`);
+        }
+        ctx.showNext();
+      }
+      validateBtn.addEventListener('click', doValidate);
+
+      words.forEach((w, i) => {
+        const span = document.createElement('span');
+        span.className   = 'ex-word-static';
+        span.textContent = w;
+        gapsEl.appendChild(span);
+
+        if (i < words.length - 1) {
+          const gapBtn = document.createElement('button');
+          gapBtn.type      = 'button';
+          gapBtn.className = 'ex-gap-btn';
+          gapBtn.setAttribute('aria-label', 'Insérer le mot manquant ici');
+          gapBtn.addEventListener('click', () => {
+            if (resolved) return;
+            if (i !== correctGapIdx) {
+              gapBtn.classList.add('is-wrong');
+              setTimeout(() => gapBtn.classList.remove('is-wrong'), 450);
+              return;
+            }
+            resolved = true;
+            gapsEl.querySelectorAll('.ex-gap-btn').forEach(b => b.disabled = true);
+            gapBtn.classList.add('is-correct');
+
+            input = document.createElement('input');
+            input.type            = 'text';
+            input.className       = 'tt-input';
+            input.autocomplete    = 'off';
+            input.autocorrect     = 'off';
+            input.autocapitalize  = 'off';
+            input.spellcheck      = false;
+            input.placeholder     = '?';
+            input.setAttribute('aria-label', 'mot manquant');
+            input.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
+            gapBtn.replaceWith(input);
+            validateBtn.classList.remove('ex-hidden');
+            input.focus();
+          });
+          gapsEl.appendChild(gapBtn);
+        }
       });
     }
 
