@@ -21,14 +21,26 @@ const EvaluationsPrint = (() => {
   }
 
   function critereRowHtml(critere) {
+    const dot = critere.couleur ? `<span class="evp-couleur-dot" style="background:${escapeHtml(critere.couleur)}"></span>` : '';
     return `
       <tr>
-        <td>${escapeHtml(critere)}</td>
+        <td>${dot}${escapeHtml(critere.texte)}</td>
         <td></td>
         <td></td>
         <td></td>
         <td></td>
       </tr>`;
+  }
+
+  /* Rétrocompatibilité : évaluations sauvegardées avant le lien critère ↔
+     exercices (criteres = tableau de strings, exercices sans critereId).
+     Nécessaire ici en plus de evaluations-enseignant.html openForm() car
+     "📄 Générer le PDF" depuis la liste appelle generate() avec la donnée
+     brute de la DB, sans passer par le formulaire. */
+  function normalizeCriteres(criteres) {
+    return (criteres || []).map((c, i) => typeof c === 'string'
+      ? { id: null, texte: c, couleur: typeof EvaluationsExerciseForm !== 'undefined' ? EvaluationsExerciseForm.PALETTE[i % EvaluationsExerciseForm.PALETTE.length] : null }
+      : c);
   }
 
   /* ── Corps par type d'exercice ────────────────────────────────────────────
@@ -263,16 +275,17 @@ const EvaluationsPrint = (() => {
     vrai_faux: corpsVraiFaux
   };
 
-  function exerciceBlockHtml(exercice, index) {
+  function exerciceBlockHtml(exercice, index, couleur) {
     const type = exercice.type || 'marquage';
     const corpsFn = CORPS_PAR_TYPE[type] || corpsMarquage;
     const { groupeTeteExtra, resteHtml } = corpsFn(exercice);
+    const dot = couleur ? `<span class="evp-couleur-dot" style="background:${escapeHtml(couleur)}"></span>` : '';
 
     return `
       <div class="evp-exercice">
         <div class="evp-exercice-groupe-tete">
           <div class="evp-exercice-head">
-            <span class="evp-exercice-num"><span class="evp-exercice-mot">EXERCICE</span> ${index + 1} — </span><span class="evp-exercice-consigne">${escapeHtml(exercice.consigne)}</span>
+            ${dot}<span class="evp-exercice-num"><span class="evp-exercice-mot">EXERCICE</span> ${index + 1} — </span><span class="evp-exercice-consigne">${escapeHtml(exercice.consigne)}</span>
           </div>
           ${groupeTeteExtra}
         </div>
@@ -280,10 +293,13 @@ const EvaluationsPrint = (() => {
       </div>`;
   }
 
-  /* data : { classe, titre, criteres: [string], exercices: [...], enseignantNom } */
+  /* data : { classe, titre, criteres: [{id,texte,couleur}], exercices: [...], enseignantNom } */
   function buildPageHtml(data) {
-    const criteresHtml = (data.criteres || []).map(critereRowHtml).join('');
-    const exercicesHtml = (data.exercices || []).map(exerciceBlockHtml).join('');
+    const criteres = normalizeCriteres(data.criteres);
+    const criteresHtml = criteres.map(critereRowHtml).join('');
+    const exercicesHtml = (data.exercices || [])
+      .map((ex, i) => exerciceBlockHtml(ex, i, typeof EvaluationsExerciseForm !== 'undefined' ? EvaluationsExerciseForm.colorForCritere(criteres, ex.critereId) : null))
+      .join('');
 
     return `
       <div class="evp-page">
@@ -333,5 +349,5 @@ const EvaluationsPrint = (() => {
     document.body.classList.remove('printing-evaluation');
   }
 
-  return { generate, exerciceBlockHtml };
+  return { generate, exerciceBlockHtml, buildPageHtml };
 })();

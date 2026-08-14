@@ -87,7 +87,9 @@
   text-align: center;
   text-transform: uppercase;
   letter-spacing: .02em;
-  padding: 10pt 8pt 2pt 8pt;
+  /* Écart avec le filet du dessus resserré (10pt -> 6pt) : le bloc reste
+     lisible sans coller au filet, mais occupe moins de hauteur. */
+  padding: 6pt 8pt 2pt 8pt;
   margin: 0;
 }
 /* Ligne d'attribution — déplacée du pied de page (retiré) vers ici, entre
@@ -98,7 +100,8 @@
   font-size: 8pt;
   font-weight: 400;
   color: #8A93A3;
-  margin: 0 0 10pt 0;
+  /* Même resserrement que evp-titre côté filet du dessous (10pt -> 6pt). */
+  margin: 0 0 6pt 0;
 }
 
 /* ── Grille de critères ───────────────────────────────────────────────── */
@@ -118,19 +121,26 @@
   color: #fff;
   font-size: 9pt;
   font-weight: 700;
-  padding: 7pt 8pt;
+  padding: 4pt 8pt;
   text-align: center;
   border: 0.75pt solid #1A2D6B;
 }
-.evp-grille th:first-child { text-align: left; width: 40%; }
+/* Colonne "Critères" élargie, les 4 colonnes de maîtrise resserrées — elles
+   n'ont besoin que de la place pour leur en-tête (repli sur 2 lignes, déjà
+   le cas) et une coche manuscrite, pas plus. */
+.evp-grille th:first-child { text-align: left; width: 46%; }
 .evp-grille td {
   background: #fff;
   border: 0.75pt solid #1A2D6B;
-  padding: 8pt;
+  /* Vertical réduit au minimum lisible (voir font-size 10pt ci-dessous) :
+     la hauteur de ligne se cale sur le texte plutôt que de laisser un grand
+     vide, la grille occupant alors une place raisonnable de la page même
+     avec plusieurs critères. */
+  padding: 3pt 8pt;
   font-size: 10pt;
 }
 .evp-grille td:first-child { text-align: left; }
-.evp-grille td:not(:first-child) { width: 15%; }
+.evp-grille td:not(:first-child) { width: 13.5%; }
 
 /* ── Exercices ─────────────────────────────────────────────────────────────
    Pas de break-inside:avoid sur .evp-exercice lui-même : un exercice trop
@@ -149,6 +159,14 @@
 .evp-exercice-head { font-size: 11pt; line-height: 1.5; margin-bottom: 6pt; }
 .evp-exercice-num { color: #1DBFA0; font-weight: 800; }
 .evp-exercice-mot { text-decoration: underline; }
+/* Pastille de couleur du critère associé (lien critère ↔ exercices, voir
+   js/evaluations-exercise-form.js colorForCritere) — même pastille sur la
+   ligne du critère dans la grille (1ʳᵉ cellule, ci-dessous) et ici, en
+   tête de l'exercice. */
+.evp-couleur-dot {
+  display: inline-block; width: 8pt; height: 8pt; border-radius: 50%;
+  margin-right: 4pt; vertical-align: middle;
+}
 /* -webkit-text-stroke en renfort de font-weight:700 : Nunito Sans n'est
    chargée qu'aux graisses 400 et 600 (voir @import dans styles.css), donc
    700 retombe déjà sur la graisse 600 la plus proche disponible — pas de
@@ -208,7 +226,12 @@
    la 1ʳᵉ colonne est plus large) : toutes les colonnes strictement égales,
    comme demandé — sans ce reset, la 1ʳᵉ catégorie héritait des 40% et les
    suivantes se partageaient le reste, inégal. ── */
-.evp-table-classement { table-layout: fixed; }
+/* margin-bottom:0 : annule le 18pt hérité de .evp-grille (pensé pour la
+   grille de critères, suivie d'autre contenu sur la page) — ce tableau est
+   toujours le dernier élément du bloc gris .evp-exercice (resteHtml vide,
+   voir corpsClassement), donc ce 18pt s'ajoutait au padding-bottom:10pt de
+   .evp-exercice et laissait un grand vide sous le tableau. */
+.evp-table-classement { table-layout: fixed; margin-bottom: 0; }
 .evp-table-classement td { height: 22pt; }
 .evp-table-classement th:first-child,
 .evp-table-classement td:first-child {
@@ -225,6 +248,10 @@
    celles-ci absorbent alors tout l'espace restant. Sélecteur à 2 classes
    pour l'emporter sur .evp-grille th:first-child (width:40%, pensé pour le
    mode catégories libres, pas pertinent ici). ── */
+/* margin-bottom:0 : même correction que .evp-table-classement ci-dessus,
+   même cause (18pt hérité de .evp-grille, tableau toujours en fin de bloc
+   gris .evp-exercice). */
+.evp-grille.evp-table-conjugaison { margin-bottom: 0; }
 .evp-grille.evp-table-conjugaison td { height: 22pt; }
 .evp-grille.evp-table-conjugaison th:first-child,
 .evp-grille.evp-table-conjugaison td:first-child {
@@ -255,13 +282,21 @@
   height: 14pt;
 }
 
-/* ── Type Relier : deux colonnes espacées + repères points ───────────────
-   Le point reste collé à son mot (petit gap ci-dessous), pas à l'écart
-   central — chaque colonne pack son contenu vers son propre bord extérieur
-   (flex-start à gauche, flex-end à droite, voir evp-relier-col--*) plutôt
-   que d'utiliser space-between (qui éloignait le point du texte quand le
-   mot était court). L'espace pour tracer le trait à la main vient
-   uniquement du gap entre les deux colonnes ci-dessous, resté généreux. ── */
+/* ── Type Relier : disposition centrée sur l'axe de la page ──────────────
+   Point collé à son mot (petit gap ci-dessous) ET les deux colonnes de
+   points se font face de part et d'autre du centre du bloc d'exercice —
+   pas chacune plaquée sur son bord extérieur (page). .evp-relier-col en
+   flex:1 partage déjà la largeur en deux moitiés symétriques (space-between
+   n'a ici aucun effet propre, les deux items étant flex:1 sans espace
+   résiduel à répartir — c'est le gap ci-dessous qui réserve l'espace pour
+   tracer le trait à la main) : c'est le sens du "pack" à l'intérieur de
+   chaque moitié qui détermine où atterrit le point. Colonne gauche
+   "alignée à droite" -> justify-content:flex-end (empile [texte][point]
+   contre le bord droit de sa moitié, donc vers le centre) ; colonne droite
+   "alignée à gauche" -> justify-content:flex-start (empile [point][texte]
+   contre le bord gauche de sa moitié, donc vers le centre elle aussi). Les
+   deux points se retrouvent alors face à face, séparés uniquement par le
+   gap ci-dessous. */
 .evp-relier-wrap {
   display: flex;
   justify-content: space-between;
@@ -277,8 +312,8 @@
   margin-bottom: 14pt;
 }
 .evp-relier-item:last-child { margin-bottom: 0; }
-.evp-relier-col--gauche .evp-relier-item { justify-content: flex-start; }
-.evp-relier-col--droite .evp-relier-item { justify-content: flex-end; }
+.evp-relier-col--gauche .evp-relier-item { justify-content: flex-end; }
+.evp-relier-col--droite .evp-relier-item { justify-content: flex-start; }
 .evp-relier-dot { font-weight: 800; color: #1A2D6B; flex-shrink: 0; }
 
 /* ── Case à cocher dessinée en CSS (QCM, Vrai/Faux) ──────────────────────
@@ -348,7 +383,11 @@
    ligne, au-delà ça repasse naturellement sur plusieurs lignes. ── */
 .evp-souligne-mot { text-decoration: underline; text-underline-offset: 2pt; }
 .evp-souligne-exposant { font-size: 7pt; font-weight: 800; color: #1A2D6B; margin-left: 1pt; }
-.evp-souligne-texte { margin-bottom: 12pt; }
+/* line-height élargi (aligné sur .evp-exercice-ligne--marquage) : sans ça,
+   le texte hérite du 1.5 de .evp-exercice-ligne (partagée par les autres
+   types), trop serré pour les mots soulignés + leur numérotation en
+   exposant qui prend de la hauteur au-dessus de la ligne. */
+.evp-souligne-texte { line-height: 2.1; margin-bottom: 12pt; }
 .evp-souligne-reponses {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(130pt, 1fr));

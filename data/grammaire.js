@@ -472,6 +472,189 @@ Object.assign(window.EXERCISE_DATA, {
     ]
   },
 
+  "identifier-complement-nom": {
+    title: "Identifier un complément du nom",
+    domaine:    "Français",
+    competence: "Grammaire — Le complément du nom",
+    type:       "homophones-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+    levelDescs: {
+      "CM1": "Repérer le complément du nom parmi plusieurs étiquettes",
+      "CM2": "Cliquer sur le complément du nom dans une phrase",
+      "6e":  "Identifier le complément du nom et reconnaître sa nature"
+    },
+    homoShuffle: [false, true, false],
+
+    /* Refonte de la carte placeholder "identifier-complement-nom" (français-
+       grammaire.html) en 3 niveaux (level1Bank/level2Bank/level3Bank), moteur
+       générique "homophones-niveaux" — même schéma qu'identifier-adjectif/
+       identifier-adverbe/identifier-nom-phrase (aucun nouveau moteur : chaque
+       item porte son propre `type`, dispatché dans showQuestion() vers les
+       renderers standards choix-etiquette / mots-cliquables /
+       classification-etapes).
+       Niveau 1 : choix-etiquette, l'élève choisit l'étiquette qui correspond
+       au complément du nom parmi des segments de l'expression (dont une
+       étiquette fixe "Aucun complément du nom" présente sur tous les items,
+       pour éviter un repérage par élimination sur les seuls items sans CDN).
+       Niveau 2 : mots-cliquables, l'élève clique le(s) mot(s) formant le
+       complément du nom (préposition incluse) dans la phrase complète ;
+       plusieurs items contiennent un adjectif épithète ou un adverbe en
+       distracteur (piège explicatif, pas de nom-noyau à cliquer).
+       Niveau 3 : classification-etapes (même mécanique qu'identifier-nom-
+       phrase/identifier-adverbe niveau 2 : clic pour identifier, puis clic
+       pour classer — le brief demandait un "glisser-déposer" mais aucun
+       renderer de classification par glisser-déposer n'existe sur le site ;
+       classification-etapes est le renderer standard équivalent, déjà
+       utilisé pour classer un élément identifié parmi plusieurs catégories,
+       donc réutilisé ici pour respecter la contrainte "aucun moteur dédié")
+       — l'élève clique le complément du nom puis indique sa nature parmi
+       4 catégories (Nom/GN, Verbe à l'infinitif, Pronom, Adverbe). Les mots
+       élidés (d'/l') qui doivent rester des cibles de clic séparées portent
+       un espace après l'apostrophe (convention déjà utilisée pour "n' " /
+       "s' " ailleurs sur le site) ; step1Targets est alors écrit sans
+       apostrophe (« d », pas « d' ») pour matcher le nettoyage des boutons de
+       classification-etapes, qui retire l'apostrophe (contrairement au
+       mots-cliquables simple du niveau 2, qui la conserve). */
+
+    level1Bank: [
+      { type:"choix-etiquette", instruction:"Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas).",
+        word:"le vélo de course", choices:["le vélo","vélo","de course","Aucun complément du nom"], answer:"de course",
+        wrongFeedback:"Le complément du nom précise un nom-noyau et est presque toujours introduit par une préposition (de, à, en, sans…) ; un adjectif épithète, lui, se colle directement au nom, sans préposition.",
+        hint:"« de course » précise « vélo » : complément du nom introduit par la préposition « de »." },
+      { type:"choix-etiquette", instruction:"Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas).",
+        word:"une tasse à café", choices:["une tasse","café","à café","Aucun complément du nom"], answer:"à café",
+        wrongFeedback:"Le complément du nom précise un nom-noyau et est presque toujours introduit par une préposition (de, à, en, sans…) ; un adjectif épithète, lui, se colle directement au nom, sans préposition.",
+        hint:"« à café » précise « tasse » (une tasse pour le café) : complément du nom introduit par « à »." },
+      { type:"choix-etiquette", instruction:"Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas).",
+        word:"le chat de la voisine", choices:["le chat","voisine","de la voisine","Aucun complément du nom"], answer:"de la voisine",
+        wrongFeedback:"Le complément du nom précise un nom-noyau et est presque toujours introduit par une préposition (de, à, en, sans…) ; un adjectif épithète, lui, se colle directement au nom, sans préposition.",
+        hint:"« de la voisine » précise quel chat : complément du nom introduit par « de »." },
+      { type:"choix-etiquette", instruction:"Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas).",
+        word:"un roman d'aventure", choices:["un roman","aventure","d'aventure","Aucun complément du nom"], answer:"d'aventure",
+        wrongFeedback:"Le complément du nom précise un nom-noyau et est presque toujours introduit par une préposition (de, à, en, sans…) ; un adjectif épithète, lui, se colle directement au nom, sans préposition.",
+        hint:"« d'aventure » précise le type de roman : complément du nom introduit par « de » (élidé en « d' »)." },
+      { type:"choix-etiquette", instruction:"Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas).",
+        word:"la porte en bois", choices:["la porte","bois","en bois","Aucun complément du nom"], answer:"en bois",
+        wrongFeedback:"Le complément du nom précise un nom-noyau et est presque toujours introduit par une préposition (de, à, en, sans…) ; un adjectif épithète, lui, se colle directement au nom, sans préposition.",
+        hint:"« en bois » précise la matière de la porte : complément du nom introduit par « en »." },
+      { type:"choix-etiquette", instruction:"Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas).",
+        word:"le grand vélo rouge", choices:["le vélo","rouge","grand","Aucun complément du nom"], answer:"Aucun complément du nom",
+        wrongFeedback:"Le complément du nom précise un nom-noyau et est presque toujours introduit par une préposition (de, à, en, sans…) ; un adjectif épithète, lui, se colle directement au nom, sans préposition.",
+        hint:"« grand » et « rouge » sont des adjectifs épithètes : ils décrivent directement « vélo », sans préposition. Il n'y a pas de complément du nom ici." },
+      { type:"choix-etiquette", instruction:"Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas).",
+        word:"une robe à fleurs", choices:["une robe","fleurs","à fleurs","Aucun complément du nom"], answer:"à fleurs",
+        wrongFeedback:"Le complément du nom précise un nom-noyau et est presque toujours introduit par une préposition (de, à, en, sans…) ; un adjectif épithète, lui, se colle directement au nom, sans préposition.",
+        hint:"« à fleurs » précise le motif de la robe : complément du nom introduit par « à »." },
+      { type:"choix-etiquette", instruction:"Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas).",
+        word:"le sac de sport", choices:["le sac","sport","de sport","Aucun complément du nom"], answer:"de sport",
+        wrongFeedback:"Le complément du nom précise un nom-noyau et est presque toujours introduit par une préposition (de, à, en, sans…) ; un adjectif épithète, lui, se colle directement au nom, sans préposition.",
+        hint:"« de sport » précise l'usage du sac : complément du nom introduit par « de »." },
+      { type:"choix-etiquette", instruction:"Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas).",
+        word:"un enfant sage", choices:["un enfant","sage","Aucun complément du nom"], answer:"Aucun complément du nom",
+        wrongFeedback:"Le complément du nom précise un nom-noyau et est presque toujours introduit par une préposition (de, à, en, sans…) ; un adjectif épithète, lui, se colle directement au nom, sans préposition.",
+        hint:"« sage » est un adjectif épithète : il décrit directement « enfant », sans préposition. Il n'y a pas de complément du nom ici." },
+      { type:"choix-etiquette", instruction:"Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas).",
+        word:"le gardien du parc", choices:["le gardien","parc","du parc","Aucun complément du nom"], answer:"du parc",
+        wrongFeedback:"Le complément du nom précise un nom-noyau et est presque toujours introduit par une préposition (de, à, en, sans…) ; un adjectif épithète, lui, se colle directement au nom, sans préposition.",
+        hint:"« du parc » précise quel gardien : complément du nom introduit par « du » (= de + le)." }
+    ],
+
+    level2Bank: [
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).",
+        sentence:"Le facteur a livré le colis de mon oncle ce matin .", targets:["de","mon","oncle"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).",
+        sentence:"Elle porte une robe à fleurs .", targets:["à","fleurs"], piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).",
+        sentence:"Le gardien du parc ferme les grilles à 18h .", targets:["du","parc"],
+        piege:{ "à": "« à 18h » indique l'heure : il complète le verbe « ferme », pas un nom — ce n'est pas un complément du nom." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).",
+        sentence:"Mon petit frère adore les histoires de pirates .", targets:["de","pirates"],
+        piege:{ "petit": "« petit » est un adjectif épithète : il décrit « frère » directement, sans préposition — ce n'est pas un complément du nom." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).",
+        sentence:"Nous avons visité la maison des voisins hier .", targets:["des","voisins"],
+        piege:{ "hier": "« hier » est un adverbe de temps : il complète le verbe « avons visité », pas un nom." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).",
+        sentence:"Le vieux moulin à vent tourne lentement .", targets:["à","vent"],
+        piege:{ "vieux": "« vieux » est un adjectif épithète : il décrit « moulin » directement, sans préposition.", "lentement": "« lentement » est un adverbe de manière : il complète le verbe « tourne », pas un nom." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).",
+        sentence:"Elle a acheté un joli sac de sport .", targets:["de","sport"],
+        piege:{ "joli": "« joli » est un adjectif épithète : il décrit « sac » directement, sans préposition." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).",
+        sentence:"Le chien de mon voisin aboie souvent .", targets:["de","mon","voisin"],
+        piege:{ "souvent": "« souvent » est un adverbe de fréquence : il complète le verbe « aboie », pas un nom." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).",
+        sentence:"J'ai lu un roman d' aventure passionnant .", targets:["d'","aventure"],
+        piege:{ "passionnant": "« passionnant » est un adjectif épithète : il décrit « roman » directement, sans préposition." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).",
+        sentence:"Le café du coin sert un excellent chocolat chaud .", targets:["du","coin"],
+        piege:{ "excellent": "« excellent » est un adjectif épithète : il décrit « chocolat », sans préposition.", "chaud": "« chaud » est un adjectif épithète : il décrit aussi « chocolat », sans préposition." } }
+    ],
+
+    level3Bank: [
+      { type:"classification-etapes",
+        instruction:"Clique sur le complément du nom, puis indique sa nature.",
+        sentence:"Le vélo de Paul .",
+        step1Instruction:"Clique sur le complément du nom (préposition incluse).", step1Targets:["de","Paul"],
+        step2Instruction:"Quelle est la nature de ce complément du nom ?",
+        classifyChoices:["Nom/GN","Verbe à l'infinitif","Pronom","Adverbe"], step2Answer:"Nom/GN" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le complément du nom, puis indique sa nature.",
+        sentence:"Une tasse à café .",
+        step1Instruction:"Clique sur le complément du nom (préposition incluse).", step1Targets:["à","café"],
+        step2Instruction:"Quelle est la nature de ce complément du nom ?",
+        classifyChoices:["Nom/GN","Verbe à l'infinitif","Pronom","Adverbe"], step2Answer:"Nom/GN" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le complément du nom, puis indique sa nature.",
+        sentence:"Le chat de la voisine .",
+        step1Instruction:"Clique sur le complément du nom (préposition incluse).", step1Targets:["de","la","voisine"],
+        step2Instruction:"Quelle est la nature de ce complément du nom ?",
+        classifyChoices:["Nom/GN","Verbe à l'infinitif","Pronom","Adverbe"], step2Answer:"Nom/GN" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le complément du nom, puis indique sa nature.",
+        sentence:"Une machine à laver .",
+        step1Instruction:"Clique sur le complément du nom (préposition incluse).", step1Targets:["à","laver"],
+        step2Instruction:"Quelle est la nature de ce complément du nom ?",
+        classifyChoices:["Nom/GN","Verbe à l'infinitif","Pronom","Adverbe"], step2Answer:"Verbe à l'infinitif" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le complément du nom, puis indique sa nature.",
+        sentence:"L'envie de partir .",
+        step1Instruction:"Clique sur le complément du nom (préposition incluse).", step1Targets:["de","partir"],
+        step2Instruction:"Quelle est la nature de ce complément du nom ?",
+        classifyChoices:["Nom/GN","Verbe à l'infinitif","Pronom","Adverbe"], step2Answer:"Verbe à l'infinitif" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le complément du nom, puis indique sa nature.",
+        sentence:"Une salle à manger .",
+        step1Instruction:"Clique sur le complément du nom (préposition incluse).", step1Targets:["à","manger"],
+        step2Instruction:"Quelle est la nature de ce complément du nom ?",
+        classifyChoices:["Nom/GN","Verbe à l'infinitif","Pronom","Adverbe"], step2Answer:"Verbe à l'infinitif" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le complément du nom, puis indique sa nature.",
+        sentence:"Le respect de soi .",
+        step1Instruction:"Clique sur le complément du nom (préposition incluse).", step1Targets:["de","soi"],
+        step2Instruction:"Quelle est la nature de ce complément du nom ?",
+        classifyChoices:["Nom/GN","Verbe à l'infinitif","Pronom","Adverbe"], step2Answer:"Pronom" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le complément du nom, puis indique sa nature.",
+        sentence:"Le journal d' hier .",
+        step1Instruction:"Clique sur le complément du nom (préposition incluse).", step1Targets:["d","hier"],
+        step2Instruction:"Quelle est la nature de ce complément du nom ?",
+        classifyChoices:["Nom/GN","Verbe à l'infinitif","Pronom","Adverbe"], step2Answer:"Adverbe" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le complément du nom, puis indique sa nature.",
+        sentence:"La vie d' autrefois .",
+        step1Instruction:"Clique sur le complément du nom (préposition incluse).", step1Targets:["d","autrefois"],
+        step2Instruction:"Quelle est la nature de ce complément du nom ?",
+        classifyChoices:["Nom/GN","Verbe à l'infinitif","Pronom","Adverbe"], step2Answer:"Adverbe" },
+      { type:"classification-etapes",
+        instruction:"Clique sur le complément du nom, puis indique sa nature.",
+        sentence:"La mode d' aujourd'hui .",
+        step1Instruction:"Clique sur le complément du nom (préposition incluse).", step1Targets:["d","aujourdhui"],
+        step2Instruction:"Quelle est la nature de ce complément du nom ?",
+        classifyChoices:["Nom/GN","Verbe à l'infinitif","Pronom","Adverbe"], step2Answer:"Adverbe" }
+    ]
+  },
+
   "identifier-preposition": {
     title: "Identifier une préposition",
     domaine:    "Français",
@@ -2217,6 +2400,188 @@ Object.assign(window.EXERCISE_DATA, {
       { type:"gap-saisie", instruction:"Clique à l'endroit où il manque la conjonction de subordination (en tout début de phrase), puis écris-la.",
         before:"", after:"il était en retard , il a couru jusqu'à l'école .", answer:"Comme", acceptedAnswers:["Parce que"],
         confusableAnswers:{ "car":"« car » est une conjonction de COORDINATION, pas de subordination : essaie une autre conjonction." } }
+    ]
+  },
+
+  "distinguer-conjonctions": {
+    title:      "Distinguer conjonction de coordination et conjonction de subordination",
+    domaine:    "Français",
+    competence: "Grammaire — Conjonctions de coordination et de subordination",
+    type:       "homophones-niveaux",
+    levels:     ["6e"],
+    paliers:    3,
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+    levelDescs: {
+      "niveau1": "Classer une conjonction isolée : coordination ou subordination ?",
+      "niveau2": "Distinguer les deux conjonctions présentes dans une même phrase",
+      "niveau3": "Repérer puis classer chaque conjonction d'un texte"
+    },
+    homoShuffle: [false, true, false],
+
+    /* Compétence réservée à la 6e (levels:["6e"], pas de pastille CM1/CM2),
+       même schéma que distinguer-phrase-simple-complexe : 3 paliers de
+       difficulté internes (onglets génériques "niveau1/niveau2/niveau3" via
+       showHomoLevelSelect, puisque levels.length===1). Complémentaire
+       d'identifier-conjonction-coordination / identifier-conjonction-
+       subordination (qui testent l'identification isolée d'un seul type) et
+       de distinguer-coordination-subordination (qui teste la coordination/
+       subordination au niveau de la PROPOSITION, via un moteur dédié) : ici
+       l'élève classe une conjonction déjà repérée entre les deux seules
+       natures possibles, avec des boutons TOUJOURS en position fixe
+       (« coordination » à gauche, « subordination » à droite) via
+       q.fixedChoiceOrder, pour les 3 niveaux.
+
+       Niveau 1 (choix-etiquette) : une seule conjonction surlignée par
+       phrase, aucun piège.
+       Niveau 2 (choix-etiquette) : chaque phrase contient LES DEUX types de
+       conjonction ; 5 phrases posées deux fois chacune (une fois par
+       conjonction surlignée), pour forcer à ne pas répondre par position
+       mémorisée.
+       Niveau 3 (classification-etapes, avec q.fixedChoiceOrder — extension
+       générique ajoutée à renderClassificationEtapes dans exercise.html
+       pour cette compétence, cf. commentaire au-dessus de son
+       shuffle(q.classifyChoices) d'origine) : 3 mini-textes de 3-4 phrases,
+       chacun réutilisé par plusieurs items (un item = une conjonction à
+       trouver PUIS classer). step1Instruction nomme explicitement le mot à
+       cliquer (ex. « Clique sur « quand ». ») pour éviter toute ambiguïté
+       entre les différentes conjonctions présentes dans le même texte —
+       la difficulté vient du texte plus long à parcourir, pas d'un choix
+       entre plusieurs cibles valides. Conjonctions élidées (« puisqu' »,
+       « qu' ») écrites avec une espace après l'apostrophe dans `sentence`
+       (convention déjà utilisée par identifier-conjonction-subordination
+       pour mots-cliquables) ET privées de leur apostrophe dans
+       step1Targets (ex. "puisqu" pas "puisqu'") car le clean-computation de
+       renderClassificationEtapes retire l'apostrophe du token (contrairement
+       à renderMotsCliquables) — même convention que step1Targets:["n",
+       "jamais"] pour « n' » dans identifier-adverbe. */
+
+    level1Bank: [
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Il pleut , <span class='ex-teal-hl'>mais</span> je sors .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"coordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« mais » relie deux phrases de même nature : c'est une conjonction de coordination." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Je pense <span class='ex-teal-hl'>que</span> tu as raison .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"subordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« que » introduit la subordonnée « tu as raison » : c'est une conjonction de subordination." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Tu veux du thé <span class='ex-teal-hl'>ou</span> du café ?", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"coordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« ou » relie deux groupes nominaux de même nature : c'est une conjonction de coordination." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"<span class='ex-teal-hl'>Quand</span> il pleut , je reste à la maison .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"subordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« Quand » introduit la subordonnée « il pleut » : c'est une conjonction de subordination." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Il est fatigué , <span class='ex-teal-hl'>donc</span> il se repose .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"coordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« donc » relie deux phrases de même nature : c'est une conjonction de coordination." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"<span class='ex-teal-hl'>Comme</span> il est tard , je pars .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"subordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« Comme » introduit la subordonnée « il est tard » : c'est une conjonction de subordination." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Il fait froid , <span class='ex-teal-hl'>car</span> l'hiver arrive .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"coordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« car » relie deux phrases de même nature : c'est une conjonction de coordination." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"<span class='ex-teal-hl'>Puisque</span> tu insistes , j'accepte .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"subordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« Puisque » introduit la subordonnée « tu insistes » : c'est une conjonction de subordination." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Je n'aime <span class='ex-teal-hl'>ni</span> les épinards ni les carottes .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"coordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« ni » relie deux compléments de même nature : c'est une conjonction de coordination." },
+      { type:"choix-etiquette", instruction:"Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"<span class='ex-teal-hl'>Bien qu'</span>il pleuve , nous sortons .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"subordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« Bien qu' » introduit la subordonnée « il pleuve » : c'est une conjonction de subordination." }
+    ],
+
+    level2Bank: [
+      { type:"choix-etiquette", instruction:"Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Il pleut , <span class='ex-teal-hl'>mais</span> je reste à la maison quand il fait froid .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"coordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« mais » relie les deux phrases : c'est une conjonction de coordination." },
+      { type:"choix-etiquette", instruction:"Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Il pleut , mais je reste à la maison <span class='ex-teal-hl'>quand</span> il fait froid .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"subordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« quand » introduit la subordonnée « il fait froid » : c'est une conjonction de subordination." },
+      { type:"choix-etiquette", instruction:"Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Je pense que tu as raison , <span class='ex-teal-hl'>mais</span> tu devrais réfléchir encore .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"coordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« mais » relie les deux phrases : c'est une conjonction de coordination." },
+      { type:"choix-etiquette", instruction:"Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Je pense <span class='ex-teal-hl'>que</span> tu as raison , mais tu devrais réfléchir encore .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"subordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« que » introduit la subordonnée « tu as raison » : c'est une conjonction de subordination." },
+      { type:"choix-etiquette", instruction:"Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Il est fatigué , <span class='ex-teal-hl'>donc</span> il se repose puisqu'il n'a rien à faire .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"coordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« donc » relie les deux phrases : c'est une conjonction de coordination." },
+      { type:"choix-etiquette", instruction:"Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Il est fatigué , donc il se repose <span class='ex-teal-hl'>puisqu'</span>il n'a rien à faire .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"subordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« puisqu' » introduit la subordonnée « il n'a rien à faire » : c'est une conjonction de subordination." },
+      { type:"choix-etiquette", instruction:"Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Tu veux du thé <span class='ex-teal-hl'>ou</span> du café , comme tu préfères ?", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"coordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« ou » relie deux groupes nominaux de même nature : c'est une conjonction de coordination." },
+      { type:"choix-etiquette", instruction:"Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Tu veux du thé ou du café , <span class='ex-teal-hl'>comme</span> tu préfères ?", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"subordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« comme » introduit la subordonnée « tu préfères » : c'est une conjonction de subordination." },
+      { type:"choix-etiquette", instruction:"Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Il fait froid , <span class='ex-teal-hl'>car</span> l'hiver arrive alors que les feuilles tombent .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"coordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« car » relie les deux phrases : c'est une conjonction de coordination." },
+      { type:"choix-etiquette", instruction:"Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ?",
+        word:"Il fait froid , car l'hiver arrive <span class='ex-teal-hl'>alors que</span> les feuilles tombent .", choices:["coordination","subordination"], fixedChoiceOrder:true, answer:"subordination",
+        wrongFeedback:"Une conjonction de coordination relie deux mots, groupes ou phrases de même nature ; une conjonction de subordination introduit une proposition subordonnée, dépendante d'une principale.",
+        hint:"« alors que » introduit la subordonnée « les feuilles tombent » : c'est une conjonction de subordination." }
+    ],
+
+    level3Bank: [
+      { type:"classification-etapes", instruction:"Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la.",
+        sentence:"Le chien aboie quand quelqu'un frappe à la porte , mais il se calme dès que son maître arrive , car il le reconnaît aussitôt . Comme il a confiance , il se recouche ensuite .",
+        step1Instruction:"Clique sur « quand ».", step1Targets:["quand"],
+        step2Instruction:"Quel est son type ?", classifyChoices:["coordination","subordination"], fixedChoiceOrder:true, step2Answer:"subordination" },
+      { type:"classification-etapes", instruction:"Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la.",
+        sentence:"Le chien aboie quand quelqu'un frappe à la porte , mais il se calme dès que son maître arrive , car il le reconnaît aussitôt . Comme il a confiance , il se recouche ensuite .",
+        step1Instruction:"Clique sur « mais ».", step1Targets:["mais"],
+        step2Instruction:"Quel est son type ?", classifyChoices:["coordination","subordination"], fixedChoiceOrder:true, step2Answer:"coordination" },
+      { type:"classification-etapes", instruction:"Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la.",
+        sentence:"Le chien aboie quand quelqu'un frappe à la porte , mais il se calme dès que son maître arrive , car il le reconnaît aussitôt . Comme il a confiance , il se recouche ensuite .",
+        step1Instruction:"Clique sur « car ».", step1Targets:["car"],
+        step2Instruction:"Quel est son type ?", classifyChoices:["coordination","subordination"], fixedChoiceOrder:true, step2Answer:"coordination" },
+      { type:"classification-etapes", instruction:"Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la.",
+        sentence:"Le chien aboie quand quelqu'un frappe à la porte , mais il se calme dès que son maître arrive , car il le reconnaît aussitôt . Comme il a confiance , il se recouche ensuite .",
+        step1Instruction:"Clique sur « Comme ».", step1Targets:["Comme"],
+        step2Instruction:"Quel est son type ?", classifyChoices:["coordination","subordination"], fixedChoiceOrder:true, step2Answer:"subordination" },
+      { type:"classification-etapes", instruction:"Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la.",
+        sentence:"Elle travaille dur puisqu' elle veut réussir , mais elle prend aussi le temps de se reposer . Elle sort quand la pluie s'arrête .",
+        step1Instruction:"Clique sur « puisqu' ».", step1Targets:["puisqu"],
+        step2Instruction:"Quel est son type ?", classifyChoices:["coordination","subordination"], fixedChoiceOrder:true, step2Answer:"subordination" },
+      { type:"classification-etapes", instruction:"Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la.",
+        sentence:"Elle travaille dur puisqu' elle veut réussir , mais elle prend aussi le temps de se reposer . Elle sort quand la pluie s'arrête .",
+        step1Instruction:"Clique sur « mais ».", step1Targets:["mais"],
+        step2Instruction:"Quel est son type ?", classifyChoices:["coordination","subordination"], fixedChoiceOrder:true, step2Answer:"coordination" },
+      { type:"classification-etapes", instruction:"Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la.",
+        sentence:"Elle travaille dur puisqu' elle veut réussir , mais elle prend aussi le temps de se reposer . Elle sort quand la pluie s'arrête .",
+        step1Instruction:"Clique sur « quand ».", step1Targets:["quand"],
+        step2Instruction:"Quel est son type ?", classifyChoices:["coordination","subordination"], fixedChoiceOrder:true, step2Answer:"subordination" },
+      { type:"classification-etapes", instruction:"Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la.",
+        sentence:"Il aime lire ou regarder des films , bien qu' il préfère la lecture . Il lit donc chaque soir avant de dormir .",
+        step1Instruction:"Clique sur « ou ».", step1Targets:["ou"],
+        step2Instruction:"Quel est son type ?", classifyChoices:["coordination","subordination"], fixedChoiceOrder:true, step2Answer:"coordination" },
+      { type:"classification-etapes", instruction:"Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la.",
+        sentence:"Il aime lire ou regarder des films , bien qu' il préfère la lecture . Il lit donc chaque soir avant de dormir .",
+        step1Instruction:"Clique sur « bien qu' ».", step1Targets:["bien","qu"],
+        step2Instruction:"Quel est son type ?", classifyChoices:["coordination","subordination"], fixedChoiceOrder:true, step2Answer:"subordination" },
+      { type:"classification-etapes", instruction:"Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la.",
+        sentence:"Il aime lire ou regarder des films , bien qu' il préfère la lecture . Il lit donc chaque soir avant de dormir .",
+        step1Instruction:"Clique sur « donc ».", step1Targets:["donc"],
+        step2Instruction:"Quel est son type ?", classifyChoices:["coordination","subordination"], fixedChoiceOrder:true, step2Answer:"coordination" }
     ]
   },
 

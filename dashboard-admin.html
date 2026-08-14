@@ -16,7 +16,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/utils.js"></script>
-  <script src="js/admin.js?v=1"></script>
+  <script src="js/admin.js?v=2"></script>
   <script src="js/teacher-analytics.js?v=6"></script>
   <style>
     .dash-wrap {
@@ -469,6 +469,32 @@
         </div>
       </div>
 
+      <!-- Section : Évaluations — point d'entrée unique du dossier
+           "Évaluations" (banque d'items par compétence + modération des
+           évaluations partagées, regroupées en sous-onglets une fois dans
+           la page — voir evaluations-enseignant.html / evaluations-
+           banque-admin.html #ev-admin-tabs/.main-tabs). Ouvre sur la vue
+           modération (le contenu complet, rendu PDF réel, y est visible
+           avant toute décision de Valider/Rejeter, contrairement au
+           widget générique ci-dessus qui ne fait qu'un résumé en ligne) ;
+           la banque d'items reste à un clic via les sous-onglets. -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-card-title">
+            Évaluations
+            <span class="pending-badge" id="evaluations-pending-badge" style="display:none;margin-left:6px">0</span>
+          </div>
+        </div>
+        <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div style="font-size:13px;color:var(--muted);max-width:520px">
+            Banque d'items par compétence, et modération des évaluations que les enseignants partagent avec la
+            communauté : voir leur contenu, valider, rejeter, revenir sur une décision ou retirer une évaluation
+            déjà publiée.
+          </div>
+          <a href="evaluations-enseignant.html" class="btn btn-outline">Ouvrir →</a>
+        </div>
+      </div>
+
       <!-- Section : Signalements & propositions (feedback.html) -->
       <div class="section-card">
         <div class="section-card-header">
@@ -647,7 +673,13 @@
       else document.getElementById('pending-count').textContent = remaining;
     }
 
-    /* ── Contenu en attente de validation (Champ lexical + Questionnaires) ── */
+    /* ── Contenu en attente de validation (Champ lexical + Questionnaires) ──
+       Les évaluations partagées ont leur propre entrée dédiée (carte
+       "Évaluations partagées" ci-dessous, badge géré par
+       loadEvaluationsBadge()) plutôt que d'être mélangées ici — un seul
+       endroit pour modérer une évaluation, avec son contenu visible avant
+       décision (voir evaluations-enseignant.html openAdminEvaluationDetail),
+       pas une ligne de résumé sans aperçu comme les deux types ci-dessous. ── */
     async function loadPendingContent() {
       try {
         const [champs, questionnaires] = await Promise.all([
@@ -694,19 +726,37 @@
       }
     }
 
+    /* Badge de la carte "Évaluations partagées" — reflète le nombre
+       d'évaluations en attente à chaque chargement de la page (pas
+       d'abonnement Supabase Realtime : l'admin est seul à modérer, un
+       badge qui se remet à jour dès qu'on revient sur la page suffit). */
+    async function loadEvaluationsBadge() {
+      try {
+        const pending = await lfmAdmin.getPendingEvaluations();
+        const badge = document.getElementById('evaluations-pending-badge');
+        if (pending.length === 0) { badge.style.display = 'none'; return; }
+        badge.textContent = pending.length;
+        badge.style.display = '';
+      } catch (e) {
+        console.warn('[LFM] badge évaluations :', e.message);
+      }
+    }
+
+    const MODERATE_ROW_ID = { champ: 'cp-champ-', questionnaire: 'cp-qz-' };
+    const MODERATE_FN = { champ: 'moderateChamp', questionnaire: 'moderateQuestionnaire' };
+
     window.doModerateContent = async function(kind, id, decision) {
-      const rowId = kind === 'champ' ? 'cp-champ-' + id : 'cp-qz-' + id;
-      const row = document.getElementById(rowId);
+      const row = document.getElementById(MODERATE_ROW_ID[kind] + id);
+      const estValidation = decision === 'publie' || decision === 'validee';
       let motif = null;
-      if (decision === 'brouillon') {
+      if (!estValidation) {
         motif = window.prompt('Motif du refus (visible par l\'enseignant) :', '');
         if (motif === null) return; // annulé
       }
       row.querySelectorAll('button').forEach(b => b.disabled = true);
       try {
-        if (kind === 'champ') await lfmAdmin.moderateChamp(id, decision, motif);
-        else await lfmAdmin.moderateQuestionnaire(id, decision, motif);
-        row.innerHTML = decision === 'publie'
+        await lfmAdmin[MODERATE_FN[kind]](id, decision, motif);
+        row.innerHTML = estValidation
           ? `<div style="padding:0;flex:1"><span style="color:#15803d;font-weight:600">✓ Validé, désormais public</span></div>`
           : `<div style="padding:0;flex:1"><span style="color:var(--red);font-weight:600">✗ Refusé</span></div>`;
         setTimeout(() => {
@@ -715,7 +765,7 @@
           if (remaining === 0) document.getElementById('content-pending-section').style.display = 'none';
           else document.getElementById('content-pending-count').textContent = remaining;
         }, 1800);
-        showToast(decision === 'publie' ? 'Contenu validé' : 'Contenu refusé');
+        showToast(estValidation ? 'Contenu validé' : 'Contenu refusé');
       } catch (e) {
         row.querySelectorAll('button').forEach(b => b.disabled = false);
         showToast('Erreur : ' + e.message, 'error');
@@ -724,6 +774,7 @@
 
     await loadPending();
     await loadPendingContent();
+    await loadEvaluationsBadge();
 
     /* ── Enseignants actifs ──────────────────────────────────────────────── */
     async function loadTeachers() {
@@ -1092,7 +1143,7 @@
            est commitée ou reversée séparément de ce commit de migration. */
         await Promise.all([
           'data/conjugaison.js?v=2',
-          'data/grammaire.js?v=5',
+          'data/grammaire.js?v=7',
           'data/orthographe.js?v=2',
           'data/lecture.js?v=2',
           'data/nombres-entiers.js?v=2',

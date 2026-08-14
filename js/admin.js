@@ -94,6 +94,27 @@ const lfmAdmin = (() => {
     if (error) throw error;
   }
 
+  /* Évaluations partagées — même patron pivot que champs_lexicaux/
+     questionnaires (voir 20260829100000_evaluations_partage.sql), mais
+     vocabulaire propre au module (statut_validation: en_attente/validee/
+     rejetee, pas statut: brouillon/en_attente/publie). */
+  async function getPendingEvaluations() {
+    const { data, error } = await db.from('evaluations')
+      .select('id, titre, classe, domaine, sous_domaine, created_at, profiles(display_name)')
+      .eq('partage', true)
+      .eq('statut_validation', 'en_attente')
+      .order('created_at');
+    if (error) throw error;
+    return data || [];
+  }
+
+  async function moderateEvaluation(id, decision, motif) {
+    const { error } = await db.from('evaluations')
+      .update({ statut_validation: decision, motif_refus: decision === 'validee' ? null : (motif || null) })
+      .eq('id', id);
+    if (error) throw error;
+  }
+
   /* ── Liste des enseignants actifs avec email et stats ────────────────────── */
   /* Utilise la fonction SQL get_teachers_with_email() (voir migration V5 du schéma) */
   async function getTeachers() {
@@ -214,6 +235,7 @@ const lfmAdmin = (() => {
     getGlobalStats,
     getPendingTeachers, approveTeacher, rejectTeacher,
     getPendingChamps, getPendingQuestionnaires, moderateChamp, moderateQuestionnaire,
+    getPendingEvaluations, moderateEvaluation,
     getTeachers, getAllClasses, getClassesWithStats, exportAllStudents,
     deleteTeacher, deleteClasses, getAllResultsRaw
   };

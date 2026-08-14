@@ -7520,7 +7520,13 @@
       });
 
       const choices2El = document.getElementById("ce-choices2");
-      shuffle(q.classifyChoices).forEach(c => {
+      /* q.fixedChoiceOrder : même mécanisme que renderChoixEtiquette
+         (exercise.html) — conserve l'ordre déclaré de q.classifyChoices au
+         lieu du mélange par défaut, pour les compétences où la position des
+         boutons doit rester stable d'un item à l'autre. Sans ce champ,
+         comportement inchangé pour tous les classification-etapes existants. */
+      const orderedChoices2 = q.fixedChoiceOrder ? q.classifyChoices : shuffle(q.classifyChoices);
+      orderedChoices2.forEach(c => {
         const btn = document.createElement("button");
         btn.className   = "ex-choice";
         btn.textContent = c;
