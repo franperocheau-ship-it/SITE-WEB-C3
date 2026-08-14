@@ -151,6 +151,59 @@ const lfmAdmin = (() => {
     return data;
   }
 
+  /* ── Fin d'année scolaire : élèves groupés par enseignant/classe ─────────── */
+  /* hemisphere_sud est lu sur profiles (marque l'enseignant, pas l'élève) —
+     sert côté client à exclure ses élèves des "tout cocher" (classe/global),
+     voir renderEoyTable() dans dashboard-admin.html. Les enseignants sans
+     aucun élève (ni en classe, ni non affecté) sont omis : rien à supprimer
+     pour eux. */
+  async function getEoyOverview() {
+    const [teachersRes, classesRes, studentsRes] = await Promise.all([
+      db.from('profiles').select('id, display_name, hemisphere_sud')
+        .eq('role', 'enseignant').eq('status', 'active').order('display_name'),
+      db.from('classes').select('id, name, level, school_year, teacher_id'),
+      db.from('students').select('id, display_name, teacher_id, class_id')
+    ]);
+    if (teachersRes.error) throw teachersRes.error;
+    if (classesRes.error)  throw classesRes.error;
+    if (studentsRes.error) throw studentsRes.error;
+
+    const classesByTeacher = {};
+    (classesRes.data || []).forEach(c => {
+      (classesByTeacher[c.teacher_id] = classesByTeacher[c.teacher_id] || []).push(c);
+    });
+    const studentsByClass = {};
+    const unassignedByTeacher = {};
+    (studentsRes.data || []).forEach(s => {
+      if (s.class_id) {
+        (studentsByClass[s.class_id] = studentsByClass[s.class_id] || []).push(s);
+      } else {
+        (unassignedByTeacher[s.teacher_id] = unassignedByTeacher[s.teacher_id] || []).push(s);
+      }
+    });
+
+    return (teachersRes.data || [])
+      .map(t => ({
+        ...t,
+        classes: (classesByTeacher[t.id] || []).map(c => ({
+          ...c,
+          students: studentsByClass[c.id] || []
+        })),
+        unassignedStudents: unassignedByTeacher[t.id] || []
+      }))
+      .filter(t => t.classes.some(c => c.students.length > 0) || t.unassignedStudents.length > 0);
+  }
+
+  /* ── Suppression de fin d'année (élèves sélectionnés) ────────────────────── */
+  async function deleteStudentsEoy(studentIds) {
+    const { data, error } = await db.functions.invoke('delete-students-eoy', {
+      body: { student_ids: studentIds }
+    });
+    if (error) throw new Error(error.message || 'Erreur lors de la suppression');
+    if (data && data.error) throw new Error(data.error);
+    return data;
+  }
+
   /* ── Toutes les classes avec enseignant et nb élèves ─────────────────────── */
   async function getAllClasses() {
     const { data, error } = await db
@@ -237,6 +290,7 @@ const lfmAdmin = (() => {
     getPendingChamps, getPendingQuestionnaires, moderateChamp, moderateQuestionnaire,
     getPendingEvaluations, moderateEvaluation,
     getTeachers, getAllClasses, getClassesWithStats, exportAllStudents,
-    deleteTeacher, deleteClasses, getAllResultsRaw
+    deleteTeacher, deleteClasses, getAllResultsRaw,
+    getEoyOverview, deleteStudentsEoy
   };
 })();

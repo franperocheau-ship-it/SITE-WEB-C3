@@ -42,6 +42,20 @@ const DicteeGrammarPrint = (() => {
 
   function capitalizeFr(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
 
+  /* Même découpage que dictees-enseignant.html (tokenizeTrouPhrase, où les
+     trous sont créés) et js/dictees-engine.js (parcours élève) : `position`
+     numérote uniquement les tokens-mots (lettres, \p{L}), jamais la
+     ponctuation — à ne jamais faire diverger entre ces trois copies. */
+  function tokenizeTrouPhrase(phrase) {
+    const tokens = [];
+    const re = /\p{L}+|[^\p{L}]+/gu;
+    let m;
+    while ((m = re.exec(phrase)) !== null) {
+      tokens.push({ text: m[0], isWord: /\p{L}/u.test(m[0][0]) });
+    }
+    return tokens;
+  }
+
   function shuffleForPrint(arr) {
     const a = arr.slice();
     for (let i = a.length - 1; i > 0; i--) {
@@ -65,21 +79,21 @@ const DicteeGrammarPrint = (() => {
   /* ── Texte à trous ── */
   function trouSentenceHtml(trou, showAnswers) {
     const tags = (trou.dictee_trous_mots || []).slice().sort((a, b) => a.position - b.position);
-    const tokens = trou.phrase.trim().split(/\s+/);
-    const html = tokens.map((tok, pos) => {
-      const tag = tags.find(g => g.position === pos);
-      if (!tag) return escapeHtml(tok);
+    const tokens = tokenizeTrouPhrase(trou.phrase);
+    let wordIdx = -1;
+    const html = tokens.map(tok => {
+      if (!tok.isWord) return escapeHtml(tok.text);
+      wordIdx++;
+      const tag = tags.find(g => g.position === wordIdx);
+      if (!tag) return escapeHtml(tok.text);
       if (showAnswers) {
-        const alt = tag.reponses_alt && tag.reponses_alt.length
-          ? ` <span class="dgp-alt-answers">(ou : ${tag.reponses_alt.map(escapeHtml).join(', ')})</span>` : '';
-        return `<span class="dgp-answer-highlight">${escapeHtml(tag.mot_attendu)}</span>${alt}`;
+        return `<span class="dgp-answer-highlight">${escapeHtml(tag.mot_attendu)}</span>`;
       }
       const width = Math.max(38, tag.mot_attendu.length * 7);
       return `<span class="dgp-blank-wrap">
         <span class="dgp-blank-line" style="width:${width}pt"></span>
-        <span class="dgp-regle-badge">${escapeHtml(tag.regle)}</span>
       </span>`;
-    }).join(' ');
+    }).join('');
     return `<div class="dgp-trou-sentence">${html}</div>`;
   }
 

@@ -14,12 +14,12 @@
   <link rel="stylesheet" href="styles.css?v=12">
   <link rel="stylesheet" href="breadcrumb.css?v=1">
   <link rel="stylesheet" href="level-select.css?v=1">
-  <link rel="stylesheet" href="css/dictees.css?v=12">
+  <link rel="stylesheet" href="css/dictees.css?v=21">
   <script src="js/breadcrumb.js?v=3"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/dictees-speech.js?v=4"></script>
+  <script src="js/dictees-speech.js?v=5"></script>
 </head>
 <body>
 
@@ -40,7 +40,7 @@
 
   <!-- MAIN -->
   <div class="page-wrap">
-    <div class="page-content" style="max-width:640px;">
+    <div class="page-content" style="max-width:720px;">
 
       <script>Breadcrumb.render({ category: { href: "français-orthographe.html", label: "Orthographe" }, current: 'Chargement…' });</script>
 
@@ -49,8 +49,8 @@
         <div class="page-title-rule"></div>
       </div>
 
-      <div class="dic-step-banner" id="dic-step-banner"></div>
-      <div style="text-align:center;"><span class="dic-section-label" id="dic-section-label"></span></div>
+      <div class="dic-niveau-indicator" id="dic-niveau-indicator"></div>
+      <div id="dic-step-banner"></div>
 
       <!-- ── État : chargement ── -->
       <div id="dic-state-loading" style="text-align:center;padding:40px 0;color:var(--muted);">
@@ -116,7 +116,7 @@
 </footer>
 
   <script src="js/menu.js"></script>
-  <script src="js/dictees-engine.js?v=16"></script>
+  <script src="js/dictees-engine.js?v=31"></script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */
     footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }

@@ -221,6 +221,55 @@
     .btn-danger:hover:not(:disabled) { background: #b01423; }
     .btn-danger:disabled { opacity: 0.5; cursor: default; }
 
+    /* ── Suppression des données élèves (fin d'année) — zone dangereuse ─────── */
+    .eoy-danger-zone {
+      border: 1.5px solid rgba(214,40,57,0.3);
+      background: rgba(214,40,57,0.02);
+    }
+    .eoy-danger-zone .section-card-header {
+      background: rgba(214,40,57,0.05);
+      border-bottom-color: rgba(214,40,57,0.2);
+    }
+    .eoy-danger-zone .section-card-title { color: var(--red); }
+    .eoy-select-all-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--muted); font-weight: 600; cursor: pointer;
+    }
+    .eoy-select-all-label input { cursor: pointer; accent-color: #d62839; width: 15px; height: 15px; }
+
+    .eoy-teacher-block {
+      padding: 16px 24px; border-bottom: 1px solid var(--border);
+    }
+    .eoy-teacher-block:last-child { border-bottom: none; }
+    .eoy-teacher-header {
+      font-weight: 800; font-size: 14px; color: var(--blue);
+      display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+    }
+    .eoy-badge-hem {
+      background: rgba(29,191,160,0.12); color: #0f8a72;
+      border: 1px solid rgba(29,191,160,0.3);
+    }
+    .eoy-class-block { margin-bottom: 14px; margin-left: 4px; }
+    .eoy-class-block:last-child { margin-bottom: 0; }
+    .eoy-class-check-all {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--text); cursor: pointer;
+      padding: 4px 0; margin-bottom: 4px;
+    }
+    .eoy-class-check-all input { cursor: pointer; accent-color: #d62839; width: 14px; height: 14px; }
+    .eoy-class-meta { color: var(--muted); font-size: 12px; font-weight: 400; }
+    .eoy-student-list {
+      display: flex; flex-wrap: wrap; gap: 6px 18px;
+      padding-left: 22px;
+    }
+    .eoy-student-row {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--text); cursor: pointer;
+      padding: 3px 0;
+    }
+    .eoy-student-row input { cursor: pointer; accent-color: #d62839; width: 14px; height: 14px; }
+    .eoy-mini-hem { font-size: 11px; }
+
     /* Demandes en attente */
     .pending-card {
       background: var(--card-bg); border-radius: var(--radius-card);
@@ -505,6 +554,33 @@
         </div>
       </div>
 
+      <!-- Section : Suppression des données élèves — fin d'année scolaire.
+           Zone dangereuse séparée du reste : suppression à la granularité de
+           l'élève (pas de la classe), groupée par enseignant/classe pour la
+           lisibilité. Les élèves d'un enseignant hémisphère sud
+           (profiles.hemisphere_sud) sont automatiquement exclus des cases
+           "tout sélectionner" (classe ou globale) — sélection manuelle
+           uniquement, avec confirmation supplémentaire (voir
+           handleStudentCheckboxChange ci-dessous). -->
+      <div class="section-card eoy-danger-zone">
+        <div class="section-card-header">
+          <div class="section-card-title">⚠️ Suppression des données élèves — fin d'année</div>
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <label class="eoy-select-all-label">
+              <input type="checkbox" id="eoy-check-all-global">
+              Tout sélectionner
+            </label>
+            <span id="eoy-select-info" style="font-size:12px;color:var(--muted);display:none"></span>
+            <button class="btn-class-del-bulk" id="eoy-bulk-del-btn" style="display:none" disabled>
+              ✕ Supprimer la sélection
+            </button>
+          </div>
+        </div>
+        <div id="eoy-body">
+          <div class="tbl-loading">Chargement…</div>
+        </div>
+      </div>
+
       <!-- Modal : suppression de classe(s) -->
       <div id="class-delete-modal" class="modal-overlay" style="display:none" role="dialog" aria-modal="true">
         <div class="modal-box" style="max-width:500px">
@@ -536,6 +612,25 @@
           <div class="modal-actions">
             <button class="btn btn-ghost btn-sm" id="modal-cancel">Annuler</button>
             <button class="btn-danger" id="modal-confirm">Supprimer définitivement</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal : suppression fin d'année (élèves sélectionnés) -->
+      <div id="eoy-delete-modal" class="modal-overlay" style="display:none" role="dialog" aria-modal="true">
+        <div class="modal-box" style="max-width:500px">
+          <div class="modal-icon">⚠️</div>
+          <div class="modal-title">Supprimer les données sélectionnées</div>
+          <div class="modal-body" id="eoy-modal-body"></div>
+          <div style="margin-bottom:20px">
+            <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:8px">
+              Tapez <strong>SUPPRIMER</strong> pour confirmer :
+            </label>
+            <input type="text" id="eoy-modal-input" class="modal-input" autocomplete="off" spellcheck="false" placeholder="SUPPRIMER" />
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-ghost btn-sm" id="eoy-modal-cancel">Annuler</button>
+            <button class="btn-danger" id="eoy-modal-confirm" disabled>Supprimer définitivement</button>
           </div>
         </div>
       </div>
@@ -1079,6 +1174,234 @@
     });
 
     await loadClassManagement();
+
+    /* ── Suppression des données élèves — fin d'année scolaire ───────────── */
+    let _eoyData      = [];  // aperçu courant (enseignants > classes > élèves)
+    let _eoySelection = [];  // sélection en attente de confirmation dans la modale
+
+    const eoyBody      = document.getElementById('eoy-body');
+    const eoyGlobalAll = document.getElementById('eoy-check-all-global');
+
+    async function loadEoyOverview() {
+      eoyBody.innerHTML = '<div class="tbl-loading">Chargement…</div>';
+      try {
+        _eoyData = await lfmAdmin.getEoyOverview();
+        renderEoyBody();
+      } catch (e) {
+        eoyBody.innerHTML = `<div class="tbl-empty" style="color:var(--red)">Erreur : ${escHtml(e.message)}</div>`;
+      }
+    }
+
+    function renderEoyBody() {
+      if (_eoyData.length === 0) {
+        eoyBody.innerHTML = '<div class="tbl-empty">Aucun élève à supprimer.</div>';
+        updateEoyBulkBar();
+        return;
+      }
+      eoyBody.innerHTML = _eoyData.map(t => {
+        const hemBadge = t.hemisphere_sud
+          ? '<span class="badge eoy-badge-hem">🌏 Hémisphère sud</span>' : '';
+
+        const classesHtml = t.classes.filter(c => c.students.length > 0).map(c => `
+          <div class="eoy-class-block">
+            <label class="eoy-class-check-all">
+              <input type="checkbox" class="eoy-check-all-class" data-class="${c.id}">
+              <strong>${escHtml(c.name)}</strong>
+              <span class="eoy-class-meta">${escHtml(c.level)} · ${escHtml(c.school_year)} · ${c.students.length} élève${c.students.length > 1 ? 's' : ''}</span>
+            </label>
+            <div class="eoy-student-list">
+              ${c.students.map(s => `
+                <label class="eoy-student-row">
+                  <input type="checkbox" class="eoy-check-student"
+                    data-student="${s.id}" data-teacher="${t.id}" data-class="${c.id}"
+                    data-hemisphere="${t.hemisphere_sud ? '1' : '0'}">
+                  ${escHtml(s.display_name)}${t.hemisphere_sud ? ' <span class="eoy-mini-hem" title="Enseignant hémisphère sud">🌏</span>' : ''}
+                </label>
+              `).join('')}
+            </div>
+          </div>
+        `).join('');
+
+        const unassignedHtml = t.unassignedStudents.length > 0 ? `
+          <div class="eoy-class-block">
+            <div class="eoy-class-meta" style="padding:4px 0 6px">Élèves non affectés à une classe</div>
+            <div class="eoy-student-list">
+              ${t.unassignedStudents.map(s => `
+                <label class="eoy-student-row">
+                  <input type="checkbox" class="eoy-check-student"
+                    data-student="${s.id}" data-teacher="${t.id}" data-class=""
+                    data-hemisphere="${t.hemisphere_sud ? '1' : '0'}">
+                  ${escHtml(s.display_name)}${t.hemisphere_sud ? ' <span class="eoy-mini-hem" title="Enseignant hémisphère sud">🌏</span>' : ''}
+                </label>
+              `).join('')}
+            </div>
+          </div>` : '';
+
+        return `<div class="eoy-teacher-block">
+          <div class="eoy-teacher-header">${escHtml(t.display_name)} ${hemBadge}</div>
+          ${classesHtml}${unassignedHtml}
+        </div>`;
+      }).join('');
+      updateEoyBulkBar();
+    }
+
+    function syncClassAllCheckboxState(classId) {
+      if (!classId) return;
+      const classAllBox = eoyBody.querySelector(`.eoy-check-all-class[data-class="${classId}"]`);
+      if (!classAllBox) return;
+      const boxes = [...eoyBody.querySelectorAll(`.eoy-check-student[data-class="${classId}"]`)]
+        .filter(cb => cb.dataset.hemisphere !== '1');
+      const checkedCount = boxes.filter(cb => cb.checked).length;
+      classAllBox.checked       = boxes.length > 0 && checkedCount === boxes.length;
+      classAllBox.indeterminate = checkedCount > 0 && checkedCount < boxes.length;
+    }
+
+    function updateEoyBulkBar() {
+      const all     = [...eoyBody.querySelectorAll('.eoy-check-student')];
+      const checked = all.filter(cb => cb.checked);
+      const info    = document.getElementById('eoy-select-info');
+      const btn     = document.getElementById('eoy-bulk-del-btn');
+      if (checked.length === 0) {
+        info.style.display = 'none';
+        btn.style.display  = 'none';
+      } else {
+        info.textContent   = `${checked.length} élève${checked.length > 1 ? 's' : ''} sélectionné${checked.length > 1 ? 's' : ''}`;
+        info.style.display = '';
+        btn.textContent    = `✕ Supprimer la sélection (${checked.length})`;
+        btn.style.display  = '';
+        btn.disabled       = false;
+      }
+      // "Tout sélectionner" global ne porte que sur les élèves non exclus
+      // (hémisphère sud) — coché seulement si tous ceux-là sont sélectionnés.
+      const selectable = all.filter(cb => cb.dataset.hemisphere !== '1');
+      const eligible   = selectable.filter(cb => cb.checked);
+      eoyGlobalAll.checked       = selectable.length > 0 && eligible.length === selectable.length;
+      eoyGlobalAll.indeterminate = checked.length > 0 && !eoyGlobalAll.checked;
+    }
+
+    function handleStudentCheckboxChange(cb) {
+      if (cb.checked && cb.dataset.hemisphere === '1') {
+        const ok = confirm('Cet élève appartient à un enseignant de l\'hémisphère sud, êtes-vous sûr ?');
+        if (!ok) { cb.checked = false; }
+      }
+      if (cb.dataset.class) syncClassAllCheckboxState(cb.dataset.class);
+      updateEoyBulkBar();
+    }
+
+    eoyBody.addEventListener('change', e => {
+      if (e.target.classList.contains('eoy-check-student')) {
+        handleStudentCheckboxChange(e.target);
+      } else if (e.target.classList.contains('eoy-check-all-class')) {
+        const classId = e.target.dataset.class;
+        const checked  = e.target.checked;
+        eoyBody.querySelectorAll(`.eoy-check-student[data-class="${classId}"]`).forEach(cb => {
+          cb.checked = checked && cb.dataset.hemisphere !== '1'; // 🌏 jamais via "tout cocher"
+        });
+        syncClassAllCheckboxState(classId);
+        updateEoyBulkBar();
+      }
+    });
+
+    eoyGlobalAll.addEventListener('change', () => {
+      const checked = eoyGlobalAll.checked;
+      eoyBody.querySelectorAll('.eoy-check-student').forEach(cb => {
+        cb.checked = checked && cb.dataset.hemisphere !== '1';
+      });
+      eoyBody.querySelectorAll('.eoy-check-all-class').forEach(box => syncClassAllCheckboxState(box.dataset.class));
+      updateEoyBulkBar();
+    });
+
+    document.getElementById('eoy-bulk-del-btn').addEventListener('click', () => {
+      const checked = [...eoyBody.querySelectorAll('.eoy-check-student:checked')];
+      if (!checked.length) return;
+      openEoyDeleteModal(checked.map(cb => ({
+        id:         cb.dataset.student,
+        teacher_id: cb.dataset.teacher,
+        class_id:   cb.dataset.class || null,
+        hemisphere: cb.dataset.hemisphere === '1'
+      })));
+    });
+
+    function openEoyDeleteModal(selected) {
+      _eoySelection = selected;
+      const totalStudents = selected.length;
+      const hemCount       = selected.filter(s => s.hemisphere).length;
+
+      // Classes qui seront entièrement vidées par la sélection (donc supprimées).
+      const classTotals = {};
+      _eoyData.forEach(t => t.classes.forEach(c => { classTotals[c.id] = c.students.length; }));
+      const selectedByClass = {};
+      selected.forEach(s => {
+        if (s.class_id) selectedByClass[s.class_id] = (selectedByClass[s.class_id] || 0) + 1;
+      });
+      const emptiedCount = Object.keys(selectedByClass)
+        .filter(cid => selectedByClass[cid] === classTotals[cid]).length;
+
+      document.getElementById('eoy-modal-body').innerHTML = `
+        Vous allez supprimer définitivement <strong>${totalStudents}</strong> élève${totalStudents > 1 ? 's' : ''}
+        (compte, résultats, progression).
+        ${emptiedCount > 0 ? `Cela videra complètement <strong>${emptiedCount}</strong> classe${emptiedCount > 1 ? 's' : ''},
+        qui ${emptiedCount > 1 ? 'seront' : 'sera'} aussi supprimée${emptiedCount > 1 ? 's' : ''}.` : ''}
+        ${hemCount > 0 ? `<br><br><strong style="color:#d9770f">${hemCount} élève${hemCount > 1 ? 's' : ''} signalé${hemCount > 1 ? 's' : ''} 🌏 hémisphère sud</strong>
+        ${hemCount > 1 ? 'sont inclus' : 'est inclus'} dans cette sélection.` : ''}
+        <br><br>Cette action est <strong>irréversible</strong>. Les contenus pédagogiques (joggings, dictées,
+        questionnaires, corpus lexical, évaluations) ne sont pas concernés.
+      `;
+      const input = document.getElementById('eoy-modal-input');
+      input.value     = '';
+      input.className = 'modal-input';
+      document.getElementById('eoy-modal-confirm').disabled    = true;
+      document.getElementById('eoy-modal-confirm').textContent = 'Supprimer définitivement';
+      document.getElementById('eoy-delete-modal').style.display = 'flex';
+      setTimeout(() => input.focus(), 50);
+    }
+
+    document.getElementById('eoy-modal-input').addEventListener('input', e => {
+      const ok = e.target.value === 'SUPPRIMER';
+      document.getElementById('eoy-modal-confirm').disabled = !ok;
+      e.target.classList.toggle('is-valid', ok);
+    });
+
+    document.getElementById('eoy-modal-cancel').addEventListener('click', () => {
+      document.getElementById('eoy-delete-modal').style.display = 'none';
+      _eoySelection = [];
+    });
+
+    document.getElementById('eoy-modal-confirm').addEventListener('click', async () => {
+      if (!_eoySelection.length) return;
+      const btn = document.getElementById('eoy-modal-confirm');
+      btn.disabled    = true;
+      btn.textContent = 'Suppression…';
+      try {
+        const result = await lfmAdmin.deleteStudentsEoy(_eoySelection.map(s => s.id));
+        document.getElementById('eoy-delete-modal').style.display = 'none';
+        _eoySelection = [];
+
+        const { deleted_student_count = 0, deleted_classes = [], errors = [] } = result || {};
+        if (errors.length === 0) {
+          showToast(
+            `${deleted_student_count} élève${deleted_student_count > 1 ? 's' : ''} supprimé${deleted_student_count > 1 ? 's' : ''}` +
+            (deleted_classes.length ? ` — ${deleted_classes.length} classe${deleted_classes.length > 1 ? 's' : ''} supprimée${deleted_classes.length > 1 ? 's' : ''}` : '')
+          );
+        } else {
+          showToast(`Suppression partielle — ${errors.length} erreur(s). ` + errors.map(e => e.error).join(' ; '), 'error');
+        }
+
+        await loadEoyOverview();
+        try {
+          const stats = await lfmAdmin.getGlobalStats();
+          document.getElementById('stat-classes').textContent  = stats.classes;
+          document.getElementById('stat-students').textContent = stats.students;
+          document.getElementById('stat-results').textContent  = stats.results;
+        } catch (_) {}
+      } catch (e) {
+        showToast('Erreur : ' + e.message, 'error');
+        btn.disabled    = false;
+        btn.textContent = 'Supprimer définitivement';
+      }
+    });
+
+    await loadEoyOverview();
 
     /* ── Signalements & propositions (feedback) ──────────────────────────── */
     async function loadFeedbackAdmin() {

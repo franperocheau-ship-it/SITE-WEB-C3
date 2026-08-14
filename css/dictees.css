@@ -1,8 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════════════
    css/dictees.css — Module Orthographe : Dictées préparées.
-   Chargé uniquement sur les pages du module — français-orthographe.html,
+   Chargé uniquement sur les pages du module — dictees-catalogue.html,
    dictee.html, dictees-enseignant.html, et dashboard-eleve.html (carnet de
-   badges partagé) — jamais sur le reste du site.
+   badges partagé) — jamais sur le reste du site. La vignette d'entrée sur
+   français-orthographe.html est un bandeau statique indépendant
+   (.dic-entry-banner, CSS scopée dans cette page).
 
    Comme pour css/jogging.css (voir son en-tête), les valeurs visuelles de
    carte sont recopiées de .skill-card/.jog-card plutôt que centralisées
@@ -156,50 +158,197 @@
 .dic-ordre-choice-btn[data-ordre="grammatical"]:hover,
 .dic-ordre-choice-btn[data-ordre="grammatical"]:focus-visible { border-color: #F5A623; }
 
-/* ─── Écran de dictée (dictee.html) — bandeau d'étape et consigne ──────── */
-.dic-intro-consigne {
-  background: var(--card-bg);
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
-  padding: 18px 20px;
+/* Badge de niveau — pastille pleine + texte foncé, toujours lisible quelle
+   que soit la couleur de niveau (contrairement à .ls-pastille, texte blanc
+   sans repli si --ls-color ne résout pas — cause du bug "n°NaN en blanc sur
+   blanc" signalé par l'élève). Classe dédiée au module Dictées plutôt qu'une
+   modification de .ls-pastille (level-select.css), réutilisée telle quelle
+   par d'autres pages (algèbre, dictees-enseignant) qu'on ne veut pas
+   affecter. Couleur reprise de --ls-color-N (level-select.css, mêmes
+   valeurs que --color-niveau-cm1/cm2/6e). Réservée à l'écran de choix
+   (boutons réellement cliquables, dic-niveau-choice-btn) — pour le rappel de
+   niveau affiché pendant l'exercice, voir .dic-niveau-indicator ci-dessous,
+   volontairement sans forme de bouton. */
+.dic-niveau-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-display);
+  font-weight: 800;
   font-size: 15px;
-  line-height: 1.6;
-  color: var(--text);
-  margin-bottom: 18px;
-  text-align: center;
+  padding: 7px 18px;
+  border-radius: 20px;
+  white-space: nowrap;
+  background: var(--ls-color, var(--blue));
+  color: var(--text, #1E2532);
 }
 
-.dic-step-banner {
+/* Rappel de niveau pendant l'exercice — élément séparé de .dic-tab-bar (voir
+   renderStepBanner, js/dictees-engine.js) : ni bordure ni fond plein comme
+   les onglets, juste un texte discret + une pastille de couleur, pour ne
+   plus être confondu avec une 4e option cliquable (retour utilisateur). */
+.dic-niveau-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 10px;
+}
+.dic-niveau-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ls-color, var(--blue));
+  flex-shrink: 0;
+}
+.dic-niveau-indicator:empty { display: none; }
+
+/* ─── Écran de dictée (dictee.html) — bandeau d'étape et consigne ──────── */
+/* Fond légèrement teinté + icône (::before) + texte plus grand/gras/foncé —
+   remplace l'ancien style gris clair 15px trop peu contrasté (retour
+   utilisateur, valable pour toutes les consignes du module puisqu'un seul
+   élément #dic-intro-consigne est réutilisé par tous les paliers, voir
+   js/dictees-engine.js). `:empty` masque le cadre (icône comprise) pour les
+   quelques écrans qui vident volontairement la consigne (ex.
+   renderRedoOrSkipChoice). */
+.dic-intro-consigne {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(16,43,106,0.06);
+  border: 1.5px solid rgba(16,43,106,0.14);
+  border-radius: 14px;
+  padding: 16px 22px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.55;
+  color: var(--text);
+  margin-bottom: 18px;
+  text-align: left;
+}
+.dic-intro-consigne::before {
+  content: "💡";
+  font-size: 26px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.dic-intro-consigne:empty { display: none; }
+
+/* Bandeau d'étape — UN SEUL groupe affiché à la fois (lexical OU
+   grammatical, voir renderStepBanner dans js/dictees-engine.js) : les 2
+   groupes empilés en permanence faisaient trop d'éléments à scanner d'un
+   coup (retour utilisateur). Le switcher ci-dessous (.dic-section-switcher)
+   permet de prévisualiser l'autre section sans lancer d'exercice ; s'il n'y
+   a qu'un seul volet actif pour la dictée, pas de switcher, juste
+   l'étiquette .dic-section-label comme avant. */
+.dic-tab-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+/* Switcher de section — délibérément plus discret que .dic-tab (retour
+   utilisateur) : "segmented control" gris, le segment actif se détache en
+   blanc avec la couleur de sa catégorie (bleu lexical / ambre grammatical,
+   même code couleur que .dic-section-label ci-dessous et .dic-tab--gram).
+   Change uniquement previewSection et redessine le bandeau — ne touche
+   jamais l'exercice en cours. */
+.dic-section-switcher {
+  display: inline-flex;
+  background: var(--border);
+  border-radius: 100px;
+  padding: 3px;
+  gap: 3px;
+  margin-bottom: 14px;
+}
+.dic-section-switch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 16px;
+  border: none;
+  border-radius: 100px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 150ms, color 150ms;
+}
+.dic-section-switch-btn--active.dic-section-switch-btn--lexical { background: var(--card-bg); color: var(--blue); box-shadow: var(--shadow-sm); }
+.dic-section-switch-btn--active.dic-section-switch-btn--gram { background: var(--card-bg); color: #7A4D0A; box-shadow: var(--shadow-sm); }
+
+@media (max-width: 480px) {
+  .dic-section-switch-btn { padding: 6px 12px; font-size: 11.5px; }
+}
+
+.dic-tab-bar {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 18px;
 }
-.dic-step {
-  padding: 6px 16px;
+/* .dic-tab est un vrai <button> (navigation libre entre paliers, voir
+   renderStepBanner dans js/dictees-engine.js) — reset des styles par défaut
+   du navigateur (font, curseur) en plus des styles visuels. Couleur portée
+   par --dic-tab-color (posée en inline-style, reprend les variables
+   --color-niveau-cm1/cm2/6e déjà utilisées ailleurs sur le site plutôt que
+   d'introduire une nouvelle couleur) : à l'état actif, fond plein + texte
+   clair (repère fort pour un élève dys) ; à l'état fait, contour coloré.
+   Paliers grammaticaux : toujours ambre (dic-tab--gram), même code couleur
+   que .dic-section-label--gram. */
+.dic-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 18px;
   border-radius: 100px;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 12px;
+  font-size: 14px;
   border: 2px solid var(--border);
   color: var(--muted);
   background: var(--card-bg);
   white-space: nowrap;
   flex-shrink: 0;
+  cursor: pointer;
+  transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
-.dic-step--active { border-color: var(--blue); color: var(--blue); }
-.dic-step--done { background: var(--blue); border-color: var(--blue); color: #fff; }
-/* Paliers grammaticaux (2/3/4) : ambre plutôt que bleu — même code couleur
-   que .dic-section-label--gram et le formulaire enseignant
-   (dictees-enseignant.html, .dic-gram-section), pour que l'élève identifie
-   tout de suite le changement de bloc de travail. */
-.dic-step--gram.dic-step--active { border-color: #F5A623; color: #7A4D0A; }
-.dic-step--gram.dic-step--done { background: #F5A623; border-color: #F5A623; color: #fff; }
+.dic-tab:hover { transform: translateY(-2px); }
+.dic-tab:focus-visible { outline: 2px solid var(--dic-tab-color, var(--blue)); outline-offset: 2px; }
+.dic-tab-icon { font-size: 17px; line-height: 1; }
+.dic-tab--done { border-color: var(--dic-tab-color, var(--blue)); color: var(--dic-tab-color, var(--blue)); }
+.dic-tab--active { background: var(--dic-tab-color, var(--blue)); border-color: var(--dic-tab-color, var(--blue)); color: #fff; }
+.dic-tab--gram.dic-tab--done { border-color: #F5A623; color: #7A4D0A; }
+.dic-tab--gram.dic-tab--active { background: #F5A623; border-color: #F5A623; color: #fff; }
 
-/* Bandeau "Orthographe lexicale" / "Orthographe grammaticale" au-dessus de
-   chaque exercice — sépare visuellement les deux blocs pour l'élève. */
+/* Chaque groupe ne montre que ses 3 tuiles (labels longs : "Effacement
+   progressif"…) qui dépassent la largeur utile de .page-content une fois
+   ses marges latérales retirées (720px de colonne − 2×64px de padding
+   desktop, styles.css) — le bandeau récupère donc ce padding en pleine
+   largeur desktop (>768px, seuil où styles.css réduit le padding de
+   .page-content à 24px, cf. media query juste après) pour que les 3 tuiles
+   de chaque groupe tiennent sur une seule ligne. */
+@media (min-width: 769px) {
+  .dic-tab-bar { margin-left: -64px; margin-right: -64px; }
+}
+
+@media (max-width: 480px) {
+  .dic-tab { padding: 10px 16px; font-size: 13px; }
+}
+
+/* Étiquette "Orthographe lexicale" / "Orthographe grammaticale" — en-tête du
+   groupe d'onglets affiché quand la dictée n'a qu'un seul volet actif (pas
+   de switcher dans ce cas, voir renderStepBanner). Mêmes couleurs que
+   .dic-section-switch-btn--active ci-dessus. */
 .dic-section-label {
   display: inline-flex;
   align-items: center;
@@ -210,7 +359,7 @@
   letter-spacing: .04em;
   padding: 6px 16px;
   border-radius: 100px;
-  margin-bottom: 18px;
+  margin-bottom: 10px;
 }
 .dic-section-label--lexical { background: rgba(16,43,106,0.08); color: var(--blue); }
 .dic-section-label--gram { background: rgba(245,166,35,0.16); color: #7A4D0A; }
@@ -226,10 +375,33 @@
 /* ─── Item de dictée : capsule sonore + saisie (adapté de l'exercice
    "mots invariables" d'exercise.html, mécanique de dictée déjà éprouvée) ── */
 .dic-counters { text-align: center; margin-bottom: 20px; }
-.dic-word-count {
+
+/* Barre de progression — remplace l'ancien texte brut "Il reste X mots…"
+   (tous les paliers scorés, voir progressBarHTML() dans js/dictees-engine.js
+   qui génère ce bloc). Valeurs reprises visuellement de .ex-bar-fill
+   (styles.css) plutôt qu'importées, même convention que le reste de ce
+   fichier (voir en-tête). */
+.dic-progress { max-width: 520px; margin: 0 auto 14px; }
+.dic-progress-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 14px;
   font-weight: 700;
-  color: #3F4552;
+  color: var(--blue);
+  margin-bottom: 8px;
+}
+.dic-progress-track {
+  height: 10px;
+  background: var(--border);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.dic-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-niveau-cm1), var(--color-niveau-cm2));
+  border-radius: 100px;
+  transition: width 400ms ease;
 }
 
 .dic-listen-row {
@@ -255,17 +427,18 @@
 .dic-input-row {
   display: flex;
   gap: 10px;
-  max-width: 460px;
+  max-width: 520px;
   margin: 0 auto 18px;
 }
 .dic-input {
   flex: 1;
+  min-height: 56px;
   text-align: center;
   border: 2px solid var(--border);
-  border-radius: 14px;
-  padding: 16px 18px;
+  border-radius: 18px;
+  padding: 14px 20px;
   font-family: inherit;
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 700;
   color: var(--text);
   background: var(--card-bg);
@@ -278,13 +451,14 @@
 .dic-input:disabled   { cursor: default; }
 
 .dic-validate-btn {
+  min-height: 56px;
   background: var(--blue);
   color: #fff;
   border: none;
-  border-radius: 12px;
-  padding: 0 20px;
+  border-radius: 18px;
+  padding: 0 28px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
   transition: background 200ms;
@@ -293,13 +467,13 @@
 .dic-validate-btn:disabled { opacity: 0.5; cursor: default; }
 
 .dic-feedback-area {
-  max-width: 460px;
+  max-width: 520px;
   margin: 0 auto 8px;
   text-align: center;
   min-height: 26px;
 }
-.dic-feedback-correct { font-size: 17px; font-weight: 800; color: #16a34a; }
-.dic-feedback-wrong { font-size: 15px; font-weight: 600; color: var(--red); line-height: 1.5; }
+.dic-feedback-correct { font-size: 18px; font-weight: 800; color: #16a34a; }
+.dic-feedback-wrong { font-size: 16px; font-weight: 600; color: var(--red); line-height: 1.5; }
 .dic-feedback-wrong .dic-correct-word { font-size: 19px; font-weight: 800; }
 .dic-diff-char { background: rgba(214,40,57,0.16); border-radius: 3px; padding: 0 1px; }
 
@@ -318,12 +492,12 @@
   max-width: 90%;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 34px;
+  font-size: 38px;
   line-height: 1.3;
   color: var(--text);
   text-align: center;
   word-break: break-word;
-  padding: 20px 28px;
+  padding: 26px 36px;
   background: var(--card-bg);
   border: 2px solid var(--border);
   border-radius: 16px;
@@ -358,13 +532,13 @@
   text-align: center;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 16px;
+  font-size: 19px;
   color: var(--blue);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 .dic-final-detail {
   text-align: center;
-  font-size: 15px;
+  font-size: 16px;
   color: #3F4552;
   margin-bottom: 22px;
 }
@@ -385,8 +559,8 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
-  max-width: 560px;
+  gap: 10px;
+  max-width: 620px;
   margin: 0 auto 16px;
 }
 .dic-classify-word {
@@ -411,8 +585,8 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
-  max-width: 560px;
+  gap: 10px;
+  max-width: 620px;
   margin: 0 auto 16px;
 }
 .dic-classify-choice {
@@ -444,25 +618,25 @@
 .dic-classify-col-empty { font-size: 12px; color: var(--muted); }
 
 .dic-trou-hint { text-align: center; font-size: 14.5px; line-height: 1.5; color: #3F4552; margin: 0 0 18px; }
+.dic-trou-missed-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 4px 0; }
 
-/* Palier 3 — texte à trous taggé : phrase en flux avec des inputs inline aux
-   positions masquées. Le tag de règle n'est jamais affiché à l'écran (reste
-   en base pour l'enseignant, voir dictee-grammar-print.css pour son seul
-   affichage restant, sur le PDF). Présentation en carte aérée, fort
-   contraste et interlignage/espacement généreux — pensée pour un élève
-   dyslexique (retour utilisateur) ; pas de police "dys" dédiée introduite,
-   aucune n'est utilisée ailleurs sur le site (vérifié). */
+/* Palier 3 — texte à trous : phrase en flux avec des inputs inline aux
+   positions masquées, un bouton haut-parleur par trou comme seul support
+   (aucun indice de règle). Présentation en carte aérée, fort contraste et
+   interlignage/espacement généreux — pensée pour un élève dyslexique
+   (retour utilisateur) ; pas de police "dys" dédiée introduite, aucune n'est
+   utilisée ailleurs sur le site (vérifié). */
 .dic-trou-card {
-  max-width: 640px;
+  max-width: 680px;
   margin: 0 auto 20px;
-  padding: 30px 26px;
+  padding: 34px 32px;
   background: var(--card-bg);
   border: 1.5px solid var(--border);
   border-radius: 16px;
   box-shadow: var(--shadow-sm);
 }
 .dic-trou-sentence {
-  font-size: 21px;
+  font-size: 22px;
   font-weight: 600;
   line-height: 2.9;
   letter-spacing: 0.01em;
@@ -481,11 +655,11 @@
   vertical-align: middle;
   text-align: center;
   border: 2.5px solid var(--blue);
-  border-radius: 10px;
-  padding: 7px 10px;
-  min-height: 40px;
+  border-radius: 12px;
+  padding: 9px 12px;
+  min-height: 46px;
   font-family: inherit;
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
   color: var(--text);
   background: #fff;
@@ -522,11 +696,13 @@
    cette phrase au pluriel.") mise en évidence — remplace l'ancien
    .dic-trou-hint (13px, gris sur clair) trop peu contrasté/trop petit,
    notamment pour un·e élève dys. Couleur ambre : même famille que le reste
-   du volet grammatical (voir .dic-step--gram plus bas). */
+   du volet grammatical (voir .dic-tab--gram plus haut). Affichée AVANT la
+   phrase à transformer (voir renderTransformation, js/dictees-engine.js) :
+   l'élève doit savoir ce qu'on lui demande avant de lire la phrase. */
 .dic-transfo-consigne {
-  max-width: 480px;
+  max-width: 560px;
   margin: 0 auto 18px;
-  padding: 12px 22px;
+  padding: 14px 26px;
   text-align: center;
   font-size: 18px;
   font-weight: 800;
@@ -536,11 +712,11 @@
   border: 1.5px solid rgba(245,166,35,0.4);
   border-radius: 12px;
 }
-.dic-transfo-input-row { max-width: 640px; }
-.dic-transfo-input { font-size: 16px; }
+.dic-transfo-input-row { max-width: 680px; }
+.dic-transfo-input { font-size: 17px; }
 
 @media (max-width: 480px) {
-  .dic-input { font-size: 17px; }
+  .dic-input { font-size: 18px; min-height: 52px; }
   .dic-trou-card { padding: 22px 16px; }
   .dic-trou-sentence { font-size: 18px; }
 }

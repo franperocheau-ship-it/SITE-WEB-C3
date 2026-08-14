@@ -85,6 +85,65 @@
       color: var(--muted);
     }
 
+    /* ── Bandeau fin d'année scolaire ────────────────────────────────────────── */
+    .eoy-banner {
+      background: #fff4e5;
+      border: 1.5px solid #f5a623;
+      border-left: 5px solid #d9770f;
+      border-radius: var(--radius-card);
+      padding: 18px 24px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .eoy-banner-text {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #7a4a00;
+      font-weight: 600;
+    }
+    .eoy-hemisphere-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding-top: 12px;
+      border-top: 1px solid rgba(217,119,15,0.25);
+    }
+    .eoy-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1.5px solid rgba(217,119,15,0.4);
+      border-radius: 100px;
+      padding: 8px 18px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: #7a4a00;
+      cursor: pointer;
+      transition: background 180ms, border-color 180ms, color 180ms;
+    }
+    .eoy-toggle-btn:hover:not(:disabled) { border-color: #d9770f; }
+    .eoy-toggle-btn:disabled { opacity: 0.6; cursor: default; }
+    .eoy-toggle-btn.is-active {
+      background: #d9770f;
+      border-color: #d9770f;
+      color: #fff;
+    }
+    .eoy-toggle-hint {
+      font-size: 12.5px;
+      color: #7a4a00;
+      opacity: 0.85;
+      max-width: 460px;
+      line-height: 1.5;
+    }
+    @media (max-width: 480px) {
+      .eoy-banner { padding: 16px; }
+    }
+
     /* ── Stats ───────────────────────────────────────────────────────────────── */
     .stats-row {
       display: grid;
@@ -284,6 +343,24 @@
         </div>
       </div>
 
+      <!-- Bandeau fin d'année scolaire -->
+      <div class="eoy-banner">
+        <div class="eoy-banner-text">
+          ⚠️ Fin d'année scolaire : toutes les données de vos élèves (comptes, classes, résultats, progression)
+          seront définitivement supprimées. Seuls vos joggings d'écriture, dictées préparées, questionnaires de
+          lecture, corpus lexical et évaluations créés seront conservés et réutilisables l'année prochaine.
+        </div>
+        <div class="eoy-hemisphere-row">
+          <button class="eoy-toggle-btn" id="eoy-hemisphere-btn" type="button" aria-pressed="false">
+            🌏 Je travaille dans l'hémisphère sud
+          </button>
+          <span class="eoy-toggle-hint" id="eoy-hemisphere-hint">
+            Vos données élèves ne seront pas supprimées avec les autres — l'administrateur vous contactera pour
+            choisir une autre date.
+          </span>
+        </div>
+      </div>
+
       <!-- Stats -->
       <div class="stats-row">
         <div class="stat-card">
@@ -420,6 +497,33 @@
       document.title = 'Espace enseignant — ' + profile.display_name + ' — LFM';
 
       document.getElementById('dash-logout-btn').addEventListener('click', () => lfmAuth.signOut());
+
+      /* Toggle hémisphère sud (fin d'année scolaire) */
+      const hemBtn  = document.getElementById('eoy-hemisphere-btn');
+      const hemHint = document.getElementById('eoy-hemisphere-hint');
+      const ON_HINT  = "Vos données élèves ne seront pas supprimées avec les autres — l'administrateur vous contactera pour choisir une autre date.";
+      const OFF_HINT = "Activez cette option si votre année scolaire ne suit pas le calendrier standard (rentrée en fin d'année civile).";
+
+      function renderHemisphereState(active) {
+        hemBtn.classList.toggle('is-active', active);
+        hemBtn.setAttribute('aria-pressed', String(active));
+        hemBtn.textContent = active ? '🌏 Hémisphère sud activé' : '🌏 Je travaille dans l\'hémisphère sud';
+        hemHint.textContent = active ? ON_HINT : OFF_HINT;
+      }
+      renderHemisphereState(!!profile.hemisphere_sud);
+
+      hemBtn.addEventListener('click', async () => {
+        const next = !hemBtn.classList.contains('is-active');
+        hemBtn.disabled = true;
+        try {
+          await lfmAuth.setHemisphereSud(next);
+          renderHemisphereState(next);
+        } catch (e) {
+          alert('Erreur : ' + e.message);
+        } finally {
+          hemBtn.disabled = false;
+        }
+      });
 
       /* Chargement des stats */
       try {

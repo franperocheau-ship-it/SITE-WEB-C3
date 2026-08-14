@@ -138,6 +138,20 @@ const lfmAuth = (() => {
     return profile;
   }
 
+  /* Hémisphère sud (fin d'année scolaire) — marque le profil enseignant
+     connecté pour l'exclure des suppressions automatiques "tout cocher" côté
+     admin (voir dashboard-admin.html, section Suppression des données
+     élèves). ────────────────────────────────────────────────────────────── */
+  async function setHemisphereSud(value) {
+    const session = await getSession();
+    if (!session) throw new Error('Non connecté');
+    const { error } = await db
+      .from('profiles')
+      .update({ hemisphere_sud: value })
+      .eq('id', session.user.id);
+    if (error) throw error;
+  }
+
   /* Envoie un e-mail de réinitialisation de mot de passe ──────────────────── */
   async function resetPassword(email, redirectTo) {
     const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo });
@@ -150,5 +164,5 @@ const lfmAuth = (() => {
     if (error) throw error;
   }
 
-  return { signIn, signUp, signOut, getSession, getProfile, getMyStudentRecord, redirectToDashboard, requireRole, requireAnyRole, resetPassword, updatePassword };
+  return { signIn, signUp, signOut, getSession, getProfile, getMyStudentRecord, redirectToDashboard, requireRole, requireAnyRole, setHemisphereSud, resetPassword, updatePassword };
 })();

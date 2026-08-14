@@ -58,7 +58,10 @@ const lfmDicteesTeacher = (() => {
    * `mots` : [{ contenu, niveau, nature_grammaticale }] — l'ordre est déduit
    * de la position dans le tableau (correspond à l'ordre de saisie dans la
    * zone de texte). `trous`/`transformations`/`extraMots` : voir §2/§1 des
-   * fonctions replaceX ci-dessous.
+   * fonctions replaceX ci-dessous. `inclutLexicale`/`inclutGrammaticale` :
+   * volets proposés à l'élève pour cette dictée (colonnes `dictees.inclut_lexicale`/
+   * `inclut_grammaticale`, défaut true en base — validé côté formulaire
+   * pour qu'au moins l'un des deux reste actif).
    *
    * Ne touche plus `points_grammaticaux` (champ retiré de l'interface —
    * présentation jugée trop dense pour son utilité, retour utilisateur) :
@@ -66,11 +69,13 @@ const lfmDicteesTeacher = (() => {
    * sont conservées telles quelles, mais plus jamais lues/écrites/affichées
    * par le client (voir aussi dictees-catalogue.html, épuré de même).
    */
-  async function createDictee(classId, teacherId, titre, mots, trous, transformations, extraMots) {
+  async function createDictee(classId, teacherId, titre, mots, trous, transformations, extraMots, inclutLexicale, inclutGrammaticale) {
     const { data: dictee, error } = await db.from('dictees').insert({
       class_id: classId,
       teacher_id: teacherId,
-      titre: titre.trim()
+      titre: titre.trim(),
+      inclut_lexicale: inclutLexicale,
+      inclut_grammaticale: inclutGrammaticale
     }).select().single();
     if (error) throw error;
 
@@ -83,9 +88,11 @@ const lfmDicteesTeacher = (() => {
     return dictee;
   }
 
-  async function updateDictee(dicteeId, titre, mots, trous, transformations, extraMots) {
+  async function updateDictee(dicteeId, titre, mots, trous, transformations, extraMots, inclutLexicale, inclutGrammaticale) {
     const { error } = await db.from('dictees').update({
       titre: titre.trim(),
+      inclut_lexicale: inclutLexicale,
+      inclut_grammaticale: inclutGrammaticale,
       updated_at: new Date().toISOString()
     }).eq('id', dicteeId);
     if (error) throw error;
@@ -119,11 +126,13 @@ const lfmDicteesTeacher = (() => {
     if (insErr) throw insErr;
   }
 
-  /* Texte à trous taggé (§1) : une phrase par item, `tags` = mots
-     sélectionnés dans cette phrase, chacun avec sa position (index dans
-     phrase.split(/\s+/)), sa réponse attendue et son tag de règle. Même
-     delete-then-reinsert que replaceMots ; le delete sur dictee_trous
-     cascade sur dictee_trous_mots. */
+  /* Texte à trous (§1) : une phrase par item, `tags` = mots sélectionnés dans
+     cette phrase, chacun avec sa position (index dans phrase.split(/\s+/)) et
+     sa réponse attendue — un seul mot attendu par trou, aucun indice de
+     règle ni réponse alternative (exercice volontairement simplifié, voir
+     js/dictees-engine.js/validateTrou pour la correction tolérante côté
+     élève). Même delete-then-reinsert que replaceMots ; le delete sur
+     dictee_trous cascade sur dictee_trous_mots. */
   async function replaceTrous(dicteeId, trous) {
     const { error: delErr } = await db.from('dictee_trous').delete().eq('dictee_id', dicteeId);
     if (delErr) throw delErr;
@@ -133,6 +142,7 @@ const lfmDicteesTeacher = (() => {
     const trouRows = trous.map((t, i) => ({
       dictee_id: dicteeId,
       phrase: t.phrase.trim(),
+      niveau: t.niveau,
       ordre: i
     }));
     const { data: insertedTrous, error: insErr } = await db.from('dictee_trous').insert(trouRows).select();
@@ -144,9 +154,7 @@ const lfmDicteesTeacher = (() => {
         motRows.push({
           trou_id: row.id,
           mot_attendu: tag.mot_attendu.trim(),
-          position: tag.position,
-          regle: tag.regle.trim(),
-          reponses_alt: tag.reponses_alt || []
+          position: tag.position
         });
       });
     });
@@ -215,6 +223,26 @@ const lfmDicteesTeacher = (() => {
 
   async function deleteDictee(dicteeId) {
     const { error } = await db.from('dictees').delete().eq('id', dicteeId);
+    if (error) throw error;
+  }
+
+  /* Dictées orphelines de classe (class_id NULL) — survivent à une
+     suppression de fin d'année (voir 20260902100000_fin_annee_suppression.sql)
+     tant que la classe qui les portait a été supprimée. RLS scope déjà sur
+     teacher_id = auth.uid(), inutile de le repasser en paramètre. */
+  async function getOrphanDictees() {
+    const { data, error } = await db.from('dictees')
+      .select('id, titre, created_at')
+      .is('class_id', null)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  }
+
+  async function reassignDictee(dicteeId, classId) {
+    const { error } = await db.from('dictees')
+      .update({ class_id: classId })
+      .eq('id', dicteeId);
     if (error) throw error;
   }
 
@@ -306,6 +334,6 @@ const lfmDicteesTeacher = (() => {
 
   return {
     getClassDictees, getDictee, createDictee, updateDictee, deleteDictee,
-    getClassDicteeReport
+    getClassDicteeReport, getOrphanDictees, reassignDictee
   };
 })();

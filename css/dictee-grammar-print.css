@@ -61,13 +61,6 @@
   height: 13pt;
   border-bottom: 1.5pt solid #1A2D6B;
 }
-.dgp-regle-badge {
-  font-size: 7.5pt;
-  font-style: italic;
-  color: #5F6368;
-  white-space: nowrap;
-}
-
 /* ── Transformation de phrase ── */
 .dgp-transfo-block {
   margin-bottom: 16pt;

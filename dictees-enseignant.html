@@ -12,12 +12,12 @@
   <link rel="manifest" href="site.webmanifest?v=1">
   <title>Dictées préparées — Espace enseignant — LFM</title>
   <link rel="stylesheet" href="styles.css?v=12">
-  <link rel="stylesheet" href="css/dictees.css?v=1">
+  <link rel="stylesheet" href="css/dictees.css?v=2">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=2"></script>
-  <script src="js/dictees-teacher.js?v=6"></script>
+  <script src="js/dictees-teacher.js?v=8"></script>
   <style>
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
     .dash-content { max-width: 960px; margin: 0 auto; }
@@ -145,25 +145,29 @@
     .dic-trou-item { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
     .dic-trou-item-top { display: flex; gap: 8px; align-items: flex-start; }
     .dic-trou-item-top .dic-form-input { margin: 0; }
-    .dic-trou-tokens { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    /* Flux inline (pas de flex/gap) : la ponctuation issue de tokenizeTrouPhrase
+       (espaces et signes compris) reste un texte normal entre les mots, elle
+       ne doit jamais hériter de l'espacement réservé aux mots cliquables. */
+    .dic-trou-tokens { margin-top: 10px; line-height: 2.3; }
     .dic-trou-token {
-      border: 1.5px solid var(--border); border-radius: 8px; padding: 4px 10px;
+      display: inline-block; margin: 2px 1px;
+      border: 1.5px solid var(--border); border-radius: 8px; padding: 3px 9px;
       font-family: inherit; font-size: 13px; color: var(--text); background: #fff; cursor: pointer;
       transition: background 150ms, border-color 150ms;
     }
     .dic-trou-token:hover { border-color: var(--blue); }
     .dic-trou-token.is-tagged { background: var(--blue); color: #fff; border-color: var(--blue); }
     .dic-trou-hint { font-size: 13.5px; color: #3F4552; line-height: 1.55; margin-top: 10px; }
-    .dic-trou-tag-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
-    .dic-trou-tag-row .dic-form-input { margin: 0; width: auto; flex: 1; min-width: 140px; }
-    .dic-trou-tag-word { font-size: 12px; font-weight: 700; color: var(--blue); flex-shrink: 0; }
-
     .dic-transfo-row { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
     .dic-transfo-row .dic-form-label { margin-top: 10px; font-size: 12px; }
     .dic-transfo-row .dic-form-label:first-child { margin-top: 0; }
     .dic-transfo-row-top { display: flex; justify-content: flex-end; }
 
     .dic-extra-note { font-size: 13px; color: #3F4552; line-height: 1.5; margin: 8px 0 4px; }
+
+    .dic-volets-row { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 8px; }
+    .dic-volet-checkbox { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; }
+    .dic-volet-checkbox input { width: 17px; height: 17px; cursor: pointer; accent-color: var(--blue); }
   </style>
 </head>
 <body>
@@ -214,6 +218,14 @@
         <a id="dic-results-link" class="dic-btn dic-btn-outline dic-btn-sm" href="resultats-dictees-enseignant.html">📊 Voir les résultats des dictées</a>
       </div>
 
+      <!-- Dictées orphelines (classe supprimée en fin d'année) — visible même
+           si l'enseignant n'a plus aucune classe, voir loadOrphanDictees(). -->
+      <div id="dic-orphans-card" class="dic-form-card" style="display:none; margin-bottom:20px;">
+        <div class="dic-form-title">📦 Dictées à réaffecter</div>
+        <p class="dic-form-hint">Ces dictées appartenaient à une classe supprimée en fin d'année scolaire. Choisis une nouvelle classe pour les réutiliser.</p>
+        <div id="dic-orphans-list"></div>
+      </div>
+
       <div class="dic-filter-field" style="margin-bottom:20px;">
         <label for="dic-class-select">Classe</label>
         <select id="dic-class-select" class="dic-select"></select>
@@ -231,13 +243,19 @@
         <label class="dic-form-label" for="dic-form-titre">Titre</label>
         <input type="text" id="dic-form-titre" class="dic-form-input" placeholder="Ex. La rentrée des classes">
 
+        <label class="dic-form-label">Volets proposés à l'élève</label>
+        <div class="dic-volets-row">
+          <label class="dic-volet-checkbox"><input type="checkbox" id="dic-form-inclut-lexicale" checked> Proposer l'orthographe lexicale</label>
+          <label class="dic-volet-checkbox"><input type="checkbox" id="dic-form-inclut-grammaticale" checked> Proposer l'orthographe grammaticale</label>
+        </div>
+
         <!-- ── Orthographe lexicale ── -->
         <div class="dic-lexical-section">
           <div class="dic-lexical-title">📘 Orthographe lexicale</div>
 
-          <label class="dic-form-label" for="dic-form-mots">Mots ou groupes de mots difficiles</label>
+          <label class="dic-form-label" for="dic-form-mots">Mots ou groupes de mots difficiles séparés par des points-virgules</label>
           <textarea id="dic-form-mots" class="dic-form-textarea"
-            placeholder="Séparés par des points-virgules : un aéroport ; les enfants jouaient ; malheureusement"></textarea>
+            placeholder="Ex. : un aéroport ; les enfants jouaient ; malheureusement"></textarea>
           <p class="dic-form-hint">Un niveau de difficulté (1, 2 ou 3) est assigné à chaque mot ci-dessous, pour différencier selon les besoins des élèves. La dictée elle-même n'affiche aucun badge de niveau. La nature grammaticale (optionnelle) sert à l'exercice de classification ci-dessous.</p>
           <div class="dic-mots-list" id="dic-mots-list"></div>
         </div>
@@ -247,10 +265,10 @@
           <div class="dic-gram-title">✏️ Orthographe grammaticale</div>
           <p class="dic-form-hint">Exercices interactifs à partir des phrases de la dictée, en plus des mots difficiles ci-dessus. Chaque exercice est facultatif : l'élève ne verra que ceux que tu as remplis.</p>
 
-          <!-- Texte à trous taggé -->
+          <!-- Texte à trous -->
           <div class="dic-gram-subsection">
-            <div class="dic-gram-subtitle">Texte à trous taggé</div>
-            <p class="dic-form-hint">Saisis une phrase, puis clique sur le ou les mots à travailler pour leur assigner une règle (affichée comme indice à l'élève).</p>
+            <div class="dic-gram-subtitle">Texte à trous</div>
+            <p class="dic-form-hint">Saisis une phrase, puis clique sur le ou les mots à retirer : l'élève les entendra au haut-parleur et devra les réécrire, sans aucun autre indice. Un niveau de difficulté (1, 2 ou 3) est assigné à chaque phrase, filtré côté élève selon le niveau choisi au démarrage de la dictée — même logique que pour les mots difficiles ci-dessus.</p>
             <div id="dic-trous-list"></div>
             <button type="button" class="dic-btn dic-btn-outline dic-btn-sm" id="dic-add-trou-btn">+ Ajouter une phrase à trous</button>
           </div>
@@ -443,39 +461,65 @@
       });
     }
 
-    /* ── Texte à trous taggé ─────────────────────────────────────────────
-       Clic sur un mot de la phrase = ajoute/retire un tag à cette position.
-       Le mot attendu et la règle restent éditables une fois le tag posé. */
+    /* Découpe une phrase en tokens { text, isWord } : un token "mot" est un
+       groupe de lettres (accents compris via \p{L}) ; tout le reste — espaces,
+       ponctuation, apostrophes (droites ou courbes) — forme des tokens
+       non-mots, jamais cliquables/sélectionnables comme trou, affichés tels
+       quels dans la phrase. Une apostrophe suivie d'un mot (élision, ex.
+       « l'arbre ») isole donc ce mot comme n'importe quel autre signe de
+       ponctuation (conséquence assumée : un mot à apostrophe interne non
+       élisive comme « aujourd'hui » se retrouve coupé en deux tokens-mots
+       séparés par l'apostrophe, cf. retour utilisateur — pas de liste
+       d'exceptions lexicales, hors périmètre). `position` (sauvegardée dans
+       dictee_trous_mots.position) numérote uniquement les tokens-mots, dans
+       l'ordre de la phrase — MÊME découpage réutilisé côté élève
+       (js/dictees-engine.js) et impression (js/dictee-grammar-print.js) : ne
+       jamais faire diverger ces trois copies. */
+    function tokenizeTrouPhrase(phrase) {
+      const tokens = [];
+      const re = /\p{L}+|[^\p{L}]+/gu;
+      let m;
+      while ((m = re.exec(phrase)) !== null) {
+        tokens.push({ text: m[0], isWord: /\p{L}/u.test(m[0][0]) });
+      }
+      return tokens;
+    }
+
+    /* ── Texte à trous ───────────────────────────────────────────────────
+       Clic sur un mot de la phrase = ajoute/retire un trou à cette position
+       (même clic pour les deux sens, cf. listener .dic-trou-token) ; le mot
+       attendu est le mot pur tel que tapé dans la phrase (jamais de
+       ponctuation attachée, cf. tokenizeTrouPhrase), aucun champ de saisie
+       séparé (aucun indice de règle ni réponse alternative non plus —
+       exercice simplifié, cf. js/dictees-engine.js). */
     function renderTrousList() {
       const list = document.getElementById('dic-trous-list');
       list.innerHTML = _formTrous.map((t, ti) => {
-        const tokens = t.phrase.trim().length ? t.phrase.trim().split(/\s+/) : [];
+        const tokens = tokenizeTrouPhrase(t.phrase);
+        let wordIdx = -1;
+        const sentenceHTML = tokens.map(tok => {
+          if (!tok.isWord) return escHtml(tok.text);
+          wordIdx++;
+          const pos = wordIdx;
+          return `<button type="button" class="dic-trou-token ${t.tags.some(g => g.position === pos) ? 'is-tagged' : ''}"
+            data-trou-idx="${ti}" data-pos="${pos}">${escHtml(tok.text)}</button>`;
+        }).join('');
         return `
         <div class="dic-trou-item">
           <div class="dic-trou-item-top">
             <input type="text" class="dic-form-input dic-trou-phrase-input" data-trou-idx="${ti}"
               value="${escHtml(t.phrase)}" placeholder="Saisis la phrase de la dictée…">
+            <select class="dic-mot-niveau-select" data-trou-idx="${ti}" style="background:${NIVEAU_VAR[t.niveau]}">
+              <option value="1" ${t.niveau === 1 ? 'selected' : ''}>Niveau 1</option>
+              <option value="2" ${t.niveau === 2 ? 'selected' : ''}>Niveau 2</option>
+              <option value="3" ${t.niveau === 3 ? 'selected' : ''}>Niveau 3</option>
+            </select>
             <button type="button" class="dic-btn dic-btn-danger dic-btn-sm" data-remove-trou="${ti}">✕</button>
           </div>
-          ${tokens.length ? `
-            <div class="dic-trou-tokens">
-              ${tokens.map((tok, pos) => `<button type="button" class="dic-trou-token ${t.tags.some(g => g.position === pos) ? 'is-tagged' : ''}"
-                data-trou-idx="${ti}" data-pos="${pos}">${escHtml(tok)}</button>`).join('')}
-            </div>
-            <p class="dic-trou-hint">Clique sur un ou plusieurs mots pour les transformer en trou à compléter.</p>
+          ${tokens.some(tok => tok.isWord) ? `
+            <div class="dic-trou-tokens">${sentenceHTML}</div>
+            <p class="dic-trou-hint">Clique sur un ou plusieurs mots pour les transformer en trou à compléter — reclique sur un mot en bleu pour le retirer.</p>
           ` : ''}
-          ${t.tags.map((tag, gi) => `
-            <div class="dic-trou-tag-row">
-              <span class="dic-trou-tag-word">${escHtml(tokens[tag.position] || tag.mot_attendu)}</span>
-              <input type="text" class="dic-form-input dic-trou-tag-answer" data-trou-idx="${ti}" data-tag-idx="${gi}"
-                value="${escHtml(tag.mot_attendu)}" placeholder="Réponse attendue">
-              <input type="text" class="dic-form-input dic-trou-tag-alt" data-trou-idx="${ti}" data-tag-idx="${gi}"
-                value="${escHtml(tag.alt_raw || '')}" placeholder="Autres réponses acceptées, séparées par ;">
-              <input type="text" class="dic-form-input dic-trou-tag-regle" data-trou-idx="${ti}" data-tag-idx="${gi}"
-                value="${escHtml(tag.regle)}" placeholder="Règle (facultatif, ex. accord adjectif — jamais montrée à l'élève)">
-              <button type="button" class="dic-btn dic-btn-outline dic-btn-sm" data-untag-trou="${ti}" data-untag-tag="${gi}">Retirer</button>
-            </div>
-          `).join('')}
         </div>`;
       }).join('');
 
@@ -487,9 +531,16 @@
         // blur, sinon le champ perdrait le focus à chaque frappe.
         inp.addEventListener('blur', () => {
           const t = _formTrous[parseInt(inp.dataset.trouIdx, 10)];
-          const tokenCount = t.phrase.trim().length ? t.phrase.trim().split(/\s+/).length : 0;
-          t.tags = t.tags.filter(g => g.position < tokenCount);
+          const wordCount = tokenizeTrouPhrase(t.phrase).filter(tok => tok.isWord).length;
+          t.tags = t.tags.filter(g => g.position < wordCount);
           renderTrousList();
+        });
+      });
+      list.querySelectorAll('.dic-mot-niveau-select').forEach(sel => {
+        sel.addEventListener('change', () => {
+          const idx = parseInt(sel.dataset.trouIdx, 10);
+          _formTrous[idx].niveau = parseInt(sel.value, 10);
+          sel.style.background = NIVEAU_VAR[_formTrous[idx].niveau];
         });
       });
       list.querySelectorAll('[data-remove-trou]').forEach(btn => {
@@ -506,31 +557,10 @@
           if (existingIdx >= 0) {
             t.tags.splice(existingIdx, 1);
           } else {
-            const tokens = t.phrase.trim().split(/\s+/);
-            t.tags.push({ position: pos, mot_attendu: tokens[pos], regle: '', alt_raw: '' });
+            const words = tokenizeTrouPhrase(t.phrase).filter(tok => tok.isWord);
+            t.tags.push({ position: pos, mot_attendu: words[pos].text });
           }
           renderTrousList();
-        });
-      });
-      list.querySelectorAll('[data-untag-trou]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          _formTrous[parseInt(btn.dataset.untagTrou, 10)].tags.splice(parseInt(btn.dataset.untagTag, 10), 1);
-          renderTrousList();
-        });
-      });
-      list.querySelectorAll('.dic-trou-tag-answer').forEach(inp => {
-        inp.addEventListener('input', () => {
-          _formTrous[parseInt(inp.dataset.trouIdx, 10)].tags[parseInt(inp.dataset.tagIdx, 10)].mot_attendu = inp.value;
-        });
-      });
-      list.querySelectorAll('.dic-trou-tag-alt').forEach(inp => {
-        inp.addEventListener('input', () => {
-          _formTrous[parseInt(inp.dataset.trouIdx, 10)].tags[parseInt(inp.dataset.tagIdx, 10)].alt_raw = inp.value;
-        });
-      });
-      list.querySelectorAll('.dic-trou-tag-regle').forEach(inp => {
-        inp.addEventListener('input', () => {
-          _formTrous[parseInt(inp.dataset.trouIdx, 10)].tags[parseInt(inp.dataset.tagIdx, 10)].regle = inp.value;
         });
       });
     }
@@ -583,15 +613,17 @@
       _editingId = dictee ? dictee.id : null;
       document.getElementById('dic-form-title').textContent = dictee ? 'Modifier la dictée' : 'Nouvelle dictée';
       document.getElementById('dic-form-titre').value = dictee ? dictee.titre : '';
+      document.getElementById('dic-form-inclut-lexicale').checked = dictee ? dictee.inclut_lexicale !== false : true;
+      document.getElementById('dic-form-inclut-grammaticale').checked = dictee ? dictee.inclut_grammaticale !== false : true;
       document.getElementById('dic-form-mots').value = mots ? mots.map(m => m.contenu).join(' ; ') : '';
       _formMots = mots ? mots.map(m => ({ contenu: m.contenu, niveau: m.niveau, nature_grammaticale: m.nature_grammaticale || null })) : [];
 
       const trous = extra ? extra.trous : null;
       _formTrous = trous ? trous.map(t => ({
         phrase: t.phrase,
+        niveau: t.niveau || 1,
         tags: (t.dictee_trous_mots || []).map(g => ({
-          position: g.position, mot_attendu: g.mot_attendu, regle: g.regle,
-          alt_raw: (g.reponses_alt || []).join(' ; ')
+          position: g.position, mot_attendu: g.mot_attendu
         }))
       })) : [];
 
@@ -627,6 +659,13 @@
       if (!titre) { alert('Le titre est obligatoire.'); return; }
       if (_formMots.length === 0) { alert('Ajoute au moins un mot difficile.'); return; }
 
+      const inclutLexicale = document.getElementById('dic-form-inclut-lexicale').checked;
+      const inclutGrammaticale = document.getElementById('dic-form-inclut-grammaticale').checked;
+      if (!inclutLexicale && !inclutGrammaticale) {
+        alert("Choisis au moins un volet à proposer à l'élève (orthographe lexicale et/ou grammaticale).");
+        return;
+      }
+
       // Filet de sécurité : une entrée de plusieurs mots ne peut jamais
       // porter de nature grammaticale (cf. isMultiWord/renderMotsList), même
       // si un état UI incohérent venait à en laisser une.
@@ -635,22 +674,16 @@
         nature_grammaticale: isMultiWord(m.contenu) ? null : m.nature_grammaticale
       }));
 
-      // Ne garder que les phrases à trous avec au moins un mot taggé (réponse
-      // renseignée) — une phrase vide ou sans tag n'a pas de sens pour
-      // l'élève. La règle reste facultative (jamais affichée à l'élève, cf.
-      // renderTrousExercise) : l'exiger ici faisait disparaître silencieusement
-      // toute phrase où l'enseignant l'avait laissée vide (bug corrigé —
-      // l'exercice n'apparaissait plus du tout côté élève). alt_raw ("autres
-      // réponses acceptées") est parsé ici en tableau reponses_alt, dédupliqué
-      // contre la réponse principale.
+      // Ne garder que les phrases à trous avec au moins un mot marqué (réponse
+      // renseignée) — une phrase vide ou sans trou n'a pas de sens pour
+      // l'élève.
       const trous = _formTrous
         .map(t => ({
           phrase: t.phrase.trim(),
+          niveau: t.niveau,
           tags: t.tags.filter(g => g.mot_attendu.trim()).map(g => ({
             position: g.position,
-            mot_attendu: g.mot_attendu,
-            regle: g.regle || '',
-            reponses_alt: parseList(g.alt_raw).filter(a => a.toLowerCase() !== g.mot_attendu.trim().toLowerCase())
+            mot_attendu: g.mot_attendu
           }))
         }))
         .filter(t => t.phrase && t.tags.length > 0);
@@ -667,9 +700,9 @@
       saveBtn.disabled = true;
       try {
         if (_editingId) {
-          await lfmDicteesTeacher.updateDictee(_editingId, titre, mots, trous, transformations, extraMots);
+          await lfmDicteesTeacher.updateDictee(_editingId, titre, mots, trous, transformations, extraMots, inclutLexicale, inclutGrammaticale);
         } else {
-          await lfmDicteesTeacher.createDictee(_currentClassId, _teacherProfile.id, titre, mots, trous, transformations, extraMots);
+          await lfmDicteesTeacher.createDictee(_currentClassId, _teacherProfile.id, titre, mots, trous, transformations, extraMots, inclutLexicale, inclutGrammaticale);
         }
         closeForm();
         await loadDictees();
@@ -720,6 +753,48 @@
       renderList();
     }
 
+    /* ── Dictées orphelines (classe supprimée en fin d'année) ────────────── */
+    async function loadOrphanDictees() {
+      const orphans = await lfmDicteesTeacher.getOrphanDictees();
+      const card = document.getElementById('dic-orphans-card');
+      const list = document.getElementById('dic-orphans-list');
+      if (orphans.length === 0) { card.style.display = 'none'; return; }
+
+      const noClasses = _classes.length === 0;
+      card.style.display = 'block';
+      list.innerHTML = orphans.map(d => `
+        <div class="dic-orphan-row" data-id="${d.id}"
+             style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--border)">
+          <strong style="flex:1;min-width:160px">${escHtml(d.titre)}</strong>
+          <select class="dic-select dic-orphan-select" ${noClasses ? 'disabled' : ''}>
+            ${noClasses
+              ? '<option>Crée d\'abord une classe</option>'
+              : _classes.map(c => `<option value="${c.id}">${escHtml(c.name)} (${escHtml(c.level)})</option>`).join('')}
+          </select>
+          <button type="button" class="dic-btn dic-btn-outline dic-btn-sm dic-orphan-reassign" ${noClasses ? 'disabled' : ''}>Réaffecter</button>
+        </div>
+      `).join('');
+
+      list.querySelectorAll('.dic-orphan-reassign').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const row      = btn.closest('.dic-orphan-row');
+          const dicteeId = row.dataset.id;
+          const classId  = row.querySelector('.dic-orphan-select').value;
+          btn.disabled    = true;
+          btn.textContent = 'Réaffectation…';
+          try {
+            await lfmDicteesTeacher.reassignDictee(dicteeId, classId);
+            await loadOrphanDictees();
+            if (_currentClassId === classId) loadDictees();
+          } catch (e) {
+            alert('Erreur : ' + e.message);
+            btn.disabled    = false;
+            btn.textContent = 'Réaffecter';
+          }
+        });
+      });
+    }
+
     /* ── Lien croisé vers le hub de résultats ─────────────────────────────
        Sans le paramètre ?class=, la page de résultats retomberait toujours
        sur la première classe de l'enseignant au lieu de celle en cours de
@@ -737,6 +812,8 @@
       if (!_teacherProfile) return;
 
       _classes = await lfmTeacher.getClasses();
+      await loadOrphanDictees();
+
       const classSel = document.getElementById('dic-class-select');
       if (_classes.length === 0) {
         document.getElementById('dic-list').innerHTML = '<div class="dic-empty">Crée d\'abord une classe dans « Mes classes ».</div>';
@@ -758,7 +835,7 @@
       document.getElementById('dic-form-mots').addEventListener('input', reparseMots);
       document.getElementById('dic-form-extra-mots').addEventListener('input', reparseExtraMots);
       document.getElementById('dic-add-trou-btn').addEventListener('click', () => {
-        _formTrous.push({ phrase: '', tags: [] });
+        _formTrous.push({ phrase: '', niveau: 1, tags: [] });
         renderTrousList();
       });
       document.getElementById('dic-add-transfo-btn').addEventListener('click', () => {

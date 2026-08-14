@@ -110,6 +110,18 @@ const DicteesSpeech = (() => {
       .trim();
   }
 
+  /* Normalisation dédiée au texte à trous (§ orthographe grammaticale,
+     js/dictees-engine.js/validateTrou) : reprend normalizeSentence (espaces,
+     ponctuation de fin/liaison) et y ajoute une tolérance sur l'apostrophe —
+     contrairement à normalizeSentence, l'élève ne retape ici qu'un mot isolé
+     entendu à l'oral (bouton haut-parleur, jamais affiché à l'écrit avant
+     saisie) : une apostrophe oubliée ou d'un mauvais type (' vs ’) est une
+     erreur de frappe bénigne, pas la faute que l'exercice cherche à évaluer.
+     Apostrophes droites/courbes retirées des deux côtés avant comparaison. */
+  function normalizeTrouAnswer(str) {
+    return normalizeSentence(str).replace(/['’ʼ`]/g, '');
+  }
+
   /* Met en évidence, dans le mot correct, la zone qui diffère de la saisie
      (alignement par préfixe/suffixe communs) — même mécanique que
      l'exercice « mots invariables ». */
@@ -131,5 +143,5 @@ const DicteesSpeech = (() => {
       c.slice(midEnd);
   }
 
-  return { speak, cancel, normalize, normalizeSentence, diffHighlight };
+  return { speak, cancel, normalize, normalizeSentence, normalizeTrouAnswer, diffHighlight };
 })();

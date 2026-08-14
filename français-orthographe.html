@@ -22,7 +22,6 @@
   <!-- SEO: og:description et og:image à compléter avant le lancement (voir SEO-TODO.md) -->
   <link rel="stylesheet" href="styles.css?v=12">
   <link rel="stylesheet" href="breadcrumb.css?v=1">
-  <link rel="stylesheet" href="css/dictees.css?v=1">
   <script src="js/breadcrumb.js?v=3"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
@@ -80,6 +79,29 @@
       gap: 8px;
       flex-shrink: 0;
     }
+
+    /* ── Bannière Dictées préparées (module dédié, hors du moteur
+       exercise.html — voir dictees-catalogue.html). Style recopié à
+       l'identique de .cl-entry-banner (français-lexique.html) pour la
+       cohérence visuelle entre modules, plutôt que centralisé (même
+       décision que pour css/dictees.css). ──────────────────────────── */
+    .dic-entry-banner {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, rgba(29,191,160,0.10), rgba(245,166,35,0.08));
+      border: 1.5px solid rgba(29,191,160,0.30);
+      border-radius: var(--radius-card);
+      padding: 20px 24px;
+      margin-bottom: 28px;
+      text-decoration: none;
+      transition: transform 200ms ease, box-shadow 200ms ease;
+    }
+    .dic-entry-banner:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .dic-entry-banner-icon { font-size: 38px; flex-shrink: 0; }
+    .dic-entry-banner-title { font-family: var(--font-display); font-weight: 800; font-size: 16px; color: var(--text); }
+    .dic-entry-banner-desc { font-size: 13px; color: var(--muted); margin-top: 3px; }
+    .dic-entry-banner-cta { margin-left: auto; font-weight: 700; font-size: 13px; color: var(--blue); white-space: nowrap; }
 
     /* ── Sections ───────────────────────────────────────────── */
     .skill-sections {
@@ -297,16 +319,16 @@
         <p class="page-subtitle">Choisis une notion à travailler.</p>
       </div>
 
-      <!-- Dictées préparées (créées par l'enseignant pour la classe de l'élève) -->
-      <div class="skill-section" id="dic-section" style="display:none;margin-bottom:20px;">
-        <div class="section-header" style="cursor:default;">
-          <span class="section-emoji">📖</span>
-          <span class="section-title">Dictées préparées</span>
+      <!-- Dictées préparées / module dédié, hors moteur exercise.html
+           (voir dictees-catalogue.html) -->
+      <a href="dictees-catalogue.html" class="dic-entry-banner">
+        <div class="dic-entry-banner-icon">📖</div>
+        <div>
+          <div class="dic-entry-banner-title">Dictées préparées</div>
+          <div class="dic-entry-banner-desc">Retrouve les dictées préparées par ton enseignant pour ta classe.</div>
         </div>
-        <div class="section-content">
-          <div class="dic-cards-grid" id="dic-cards-grid"></div>
-        </div>
-      </div>
+        <div class="dic-entry-banner-cta">Découvrir →</div>
+      </a>
 
       <!-- Filter bar -->
       <div class="filter-bar">
@@ -543,42 +565,6 @@
       `;
     }
 
-    /* ── Dictées préparées ─────────────────────────────────────────────────
-       Contrairement aux notions ci-dessus (catalogue statique SECTIONS), les
-       dictées sont entièrement créées par l'enseignant pour sa classe. Cette
-       page n'affiche plus qu'une vignette compacte (renvoyant vers le
-       catalogue complet, dictees-catalogue.html, qui reprend la grille de
-       cartes déplacée depuis ici) — juste un comptage, pas de titre/points
-       grammaticaux par dictée (voir dictees-catalogue.html pour ce détail).
-       Section masquée si l'élève n'est pas connecté, n'a pas de classe, ou
-       si sa classe n'a aucune dictée. */
-    async function loadDictees() {
-      if (!window.lfmDb || typeof lfmAuth === 'undefined') return;
-      try {
-        const session = await lfmAuth.getSession();
-        if (!session) return;
-
-        const { data: student } = await window.lfmDb
-          .from('students').select('class_id').eq('auth_user_id', session.user.id).single();
-        if (!student || !student.class_id) return;
-
-        const { count, error } = await window.lfmDb
-          .from('dictees').select('id', { count: 'exact', head: true }).eq('class_id', student.class_id);
-        if (error || !count) return;
-
-        document.getElementById('dic-cards-grid').innerHTML = `
-          <a class="dic-card" href="dictees-catalogue.html">
-            <div class="dic-card-illustration">📖</div>
-            <div class="dic-card-title">Dictées préparées</div>
-            <span class="dic-card-btn">${count} dictée${count !== 1 ? 's' : ''} disponible${count !== 1 ? 's' : ''} →</span>
-          </a>
-        `;
-        document.getElementById('dic-section').style.display = '';
-      } catch (e) {
-        // Repli silencieux : la section reste masquée (§ pas de blocage sur erreur réseau)
-      }
-    }
-
     /* ── Init ──────────────────────────────────────────────────────────────── */
     async function init() {
       if (typeof lfmGuidedAccess !== 'undefined') await lfmGuidedAccess.get();
@@ -586,7 +572,6 @@
         SECTIONS.map(renderSection).join("");
       bindEvents();
       if (typeof applySkillValidationBadges === 'function') applySkillValidationBadges();
-      loadDictees();
     }
 
     /* ── Toggle section collapse ───────────────────────────────────────────── */
