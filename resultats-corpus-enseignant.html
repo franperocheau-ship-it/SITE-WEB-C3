@@ -169,8 +169,6 @@
         <select id="cl-class-select" class="cl-select"></select>
       </div>
 
-      <div id="cl-student-filter-banner" style="display:none"></div>
-
       <div id="cl-stats-body"><div class="cl-report-empty">Chargement…</div></div>
 
     </div>
@@ -271,27 +269,42 @@
       document.getElementById('cl-report-back-btn').addEventListener('click', renderReportList);
     }
 
-    /* Restreint le rapport (déjà chargé pour toute la classe) au seul élève
-       transmis par la fiche élève (?student=), en retirant les champs
-       lexicaux où il n'a aucune session. */
-    function applyStudentFilter() {
-      if (!_filterStudentId || !_currentReport) return;
-      _currentReport = {
-        perChamp: _currentReport.perChamp
-          .map(c => ({ ...c, sessions: c.sessions.filter(s => s.student.auth_user_id === _filterStudentId) }))
-          .filter(c => c.sessions.length > 0)
-      };
-    }
+    /* ── Fiche élève : au lieu de filtrer la vue classe entière sur un seul
+       élève (ancien comportement, retour utilisateur : trop détourné, on
+       veut la fiche individuelle directement), transmis par ?student=/
+       ?sname= depuis la fiche élève d'un autre onglet du hub Résultats —
+       toutes les sessions de champ lexical de cet élève, tous champs
+       confondus (un élève peut avoir plusieurs niveaux suivis indépendamment
+       sur un même champ), réutilise les données déjà chargées pour toute la
+       classe (aucune requête Supabase supplémentaire). ────────────────────── */
+    function renderStudentFiche() {
+      const body = document.getElementById('cl-stats-body');
+      if (!_currentReport) return;
 
-    function renderStudentFilterBanner() {
-      const banner = document.getElementById('cl-student-filter-banner');
-      if (!_filterStudentId) { banner.style.display = 'none'; return; }
-      banner.style.display = '';
-      banner.innerHTML = `
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(16,43,106,0.06);border:1.5px solid rgba(16,43,106,0.2);border-radius:10px;padding:10px 16px;margin-bottom:18px;font-size:13.5px;color:var(--text)">
-          <span>👤 Filtré sur <strong>${escHtml(_filterStudentName || 'cet élève')}</strong></span>
-          <a href="resultats-corpus-enseignant.html?class=${encodeURIComponent(_currentClassId || '')}" style="color:var(--blue);font-weight:700;text-decoration:none">✕ Voir toute la classe</a>
-        </div>`;
+      const rows = _currentReport.perChamp
+        .flatMap(c => c.sessions
+          .filter(s => s.student.auth_user_id === _filterStudentId)
+          .map(s => ({ theme: c.theme, ...s })))
+        .sort((a, b) => a.theme.localeCompare(b.theme) || a.niveau - b.niveau);
+
+      const rowsHtml = rows.map(s => `
+        <tr>
+          <td>${escHtml(s.theme)}</td>
+          <td>Niveau ${s.niveau}</td>
+          <td>${s.totalPoints}</td>
+          <td class="cl-report-status--${s.status}">${s.status === 'termine' ? 'Terminé' : 'En cours'}</td>
+        </tr>`).join('');
+
+      body.innerHTML = `
+        <a href="resultats-corpus-enseignant.html?class=${encodeURIComponent(_currentClassId || '')}" class="cl-report-back-btn" style="text-decoration:none">← Retour à la classe</a>
+        <div class="cl-report-detail-title">${escHtml(_filterStudentName || 'Élève')}</div>
+        ${rowsHtml
+          ? `<table class="cl-report-table">
+               <thead><tr><th>Champ lexical</th><th>Niveau</th><th>Points</th><th>Statut</th></tr></thead>
+               <tbody>${rowsHtml}</tbody>
+             </table>`
+          : '<div class="empty-inline">Aucun résultat de champ lexical pour cet élève.</div>'}
+      `;
     }
 
     async function loadStats() {
@@ -303,8 +316,11 @@
         document.getElementById('cl-stats-body').innerHTML = `<div class="cl-report-empty">Erreur : ${escHtml(e.message)}</div>`;
         return;
       }
-      applyStudentFilter();
-      renderReportList();
+      if (_filterStudentId) {
+        renderStudentFiche();
+      } else {
+        renderReportList();
+      }
     }
 
     async function init() {
@@ -321,7 +337,8 @@
 
       /* ?class= transmis depuis un lien croisé ou depuis la fiche élève,
          sinon première classe. ?student= (+ ?sname=) transmis depuis la
-         fiche élève restreint le rapport à cet élève (applyStudentFilter). */
+         fiche élève ouvre directement sa fiche corpus lexical (voir
+         renderStudentFiche). */
       const urlParams = new URLSearchParams(window.location.search);
       const classParam = urlParams.get('class');
       _currentClassId = (classParam && _classes.some(c => c.id === classParam))
@@ -331,8 +348,10 @@
 
       _filterStudentId = urlParams.get('student') || null;
       _filterStudentName = urlParams.get('sname') ? decodeURIComponent(urlParams.get('sname')) : '';
-      classSel.disabled = !!_filterStudentId;
-      renderStudentFilterBanner();
+      /* En fiche élève, le sélecteur de classe n'a pas de sens (un élève
+         appartient à une seule classe) — masqué au profit du bouton
+         "← Retour à la classe" dans renderStudentFiche(). */
+      document.querySelector('.cl-filter-field').style.display = _filterStudentId ? 'none' : '';
 
       classSel.addEventListener('change', () => {
         _currentClassId = classSel.value;

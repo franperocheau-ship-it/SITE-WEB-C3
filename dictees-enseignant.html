@@ -12,14 +12,14 @@
   <link rel="manifest" href="site.webmanifest?v=1">
   <title>Dictées préparées — Espace enseignant — LFM</title>
   <link rel="stylesheet" href="styles.css?v=12">
-  <link rel="stylesheet" href="css/dictees.css?v=2">
+  <link rel="stylesheet" href="css/dictees.css?v=28">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/teacher.js?v=2"></script>
   <script src="js/teacher-spellcheck.js?v=1"></script>
-  <script src="js/dictees-teacher.js?v=11"></script>
+  <script src="js/dictees-teacher.js?v=12"></script>
   <style>
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
     .dash-content { max-width: 960px; margin: 0 auto; }
@@ -203,6 +203,7 @@
     }
     .dic-trou-token:hover { border-color: var(--blue); }
     .dic-trou-token.is-tagged { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .dic-trou-token.is-pending { border: 1.5px dashed var(--blue); color: var(--blue); background: #fff; }
     .dic-trou-hint { font-size: 13.5px; color: #3F4552; line-height: 1.55; margin-top: 10px; }
 
     /* ── Champs propres à un trou de conjugaison (infinitif + temps),
@@ -444,13 +445,26 @@
     /* Liste fixe des natures grammaticales (partagée par duplication avec
        js/dictees-engine.js — le module n'a pas de fichier utilitaire commun,
        cohérent avec son style actuel de fichiers autonomes). */
-    const NATURE_OPTIONS = ['nom commun', 'nom propre', 'verbe', 'adjectif', 'adverbe', 'déterminant', 'article défini',
+    const NATURE_OPTIONS = ['nom commun', 'nom propre', 'verbe', 'verbe pronominal', 'adjectif', 'adverbe', 'article défini',
       'article indéfini', 'déterminant possessif', 'déterminant démonstratif', 'préposition', 'conjonction', 'autre'];
 
-    /* Liste fixe des temps pour le trou de conjugaison — reprend exactement
-       les 4 libellés déjà utilisés pour les joggings d'écriture (redaction.html,
-       TEMPS_CLASS), pour rester cohérent sur le site. */
-    const TEMPS_OPTIONS = ['Présent', 'Imparfait', 'Passé composé', 'Futur'];
+    /* Liste fixe des temps pour le trou de conjugaison — distincte de celle des
+       joggings d'écriture (redaction.html, TEMPS_CLASS) : la consigne élève
+       (js/dictees-engine.js/renderTrousConjugaisonExercise) verbalise
+       directement ce libellé ("Conjugue le verbe entre parenthèses au…"), il
+       doit donc être complet et sans ambiguïté (ex. "Présent de l'indicatif"
+       plutôt que "Présent"). Valeurs contraintes en base par le check
+       dictee_trous_conjugaison_mots_temps_check (cf. migration
+       20260912100000). */
+    const TEMPS_OPTIONS = [
+      "Présent de l'indicatif",
+      "Imparfait de l'indicatif",
+      "Futur simple de l'indicatif",
+      'Passé composé',
+      'Plus-que-parfait',
+      'Impératif',
+      'Conditionnel'
+    ];
 
     /* Palette fixe d'émoticons d'illustration pour la carte de la dictée
        (dictees.emoji) — thèmes variés pertinents pour une dictée d'école
@@ -594,8 +608,15 @@
        lève") ; "s"/"m"/"t" pour la forme élidée ("s'habille" — l'apostrophe
        isole "s" comme un token-mot à part entière, cf. tokenizeTrouPhrase,
        donc le pronom élidé apparaît toujours comme un mot d'une seule
-       lettre). Portée volontairement limitée à cette liste fermée (retour
-       utilisateur) : pas de détection linguistique plus fine. */
+       lettre). "nous"/"vous" sont ré-inclus ici volontairement : bien qu'ils
+       soient aussi des pronoms sujets ("Nous commençons"), cette liste ne
+       sert plus qu'à armer une ATTENTE explicite au clic (cf.
+       _pendingPronounPos plus bas) — aucune fusion automatique par simple
+       proximité n'a lieu, donc plus de risque de happer à tort un sujet de
+       verbe non pronominal (l'ancien bug venait de la détection automatique,
+       pas de la liste elle-même, retour utilisateur). Portée volontairement
+       limitée à cette liste fermée : pas de détection linguistique plus
+       fine. */
     const REFLEXIVE_PRONOUNS = new Set(['se', 'me', 'te', 'nous', 'vous', 's', 'm', 't']);
     function isReflexivePronoun(word) {
       return REFLEXIVE_PRONOUNS.has(word.toLowerCase());
@@ -703,15 +724,19 @@
        niveau que renderTrousList (dupliqué plutôt que partagé, les deux
        exercices ont des tables et des listes distinctes côté sauvegarde).
 
-       Verbe pronominal ("il se lève") : un clic sur le pronom réfléchi OU
-       sur le verbe suffit — le mot adjacent (cf. REFLEXIVE_PRONOUNS) est
-       automatiquement inclus dans le MÊME trou (g.position/g.positionFin),
-       jamais deux trous distincts (retour utilisateur). Choisi plutôt qu'un
-       clic-pronom-puis-clic-verbe explicite : un seul clic reste suffisant
-       pour créer un trou, exactement comme pour un mot simple — aucune
-       nouvelle interaction à apprendre pour l'enseignant. Un tag couvre
-       g.position à (g.positionFin ?? g.position) inclus ; positionFin
-       absent/null = trou d'un seul mot (cas courant, inchangé). */
+       Verbe pronominal ("il se lève") : PAS de détection/inclusion
+       automatique (retentative sur retour utilisateur — un pronom sujet
+       "nous"/"vous" ne doit jamais être happé dans le trou d'un verbe non
+       pronominal, cf. isReflexivePronoun). À la place, sélection explicite en
+       deux clics, dans n'importe quel ordre : cliquer un pronom réfléchi
+       (se/s'/me/m'/te/t'/nous/vous — ceux-là seuls, jamais ambigus dans ce
+       contexte) ne crée pas de trou tout de suite, il "attend" (état
+       transitoire _pendingPronounPos sur l'entrée _formTrousConj, cf.
+       .is-pending) le clic du mot voisin ; cliquer ensuite le verbe adjacent
+       (ou l'inverse : verbe d'abord, pronom ensuite) fusionne les deux en un
+       seul tag {position, positionFin}. Un tag couvre g.position à
+       (g.positionFin ?? g.position) inclus ; positionFin absent/null = trou
+       d'un seul mot (cas courant, verbes non pronominaux inchangés). */
     function renderTrousConjList() {
       const list = document.getElementById('dic-trous-conj-list');
       list.innerHTML = _formTrousConj.map((t, ti) => {
@@ -722,7 +747,8 @@
           wordIdx++;
           const pos = wordIdx;
           const isTagged = t.tags.some(g => pos >= g.position && pos <= (g.positionFin != null ? g.positionFin : g.position));
-          return `<button type="button" class="dic-trou-token ${isTagged ? 'is-tagged' : ''}"
+          const isPending = t._pendingPronounPos === pos;
+          return `<button type="button" class="dic-trou-token ${isTagged ? 'is-tagged' : isPending ? 'is-pending' : ''}"
             data-trou-idx="${ti}" data-pos="${pos}">${escHtml(tok.text)}</button>`;
         }).join('');
 
@@ -754,7 +780,7 @@
           </div>
           ${tokens.some(tok => tok.isWord) ? `
             <div class="dic-trou-tokens">${sentenceHTML}</div>
-            <p class="dic-trou-hint">Clique sur un ou plusieurs mots pour les transformer en trou de conjugaison — reclique sur un mot en bleu pour le retirer. Pour un verbe pronominal, un clic sur le pronom (« se », « s'»…) ou sur le verbe suffit : les deux sont regroupés dans le même trou.</p>
+            <p class="dic-trou-hint">Clique sur un ou plusieurs mots pour les transformer en trou de conjugaison.</p>
             ${conjFieldsHTML}
           ` : ''}
         </div>`;
@@ -768,6 +794,7 @@
           const t = _formTrousConj[parseInt(inp.dataset.trouIdx, 10)];
           const wordCount = tokenizeTrouPhrase(t.phrase).filter(tok => tok.isWord).length;
           t.tags = t.tags.filter(g => (g.positionFin != null ? g.positionFin : g.position) < wordCount);
+          t._pendingPronounPos = null;
           renderTrousConjList();
         });
       });
@@ -788,25 +815,72 @@
         btn.addEventListener('click', () => {
           const t = _formTrousConj[parseInt(btn.dataset.trouIdx, 10)];
           const pos = parseInt(btn.dataset.pos, 10);
+          const words = tokenizeTrouPhrase(t.phrase).filter(tok => tok.isWord);
+
+          // Mot déjà couvert par un trou existant : reclique = retire tout le trou.
           const existingIdx = t.tags.findIndex(g => pos >= g.position && pos <= (g.positionFin != null ? g.positionFin : g.position));
           if (existingIdx >= 0) {
             t.tags.splice(existingIdx, 1);
-          } else {
-            const words = tokenizeTrouPhrase(t.phrase).filter(tok => tok.isWord);
-            const taggedPositions = new Set();
-            t.tags.forEach(g => {
-              for (let p = g.position; p <= (g.positionFin != null ? g.positionFin : g.position); p++) taggedPositions.add(p);
-            });
-            let start = pos, end = pos;
-            if (isReflexivePronoun(words[pos].text) && words[pos + 1] && !taggedPositions.has(pos + 1)) {
-              end = pos + 1;
-            } else if (pos > 0 && isReflexivePronoun(words[pos - 1].text) && !taggedPositions.has(pos - 1)) {
-              start = pos - 1;
+            t._pendingPronounPos = null;
+            renderTrousConjList();
+            return;
+          }
+
+          // Reclique sur le pronom en attente : annule l'attente.
+          if (t._pendingPronounPos === pos) {
+            t._pendingPronounPos = null;
+            renderTrousConjList();
+            return;
+          }
+
+          // Pronom réfléchi cliqué alors que son verbe voisin est déjà un
+          // trou d'un seul mot (ordre verbe-puis-pronom) : fusion immédiate.
+          if (isReflexivePronoun(words[pos].text)) {
+            const neighborIdx = t.tags.findIndex(g => g.position === pos + 1 && g.positionFin == null);
+            if (neighborIdx >= 0) {
+              const neighbor = t.tags[neighborIdx];
+              neighbor.position = pos;
+              neighbor.positionFin = pos + 1;
+              neighbor.mot_attendu = extractPhraseSpan(t.phrase, pos, pos + 1);
+              t._pendingPronounPos = null;
+              renderTrousConjList();
+              return;
             }
+          }
+
+          // Mot voisin d'un pronom en attente (ordre pronom-puis-verbe) :
+          // fusionne les deux positions en un seul trou. Le mot cliqué ne
+          // doit pas lui-même être un pronom réfléchi ("Nous nous levons" :
+          // si le sujet "Nous" est cliqué par erreur avant le "nous"
+          // réfléchi, ce garde-fou évite de fusionner les deux pronoms entre
+          // eux — le second clic réarme l'attente sur lui à la place, cf.
+          // plus bas.
+          if (t._pendingPronounPos != null && Math.abs(t._pendingPronounPos - pos) === 1 && !isReflexivePronoun(words[pos].text)) {
+            const start = Math.min(t._pendingPronounPos, pos);
+            const end = Math.max(t._pendingPronounPos, pos);
             t.tags.push({
               position: start,
-              positionFin: end > start ? end : null,
+              positionFin: end,
               mot_attendu: extractPhraseSpan(t.phrase, start, end),
+              infinitif: '',
+              temps: TEMPS_OPTIONS[0]
+            });
+            t._pendingPronounPos = null;
+            renderTrousConjList();
+            return;
+          }
+
+          // Clic sans rapport avec une éventuelle attente précédente : elle devient caduque.
+          t._pendingPronounPos = null;
+
+          if (isReflexivePronoun(words[pos].text)) {
+            // Pronom seul : n'ouvre pas de trou tout de suite, attend le clic du verbe voisin.
+            t._pendingPronounPos = pos;
+          } else {
+            t.tags.push({
+              position: pos,
+              positionFin: null,
+              mot_attendu: words[pos].text,
               infinitif: '',
               temps: TEMPS_OPTIONS[0]
             });

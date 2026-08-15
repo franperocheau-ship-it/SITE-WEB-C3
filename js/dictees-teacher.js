@@ -342,7 +342,16 @@ const lfmDicteesTeacher = (() => {
    * que les 3 n'ont pas été faits) ; `gramByType` = dernière tentative par
    * type classification/trous/trous_conjugaison/transformation (null si
    * jamais tenté) — la page n'affiche une pastille que pour les
-   * paliers/types réellement tentés.
+   * paliers/types réellement tentés ; `gramNiveauByType` = niveau maximal
+   * (1/2/3, null si inconnu) essayé pour ce type, toutes tentatives
+   * confondues — distinct de gramByType qui ne regarde que la dernière ;
+   * `freqLine` = retour "erreurs les plus fréquentes" (js/dictees-word-
+   * stats.js) sur les tentatives lexicales de CET élève pour CETTE dictée,
+   * toutes tentatives confondues (pas seulement la dernière — reflète la
+   * difficulté réelle du mot pour lui), chaîne vide si aucune erreur.
+   * `perDictee[].avgMissed` = nombre moyen de mots ratés par résultat
+   * lexical, tous élèves confondus, pour CETTE dictée (null si aucun
+   * résultat lexical).
    */
   async function getClassDicteeReport(classId) {
     const dictees = await getClassDictees(classId);
@@ -351,7 +360,7 @@ const lfmDicteesTeacher = (() => {
     const dicteeIds = dictees.map(d => d.id);
     const studentById = new Map(students.map(s => [s.auth_user_id, s]));
 
-    let lexResults = [], gramResults = [];
+    let lexResults = [], gramResults = [], mots = [];
     if (dicteeIds.length > 0 && authIds.length > 0) {
       const [lexRes, gramRes] = await Promise.all([
         db.from('dictee_results').select('*')
@@ -364,6 +373,13 @@ const lfmDicteesTeacher = (() => {
       lexResults = lexRes.data || [];
       gramResults = gramRes.data || [];
     }
+    if (dicteeIds.length > 0) {
+      const { data: motsData, error: motsErr } = await db.from('dictee_mots')
+        .select('id, contenu').in('dictee_id', dicteeIds);
+      if (motsErr) throw motsErr;
+      mots = motsData || [];
+    }
+    const motById = new Map(mots.map(m => [m.id, m.contenu]));
 
     const TYPES = ['classification', 'trous', 'trous_conjugaison', 'transformation'];
 
@@ -382,10 +398,25 @@ const lfmDicteesTeacher = (() => {
       if (!prev || new Date(r.completed_at) > new Date(prev.completed_at)) gramLatest.set(k, r);
     });
 
+    /* Niveau maximal essayé par clé (élève|dictée|type), toutes tentatives
+       confondues — contrairement au pourcentage affiché (dernière tentative
+       seulement, gramLatest ci-dessus), le niveau affiché est le plus élevé
+       sur lequel l'élève s'est entraîné, retour utilisateur. Uniquement
+       renseigné (dictee_gram_results.niveau) depuis son ajout ; les
+       tentatives antérieures restent sans niveau connu. */
+    const gramNiveauMax = new Map();
+    gramResults.forEach(r => {
+      if (r.niveau == null) return;
+      const k = `${r.student_id}|${r.dictee_id}|${r.type}`;
+      const prev = gramNiveauMax.get(k);
+      if (prev == null || r.niveau > prev) gramNiveauMax.set(k, r.niveau);
+    });
+
     const perDictee = dictees
       .map(d => {
+        const dicteeLexResults = lexResults.filter(r => r.dictee_id === d.id);
         const studentIds = new Set([
-          ...lexResults.filter(r => r.dictee_id === d.id).map(r => r.student_id),
+          ...dicteeLexResults.map(r => r.student_id),
           ...gramResults.filter(r => r.dictee_id === d.id).map(r => r.student_id)
         ]);
         if (studentIds.size === 0) return null;
@@ -397,18 +428,24 @@ const lfmDicteesTeacher = (() => {
             lexByExercice[ex] = r ? Math.round((r.score / r.total) * 100) : null;
           });
           const gramByType = {};
+          const gramNiveauByType = {};
           TYPES.forEach(type => {
             const r = gramLatest.get(`${studentId}|${d.id}|${type}`);
             gramByType[type] = r ? Math.round((r.score / r.total) * 100) : null;
+            gramNiveauByType[type] = gramNiveauMax.get(`${studentId}|${d.id}|${type}`) ?? null;
           });
+          const studentLexResults = dicteeLexResults.filter(r => r.student_id === studentId);
+          const freqLine = DicteesWordStats.formatLine(DicteesWordStats.tally(studentLexResults, motById));
           return {
             student: studentById.get(studentId) || { display_name: 'Élève inconnu' },
             lexByExercice,
-            gramByType
+            gramByType,
+            gramNiveauByType,
+            freqLine
           };
         }).sort((a, b) => a.student.display_name.localeCompare(b.student.display_name, 'fr'));
 
-        return { id: d.id, titre: d.titre, students: studentsList };
+        return { id: d.id, titre: d.titre, students: studentsList, avgMissed: DicteesWordStats.averageMissedCount(dicteeLexResults) };
       })
       .filter(Boolean);
 

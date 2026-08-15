@@ -136,7 +136,7 @@ const DicteesEngine = (() => {
   /* Liste fixe des natures grammaticales (dupliquée depuis
      dictees-enseignant.html — pas de fichier utilitaire commun sur ce
      module, cohérent avec son style actuel de fichiers autonomes). */
-  const NATURE_OPTIONS = ['nom commun', 'nom propre', 'verbe', 'adjectif', 'adverbe', 'déterminant', 'article défini',
+  const NATURE_OPTIONS = ['nom commun', 'nom propre', 'verbe', 'verbe pronominal', 'adjectif', 'adverbe', 'article défini',
     'article indéfini', 'déterminant possessif', 'déterminant démonstratif', 'préposition', 'conjonction', 'autre'];
 
   const TRANSFO_TYPE_LABELS = {
@@ -332,8 +332,8 @@ const DicteesEngine = (() => {
     }
 
     /* Historique des résultats déjà soumis par cet élève sur CETTE dictée
-       (toutes tentatives passées, tous niveaux confondus — ni dictee_results
-       ni dictee_gram_results ne distinguent le niveau choisi) : sert
+       (toutes tentatives passées, tous niveaux confondus — cette vérification
+       d'existence ignore volontairement dictee_gram_results.niveau) : sert
        uniquement à proposer refaire/passer avant de relancer un exercice
        déjà fait (voir withRedoOrSkipCheck). Échec isolé sans conséquence :
        repli sur "rien de fait" plutôt que de bloquer le chargement. */
@@ -1005,7 +1005,17 @@ const DicteesEngine = (() => {
         if (!state.ex0.wrongIds.includes(mot.id)) state.ex0.correctFirstTry++;
         state.ex0.unmastered = state.ex0.unmastered.filter(id => id !== mot.id);
         state.ex0.deck = state.ex0.deck.filter(id => id !== mot.id);
-      } else if (!state.ex0.wrongIds.includes(mot.id)) {
+      } else {
+        /* Une entrée par échec réel, pas par mot distinct (retiré le garde
+           `!wrongIds.includes(mot.id)` qui plafonnait à 1 occurrence par mot
+           même si retenté 3-4 fois avant réussite) : wrong_mot_ids doit
+           refléter le nombre de fois où le mot a été raté, pas juste "a été
+           raté au moins une fois" — c'est ce que compte
+           js/dictees-word-stats.js/tally côté "erreurs les plus fréquentes",
+           et ce que sous-comptait ce garde (bug remonté 2026-08-16 :
+           "désormais (1)" alors que raté 3 fois). .includes() ci-dessus
+           reste valable pour correctFirstTry, qui ne teste que la présence,
+           pas le nombre d'occurrences. */
         state.ex0.wrongIds.push(mot.id);
       }
 
@@ -1172,7 +1182,9 @@ const DicteesEngine = (() => {
           state.ex05.levels[mot.id] = passage + 1;
         }
       } else {
-        if (!state.ex05.wrongIds.includes(mot.id)) state.ex05.wrongIds.push(mot.id);
+        // Une entrée par échec réel (pas de garde de dédoublonnage) — même
+        // correction que le palier 0 ci-dessus, voir son commentaire.
+        state.ex05.wrongIds.push(mot.id);
         state.ex05.levels[mot.id] = Math.max(1, passage - 1);
       }
 
@@ -1303,7 +1315,10 @@ const DicteesEngine = (() => {
       state.ex1.correctFirstTry++;
     } else {
       state.ex1.firstTryWrong.push(mot.id);
-      if (!state.ex1.wrongIds.includes(mot.id)) state.ex1.wrongIds.push(mot.id);
+      // Chaque mot.id ne passe qu'une fois par `order` (cf. startExercice1) :
+      // pas de garde de dédoublonnage nécessaire ici (mais retiré quand même
+      // pour rester cohérent avec ex0/ex05 ci-dessus, même correction).
+      state.ex1.wrongIds.push(mot.id);
     }
 
     document.getElementById('dic-feedback').innerHTML = isRight
@@ -1911,13 +1926,24 @@ const DicteesEngine = (() => {
   function renderTrousConjugaisonExercise() {
     document.getElementById('dic-state-results').style.display = 'none';
     document.getElementById('dic-state-exercise').style.display = '';
-    setConsigne("Retrouve la forme conjuguée à partir de l'infinitif indiqué.");
 
     if (state.trousConj.unmastered.length === 0 || state.trousConj.attempts >= state.trousConj.maxAttempts) return finishTrousConjugaison();
     if (state.trousConj.current == null) { drawNextTrouConj(); saveState(); }
 
     const trou = trouConjById(state.trousConj.current);
     const tags = trou.dictee_trous_conjugaison_mots.slice().sort((a, b) => a.position - b.position);
+    /* Consigne dynamique : verbalise le temps imposé par l'enseignant pour
+       CETTE phrase, recalculée à chaque nouveau tirage (cf. tags recalculé
+       ci-dessus à chaque appel) — remplace l'ancienne consigne fixe qui ne
+       précisait jamais à quel temps conjuguer (retour utilisateur, exercice
+       impossible à réaliser sans cette info). `temps` est saisi par mot
+       (dictee_trous_conjugaison_mots.temps, cf. dictees-enseignant.html) et
+       non par phrase ; en pratique une même phrase n'a qu'un seul temps
+       imposé, donc le premier tag suffit — si l'enseignant tague malgré tout
+       plusieurs verbes d'une même phrase à des temps différents, seul le
+       temps du premier suffit à couvrir la consigne affichée. */
+    const temps = tags[0].temps;
+    setConsigne(`Conjugue le verbe entre parenthèses au ${temps.charAt(0).toLowerCase()}${temps.slice(1)}.`);
     const tokens = tokenizeTrouPhrase(trou.phrase);
     const remaining = state.trousConj.unmastered.length;
     const total = gramTrousConj.length;
@@ -2275,7 +2301,8 @@ const DicteesEngine = (() => {
       type,
       score,
       total,
-      duration_secs: durationSecs
+      duration_secs: durationSecs,
+      niveau: state.niveauChoisi
     };
     const { error } = await window.lfmDb.from('dictee_gram_results').insert(payload);
     if (!error) return;

@@ -242,7 +242,16 @@
   font-weight: 700;
   line-height: 1.55;
   color: var(--text);
-  margin-bottom: 18px;
+  /* Épouse la largeur de son texte (jusqu'à 640px, au-delà de quoi il
+     retombe sur 2 lignes) au lieu de s'étirer sur toute la largeur de la
+     page — page-content bien plus large que ce bandeau depuis
+     l'élargissement de la carte à trous (retour utilisateur : le bandeau
+     grisé ne doit pas suivre cet élargissement). Centré via margin auto,
+     ce qui exige width:fit-content ici (un flex en display:flex reste sinon
+     block, donc plein-largeur par défaut). */
+  width: fit-content;
+  max-width: min(640px, 100%);
+  margin: 0 auto 18px;
   text-align: left;
 }
 .dic-intro-consigne::before {
@@ -640,11 +649,20 @@
    (aucun indice de règle). Présentation en carte aérée, fort contraste et
    interlignage/espacement généreux — pensée pour un élève dyslexique
    (retour utilisateur) ; pas de police "dys" dédiée introduite, aucune n'est
-   utilisée ailleurs sur le site (vérifié). */
+   utilisée ailleurs sur le site (vérifié).
+   Carte élargie (retour utilisateur : trop de marge blanche perdue de
+   chaque côté sur desktop/tablette, phrases compressées, à 2 reprises) —
+   voir aussi dictee.html, page-content passé de 720 à 1280px pour lui
+   laisser la place. max-width posé ici volontairement au-dessus de la
+   largeur utilisable réelle à l'intérieur de page-content (1280 - 2×64 de
+   padding = 1152px) : c'est page-content qui reste le vrai plafond, ce
+   max-width n'est qu'un garde-fou si son padding venait à changer. Sur
+   mobile/tablette la largeur reste pilotée par le viewport (pas de media
+   query dédiée nécessaire, ce plafond ne joue déjà plus sous ~1280px). */
 .dic-trou-card {
-  max-width: 680px;
+  max-width: 1150px;
   margin: 0 auto 20px;
-  padding: 34px 32px;
+  padding: 34px 40px;
   background: var(--card-bg);
   border: 1.5px solid var(--border);
   border-radius: 16px;
@@ -653,9 +671,9 @@
 .dic-trou-sentence {
   font-size: 22px;
   font-weight: 600;
-  line-height: 2.9;
+  line-height: 3.1;
   letter-spacing: 0.01em;
-  word-spacing: 0.14em;
+  word-spacing: 0.2em;
   text-align: center;
   color: var(--text);
 }
@@ -664,7 +682,7 @@
   align-items: center;
   gap: 5px;
   vertical-align: middle;
-  margin: 0 4px;
+  margin: 0 8px;
 }
 /* Trou de conjugaison : infinitif affiché en clair juste avant le trou (seul
    indice fourni en plus du haut-parleur) — teinté gold pour rester
@@ -761,6 +779,16 @@
   padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px; margin-bottom: 8px;
 }
 .dic-mydictees-title { font-weight: 700; font-size: 13.5px; color: var(--text); flex: 1; min-width: 140px; }
+/* Pastille de niveau global de la dictée (BUG 3, 2026-08-16) — dot coloré
+   réutilisé tel quel depuis .dic-niveau-dot (rappel de niveau pendant
+   l'exercice, même variable --ls-color-N), sous le titre plutôt qu'après
+   chaque pastille d'exercice grammatical (trompeur : le niveau est choisi
+   une fois pour toute la dictée, pas par exercice). */
+.dic-mydictees-niveau {
+  display: flex; align-items: center; gap: 6px; margin-top: 4px;
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.03em;
+}
 /* Colonne de 2 lignes maxi (lexique / grammaire) plutôt qu'un seul flux de
    pastilles mélangées — retour utilisateur : les 2 volets doivent se
    distinguer d'un coup d'œil, pas seulement par la couleur de fond. */
@@ -783,6 +811,9 @@
 .dic-mydictees-pill--good::before { content: '●'; color: #16a34a; margin-right: 4px; }
 .dic-mydictees-pill--ok::before   { content: '●'; color: #F5A623; margin-right: 4px; }
 .dic-mydictees-pill--low::before  { content: '●'; color: var(--red); margin-right: 4px; }
+/* Retour "erreurs les plus fréquentes" (js/dictees-word-stats.js) — texte
+   simple, pas une pastille (une liste de mots, pas un score isolé). */
+.dic-mydictees-freqtext { font-size: 12px; color: var(--muted); font-weight: 600; }
 
 /* ─── Mon évolution (dashboard-eleve.html, onglet "Mes dictées préparées") —
    valeurs recopiées de .jog-evo-bars (css/jogging.css) : même composant

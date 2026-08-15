@@ -172,8 +172,6 @@
         <select id="qz-class-select" class="qz-select"></select>
       </div>
 
-      <div id="qz-student-filter-banner" style="display:none"></div>
-
       <div id="qz-stats-body"><div class="qz-empty">Chargement…</div></div>
 
     </div>
@@ -264,31 +262,32 @@
       document.getElementById('qz-report-back-btn').addEventListener('click', renderReportList);
     }
 
-    /* Restreint le rapport (déjà chargé pour toute la classe) au seul élève
-       transmis par la fiche élève (?student=), en retirant les questionnaires
-       où il n'a aucun résultat et en recalculant count/avgPct sur ce seul
-       élève (sinon ces deux champs resteraient ceux de toute la classe). */
-    function applyStudentFilter() {
-      if (!_filterStudentId || !_currentReport) return;
-      _currentReport = {
-        perQuestionnaire: _currentReport.perQuestionnaire
-          .map(q => {
-            const students = q.students.filter(s => s.student.auth_user_id === _filterStudentId);
-            return { ...q, students, count: students.length, avgPct: students.length ? students[0].pct : null };
-          })
-          .filter(q => q.count > 0)
-      };
-    }
+    /* ── Fiche élève : au lieu de filtrer la vue classe entière sur un seul
+       élève (ancien comportement, retour utilisateur : trop détourné, on
+       veut la fiche individuelle directement), transmis par ?student=/
+       ?sname= depuis la fiche élève d'un autre onglet du hub Résultats — une
+       ligne par questionnaire passé par cet élève, réutilise les données
+       déjà chargées pour toute la classe (aucune requête Supabase
+       supplémentaire). ──────────────────────────────────────────────────── */
+    function renderStudentFiche() {
+      const body = document.getElementById('qz-stats-body');
+      if (!_currentReport) return;
 
-    function renderStudentFilterBanner() {
-      const banner = document.getElementById('qz-student-filter-banner');
-      if (!_filterStudentId) { banner.style.display = 'none'; return; }
-      banner.style.display = '';
-      banner.innerHTML = `
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(16,43,106,0.06);border:1.5px solid rgba(16,43,106,0.2);border-radius:10px;padding:10px 16px;margin-bottom:18px;font-size:13.5px;color:var(--text)">
-          <span>👤 Filtré sur <strong>${escHtml(_filterStudentName || 'cet élève')}</strong></span>
-          <a href="resultats-questionnaires-enseignant.html?class=${encodeURIComponent(_currentClassId || '')}" style="color:var(--blue);font-weight:700;text-decoration:none">✕ Voir toute la classe</a>
-        </div>`;
+      const rowsHtml = _currentReport.perQuestionnaire.map(q => {
+        const s = q.students.find(st => st.student.auth_user_id === _filterStudentId);
+        if (!s) return '';
+        return `
+          <div class="qz-report-student-row">
+            <div class="qz-report-student-name">${escHtml(q.titre)}</div>
+            <div class="qz-report-score">${s.score} / ${s.total} <span class="qz-report-pct">${s.pct} %</span></div>
+          </div>`;
+      }).join('');
+
+      body.innerHTML = `
+        <a href="resultats-questionnaires-enseignant.html?class=${encodeURIComponent(_currentClassId || '')}" class="qz-report-back-btn" style="text-decoration:none">← Retour à la classe</a>
+        <div class="qz-report-detail-title">${escHtml(_filterStudentName || 'Élève')}</div>
+        ${rowsHtml || '<div class="empty-inline">Aucun résultat de questionnaire pour cet élève.</div>'}
+      `;
     }
 
     async function loadStats() {
@@ -300,8 +299,11 @@
         document.getElementById('qz-stats-body').innerHTML = `<div class="qz-empty">Erreur : ${escHtml(e.message)}</div>`;
         return;
       }
-      applyStudentFilter();
-      renderReportList();
+      if (_filterStudentId) {
+        renderStudentFiche();
+      } else {
+        renderReportList();
+      }
     }
 
     async function init() {
@@ -318,7 +320,8 @@
 
       /* ?class= transmis depuis un lien croisé ou depuis la fiche élève,
          sinon première classe. ?student= (+ ?sname=) transmis depuis la
-         fiche élève restreint le rapport à cet élève (applyStudentFilter). */
+         fiche élève ouvre directement sa fiche questionnaires (voir
+         renderStudentFiche). */
       const urlParams = new URLSearchParams(window.location.search);
       const classParam = urlParams.get('class');
       _currentClassId = (classParam && _classes.some(c => c.id === classParam))
@@ -328,8 +331,10 @@
 
       _filterStudentId = urlParams.get('student') || null;
       _filterStudentName = urlParams.get('sname') ? decodeURIComponent(urlParams.get('sname')) : '';
-      classSel.disabled = !!_filterStudentId;
-      renderStudentFilterBanner();
+      /* En fiche élève, le sélecteur de classe n'a pas de sens (un élève
+         appartient à une seule classe) — masqué au profit du bouton
+         "← Retour à la classe" dans renderStudentFiche(). */
+      document.querySelector('.qz-filter-field').style.display = _filterStudentId ? 'none' : '';
 
       classSel.addEventListener('change', () => {
         _currentClassId = classSel.value;

@@ -12,13 +12,14 @@
   <link rel="manifest" href="site.webmanifest?v=1">
   <title>Résultats des dictées — Espace enseignant — LFM</title>
   <link rel="stylesheet" href="styles.css?v=12">
-  <link rel="stylesheet" href="css/dictees.css?v=2">
+  <link rel="stylesheet" href="css/dictees.css?v=28">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/teacher.js?v=2"></script>
-  <script src="js/dictees-teacher.js?v=11"></script>
+  <script src="js/dictees-word-stats.js?v=2"></script>
+  <script src="js/dictees-teacher.js?v=12"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=2">
   <script src="js/resultats-nav.js?v=3"></script>
   <style>
@@ -75,6 +76,7 @@
     }
     .dic-report-list-row:hover, .dic-report-list-row:focus-visible { background: rgba(16,43,106,0.05); border-color: var(--blue); outline: none; }
     .dic-report-list-title { flex: 1; font-weight: 700; font-size: 15px; color: var(--text); }
+    .dic-report-list-avg { font-weight: 600; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
     .dic-report-list-meta { font-size: 13px; color: var(--text); font-weight: 600; flex-shrink: 0; }
     .dic-report-chevron { color: var(--blue); font-size: 18px; flex-shrink: 0; }
 
@@ -115,6 +117,7 @@
     .dic-report-pill--ok::before   { content: '●'; color: #F5A623; margin-right: 4px; }
     .dic-report-pill--low::before  { content: '●'; color: var(--red); margin-right: 4px; }
     .dic-report-pill--empty { background: var(--bg); color: var(--muted); font-weight: 600; }
+    .dic-report-freqtext { font-size: 12.5px; color: var(--muted); font-weight: 600; }
   </style>
 </head>
 <body>
@@ -193,8 +196,6 @@
         <select id="dic-class-select" class="dic-select"></select>
       </div>
 
-      <div id="dic-student-filter-banner" style="display:none"></div>
-
       <div id="dic-stats-body"><div class="dic-empty">Chargement…</div></div>
 
     </div>
@@ -242,6 +243,10 @@
        actuel de fichiers autonomes, cf. js/dictees-engine.js). */
     const LEX_EXERCICES = [0, 3, 1];
     const LEX_LABELS = { 0: 'Photographier un mot', 3: 'Compléter un mot', 1: 'Dictée de mots' };
+    /* Types dotés d'un niveau de difficulté — dupliqué depuis
+       js/dictees-student-space.js/NIVEAU_TYPES (classification et
+       transformation n'ont pas de contenu filtré par niveau). */
+    const NIVEAU_TYPES = new Set(['trous', 'trous_conjugaison']);
 
     /* Bordure de la pastille selon le score — dupliqué depuis
        js/dictees-student-space.js/tierClassFor (même présentation, retour
@@ -263,7 +268,7 @@
       body.innerHTML = _currentReport.perDictee.map((d, i) => `
         <div class="dic-report-list-row" data-dictee-idx="${i}" tabindex="0" role="button"
              aria-label="Voir les résultats de ${escHtml(d.titre)}">
-          <div class="dic-report-list-title">${escHtml(d.titre)}</div>
+          <div class="dic-report-list-title">${escHtml(d.titre)}${d.avgMissed != null ? `<div class="dic-report-list-avg">Moyenne : ${String(d.avgMissed).replace('.', ',')} erreur${d.avgMissed >= 2 ? 's' : ''}</div>` : ''}</div>
           <div class="dic-report-list-meta">${d.students.length} élève${d.students.length !== 1 ? 's' : ''}</div>
           <div class="dic-report-chevron">›</div>
         </div>
@@ -295,14 +300,19 @@
           .join('');
         const gramPills = Object.entries(s.gramByType)
           .filter(([, pct]) => pct !== null)
-          .map(([type, pct]) => `<span class="dic-report-pill dic-report-pill--gram ${tierClassFor(pct)}">${GRAM_TYPE_LABELS[type]} : ${pct}%</span>`)
+          .map(([type, pct]) => {
+            const niveauMax = NIVEAU_TYPES.has(type) ? s.gramNiveauByType[type] : null;
+            const niveauSuffix = niveauMax != null ? ` — Niveau ${niveauMax}` : '';
+            return `<span class="dic-report-pill dic-report-pill--gram ${tierClassFor(pct)}">${GRAM_TYPE_LABELS[type]} : ${pct}%${niveauSuffix}</span>`;
+          })
           .join('');
         /* Une ligne par catégorie (lexique / grammaire), omise si l'élève
            n'a rien tenté dans cette catégorie pour cette dictée — même
            logique que js/dictees-student-space.js/renderMesDictees. */
         const lexRow = lexPill ? `<div class="dic-report-pillrow"><span class="dic-report-catlabel">Lexique</span>${lexPill}</div>` : '';
         const gramRow = gramPills ? `<div class="dic-report-pillrow"><span class="dic-report-catlabel">Grammaire</span>${gramPills}</div>` : '';
-        const pills = (lexRow + gramRow) || '<span class="dic-report-pill dic-report-pill--empty">Aucun résultat</span>';
+        const freqRow = s.freqLine ? `<div class="dic-report-pillrow"><span class="dic-report-catlabel">Erreurs</span><span class="dic-report-freqtext">${escHtml(s.freqLine)}</span></div>` : '';
+        const pills = (lexRow + gramRow + freqRow) || '<span class="dic-report-pill dic-report-pill--empty">Aucun résultat</span>';
         return `
           <div class="dic-report-student-row">
             <div class="dic-report-student-name">${escHtml(s.student.display_name)}</div>
@@ -318,29 +328,48 @@
       document.getElementById('dic-report-back-btn').addEventListener('click', renderReportList);
     }
 
-    /* Restreint le rapport (déjà chargé pour toute la classe) au seul élève
-       transmis par la fiche élève (?student=), en retirant les dictées où il
-       n'a aucun résultat — même filtre appliqué côté rendu, aucune requête
-       Supabase supplémentaire. */
-    function applyStudentFilter() {
-      if (!_filterStudentId || !_currentReport) return;
-      _currentReport = {
-        ...(_currentReport),
-        perDictee: _currentReport.perDictee
-          .map(d => ({ ...d, students: d.students.filter(s => s.student.auth_user_id === _filterStudentId) }))
-          .filter(d => d.students.length > 0)
-      };
-    }
+    /* ── Fiche élève : au lieu de filtrer la vue classe entière sur un seul
+       élève (ancien comportement, retour utilisateur : trop détourné, on
+       veut la fiche individuelle directement), transmis par ?student=/
+       ?sname= depuis la fiche élève d'un autre onglet du hub Résultats — une
+       ligne par dictée où cet élève a un résultat, même patron que
+       js/dictees-student-space.js/renderMesDictees (dashboard élève),
+       réutilise les données déjà chargées pour toute la classe (aucune
+       requête Supabase supplémentaire). ────────────────────────────────── */
+    function renderStudentFiche() {
+      const body = document.getElementById('dic-stats-body');
+      if (!_currentReport) return;
 
-    function renderStudentFilterBanner() {
-      const banner = document.getElementById('dic-student-filter-banner');
-      if (!_filterStudentId) { banner.style.display = 'none'; return; }
-      banner.style.display = '';
-      banner.innerHTML = `
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(16,43,106,0.06);border:1.5px solid rgba(16,43,106,0.2);border-radius:10px;padding:10px 16px;margin-bottom:18px;font-size:13.5px;color:var(--text)">
-          <span>👤 Filtré sur <strong>${escHtml(_filterStudentName || 'cet élève')}</strong></span>
-          <a href="resultats-dictees-enseignant.html?class=${encodeURIComponent(_currentClassId || '')}" style="color:var(--blue);font-weight:700;text-decoration:none">✕ Voir toute la classe</a>
-        </div>`;
+      const rowsHtml = _currentReport.perDictee.map(d => {
+        const s = d.students.find(st => st.student.auth_user_id === _filterStudentId);
+        if (!s) return '';
+        const lexPill = LEX_EXERCICES
+          .filter(ex => s.lexByExercice[ex] !== null)
+          .map(ex => `<span class="dic-report-pill dic-report-pill--lex ${tierClassFor(s.lexByExercice[ex])}">${LEX_LABELS[ex]} : ${s.lexByExercice[ex]}%</span>`)
+          .join('');
+        const gramPills = Object.entries(s.gramByType)
+          .filter(([, pct]) => pct !== null)
+          .map(([type, pct]) => {
+            const niveauMax = NIVEAU_TYPES.has(type) ? s.gramNiveauByType[type] : null;
+            const niveauSuffix = niveauMax != null ? ` — Niveau ${niveauMax}` : '';
+            return `<span class="dic-report-pill dic-report-pill--gram ${tierClassFor(pct)}">${GRAM_TYPE_LABELS[type]} : ${pct}%${niveauSuffix}</span>`;
+          })
+          .join('');
+        const lexRow = lexPill ? `<div class="dic-report-pillrow"><span class="dic-report-catlabel">Lexique</span>${lexPill}</div>` : '';
+        const gramRow = gramPills ? `<div class="dic-report-pillrow"><span class="dic-report-catlabel">Grammaire</span>${gramPills}</div>` : '';
+        const pills = (lexRow + gramRow) || '<span class="dic-report-pill dic-report-pill--empty">Aucun résultat</span>';
+        return `
+          <div class="dic-report-student-row">
+            <div class="dic-report-student-name">${escHtml(d.titre)}</div>
+            <div class="dic-report-pills">${pills}</div>
+          </div>`;
+      }).join('');
+
+      body.innerHTML = `
+        <a href="resultats-dictees-enseignant.html?class=${encodeURIComponent(_currentClassId || '')}" class="dic-report-back-btn" style="text-decoration:none">← Retour à la classe</a>
+        <div class="dic-report-detail-title">${escHtml(_filterStudentName || 'Élève')}</div>
+        ${rowsHtml || '<div class="empty-inline">Aucun résultat de dictée pour cet élève.</div>'}
+      `;
     }
 
     async function loadStats() {
@@ -352,8 +381,11 @@
         document.getElementById('dic-stats-body').innerHTML = `<div class="dic-empty">Erreur : ${escHtml(e.message)}</div>`;
         return;
       }
-      applyStudentFilter();
-      renderReportList();
+      if (_filterStudentId) {
+        renderStudentFiche();
+      } else {
+        renderReportList();
+      }
     }
 
     async function init() {
@@ -371,7 +403,7 @@
       /* ?class= transmis depuis le lien croisé de dictees-enseignant.html
          (classe en cours de gestion là-bas) ou depuis la fiche élève — sinon,
          première classe. ?student= (+ ?sname=) transmis depuis la fiche
-         élève restreint le rapport à cet élève (voir applyStudentFilter). */
+         élève ouvre directement sa fiche dictées (voir renderStudentFiche). */
       const urlParams = new URLSearchParams(window.location.search);
       const classParam = urlParams.get('class');
       _currentClassId = (classParam && _classes.some(c => c.id === classParam))
@@ -381,8 +413,10 @@
 
       _filterStudentId = urlParams.get('student') || null;
       _filterStudentName = urlParams.get('sname') ? decodeURIComponent(urlParams.get('sname')) : '';
-      classSel.disabled = !!_filterStudentId;
-      renderStudentFilterBanner();
+      /* En fiche élève, le sélecteur de classe n'a pas de sens (un élève
+         appartient à une seule classe) — masqué au profit du bouton
+         "← Retour à la classe" dans renderStudentFiche(). */
+      document.querySelector('.dic-filter-field').style.display = _filterStudentId ? 'none' : '';
 
       classSel.addEventListener('change', () => {
         _currentClassId = classSel.value;

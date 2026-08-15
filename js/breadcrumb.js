@@ -85,11 +85,12 @@ const Breadcrumb = (() => {
 
   /**
    * @param {object}  [config]
-   * @param {object}  [config.category] { href, label } — maillon cliquable. Omis si absent (ex: sur une page de catégorie elle-même).
-   * @param {string}  [config.current]  Libellé du dernier maillon (page en cours), non cliquable.
+   * @param {object}  [config.category]    { href, label } — maillon cliquable. Omis si absent (ex: sur une page de catégorie elle-même).
+   * @param {object}  [config.subcategory] { href, label } — maillon cliquable intermédiaire entre la catégorie et la page courante (ex: "Dictées préparées" entre "Orthographe" et le titre d'une dictée). Omis si absent.
+   * @param {string}  [config.current]     Libellé du dernier maillon (page en cours), non cliquable.
    */
   function render(config = {}) {
-    const { category = null, current = '' } = config;
+    const { category = null, subcategory = null, current = '' } = config;
     const subject = resolveSubject(category, current);
 
     const bar = document.createElement('div');
@@ -103,6 +104,8 @@ const Breadcrumb = (() => {
         <a class="bc-link" id="bc-link-subject" href="${subject ? subject.href : '#'}"${subject ? '' : ' hidden'}>${subject ? escapeHTML(subject.label) : ''}</a>
         <span class="bc-sep" id="bc-sep-cat"${category ? '' : ' hidden'}>›</span>
         <a class="bc-link" id="bc-link" href="${category ? category.href : '#'}"${category ? '' : ' hidden'}>${category ? escapeHTML(category.label) : ''}</a>
+        <span class="bc-sep" id="bc-sep-subcat"${subcategory ? '' : ' hidden'}>›</span>
+        <a class="bc-link" id="bc-link-subcat" href="${subcategory ? subcategory.href : '#'}"${subcategory ? '' : ' hidden'}>${subcategory ? escapeHTML(subcategory.label) : ''}</a>
         <span class="bc-sep" id="bc-sep-cur"${current ? '' : ' hidden'}>›</span>
         <span class="bc-current" id="bc-current"${current ? '' : ' hidden'}>${escapeHTML(current)}</span>
         <span class="bc-sep" id="bc-sep-sub" hidden>›</span>
@@ -159,6 +162,17 @@ const Breadcrumb = (() => {
     applySubject(resolveSubject(category, null));
   }
 
+  /** À appeler après render() une fois la sous-catégorie connue (ex: liste intermédiaire résolue après coup). */
+  function setSubcategory(subcategory) {
+    const link = document.getElementById('bc-link-subcat');
+    const sep  = document.getElementById('bc-sep-subcat');
+    if (!link || !sep || !subcategory) return;
+    link.href        = subcategory.href;
+    link.textContent = subcategory.label;
+    link.hidden = false;
+    sep.hidden  = false;
+  }
+
   /** À appeler après render() une fois le titre de la page connu (ex: après résolution du slug dans exercise.html). */
   function setCurrent(text) {
     const el  = document.getElementById('bc-current');
@@ -212,5 +226,5 @@ const Breadcrumb = (() => {
     el.classList.remove('is-clickable');
   }
 
-  return { render, setCategory, setCurrent, setSub, clearSub, setCurrentClickable, clearCurrentClickable };
+  return { render, setCategory, setSubcategory, setCurrent, setSub, clearSub, setCurrentClickable, clearCurrentClickable };
 })();
