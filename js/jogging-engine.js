@@ -525,6 +525,11 @@ async function showCompletedState() {
 /* ── Initialisation ───────────────────────────────────────────────────────── */
 
 (async function init() {
+  // Module désactivé (JOGGING_ENABLED = false, voir js/feature-flags.js) :
+  // le message "non disponible" est déjà affiché côté HTML (jogging.html) ;
+  // ce garde évite juste le travail inutile (auth, préchargement Grammalecte…).
+  if (typeof LFM_FEATURES !== 'undefined' && !LFM_FEATURES.isEnabled('jogging')) return;
+
   const id = new URLSearchParams(window.location.search).get('id');
   const baseJogging = id ? JOGGING_DATA[id] : null;
 

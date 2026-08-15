@@ -100,7 +100,7 @@
         </a>
 
         <!-- Rédaction -->
-        <a class="hub-card" href="redaction.html">
+        <a class="hub-card" href="redaction.html" data-feature="jogging">
           <img class="hub-card-img" src="assets/redaction.png" alt="Rédaction" />
           <div class="hub-card-title">Rédaction</div>
           <div class="hub-card-rule"></div>
@@ -118,6 +118,7 @@
         </a>
 
       </div>
+      <script src="js/feature-flags.js?v=1"></script><script>LFM_FEATURES.hideDisabled();</script>
 
     </div>
   </div>
@@ -146,6 +147,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/idle-logout.js"></script>
   <script src="js/menu.js"></script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */

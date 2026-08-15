@@ -658,6 +658,14 @@
   border-radius: 12px;
   padding: 9px 12px;
   min-height: 46px;
+  min-width: 70px;
+  /* Élargissement natif à la saisie, là où le navigateur le supporte (Chrome
+     ≥123 à ce jour) — la largeur posée en JS (sizeTrouInput, mesure réelle
+     du texte) reste la garantie qui fonctionne partout ailleurs, cf.
+     js/dictees-engine.js/renderTrousExercise. Sans ça (et sans ce JS), la
+     largeur fixe calculée sur le mot attendu tronquait le texte dès que la
+     saisie dépassait (retour utilisateur). */
+  field-sizing: content;
   font-family: inherit;
   font-size: 19px;
   font-weight: 700;
@@ -669,6 +677,7 @@
 .dic-trou-blank-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(16,43,106,0.15); }
 .dic-trou-blank-input.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.08); color: #15803d; }
 .dic-trou-blank-input.is-wrong { border-color: var(--red); background: rgba(214,40,57,0.08); color: var(--red); }
+.dic-trou-blank-input:disabled { cursor: default; opacity: 1; }
 
 /* Haut-parleur par trou — lit le mot attendu à voix haute
    (DicteesSpeech.speak). Compact : à côté d'un input plutôt qu'un gros
@@ -730,10 +739,19 @@
 }
 .dic-mydictees-title { font-weight: 700; font-size: 13.5px; color: var(--text); flex: 1; min-width: 140px; }
 .dic-mydictees-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+/* Fond fixe par catégorie (bleu lexical / ambre grammatical — mêmes
+   couleurs que .dic-section-label, retour utilisateur : distinguer
+   visuellement orthographe lexicale et grammaticale) ; le score ne joue
+   plus sur le fond mais sur un point coloré devant le nom de l'exercice
+   (retour utilisateur : la bordure se voyait mal / se confondait avec
+   l'ambre grammatical). Vert repris de .dic-input.is-correct (même code
+   couleur "juste" que partout ailleurs sur ce module). */
 .dic-mydictees-pill { font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 100px; white-space: nowrap; }
-.dic-mydictees-pill--good { background: rgba(29,191,160,0.12); color: #0E7A66; }
-.dic-mydictees-pill--ok   { background: rgba(245,166,35,0.14); color: #7A4D0A; }
-.dic-mydictees-pill--low  { background: rgba(214,40,57,0.10); color: var(--red); }
+.dic-mydictees-pill--lexical { background: rgba(16,43,106,0.08); color: var(--blue); }
+.dic-mydictees-pill--gram    { background: rgba(245,166,35,0.16); color: #7A4D0A; }
+.dic-mydictees-pill--good::before { content: '●'; color: #16a34a; margin-right: 4px; }
+.dic-mydictees-pill--ok::before   { content: '●'; color: #F5A623; margin-right: 4px; }
+.dic-mydictees-pill--low::before  { content: '●'; color: var(--red); margin-right: 4px; }
 
 /* ─── Mon évolution (dashboard-eleve.html, onglet "Mes dictées préparées") —
    valeurs recopiées de .jog-evo-bars (css/jogging.css) : même composant

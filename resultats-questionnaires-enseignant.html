@@ -19,7 +19,7 @@
   <script src="js/teacher-analytics.js?v=6"></script>
   <script src="js/questionnaires-teacher.js?v=5"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=2">
-  <script src="js/resultats-nav.js?v=2"></script>
+  <script src="js/resultats-nav.js?v=3"></script>
   <style>
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
     .dash-content { max-width: 900px; margin: 0 auto; }
@@ -129,23 +129,36 @@
         <a class="main-tab" href="pilotage-enseignant.html">🎯 Pilotage des compétences</a>
         <a class="main-tab" href="resultats-enseignant.html">📊 Résultats</a>
         <a class="main-tab" href="remediations-enseignant.html">🧩 Remédiations</a>
-        <a class="main-tab" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
+        <a class="main-tab" data-feature="jogging" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
         <a class="main-tab" href="dictees-enseignant.html">📖 Dictées préparées</a>
         <a class="main-tab is-active" href="questionnaires-enseignant.html">📚 Questionnaires de lecture</a>
         <a class="main-tab" href="vocabulaire-corpus-enseignant.html">🔤 Corpus lexical</a>
       </nav>
+      <script src="js/feature-flags.js?v=1"></script><script>LFM_FEATURES.hideDisabled();</script>
 
       <!-- Sous-navigation résultats -->
       <div id="resultats-nav-mount"></div>
       <script>
+        /* Reçu depuis la fiche élève (resultats-enseignant.html, view=eleve) :
+           student/sname/cname/clevel/cyear/class transmis pour rester scopé à
+           l'élève cliqué au lieu de retomber sur le panneau classe entière —
+           on les retransmet aux autres pastilles pour garder le filtre en
+           circulant entre les modules. */
+        const _rnParams = new URLSearchParams(window.location.search);
+        const _rnExtra = {};
+        ['student', 'sname', 'cname', 'clevel', 'cyear', 'class'].forEach(k => {
+          const v = _rnParams.get(k);
+          if (v) _rnExtra[k] = v;
+        });
+        const _rnQs = Object.keys(_rnExtra).length ? '?' + new URLSearchParams(_rnExtra).toString() : '';
         ResultatsNav.render(document.getElementById('resultats-nav-mount'), {
           active: 'questionnaires',
           items: {
-            general:        { href: 'resultats-enseignant.html' },
-            joggings:       { href: 'resultats-joggings-enseignant.html' },
-            dictees:        { href: 'resultats-dictees-enseignant.html' },
-            questionnaires: { href: 'resultats-questionnaires-enseignant.html' },
-            corpus:         { href: 'resultats-corpus-enseignant.html' },
+            general:        { href: 'resultats-enseignant.html' + (_rnExtra.student ? ('?view=eleve&' + new URLSearchParams(_rnExtra).toString()) : '') },
+            joggings:       { href: 'resultats-joggings-enseignant.html' + _rnQs },
+            dictees:        { href: 'resultats-dictees-enseignant.html' + _rnQs },
+            questionnaires: { href: 'resultats-questionnaires-enseignant.html' + _rnQs },
+            corpus:         { href: 'resultats-corpus-enseignant.html' + _rnQs },
           }
         });
       </script>
@@ -158,6 +171,8 @@
         <label for="qz-class-select">Classe</label>
         <select id="qz-class-select" class="qz-select"></select>
       </div>
+
+      <div id="qz-student-filter-banner" style="display:none"></div>
 
       <div id="qz-stats-body"><div class="qz-empty">Chargement…</div></div>
 
@@ -191,6 +206,8 @@
     let _classes = [];
     let _currentClassId = null;
     let _currentReport = null; // { perQuestionnaire: [{ id, titre, count, avgPct, students }] }
+    let _filterStudentId = null;
+    let _filterStudentName = '';
 
     function escHtml(str) {
       return String(str == null ? '' : str)
@@ -241,10 +258,37 @@
       body.innerHTML = `
         <button type="button" class="qz-report-back-btn" id="qz-report-back-btn">← Retour aux questionnaires</button>
         <div class="qz-report-detail-title">${escHtml(q.titre)}</div>
-        <div class="qz-report-detail-avg">Moyenne de la classe : ${q.avgPct !== null ? q.avgPct + ' %' : '—'}</div>
+        <div class="qz-report-detail-avg">${_filterStudentId ? 'Score' : 'Moyenne de la classe'} : ${q.avgPct !== null ? q.avgPct + ' %' : '—'}</div>
         ${studentsHtml || '<div class="empty-inline">Aucun élève n\'a encore de résultat pour ce questionnaire.</div>'}
       `;
       document.getElementById('qz-report-back-btn').addEventListener('click', renderReportList);
+    }
+
+    /* Restreint le rapport (déjà chargé pour toute la classe) au seul élève
+       transmis par la fiche élève (?student=), en retirant les questionnaires
+       où il n'a aucun résultat et en recalculant count/avgPct sur ce seul
+       élève (sinon ces deux champs resteraient ceux de toute la classe). */
+    function applyStudentFilter() {
+      if (!_filterStudentId || !_currentReport) return;
+      _currentReport = {
+        perQuestionnaire: _currentReport.perQuestionnaire
+          .map(q => {
+            const students = q.students.filter(s => s.student.auth_user_id === _filterStudentId);
+            return { ...q, students, count: students.length, avgPct: students.length ? students[0].pct : null };
+          })
+          .filter(q => q.count > 0)
+      };
+    }
+
+    function renderStudentFilterBanner() {
+      const banner = document.getElementById('qz-student-filter-banner');
+      if (!_filterStudentId) { banner.style.display = 'none'; return; }
+      banner.style.display = '';
+      banner.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(16,43,106,0.06);border:1.5px solid rgba(16,43,106,0.2);border-radius:10px;padding:10px 16px;margin-bottom:18px;font-size:13.5px;color:var(--text)">
+          <span>👤 Filtré sur <strong>${escHtml(_filterStudentName || 'cet élève')}</strong></span>
+          <a href="resultats-questionnaires-enseignant.html?class=${encodeURIComponent(_currentClassId || '')}" style="color:var(--blue);font-weight:700;text-decoration:none">✕ Voir toute la classe</a>
+        </div>`;
     }
 
     async function loadStats() {
@@ -256,6 +300,7 @@
         document.getElementById('qz-stats-body').innerHTML = `<div class="qz-empty">Erreur : ${escHtml(e.message)}</div>`;
         return;
       }
+      applyStudentFilter();
       renderReportList();
     }
 
@@ -271,12 +316,20 @@
       }
       classSel.innerHTML = _classes.map(c => `<option value="${c.id}">${escHtml(c.name)} (${escHtml(c.level)})</option>`).join('');
 
-      /* ?class= transmis depuis un lien croisé, sinon première classe. */
-      const classParam = new URLSearchParams(window.location.search).get('class');
+      /* ?class= transmis depuis un lien croisé ou depuis la fiche élève,
+         sinon première classe. ?student= (+ ?sname=) transmis depuis la
+         fiche élève restreint le rapport à cet élève (applyStudentFilter). */
+      const urlParams = new URLSearchParams(window.location.search);
+      const classParam = urlParams.get('class');
       _currentClassId = (classParam && _classes.some(c => c.id === classParam))
         ? classParam
         : _classes[0].id;
       classSel.value = _currentClassId;
+
+      _filterStudentId = urlParams.get('student') || null;
+      _filterStudentName = urlParams.get('sname') ? decodeURIComponent(urlParams.get('sname')) : '';
+      classSel.disabled = !!_filterStudentId;
+      renderStudentFilterBanner();
 
       classSel.addEventListener('change', () => {
         _currentClassId = classSel.value;

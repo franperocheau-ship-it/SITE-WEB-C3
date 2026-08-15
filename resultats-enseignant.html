@@ -24,14 +24,14 @@
   <!-- Sources de données réutilisées pour la synthèse PDF (dictées/corpus/
        joggings) — voir printStudentBilan(), aucune de ces sections n'est
        affichée à l'écran ici, uniquement à l'impression. -->
-  <script src="js/dictees-teacher.js?v=7"></script>
+  <script src="js/dictees-teacher.js?v=9"></script>
   <script src="js/champ-lexical-teacher.js?v=4"></script>
   <script src="js/jogging-data.js?v=1"></script>
   <script src="js/jogging-teacher.js?v=1"></script>
   <link rel="stylesheet" href="laurels.css?v=5">
   <script src="js/laurels.js?v=7"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=2">
-  <script src="js/resultats-nav.js?v=2"></script>
+  <script src="js/resultats-nav.js?v=3"></script>
   <style>
     /* ── Layout ──────────────────────────────────────────────────────────────── */
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
@@ -570,7 +570,19 @@
     }
     .bulletin-dic-row:last-child { border-bottom: none; }
     .bulletin-dic-row .bdic-title { font-weight: 700; }
-    .bulletin-dic-row .bdic-score { font-weight: 700; color: #1A2D6B; white-space: nowrap; text-align: right; }
+    /* Pastilles couleur, même présentation que le dashboard élève
+       (css/dictees.css/.dic-mydictees-pill) et le tableau enseignant
+       (resultats-dictees-enseignant.html/.dic-report-pill) — retour
+       utilisateur : cohérence des 3 surfaces. Fond fixe par catégorie
+       (bleu lexical / ambre grammatical), score porté par un point coloré
+       devant le nom de l'exercice. */
+    .bulletin-dic-row .bdic-pills { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+    .bdic-pill { font-size: 7.5pt; font-weight: 700; padding: 2px 8px; border-radius: 100px; white-space: nowrap; }
+    .bdic-pill--lex { background: rgba(16,43,106,0.12); color: var(--blue); }
+    .bdic-pill--gram { background: rgba(245,166,35,0.20); color: #7A4D0A; }
+    .bdic-pill--good::before { content: '●'; color: #16a34a; margin-right: 3px; }
+    .bdic-pill--ok::before   { content: '●'; color: #F5A623; margin-right: 3px; }
+    .bdic-pill--low::before  { content: '●'; color: var(--red); margin-right: 3px; }
 
     /* 5quater. Corpus lexical — une ligne par champ/niveau travaillé. */
     .bulletin-corpus { margin-bottom: 18px; }
@@ -700,26 +712,46 @@
         <a class="main-tab" href="pilotage-enseignant.html">🎯 Pilotage des compétences</a>
         <a class="main-tab is-active" href="resultats-enseignant.html">📊 Résultats</a>
         <a class="main-tab" href="remediations-enseignant.html">🧩 Remédiations</a>
-        <a class="main-tab" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
+        <a class="main-tab" data-feature="jogging" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
         <a class="main-tab" href="dictees-enseignant.html">📖 Dictées préparées</a>
         <a class="main-tab" href="questionnaires-enseignant.html">📚 Questionnaires de lecture</a>
         <a class="main-tab" href="vocabulaire-corpus-enseignant.html">🔤 Corpus lexical</a>
         <a class="main-tab" href="evaluations-enseignant.html">📝 Évaluations</a>
       </nav>
+      <script src="js/feature-flags.js?v=1"></script><script>LFM_FEATURES.hideDisabled();</script>
 
       <!-- Sous-navigation résultats -->
       <div id="resultats-nav-mount"></div>
       <script>
-        ResultatsNav.render(document.getElementById('resultats-nav-mount'), {
-          active: 'general',
-          items: {
-            general:  { href: 'resultats-enseignant.html' },
-            joggings: { href: 'resultats-joggings-enseignant.html' },
-            dictees:  { href: 'resultats-dictees-enseignant.html' },
-            questionnaires: { href: 'resultats-questionnaires-enseignant.html' },
-            corpus:   { href: 'resultats-corpus-enseignant.html' },
+        /* En vue "fiche élève" (view=eleve), les pastilles Dictées/Questionnaires/
+           Corpus (et Joggings) doivent rester scopées à l'élève affiché plutôt que
+           de renvoyer vers le panneau classe entière — on leur transmet les mêmes
+           paramètres (student/sname/class/cname/clevel/cyear) que ceux déjà utilisés
+           par navigate({view:'eleve', ...}) ci-dessous. Ré-appelé par applyView() à
+           chaque changement de vue (voir NAVIGATION). */
+        let _resultatsNavEl = document.getElementById('resultats-nav-mount');
+        function renderResultatsNav() {
+          const p = new URLSearchParams(window.location.search);
+          const extra = {};
+          if ((p.get('view') || 'classes') === 'eleve') {
+            ['student', 'sname', 'cname', 'clevel', 'cyear', 'class'].forEach(k => {
+              const v = p.get(k);
+              if (v) extra[k] = v;
+            });
           }
-        });
+          const qs = Object.keys(extra).length ? '?' + new URLSearchParams(extra).toString() : '';
+          _resultatsNavEl = ResultatsNav.render(_resultatsNavEl, {
+            active: 'general',
+            items: {
+              general:  { href: 'resultats-enseignant.html' },
+              joggings: { href: 'resultats-joggings-enseignant.html' + qs },
+              dictees:  { href: 'resultats-dictees-enseignant.html' + qs },
+              questionnaires: { href: 'resultats-questionnaires-enseignant.html' + qs },
+              corpus:   { href: 'resultats-corpus-enseignant.html' + qs },
+            }
+          });
+        }
+        renderResultatsNav();
       </script>
 
       <!-- Chargement -->
@@ -1365,6 +1397,7 @@
   async function applyView() {
     const p    = new URLSearchParams(window.location.search);
     const view = p.get('view') || 'classes';
+    renderResultatsNav();
 
     ['view-loading','view-classes','view-students','view-student'].forEach(id => {
       document.getElementById(id).style.display = 'none';
@@ -1773,6 +1806,17 @@
     }
   }
   const GRAM_TYPE_LABELS_PRINT = { classification: 'Classification', trous: 'Texte à trous', transformation: 'Transformation' };
+  /* Ordre pédagogique (0 → 0.5 → 1) — dupliqué depuis js/dictees-teacher.js/
+     LEX_EXERCICES (pas de fichier utilitaire commun sur ce module). */
+  const LEX_EXERCICES_PRINT = [0, 3, 1];
+  const LEX_LABELS_PRINT = { 0: 'Photographier un mot', 3: 'Compléter un mot', 1: 'Dictée de mots' };
+  /* Bordure de la pastille selon le score — dupliqué depuis
+     js/dictees-student-space.js/tierClassFor (même présentation partout). */
+  function tierClassForPrint(pct) {
+    if (pct >= 80) return 'bdic-pill--good';
+    if (pct >= 50) return 'bdic-pill--ok';
+    return 'bdic-pill--low';
+  }
 
   /* Même donnée que resultats-corpus-enseignant.html, voir
      js/champ-lexical-teacher.js:getClassSessionsReport(teacherId, classId) —
@@ -1848,10 +1892,11 @@
 
     const classId    = new URLSearchParams(window.location.search).get('class');
     const authUserId = _currentStudent.auth_user_id;
+    const joggingOn  = typeof LFM_FEATURES === 'undefined' || LFM_FEATURES.isEnabled('jogging');
     const [dictees, corpusRows, joggingSummary] = await Promise.all([
       getStudentDicteesForPrint(classId, authUserId),
       getStudentCorpusForPrint(_teacherProfile?.id, classId, authUserId),
-      getStudentJoggingSummaryForPrint(authUserId)
+      joggingOn ? getStudentJoggingSummaryForPrint(authUserId) : Promise.resolve(null)
     ]);
 
     const name  = document.getElementById('student-header-name').textContent;
@@ -1907,17 +1952,17 @@
       <div class="bulletin-dictees">
         <div class="bulletin-jauges-title">Dictées préparées (${dictees.length})</div>
         ${dictees.map(d => {
-          const gramParts = Object.entries(d.entry.gramByType)
+          const gramPills = Object.entries(d.entry.gramByType)
             .filter(([, pct]) => pct !== null)
-            .map(([type, pct]) => `${GRAM_TYPE_LABELS_PRINT[type]} : ${pct}%`);
-          const scoreParts = [
-            d.entry.lexicalPct !== null ? `Lexical : ${d.entry.lexicalPct}%` : null,
-            ...gramParts
-          ].filter(Boolean);
+            .map(([type, pct]) => `<span class="bdic-pill bdic-pill--gram ${tierClassForPrint(pct)}">${GRAM_TYPE_LABELS_PRINT[type]} : ${pct}%</span>`);
+          const lexPills = LEX_EXERCICES_PRINT
+            .filter(ex => d.entry.lexByExercice[ex] !== null)
+            .map(ex => `<span class="bdic-pill bdic-pill--lex ${tierClassForPrint(d.entry.lexByExercice[ex])}">${LEX_LABELS_PRINT[ex]} : ${d.entry.lexByExercice[ex]}%</span>`);
+          const pills = [...lexPills, ...gramPills];
           return `
           <div class="bulletin-dic-row">
             <div class="bdic-title">${escHtml(d.titre)}</div>
-            <div class="bdic-score">${scoreParts.join(' · ') || 'Aucun résultat'}</div>
+            <div class="bdic-pills">${pills.join('') || 'Aucun résultat'}</div>
           </div>`;
         }).join('')}
       </div>` : `
@@ -1966,8 +2011,9 @@
       </div>`;
 
     /* Joggings d'écriture — même donnée que resultats-joggings-enseignant.html
-       (voir getStudentJoggingSummaryForPrint ci-dessus). */
-    const joggingHtml = joggingSummary ? `
+       (voir getStudentJoggingSummaryForPrint ci-dessus). Section omise du
+       bilan tant que le module est masqué (voir js/feature-flags.js). */
+    const joggingHtml = !joggingOn ? '' : joggingSummary ? `
       <div class="bulletin-jogging">
         <div class="bulletin-jauges-title">Joggings d'écriture — taux de réussite ${joggingSummary.tauxReussite}% (${joggingSummary.count})</div>
         ${joggingSummary.rows.map(r => `

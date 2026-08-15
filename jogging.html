@@ -19,6 +19,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/idle-logout.js"></script>
   <script src="js/text-to-speech.js?v=2"></script>
   <script src="js/jogging-data.js?v=1"></script>
   <script src="js/jogging-grammalecte.js?v=1"></script>
@@ -50,6 +51,16 @@
     <div class="page-content" style="max-width:720px;">
 
       <script>Breadcrumb.render({ category: { href: "redaction.html", label: "Rédaction" }, current: 'Chargement…' });</script>
+
+      <!-- Module désactivé (JOGGING_ENABLED = false, voir js/feature-flags.js) :
+           blocage de l'accès direct par URL, même id valide. -->
+      <div id="jog-module-disabled" style="display:none;text-align:center;padding:64px 24px;">
+        <p style="font-size:40px;margin-bottom:12px;">🔒</p>
+        <p style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Cette activité n'est pas disponible pour le moment</p>
+        <p style="font-size:14px;color:var(--muted);">Le module Rédaction / Joggings d'écriture est temporairement indisponible.</p>
+      </div>
+
+      <div id="jog-module-content">
 
       <div class="page-header" style="padding:20px 0 24px;">
         <h1 class="page-title" id="jog-title" style="font-size:1.5rem;">…</h1>
@@ -110,6 +121,8 @@
 
       <div id="jog-print-root"></div>
 
+      </div><!-- /#jog-module-content -->
+
     </div>
   </div>
 
@@ -135,6 +148,14 @@
 </footer>
 
   <script src="js/menu.js"></script>
+  <script src="js/feature-flags.js?v=1"></script>
+  <script>
+    if (!LFM_FEATURES.isEnabled('jogging')) {
+      document.getElementById('jog-module-content').style.display = 'none';
+      document.getElementById('jog-module-disabled').style.display = '';
+      Breadcrumb.setCurrent('Activité non disponible');
+    }
+  </script>
   <script src="js/jogging-engine.js?v=1"></script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */

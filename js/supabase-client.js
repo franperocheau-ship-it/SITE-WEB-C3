@@ -21,6 +21,7 @@ if (!window.lfmDb) {
     SUPABASE_ANON,
     {
       auth: {
+        storage: window.sessionStorage,
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true

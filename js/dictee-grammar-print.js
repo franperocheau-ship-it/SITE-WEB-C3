@@ -173,11 +173,10 @@ const DicteeGrammarPrint = (() => {
     const dictee = data.dictee;
     const trous = (data.trous || []).filter(t => (t.dictee_trous_mots || []).length > 0);
     const transformations = data.transformations || [];
-    // Une entrée de plusieurs mots ne peut pas porter une seule nature — même
-    // filet de sécurité que js/dictees-engine.js.
-    const pool = (data.mots || []).filter(m => m.nature_grammaticale && m.contenu.trim().split(/\s+/).length === 1)
-      .map(m => ({ id: m.id, contenu: m.contenu, nature_grammaticale: m.nature_grammaticale }))
-      .concat((data.extraMots || []).map(m => ({ id: m.id, contenu: m.contenu, nature_grammaticale: m.nature_grammaticale })));
+    // Uniquement les mots saisis manuellement pour l'exercice de
+    // classification — jamais les mots de la dictée de mots (data.mots),
+    // même chose côté élève, cf. js/dictees-engine.js.
+    const pool = (data.extraMots || []).map(m => ({ id: m.id, contenu: m.contenu, nature_grammaticale: m.nature_grammaticale }));
 
     let pages = '';
     if (trous.length > 0) {

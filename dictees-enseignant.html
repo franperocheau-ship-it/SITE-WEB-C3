@@ -17,7 +17,8 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=2"></script>
-  <script src="js/dictees-teacher.js?v=8"></script>
+  <script src="js/teacher-spellcheck.js?v=1"></script>
+  <script src="js/dictees-teacher.js?v=9"></script>
   <style>
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
     .dash-content { max-width: 960px; margin: 0 auto; }
@@ -139,8 +140,6 @@
       border: 1.5px solid var(--border); border-radius: 100px; padding: 5px 12px;
       font-family: inherit; font-size: 12px; font-weight: 600; color: var(--text); background: #fff; cursor: pointer;
     }
-    .dic-mot-nature-select:disabled { opacity: 0.5; cursor: not-allowed; background: var(--bg); }
-    .dic-mot-multiword-note { font-size: 12.5px; color: #3F4552; font-style: italic; white-space: nowrap; cursor: help; }
 
     .dic-trou-item { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
     .dic-trou-item-top { display: flex; gap: 8px; align-items: flex-start; }
@@ -201,12 +200,13 @@
         <a class="main-tab" href="pilotage-enseignant.html">🎯 Pilotage des compétences</a>
         <a class="main-tab" href="resultats-enseignant.html">📊 Résultats</a>
         <a class="main-tab" href="remediations-enseignant.html">🧩 Remédiations</a>
-        <a class="main-tab" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
+        <a class="main-tab" data-feature="jogging" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
         <a class="main-tab is-active" href="dictees-enseignant.html">📖 Dictées préparées</a>
         <a class="main-tab" href="questionnaires-enseignant.html">📚 Questionnaires de lecture</a>
         <a class="main-tab" href="vocabulaire-corpus-enseignant.html">🔤 Corpus lexical</a>
         <a class="main-tab" href="evaluations-enseignant.html">📝 Évaluations</a>
       </nav>
+      <script src="js/feature-flags.js?v=1"></script><script>LFM_FEATURES.hideDisabled();</script>
 
       <div class="section-header">
         <h1 class="section-title">Dictées préparées</h1>
@@ -241,7 +241,7 @@
         <div class="dic-form-title" id="dic-form-title">Nouvelle dictée</div>
 
         <label class="dic-form-label" for="dic-form-titre">Titre</label>
-        <input type="text" id="dic-form-titre" class="dic-form-input" placeholder="Ex. La rentrée des classes">
+        <input type="text" id="dic-form-titre" class="dic-form-input lfm-verifie" placeholder="Ex. La rentrée des classes">
 
         <label class="dic-form-label">Volets proposés à l'élève</label>
         <div class="dic-volets-row">
@@ -254,9 +254,9 @@
           <div class="dic-lexical-title">📘 Orthographe lexicale</div>
 
           <label class="dic-form-label" for="dic-form-mots">Mots ou groupes de mots difficiles séparés par des points-virgules</label>
-          <textarea id="dic-form-mots" class="dic-form-textarea"
+          <textarea id="dic-form-mots" class="dic-form-textarea lfm-verifie"
             placeholder="Ex. : un aéroport ; les enfants jouaient ; malheureusement"></textarea>
-          <p class="dic-form-hint">Un niveau de difficulté (1, 2 ou 3) est assigné à chaque mot ci-dessous, pour différencier selon les besoins des élèves. La dictée elle-même n'affiche aucun badge de niveau. La nature grammaticale (optionnelle) sert à l'exercice de classification ci-dessous.</p>
+          <p class="dic-form-hint">Un niveau de difficulté (1, 2 ou 3) est assigné à chaque mot ci-dessous, pour différencier selon les besoins des élèves. La dictée elle-même n'affiche aucun badge de niveau.</p>
           <div class="dic-mots-list" id="dic-mots-list"></div>
         </div>
 
@@ -283,9 +283,9 @@
 
           <!-- Classification par nature grammaticale -->
           <div class="dic-gram-subsection">
-            <div class="dic-gram-subtitle">Classification — mots supplémentaires</div>
-            <p class="dic-form-hint">L'exercice de classification réutilise automatiquement les mots difficiles ci-dessus ayant une nature grammaticale renseignée. Ajoute ici des mots propres à cet exercice si besoin.</p>
-            <textarea id="dic-form-extra-mots" class="dic-form-textarea" style="min-height:50px;"
+            <div class="dic-gram-subtitle">Classification par nature grammaticale</div>
+            <p class="dic-form-hint">Saisis ici les mots à faire apparaître dans l'exercice de classification, chacun avec sa nature grammaticale. Indépendant des mots difficiles ci-dessus : aucune reprise automatique.</p>
+            <textarea id="dic-form-extra-mots" class="dic-form-textarea lfm-verifie" style="min-height:50px;"
               placeholder="Séparés par des points-virgules : le chat ; rapidement ; ces"></textarea>
             <p class="dic-extra-note">Ces mots ne s'ajoutent pas à la liste des mots difficiles — ils n'existent que pour l'exercice de classification.</p>
             <div class="dic-mots-list" id="dic-extra-mots-list"></div>
@@ -332,7 +332,7 @@
     let _currentClassId = null;
     let _dictees = [];
     let _editingId = null;
-    let _formMots = []; // [{ contenu, niveau, nature_grammaticale }] — état du formulaire en cours
+    let _formMots = []; // [{ contenu, niveau }] — état du formulaire en cours
     let _formTrous = []; // [{ phrase, tags: [{ position, mot_attendu, regle }] }]
     let _formTransfos = []; // [{ phrase_depart, type_transformation, phrase_attendue }]
     let _formExtraMots = []; // [{ contenu, nature_grammaticale }] — mots propres à la classification
@@ -372,23 +372,17 @@
       return (raw || '').split(';').map(s => s.trim()).filter(Boolean);
     }
 
-    /* Une entrée lexicale de plusieurs mots (ex. "une rentrée") combine
-       plusieurs natures (article + nom) — un seul champ nature ne peut pas
-       les porter. Ces entrées sont exclues de la classification automatique ;
-       le prof ajoute séparément "une" et "rentrée" dans les mots
-       supplémentaires de classification (nature par mot possible là). */
-    function isMultiWord(contenu) {
-      return contenu.trim().split(/\s+/).length > 1;
-    }
-
-    /* ── Mots difficiles : reparse en conservant le niveau et la nature des mots déjà connus ── */
+    /* ── Mots difficiles : reparse en conservant le niveau des mots déjà connus ──
+       Aucune nature grammaticale ici : la classification a son propre champ
+       de saisie indépendant ci-dessous (dic-form-extra-mots), sans lien avec
+       cette liste (retour utilisateur : la reprise automatique des mots
+       tagués créait un couplage indésirable entre les deux exercices). */
     function reparseMots() {
       const raw = parseList(document.getElementById('dic-form-mots').value);
       const previousByContent = new Map(_formMots.map(m => [m.contenu.toLowerCase(), m]));
       _formMots = raw.map(contenu => {
         const prev = previousByContent.get(contenu.toLowerCase());
-        const nature = (!isMultiWord(contenu) && prev) ? prev.nature_grammaticale : null;
-        return { contenu, niveau: prev ? prev.niveau : 1, nature_grammaticale: nature };
+        return { contenu, niveau: prev ? prev.niveau : 1 };
       });
       renderMotsList();
     }
@@ -396,37 +390,20 @@
     function renderMotsList() {
       const list = document.getElementById('dic-mots-list');
       if (_formMots.length === 0) { list.innerHTML = ''; return; }
-      list.innerHTML = _formMots.map((m, i) => {
-        const multiWord = isMultiWord(m.contenu);
-        const title = multiWord
-          ? 'Mot composé de plusieurs mots : impossible d\'assigner une seule nature grammaticale. Ajoute les mots séparément dans « Classification — mots supplémentaires » ci-dessous.'
-          : '';
-        return `
+      list.innerHTML = _formMots.map((m, i) => `
         <div class="dic-mot-row">
           <div class="dic-mot-content">${escHtml(m.contenu)}</div>
-          <select class="dic-mot-nature-select" data-mot-idx="${i}" ${multiWord ? 'disabled' : ''} title="${escHtml(title)}">
-            <option value="">— nature —</option>
-            ${NATURE_OPTIONS.map(n => `<option value="${n}" ${m.nature_grammaticale === n ? 'selected' : ''}>${capitalize(n)}</option>`).join('')}
-          </select>
-          ${multiWord ? `<span class="dic-mot-multiword-note" title="${escHtml(title)}">ⓘ plusieurs mots</span>` : ''}
           <select class="dic-mot-niveau-select" data-mot-idx="${i}" style="background:${NIVEAU_VAR[m.niveau]}">
             <option value="1" ${m.niveau === 1 ? 'selected' : ''}>Niveau 1</option>
             <option value="2" ${m.niveau === 2 ? 'selected' : ''}>Niveau 2</option>
             <option value="3" ${m.niveau === 3 ? 'selected' : ''}>Niveau 3</option>
           </select>
-        </div>`;
-      }).join('');
+        </div>`).join('');
       list.querySelectorAll('.dic-mot-niveau-select').forEach(sel => {
         sel.addEventListener('change', () => {
           const idx = parseInt(sel.dataset.motIdx, 10);
           _formMots[idx].niveau = parseInt(sel.value, 10);
           sel.style.background = NIVEAU_VAR[_formMots[idx].niveau];
-        });
-      });
-      list.querySelectorAll('.dic-mot-nature-select').forEach(sel => {
-        sel.addEventListener('change', () => {
-          const idx = parseInt(sel.dataset.motIdx, 10);
-          _formMots[idx].nature_grammaticale = sel.value || null;
         });
       });
     }
@@ -507,7 +484,7 @@
         return `
         <div class="dic-trou-item">
           <div class="dic-trou-item-top">
-            <input type="text" class="dic-form-input dic-trou-phrase-input" data-trou-idx="${ti}"
+            <input type="text" class="dic-form-input dic-trou-phrase-input lfm-verifie" data-trou-idx="${ti}"
               value="${escHtml(t.phrase)}" placeholder="Saisis la phrase de la dictée…">
             <select class="dic-mot-niveau-select" data-trou-idx="${ti}" style="background:${NIVEAU_VAR[t.niveau]}">
               <option value="1" ${t.niveau === 1 ? 'selected' : ''}>Niveau 1</option>
@@ -574,15 +551,15 @@
             <button type="button" class="dic-btn dic-btn-danger dic-btn-sm" data-remove-transfo="${i}">✕</button>
           </div>
           <label class="dic-form-label">Phrase de départ</label>
-          <textarea class="dic-form-textarea dic-transfo-depart" data-idx="${i}" style="min-height:44px;">${escHtml(t.phrase_depart)}</textarea>
+          <textarea class="dic-form-textarea dic-transfo-depart lfm-verifie" data-idx="${i}" style="min-height:44px;">${escHtml(t.phrase_depart)}</textarea>
           <label class="dic-form-label">Transformation</label>
           <select class="dic-select dic-transfo-type" data-idx="${i}">
             ${TRANSFO_TYPES.map(tt => `<option value="${tt.value}" ${t.type_transformation === tt.value ? 'selected' : ''}>${tt.label}</option>`).join('')}
           </select>
           <label class="dic-form-label">Phrase attendue (transformée)</label>
-          <textarea class="dic-form-textarea dic-transfo-attendue" data-idx="${i}" style="min-height:44px;">${escHtml(t.phrase_attendue)}</textarea>
+          <textarea class="dic-form-textarea dic-transfo-attendue lfm-verifie" data-idx="${i}" style="min-height:44px;">${escHtml(t.phrase_attendue)}</textarea>
           <label class="dic-form-label">Autres formulations acceptées (séparées par ;, facultatif)</label>
-          <textarea class="dic-form-textarea dic-transfo-alt" data-idx="${i}" style="min-height:36px;"
+          <textarea class="dic-form-textarea dic-transfo-alt lfm-verifie" data-idx="${i}" style="min-height:36px;"
             placeholder="Ex. une autre phrase tout aussi correcte ; encore une autre">${escHtml(t.phrase_attendue_alt_raw || '')}</textarea>
         </div>
       `).join('');
@@ -616,7 +593,7 @@
       document.getElementById('dic-form-inclut-lexicale').checked = dictee ? dictee.inclut_lexicale !== false : true;
       document.getElementById('dic-form-inclut-grammaticale').checked = dictee ? dictee.inclut_grammaticale !== false : true;
       document.getElementById('dic-form-mots').value = mots ? mots.map(m => m.contenu).join(' ; ') : '';
-      _formMots = mots ? mots.map(m => ({ contenu: m.contenu, niveau: m.niveau, nature_grammaticale: m.nature_grammaticale || null })) : [];
+      _formMots = mots ? mots.map(m => ({ contenu: m.contenu, niveau: m.niveau })) : [];
 
       const trous = extra ? extra.trous : null;
       _formTrous = trous ? trous.map(t => ({
@@ -666,13 +643,7 @@
         return;
       }
 
-      // Filet de sécurité : une entrée de plusieurs mots ne peut jamais
-      // porter de nature grammaticale (cf. isMultiWord/renderMotsList), même
-      // si un état UI incohérent venait à en laisser une.
-      const mots = _formMots.map(m => ({
-        ...m,
-        nature_grammaticale: isMultiWord(m.contenu) ? null : m.nature_grammaticale
-      }));
+      const mots = _formMots;
 
       // Ne garder que les phrases à trous avec au moins un mot marqué (réponse
       // renseignée) — une phrase vide ou sans trou n'a pas de sens pour

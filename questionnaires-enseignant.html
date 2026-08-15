@@ -17,6 +17,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=2"></script>
+  <script src="js/teacher-spellcheck.js?v=1"></script>
   <script src="js/teacher-analytics.js?v=6"></script>
   <script src="js/questionnaires-teacher.js?v=5"></script>
   <style>
@@ -113,12 +114,13 @@
         <a class="main-tab" href="pilotage-enseignant.html">🎯 Pilotage des compétences</a>
         <a class="main-tab" href="resultats-enseignant.html">📊 Résultats</a>
         <a class="main-tab" href="remediations-enseignant.html">🧩 Remédiations</a>
-        <a class="main-tab" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
+        <a class="main-tab" data-feature="jogging" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
         <a class="main-tab" href="dictees-enseignant.html">📖 Dictées préparées</a>
         <a class="main-tab is-active" href="questionnaires-enseignant.html">📚 Questionnaires de lecture</a>
         <a class="main-tab" href="vocabulaire-corpus-enseignant.html">🔤 Corpus lexical</a>
         <a class="main-tab" href="evaluations-enseignant.html">📝 Évaluations</a>
       </nav>
+      <script src="js/feature-flags.js?v=1"></script><script>LFM_FEATURES.hideDisabled();</script>
 
       <div class="section-header">
         <h1 class="section-title">Questionnaires de lecture</h1>
@@ -133,7 +135,7 @@
         <div class="qz-form-title" id="qz-form-title">Nouveau questionnaire</div>
 
         <label class="qz-form-label" for="qz-form-titre">Titre de l'œuvre</label>
-        <input type="text" id="qz-form-titre" class="qz-form-input" placeholder="Ex. Le Petit Prince">
+        <input type="text" id="qz-form-titre" class="qz-form-input lfm-verifie" placeholder="Ex. Le Petit Prince">
 
         <label class="qz-form-label" for="qz-form-auteur">Auteur de l'œuvre</label>
         <input type="text" id="qz-form-auteur" class="qz-form-input" placeholder="Ex. Antoine de Saint-Exupéry">
@@ -209,19 +211,19 @@
             <span class="qz-question-num">Question ${qi + 1}</span>
             <button type="button" class="qz-question-remove" data-remove-question="${qi}">Supprimer</button>
           </div>
-          <textarea class="qz-form-textarea qz-enonce" data-q-idx="${qi}" rows="2" placeholder="Énoncé de la question">${escHtml(q.enonce)}</textarea>
+          <textarea class="qz-form-textarea qz-enonce lfm-verifie" data-q-idx="${qi}" rows="2" placeholder="Énoncé de la question">${escHtml(q.enonce)}</textarea>
           <div class="qz-reponses-list">
             ${q.reponses.map((r, ri) => `
               <div class="qz-reponse-row">
                 <input type="checkbox" data-q-idx="${qi}" data-r-idx="${ri}" class="qz-correcte-check" ${r.est_correcte ? 'checked' : ''} title="Bonne réponse">
-                <input type="text" class="qz-form-input qz-reponse-texte" data-q-idx="${qi}" data-r-idx="${ri}" value="${escHtml(r.texte)}" placeholder="Réponse ${ri + 1}">
+                <input type="text" class="qz-form-input qz-reponse-texte lfm-verifie" data-q-idx="${qi}" data-r-idx="${ri}" value="${escHtml(r.texte)}" placeholder="Réponse ${ri + 1}">
                 <button type="button" class="qz-reponse-remove" data-remove-reponse-q="${qi}" data-remove-reponse-r="${ri}" title="Supprimer cette réponse">✕</button>
               </div>
             `).join('')}
           </div>
           ${q.reponses.length < 4 ? `<button type="button" class="qz-add-reponse-btn" data-add-reponse="${qi}">+ Ajouter une réponse</button>` : ''}
           <label class="qz-form-label" style="margin-top:12px;">Explication (facultatif, affichée à l'élève après correction)</label>
-          <textarea class="qz-form-textarea qz-explication" data-q-idx="${qi}" rows="2" placeholder="Ex. Le texte précise que...">${escHtml(q.explication)}</textarea>
+          <textarea class="qz-form-textarea qz-explication lfm-verifie" data-q-idx="${qi}" rows="2" placeholder="Ex. Le texte précise que...">${escHtml(q.explication)}</textarea>
         </div>
       `).join('');
 

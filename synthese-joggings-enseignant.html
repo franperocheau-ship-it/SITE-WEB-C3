@@ -18,6 +18,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=2"></script>
+  <script src="js/teacher-spellcheck.js?v=1"></script>
   <script src="js/jogging-data.js?v=1"></script>
   <script src="js/jogging-teacher.js?v=1"></script>
   <script src="js/jogging-print.js?v=1"></script>
@@ -252,12 +253,23 @@
         <a class="main-tab" href="pilotage-enseignant.html">🎯 Pilotage des compétences</a>
         <a class="main-tab" href="resultats-enseignant.html">📊 Résultats</a>
         <a class="main-tab" href="remediations-enseignant.html">🧩 Remédiations</a>
-        <a class="main-tab is-active" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
+        <a class="main-tab is-active" data-feature="jogging" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
         <a class="main-tab" href="dictees-enseignant.html">📖 Dictées préparées</a>
         <a class="main-tab" href="questionnaires-enseignant.html">📚 Questionnaires de lecture</a>
         <a class="main-tab" href="vocabulaire-corpus-enseignant.html">🔤 Corpus lexical</a>
         <a class="main-tab" href="evaluations-enseignant.html">📝 Évaluations</a>
       </nav>
+      <script src="js/feature-flags.js?v=1"></script><script>LFM_FEATURES.hideDisabled();</script>
+
+      <!-- Module désactivé (JOGGING_ENABLED = false, voir js/feature-flags.js) :
+           blocage de l'accès direct par URL, même compte enseignant connecté. -->
+      <div id="jog-module-disabled" style="display:none;text-align:center;padding:64px 24px;">
+        <p style="font-size:40px;margin-bottom:12px;">🔒</p>
+        <p style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Cette activité n'est pas disponible pour le moment</p>
+        <p style="font-size:14px;color:var(--muted);">Le module Joggings d'écriture est temporairement indisponible.</p>
+      </div>
+
+      <div id="jog-module-content">
 
       <!-- Lien croisé vers le hub de résultats -->
       <div style="margin-bottom:16px;">
@@ -332,6 +344,14 @@
 
       <!-- Racine imprimée du premier jet (Phase 2bis, §5.5 — cachée à l'écran) -->
       <div id="jog-print-root"></div>
+
+      </div><!-- /#jog-module-content -->
+      <script>
+        if (!LFM_FEATURES.isEnabled('jogging')) {
+          document.getElementById('jog-module-content').style.display = 'none';
+          document.getElementById('jog-module-disabled').style.display = '';
+        }
+      </script>
 
     </div>
   </div>
@@ -504,13 +524,13 @@
           <label>Titre</label>
           <button type="button" class="jog-gerer-reset-btn" data-reset data-field="titre" data-default="${escHtml(jog.title)}">↺ Réinitialiser</button>
         </div>
-        <input type="text" data-field="titre" data-custom="${isCustom('titre')}" value="${escHtml(isCustom('titre') ? row.titre : jog.title)}">
+        <input type="text" class="lfm-verifie" data-field="titre" data-custom="${isCustom('titre')}" value="${escHtml(isCustom('titre') ? row.titre : jog.title)}">
 
         <div class="jog-gerer-field-row">
           <label>Consigne</label>
           <button type="button" class="jog-gerer-reset-btn" data-reset data-field="consigne" data-default="${escHtml(jog.consigne)}">↺ Réinitialiser</button>
         </div>
-        <textarea data-field="consigne" data-custom="${isCustom('consigne')}" style="min-height:80px;">${escHtml(isCustom('consigne') ? row.consigne : jog.consigne)}</textarea>
+        <textarea class="lfm-verifie" data-field="consigne" data-custom="${isCustom('consigne')}" style="min-height:80px;">${escHtml(isCustom('consigne') ? row.consigne : jog.consigne)}</textarea>
 
         <div class="jog-gerer-field-row">
           <label>Temps de conjugaison imposé</label>
@@ -528,7 +548,7 @@
           <label>Compétence</label>
           <button type="button" class="jog-gerer-reset-btn" data-reset data-field="competence" data-default="${escHtml(jog.competence)}">↺ Réinitialiser</button>
         </div>
-        <input type="text" data-field="competence" data-custom="${isCustom('competence')}" value="${escHtml(isCustom('competence') ? row.competence : jog.competence)}">
+        <input type="text" class="lfm-verifie" data-field="competence" data-custom="${isCustom('competence')}" value="${escHtml(isCustom('competence') ? row.competence : jog.competence)}">
 
         ${_gererMode === 'guide' ? `
           <label style="margin-top:10px;display:block;">État pour cette classe (parcours guidé)</label>
@@ -716,6 +736,7 @@
      INITIALISATION
   ═══════════════════════════════════════════════════════════════════════════ */
   (async () => {
+    if (!LFM_FEATURES.isEnabled('jogging')) return; // module masqué (voir js/feature-flags.js)
     const profile = await lfmAuth.requireRole('enseignant');
     if (!profile) return;
     _teacherProfile = profile;

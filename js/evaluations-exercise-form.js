@@ -206,13 +206,13 @@ const EvaluationsExerciseForm = (() => {
       case 'mots_souligne':
         return `
           <label class="ev-form-label">Texte (encadre les mots à marquer entre crochets, ex. « Le [chat] noir [dort]. »)</label>
-          <textarea class="ev-form-textarea ev-ex-texte" data-idx="${i}"
+          <textarea class="ev-form-textarea ev-ex-texte lfm-verifie" data-idx="${i}"
             placeholder="Le [chat] noir [dort] sur le canapé.">${escHtml(ex.texte)}</textarea>`;
 
       case 'mot_grille':
         return `
           <label class="ev-form-label">Liste de mots (un par ligne)</label>
-          <textarea class="ev-form-textarea ev-ex-mots" data-idx="${i}"
+          <textarea class="ev-form-textarea ev-ex-mots lfm-verifie" data-idx="${i}"
             placeholder="chat&#10;souris&#10;joli">${escHtml(ex.mots)}</textarea>
           <label class="ev-form-label">Nombre de colonnes</label>
           <select class="ev-select ev-ex-nbColonnes" data-idx="${i}" style="max-width:120px">
@@ -223,10 +223,10 @@ const EvaluationsExerciseForm = (() => {
       case 'reecriture':
         return `
           <label class="ev-form-label">Liste de phrases à transformer (une par ligne)</label>
-          <textarea class="ev-form-textarea ev-ex-phrases" data-idx="${i}"
+          <textarea class="ev-form-textarea ev-ex-phrases lfm-verifie" data-idx="${i}"
             placeholder="Il était content.&#10;Ils seront prêts.">${escHtml(ex.phrases)}</textarea>
           <label class="ev-form-label">Banque de mots (optionnel)</label>
-          <input type="text" class="ev-form-input ev-ex-banqueMots" data-idx="${i}"
+          <input type="text" class="ev-form-input ev-ex-banqueMots lfm-verifie" data-idx="${i}"
             value="${escHtml(ex.banqueMots)}" placeholder="Ex. était, sera, seront">`;
 
       case 'classement':
@@ -237,7 +237,7 @@ const EvaluationsExerciseForm = (() => {
           </label>
           ${ex.utiliserTableauConjugaison ? `
           <label class="ev-form-label">Verbes à conjuguer</label>
-          <input type="text" class="ev-form-input ev-ex-verbesConjugaison" data-idx="${i}"
+          <input type="text" class="ev-form-input ev-ex-verbesConjugaison lfm-verifie" data-idx="${i}"
             value="${escHtml(ex.verbesConjugaison)}" placeholder="Ex. aller, avoir, être...">
           <label class="ev-form-label">Pronoms à inclure</label>
           <div class="ev-pronoms-list">
@@ -248,10 +248,10 @@ const EvaluationsExerciseForm = (() => {
               </label>`).join('')}
           </div>` : `
           <label class="ev-form-label">Catégories (une par ligne)</label>
-          <textarea class="ev-form-textarea ev-ex-categories" data-idx="${i}"
+          <textarea class="ev-form-textarea ev-ex-categories lfm-verifie" data-idx="${i}"
             placeholder="Noms&#10;Adjectifs&#10;Verbes">${escHtml(ex.categories)}</textarea>
           <label class="ev-form-label">Texte de support ou mots à classer</label>
-          <input type="text" class="ev-form-input ev-ex-banqueMots" data-idx="${i}"
+          <input type="text" class="ev-form-input ev-ex-banqueMots lfm-verifie" data-idx="${i}"
             value="${escHtml(ex.banqueMots)}" placeholder="Ex. rapide, chanter, maison">
           <div class="ev-classement-lignes-info">Lignes vides sur le PDF : <strong>${ex.nbLignesClassement}</strong></div>
           <button type="button" class="ev-btn ev-btn-outline ev-btn-sm" data-add-ligne-classement="${i}">+ Insérer une ligne</button>`}`;
@@ -259,21 +259,21 @@ const EvaluationsExerciseForm = (() => {
       case 'relier':
         return `
           <label class="ev-form-label">Liste colonne gauche (une par ligne)</label>
-          <textarea class="ev-form-textarea ev-ex-colonneGauche" data-idx="${i}">${escHtml(ex.colonneGauche)}</textarea>
+          <textarea class="ev-form-textarea ev-ex-colonneGauche lfm-verifie" data-idx="${i}">${escHtml(ex.colonneGauche)}</textarea>
           <label class="ev-form-label">Liste colonne droite (une par ligne)</label>
-          <textarea class="ev-form-textarea ev-ex-colonneDroite" data-idx="${i}">${escHtml(ex.colonneDroite)}</textarea>`;
+          <textarea class="ev-form-textarea ev-ex-colonneDroite lfm-verifie" data-idx="${i}">${escHtml(ex.colonneDroite)}</textarea>`;
 
       case 'qcm':
         return `
           <label class="ev-form-label">Question (optionnel si la consigne suffit)</label>
-          <input type="text" class="ev-form-input ev-ex-question" data-idx="${i}" value="${escHtml(ex.question)}">
+          <input type="text" class="ev-form-input ev-ex-question lfm-verifie" data-idx="${i}" value="${escHtml(ex.question)}">
           <label class="ev-form-label">Liste de propositions (une par ligne)</label>
-          <textarea class="ev-form-textarea ev-ex-propositions" data-idx="${i}">${escHtml(ex.propositions)}</textarea>`;
+          <textarea class="ev-form-textarea ev-ex-propositions lfm-verifie" data-idx="${i}">${escHtml(ex.propositions)}</textarea>`;
 
       case 'reponse_courte':
         return `
           <label class="ev-form-label">Question</label>
-          <input type="text" class="ev-form-input ev-ex-question" data-idx="${i}" value="${escHtml(ex.question)}">
+          <input type="text" class="ev-form-input ev-ex-question lfm-verifie" data-idx="${i}" value="${escHtml(ex.question)}">
           <label class="ev-form-label">Nombre de lignes de réponse</label>
           <input type="number" class="ev-form-input ev-ex-nombreDeLignes" data-idx="${i}" min="1" max="10"
             value="${ex.nombreDeLignes}" style="max-width:100px">`;
@@ -281,13 +281,13 @@ const EvaluationsExerciseForm = (() => {
       case 'vrai_faux':
         return `
           <label class="ev-form-label">Liste d'affirmations (une par ligne)</label>
-          <textarea class="ev-form-textarea ev-ex-affirmations" data-idx="${i}">${escHtml(ex.affirmations)}</textarea>`;
+          <textarea class="ev-form-textarea ev-ex-affirmations lfm-verifie" data-idx="${i}">${escHtml(ex.affirmations)}</textarea>`;
 
       case 'marquage':
       default:
         return `
           <label class="ev-form-label">Contenu de l'exercice</label>
-          <textarea class="ev-form-textarea ev-ex-contenu" data-idx="${i}"
+          <textarea class="ev-form-textarea ev-ex-contenu lfm-verifie" data-idx="${i}"
             placeholder="La phrase, la liste ou la question à faire apparaître…">${escHtml(ex.contenu)}</textarea>`;
     }
   }
@@ -296,7 +296,7 @@ const EvaluationsExerciseForm = (() => {
     return `
       <div class="ev-trou-item">
         <div class="ev-trou-item-top">
-          <input type="text" class="ev-form-input ev-trou-texte" data-ex-idx="${exIdx}" data-phrase-idx="${phraseIdx}"
+          <input type="text" class="ev-form-input ev-trou-texte lfm-verifie" data-ex-idx="${exIdx}" data-phrase-idx="${phraseIdx}"
             value="${escHtml(item.texte)}" placeholder="Tape ta phrase, puis clique sur « Insérer un trou ».">
           <button type="button" class="ev-btn ev-btn-outline ev-btn-sm" data-insert-trou-ex="${exIdx}" data-insert-trou-phrase="${phraseIdx}">+ Insérer un trou</button>
           <button type="button" class="ev-btn ev-btn-danger ev-btn-icon" data-remove-trou-ex="${exIdx}" data-remove-trou-phrase="${phraseIdx}" title="Supprimer">✕</button>
@@ -391,7 +391,7 @@ const EvaluationsExerciseForm = (() => {
               </button>`).join('')}
           </div>
           <label class="ev-form-label">Consigne</label>
-          <input type="text" class="ev-form-input ev-ex-consigne" data-idx="${i}"
+          <input type="text" class="ev-form-input ev-ex-consigne lfm-verifie" data-idx="${i}"
             value="${escHtml(ex.consigne)}" placeholder="Ex. Souligne le verbe conjugué dans chaque phrase.">
           ${typeFieldsHtml(ex, i)}
         </div>`;

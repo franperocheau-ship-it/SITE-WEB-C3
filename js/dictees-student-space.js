@@ -9,16 +9,30 @@
    (JoggingStudentSpace.render(studentId) sur activation de l'onglet).
 
    « Mon évolution » trace le taux de réussite du premier coup à l'exercice 1
-   (capsule sonore), seul indicateur qui varie réellement dictée après
-   dictée : le score de l'exercice 2 est toujours égal au total par
-   construction (l'exercice ne finit qu'une fois tous les mots maîtrisés),
-   donc sans intérêt pour une courbe de progression.
+   (Dictée de mots, capsule sonore) uniquement — pas les 2 autres paliers
+   lexicaux, dont la courbe serait moins lisible en la mêlant à celle-ci.
+
+   Les 3 paliers lexicaux (dictee_results.exercice : 0 = Photographier un
+   mot, 3 = Compléter un mot, 1 = Dictée de mots — jamais 2, valeur laissée
+   inutilisée, cf. js/dictees-engine.js) sont affichés comme 3 résultats
+   indépendants dans « Mes dictées » (retour utilisateur — chacun visible dès
+   qu'il a été tenté, même si les 2 autres ne l'ont pas encore été). Fond de
+   pastille fixé par catégorie (bleu lexical / ambre grammatical, mêmes
+   couleurs que .dic-section-label — retour utilisateur : distinguer les 2
+   volets d'un coup d'œil) ; le score n'agit plus que sur une bordure
+   (tierClassFor), pour ne pas perdre ce signal en le confondant avec
+   l'ambre grammatical.
 
    Dépend de : supabase-client.js (window.lfmDb), js/dictees-badges.js.
    ───────────────────────────────────────────────────────────────────────────── */
 
 const DicteesStudentSpace = (() => {
   const GRAM_TYPE_LABELS = { classification: 'Classification', trous: 'Texte à trous', transformation: 'Transformation' };
+  /* Ordre pédagogique (0 → 0.5 → 1), pas l'ordre numérique des codes exercice
+     (1 reste la Dictée de mots pour compatibilité historique, cf.
+     js/dictees-engine.js). */
+  const LEX_EXERCICES = [0, 3, 1];
+  const LEX_LABELS = { 0: 'Photographier un mot', 3: 'Compléter un mot', 1: 'Dictée de mots' };
 
   function formatDate(iso) {
     return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
@@ -29,7 +43,11 @@ const DicteesStudentSpace = (() => {
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  function pillClassFor(pct) {
+  /* Fond de la pastille fixé par catégorie (lexical/gram, cf. LEX_EXERCICES/
+     GRAM_TYPE_LABELS plus bas) — le score ne joue plus que sur une bordure
+     (retour utilisateur : ne pas perdre le signal "score bas"/"score haut"
+     une fois le fond réservé à la catégorie). */
+  function tierClassFor(pct) {
     if (pct >= 80) return 'dic-mydictees-pill--good';
     if (pct >= 50) return 'dic-mydictees-pill--ok';
     return 'dic-mydictees-pill--low';
@@ -48,10 +66,12 @@ const DicteesStudentSpace = (() => {
     return map;
   }
 
-  /* ── Liste "Mes dictées" — une ligne par dictée faite, avec le résultat
-     lexical (ex.1) ET les résultats grammaticaux (un par type tenté), pour
-     que l'élève retrouve d'un coup d'œil ce qu'il a fait sur CETTE dictée
-     précise plutôt que des moyennes globales (voir §3 du retour utilisateur :
+  /* ── Liste "Mes dictées" — une ligne par dictée faite, avec les résultats
+     lexicaux (une pastille par palier réellement tenté parmi les 3 — 0/0.5/1,
+     retour utilisateur : auparavant un seul agrégat "Lexical", jugé pas assez
+     distingué) ET les résultats grammaticaux (un par type tenté), pour que
+     l'élève retrouve d'un coup d'œil ce qu'il a fait sur CETTE dictée précise
+     plutôt que des moyennes globales (voir §3 du retour utilisateur :
      structure auparavant confuse, mélangeait tout). */
   async function renderMesDictees(studentId, lexicalResults) {
     const section = document.getElementById('dic-dash-mesdictees-section');
@@ -65,8 +85,7 @@ const DicteesStudentSpace = (() => {
       if (!error) gramResults = data || [];
     }
 
-    const ex1 = lexicalResults.filter(r => r.exercice === 1);
-    const dicteeIds = [...new Set([...ex1.map(r => r.dictee_id), ...gramResults.map(r => r.dictee_id)])];
+    const dicteeIds = [...new Set([...lexicalResults.map(r => r.dictee_id), ...gramResults.map(r => r.dictee_id)])];
     if (dicteeIds.length === 0) { section.style.display = 'none'; return; }
 
     let titresById = new Map();
@@ -75,31 +94,34 @@ const DicteesStudentSpace = (() => {
       if (!error) titresById = new Map((data || []).map(d => [d.id, d.titre]));
     }
 
-    const lexLatest = latestByKey(ex1, r => r.dictee_id);
+    const lexLatest = latestByKey(lexicalResults, r => r.dictee_id + '|' + r.exercice);
     const gramLatest = latestByKey(gramResults, r => r.dictee_id + '|' + r.type);
 
     const rows = dicteeIds.map(id => {
-      const lex = lexLatest.get(id);
+      const lexResults = LEX_EXERCICES
+        .map(ex => lexLatest.get(id + '|' + ex))
+        .filter(Boolean);
       const gramTypes = ['classification', 'trous', 'transformation']
         .map(type => gramLatest.get(id + '|' + type))
         .filter(Boolean);
-      const lastActivity = [lex, ...gramTypes].filter(Boolean)
+      const lastActivity = [...lexResults, ...gramTypes]
         .reduce((max, r) => Math.max(max, new Date(r.completed_at).getTime()), 0);
-      return { id, titre: titresById.get(id) || '—', lex, gramTypes, lastActivity };
+      return { id, titre: titresById.get(id) || '—', lexResults, gramTypes, lastActivity };
     }).sort((a, b) => b.lastActivity - a.lastActivity);
 
     list.innerHTML = rows.map(r => {
-      const lexPill = r.lex
-        ? `<span class="dic-mydictees-pill ${pillClassFor(Math.round(r.lex.score / r.lex.total * 100))}">Lexical : ${Math.round(r.lex.score / r.lex.total * 100)}%</span>`
-        : '';
+      const lexPills = r.lexResults.map(lex => {
+        const pct = Math.round(lex.score / lex.total * 100);
+        return `<span class="dic-mydictees-pill dic-mydictees-pill--lexical ${tierClassFor(pct)}">${LEX_LABELS[lex.exercice]} : ${pct}%</span>`;
+      }).join('');
       const gramPills = r.gramTypes.map(g => {
         const pct = Math.round(g.score / g.total * 100);
-        return `<span class="dic-mydictees-pill ${pillClassFor(pct)}">${GRAM_TYPE_LABELS[g.type]} : ${pct}%</span>`;
+        return `<span class="dic-mydictees-pill dic-mydictees-pill--gram ${tierClassFor(pct)}">${GRAM_TYPE_LABELS[g.type]} : ${pct}%</span>`;
       }).join('');
       return `
         <div class="dic-mydictees-row">
           <div class="dic-mydictees-title">${escHtml(r.titre)}</div>
-          <div class="dic-mydictees-pills">${lexPill}${gramPills}</div>
+          <div class="dic-mydictees-pills">${lexPills}${gramPills}</div>
         </div>`;
     }).join('');
     section.style.display = '';

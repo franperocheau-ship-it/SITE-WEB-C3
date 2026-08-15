@@ -87,10 +87,17 @@ const DicteesSpeech = (() => {
     if (window.speechSynthesis) window.speechSynthesis.cancel();
   }
 
-  /* Tolérance : espaces multiples réduits + insensible à la casse. Accents et
-     ponctuation restent stricts (souvent l'objet même de la dictée). */
+  /* Tolérance : espaces multiples réduits + insensible à la casse, apostrophe
+     ramenée à une forme canonique (') quelle que soit celle tapée par
+     l'élève (' ’ ʼ `) ou stockée en base pour ce mot — un clavier standard
+     ne produit qu'une apostrophe droite, alors qu'un mot saisi/copié côté
+     enseignant peut très bien contenir une apostrophe courbe (ex.
+     "l'alphabétisation" en base, bug remonté par un utilisateur : réponse
+     juste refusée à chaque fois). La présence d'une apostrophe reste
+     exigée : seul son type précis devient tolérant. Accents et ponctuation
+     restent stricts par ailleurs (souvent l'objet même de la dictée). */
   function normalize(str) {
-    return (str || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    return (str || '').trim().toLowerCase().replace(/['’ʼ`]/g, "'").replace(/\s+/g, ' ');
   }
 
   /* Variante utilisée uniquement par le volet Orthographe grammaticale

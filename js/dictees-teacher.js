@@ -246,6 +246,12 @@ const lfmDicteesTeacher = (() => {
     if (error) throw error;
   }
 
+  /* Ordre pédagogique (0 → 0.5 → 1), pas l'ordre numérique des codes
+     exercice (1 reste la Dictée de mots pour compatibilité historique — 2
+     est délibérément inutilisé, cf. js/dictees-engine.js). Partagé par
+     resultats-dictees-enseignant.html pour libeller les pastilles lexicales. */
+  const LEX_EXERCICES = [0, 3, 1];
+
   /**
    * Rapport de résultats de la classe — structure "une dictée → qui l'a
    * faite → avec quel résultat", calculée à la volée (pas de table
@@ -253,17 +259,20 @@ const lfmDicteesTeacher = (() => {
    * (moyennes globales + "mots les plus ratés" + "élèves à suivre" séparés,
    * jugé confus — retour utilisateur) par la vue simple à deux temps attendue
    * côté page : liste des dictées, puis au clic la liste des élèves avec
-   * leur résultat lexical (ex.1 de dictee_results, pastille bleue) et
-   * grammatical par type (dictee_gram_results, pastilles jaunes) — plus
-   * aucun agrégat de classe intermédiaire.
+   * leurs résultats lexicaux (dictee_results, un par palier 0/0.5/1 tenté,
+   * pastilles bleues) et grammatical par type (dictee_gram_results,
+   * pastilles jaunes) — plus aucun agrégat de classe intermédiaire.
    *
    * `perDictee` ne contient QUE les dictées ayant au moins un résultat
    * (lexical OU grammatical), triées comme getClassDictees (created_at
    * desc). `students` : triés par nom, un élève par entrée dès qu'il a au
-   * moins un résultat sur CETTE dictée ; `lexicalPct` = dernière tentative
-   * ex.1 (null si jamais tentée) ; `gramByType` = dernière tentative par
+   * moins un résultat sur CETTE dictée ; `lexByExercice` = dernière
+   * tentative par palier lexical (0/3/1, null si jamais tenté — retour
+   * utilisateur : les 3 doivent s'afficher indépendamment, pas bloqués tant
+   * que les 3 n'ont pas été faits) ; `gramByType` = dernière tentative par
    * type classification/trous/transformation (null si jamais tenté) — la
-   * page n'affiche une pastille que pour les types réellement tentés.
+   * page n'affiche une pastille que pour les paliers/types réellement
+   * tentés.
    */
   async function getClassDicteeReport(classId) {
     const dictees = await getClassDictees(classId);
@@ -276,7 +285,7 @@ const lfmDicteesTeacher = (() => {
     if (dicteeIds.length > 0 && authIds.length > 0) {
       const [lexRes, gramRes] = await Promise.all([
         db.from('dictee_results').select('*')
-          .in('dictee_id', dicteeIds).in('student_id', authIds).eq('exercice', 1).limit(5000),
+          .in('dictee_id', dicteeIds).in('student_id', authIds).limit(5000),
         db.from('dictee_gram_results').select('*')
           .in('dictee_id', dicteeIds).in('student_id', authIds).limit(5000)
       ]);
@@ -292,7 +301,7 @@ const lfmDicteesTeacher = (() => {
        plusieurs fois, on n'affiche que la plus récente. */
     const lexLatest = new Map();
     lexResults.forEach(r => {
-      const k = `${r.student_id}|${r.dictee_id}`;
+      const k = `${r.student_id}|${r.dictee_id}|${r.exercice}`;
       const prev = lexLatest.get(k);
       if (!prev || new Date(r.completed_at) > new Date(prev.completed_at)) lexLatest.set(k, r);
     });
@@ -312,7 +321,11 @@ const lfmDicteesTeacher = (() => {
         if (studentIds.size === 0) return null;
 
         const studentsList = [...studentIds].map(studentId => {
-          const lex = lexLatest.get(`${studentId}|${d.id}`);
+          const lexByExercice = {};
+          LEX_EXERCICES.forEach(ex => {
+            const r = lexLatest.get(`${studentId}|${d.id}|${ex}`);
+            lexByExercice[ex] = r ? Math.round((r.score / r.total) * 100) : null;
+          });
           const gramByType = {};
           TYPES.forEach(type => {
             const r = gramLatest.get(`${studentId}|${d.id}|${type}`);
@@ -320,7 +333,7 @@ const lfmDicteesTeacher = (() => {
           });
           return {
             student: studentById.get(studentId) || { display_name: 'Élève inconnu' },
-            lexicalPct: lex ? Math.round((lex.score / lex.total) * 100) : null,
+            lexByExercice,
             gramByType
           };
         }).sort((a, b) => a.student.display_name.localeCompare(b.student.display_name, 'fr'));

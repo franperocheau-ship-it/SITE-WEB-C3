@@ -19,13 +19,23 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 const DicteesBadges = (() => {
-  /* results : lignes dictee_results de l'élève (tous exercices confondus). */
+  /* results : lignes dictee_results de l'élève (tous exercices confondus).
+     Les 3 stats convergent volontairement sur exercice === 1 (Dictée de
+     mots, capsule sonore) : c'est le seul des 3 paliers lexicaux actuels
+     (0 = Photographier un mot, 3 = Compléter un mot, 1 = Dictée de mots) qui
+     correspond à l'esprit "dictée"/"répétition" que décrivent ces badges.
+     Corrigé d'un ancien `exercice === 2` — valeur d'un schéma disparu depuis
+     la refonte en paliers, plus jamais écrite : ces 4 badges n'ont donc
+     jamais pu être obtenus (bug signalé). `syncBadges` étant rejoué à chaque
+     visite du tableau de bord, les élèves qui remplissent déjà les
+     conditions actuelles les recevront automatiquement dès leur prochaine
+     visite, sans script de rattrapage. */
   function computeStats(results) {
     const completedDictees = new Set(
-      results.filter(r => r.exercice === 2).map(r => r.dictee_id)
+      results.filter(r => r.exercice === 1).map(r => r.dictee_id)
     );
     const sansFauteDictees = new Set(
-      results.filter(r => r.exercice === 2 && r.sans_faute).map(r => r.dictee_id)
+      results.filter(r => r.exercice === 1 && r.sans_faute).map(r => r.dictee_id)
     );
     const premierCoupTotal = results
       .filter(r => r.exercice === 1)

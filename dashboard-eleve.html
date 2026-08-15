@@ -15,12 +15,13 @@
   <link rel="stylesheet" href="laurels.css?v=5">
   <link rel="stylesheet" href="css/jogging.css?v=1">
   <link rel="stylesheet" href="css/jogging-print.css?v=1">
-  <link rel="stylesheet" href="css/dictees.css?v=21">
+  <link rel="stylesheet" href="css/dictees.css?v=25">
   <link rel="stylesheet" href="css/niveau-pastilles.css?v=1">
   <link rel="stylesheet" href="css/champ-lexical.css?v=4">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/idle-logout.js"></script>
   <script src="js/guided-access.js?v=1"></script>
   <script src="data/index.js?v=2"></script>
   <script src="js/exercise-catalog.js?v=6"></script>
@@ -30,13 +31,14 @@
   <script src="js/jogging-data.js?v=1"></script>
   <script src="js/jogging-badges.js?v=1"></script>
   <script src="js/jogging-print.js?v=1"></script>
-  <script src="js/dictees-badges.js?v=1"></script>
+  <script src="js/dictees-badges.js?v=2"></script>
   <script src="js/carnet-widget.js?v=2"></script>
   <script src="js/jogging-student-space.js?v=1"></script>
-  <script src="js/dictees-student-space.js?v=2"></script>
+  <script src="js/dictees-student-space.js?v=5"></script>
   <script src="js/vocab-student-space.js?v=3"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=2">
-  <script src="js/resultats-nav.js?v=2"></script>
+  <script src="js/feature-flags.js?v=1"></script>
+  <script src="js/resultats-nav.js?v=3"></script>
   <style>
     .dash-wrap {
       min-height: calc(100vh - 88px - 74px);
@@ -457,7 +459,7 @@
             <div class="dash-card-accent"></div>
           </a>
 
-          <a href="redaction.html" class="dash-card dash-card--active">
+          <a href="redaction.html" class="dash-card dash-card--active" data-feature="jogging">
             <div class="dash-card-icon"><img src="assets/logos panneau de controle/Jogging d'écriture.png" alt=""></div>
             <div class="dash-card-title">Joggings d'écriture</div>
             <div class="dash-card-desc">Entraîne-toi à rédiger en t'aidant du code champion et progresse à ton rythme.</div>
@@ -490,6 +492,7 @@
           </a>
 
         </div>
+        <script>LFM_FEATURES.hideDisabled();</script>
       </div>
 
       <!-- ── Tab 2 : Mes résultats (hub Général / Joggings / Dictées) ── -->
@@ -1106,6 +1109,7 @@
        placeholder 🧭 par une vraie icône quand elle sera disponible. */
     async function maybeRenderGuidedCard() {
       if (typeof lfmGuidedAccess === 'undefined') return;
+      if (!LFM_FEATURES.isEnabled('jogging')) return; // pointe vers redaction.html, module masqué
       const access = await lfmGuidedAccess.get();
       if (access.mode !== 'guide') return;
 

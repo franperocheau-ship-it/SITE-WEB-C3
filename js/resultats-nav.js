@@ -21,13 +21,21 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 const ResultatsNav = (() => {
-  const TABS = [
+  const ALL_TABS = [
     { key: 'general',        icon: '📊', label: 'Général' },
     { key: 'joggings',       icon: '✍️', label: "Joggings d'écriture" },
     { key: 'dictees',        icon: '✏️', label: 'Dictées préparées' },
     { key: 'questionnaires', icon: '📚', label: 'Questionnaires de lecture' },
     { key: 'corpus',         icon: '🔤', label: 'Corpus lexical' },
   ];
+
+  /* Pastille "Joggings d'écriture" masquée quand le module est désactivé
+     (voir js/feature-flags.js — JOGGING_ENABLED). Repli permissif si le
+     flag n'est pas chargé sur la page (pastille affichée). */
+  function visibleTabs() {
+    const joggingOn = typeof LFM_FEATURES === 'undefined' || LFM_FEATURES.isEnabled('jogging');
+    return joggingOn ? ALL_TABS : ALL_TABS.filter(t => t.key !== 'joggings');
+  }
 
   function escapeHTML(str) {
     const div = document.createElement('div');
@@ -49,7 +57,7 @@ const ResultatsNav = (() => {
     bar.className = 'rn-bar';
     bar.setAttribute('aria-label', 'Navigation résultats');
 
-    TABS.forEach(tab => {
+    visibleTabs().forEach(tab => {
       const isActive = tab.key === active;
       const item = items[tab.key] || {};
       const el = document.createElement(item.href ? 'a' : 'button');

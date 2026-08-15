@@ -50,6 +50,16 @@
 
       <script>Breadcrumb.render({ current: 'Rédaction' });</script>
 
+      <!-- Module désactivé (JOGGING_ENABLED = false, voir js/feature-flags.js) :
+           blocage de l'accès direct par URL au catalogue des joggings. -->
+      <div id="jog-module-disabled" style="display:none;text-align:center;padding:64px 24px;">
+        <p style="font-size:40px;margin-bottom:12px;">🔒</p>
+        <p style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Cette activité n'est pas disponible pour le moment</p>
+        <p style="font-size:14px;color:var(--muted);">Le module Rédaction / Joggings d'écriture est temporairement indisponible.</p>
+      </div>
+
+      <div id="jog-module-content">
+
       <div class="page-header">
         <div class="page-header-icon" style="font-size:56px;line-height:1;">✍️</div>
         <h1 class="page-title">RÉDACTION</h1>
@@ -60,6 +70,8 @@
       <img src="assets/Explication jogging.png" alt="Frise expliquant le fonctionnement du jogging d'écriture : rédaction, correction automatique, feux Code Champion" class="jog-explication-frise">
 
       <div class="jog-cards-grid" id="jog-cards-grid"></div>
+
+      </div><!-- /#jog-module-content -->
 
     </div>
   </div>
@@ -88,9 +100,17 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/idle-logout.js"></script>
   <script src="js/guided-access.js?v=1"></script>
   <script src="js/jogging-class-settings.js?v=1"></script>
   <script src="js/menu.js"></script>
+  <script src="js/feature-flags.js?v=1"></script>
+  <script>
+    if (!LFM_FEATURES.isEnabled('jogging')) {
+      document.getElementById('jog-module-content').style.display = 'none';
+      document.getElementById('jog-module-disabled').style.display = '';
+    }
+  </script>
 
   <script>
     const TEMPS_CLASS = {
@@ -142,6 +162,7 @@
     }
 
     (async function renderCatalogue() {
+      if (!LFM_FEATURES.isEnabled('jogging')) return; // module masqué (voir js/feature-flags.js)
       let items = null;
       try {
         if (typeof JoggingClassSettings !== 'undefined') {
