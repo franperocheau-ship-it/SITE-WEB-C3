@@ -103,6 +103,21 @@
 .dic-card-btn:hover { background: #0d2255; transform: translateY(-1px); }
 .dic-card a.dic-card-btn::after { content: ''; position: absolute; inset: 0; }
 
+/* ─── Alternance cyclique navy/gold/turquoise sur "Commencer →" ──────────
+   Scopée à dictees-catalogue.html (cf. renderDicteeCard, CARD_BTN_COLORS) :
+   modificateurs plutôt que de toucher .dic-card-btn lui-même, qui est
+   réutilisé tel quel pour de nombreux boutons "Continuer"/"Retour" du
+   parcours d'exercice (js/dictees-engine.js) — jamais concernés par ce
+   cycle. Couleur purement visuelle selon la position de la carte dans la
+   grille, jamais stockée en base. Texte navy (pas blanc) sur gold et
+   turquoise : le blanc n'atteint pas le contraste minimum WCAG AA (4.5:1)
+   sur ces deux fonds (~2:1 mesuré) — navy passe largement (>5.5:1) sur les
+   deux, contrairement au navy par défaut où le blanc reste inchangé. */
+.dic-card-btn--gold { background: var(--color-niveau-6e); color: #1A2D6B; }
+.dic-card-btn--gold:hover { background: #dd9313; }
+.dic-card-btn--turquoise { background: var(--color-niveau-cm1); color: #1A2D6B; }
+.dic-card-btn--turquoise:hover { background: #189d84; }
+
 .dic-empty-state {
   text-align: center;
   padding: 40px 24px;

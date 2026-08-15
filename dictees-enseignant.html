@@ -16,9 +16,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
   <script src="js/teacher.js?v=2"></script>
   <script src="js/teacher-spellcheck.js?v=1"></script>
-  <script src="js/dictees-teacher.js?v=10"></script>
+  <script src="js/dictees-teacher.js?v=11"></script>
   <style>
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
     .dash-content { max-width: 960px; margin: 0 auto; }
@@ -62,10 +63,20 @@
       padding: 16px 18px; margin-bottom: 12px;
     }
     .dic-teacher-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .dic-teacher-card-heading { display: flex; align-items: flex-start; gap: 10px; }
+    .dic-teacher-card-icon { font-size: 22px; line-height: 1.2; flex-shrink: 0; }
     .dic-teacher-card-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 8px; }
     .dic-teacher-card-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
     .dic-teacher-card-meta { font-size: 12px; color: var(--muted); }
     .dic-teacher-card-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    /* Carte de la dictée en cours d'édition dans le formulaire au-dessus —
+       grisée + boutons désactivés pour ne pas laisser croire qu'elle reste
+       cliquable normalement pendant qu'on la modifie (retour utilisateur :
+       impression de "doublon" entre le formulaire et la liste). */
+    .dic-teacher-card--editing { opacity: 0.55; }
+    .dic-teacher-card--editing .dic-btn { cursor: not-allowed; }
+    .dic-editing-badge { color: var(--blue); font-weight: 700; }
 
     .dic-btn {
       border: none; border-radius: 10px; padding: 9px 16px; font-family: inherit;
@@ -167,8 +178,19 @@
     }
 
     .dic-trou-item { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+    /* Champ de saisie de phrase partagé par "Texte à trous" et "Trous de
+       conjugaison" (même markup .dic-trou-item-top dans renderTrousList et
+       renderTrousConjList) — le champ doit prendre toute la largeur
+       disponible, le select Niveau et le bouton ✕ gardant leur taille
+       naturelle compacte (flex-shrink: 0) plutôt que de se répartir l'espace
+       à parts égales avec le champ (retour utilisateur : une phrase longue
+       n'affichait qu'une petite partie de son texte). min-width: 0 est
+       nécessaire pour qu'un enfant flex puisse rétrécir sous sa largeur
+       intrinsèque plutôt que de forcer le conteneur à déborder. */
     .dic-trou-item-top { display: flex; gap: 8px; align-items: flex-start; }
-    .dic-trou-item-top .dic-form-input { margin: 0; }
+    .dic-trou-item-top .dic-form-input { flex: 1 1 auto; min-width: 0; margin: 0; }
+    .dic-trou-item-top .dic-mot-niveau-select { flex-shrink: 0; }
+    .dic-trou-item-top .dic-btn-danger { flex-shrink: 0; }
     /* Flux inline (pas de flex/gap) : la ponctuation issue de tokenizeTrouPhrase
        (espaces et signes compris) reste un texte normal entre les mots, elle
        ne doit jamais hériter de l'espacement réservé aux mots cliquables. */
@@ -206,6 +228,16 @@
     .dic-volets-row { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 8px; }
     .dic-volet-checkbox { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; }
     .dic-volet-checkbox input { width: 17px; height: 17px; cursor: pointer; accent-color: var(--blue); }
+
+    /* ── Palette d'émoticons d'illustration (carte de la dictée) ─────────── */
+    .dic-emoji-picker { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .dic-emoji-option {
+      width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+      font-size: 20px; line-height: 1; border: 1.5px solid var(--border); border-radius: 10px;
+      background: var(--bg); cursor: pointer; transition: border-color 150ms, background 150ms, transform 150ms;
+    }
+    .dic-emoji-option:hover { border-color: var(--blue); transform: translateY(-1px); }
+    .dic-emoji-option.is-selected { border-color: var(--blue); background: rgba(16,43,106,0.1); box-shadow: 0 0 0 2px rgba(16,43,106,0.18); }
   </style>
 </head>
 <body>
@@ -281,6 +313,10 @@
 
         <label class="dic-form-label" for="dic-form-titre">Titre</label>
         <input type="text" id="dic-form-titre" class="dic-form-input lfm-verifie" placeholder="Ex. La rentrée des classes">
+
+        <label class="dic-form-label">Émoticon d'illustration</label>
+        <p class="dic-form-hint" style="margin-top:0;">Affiché sur la carte de la dictée, à la place de 📖 par défaut.</p>
+        <div class="dic-emoji-picker" id="dic-emoji-picker"></div>
 
         <label class="dic-form-label">Volets proposés à l'élève</label>
         <div class="dic-volets-row">
@@ -391,9 +427,10 @@
     let _currentClassId = null;
     let _dictees = [];
     let _editingId = null;
+    let _formEmoji = '📖'; // émoticon d'illustration de la carte, défaut identique à la colonne dictees.emoji
     let _formMots = []; // [{ contenu, niveau }] — état du formulaire en cours
     let _formTrous = []; // [{ phrase, niveau, tags: [{ position, mot_attendu }] }]
-    let _formTrousConj = []; // [{ phrase, niveau, tags: [{ position, mot_attendu, infinitif, temps }] }]
+    let _formTrousConj = []; // [{ phrase, niveau, tags: [{ position, positionFin, mot_attendu, infinitif, temps }] }] — positionFin renseigné seulement pour un verbe pronominal (pronom + verbe)
     let _formTransfos = []; // [{ phrase_depart, type_transformation, phrase_attendue }]
     let _formExtraMots = []; // [{ contenu, nature_grammaticale }] — mots propres à la classification
 
@@ -415,6 +452,17 @@
        TEMPS_CLASS), pour rester cohérent sur le site. */
     const TEMPS_OPTIONS = ['Présent', 'Imparfait', 'Passé composé', 'Futur'];
 
+    /* Palette fixe d'émoticons d'illustration pour la carte de la dictée
+       (dictees.emoji) — thèmes variés pertinents pour une dictée d'école
+       primaire/collège (histoire, sciences, nature, actualité, contes,
+       art…), 📖 en premier (valeur par défaut en base). */
+    const EMOJI_OPTIONS = [
+      '📖', '✏️', '📚', '🗺️', '🏛️', '👑', '🏰', '⚔️',
+      '🔬', '🧪', '🌋', '🌍', '🌳', '🌊', '🦋', '🐦',
+      '🌻', '🚀', '🪐', '⭐', '🎨', '🎭', '🎶', '📰',
+      '📅', '🕰️', '🏞️', '🌅', '⛵', '🧭', '🐉', '🦁'
+    ];
+
     const TRANSFO_TYPES = [
       { value: 'singulier_pluriel', label: 'Singulier → pluriel' },
       { value: 'pluriel_singulier', label: 'Pluriel → singulier' },
@@ -435,6 +483,20 @@
 
     function parseList(raw) {
       return (raw || '').split(';').map(s => s.trim()).filter(Boolean);
+    }
+
+    /* ── Émoticon d'illustration ── */
+    function renderEmojiPicker() {
+      const picker = document.getElementById('dic-emoji-picker');
+      picker.innerHTML = EMOJI_OPTIONS.map(e => `
+        <button type="button" class="dic-emoji-option${e === _formEmoji ? ' is-selected' : ''}" data-emoji="${e}" aria-label="${e}">${e}</button>
+      `).join('');
+      picker.querySelectorAll('.dic-emoji-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          _formEmoji = btn.dataset.emoji;
+          renderEmojiPicker();
+        });
+      });
     }
 
     /* ── Mots difficiles : reparse en conservant le niveau des mots déjà connus ──
@@ -527,6 +589,31 @@
       return tokens;
     }
 
+    /* ── Verbes pronominaux (trous de conjugaison uniquement) ────────────
+       "se"/"me"/"te"/"nous"/"vous" pleins pour la forme non élidée ("se
+       lève") ; "s"/"m"/"t" pour la forme élidée ("s'habille" — l'apostrophe
+       isole "s" comme un token-mot à part entière, cf. tokenizeTrouPhrase,
+       donc le pronom élidé apparaît toujours comme un mot d'une seule
+       lettre). Portée volontairement limitée à cette liste fermée (retour
+       utilisateur) : pas de détection linguistique plus fine. */
+    const REFLEXIVE_PRONOUNS = new Set(['se', 'me', 'te', 'nous', 'vous', 's', 'm', 't']);
+    function isReflexivePronoun(word) {
+      return REFLEXIVE_PRONOUNS.has(word.toLowerCase());
+    }
+
+    /* Reconstruit le texte exact de la phrase couvrant les positions-mots
+       [startPos, endPos] (inclus), ponctuation/espaces intermédiaires
+       compris (ex. "se lève", "s'habille") — jamais une simple jointure par
+       espace, qui casserait l'apostrophe d'une forme élidée. */
+    function extractPhraseSpan(phrase, startPos, endPos) {
+      const rawTokens = tokenizeTrouPhrase(phrase);
+      const wordRawIndices = [];
+      rawTokens.forEach((tok, i) => { if (tok.isWord) wordRawIndices.push(i); });
+      const rawStart = wordRawIndices[startPos];
+      const rawEnd = wordRawIndices[endPos];
+      return rawTokens.slice(rawStart, rawEnd + 1).map(tok => tok.text).join('');
+    }
+
     /* ── Texte à trous ───────────────────────────────────────────────────
        Clic sur un mot de la phrase = ajoute/retire un trou à cette position
        (même clic pour les deux sens, cf. listener .dic-trou-token) ; le mot
@@ -614,7 +701,17 @@
        seul type de trou possible) ; les champs infinitif/temps de chaque mot
        tagué apparaissent sous la phrase. Mêmes mécaniques de saisie/blur/
        niveau que renderTrousList (dupliqué plutôt que partagé, les deux
-       exercices ont des tables et des listes distinctes côté sauvegarde). */
+       exercices ont des tables et des listes distinctes côté sauvegarde).
+
+       Verbe pronominal ("il se lève") : un clic sur le pronom réfléchi OU
+       sur le verbe suffit — le mot adjacent (cf. REFLEXIVE_PRONOUNS) est
+       automatiquement inclus dans le MÊME trou (g.position/g.positionFin),
+       jamais deux trous distincts (retour utilisateur). Choisi plutôt qu'un
+       clic-pronom-puis-clic-verbe explicite : un seul clic reste suffisant
+       pour créer un trou, exactement comme pour un mot simple — aucune
+       nouvelle interaction à apprendre pour l'enseignant. Un tag couvre
+       g.position à (g.positionFin ?? g.position) inclus ; positionFin
+       absent/null = trou d'un seul mot (cas courant, inchangé). */
     function renderTrousConjList() {
       const list = document.getElementById('dic-trous-conj-list');
       list.innerHTML = _formTrousConj.map((t, ti) => {
@@ -624,7 +721,8 @@
           if (!tok.isWord) return escHtml(tok.text);
           wordIdx++;
           const pos = wordIdx;
-          return `<button type="button" class="dic-trou-token ${t.tags.some(g => g.position === pos) ? 'is-tagged' : ''}"
+          const isTagged = t.tags.some(g => pos >= g.position && pos <= (g.positionFin != null ? g.positionFin : g.position));
+          return `<button type="button" class="dic-trou-token ${isTagged ? 'is-tagged' : ''}"
             data-trou-idx="${ti}" data-pos="${pos}">${escHtml(tok.text)}</button>`;
         }).join('');
 
@@ -656,7 +754,7 @@
           </div>
           ${tokens.some(tok => tok.isWord) ? `
             <div class="dic-trou-tokens">${sentenceHTML}</div>
-            <p class="dic-trou-hint">Clique sur un ou plusieurs mots pour les transformer en trou de conjugaison — reclique sur un mot en bleu pour le retirer.</p>
+            <p class="dic-trou-hint">Clique sur un ou plusieurs mots pour les transformer en trou de conjugaison — reclique sur un mot en bleu pour le retirer. Pour un verbe pronominal, un clic sur le pronom (« se », « s'»…) ou sur le verbe suffit : les deux sont regroupés dans le même trou.</p>
             ${conjFieldsHTML}
           ` : ''}
         </div>`;
@@ -669,7 +767,7 @@
         inp.addEventListener('blur', () => {
           const t = _formTrousConj[parseInt(inp.dataset.trouIdx, 10)];
           const wordCount = tokenizeTrouPhrase(t.phrase).filter(tok => tok.isWord).length;
-          t.tags = t.tags.filter(g => g.position < wordCount);
+          t.tags = t.tags.filter(g => (g.positionFin != null ? g.positionFin : g.position) < wordCount);
           renderTrousConjList();
         });
       });
@@ -690,12 +788,28 @@
         btn.addEventListener('click', () => {
           const t = _formTrousConj[parseInt(btn.dataset.trouIdx, 10)];
           const pos = parseInt(btn.dataset.pos, 10);
-          const existingIdx = t.tags.findIndex(g => g.position === pos);
+          const existingIdx = t.tags.findIndex(g => pos >= g.position && pos <= (g.positionFin != null ? g.positionFin : g.position));
           if (existingIdx >= 0) {
             t.tags.splice(existingIdx, 1);
           } else {
             const words = tokenizeTrouPhrase(t.phrase).filter(tok => tok.isWord);
-            t.tags.push({ position: pos, mot_attendu: words[pos].text, infinitif: '', temps: TEMPS_OPTIONS[0] });
+            const taggedPositions = new Set();
+            t.tags.forEach(g => {
+              for (let p = g.position; p <= (g.positionFin != null ? g.positionFin : g.position); p++) taggedPositions.add(p);
+            });
+            let start = pos, end = pos;
+            if (isReflexivePronoun(words[pos].text) && words[pos + 1] && !taggedPositions.has(pos + 1)) {
+              end = pos + 1;
+            } else if (pos > 0 && isReflexivePronoun(words[pos - 1].text) && !taggedPositions.has(pos - 1)) {
+              start = pos - 1;
+            }
+            t.tags.push({
+              position: start,
+              positionFin: end > start ? end : null,
+              mot_attendu: extractPhraseSpan(t.phrase, start, end),
+              infinitif: '',
+              temps: TEMPS_OPTIONS[0]
+            });
           }
           renderTrousConjList();
         });
@@ -764,6 +878,7 @@
       _editingId = dictee ? dictee.id : null;
       document.getElementById('dic-form-title').textContent = dictee ? 'Modifier la dictée' : 'Nouvelle dictée';
       document.getElementById('dic-form-titre').value = dictee ? dictee.titre : '';
+      _formEmoji = dictee && dictee.emoji ? dictee.emoji : '📖';
       document.getElementById('dic-form-inclut-lexicale').checked = dictee ? dictee.inclut_lexicale !== false : true;
       document.getElementById('dic-form-inclut-grammaticale').checked = dictee ? dictee.inclut_grammaticale !== false : true;
       document.getElementById('dic-form-mots').value = mots ? mots.map(m => m.contenu).join(' ; ') : '';
@@ -783,7 +898,8 @@
         phrase: t.phrase,
         niveau: t.niveau || 1,
         tags: (t.dictee_trous_conjugaison_mots || []).map(g => ({
-          position: g.position, mot_attendu: g.mot_attendu,
+          position: g.position, positionFin: g.position_fin != null ? g.position_fin : null,
+          mot_attendu: g.mot_attendu,
           infinitif: g.infinitif || '', temps: g.temps || TEMPS_OPTIONS[0]
         }))
       })) : [];
@@ -798,6 +914,7 @@
       document.getElementById('dic-form-extra-mots').value = extraMots ? extraMots.map(m => m.contenu).join(' ; ') : '';
       _formExtraMots = extraMots ? extraMots.map(m => ({ contenu: m.contenu, nature_grammaticale: m.nature_grammaticale })) : [];
 
+      renderEmojiPicker();
       renderMotsList();
       renderTrousList();
       renderTrousConjList();
@@ -805,16 +922,19 @@
       renderExtraMotsList();
       document.getElementById('dic-form-card').style.display = '';
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      renderList();
     }
 
     function closeForm() {
       document.getElementById('dic-form-card').style.display = 'none';
       _editingId = null;
+      _formEmoji = '📖';
       _formMots = [];
       _formTrous = [];
       _formTrousConj = [];
       _formTransfos = [];
       _formExtraMots = [];
+      renderList();
     }
 
     async function saveForm() {
@@ -855,6 +975,7 @@
             .filter(g => g.mot_attendu.trim() && (g.infinitif || '').trim())
             .map(g => ({
               position: g.position,
+              positionFin: g.positionFin != null ? g.positionFin : null,
               mot_attendu: g.mot_attendu,
               infinitif: g.infinitif.trim(),
               temps: g.temps
@@ -874,9 +995,9 @@
       saveBtn.disabled = true;
       try {
         if (_editingId) {
-          await lfmDicteesTeacher.updateDictee(_editingId, titre, mots, trous, trousConj, transformations, extraMots, inclutLexicale, inclutGrammaticale);
+          await lfmDicteesTeacher.updateDictee(_editingId, titre, _formEmoji, mots, trous, trousConj, transformations, extraMots, inclutLexicale, inclutGrammaticale);
         } else {
-          await lfmDicteesTeacher.createDictee(_currentClassId, _teacherProfile.id, titre, mots, trous, trousConj, transformations, extraMots, inclutLexicale, inclutGrammaticale);
+          await lfmDicteesTeacher.createDictee(_currentClassId, _teacherProfile.id, titre, _formEmoji, mots, trous, trousConj, transformations, extraMots, inclutLexicale, inclutGrammaticale);
         }
         closeForm();
         await loadDictees();
@@ -894,20 +1015,26 @@
         wrap.innerHTML = '<div class="dic-empty">Aucune dictée préparée pour cette classe pour l\'instant.</div>';
         return;
       }
-      wrap.innerHTML = _dictees.map(d => `
-        <div class="dic-teacher-card">
+      wrap.innerHTML = _dictees.map(d => {
+        const isEditing = d.id === _editingId;
+        return `
+        <div class="dic-teacher-card${isEditing ? ' dic-teacher-card--editing' : ''}">
           <div class="dic-teacher-card-top">
-            <div>
-              <div class="dic-teacher-card-title">${escHtml(d.titre)}</div>
-              <div class="dic-teacher-card-meta">${d.mot_count} mot${d.mot_count !== 1 ? 's' : ''} difficile${d.mot_count !== 1 ? 's' : ''}</div>
+            <div class="dic-teacher-card-heading">
+              <span class="dic-teacher-card-icon">${escHtml(d.emoji || '📖')}</span>
+              <div>
+                <div class="dic-teacher-card-title">${escHtml(d.titre)}</div>
+                <div class="dic-teacher-card-meta">${d.mot_count} mot${d.mot_count !== 1 ? 's' : ''} difficile${d.mot_count !== 1 ? 's' : ''}${isEditing ? ' · <span class="dic-editing-badge">En cours d’édition</span>' : ''}</div>
+              </div>
             </div>
             <div class="dic-teacher-card-actions">
-              <button type="button" class="dic-btn dic-btn-outline dic-btn-sm" data-edit="${d.id}">Modifier</button>
-              <button type="button" class="dic-btn dic-btn-danger dic-btn-sm" data-delete="${d.id}">Supprimer</button>
+              <button type="button" class="dic-btn dic-btn-outline dic-btn-sm" data-edit="${d.id}" ${isEditing ? 'disabled' : ''}>Modifier</button>
+              <button type="button" class="dic-btn dic-btn-danger dic-btn-sm" data-delete="${d.id}" ${isEditing ? 'disabled' : ''}>Supprimer</button>
             </div>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
       wrap.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', async () => {
         const { dictee, mots, trous, trousConjugaison, transformations, extraMots } = await lfmDicteesTeacher.getDictee(btn.dataset.edit);

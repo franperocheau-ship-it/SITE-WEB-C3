@@ -1928,10 +1928,29 @@ const DicteesEngine = (() => {
         <div class="dic-passage-badge">${attemptsLeft} tentative${attemptsLeft !== 1 ? 's' : ''} restante${attemptsLeft !== 1 ? 's' : ''}</div>
       </div>`;
 
+    /* Verbe pronominal (tag.position_fin renseigné) : le pronom réfléchi et
+       le verbe forment UN SEUL trou sur 2 positions-mots consécutives — les
+       tokens (mot + ponctuation/espace intermédiaires) situés APRÈS le
+       premier mot du trou et jusqu'à son dernier mot inclus ne sont jamais
+       rendus séparément (skipRawIndex), le trou (conjHint + input) n'étant
+       émis qu'une seule fois, au premier mot couvert. */
+    const wordRawIndices = [];
+    tokens.forEach((tok, i) => { if (tok.isWord) wordRawIndices.push(i); });
+    const skipRawIndex = new Array(tokens.length).fill(false);
+    tags.forEach(g => {
+      const end = g.position_fin != null ? g.position_fin : g.position;
+      if (end > g.position) {
+        const rawStart = wordRawIndices[g.position];
+        const rawEnd = wordRawIndices[end];
+        for (let i = rawStart + 1; i <= rawEnd; i++) skipRawIndex[i] = true;
+      }
+    });
+
     let wordIdx = -1;
-    const sentenceHTML = tokens.map(tok => {
+    const sentenceHTML = tokens.map((tok, rawIdx) => {
+      if (tok.isWord) wordIdx++;
+      if (skipRawIndex[rawIdx]) return '';
       if (!tok.isWord) return escapeHtml(tok.text);
-      wordIdx++;
       const tag = tags.find(g => g.position === wordIdx);
       if (!tag) return escapeHtml(tok.text);
       const conjHint = `<span class="dic-trou-conj-hint">(${escapeHtml(tag.infinitif)})</span> `;

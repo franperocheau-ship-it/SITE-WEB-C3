@@ -108,14 +108,31 @@ const DicteeGrammarPrint = (() => {
   /* ── Trous de conjugaison ── (exercice à part, cf. migration 20260908100000)
      Toujours l'infinitif affiché en clair avant le blanc/la réponse — même
      rendu qu'à l'écran (js/dictees-engine.js/renderTrousConjugaisonExercise) :
-     ne jamais faire diverger ces deux copies. */
+     ne jamais faire diverger ces deux copies. Verbe pronominal
+     (tag.position_fin renseigné, cf. migration 20260909100000) : même
+     logique de repli (skipRawIndex) que côté élève — le pronom et le verbe
+     ne forment qu'un seul blanc/une seule réponse ("se lève"), jamais deux
+     tokens séparés. */
   function trouConjSentenceHtml(trou, showAnswers) {
     const tags = (trou.dictee_trous_conjugaison_mots || []).slice().sort((a, b) => a.position - b.position);
     const tokens = tokenizeTrouPhrase(trou.phrase);
+    const wordRawIndices = [];
+    tokens.forEach((tok, i) => { if (tok.isWord) wordRawIndices.push(i); });
+    const skipRawIndex = new Array(tokens.length).fill(false);
+    tags.forEach(g => {
+      const end = g.position_fin != null ? g.position_fin : g.position;
+      if (end > g.position) {
+        const rawStart = wordRawIndices[g.position];
+        const rawEnd = wordRawIndices[end];
+        for (let i = rawStart + 1; i <= rawEnd; i++) skipRawIndex[i] = true;
+      }
+    });
+
     let wordIdx = -1;
-    const html = tokens.map(tok => {
+    const html = tokens.map((tok, rawIdx) => {
+      if (tok.isWord) wordIdx++;
+      if (skipRawIndex[rawIdx]) return '';
       if (!tok.isWord) return escapeHtml(tok.text);
-      wordIdx++;
       const tag = tags.find(g => g.position === wordIdx);
       if (!tag) return escapeHtml(tok.text);
       const conjHint = `<span class="dgp-conj-hint">(${escapeHtml(tag.infinitif)})</span> `;

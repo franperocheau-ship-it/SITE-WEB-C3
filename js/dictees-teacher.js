@@ -1,6 +1,7 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    dictees-teacher.js — Accès aux données du module Dictées préparées côté
-   enseignant. Dépend de : supabase-client.js (window.lfmDb).
+   enseignant. Dépend de : supabase-client.js (window.lfmDb), js/utils.js
+   (sortByTitleNumber).
 
    Utilisé par dictees-enseignant.html. Pas d'Edge Function : les
    lectures/écritures passent directement par le SDK Supabase, protégées par
@@ -28,7 +29,8 @@ const lfmDicteesTeacher = (() => {
       (mots || []).forEach(m => { countMap[m.dictee_id] = (countMap[m.dictee_id] || 0) + 1; });
     }
 
-    return (dictees || []).map(d => ({ ...d, mot_count: countMap[d.id] || 0 }));
+    const withCounts = (dictees || []).map(d => ({ ...d, mot_count: countMap[d.id] || 0 }));
+    return sortByTitleNumber(withCounts);
   }
 
   /* Dictée complète (pour édition), avec ses mots triés par ordre, ainsi que
@@ -66,7 +68,10 @@ const lfmDicteesTeacher = (() => {
    * fonctions replaceX ci-dessous. `inclutLexicale`/`inclutGrammaticale` :
    * volets proposés à l'élève pour cette dictée (colonnes `dictees.inclut_lexicale`/
    * `inclut_grammaticale`, défaut true en base — validé côté formulaire
-   * pour qu'au moins l'un des deux reste actif).
+   * pour qu'au moins l'un des deux reste actif). `emoji` : illustration de
+   * la carte (dictees-catalogue.html/dictees-enseignant.html), choisie dans
+   * une palette fixe côté formulaire — colonne `dictees.emoji`, défaut 📖 en
+   * base (cf. supabase/migrations/20260910100000_dictees_emoji.sql).
    *
    * Ne touche plus `points_grammaticaux` (champ retiré de l'interface —
    * présentation jugée trop dense pour son utilité, retour utilisateur) :
@@ -74,11 +79,12 @@ const lfmDicteesTeacher = (() => {
    * sont conservées telles quelles, mais plus jamais lues/écrites/affichées
    * par le client (voir aussi dictees-catalogue.html, épuré de même).
    */
-  async function createDictee(classId, teacherId, titre, mots, trous, trousConjugaison, transformations, extraMots, inclutLexicale, inclutGrammaticale) {
+  async function createDictee(classId, teacherId, titre, emoji, mots, trous, trousConjugaison, transformations, extraMots, inclutLexicale, inclutGrammaticale) {
     const { data: dictee, error } = await db.from('dictees').insert({
       class_id: classId,
       teacher_id: teacherId,
       titre: titre.trim(),
+      emoji: emoji || '📖',
       inclut_lexicale: inclutLexicale,
       inclut_grammaticale: inclutGrammaticale
     }).select().single();
@@ -94,9 +100,10 @@ const lfmDicteesTeacher = (() => {
     return dictee;
   }
 
-  async function updateDictee(dicteeId, titre, mots, trous, trousConjugaison, transformations, extraMots, inclutLexicale, inclutGrammaticale) {
+  async function updateDictee(dicteeId, titre, emoji, mots, trous, trousConjugaison, transformations, extraMots, inclutLexicale, inclutGrammaticale) {
     const { error } = await db.from('dictees').update({
       titre: titre.trim(),
+      emoji: emoji || '📖',
       inclut_lexicale: inclutLexicale,
       inclut_grammaticale: inclutGrammaticale,
       updated_at: new Date().toISOString()
@@ -187,7 +194,12 @@ const lfmDicteesTeacher = (() => {
      construction. `infinitif`/`temps` sont de simples métadonnées
      d'affichage (l'infinitif est montré en clair côté élève) ; `mot_attendu`
      reste la réponse unique, saisie par l'enseignant (pas de conjugueur
-     automatique). */
+     automatique).
+
+     `positionFin` (optionnel) : verbe pronominal ("se lève") où le pronom
+     réfléchi et le verbe forment un seul trou sur 2 positions consécutives
+     — cf. supabase/migrations/20260909100000. Absent/null pour un trou d'un
+     seul mot (cas le plus courant, comportement inchangé). */
   async function replaceTrousConjugaison(dicteeId, trous) {
     const { error: delErr } = await db.from('dictee_trous_conjugaison').delete().eq('dictee_id', dicteeId);
     if (delErr) throw delErr;
@@ -210,6 +222,7 @@ const lfmDicteesTeacher = (() => {
           trou_id: row.id,
           mot_attendu: tag.mot_attendu.trim(),
           position: tag.position,
+          position_fin: tag.positionFin != null ? tag.positionFin : null,
           infinitif: tag.infinitif.trim(),
           temps: tag.temps
         });
@@ -293,7 +306,7 @@ const lfmDicteesTeacher = (() => {
       .is('class_id', null)
       .order('created_at', { ascending: false });
     if (error) throw error;
-    return data || [];
+    return sortByTitleNumber(data || []);
   }
 
   async function reassignDictee(dicteeId, classId) {
