@@ -32,9 +32,13 @@ const lfmDicteesTeacher = (() => {
   }
 
   /* Dictée complète (pour édition), avec ses mots triés par ordre, ainsi que
-     les 3 collections du volet Orthographe grammaticale (§2 du cahier des
+     les 4 collections du volet Orthographe grammaticale (§2 du cahier des
      charges) — chargées en parallèle, aucune n'est requise (une dictée peut
-     n'avoir aucun exercice grammatical). */
+     n'avoir aucun exercice grammatical). Texte à trous et trous de
+     conjugaison sont deux exercices indépendants depuis la migration
+     20260908100000 (tables séparées, comme transformation/classification),
+     même si leur mécanique de saisie (clic sur un mot de la phrase) reste
+     très proche côté formulaire. */
   async function getDictee(dicteeId) {
     const { data: dictee, error } = await db.from('dictees').select('*')
       .eq('id', dicteeId).single();
@@ -44,13 +48,14 @@ const lfmDicteesTeacher = (() => {
       .eq('dictee_id', dicteeId).order('ordre', { ascending: true });
     if (motsErr) throw motsErr;
 
-    const [trous, transformations, extraMots] = await Promise.all([
+    const [trous, trousConjugaison, transformations, extraMots] = await Promise.all([
       getTrous(dicteeId),
+      getTrousConjugaison(dicteeId),
       getTransformations(dicteeId),
       getGramExtraMots(dicteeId)
     ]);
 
-    return { dictee, mots: mots || [], trous, transformations, extraMots };
+    return { dictee, mots: mots || [], trous, trousConjugaison, transformations, extraMots };
   }
 
   /**
@@ -69,7 +74,7 @@ const lfmDicteesTeacher = (() => {
    * sont conservées telles quelles, mais plus jamais lues/écrites/affichées
    * par le client (voir aussi dictees-catalogue.html, épuré de même).
    */
-  async function createDictee(classId, teacherId, titre, mots, trous, transformations, extraMots, inclutLexicale, inclutGrammaticale) {
+  async function createDictee(classId, teacherId, titre, mots, trous, trousConjugaison, transformations, extraMots, inclutLexicale, inclutGrammaticale) {
     const { data: dictee, error } = await db.from('dictees').insert({
       class_id: classId,
       teacher_id: teacherId,
@@ -82,13 +87,14 @@ const lfmDicteesTeacher = (() => {
     await Promise.all([
       replaceMots(dictee.id, mots),
       replaceTrous(dictee.id, trous),
+      replaceTrousConjugaison(dictee.id, trousConjugaison),
       replaceTransformations(dictee.id, transformations),
       replaceGramExtraMots(dictee.id, extraMots)
     ]);
     return dictee;
   }
 
-  async function updateDictee(dicteeId, titre, mots, trous, transformations, extraMots, inclutLexicale, inclutGrammaticale) {
+  async function updateDictee(dicteeId, titre, mots, trous, trousConjugaison, transformations, extraMots, inclutLexicale, inclutGrammaticale) {
     const { error } = await db.from('dictees').update({
       titre: titre.trim(),
       inclut_lexicale: inclutLexicale,
@@ -100,6 +106,7 @@ const lfmDicteesTeacher = (() => {
     await Promise.all([
       replaceMots(dicteeId, mots),
       replaceTrous(dicteeId, trous),
+      replaceTrousConjugaison(dicteeId, trousConjugaison),
       replaceTransformations(dicteeId, transformations),
       replaceGramExtraMots(dicteeId, extraMots)
     ]);
@@ -167,6 +174,56 @@ const lfmDicteesTeacher = (() => {
   async function getTrous(dicteeId) {
     const { data, error } = await db.from('dictee_trous')
       .select('*, dictee_trous_mots(*)')
+      .eq('dictee_id', dicteeId).order('ordre', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  }
+
+  /* Trous de conjugaison — exercice indépendant du texte à trous classique
+     (scindé de celui-ci, cf. supabase/migrations/20260908100000), même forme
+     de table (dictee_trous_conjugaison/dictee_trous_conjugaison_mots miroir
+     de dictee_trous/dictee_trous_mots) sans discriminant `type` puisque
+     toutes les phrases de cette table sont de la conjugaison par
+     construction. `infinitif`/`temps` sont de simples métadonnées
+     d'affichage (l'infinitif est montré en clair côté élève) ; `mot_attendu`
+     reste la réponse unique, saisie par l'enseignant (pas de conjugueur
+     automatique). */
+  async function replaceTrousConjugaison(dicteeId, trous) {
+    const { error: delErr } = await db.from('dictee_trous_conjugaison').delete().eq('dictee_id', dicteeId);
+    if (delErr) throw delErr;
+
+    if (!trous || trous.length === 0) return;
+
+    const trouRows = trous.map((t, i) => ({
+      dictee_id: dicteeId,
+      phrase: t.phrase.trim(),
+      niveau: t.niveau,
+      ordre: i
+    }));
+    const { data: insertedTrous, error: insErr } = await db.from('dictee_trous_conjugaison').insert(trouRows).select();
+    if (insErr) throw insErr;
+
+    const motRows = [];
+    insertedTrous.forEach((row, i) => {
+      (trous[i].tags || []).forEach(tag => {
+        motRows.push({
+          trou_id: row.id,
+          mot_attendu: tag.mot_attendu.trim(),
+          position: tag.position,
+          infinitif: tag.infinitif.trim(),
+          temps: tag.temps
+        });
+      });
+    });
+    if (motRows.length > 0) {
+      const { error: motsErr } = await db.from('dictee_trous_conjugaison_mots').insert(motRows);
+      if (motsErr) throw motsErr;
+    }
+  }
+
+  async function getTrousConjugaison(dicteeId) {
+    const { data, error } = await db.from('dictee_trous_conjugaison')
+      .select('*, dictee_trous_conjugaison_mots(*)')
       .eq('dictee_id', dicteeId).order('ordre', { ascending: true });
     if (error) throw error;
     return data || [];
@@ -270,9 +327,9 @@ const lfmDicteesTeacher = (() => {
    * tentative par palier lexical (0/3/1, null si jamais tenté — retour
    * utilisateur : les 3 doivent s'afficher indépendamment, pas bloqués tant
    * que les 3 n'ont pas été faits) ; `gramByType` = dernière tentative par
-   * type classification/trous/transformation (null si jamais tenté) — la
-   * page n'affiche une pastille que pour les paliers/types réellement
-   * tentés.
+   * type classification/trous/trous_conjugaison/transformation (null si
+   * jamais tenté) — la page n'affiche une pastille que pour les
+   * paliers/types réellement tentés.
    */
   async function getClassDicteeReport(classId) {
     const dictees = await getClassDictees(classId);
@@ -295,7 +352,7 @@ const lfmDicteesTeacher = (() => {
       gramResults = gramRes.data || [];
     }
 
-    const TYPES = ['classification', 'trous', 'transformation'];
+    const TYPES = ['classification', 'trous', 'trous_conjugaison', 'transformation'];
 
     /* Dernière tentative par clé — un élève peut refaire un même exercice
        plusieurs fois, on n'affiche que la plus récente. */

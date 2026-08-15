@@ -61,6 +61,7 @@
   height: 13pt;
   border-bottom: 1.5pt solid #1A2D6B;
 }
+.dgp-conj-hint { font-weight: 700; color: #7A4D0A; font-size: 0.86em; }
 /* ── Transformation de phrase ── */
 .dgp-transfo-block {
   margin-bottom: 16pt;

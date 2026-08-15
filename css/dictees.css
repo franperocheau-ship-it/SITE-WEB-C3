@@ -651,6 +651,14 @@
   vertical-align: middle;
   margin: 0 4px;
 }
+/* Trou de conjugaison : infinitif affiché en clair juste avant le trou (seul
+   indice fourni en plus du haut-parleur) — teinté gold pour rester
+   distinguable d'un simple mot de la phrase, cf. renderTrousExercise. */
+.dic-trou-conj-hint {
+  font-weight: 700;
+  color: #7A4D0A;
+  font-size: 0.86em;
+}
 .dic-trou-blank-input {
   vertical-align: middle;
   text-align: center;

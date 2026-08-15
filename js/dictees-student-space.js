@@ -27,7 +27,7 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 const DicteesStudentSpace = (() => {
-  const GRAM_TYPE_LABELS = { classification: 'Classification', trous: 'Texte à trous', transformation: 'Transformation' };
+  const GRAM_TYPE_LABELS = { classification: 'Classification', trous: 'Texte à trous', trous_conjugaison: 'Trous — conjugaison', transformation: 'Transformation' };
   /* Ordre pédagogique (0 → 0.5 → 1), pas l'ordre numérique des codes exercice
      (1 reste la Dictée de mots pour compatibilité historique, cf.
      js/dictees-engine.js). */
@@ -101,7 +101,7 @@ const DicteesStudentSpace = (() => {
       const lexResults = LEX_EXERCICES
         .map(ex => lexLatest.get(id + '|' + ex))
         .filter(Boolean);
-      const gramTypes = ['classification', 'trous', 'transformation']
+      const gramTypes = ['classification', 'trous', 'trous_conjugaison', 'transformation']
         .map(type => gramLatest.get(id + '|' + type))
         .filter(Boolean);
       const lastActivity = [...lexResults, ...gramTypes]

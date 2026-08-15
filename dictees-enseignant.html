@@ -18,7 +18,7 @@
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=2"></script>
   <script src="js/teacher-spellcheck.js?v=1"></script>
-  <script src="js/dictees-teacher.js?v=9"></script>
+  <script src="js/dictees-teacher.js?v=10"></script>
   <style>
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
     .dash-content { max-width: 960px; margin: 0 auto; }
@@ -134,7 +134,32 @@
     }
     .dic-gram-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: #7A4D0A; margin-bottom: 4px; }
     .dic-gram-subsection { margin-top: 20px; }
-    .dic-gram-subtitle { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+
+    /* ── Cartes des 4 exercices grammaticaux : bandeau haut + icône + couleur
+       d'accent propres à chaque type, pour que l'enseignant distingue les
+       blocs d'un coup d'œil (retour utilisateur). Les 4 couleurs sont déjà
+       utilisées ailleurs sur le site (charte Fredoka/navy/gold/turquoise +
+       le bleu moyen des niveaux CM2) — aucune couleur nouvelle introduite :
+       turquoise (--color-niveau-cm1) pour le texte à trous, bleu moyen
+       (--color-niveau-cm2) pour les trous de conjugaison, gold
+       (--color-niveau-6e) pour la transformation de phrase, navy (--blue)
+       pour la classification. ── */
+    .dic-exo-card {
+      background: #fff; border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 16px 18px 18px; border-top: 4px solid var(--exo-accent);
+    }
+    .dic-exo-card + .dic-exo-card { margin-top: 22px; }
+    .dic-exo-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .dic-exo-card-icon {
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+      width: 30px; height: 30px; border-radius: 50%; font-size: 15px;
+      background: color-mix(in srgb, var(--exo-accent) 16%, transparent);
+    }
+    .dic-exo-card-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--exo-accent-text); }
+    .dic-exo-card--trous      { --exo-accent: #1DBFA0; --exo-accent-text: #0E7A66; }
+    .dic-exo-card--trous-conj { --exo-accent: #4A90D9; --exo-accent-text: #235A94; }
+    .dic-exo-card--transfo    { --exo-accent: #F5A623; --exo-accent-text: #7A4D0A; }
+    .dic-exo-card--classif    { --exo-accent: #1A2D6B; --exo-accent-text: #1A2D6B; }
 
     .dic-mot-nature-select {
       border: 1.5px solid var(--border); border-radius: 100px; padding: 5px 12px;
@@ -157,6 +182,20 @@
     .dic-trou-token:hover { border-color: var(--blue); }
     .dic-trou-token.is-tagged { background: var(--blue); color: #fff; border-color: var(--blue); }
     .dic-trou-hint { font-size: 13.5px; color: #3F4552; line-height: 1.55; margin-top: 10px; }
+
+    /* ── Champs propres à un trou de conjugaison (infinitif + temps),
+       affichés sous la phrase du bloc "Trous de conjugaison" dès qu'un mot y
+       est tagué. ── */
+    .dic-trou-conj-fields { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .dic-trou-conj-row {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      padding: 8px 10px; background: rgba(74,144,217,0.08); border: 1.5px solid rgba(74,144,217,0.3); border-radius: 10px;
+    }
+    .dic-trou-conj-row .dic-form-input { flex: 1; min-width: 140px; margin: 0; }
+    .dic-conj-select {
+      border: 1.5px solid var(--border); border-radius: 10px; padding: 8px 10px;
+      font-family: inherit; font-size: 13px; color: var(--text); background: #fff; cursor: pointer;
+    }
     .dic-transfo-row { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
     .dic-transfo-row .dic-form-label { margin-top: 10px; font-size: 12px; }
     .dic-transfo-row .dic-form-label:first-child { margin-top: 0; }
@@ -266,25 +305,45 @@
           <p class="dic-form-hint">Exercices interactifs à partir des phrases de la dictée, en plus des mots difficiles ci-dessus. Chaque exercice est facultatif : l'élève ne verra que ceux que tu as remplis.</p>
 
           <!-- Texte à trous -->
-          <div class="dic-gram-subsection">
-            <div class="dic-gram-subtitle">Texte à trous</div>
-            <p class="dic-form-hint">Saisis une phrase, puis clique sur le ou les mots à retirer : l'élève les entendra au haut-parleur et devra les réécrire, sans aucun autre indice. Un niveau de difficulté (1, 2 ou 3) est assigné à chaque phrase, filtré côté élève selon le niveau choisi au démarrage de la dictée — même logique que pour les mots difficiles ci-dessus.</p>
+          <div class="dic-gram-subsection dic-exo-card dic-exo-card--trous">
+            <div class="dic-exo-card-header">
+              <span class="dic-exo-card-icon">🧩</span>
+              <div class="dic-exo-card-title">Texte à trous</div>
+            </div>
+            <p class="dic-form-hint">Saisis une phrase, puis clique sur le ou les mots à retirer : l'élève les entendra au haut-parleur et devra les réécrire, sans aucun autre indice.</p>
             <div id="dic-trous-list"></div>
             <button type="button" class="dic-btn dic-btn-outline dic-btn-sm" id="dic-add-trou-btn">+ Ajouter une phrase à trous</button>
           </div>
 
+          <!-- Trous de conjugaison -->
+          <div class="dic-gram-subsection dic-exo-card dic-exo-card--trous-conj">
+            <div class="dic-exo-card-header">
+              <span class="dic-exo-card-icon">🔤</span>
+              <div class="dic-exo-card-title">Trous de conjugaison</div>
+            </div>
+            <p class="dic-form-hint">Saisis une phrase, puis clique sur le mot à transformer en trou de conjugaison : renseigne l'infinitif du verbe et choisis un temps. Côté élève, l'infinitif est affiché en clair entre parenthèses, à charge pour lui de retrouver la forme conjuguée.</p>
+            <div id="dic-trous-conj-list"></div>
+            <button type="button" class="dic-btn dic-btn-outline dic-btn-sm" id="dic-add-trou-conj-btn">+ Ajouter une phrase à trous de conjugaison</button>
+          </div>
+
           <!-- Transformation de phrase -->
-          <div class="dic-gram-subsection">
-            <div class="dic-gram-subtitle">Transformation de phrase</div>
+          <div class="dic-gram-subsection dic-exo-card dic-exo-card--transfo">
+            <div class="dic-exo-card-header">
+              <span class="dic-exo-card-icon">🔁</span>
+              <div class="dic-exo-card-title">Transformation de phrase</div>
+            </div>
             <p class="dic-form-hint">Saisis une phrase de départ, choisis une transformation, puis saisis la phrase attendue (l'élève sera corrigé par comparaison stricte à ta saisie).</p>
             <div id="dic-transfos-list"></div>
             <button type="button" class="dic-btn dic-btn-outline dic-btn-sm" id="dic-add-transfo-btn">+ Ajouter une transformation</button>
           </div>
 
           <!-- Classification par nature grammaticale -->
-          <div class="dic-gram-subsection">
-            <div class="dic-gram-subtitle">Classification par nature grammaticale</div>
-            <p class="dic-form-hint">Saisis ici les mots à faire apparaître dans l'exercice de classification, chacun avec sa nature grammaticale. Indépendant des mots difficiles ci-dessus : aucune reprise automatique.</p>
+          <div class="dic-gram-subsection dic-exo-card dic-exo-card--classif">
+            <div class="dic-exo-card-header">
+              <span class="dic-exo-card-icon">🏷️</span>
+              <div class="dic-exo-card-title">Classification par nature grammaticale</div>
+            </div>
+            <p class="dic-form-hint">Saisis ici les mots à faire apparaître dans l'exercice de classification, chacun avec sa nature grammaticale.</p>
             <textarea id="dic-form-extra-mots" class="dic-form-textarea lfm-verifie" style="min-height:50px;"
               placeholder="Séparés par des points-virgules : le chat ; rapidement ; ces"></textarea>
             <p class="dic-extra-note">Ces mots ne s'ajoutent pas à la liste des mots difficiles — ils n'existent que pour l'exercice de classification.</p>
@@ -333,7 +392,8 @@
     let _dictees = [];
     let _editingId = null;
     let _formMots = []; // [{ contenu, niveau }] — état du formulaire en cours
-    let _formTrous = []; // [{ phrase, tags: [{ position, mot_attendu, regle }] }]
+    let _formTrous = []; // [{ phrase, niveau, tags: [{ position, mot_attendu }] }]
+    let _formTrousConj = []; // [{ phrase, niveau, tags: [{ position, mot_attendu, infinitif, temps }] }]
     let _formTransfos = []; // [{ phrase_depart, type_transformation, phrase_attendue }]
     let _formExtraMots = []; // [{ contenu, nature_grammaticale }] — mots propres à la classification
 
@@ -349,6 +409,11 @@
        cohérent avec son style actuel de fichiers autonomes). */
     const NATURE_OPTIONS = ['nom commun', 'nom propre', 'verbe', 'adjectif', 'adverbe', 'déterminant', 'article défini',
       'article indéfini', 'déterminant possessif', 'déterminant démonstratif', 'préposition', 'conjonction', 'autre'];
+
+    /* Liste fixe des temps pour le trou de conjugaison — reprend exactement
+       les 4 libellés déjà utilisés pour les joggings d'écriture (redaction.html,
+       TEMPS_CLASS), pour rester cohérent sur le site. */
+    const TEMPS_OPTIONS = ['Présent', 'Imparfait', 'Passé composé', 'Futur'];
 
     const TRANSFO_TYPES = [
       { value: 'singulier_pluriel', label: 'Singulier → pluriel' },
@@ -542,6 +607,115 @@
       });
     }
 
+    /* ── Trous de conjugaison ────────────────────────────────────────────
+       Exercice à part (scindé du texte à trous, cf. migration
+       20260908100000) : clic sur un mot de la phrase le transforme
+       directement en trou de conjugaison (pas de chooser, ce bloc n'a qu'un
+       seul type de trou possible) ; les champs infinitif/temps de chaque mot
+       tagué apparaissent sous la phrase. Mêmes mécaniques de saisie/blur/
+       niveau que renderTrousList (dupliqué plutôt que partagé, les deux
+       exercices ont des tables et des listes distinctes côté sauvegarde). */
+    function renderTrousConjList() {
+      const list = document.getElementById('dic-trous-conj-list');
+      list.innerHTML = _formTrousConj.map((t, ti) => {
+        const tokens = tokenizeTrouPhrase(t.phrase);
+        let wordIdx = -1;
+        const sentenceHTML = tokens.map(tok => {
+          if (!tok.isWord) return escHtml(tok.text);
+          wordIdx++;
+          const pos = wordIdx;
+          return `<button type="button" class="dic-trou-token ${t.tags.some(g => g.position === pos) ? 'is-tagged' : ''}"
+            data-trou-idx="${ti}" data-pos="${pos}">${escHtml(tok.text)}</button>`;
+        }).join('');
+
+        const conjFieldsHTML = t.tags.length > 0 ? `
+          <div class="dic-trou-conj-fields">
+            ${t.tags.map(g => `
+              <div class="dic-trou-conj-row" data-trou-idx="${ti}" data-tag-pos="${g.position}">
+                <span>Conjugaison de « <strong>${escHtml(g.mot_attendu)}</strong> » — infinitif :</span>
+                <input type="text" class="dic-form-input dic-conj-infinitif lfm-verifie" data-trou-idx="${ti}" data-tag-pos="${g.position}"
+                  value="${escHtml(g.infinitif || '')}" placeholder="Ex. décider">
+                <select class="dic-conj-select dic-conj-temps" data-trou-idx="${ti}" data-tag-pos="${g.position}">
+                  ${TEMPS_OPTIONS.map(temps => `<option value="${temps}" ${g.temps === temps ? 'selected' : ''}>${temps}</option>`).join('')}
+                </select>
+              </div>
+            `).join('')}
+          </div>` : '';
+
+        return `
+        <div class="dic-trou-item">
+          <div class="dic-trou-item-top">
+            <input type="text" class="dic-form-input dic-trou-conj-phrase-input lfm-verifie" data-trou-idx="${ti}"
+              value="${escHtml(t.phrase)}" placeholder="Saisis la phrase de la dictée…">
+            <select class="dic-mot-niveau-select" data-trou-idx="${ti}" style="background:${NIVEAU_VAR[t.niveau]}">
+              <option value="1" ${t.niveau === 1 ? 'selected' : ''}>Niveau 1</option>
+              <option value="2" ${t.niveau === 2 ? 'selected' : ''}>Niveau 2</option>
+              <option value="3" ${t.niveau === 3 ? 'selected' : ''}>Niveau 3</option>
+            </select>
+            <button type="button" class="dic-btn dic-btn-danger dic-btn-sm" data-remove-trou-conj="${ti}">✕</button>
+          </div>
+          ${tokens.some(tok => tok.isWord) ? `
+            <div class="dic-trou-tokens">${sentenceHTML}</div>
+            <p class="dic-trou-hint">Clique sur un ou plusieurs mots pour les transformer en trou de conjugaison — reclique sur un mot en bleu pour le retirer.</p>
+            ${conjFieldsHTML}
+          ` : ''}
+        </div>`;
+      }).join('');
+
+      list.querySelectorAll('.dic-trou-conj-phrase-input').forEach(inp => {
+        inp.addEventListener('input', () => {
+          _formTrousConj[parseInt(inp.dataset.trouIdx, 10)].phrase = inp.value;
+        });
+        inp.addEventListener('blur', () => {
+          const t = _formTrousConj[parseInt(inp.dataset.trouIdx, 10)];
+          const wordCount = tokenizeTrouPhrase(t.phrase).filter(tok => tok.isWord).length;
+          t.tags = t.tags.filter(g => g.position < wordCount);
+          renderTrousConjList();
+        });
+      });
+      list.querySelectorAll('.dic-mot-niveau-select').forEach(sel => {
+        sel.addEventListener('change', () => {
+          const idx = parseInt(sel.dataset.trouIdx, 10);
+          _formTrousConj[idx].niveau = parseInt(sel.value, 10);
+          sel.style.background = NIVEAU_VAR[_formTrousConj[idx].niveau];
+        });
+      });
+      list.querySelectorAll('[data-remove-trou-conj]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          _formTrousConj.splice(parseInt(btn.dataset.removeTrouConj, 10), 1);
+          renderTrousConjList();
+        });
+      });
+      list.querySelectorAll('.dic-trou-token').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const t = _formTrousConj[parseInt(btn.dataset.trouIdx, 10)];
+          const pos = parseInt(btn.dataset.pos, 10);
+          const existingIdx = t.tags.findIndex(g => g.position === pos);
+          if (existingIdx >= 0) {
+            t.tags.splice(existingIdx, 1);
+          } else {
+            const words = tokenizeTrouPhrase(t.phrase).filter(tok => tok.isWord);
+            t.tags.push({ position: pos, mot_attendu: words[pos].text, infinitif: '', temps: TEMPS_OPTIONS[0] });
+          }
+          renderTrousConjList();
+        });
+      });
+      list.querySelectorAll('.dic-conj-infinitif').forEach(inp => {
+        inp.addEventListener('input', () => {
+          const t = _formTrousConj[parseInt(inp.dataset.trouIdx, 10)];
+          const tag = t.tags.find(g => g.position === parseInt(inp.dataset.tagPos, 10));
+          if (tag) tag.infinitif = inp.value;
+        });
+      });
+      list.querySelectorAll('.dic-conj-temps').forEach(sel => {
+        sel.addEventListener('change', () => {
+          const t = _formTrousConj[parseInt(sel.dataset.trouIdx, 10)];
+          const tag = t.tags.find(g => g.position === parseInt(sel.dataset.tagPos, 10));
+          if (tag) tag.temps = sel.value;
+        });
+      });
+    }
+
     /* ── Transformation de phrase ── */
     function renderTransfosList() {
       const list = document.getElementById('dic-transfos-list');
@@ -604,6 +778,16 @@
         }))
       })) : [];
 
+      const trousConjugaison = extra ? extra.trousConjugaison : null;
+      _formTrousConj = trousConjugaison ? trousConjugaison.map(t => ({
+        phrase: t.phrase,
+        niveau: t.niveau || 1,
+        tags: (t.dictee_trous_conjugaison_mots || []).map(g => ({
+          position: g.position, mot_attendu: g.mot_attendu,
+          infinitif: g.infinitif || '', temps: g.temps || TEMPS_OPTIONS[0]
+        }))
+      })) : [];
+
       const transformations = extra ? extra.transformations : null;
       _formTransfos = transformations ? transformations.map(t => ({
         phrase_depart: t.phrase_depart, type_transformation: t.type_transformation, phrase_attendue: t.phrase_attendue,
@@ -616,6 +800,7 @@
 
       renderMotsList();
       renderTrousList();
+      renderTrousConjList();
       renderTransfosList();
       renderExtraMotsList();
       document.getElementById('dic-form-card').style.display = '';
@@ -627,6 +812,7 @@
       _editingId = null;
       _formMots = [];
       _formTrous = [];
+      _formTrousConj = [];
       _formTransfos = [];
       _formExtraMots = [];
     }
@@ -658,6 +844,23 @@
           }))
         }))
         .filter(t => t.phrase && t.tags.length > 0);
+      // Trous de conjugaison : un mot tagué sans infinitif renseigné est
+      // écarté (métadonnée d'affichage obligatoire côté élève, cf.
+      // js/dictees-engine.js/renderTrousConjugaisonExercise).
+      const trousConj = _formTrousConj
+        .map(t => ({
+          phrase: t.phrase.trim(),
+          niveau: t.niveau,
+          tags: t.tags
+            .filter(g => g.mot_attendu.trim() && (g.infinitif || '').trim())
+            .map(g => ({
+              position: g.position,
+              mot_attendu: g.mot_attendu,
+              infinitif: g.infinitif.trim(),
+              temps: g.temps
+            }))
+        }))
+        .filter(t => t.phrase && t.tags.length > 0);
       const transformations = _formTransfos
         .filter(t => t.phrase_depart.trim() && t.phrase_attendue.trim() && t.type_transformation)
         .map(t => ({
@@ -671,9 +874,9 @@
       saveBtn.disabled = true;
       try {
         if (_editingId) {
-          await lfmDicteesTeacher.updateDictee(_editingId, titre, mots, trous, transformations, extraMots, inclutLexicale, inclutGrammaticale);
+          await lfmDicteesTeacher.updateDictee(_editingId, titre, mots, trous, trousConj, transformations, extraMots, inclutLexicale, inclutGrammaticale);
         } else {
-          await lfmDicteesTeacher.createDictee(_currentClassId, _teacherProfile.id, titre, mots, trous, transformations, extraMots, inclutLexicale, inclutGrammaticale);
+          await lfmDicteesTeacher.createDictee(_currentClassId, _teacherProfile.id, titre, mots, trous, trousConj, transformations, extraMots, inclutLexicale, inclutGrammaticale);
         }
         closeForm();
         await loadDictees();
@@ -707,8 +910,8 @@
       `).join('');
 
       wrap.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', async () => {
-        const { dictee, mots, trous, transformations, extraMots } = await lfmDicteesTeacher.getDictee(btn.dataset.edit);
-        openForm(dictee, { mots, trous, transformations, extraMots });
+        const { dictee, mots, trous, trousConjugaison, transformations, extraMots } = await lfmDicteesTeacher.getDictee(btn.dataset.edit);
+        openForm(dictee, { mots, trous, trousConjugaison, transformations, extraMots });
       }));
       wrap.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', async () => {
         if (!confirm('Supprimer définitivement cette dictée ?')) return;
@@ -808,6 +1011,10 @@
       document.getElementById('dic-add-trou-btn').addEventListener('click', () => {
         _formTrous.push({ phrase: '', niveau: 1, tags: [] });
         renderTrousList();
+      });
+      document.getElementById('dic-add-trou-conj-btn').addEventListener('click', () => {
+        _formTrousConj.push({ phrase: '', niveau: 1, tags: [] });
+        renderTrousConjList();
       });
       document.getElementById('dic-add-transfo-btn').addEventListener('click', () => {
         _formTransfos.push({ phrase_depart: '', type_transformation: TRANSFO_TYPES[0].value, phrase_attendue: '', phrase_attendue_alt_raw: '' });

@@ -40,9 +40,11 @@
           (DicteesSpeech.normalize), seulement différée à la toute fin de
           l'exercice.
 
-   Puis, si la dictée en a été pourvue par l'enseignant, jusqu'à 3 paliers
-   Orthographe grammaticale (state.step 2/3/4, chacun sauté si aucune donnée
-   n'existe pour lui — voir gramSteps()/advanceAfter()) :
+   Puis, si la dictée en a été pourvue par l'enseignant, jusqu'à 4 paliers
+   Orthographe grammaticale (state.step 2/3/5/4 — l'ordre d'apparition dans
+   gramSteps()/le bandeau suit CET ordre, pas l'ordre numérique des steps ;
+   chacun sauté si aucune donnée n'existe pour lui — voir
+   gramSteps()/advanceAfter()) :
      2.   Classification par nature grammaticale — mots saisis manuellement
           par l'enseignant spécifiquement pour cet exercice
           (dictee_gram_extra_mots), indépendamment des mots choisis pour la
@@ -67,6 +69,15 @@
           l'exercice (state.trous.attempts/maxAttempts) : succès si plus
           aucun trou faux à l'issue, sinon synthèse des mots encore ratés à
           la fin (voir renderTrousFinished).
+     5.   Trous — conjugaison — exercice à part entière (jusqu'au 2026-09,
+          un simple sous-type du palier 3 ; scindé en palier indépendant sur
+          ses propres tables dictee_trous_conjugaison/
+          dictee_trous_conjugaison_mots, cf. migration 20260908100000), même
+          mécanique que le palier 3 (deck/unmastered, 3 tentatives au total,
+          verrouillage des blancs déjà justes) mais l'infinitif du verbe est
+          affiché en clair juste avant chaque trou (jamais caché) — seul
+          indice fourni en plus du haut-parleur (voir
+          renderTrousConjugaisonExercise).
      4.   Transformation de phrase — phrase de départ + consigne de
           transformation, réponse(s) attendue(s) saisie(s) par l'enseignant
           (pas calculées) ; même comparaison tolérante qu'au palier 3. Retries
@@ -74,7 +85,7 @@
           (correctFirstTry) compté uniquement au premier essai, jamais
           après une correction (cf. bug corrigé sur ce palier).
 
-   Bloc lexical (0/0.5/1) et bloc grammatical (2/3/4) sont chacun un tout :
+   Bloc lexical (0/0.5/1) et bloc grammatical (2/3/5/4) sont chacun un tout :
    l'ordre INTERNE à chaque bloc est fixe, mais l'élève choisit lequel des
    deux blocs passe en premier juste après le niveau (écran
    dic-state-ordre-choice, voir showOrdreChoice/chooseOrdre/currentSequence)
@@ -85,7 +96,7 @@
    la séquence choisie : son écran de fin est l'écran de fin du module entier
    (cf. advanceAfter).
 
-   Les résultats des 3 paliers grammaticaux vont dans dictee_gram_results
+   Les résultats des 4 paliers grammaticaux vont dans dictee_gram_results
    (jamais dictee_results ni exercise_results — cf. submitGramResult), lus
    uniquement par resultats-dictees-enseignant.html.
 
@@ -120,7 +131,7 @@
    ───────────────────────────────────────────────────────────────────────────── */
 
 const DicteesEngine = (() => {
-  const SCHEMA_VERSION = 16;  // voir note ci-dessus
+  const SCHEMA_VERSION = 17;  // voir note ci-dessus
 
   /* Liste fixe des natures grammaticales (dupliquée depuis
      dictees-enseignant.html — pas de fichier utilitaire commun sur ce
@@ -144,6 +155,8 @@ const DicteesEngine = (() => {
   let mots = [];      // mots effectivement travaillés (filtrés selon le niveau choisi)
   let allGramTrous = [];          // dictee_trous + dictee_trous_mots imbriqués, non filtrés
   let gramTrous = [];             // phrases à trous effectivement travaillées (filtrées selon le niveau choisi)
+  let allGramTrousConj = [];      // dictee_trous_conjugaison + dictee_trous_conjugaison_mots imbriqués, non filtrés
+  let gramTrousConj = [];         // phrases à trous de conjugaison effectivement travaillées (filtrées selon le niveau choisi)
   let gramTransformations = [];   // dictee_transformations
   let gramExtraMots = [];         // dictee_gram_extra_mots
   let classificationPool = [];    // gramExtraMots seuls (jamais les mots de dictee_mots, cf. §2 en tête de fichier)
@@ -155,7 +168,7 @@ const DicteesEngine = (() => {
      uniquement à proposer refaire/passer (voir withRedoOrSkipCheck) —
      jamais mis à jour en cours de session pour ne pas se re-déclencher sur
      ce que l'élève vient tout juste de terminer ici. */
-  let alreadyDone = { 1: false, 2: false, 3: false, 4: false };  // clé = même `step` numérique que currentSequence()
+  let alreadyDone = { 1: false, 2: false, 3: false, 4: false, 5: false };  // clé = même `step` numérique que currentSequence()
 
   /* Note historique : une variable previewSection permettait de "prévisualiser"
      l'autre section sans lancer d'exercice, mais ça désynchronisait le
@@ -241,6 +254,7 @@ const DicteesEngine = (() => {
       ex1: null,
       classification: null,
       trous: null,
+      trousConj: null,
       transfo: null,
       redoChoiceResolved: {},  // { [step]: true } une fois le choix refaire/passer tranché pour ce step
       sectionResume: { lexical: null, gram: null },  // dernier step actif par section, voir renderStepBanner
@@ -298,20 +312,23 @@ const DicteesEngine = (() => {
        lexical déjà fonctionnel — repli sur des listes vides plutôt que
        showError(). */
     try {
-      const [trousRes, transfoRes, extraRes] = await Promise.all([
+      const [trousRes, trousConjRes, transfoRes, extraRes] = await Promise.all([
         window.lfmDb.from('dictee_trous').select('*, dictee_trous_mots(*)').eq('dictee_id', dicteeId).order('ordre', { ascending: true }),
+        window.lfmDb.from('dictee_trous_conjugaison').select('*, dictee_trous_conjugaison_mots(*)').eq('dictee_id', dicteeId).order('ordre', { ascending: true }),
         window.lfmDb.from('dictee_transformations').select('*').eq('dictee_id', dicteeId).order('ordre', { ascending: true }),
         window.lfmDb.from('dictee_gram_extra_mots').select('*').eq('dictee_id', dicteeId).order('ordre', { ascending: true })
       ]);
       if (trousRes.error) throw trousRes.error;
+      if (trousConjRes.error) throw trousConjRes.error;
       if (transfoRes.error) throw transfoRes.error;
       if (extraRes.error) throw extraRes.error;
       allGramTrous = (trousRes.data || []).filter(t => (t.dictee_trous_mots || []).length > 0);
+      allGramTrousConj = (trousConjRes.data || []).filter(t => (t.dictee_trous_conjugaison_mots || []).length > 0);
       gramTransformations = transfoRes.data || [];
       gramExtraMots = extraRes.data || [];
     } catch (e) {
       console.warn('[LFM] DicteesEngine: volet orthographe grammaticale indisponible:', e.message);
-      allGramTrous = []; gramTransformations = []; gramExtraMots = [];
+      allGramTrous = []; allGramTrousConj = []; gramTransformations = []; gramExtraMots = [];
     }
 
     /* Historique des résultats déjà soumis par cet élève sur CETTE dictée
@@ -332,7 +349,8 @@ const DicteesEngine = (() => {
         1: (lexRes.data || []).length > 0,
         2: gramTypes.has('classification'),
         3: gramTypes.has('trous'),
-        4: gramTypes.has('transformation')
+        4: gramTypes.has('transformation'),
+        5: gramTypes.has('trous_conjugaison')
       };
     } catch (e) {
       console.warn('[LFM] DicteesEngine: historique des résultats indisponible (refaire/passer désactivé):', e.message);
@@ -363,6 +381,7 @@ const DicteesEngine = (() => {
     if (saved && saved.niveauChoisi && saved.schemaVersion === SCHEMA_VERSION) {
       mots = filterByChosenNiveau(allMots, saved.niveauChoisi);
       gramTrous = filterByChosenNiveau(allGramTrous, saved.niveauChoisi);
+      gramTrousConj = filterByChosenNiveau(allGramTrousConj, saved.niveauChoisi);
       state = saved;
       trapBackToNiveauChoice();
       render();
@@ -433,6 +452,7 @@ const DicteesEngine = (() => {
     trapBackToNiveauChoice();
     mots = filterByChosenNiveau(allMots, niveauChoisi);
     gramTrous = filterByChosenNiveau(allGramTrous, niveauChoisi);
+    gramTrousConj = filterByChosenNiveau(allGramTrousConj, niveauChoisi);
     document.getElementById('dic-state-niveau-choice').style.display = 'none';
     // gramSteps()/lexicalSteps() combinent déjà le choix de l'enseignant
     // (dictee.inclut_lexicale/inclut_grammaticale) et le contenu réellement
@@ -547,6 +567,7 @@ const DicteesEngine = (() => {
     const steps = [];
     if (classificationPool.length > 0) steps.push({ step: 2, label: 'Classification', icon: '🏷️', start: withRedoOrSkipCheck(2, startClassification) });
     if (gramTrous.length > 0) steps.push({ step: 3, label: 'Texte à trous', icon: '🧩', start: withRedoOrSkipCheck(3, startTrous) });
+    if (gramTrousConj.length > 0) steps.push({ step: 5, label: 'Trous — conjugaison', icon: '🔤', start: withRedoOrSkipCheck(5, startTrousConjugaison) });
     if (gramTransformations.length > 0) steps.push({ step: 4, label: 'Transformation', icon: '🔄', start: withRedoOrSkipCheck(4, startTransformation) });
     return steps;
   }
@@ -590,7 +611,8 @@ const DicteesEngine = (() => {
       1: state.ex1 && state.ex1.unmastered.length === 0,
       2: state.classification && state.classification.unmastered.length === 0,
       3: state.trous && (state.trous.unmastered.length === 0 || state.trous.attempts >= state.trous.maxAttempts),
-      4: state.transfo && state.transfo.unmastered.length === 0
+      4: state.transfo && state.transfo.unmastered.length === 0,
+      5: state.trousConj && (state.trousConj.unmastered.length === 0 || state.trousConj.attempts >= state.trousConj.maxAttempts)
     }[s.step];
     return done ? 'done' : '';
   }
@@ -699,6 +721,7 @@ const DicteesEngine = (() => {
     else if (state.step === 1) renderExercice1();
     else if (state.step === 2) renderClassification();
     else if (state.step === 3) renderTrousExercise();
+    else if (state.step === 5) renderTrousConjugaisonExercise();
     else renderTransformation();
   }
 
@@ -721,6 +744,7 @@ const DicteesEngine = (() => {
     else if (step === 2) state.classification = null;
     else if (step === 3) state.trous = null;
     else if (step === 4) state.transfo = null;
+    else if (step === 5) state.trousConj = null;
   }
 
   /* Bouton "refaire" partagé par les 6 écrans de fin (advanceAfter pour 1/4,
@@ -1839,6 +1863,201 @@ const DicteesEngine = (() => {
     `;
     if (next) document.getElementById('dic-next-ex-btn').addEventListener('click', next.start);
     if (current) wireRedoButton(3, current.start);
+  }
+
+  /* ── Palier 5 : trous — conjugaison ───────────────────────────────────────
+     Exercice à part entière, distinct du palier 3 (texte à trous), sur ses
+     propres phrases (dictee_trous_conjugaison/dictee_trous_conjugaison_mots)
+     — même table shape que dictee_trous/dictee_trous_mots, sans discriminant
+     `type` puisque toutes les phrases de cette table sont de la conjugaison
+     par construction (cf. supabase/migrations/20260908100000). Mécanique
+     IDENTIQUE au palier 3 (deck/unmastered, 3 tentatives au total,
+     verrouillage des blancs déjà justes, correction tolérante) — dupliquée
+     plutôt que partagée, cohérent avec le style du fichier (paliers
+     autonomes, voir palier 3/note SCHEMA_VERSION en tête de fichier). Deux
+     différences de rendu par rapport au palier 3 : l'infinitif du verbe est
+     affiché en clair juste avant chaque trou (jamais caché, contrairement au
+     reste de la phrase) — seul indice fourni ; et PAS de bouton haut-parleur
+     (contrairement au palier 3) puisqu'il lirait justement la forme
+     conjuguée attendue, donnant la réponse à l'élève. */
+  function trouConjById(id) { return gramTrousConj.find(t => t.id === id); }
+
+  function drawNextTrouConj() {
+    if (state.trousConj.deck.length === 0) state.trousConj.deck = shuffle(state.trousConj.unmastered);
+    state.trousConj.current = state.trousConj.deck.shift();
+  }
+
+  function startTrousConjugaison() {
+    state.step = 5;
+    if (!state.trousConj) {
+      const ids = gramTrousConj.map(t => t.id);
+      state.trousConj = {
+        unmastered: ids,
+        deck: shuffle(ids),
+        current: null,
+        masteredBlankIds: [],
+        answers: {},
+        totalBlanks: gramTrousConj.reduce((s, t) => s + t.dictee_trous_conjugaison_mots.length, 0),
+        attempts: 0,
+        maxAttempts: 3,
+        submitted: false,
+        startedAt: Date.now()
+      };
+    }
+    saveState();
+    render();
+  }
+
+  function renderTrousConjugaisonExercise() {
+    document.getElementById('dic-state-results').style.display = 'none';
+    document.getElementById('dic-state-exercise').style.display = '';
+    setConsigne("Retrouve la forme conjuguée à partir de l'infinitif indiqué.");
+
+    if (state.trousConj.unmastered.length === 0 || state.trousConj.attempts >= state.trousConj.maxAttempts) return finishTrousConjugaison();
+    if (state.trousConj.current == null) { drawNextTrouConj(); saveState(); }
+
+    const trou = trouConjById(state.trousConj.current);
+    const tags = trou.dictee_trous_conjugaison_mots.slice().sort((a, b) => a.position - b.position);
+    const tokens = tokenizeTrouPhrase(trou.phrase);
+    const remaining = state.trousConj.unmastered.length;
+    const total = gramTrousConj.length;
+    const attemptsLeft = state.trousConj.maxAttempts - state.trousConj.attempts;
+    const counterHTML = `
+      <div class="dic-counters">
+        ${progressBarHTML(total - remaining, total, 'Phrases complétées')}
+        <div class="dic-passage-badge">${attemptsLeft} tentative${attemptsLeft !== 1 ? 's' : ''} restante${attemptsLeft !== 1 ? 's' : ''}</div>
+      </div>`;
+
+    let wordIdx = -1;
+    const sentenceHTML = tokens.map(tok => {
+      if (!tok.isWord) return escapeHtml(tok.text);
+      wordIdx++;
+      const tag = tags.find(g => g.position === wordIdx);
+      if (!tag) return escapeHtml(tok.text);
+      const conjHint = `<span class="dic-trou-conj-hint">(${escapeHtml(tag.infinitif)})</span> `;
+      const locked = state.trousConj.masteredBlankIds.includes(tag.id);
+      if (locked) {
+        const answer = state.trousConj.answers[tag.id] || tag.mot_attendu;
+        return `${conjHint}<span class="dic-trou-blank-group">
+          <input type="text" class="dic-input dic-trou-blank-input is-correct" data-blank-id="${tag.id}"
+            disabled value="${escapeHtml(answer)}">
+        </span>`;
+      }
+      return `${conjHint}<span class="dic-trou-blank-group">
+        <input type="text" class="dic-input dic-trou-blank-input" data-blank-id="${tag.id}"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      </span>`;
+    }).join('');
+
+    document.getElementById('dic-item').innerHTML = `
+      ${counterHTML}
+      <div class="dic-trou-card">
+        <div class="dic-trou-sentence">${sentenceHTML}</div>
+      </div>
+      <div class="dic-actions" style="margin-top:16px;">
+        <button type="button" class="dic-validate-btn" id="dic-val-btn">Valider</button>
+      </div>
+      <div class="dic-feedback-area" id="dic-feedback"></div>
+    `;
+
+    const allBlankInputs = Array.from(document.querySelectorAll('.dic-trou-blank-input'));
+    allBlankInputs.forEach(inp => {
+      const tag = tags.find(g => g.id === inp.dataset.blankId);
+      sizeTrouInput(inp, tag.mot_attendu);
+    });
+    const editableInputs = allBlankInputs.filter(inp => !inp.disabled);
+
+    document.getElementById('dic-val-btn').addEventListener('click', () => validateTrouConj(tags));
+    editableInputs.forEach((inp, i) => {
+      const tag = tags.find(g => g.id === inp.dataset.blankId);
+      inp.addEventListener('input', () => sizeTrouInput(inp, tag.mot_attendu));
+      inp.addEventListener('keydown', e => {
+        if (e.key !== 'Enter') return;
+        if (i < editableInputs.length - 1) editableInputs[i + 1].focus();
+        else validateTrouConj(tags);
+      });
+    });
+    if (editableInputs[0]) setTimeout(() => { if (state.step === 5) editableInputs[0].focus(); }, 80);
+  }
+
+  function validateTrouConj(tags) {
+    const inputs = Array.from(document.querySelectorAll('.dic-trou-blank-input')).filter(inp => !inp.disabled);
+    if (inputs.length === 0) return;
+    if (inputs.some(inp => !inp.value.trim())) return;
+
+    let allRight = true;
+    const wrongTags = [];
+    inputs.forEach(inp => {
+      const tag = tags.find(g => g.id === inp.dataset.blankId);
+      const isRight = DicteesSpeech.normalizeTrouAnswer(inp.value) === DicteesSpeech.normalizeTrouAnswer(tag.mot_attendu);
+      inp.disabled = true;
+      inp.classList.add(isRight ? 'is-correct' : 'is-wrong');
+      state.trousConj.answers[tag.id] = inp.value;
+      if (isRight) {
+        if (!state.trousConj.masteredBlankIds.includes(tag.id)) state.trousConj.masteredBlankIds.push(tag.id);
+      } else {
+        allRight = false;
+        wrongTags.push(tag);
+      }
+    });
+    document.getElementById('dic-val-btn').disabled = true;
+    state.trousConj.attempts++;
+
+    document.getElementById('dic-feedback').innerHTML = allRight
+      ? '<div class="dic-feedback-correct">✅ Correct</div>'
+      : `<div class="dic-feedback-wrong">❌ Réponse${wrongTags.length > 1 ? 's' : ''} attendue${wrongTags.length > 1 ? 's' : ''} : ${wrongTags.map(t => `<span class="dic-correct-word">${escapeHtml(t.mot_attendu)}</span>`).join(', ')}</div>`;
+
+    if (allRight) {
+      state.trousConj.unmastered = state.trousConj.unmastered.filter(id => id !== state.trousConj.current);
+      state.trousConj.deck = state.trousConj.deck.filter(id => id !== state.trousConj.current);
+      state.trousConj.current = null;
+    }
+    saveState();
+    setTimeout(() => { if (state.step === 5) render(); }, allRight ? 900 : 2600);
+  }
+
+  function finishTrousConjugaison() {
+    if (!state.trousConj.submitted) {
+      state.trousConj.submitted = true;
+      saveState();
+      submitGramResult('trous_conjugaison', state.trousConj.masteredBlankIds.length, state.trousConj.totalBlanks, Math.round((Date.now() - state.trousConj.startedAt) / 1000));
+    }
+    renderTrousConjugaisonFinished();
+  }
+
+  function renderTrousConjugaisonFinished() {
+    document.getElementById('dic-state-results').style.display = 'none';
+    document.getElementById('dic-state-exercise').style.display = '';
+    setConsigne('Trous de conjugaison terminés !');
+
+    const seq = currentSequence();
+    const idx = seq.findIndex(s => s.step === 5);
+    const current = idx >= 0 ? seq[idx] : null;
+    const next = idx >= 0 ? seq[idx + 1] : undefined;
+    const nextHTML = next
+      ? `<button type="button" class="dic-card-btn" id="dic-next-ex-btn" style="width:auto;padding:12px 28px;">Continuer vers ${next.label} →</button>`
+      : `<a href="français-orthographe.html" class="dic-card-btn" style="width:auto;padding:12px 28px;">← Retour à l'Orthographe</a>`;
+    const actionsHTML = (current ? redoButtonHTML() : '') + nextHTML;
+
+    const missed = gramTrousConj
+      .flatMap(t => t.dictee_trous_conjugaison_mots)
+      .filter(tag => !state.trousConj.masteredBlankIds.includes(tag.id));
+
+    const bodyHTML = missed.length === 0
+      ? `<div class="dic-final-message" style="margin-bottom:6px;">Bravo, tu es prêt(e) pour ta dictée !</div>`
+      : `
+        <div class="dic-final-message" style="margin-bottom:6px;">Encore un peu d'entraînement</div>
+        <div class="dic-final-detail" style="margin-bottom:10px;">Fais attention à ${missed.length > 1 ? 'ces verbes' : 'ce verbe'} :</div>
+        <div class="dic-trou-missed-list">${missed.map(t => `<span class="dic-classify-chip">${escapeHtml(`${t.infinitif} → ${t.mot_attendu}`)}</span>`).join('')}</div>
+        <div class="dic-final-detail" style="margin-top:12px;">Tu peux refaire cet exercice demain, à tête reposée.</div>
+      `;
+
+    document.getElementById('dic-item').innerHTML = `
+      ${bodyHTML}
+      <div class="dic-actions" style="margin-top:20px;">${actionsHTML}</div>
+    `;
+    if (next) document.getElementById('dic-next-ex-btn').addEventListener('click', next.start);
+    if (current) wireRedoButton(5, current.start);
   }
 
   /* ── Palier 4 : transformation de phrase ─────────────────────────────────

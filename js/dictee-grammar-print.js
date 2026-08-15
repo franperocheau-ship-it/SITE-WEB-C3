@@ -105,6 +105,39 @@ const DicteeGrammarPrint = (() => {
       </div>`;
   }
 
+  /* ── Trous de conjugaison ── (exercice à part, cf. migration 20260908100000)
+     Toujours l'infinitif affiché en clair avant le blanc/la réponse — même
+     rendu qu'à l'écran (js/dictees-engine.js/renderTrousConjugaisonExercise) :
+     ne jamais faire diverger ces deux copies. */
+  function trouConjSentenceHtml(trou, showAnswers) {
+    const tags = (trou.dictee_trous_conjugaison_mots || []).slice().sort((a, b) => a.position - b.position);
+    const tokens = tokenizeTrouPhrase(trou.phrase);
+    let wordIdx = -1;
+    const html = tokens.map(tok => {
+      if (!tok.isWord) return escapeHtml(tok.text);
+      wordIdx++;
+      const tag = tags.find(g => g.position === wordIdx);
+      if (!tag) return escapeHtml(tok.text);
+      const conjHint = `<span class="dgp-conj-hint">(${escapeHtml(tag.infinitif)})</span> `;
+      if (showAnswers) {
+        return `${conjHint}<span class="dgp-answer-highlight">${escapeHtml(tag.mot_attendu)}</span>`;
+      }
+      const width = Math.max(38, tag.mot_attendu.length * 7);
+      return `${conjHint}<span class="dgp-blank-wrap">
+        <span class="dgp-blank-line" style="width:${width}pt"></span>
+      </span>`;
+    }).join('');
+    return `<div class="dgp-trou-sentence">${html}</div>`;
+  }
+
+  function trousConjSideHtml(dictee, trousConj, showAnswers) {
+    return `
+      <div class="dgp-side ${showAnswers ? 'dgp-verso' : 'dgp-recto'}">
+        ${headerHtml(dictee, 'Trous — conjugaison', showAnswers)}
+        ${trousConj.map(t => trouConjSentenceHtml(t, showAnswers)).join('')}
+      </div>`;
+  }
+
   /* ── Transformation de phrase ── */
   function transfoBlockHtml(t, showAnswer) {
     const alt = showAnswer && t.phrase_attendue_alt && t.phrase_attendue_alt.length
@@ -172,6 +205,7 @@ const DicteeGrammarPrint = (() => {
   function buildPagesHtml(data) {
     const dictee = data.dictee;
     const trous = (data.trous || []).filter(t => (t.dictee_trous_mots || []).length > 0);
+    const trousConj = (data.trousConjugaison || []).filter(t => (t.dictee_trous_conjugaison_mots || []).length > 0);
     const transformations = data.transformations || [];
     // Uniquement les mots saisis manuellement pour l'exercice de
     // classification — jamais les mots de la dictée de mots (data.mots),
@@ -181,6 +215,9 @@ const DicteeGrammarPrint = (() => {
     let pages = '';
     if (trous.length > 0) {
       pages += `<div class="dgp-page">${trousSideHtml(dictee, trous, false)}${trousSideHtml(dictee, trous, true)}</div>`;
+    }
+    if (trousConj.length > 0) {
+      pages += `<div class="dgp-page">${trousConjSideHtml(dictee, trousConj, false)}${trousConjSideHtml(dictee, trousConj, true)}</div>`;
     }
     if (transformations.length > 0) {
       pages += `<div class="dgp-page">${transfoSideHtml(dictee, transformations, false)}${transfoSideHtml(dictee, transformations, true)}</div>`;
@@ -197,7 +234,7 @@ const DicteeGrammarPrint = (() => {
 
     const html = buildPagesHtml(data);
     if (!html) {
-      alert("Cette dictée n'a aucun exercice d'orthographe grammaticale à exporter (texte à trous, transformation ou classification).");
+      alert("Cette dictée n'a aucun exercice d'orthographe grammaticale à exporter (texte à trous, trous de conjugaison, transformation ou classification).");
       return;
     }
     root.innerHTML = html;

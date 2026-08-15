@@ -17,7 +17,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=2"></script>
-  <script src="js/dictees-teacher.js?v=9"></script>
+  <script src="js/dictees-teacher.js?v=10"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=2">
   <script src="js/resultats-nav.js?v=3"></script>
   <style>
@@ -226,7 +226,7 @@
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    const GRAM_TYPE_LABELS = { classification: 'Classification', trous: 'Texte à trous', transformation: 'Transformation' };
+    const GRAM_TYPE_LABELS = { classification: 'Classification', trous: 'Texte à trous', trous_conjugaison: 'Trous — conjugaison', transformation: 'Transformation' };
     /* Ordre pédagogique (0 → 0.5 → 1), pas l'ordre numérique des codes
        exercice — dupliqué depuis js/dictees-teacher.js/LEX_EXERCICES (pas de
        fichier utilitaire commun sur ce module, cohérent avec son style
