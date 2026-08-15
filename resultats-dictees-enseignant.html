@@ -19,7 +19,7 @@
   <script src="js/utils.js"></script>
   <script src="js/teacher.js?v=2"></script>
   <script src="js/dictees-word-stats.js?v=2"></script>
-  <script src="js/dictees-teacher.js?v=12"></script>
+  <script src="js/dictees-teacher.js?v=13"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=2">
   <script src="js/resultats-nav.js?v=3"></script>
   <style>
@@ -97,6 +97,15 @@
       background: var(--card-bg);
     }
     .dic-report-student-name { font-weight: 700; font-size: 14.5px; color: var(--text); }
+    /* Pastille de niveau global — même composant que dashboard-eleve.html/
+       .dic-mydictees-niveau (dot .dic-niveau-dot, css/dictees.css), sous le
+       nom de l'élève (vue par dictée) ou le titre de la dictée (vue par
+       élève) plutôt qu'en suffixe par exercice grammatical. */
+    .dic-report-niveau {
+      display: flex; align-items: center; gap: 6px; margin-top: 4px;
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.03em;
+    }
     /* Colonne de 2 lignes maxi (lexique / grammaire) — même logique que
        dashboard-eleve.html/.dic-mydictees-pills, retour utilisateur : les
        pastilles ne doivent plus se mélanger dans un seul flux. */
@@ -243,10 +252,6 @@
        actuel de fichiers autonomes, cf. js/dictees-engine.js). */
     const LEX_EXERCICES = [0, 3, 1];
     const LEX_LABELS = { 0: 'Photographier un mot', 3: 'Compléter un mot', 1: 'Dictée de mots' };
-    /* Types dotés d'un niveau de difficulté — dupliqué depuis
-       js/dictees-student-space.js/NIVEAU_TYPES (classification et
-       transformation n'ont pas de contenu filtré par niveau). */
-    const NIVEAU_TYPES = new Set(['trous', 'trous_conjugaison']);
 
     /* Bordure de la pastille selon le score — dupliqué depuis
        js/dictees-student-space.js/tierClassFor (même présentation, retour
@@ -255,6 +260,46 @@
       if (pct >= 80) return 'dic-report-pill--good';
       if (pct >= 50) return 'dic-report-pill--ok';
       return 'dic-report-pill--low';
+    }
+
+    /* ── Bloc pastilles (lexique/grammaire/erreurs fréquentes) pour UN
+       élève sur UNE dictée — partagé entre renderReportDetail (vue par
+       dictée → liste d'élèves) et renderStudentFiche (vue par élève →
+       liste de dictées), qui affichent les mêmes données sous 2 angles
+       différents. Les 2 fonctions avaient chacune leur propre copie de ce
+       bloc jusqu'ici : la ligne "Erreurs" et le retrait du suffixe
+       "— Niveau N" n'avaient été faits que sur renderReportDetail, jamais
+       répercutés sur renderStudentFiche (bug remonté 2026-08-16) — d'où
+       cette factorisation, pour qu'une future évolution ne diverge plus
+       entre les deux. `s` = une entrée de d.students (voir
+       js/dictees-teacher.js/getClassDicteeReport : lexByExercice,
+       gramByType, freqLine, niveau). ────────────────────────────────────── */
+    function renderDicteePillsHtml(s) {
+      const lexPill = LEX_EXERCICES
+        .filter(ex => s.lexByExercice[ex] !== null)
+        .map(ex => `<span class="dic-report-pill dic-report-pill--lex ${tierClassFor(s.lexByExercice[ex])}">${LEX_LABELS[ex]} : ${s.lexByExercice[ex]}%</span>`)
+        .join('');
+      const gramPills = Object.entries(s.gramByType)
+        .filter(([, pct]) => pct !== null)
+        .map(([type, pct]) => `<span class="dic-report-pill dic-report-pill--gram ${tierClassFor(pct)}">${GRAM_TYPE_LABELS[type]} : ${pct}%</span>`)
+        .join('');
+      /* Une ligne par catégorie (lexique / grammaire), omise si l'élève n'a
+         rien tenté dans cette catégorie pour cette dictée — même logique
+         que js/dictees-student-space.js/renderMesDictees. */
+      const lexRow = lexPill ? `<div class="dic-report-pillrow"><span class="dic-report-catlabel">Lexique</span>${lexPill}</div>` : '';
+      const gramRow = gramPills ? `<div class="dic-report-pillrow"><span class="dic-report-catlabel">Grammaire</span>${gramPills}</div>` : '';
+      const freqRow = s.freqLine ? `<div class="dic-report-pillrow"><span class="dic-report-catlabel">Erreurs</span><span class="dic-report-freqtext">${escHtml(s.freqLine)}</span></div>` : '';
+      return (lexRow + gramRow + freqRow) || '<span class="dic-report-pill dic-report-pill--empty">Aucun résultat</span>';
+    }
+
+    /* Pastille de niveau global (une seule par carte, sous le titre/nom —
+       cf. dashboard-eleve.html/.dic-mydictees-niveau, même variable
+       --ls-color-N), plutôt que le suffixe "— Niveau N" par exercice
+       grammatical (retiré de renderDicteePillsHtml ci-dessus). */
+    function renderNiveauBadgeHtml(s) {
+      return s.niveau != null
+        ? `<div class="dic-report-niveau"><span class="dic-niveau-dot" style="--ls-color:var(--ls-color-${s.niveau})"></span>Niveau ${s.niveau}</div>`
+        : '';
     }
 
     /* ── Vue 1 : liste des dictées (ordre repris de getClassDictees — plus
@@ -293,32 +338,11 @@
       if (!d) return;
       const body = document.getElementById('dic-stats-body');
 
-      const studentsHtml = d.students.map(s => {
-        const lexPill = LEX_EXERCICES
-          .filter(ex => s.lexByExercice[ex] !== null)
-          .map(ex => `<span class="dic-report-pill dic-report-pill--lex ${tierClassFor(s.lexByExercice[ex])}">${LEX_LABELS[ex]} : ${s.lexByExercice[ex]}%</span>`)
-          .join('');
-        const gramPills = Object.entries(s.gramByType)
-          .filter(([, pct]) => pct !== null)
-          .map(([type, pct]) => {
-            const niveauMax = NIVEAU_TYPES.has(type) ? s.gramNiveauByType[type] : null;
-            const niveauSuffix = niveauMax != null ? ` — Niveau ${niveauMax}` : '';
-            return `<span class="dic-report-pill dic-report-pill--gram ${tierClassFor(pct)}">${GRAM_TYPE_LABELS[type]} : ${pct}%${niveauSuffix}</span>`;
-          })
-          .join('');
-        /* Une ligne par catégorie (lexique / grammaire), omise si l'élève
-           n'a rien tenté dans cette catégorie pour cette dictée — même
-           logique que js/dictees-student-space.js/renderMesDictees. */
-        const lexRow = lexPill ? `<div class="dic-report-pillrow"><span class="dic-report-catlabel">Lexique</span>${lexPill}</div>` : '';
-        const gramRow = gramPills ? `<div class="dic-report-pillrow"><span class="dic-report-catlabel">Grammaire</span>${gramPills}</div>` : '';
-        const freqRow = s.freqLine ? `<div class="dic-report-pillrow"><span class="dic-report-catlabel">Erreurs</span><span class="dic-report-freqtext">${escHtml(s.freqLine)}</span></div>` : '';
-        const pills = (lexRow + gramRow + freqRow) || '<span class="dic-report-pill dic-report-pill--empty">Aucun résultat</span>';
-        return `
+      const studentsHtml = d.students.map(s => `
           <div class="dic-report-student-row">
-            <div class="dic-report-student-name">${escHtml(s.student.display_name)}</div>
-            <div class="dic-report-pills">${pills}</div>
-          </div>`;
-      }).join('');
+            <div class="dic-report-student-name">${escHtml(s.student.display_name)}${renderNiveauBadgeHtml(s)}</div>
+            <div class="dic-report-pills">${renderDicteePillsHtml(s)}</div>
+          </div>`).join('');
 
       body.innerHTML = `
         <button type="button" class="dic-report-back-btn" id="dic-report-back-btn">← Retour aux dictées</button>
@@ -343,25 +367,10 @@
       const rowsHtml = _currentReport.perDictee.map(d => {
         const s = d.students.find(st => st.student.auth_user_id === _filterStudentId);
         if (!s) return '';
-        const lexPill = LEX_EXERCICES
-          .filter(ex => s.lexByExercice[ex] !== null)
-          .map(ex => `<span class="dic-report-pill dic-report-pill--lex ${tierClassFor(s.lexByExercice[ex])}">${LEX_LABELS[ex]} : ${s.lexByExercice[ex]}%</span>`)
-          .join('');
-        const gramPills = Object.entries(s.gramByType)
-          .filter(([, pct]) => pct !== null)
-          .map(([type, pct]) => {
-            const niveauMax = NIVEAU_TYPES.has(type) ? s.gramNiveauByType[type] : null;
-            const niveauSuffix = niveauMax != null ? ` — Niveau ${niveauMax}` : '';
-            return `<span class="dic-report-pill dic-report-pill--gram ${tierClassFor(pct)}">${GRAM_TYPE_LABELS[type]} : ${pct}%${niveauSuffix}</span>`;
-          })
-          .join('');
-        const lexRow = lexPill ? `<div class="dic-report-pillrow"><span class="dic-report-catlabel">Lexique</span>${lexPill}</div>` : '';
-        const gramRow = gramPills ? `<div class="dic-report-pillrow"><span class="dic-report-catlabel">Grammaire</span>${gramPills}</div>` : '';
-        const pills = (lexRow + gramRow) || '<span class="dic-report-pill dic-report-pill--empty">Aucun résultat</span>';
         return `
           <div class="dic-report-student-row">
-            <div class="dic-report-student-name">${escHtml(d.titre)}</div>
-            <div class="dic-report-pills">${pills}</div>
+            <div class="dic-report-student-name">${escHtml(d.titre)}${renderNiveauBadgeHtml(s)}</div>
+            <div class="dic-report-pills">${renderDicteePillsHtml(s)}</div>
           </div>`;
       }).join('');
 

@@ -237,22 +237,32 @@
       });
     }
 
-    /* ── Vue 2 : au clic sur un champ lexical, le détail par élève (niveau,
-       points, statut) — un élève peut apparaître sur plusieurs lignes, un
-       niveau étant suivi indépendamment (voir champ_lexical_sessions). ──── */
+    /* ── Vue 2 : au clic sur un champ lexical, le détail par élève — un
+       élève peut avoir jusqu'à 3 sessions (une par niveau, suivies
+       indépendamment, voir champ_lexical_sessions) ; on les regroupe ici
+       en une seule ligne par élève avec le total des points cumulés sur
+       les niveaux, sans afficher le score par niveau. ───────────────── */
     function renderReportDetail(idx) {
       const c = _currentReport.perChamp[idx];
       if (!c) return;
       const body = document.getElementById('cl-stats-body');
 
-      const rows = [...c.sessions]
-        .sort((a, b) => a.student.display_name.localeCompare(b.student.display_name) || a.niveau - b.niveau)
-        .map(s => `
+      const grouped = new Map();
+      c.sessions.forEach(s => {
+        const key = s.student.auth_user_id;
+        if (!grouped.has(key)) grouped.set(key, { student: s.student, totalPoints: 0, allDone: true });
+        const g = grouped.get(key);
+        g.totalPoints += s.totalPoints || 0;
+        if (s.status !== 'termine') g.allDone = false;
+      });
+
+      const rows = Array.from(grouped.values())
+        .sort((a, b) => a.student.display_name.localeCompare(b.student.display_name))
+        .map(g => `
           <tr>
-            <td>${escHtml(s.student.display_name)}</td>
-            <td>Niveau ${s.niveau}</td>
-            <td>${s.totalPoints}</td>
-            <td class="cl-report-status--${s.status}">${s.status === 'termine' ? 'Terminé' : 'En cours'}</td>
+            <td>${escHtml(g.student.display_name)}</td>
+            <td>${g.totalPoints}</td>
+            <td class="cl-report-status--${g.allDone ? 'termine' : 'en_cours'}">${g.allDone ? 'Terminé' : 'En cours'}</td>
           </tr>`)
         .join('');
 
@@ -261,7 +271,7 @@
         <div class="cl-report-detail-title">${escHtml(c.theme)}</div>
         ${rows
           ? `<table class="cl-report-table">
-               <thead><tr><th>Élève</th><th>Niveau</th><th>Points</th><th>Statut</th></tr></thead>
+               <thead><tr><th>Élève</th><th>Points</th><th>Statut</th></tr></thead>
                <tbody>${rows}</tbody>
              </table>`
           : '<div class="empty-inline">Aucun élève n\'a encore de résultat pour ce champ lexical.</div>'}
@@ -274,25 +284,34 @@
        veut la fiche individuelle directement), transmis par ?student=/
        ?sname= depuis la fiche élève d'un autre onglet du hub Résultats —
        toutes les sessions de champ lexical de cet élève, tous champs
-       confondus (un élève peut avoir plusieurs niveaux suivis indépendamment
-       sur un même champ), réutilise les données déjà chargées pour toute la
-       classe (aucune requête Supabase supplémentaire). ────────────────────── */
+       confondus, regroupées par champ (un élève peut avoir plusieurs
+       niveaux suivis indépendamment sur un même champ, voir
+       renderReportDetail) avec le total des points cumulés, réutilise les
+       données déjà chargées pour toute la classe (aucune requête Supabase
+       supplémentaire). ────────────────────────────────────────────────── */
     function renderStudentFiche() {
       const body = document.getElementById('cl-stats-body');
       if (!_currentReport) return;
 
-      const rows = _currentReport.perChamp
-        .flatMap(c => c.sessions
+      const grouped = new Map();
+      _currentReport.perChamp.forEach(c => {
+        c.sessions
           .filter(s => s.student.auth_user_id === _filterStudentId)
-          .map(s => ({ theme: c.theme, ...s })))
-        .sort((a, b) => a.theme.localeCompare(b.theme) || a.niveau - b.niveau);
+          .forEach(s => {
+            if (!grouped.has(c.theme)) grouped.set(c.theme, { theme: c.theme, totalPoints: 0, allDone: true });
+            const g = grouped.get(c.theme);
+            g.totalPoints += s.totalPoints || 0;
+            if (s.status !== 'termine') g.allDone = false;
+          });
+      });
 
-      const rowsHtml = rows.map(s => `
+      const rows = Array.from(grouped.values()).sort((a, b) => a.theme.localeCompare(b.theme));
+
+      const rowsHtml = rows.map(g => `
         <tr>
-          <td>${escHtml(s.theme)}</td>
-          <td>Niveau ${s.niveau}</td>
-          <td>${s.totalPoints}</td>
-          <td class="cl-report-status--${s.status}">${s.status === 'termine' ? 'Terminé' : 'En cours'}</td>
+          <td>${escHtml(g.theme)}</td>
+          <td>${g.totalPoints}</td>
+          <td class="cl-report-status--${g.allDone ? 'termine' : 'en_cours'}">${g.allDone ? 'Terminé' : 'En cours'}</td>
         </tr>`).join('');
 
       body.innerHTML = `
@@ -300,7 +319,7 @@
         <div class="cl-report-detail-title">${escHtml(_filterStudentName || 'Élève')}</div>
         ${rowsHtml
           ? `<table class="cl-report-table">
-               <thead><tr><th>Champ lexical</th><th>Niveau</th><th>Points</th><th>Statut</th></tr></thead>
+               <thead><tr><th>Champ lexical</th><th>Points</th><th>Statut</th></tr></thead>
                <tbody>${rowsHtml}</tbody>
              </table>`
           : '<div class="empty-inline">Aucun résultat de champ lexical pour cet élève.</div>'}

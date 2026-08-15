@@ -26,7 +26,7 @@
        joggings) — voir printStudentBilan(), aucune de ces sections n'est
        affichée à l'écran ici, uniquement à l'impression. -->
   <script src="js/dictees-word-stats.js?v=2"></script>
-  <script src="js/dictees-teacher.js?v=12"></script>
+  <script src="js/dictees-teacher.js?v=13"></script>
   <script src="js/champ-lexical-teacher.js?v=4"></script>
   <script src="js/jogging-data.js?v=1"></script>
   <script src="js/jogging-teacher.js?v=1"></script>
@@ -564,27 +564,42 @@
     .bulletin-qz-row .bqz-score { font-weight: 700; color: #1A2D6B; white-space: nowrap; }
 
     /* 5ter. Dictées préparées — même présentation compacte que les
-       questionnaires ci-dessus (titre de section + une ligne par dictée). */
+       questionnaires ci-dessus (titre de section + une ligne par dictée).
+       Titre+pastilles sur une ligne (.bdic-head), niveau + "erreurs
+       fréquentes" en dessous (largeur pleine) si présents — même patron que
+       dashboard-eleve.html/.dic-mydictees-row et resultats-dictees-
+       enseignant.html/.dic-report-student-row (3e ligne "Erreurs" +
+       pastille niveau sous le titre plutôt qu'en suffixe par exercice). */
     .bulletin-dictees { margin-bottom: 18px; }
     .bulletin-dic-row {
-      display: flex; justify-content: space-between; gap: 10px;
       font-size: 9pt; padding: 4px 0; border-bottom: 0.5pt solid #E8EDF3;
     }
     .bulletin-dic-row:last-child { border-bottom: none; }
-    .bulletin-dic-row .bdic-title { font-weight: 700; }
+    .bdic-head { display: flex; justify-content: space-between; gap: 10px; }
+    .bdic-title { font-weight: 700; }
     /* Pastilles couleur, même présentation que le dashboard élève
        (css/dictees.css/.dic-mydictees-pill) et le tableau enseignant
        (resultats-dictees-enseignant.html/.dic-report-pill) — retour
        utilisateur : cohérence des 3 surfaces. Fond fixe par catégorie
        (bleu lexical / ambre grammatical), score porté par un point coloré
        devant le nom de l'exercice. */
-    .bulletin-dic-row .bdic-pills { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+    .bdic-pills { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
     .bdic-pill { font-size: 7.5pt; font-weight: 700; padding: 2px 8px; border-radius: 100px; white-space: nowrap; }
     .bdic-pill--lex { background: rgba(16,43,106,0.12); color: var(--blue); }
     .bdic-pill--gram { background: rgba(245,166,35,0.20); color: #7A4D0A; }
     .bdic-pill--good::before { content: '●'; color: #16a34a; margin-right: 3px; }
     .bdic-pill--ok::before   { content: '●'; color: #F5A623; margin-right: 3px; }
     .bdic-pill--low::before  { content: '●'; color: var(--red); margin-right: 3px; }
+    /* Niveau global (dot coloré, --color-niveau-cm1/cm2/6e déjà définies
+       dans styles.css — pas besoin de charger level-select.css/--ls-color-N
+       juste pour ces 3 valeurs, cf. NIVEAU_COLOR_VARS_PRINT) et ligne
+       "erreurs les plus fréquentes" (js/dictees-word-stats.js/formatLine). */
+    .bdic-niveau {
+      display: flex; align-items: center; gap: 4px; margin-top: 3px;
+      font-size: 7.5pt; font-weight: 700; color: #5F6368; text-transform: uppercase; letter-spacing: .03em;
+    }
+    .bdic-niveau-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .bdic-freqtext { font-size: 7.5pt; color: #5F6368; margin-top: 3px; }
 
     /* 5quater. Corpus lexical — une ligne par champ/niveau travaillé. */
     .bulletin-corpus { margin-bottom: 18px; }
@@ -1819,6 +1834,12 @@
     if (pct >= 50) return 'bdic-pill--ok';
     return 'bdic-pill--low';
   }
+  /* Couleur du niveau global (1/2/3) pour .bdic-niveau-dot — reprend
+     directement --color-niveau-cm1/cm2/6e (déjà chargées via styles.css sur
+     cette page) plutôt que --ls-color-N (level-select.css, non chargé ici,
+     pas la peine pour 3 valeurs) ; mêmes couleurs au bout du compte
+     (level-select.css définit --ls-color-N à partir de ces mêmes variables). */
+  const NIVEAU_COLOR_VARS_PRINT = { 1: '--color-niveau-cm1', 2: '--color-niveau-cm2', 3: '--color-niveau-6e' };
 
   /* Même donnée que resultats-corpus-enseignant.html, voir
      js/champ-lexical-teacher.js:getClassSessionsReport(teacherId, classId) —
@@ -1961,10 +1982,18 @@
             .filter(ex => d.entry.lexByExercice[ex] !== null)
             .map(ex => `<span class="bdic-pill bdic-pill--lex ${tierClassForPrint(d.entry.lexByExercice[ex])}">${LEX_LABELS_PRINT[ex]} : ${d.entry.lexByExercice[ex]}%</span>`);
           const pills = [...lexPills, ...gramPills];
+          const niveauHtml = d.entry.niveau != null ? `
+            <div class="bdic-niveau"><span class="bdic-niveau-dot" style="background:var(${NIVEAU_COLOR_VARS_PRINT[d.entry.niveau]})"></span>Niveau ${d.entry.niveau}</div>` : '';
+          const freqHtml = d.entry.freqLine ? `
+            <div class="bdic-freqtext">Erreurs : ${escHtml(d.entry.freqLine)}</div>` : '';
           return `
           <div class="bulletin-dic-row">
-            <div class="bdic-title">${escHtml(d.titre)}</div>
-            <div class="bdic-pills">${pills.join('') || 'Aucun résultat'}</div>
+            <div class="bdic-head">
+              <div class="bdic-title">${escHtml(d.titre)}</div>
+              <div class="bdic-pills">${pills.join('') || 'Aucun résultat'}</div>
+            </div>
+            ${niveauHtml}
+            ${freqHtml}
           </div>`;
         }).join('')}
       </div>` : `
