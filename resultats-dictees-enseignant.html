@@ -95,7 +95,15 @@
       background: var(--card-bg);
     }
     .dic-report-student-name { font-weight: 700; font-size: 14.5px; color: var(--text); }
-    .dic-report-pills { display: flex; flex-wrap: wrap; gap: 7px; }
+    /* Colonne de 2 lignes maxi (lexique / grammaire) — même logique que
+       dashboard-eleve.html/.dic-mydictees-pills, retour utilisateur : les
+       pastilles ne doivent plus se mélanger dans un seul flux. */
+    .dic-report-pills { display: flex; flex-direction: column; gap: 5px; }
+    .dic-report-pillrow { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+    .dic-report-catlabel {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+      color: var(--muted); min-width: 60px;
+    }
     /* Fond fixe par catégorie (lex/gram) ; le score joue sur un point coloré
        devant le nom de l'exercice (--good/--ok/--low), même présentation
        que le dashboard élève (css/dictees.css, .dic-mydictees-pill) —
@@ -289,7 +297,12 @@
           .filter(([, pct]) => pct !== null)
           .map(([type, pct]) => `<span class="dic-report-pill dic-report-pill--gram ${tierClassFor(pct)}">${GRAM_TYPE_LABELS[type]} : ${pct}%</span>`)
           .join('');
-        const pills = (lexPill + gramPills) || '<span class="dic-report-pill dic-report-pill--empty">Aucun résultat</span>';
+        /* Une ligne par catégorie (lexique / grammaire), omise si l'élève
+           n'a rien tenté dans cette catégorie pour cette dictée — même
+           logique que js/dictees-student-space.js/renderMesDictees. */
+        const lexRow = lexPill ? `<div class="dic-report-pillrow"><span class="dic-report-catlabel">Lexique</span>${lexPill}</div>` : '';
+        const gramRow = gramPills ? `<div class="dic-report-pillrow"><span class="dic-report-catlabel">Grammaire</span>${gramPills}</div>` : '';
+        const pills = (lexRow + gramRow) || '<span class="dic-report-pill dic-report-pill--empty">Aucun résultat</span>';
         return `
           <div class="dic-report-student-row">
             <div class="dic-report-student-name">${escHtml(s.student.display_name)}</div>

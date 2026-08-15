@@ -118,10 +118,15 @@ const DicteesStudentSpace = (() => {
         const pct = Math.round(g.score / g.total * 100);
         return `<span class="dic-mydictees-pill dic-mydictees-pill--gram ${tierClassFor(pct)}">${GRAM_TYPE_LABELS[g.type]} : ${pct}%</span>`;
       }).join('');
+      /* Une ligne par catégorie (lexique / grammaire), omise si l'élève n'a
+         encore rien tenté dans cette catégorie pour cette dictée — retour
+         utilisateur : les pastilles se mélangeaient dans un seul flux. */
+      const lexRow = lexPills ? `<div class="dic-mydictees-pillrow"><span class="dic-mydictees-catlabel">Lexique</span>${lexPills}</div>` : '';
+      const gramRow = gramPills ? `<div class="dic-mydictees-pillrow"><span class="dic-mydictees-catlabel">Grammaire</span>${gramPills}</div>` : '';
       return `
         <div class="dic-mydictees-row">
           <div class="dic-mydictees-title">${escHtml(r.titre)}</div>
-          <div class="dic-mydictees-pills">${lexPills}${gramPills}</div>
+          <div class="dic-mydictees-pills">${lexRow}${gramRow}</div>
         </div>`;
     }).join('');
     section.style.display = '';

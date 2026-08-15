@@ -761,7 +761,15 @@
   padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px; margin-bottom: 8px;
 }
 .dic-mydictees-title { font-weight: 700; font-size: 13.5px; color: var(--text); flex: 1; min-width: 140px; }
-.dic-mydictees-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+/* Colonne de 2 lignes maxi (lexique / grammaire) plutôt qu'un seul flux de
+   pastilles mélangées — retour utilisateur : les 2 volets doivent se
+   distinguer d'un coup d'œil, pas seulement par la couleur de fond. */
+.dic-mydictees-pills { display: flex; flex-direction: column; gap: 4px; }
+.dic-mydictees-pillrow { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.dic-mydictees-catlabel {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--muted); min-width: 54px;
+}
 /* Fond fixe par catégorie (bleu lexical / ambre grammatical — mêmes
    couleurs que .dic-section-label, retour utilisateur : distinguer
    visuellement orthographe lexicale et grammaticale) ; le score ne joue
