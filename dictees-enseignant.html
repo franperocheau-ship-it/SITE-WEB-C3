@@ -724,19 +724,27 @@
        niveau que renderTrousList (dupliqué plutôt que partagé, les deux
        exercices ont des tables et des listes distinctes côté sauvegarde).
 
-       Verbe pronominal ("il se lève") : PAS de détection/inclusion
-       automatique (retentative sur retour utilisateur — un pronom sujet
-       "nous"/"vous" ne doit jamais être happé dans le trou d'un verbe non
-       pronominal, cf. isReflexivePronoun). À la place, sélection explicite en
-       deux clics, dans n'importe quel ordre : cliquer un pronom réfléchi
-       (se/s'/me/m'/te/t'/nous/vous — ceux-là seuls, jamais ambigus dans ce
-       contexte) ne crée pas de trou tout de suite, il "attend" (état
+       Trou composé de plusieurs mots (temps composés "ont signé"/"avait
+       été", voix passive "a été signé", verbe pronominal "se lève") :
+       cliquer un mot déjà tagué (ou couvert par un tag) l'étend d'un mot dès
+       qu'un mot immédiatement voisin de son premier ou dernier mot est
+       cliqué à son tour (cf. extendIdx plus bas dans le listener de clic) —
+       fonctionne dans n'importe quel ordre de clic et pour un nombre
+       quelconque de mots contigus, en répétant l'opération mot par mot. Un
+       tag couvre g.position à (g.positionFin ?? g.position) inclus ;
+       positionFin absent/null = trou d'un seul mot (comportement inchangé
+       pour une sélection à un seul mot).
+
+       Cas particulier du pronom réfléchi ("il se lève") : PAS de
+       détection/inclusion automatique (un pronom sujet "nous"/"vous" ne
+       doit jamais être happé dans le trou d'un verbe non pronominal, cf.
+       isReflexivePronoun) — cliquer un pronom réfléchi seul (se/s'/me/m'/
+       te/t'/nous/vous, jamais ambigus dans ce contexte) sans trou voisin
+       existant ne crée pas de trou tout de suite, il "attend" (état
        transitoire _pendingPronounPos sur l'entrée _formTrousConj, cf.
-       .is-pending) le clic du mot voisin ; cliquer ensuite le verbe adjacent
-       (ou l'inverse : verbe d'abord, pronom ensuite) fusionne les deux en un
-       seul tag {position, positionFin}. Un tag couvre g.position à
-       (g.positionFin ?? g.position) inclus ; positionFin absent/null = trou
-       d'un seul mot (cas courant, verbes non pronominaux inchangés). */
+       .is-pending) le clic du verbe voisin pour fusionner les deux en un
+       seul tag ; si le verbe est cliqué en premier (trou déjà créé), cliquer
+       ensuite le pronom l'étend via le mécanisme générique ci-dessus. */
     function renderTrousConjList() {
       const list = document.getElementById('dic-trous-conj-list');
       list.innerHTML = _formTrousConj.map((t, ti) => {
@@ -833,19 +841,26 @@
             return;
           }
 
-          // Pronom réfléchi cliqué alors que son verbe voisin est déjà un
-          // trou d'un seul mot (ordre verbe-puis-pronom) : fusion immédiate.
-          if (isReflexivePronoun(words[pos].text)) {
-            const neighborIdx = t.tags.findIndex(g => g.position === pos + 1 && g.positionFin == null);
-            if (neighborIdx >= 0) {
-              const neighbor = t.tags[neighborIdx];
-              neighbor.position = pos;
-              neighbor.positionFin = pos + 1;
-              neighbor.mot_attendu = extractPhraseSpan(t.phrase, pos, pos + 1);
-              t._pendingPronounPos = null;
-              renderTrousConjList();
-              return;
-            }
+          // Mot immédiatement adjacent à un trou déjà tagué (juste avant son
+          // premier mot ou juste après son dernier) : agrandit ce trou d'un
+          // mot plutôt que d'en créer un nouveau. Généralise la fusion
+          // pronom réfléchi + verbe (ex. "se" + "lève") à n'importe quel mot
+          // et à une largeur illimitée, pour permettre de composer un trou
+          // couvrant N mots contigus en cliquant dans l'ordre de son choix
+          // (temps composés "ont signé", "avait été" ; voix passive à 3 mots
+          // "a été signé"). Un clic sur un mot déjà couvert le retire
+          // entièrement (cf. existingIdx plus haut), ce qui sert de garde-fou
+          // en cas de fusion accidentelle.
+          const extendIdx = t.tags.findIndex(g => pos === g.position - 1 || pos === (g.positionFin != null ? g.positionFin : g.position) + 1);
+          if (extendIdx >= 0) {
+            const g = t.tags[extendIdx];
+            const end = g.positionFin != null ? g.positionFin : g.position;
+            g.position = Math.min(g.position, pos);
+            g.positionFin = Math.max(end, pos);
+            g.mot_attendu = extractPhraseSpan(t.phrase, g.position, g.positionFin);
+            t._pendingPronounPos = null;
+            renderTrousConjList();
+            return;
           }
 
           // Mot voisin d'un pronom en attente (ordre pronom-puis-verbe) :
