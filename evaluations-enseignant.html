@@ -448,6 +448,16 @@
         <label class="ev-form-label" for="ev-form-classe">Classe</label>
         <input type="text" id="ev-form-classe" class="ev-form-input" placeholder="Ex. CM2 A">
 
+        <label class="ev-form-label" for="ev-form-niveau">Niveau</label>
+        <select id="ev-form-niveau" class="ev-select" style="max-width:320px">
+          <option value="">— Choisir —</option>
+          <option value="CM1">CM1</option>
+          <option value="CM2">CM2</option>
+          <option value="6e">6e</option>
+          <option value="autre">Autre</option>
+        </select>
+        <input type="text" id="ev-form-niveau-autre" class="ev-form-input" style="display:none;max-width:320px;margin-top:8px" placeholder="Précise le niveau (ex. CE2, 5e, Multi-niveaux…)">
+
         <label class="ev-form-label" for="ev-form-titre">Titre de l'évaluation</label>
         <input type="text" id="ev-form-titre" class="ev-form-input lfm-verifie" placeholder="Ex. Évaluation de Grammaire N°1">
 
@@ -663,6 +673,11 @@
         domaines.map(d => `<option value="${escHtml(d.value)}">${escHtml(d.label)}</option>`).join('');
     }
 
+    function updateNiveauUI() {
+      const niveau = document.getElementById('ev-form-niveau').value;
+      document.getElementById('ev-form-niveau-autre').style.display = niveau === 'autre' ? '' : 'none';
+    }
+
     function updatePartageUI() {
       const partage = document.getElementById('ev-form-partage').checked;
       const afficherAuteur = document.getElementById('ev-form-afficher-auteur');
@@ -683,6 +698,9 @@
       _currentMode = evaluation ? (evaluation.mode || 'seul') : (prefill ? (prefill.mode || 'assiste') : 'seul');
       document.getElementById('ev-form-title').textContent = evaluation ? 'Modifier l\'évaluation' : 'Nouvelle évaluation';
       document.getElementById('ev-form-classe').value = evaluation ? evaluation.classe : '';
+      document.getElementById('ev-form-niveau').value = evaluation ? (evaluation.niveau || '') : '';
+      document.getElementById('ev-form-niveau-autre').value = evaluation ? (evaluation.niveau_autre || '') : '';
+      updateNiveauUI();
       document.getElementById('ev-form-titre').value = evaluation ? evaluation.titre : (prefill && prefill.titre ? prefill.titre : '');
       _formCriteres = normalizeCriteres(evaluation ? evaluation.criteres : (prefill ? prefill.criteres : []));
       exerciceEditor.setItems(evaluation ? evaluation.exercices : (prefill ? prefill.exercices : []));
@@ -845,28 +863,18 @@
       return visibles.join('');
     }
 
-    /* Niveau(x) couverts par l'évaluation — aucun champ structuré dédié
-       aujourd'hui (ni sur evaluations, ni sur banque_items), donc détecté
-       par recherche de "CM1"/"CM2"/"6e" dans le champ classe (texte libre
-       enseignant, ex. "CM1D (CM1)"). Repli non bloquant : une classe qui
-       ne mentionne aucun niveau n'affiche simplement aucun badge plutôt
-       qu'un badge erroné. */
-    const NIVEAUX_DETECTABLES = [
-      { niveau: 'CM1', regex: /\bCM1\b/i },
-      { niveau: 'CM2', regex: /\bCM2\b/i },
-      { niveau: '6e',  regex: /\b6\s*e(me)?\b/i }
-    ];
-    const NIVEAU_BADGE_CLASS = { CM1: 'badge-cm1', CM2: 'badge-cm2', '6e': 'badge-6e' };
+    /* Niveau de l'évaluation — choix explicite de l'enseignant à la
+       création (une seule valeur, voir #ev-form-niveau), plus un champ
+       "niveau_autre" pour préciser quand niveau = 'autre'. Une évaluation
+       sans niveau renseigné (créée avant ce champ, non couverte par le
+       backfill de la migration 20260913100000) n'affiche simplement aucune
+       pastille plutôt qu'une valeur devinée. */
+    const NIVEAU_BADGE_CLASS = { CM1: 'badge-cm1', CM2: 'badge-cm2', '6e': 'badge-6e', autre: 'badge-autre' };
 
-    function detecterNiveaux(classe) {
-      return NIVEAUX_DETECTABLES.filter(n => n.regex.test(classe || '')).map(n => n.niveau);
-    }
-
-    function niveauBadgesHtml(classe) {
-      const niveaux = detecterNiveaux(classe);
-      if (niveaux.length === 0) return '';
-      return `<div class="ev-biblio-card-niveaux">${niveaux.map(n =>
-        `<span class="badge-niveau ${NIVEAU_BADGE_CLASS[n]}">${n}</span>`).join('')}</div>`;
+    function niveauBadgesHtml(e) {
+      if (!e.niveau) return '';
+      const texte = e.niveau === 'autre' ? (e.niveau_autre || 'Autre') : e.niveau;
+      return `<div class="ev-biblio-card-niveaux"><span class="badge-niveau ${NIVEAU_BADGE_CLASS[e.niveau]}">${escHtml(texte)}</span></div>`;
     }
 
     function biblioCardHtml(e) {
@@ -882,7 +890,7 @@
         <div class="ev-biblio-card" role="button" tabindex="0" data-biblio-open="${e.id}">
           <div class="ev-biblio-card-title-row">
             <div class="ev-biblio-card-title">${escHtml(e.titre)}</div>
-            ${niveauBadgesHtml(e.classe)}
+            ${niveauBadgesHtml(e)}
           </div>
           <div class="ev-biblio-pastilles">${biblioPastillesHtml(e.criteres)}</div>
           <div class="ev-biblio-card-footer">
@@ -1054,18 +1062,22 @@
 
     function collectFormData() {
       const classe = document.getElementById('ev-form-classe').value.trim();
+      const niveau = document.getElementById('ev-form-niveau').value;
+      const niveauAutre = document.getElementById('ev-form-niveau-autre').value.trim();
       const titre = document.getElementById('ev-form-titre').value.trim();
       const criteres = _formCriteres.map(c => ({ ...c, texte: c.texte.trim() })).filter(c => c.texte);
       const exercices = exerciceEditor.getPayloads();
       const partage = document.getElementById('ev-form-partage').checked;
       const afficherAuteur = document.getElementById('ev-form-afficher-auteur').checked;
       const [domaine, sousDomaine] = document.getElementById('ev-form-domaine').value.split('|');
-      return { classe, titre, criteres, exercices, partage, afficherAuteur, domaine, sousDomaine };
+      return { classe, niveau, niveauAutre, titre, criteres, exercices, partage, afficherAuteur, domaine, sousDomaine };
     }
 
     async function saveForm(thenGeneratePdf) {
       const fields = collectFormData();
       if (!fields.classe) { alert('La classe est obligatoire.'); return; }
+      if (!fields.niveau) { alert('Le niveau est obligatoire.'); return; }
+      if (fields.niveau === 'autre' && !fields.niveauAutre) { alert('Précise le niveau.'); return; }
       if (!fields.titre) { alert('Le titre est obligatoire.'); return; }
       if (fields.partage && !fields.domaine) { alert('Choisis un domaine pour partager cette évaluation avec la communauté.'); return; }
 
@@ -1301,6 +1313,7 @@
       });
       document.getElementById('ev-add-exercice-btn').addEventListener('click', () => exerciceEditor.addItem());
       document.getElementById('ev-form-partage').addEventListener('change', updatePartageUI);
+      document.getElementById('ev-form-niveau').addEventListener('change', updateNiveauUI);
 
       await loadEvaluations();
     }

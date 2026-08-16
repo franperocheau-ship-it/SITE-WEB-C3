@@ -18,7 +18,7 @@ const EvaluationsBibliotheque = (() => {
      la même liste de likes, pas la peine d'une vue/RPC pour ce volume. */
   async function getPublished() {
     const { data, error } = await db.from('evaluations')
-      .select('id, titre, classe, criteres, exercices, domaine, sous_domaine, afficher_auteur, created_at, updated_at, profiles(display_name)')
+      .select('id, titre, classe, niveau, niveau_autre, criteres, exercices, domaine, sous_domaine, afficher_auteur, created_at, updated_at, profiles(display_name)')
       .eq('partage', true)
       .eq('statut_validation', 'validee')
       .order('created_at', { ascending: false });

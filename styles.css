@@ -23,6 +23,7 @@
   --color-niveau-cm1:  #1DBFA0;
   --color-niveau-cm2:  #4A90D9;
   --color-niveau-6e:   #F5A623;
+  --color-niveau-autre: #64748B;
   --font-display:      'Fredoka', sans-serif;
   --font-body:         'Nunito Sans', sans-serif;
 }
@@ -816,6 +817,15 @@ h3 { font-size: 1.2rem; font-weight: 700; }
 
 .badge-6e {
   background: var(--color-niveau-6e);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  border-radius: 20px;
+  padding: 4px 14px;
+}
+
+.badge-autre {
+  background: var(--color-niveau-autre);
   color: #ffffff;
   font-family: var(--font-display);
   font-weight: 800;

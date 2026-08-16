@@ -7,7 +7,7 @@
 const lfmEvaluationsTeacher = (() => {
   const db = window.lfmDb;
 
-  const SELECT_LISTE = 'id, classe, titre, criteres, exercices, mode, partage, statut_validation, motif_refus, domaine, sous_domaine, afficher_auteur, created_at, updated_at';
+  const SELECT_LISTE = 'id, classe, niveau, niveau_autre, titre, criteres, exercices, mode, partage, statut_validation, motif_refus, domaine, sous_domaine, afficher_auteur, created_at, updated_at';
 
   async function getEvaluations() {
     const { data, error } = await db
@@ -45,13 +45,16 @@ const lfmEvaluationsTeacher = (() => {
     return data;
   }
 
-  /* fields : { classe, titre, criteres, exercices, mode, partage,
-     afficherAuteur, domaine, sousDomaine } — objet plutôt que paramètres
-     positionnels (10 valeurs à cet effectif, trop d'ordre à retenir/trop
-     facile à mélanger, notamment les deux booléens partage/afficherAuteur). */
+  /* fields : { classe, niveau, niveauAutre, titre, criteres, exercices,
+     mode, partage, afficherAuteur, domaine, sousDomaine } — objet plutôt
+     que paramètres positionnels (trop nombreux pour en retenir l'ordre,
+     notamment les deux booléens partage/afficherAuteur, faciles à
+     mélanger). */
   function toRow(fields) {
     return {
       classe: fields.classe,
+      niveau: fields.niveau || null,
+      niveau_autre: fields.niveau === 'autre' ? (fields.niveauAutre || null) : null,
       titre: fields.titre,
       criteres: fields.criteres,
       exercices: fields.exercices,
