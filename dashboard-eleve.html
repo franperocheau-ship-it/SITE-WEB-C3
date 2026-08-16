@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="laurels.css?v=5">
   <link rel="stylesheet" href="css/jogging.css?v=1">
   <link rel="stylesheet" href="css/jogging-print.css?v=1">
-  <link rel="stylesheet" href="css/dictees.css?v=28">
+  <link rel="stylesheet" href="css/dictees.css?v=29">
   <link rel="stylesheet" href="css/niveau-pastilles.css?v=1">
   <link rel="stylesheet" href="css/champ-lexical.css?v=4">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -35,7 +35,7 @@
   <script src="js/carnet-widget.js?v=2"></script>
   <script src="js/jogging-student-space.js?v=1"></script>
   <script src="js/dictees-word-stats.js?v=2"></script>
-  <script src="js/dictees-student-space.js?v=8"></script>
+  <script src="js/dictees-student-space.js?v=9"></script>
   <script src="js/vocab-student-space.js?v=3"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=2">
   <script src="js/feature-flags.js?v=1"></script>
@@ -712,6 +712,14 @@
             <div class="dash-stat-label">Dictées sans faute</div>
             <div class="dash-stat-value" id="dic-stat-sans-faute">0</div>
           </div>
+        </div>
+
+        <!-- Niveau de difficulté travaillé — une pastille par niveau 1/2/3,
+             nombre de dictées où ce niveau est le niveau affiché actuel
+             (dernière session complète, cf. js/dictees-student-space.js). -->
+        <div class="dash-section" id="dic-dash-niveau-section" style="display:none">
+          <div class="dash-section-title">Niveau de difficulté travaillé</div>
+          <div id="dic-dash-niveau-counter"></div>
         </div>
 
         <!-- Mes dictées — détail par dictée (lexical + orthographe grammaticale) -->

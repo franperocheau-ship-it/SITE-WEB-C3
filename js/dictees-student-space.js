@@ -33,6 +33,12 @@ const DicteesStudentSpace = (() => {
      js/dictees-engine.js). */
   const LEX_EXERCICES = [0, 3, 1];
   const LEX_LABELS = { 0: 'Photographier un mot', 3: 'Compléter un mot', 1: 'Dictée de mots' };
+  /* var(--ls-color-N) (level-select.css) n'est pas chargé sur dashboard-
+     eleve.html — même bug/même correctif que dictees-enseignant.html
+     (NIVEAU_VAR) : on référence directement --color-niveau-cm1/cm2/6e
+     (styles.css, toujours chargé), dont --ls-color-N n'est de toute façon
+     qu'un alias. */
+  const NIVEAU_COLOR = { 1: 'var(--color-niveau-cm1)', 2: 'var(--color-niveau-cm2)', 3: 'var(--color-niveau-6e)' };
 
   function formatDate(iso) {
     return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
@@ -76,7 +82,7 @@ const DicteesStudentSpace = (() => {
   async function renderMesDictees(studentId, lexicalResults) {
     const section = document.getElementById('dic-dash-mesdictees-section');
     const list = document.getElementById('dic-dash-mesdictees-list');
-    if (!section || !list) return;
+    if (!section || !list) return { 1: 0, 2: 0, 3: 0 };
 
     let gramResults = [];
     if (window.lfmDb) {
@@ -86,7 +92,7 @@ const DicteesStudentSpace = (() => {
     }
 
     const dicteeIds = [...new Set([...lexicalResults.map(r => r.dictee_id), ...gramResults.map(r => r.dictee_id)])];
-    if (dicteeIds.length === 0) { section.style.display = 'none'; return; }
+    if (dicteeIds.length === 0) { section.style.display = 'none'; return { 1: 0, 2: 0, 3: 0 }; }
 
     let titresById = new Map();
     if (window.lfmDb) {
@@ -107,19 +113,20 @@ const DicteesStudentSpace = (() => {
 
     const lexLatest = latestByKey(lexicalResults, r => r.dictee_id + '|' + r.exercice);
     const gramLatest = latestByKey(gramResults, r => r.dictee_id + '|' + r.type);
-    /* Niveau global de la dictée (BUG 3, 2026-08-16) : le niveau (1/2/3) est
-       choisi UNE fois par l'élève au démarrage de la dictée entière
-       (state.niveauChoisi, js/dictees-engine.js/chooseNiveau), pas par
-       exercice — l'afficher après chaque pastille d'exercice grammatical
-       (ancien gramNiveauMax, niveau max toutes tentatives confondues PAR
-       TYPE) laissait croire à tort qu'il pouvait varier d'un exercice à
-       l'autre sur une même dictée. Seul dictee_gram_results porte la
-       colonne niveau (dictee_results, lexical, ne l'a pas) : on prend le
-       niveau de la tentative grammaticale la plus récente, tous types
-       confondus, comme reflet de la dernière session jouée — absent si
-       l'élève n'a encore fait aucun exercice grammatical sur cette dictée
-       (rien à afficher, pas de niveau connu). */
-    const dicteeGramLatest = latestByKey(gramResults, r => r.dictee_id);
+    /* Niveau AFFICHÉ pour la dictée (remplace l'ancien calcul "dernière
+       tentative grammaticale, tous types confondus" — ne marchait pas du
+       tout pour une dictée purement lexicale, cf. migration 20260914110000) :
+       parmi TOUTES les lignes (lexicales dictee_results ET grammaticales
+       dictee_gram_results) marquées session_complete = true — posé côté
+       client par js/dictees-engine.js/isFullSessionComplete quand TOUS les
+       exercices actifs de la dictée à ce niveau sont terminés — la plus
+       récente (completed_at). Écrase une session complète antérieure à un
+       autre niveau (pas de cumul) ; reste absent tant qu'aucune session n'a
+       jamais été menée à son terme sur cette dictée. */
+    const completeSessionLatest = latestByKey(
+      [...lexicalResults, ...gramResults].filter(r => r.session_complete && r.niveau != null),
+      r => r.dictee_id
+    );
 
     const rows = dicteeIds.map(id => {
       const lexResults = LEX_EXERCICES
@@ -131,10 +138,21 @@ const DicteesStudentSpace = (() => {
       const lastActivity = [...lexResults, ...gramTypes]
         .reduce((max, r) => Math.max(max, new Date(r.completed_at).getTime()), 0);
       const allLexResults = lexicalResults.filter(r => r.dictee_id === id);
-      const gramLatestRow = dicteeGramLatest.get(id);
-      const niveau = gramLatestRow ? gramLatestRow.niveau : null;
-      return { id, titre: titresById.get(id) || '—', lexResults, gramTypes, lastActivity, allLexResults, niveau };
+      /* wrong_items ('trous' uniquement, cf. migration 20260914100000) —
+         mêmes tentatives grammaticales que gramTypes ci-dessus, non filtrées
+         à la dernière (même logique que allLexResults). */
+      const allTrousResults = gramResults.filter(r => r.dictee_id === id && r.type === 'trous');
+      const completeRow = completeSessionLatest.get(id);
+      const niveau = completeRow ? completeRow.niveau : null;
+      return { id, titre: titresById.get(id) || '—', lexResults, gramTypes, lastActivity, allLexResults, allTrousResults, niveau };
     }).sort((a, b) => b.lastActivity - a.lastActivity);
+
+    /* Compteur "niveau de difficulté travaillé" (dashboard-eleve.html, une
+       pastille par niveau 1/2/3) : nombre de dictées où CE niveau est le
+       niveau affiché actuel — une dictée sans session complète (r.niveau ===
+       null) ne compte pour aucun niveau. */
+    const niveauCounts = { 1: 0, 2: 0, 3: 0 };
+    rows.forEach(r => { if (r.niveau != null) niveauCounts[r.niveau]++; });
 
     list.innerHTML = rows.map(r => {
       const lexPills = r.lexResults.map(lex => {
@@ -150,10 +168,13 @@ const DicteesStudentSpace = (() => {
          utilisateur : les pastilles se mélangeaient dans un seul flux. */
       const lexRow = lexPills ? `<div class="dic-mydictees-pillrow"><span class="dic-mydictees-catlabel">Lexique</span>${lexPills}</div>` : '';
       const gramRow = gramPills ? `<div class="dic-mydictees-pillrow"><span class="dic-mydictees-catlabel">Grammaire</span>${gramPills}</div>` : '';
-      const freqLine = DicteesWordStats.formatLine(DicteesWordStats.tally(r.allLexResults, motById));
+      const freqLine = DicteesWordStats.formatLine(DicteesWordStats.mergeTallies(
+        DicteesWordStats.tally(r.allLexResults, motById),
+        DicteesWordStats.tallyText(r.allTrousResults, 'wrong_items')
+      ));
       const freqRow = freqLine ? `<div class="dic-mydictees-pillrow"><span class="dic-mydictees-catlabel">Erreurs</span><span class="dic-mydictees-freqtext">${escHtml(freqLine)}</span></div>` : '';
       const niveauBadge = r.niveau != null
-        ? `<div class="dic-mydictees-niveau"><span class="dic-niveau-dot" style="--ls-color:var(--ls-color-${r.niveau})"></span>Niveau ${r.niveau}</div>`
+        ? `<div class="dic-mydictees-niveau"><span class="dic-niveau-dot" style="--ls-color:${NIVEAU_COLOR[r.niveau]}"></span>Niveau ${r.niveau}</div>`
         : '';
       return `
         <div class="dic-mydictees-row">
@@ -162,6 +183,26 @@ const DicteesStudentSpace = (() => {
         </div>`;
     }).join('');
     section.style.display = '';
+    return niveauCounts;
+  }
+
+  /* Compteur 3 pastilles (une par niveau 1/2/3, couleurs --color-niveau-cm1/
+     cm2/6e comme le reste du site) — même composant que côté enseignant
+     (resultats-dictees-enseignant.html), dupliqué ici (pas de fichier
+     utilitaire commun sur ce module, cf. en-tête). Masqué si l'élève n'a
+     encore aucune dictée avec une session complète (les 3 compteurs à 0
+     n'apportent rien). */
+  function renderNiveauCounterHtml(counts) {
+    const total = counts[1] + counts[2] + counts[3];
+    if (total === 0) return '';
+    return `
+      <div class="dic-niveau-counter">
+        ${[1, 2, 3].map(n => `
+          <div class="dic-niveau-counter-seg dic-niveau-counter-seg--${n}">
+            <span class="dic-niveau-counter-count">${counts[n]}</span>
+            <span class="dic-niveau-counter-label">Niveau ${n}</span>
+          </div>`).join('')}
+      </div>`;
   }
 
   async function render(studentId) {
@@ -176,7 +217,20 @@ const DicteesStudentSpace = (() => {
       .from('dictee_results').select('*').eq('student_id', studentId).limit(2000);
     const safeResults = (error || !results) ? [] : results;
 
-    await renderMesDictees(studentId, safeResults);
+    const niveauCounts = await renderMesDictees(studentId, safeResults);
+    /* Rendu indépendamment du reste de "Mon bilan" (gate sur exercice = 1,
+       purement lexical juste en dessous) : une dictée sans volet lexical
+       (inclut_lexicale = false) n'a jamais de ligne dans dictee_results —
+       safeResults resterait vide alors que niveauCounts peut très bien avoir
+       des dictées comptées (session complète sur le seul volet
+       grammatical). */
+    const niveauSection = document.getElementById('dic-dash-niveau-section');
+    const niveauCounterEl = document.getElementById('dic-dash-niveau-counter');
+    if (niveauSection && niveauCounterEl) {
+      const html = renderNiveauCounterHtml(niveauCounts);
+      niveauCounterEl.innerHTML = html;
+      niveauSection.style.display = html ? '' : 'none';
+    }
 
     if (safeResults.length === 0) {
       statsEl.style.display = 'none';

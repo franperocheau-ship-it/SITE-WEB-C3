@@ -213,11 +213,29 @@ const lfmChampLexicalTeacher = (() => {
     return { perChamp };
   }
 
+  /* Agrège les sessions (une par niveau, voir contrainte unique(student_id,
+     champ_id, niveau)) d'un même élève sur un même champ lexical en un seul
+     total — même règle que le tableau "Résultats de mes élèves"
+     (vocabulaire-corpus-enseignant.html:loadResultats) et resultats-corpus-
+     enseignant.html (renderReportDetail/renderStudentFiche), réutilisée ici
+     plutôt que recodée pour la synthèse PDF (resultats-enseignant.html).
+     Un niveau jamais commencé n'a simplement pas de session : il ne
+     contribue pour rien au total, jamais compté comme 0. */
+  function aggregateNiveauSessions(sessions) {
+    let totalPoints = 0;
+    let allDone = true;
+    sessions.forEach(s => {
+      totalPoints += s.totalPoints || 0;
+      if (s.status !== 'termine') allDone = false;
+    });
+    return { totalPoints, allDone };
+  }
+
   return {
     CATEGORIES,
     getCorpusOptions, createCorpus,
     getMyChamps, getSharedChamps, getChampFull,
     createChamp, updateChampMeta, replaceMots, deleteChamp, forkChamp,
-    getClassSessionsReport
+    getClassSessionsReport, aggregateNiveauSessions
   };
 })();

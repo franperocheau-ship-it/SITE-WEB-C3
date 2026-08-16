@@ -829,3 +829,55 @@
 .dic-evo-bar-col { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 22px; }
 .dic-evo-bar { width: 14px; border-radius: 4px 4px 0 0; background: var(--blue); min-height: 2px; }
 .dic-evo-bar-label { font-size: 9px; color: var(--muted); margin-top: 4px; }
+
+/* ─── Compteur "niveau de difficulté travaillé" — 3 segments/pastilles (une
+   par niveau 1/2/3), nombre de dictées (ou couples élève/dictée côté
+   enseignant) où ce niveau est le niveau AFFICHÉ actuel (dernière session
+   complète, cf. js/dictees-engine.js/isFullSessionComplete). Réutilisé tel
+   quel côté élève (dashboard-eleve.html, js/dictees-student-space.js) et
+   côté enseignant, vue globale ET fiche élève (resultats-dictees-
+   enseignant.html) — même couleurs --color-niveau-cm1/cm2/6e que le reste du
+   site (rappel de niveau pendant l'exercice, sélecteur de niveau, etc.). ── */
+.dic-niveau-counter {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.dic-niveau-counter-seg {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  min-width: 92px;
+}
+.dic-niveau-counter-count {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+.dic-niveau-counter-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+/* Teintes posées en classes fixes plutôt qu'avec color-mix() (3 niveaux
+   seulement, mêmes couleurs que --color-niveau-cm1/cm2/6e) — cohérent avec
+   le reste du site, qui mélange ses teintes en rgba() à la main plutôt
+   qu'avec color-mix() (cf. css/champ-lexical.css/.cl-chip-front). */
+.dic-niveau-counter-seg--1 { background: rgba(29,191,160,0.12); border: 1.5px solid rgba(29,191,160,0.4); }
+.dic-niveau-counter-seg--1 .dic-niveau-counter-count { color: var(--color-niveau-cm1); }
+.dic-niveau-counter-seg--2 { background: rgba(74,144,217,0.12); border: 1.5px solid rgba(74,144,217,0.4); }
+.dic-niveau-counter-seg--2 .dic-niveau-counter-count { color: var(--color-niveau-cm2); }
+.dic-niveau-counter-seg--3 { background: rgba(245,166,35,0.12); border: 1.5px solid rgba(245,166,35,0.4); }
+.dic-niveau-counter-seg--3 .dic-niveau-counter-count { color: var(--color-niveau-6e); }
+
+/* ─── Bloc "niveau global" en tête de la vue enseignant (resultats-dictees-
+   enseignant.html) — vue classe entière (renderReportList) ET fiche élève
+   (renderStudentFiche), même compteur, contexte différent en titre. ────── */
+.dic-report-niveau-section { margin-bottom: 20px; }
+.dic-report-niveau-title {
+  font-size: 12px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 8px;
+}

@@ -601,7 +601,7 @@
     .bdic-niveau-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .bdic-freqtext { font-size: 7.5pt; color: #5F6368; margin-top: 3px; }
 
-    /* 5quater. Corpus lexical — une ligne par champ/niveau travaillé. */
+    /* 5quater. Corpus lexical — une ligne par champ, score total cumulé. */
     .bulletin-corpus { margin-bottom: 18px; }
     .bulletin-cl-row {
       display: flex; justify-content: space-between; gap: 10px;
@@ -609,7 +609,6 @@
     }
     .bulletin-cl-row:last-child { border-bottom: none; }
     .bulletin-cl-row .bcl-title  { font-weight: 700; }
-    .bulletin-cl-row .bcl-niveau { font-weight: 400; color: #5F6368; }
     .bulletin-cl-row .bcl-score  { font-weight: 700; color: #1A2D6B; white-space: nowrap; }
 
     /* 5quinquies. Joggings d'écriture — une ligne par jogging terminé. */
@@ -640,7 +639,7 @@
 
     body.printing-bulletin #bulletin-print-root { display: block !important; }
     @media print {
-      @page { size: A4 portrait; margin: 15mm; }
+      @page { size: A4 portrait; margin: 15mm; margin-top: 5mm; }
       body.printing-bulletin, body.printing-bulletin #bulletin-print-root,
       body.printing-bulletin .bulletin-stat, body.printing-bulletin .bjt-pastille,
       body.printing-bulletin .bcp-pastille, body.printing-bulletin .bulletin-box {
@@ -659,6 +658,7 @@
       }
       body.printing-bulletin .dash-wrap    { padding: 0; background: #fff; min-height: unset; }
       body.printing-bulletin .dash-content { max-width: 100%; padding: 0; }
+      body.printing-bulletin { padding-top: 0 !important; }
     }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -1843,16 +1843,20 @@
 
   /* Même donnée que resultats-corpus-enseignant.html, voir
      js/champ-lexical-teacher.js:getClassSessionsReport(teacherId, classId) —
-     une ligne par champ lexical ET par niveau (suivis indépendamment). */
+     une ligne par champ lexical, total agrégé sur les niveaux déjà entamés
+     (aggregateNiveauSessions, même règle que le tableau "Résultats de mes
+     élèves" et resultats-corpus-enseignant.html — pas de détail par
+     niveau). */
   async function getStudentCorpusForPrint(teacherId, classId, authUserId) {
     if (!classId || !teacherId) return [];
     try {
       const { perChamp } = await lfmChampLexicalTeacher.getClassSessionsReport(teacherId, classId);
       const rows = [];
       perChamp.forEach(c => {
-        c.sessions
-          .filter(s => s.student.auth_user_id === authUserId)
-          .forEach(s => rows.push({ theme: c.theme, niveau: s.niveau, totalPoints: s.totalPoints, status: s.status }));
+        const sessions = c.sessions.filter(s => s.student.auth_user_id === authUserId);
+        if (sessions.length === 0) return;
+        const { totalPoints, allDone } = lfmChampLexicalTeacher.aggregateNiveauSessions(sessions);
+        rows.push({ theme: c.theme, totalPoints, allDone });
       });
       return rows;
     } catch (e) {
@@ -2025,14 +2029,15 @@
       </div>`;
 
     /* Corpus lexical — même donnée que resultats-corpus-enseignant.html
-       (voir getStudentCorpusForPrint ci-dessus), une ligne par champ/niveau. */
+       (voir getStudentCorpusForPrint ci-dessus), une ligne par champ, score
+       total cumulé sur les niveaux déjà entamés (pas de détail par niveau). */
     const corpusHtml = corpusRows.length > 0 ? `
       <div class="bulletin-corpus">
         <div class="bulletin-jauges-title">Corpus lexical (${corpusRows.length})</div>
         ${corpusRows.map(r => `
           <div class="bulletin-cl-row">
-            <div class="bcl-title">${escHtml(r.theme)} <span class="bcl-niveau">— Niveau ${r.niveau}</span></div>
-            <div class="bcl-score">${r.totalPoints} pt${r.totalPoints > 1 ? 's' : ''}${r.status === 'termine' ? '' : ' (en cours)'}</div>
+            <div class="bcl-title">${escHtml(r.theme)}</div>
+            <div class="bcl-score">${r.totalPoints} pt${r.totalPoints > 1 ? 's' : ''}${r.allDone ? '' : ' (en cours)'}</div>
           </div>
         `).join('')}
       </div>` : `
@@ -2118,7 +2123,6 @@
 
       <div class="bulletin-footer">
         <span>proficiamus.eu</span>
-        <span>Niveau 1 = attendus CM1 · Niveau 2 = CM2 · Niveau 3 = 6e</span>
       </div>
     </div>`;
 

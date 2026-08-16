@@ -12,14 +12,14 @@
   <link rel="manifest" href="site.webmanifest?v=1">
   <title>Résultats des dictées — Espace enseignant — LFM</title>
   <link rel="stylesheet" href="styles.css?v=12">
-  <link rel="stylesheet" href="css/dictees.css?v=28">
+  <link rel="stylesheet" href="css/dictees.css?v=29">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/teacher.js?v=2"></script>
   <script src="js/dictees-word-stats.js?v=2"></script>
-  <script src="js/dictees-teacher.js?v=13"></script>
+  <script src="js/dictees-teacher.js?v=14"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=2">
   <script src="js/resultats-nav.js?v=3"></script>
   <style>
@@ -70,15 +70,25 @@
     .empty-inline { color: var(--muted); font-size: 13px; padding: 8px 0; }
 
     .dic-report-list-row {
-      display: flex; align-items: center; gap: 14px; padding: 15px 18px;
+      display: flex; flex-direction: column; gap: 8px; padding: 15px 18px;
       border: 1.5px solid var(--border); border-radius: 12px; margin-bottom: 10px;
       background: var(--card-bg); cursor: pointer; transition: background 150ms, border-color 150ms;
     }
     .dic-report-list-row:hover, .dic-report-list-row:focus-visible { background: rgba(16,43,106,0.05); border-color: var(--blue); outline: none; }
+    .dic-report-list-head { display: flex; align-items: center; gap: 14px; }
     .dic-report-list-title { flex: 1; font-weight: 700; font-size: 15px; color: var(--text); }
     .dic-report-list-avg { font-weight: 600; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
     .dic-report-list-meta { font-size: 13px; color: var(--text); font-weight: 600; flex-shrink: 0; }
     .dic-report-chevron { color: var(--blue); font-size: 18px; flex-shrink: 0; }
+    /* Répartition par niveau de la carte (renderNiveauBreakdownHtml) — même
+       point coloré que .dic-report-niveau, sur une ligne dédiée sous le
+       titre/effectif plutôt qu'en préfixe (répétée 3x, un texte plus long
+       que le simple "Niveau N" des pastilles individuelles). */
+    .dic-report-list-niveau {
+      display: flex; align-items: center; flex-wrap: wrap; row-gap: 4px; column-gap: 16px;
+      font-size: 12px; font-weight: 600; color: var(--muted);
+    }
+    .dic-report-list-niveau-seg { display: inline-flex; align-items: center; gap: 6px; }
 
     .dic-report-back-btn {
       display: inline-flex; align-items: center; gap: 6px;
@@ -292,14 +302,63 @@
       return (lexRow + gramRow + freqRow) || '<span class="dic-report-pill dic-report-pill--empty">Aucun résultat</span>';
     }
 
+    /* var(--ls-color-N) (level-select.css) n'est pas chargé sur cette page —
+       même bug/même correctif que dictees-enseignant.html (NIVEAU_VAR) et
+       js/dictees-student-space.js (NIVEAU_COLOR) : on référence directement
+       --color-niveau-cm1/cm2/6e (styles.css, toujours chargé). */
+    const NIVEAU_COLOR = { 1: 'var(--color-niveau-cm1)', 2: 'var(--color-niveau-cm2)', 3: 'var(--color-niveau-6e)' };
+
     /* Pastille de niveau global (une seule par carte, sous le titre/nom —
-       cf. dashboard-eleve.html/.dic-mydictees-niveau, même variable
-       --ls-color-N), plutôt que le suffixe "— Niveau N" par exercice
-       grammatical (retiré de renderDicteePillsHtml ci-dessus). */
+       cf. dashboard-eleve.html/.dic-mydictees-niveau), plutôt que le suffixe
+       "— Niveau N" par exercice grammatical (retiré de renderDicteePillsHtml
+       ci-dessus). `s.niveau` = niveau AFFICHÉ (dernière session complète,
+       cf. js/dictees-teacher.js/getClassDicteeReport), pas juste "dernière
+       tentative". */
     function renderNiveauBadgeHtml(s) {
       return s.niveau != null
-        ? `<div class="dic-report-niveau"><span class="dic-niveau-dot" style="--ls-color:var(--ls-color-${s.niveau})"></span>Niveau ${s.niveau}</div>`
+        ? `<div class="dic-report-niveau"><span class="dic-niveau-dot" style="--ls-color:${NIVEAU_COLOR[s.niveau]}"></span>Niveau ${s.niveau}</div>`
         : '';
+    }
+
+    /* Compteur 3 pastilles (une par niveau 1/2/3) — même composant que
+       js/dictees-student-space.js/renderNiveauCounterHtml (dupliqué, pas de
+       fichier utilitaire commun sur ce module), styles partagés dans
+       css/dictees.css (.dic-niveau-counter). `entries` = tableau d'objets
+       portant `.niveau` (une entrée par couple élève/dictée à compter) —
+       vue globale : tous les students de tous les perDictee ; vue fiche
+       élève : les entrées de ce seul élève. */
+    function tallyNiveauAffiche(entries) {
+      const counts = { 1: 0, 2: 0, 3: 0 };
+      entries.forEach(e => { if (e.niveau != null) counts[e.niveau]++; });
+      return counts;
+    }
+    function renderNiveauCounterHtml(counts) {
+      const total = counts[1] + counts[2] + counts[3];
+      if (total === 0) return '';
+      return `
+        <div class="dic-niveau-counter">
+          ${[1, 2, 3].map(n => `
+            <div class="dic-niveau-counter-seg dic-niveau-counter-seg--${n}">
+              <span class="dic-niveau-counter-count">${counts[n]}</span>
+              <span class="dic-niveau-counter-label">Niveau ${n}</span>
+            </div>`).join('')}
+        </div>`;
+    }
+
+    /* Répartition par niveau AFFICHÉ (session_complete = true uniquement,
+       cf. tallyNiveauAffiche) pour UNE dictée — ligne compacte sur sa carte
+       dans la liste, un point coloré par niveau (même NIVEAU_COLOR que
+       renderNiveauBadgeHtml) plutôt que le composant boîtes .dic-niveau-
+       counter (pensé pour un agrégat isolé, trop large répété sur chaque
+       carte). Un élève sans session complète pour cette dictée (niveau
+       null) ne compte dans aucun des 3 — jamais de 4e catégorie "inconnu".
+       Vide (pas de ligne) si aucun élève n'a de session complète pour cette
+       dictée, même logique que d.avgMissed ci-dessous. */
+    function renderNiveauBreakdownHtml(counts) {
+      const total = counts[1] + counts[2] + counts[3];
+      if (total === 0) return '';
+      const segs = [1, 2, 3].map(n => `<span class="dic-report-list-niveau-seg"><span class="dic-niveau-dot" style="--ls-color:${NIVEAU_COLOR[n]}"></span>Niveau ${n} : ${counts[n]} élève${counts[n] !== 1 ? 's' : ''}</span>`);
+      return `<div class="dic-report-list-niveau">${segs.join(' · ')}</div>`;
     }
 
     /* ── Vue 1 : liste des dictées (ordre repris de getClassDictees — plus
@@ -313,9 +372,12 @@
       body.innerHTML = _currentReport.perDictee.map((d, i) => `
         <div class="dic-report-list-row" data-dictee-idx="${i}" tabindex="0" role="button"
              aria-label="Voir les résultats de ${escHtml(d.titre)}">
-          <div class="dic-report-list-title">${escHtml(d.titre)}${d.avgMissed != null ? `<div class="dic-report-list-avg">Moyenne : ${String(d.avgMissed).replace('.', ',')} erreur${d.avgMissed >= 2 ? 's' : ''}</div>` : ''}</div>
-          <div class="dic-report-list-meta">${d.students.length} élève${d.students.length !== 1 ? 's' : ''}</div>
-          <div class="dic-report-chevron">›</div>
+          <div class="dic-report-list-head">
+            <div class="dic-report-list-title">${escHtml(d.titre)}${d.avgMissed != null ? `<div class="dic-report-list-avg">Moyenne : ${String(d.avgMissed).replace('.', ',')} erreur${d.avgMissed >= 2 ? 's' : ''}</div>` : ''}</div>
+            <div class="dic-report-list-meta">${d.students.length} élève${d.students.length !== 1 ? 's' : ''}</div>
+            <div class="dic-report-chevron">›</div>
+          </div>
+          ${renderNiveauBreakdownHtml(tallyNiveauAffiche(d.students))}
         </div>
       `).join('');
       document.querySelectorAll('.dic-report-list-row').forEach(row => {
@@ -364,6 +426,10 @@
       const body = document.getElementById('dic-stats-body');
       if (!_currentReport) return;
 
+      const studentEntries = _currentReport.perDictee
+        .map(d => d.students.find(st => st.student.auth_user_id === _filterStudentId))
+        .filter(Boolean);
+
       const rowsHtml = _currentReport.perDictee.map(d => {
         const s = d.students.find(st => st.student.auth_user_id === _filterStudentId);
         if (!s) return '';
@@ -374,9 +440,15 @@
           </div>`;
       }).join('');
 
+      const niveauCounterHtml = renderNiveauCounterHtml(tallyNiveauAffiche(studentEntries));
+      const niveauSectionHtml = niveauCounterHtml
+        ? `<div class="dic-report-niveau-section"><div class="dic-report-niveau-title">Niveau de difficulté travaillé</div>${niveauCounterHtml}</div>`
+        : '';
+
       body.innerHTML = `
         <a href="resultats-dictees-enseignant.html?class=${encodeURIComponent(_currentClassId || '')}" class="dic-report-back-btn" style="text-decoration:none">← Retour à la classe</a>
         <div class="dic-report-detail-title">${escHtml(_filterStudentName || 'Élève')}</div>
+        ${niveauSectionHtml}
         ${rowsHtml || '<div class="empty-inline">Aucun résultat de dictée pour cet élève.</div>'}
       `;
     }

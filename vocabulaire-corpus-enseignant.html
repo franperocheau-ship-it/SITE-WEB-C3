@@ -689,7 +689,10 @@
       await loadResultats(_champsForResults, students || [], classes || []);
     }
 
-    /* ── Résultats de mes élèves (Phase 1, inchangé) ─────────────────────────── */
+    /* ── Résultats de mes élèves ──────────────────────────────────────────────
+       Une ligne par élève + champ lexical, score total cumulé sur les niveaux
+       déjà entamés (même pattern d'agrégation que renderReportDetail() dans
+       resultats-corpus-enseignant.html). ─────────────────────────────────── */
     async function loadResultats(champs, students, classes) {
       const container = document.getElementById('cl-ens-resultats');
       const { data: sessions, error } = await window.lfmDb
@@ -706,24 +709,47 @@
       const classById = new Map(classes.map(c => [c.id, c]));
       const champById = new Map(champs.map(c => [c.id, c]));
 
-      const rows = sessions.map(s => {
-        const student = studentByAuthId.get(s.student_id);
+      // Agrégation par élève + champ : un seul score total (somme des points
+      // des niveaux déjà entamés/terminés), au lieu d'une ligne par niveau.
+      // Les niveaux jamais commencés n'ont simplement pas de session et ne
+      // contribuent donc pour rien au total (pas de "0" comptabilisé).
+      // sessions est trié par completed_at desc, donc le premier session
+      // rencontré pour une clé donnée fixe l'ordre d'affichage du groupe.
+      const groups = new Map();
+      sessions.forEach(s => {
+        const key = s.student_id + '|' + s.champ_id;
+        let group = groups.get(key);
+        if (!group) {
+          group = { student_id: s.student_id, champ_id: s.champ_id, totalPoints: 0, niveaux: [] };
+          groups.set(key, group);
+        }
+        group.totalPoints += s.total_points || 0;
+        group.niveaux.push({ niveau: s.niveau, status: s.status });
+      });
+
+      const rows = Array.from(groups.values()).map(g => {
+        const student = studentByAuthId.get(g.student_id);
         const classe = student ? classById.get(student.class_id) : null;
-        const champ = champById.get(s.champ_id);
+        const champ = champById.get(g.champ_id);
+        const niveauxTries = g.niveaux.slice().sort((a, b) => a.niveau - b.niveau);
+        const niveauxLabel = niveauxTries
+          .map(n => n.status === 'termine' ? `Niveau ${n.niveau}` : `Niveau ${n.niveau} (en cours)`)
+          .join(', ');
+        const allTermine = niveauxTries.every(n => n.status === 'termine');
         return `
           <tr>
             <td>${escapeHtml(student ? student.display_name : '—')}</td>
             <td>${escapeHtml(classe ? classe.name : '—')}</td>
             <td>${escapeHtml(champ ? champ.theme : '—')}</td>
-            <td>Niveau ${s.niveau}</td>
-            <td>${s.total_points}</td>
-            <td class="cl-ens-status--${s.status}">${s.status === 'termine' ? 'Terminé' : 'En cours'}</td>
+            <td>${escapeHtml(niveauxLabel)}</td>
+            <td>${g.totalPoints}</td>
+            <td class="cl-ens-status--${allTermine ? 'termine' : 'en_cours'}">${allTermine ? 'Terminé' : 'En cours'}</td>
           </tr>`;
       }).join('');
 
       container.innerHTML = `
         <table class="cl-ens-table">
-          <thead><tr><th>Élève</th><th>Classe</th><th>Champ lexical</th><th>Niveau</th><th>Points</th><th>Statut</th></tr></thead>
+          <thead><tr><th>Élève</th><th>Classe</th><th>Champ lexical</th><th>Niveaux</th><th>Points (total)</th><th>Statut</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>`;
     }

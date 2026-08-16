@@ -342,24 +342,29 @@ const lfmDicteesTeacher = (() => {
    * que les 3 n'ont pas été faits) ; `gramByType` = dernière tentative par
    * type classification/trous/trous_conjugaison/transformation (null si
    * jamais tenté) — la page n'affiche une pastille que pour les
-   * paliers/types réellement tentés ; `niveau` = niveau (1/2/3, null si
-   * inconnu) de la tentative grammaticale la plus récente de cet élève sur
-   * cette dictée, tous types confondus — le niveau est choisi UNE fois par
-   * l'élève au démarrage de la dictée entière (state.niveauChoisi,
-   * js/dictees-engine.js/chooseNiveau), pas par exercice ; un ancien
-   * `gramNiveauByType` (max par type, affiché en suffixe après chaque
-   * pastille grammaticale) laissait croire à tort qu'il pouvait varier d'un
-   * exercice à l'autre — retiré, même correction que dashboard-eleve.html/
-   * DicteesStudentSpace (voir dicteeGramLatest là-bas). Seul
-   * dictee_gram_results porte cette colonne (dictee_results, lexical, ne
-   * l'a pas), donc `niveau` reste null si l'élève n'a encore fait aucun
-   * exercice grammatical sur cette dictée. `freqLine` = retour "erreurs les
+   * paliers/types réellement tentés ; `niveau` = niveau AFFICHÉ (1/2/3, null
+   * si aucune session complète) de cet élève sur cette dictée — la ligne la
+   * plus récente (dictee_results OU dictee_gram_results confondues) marquée
+   * `session_complete = true` (posé côté client par js/dictees-engine.js/
+   * isFullSessionComplete quand TOUS les exercices actifs de la dictée à ce
+   * niveau sont terminés, cf. migration 20260914110000) — écrase une session
+   * complète antérieure à un autre niveau, jamais cumulé ; une dictée
+   * commencée mais pas terminée ne compte pour aucun niveau. Remplace
+   * l'ancien calcul "dernière tentative GRAMMATICALE, tous types confondus"
+   * (gramLatestByStudentDictee), qui ne marchait pas pour une dictée
+   * purement lexicale et ne reflétait pas vraiment une session complète —
+   * même correction que dashboard-eleve.html/DicteesStudentSpace
+   * (completeSessionLatest là-bas). `freqLine` = retour "erreurs les
    * plus fréquentes" (js/dictees-word-stats.js) sur les tentatives
-   * lexicales de CET élève pour CETTE dictée, toutes tentatives confondues
-   * (pas seulement la dernière — reflète la difficulté réelle du mot pour
-   * lui), chaîne vide si aucune erreur. `perDictee[].avgMissed` = nombre
-   * moyen de mots ratés par résultat lexical, tous élèves confondus, pour
-   * CETTE dictée (null si aucun résultat lexical).
+   * lexicales de CET élève pour CETTE dictée, fusionné aux wrong_items de
+   * l'exercice "Texte à trous" (seul exercice grammatical à avoir un suivi
+   * mot-par-mot, cf. migration 20260914100000 — classification/trous_
+   * conjugaison/transformation restent hors périmètre), toutes tentatives
+   * confondues (pas seulement la dernière — reflète la difficulté réelle du
+   * mot pour lui), chaîne vide si aucune erreur. `perDictee[].avgMissed` =
+   * nombre moyen de mots ratés par résultat lexical, tous élèves confondus,
+   * pour CETTE dictée (null si aucun résultat lexical — ne compte pas les
+   * wrong_items grammaticaux, cf. DicteesWordStats.averageMissedCount).
    */
   async function getClassDicteeReport(classId) {
     const dictees = await getClassDictees(classId);
@@ -406,15 +411,16 @@ const lfmDicteesTeacher = (() => {
       if (!prev || new Date(r.completed_at) > new Date(prev.completed_at)) gramLatest.set(k, r);
     });
 
-    /* Tentative grammaticale la plus récente par élève|dictée, tous types
-       confondus — source du niveau global affiché (une seule pastille par
-       carte, cf. JSDoc ci-dessus), même logique que dashboard-eleve.html/
-       DicteesStudentSpace (dicteeGramLatest). */
-    const gramLatestByStudentDictee = new Map();
-    gramResults.forEach(r => {
+    /* Session complète la plus récente par élève|dictée (lexical ET
+       grammatical confondus) — source du niveau AFFICHÉ (une seule pastille
+       par carte, cf. JSDoc ci-dessus), même logique que dashboard-eleve.html/
+       DicteesStudentSpace (completeSessionLatest). */
+    const completeSessionLatestByStudentDictee = new Map();
+    [...lexResults, ...gramResults].forEach(r => {
+      if (!r.session_complete || r.niveau == null) return;
       const k = `${r.student_id}|${r.dictee_id}`;
-      const prev = gramLatestByStudentDictee.get(k);
-      if (!prev || new Date(r.completed_at) > new Date(prev.completed_at)) gramLatestByStudentDictee.set(k, r);
+      const prev = completeSessionLatestByStudentDictee.get(k);
+      if (!prev || new Date(r.completed_at) > new Date(prev.completed_at)) completeSessionLatestByStudentDictee.set(k, r);
     });
 
     const perDictee = dictees
@@ -438,9 +444,16 @@ const lfmDicteesTeacher = (() => {
             gramByType[type] = r ? Math.round((r.score / r.total) * 100) : null;
           });
           const studentLexResults = dicteeLexResults.filter(r => r.student_id === studentId);
-          const freqLine = DicteesWordStats.formatLine(DicteesWordStats.tally(studentLexResults, motById));
-          const gramLatestRow = gramLatestByStudentDictee.get(`${studentId}|${d.id}`);
-          const niveau = gramLatestRow ? gramLatestRow.niveau : null;
+          /* wrong_items ('trous' uniquement, cf. migration 20260914100000)
+             fusionné aux mots lexicaux ratés — même élève, même dictée,
+             toutes tentatives confondues comme studentLexResults ci-dessus. */
+          const studentTrousResults = gramResults.filter(r => r.dictee_id === d.id && r.student_id === studentId && r.type === 'trous');
+          const freqLine = DicteesWordStats.formatLine(DicteesWordStats.mergeTallies(
+            DicteesWordStats.tally(studentLexResults, motById),
+            DicteesWordStats.tallyText(studentTrousResults, 'wrong_items')
+          ));
+          const completeRow = completeSessionLatestByStudentDictee.get(`${studentId}|${d.id}`);
+          const niveau = completeRow ? completeRow.niveau : null;
           return {
             student: studentById.get(studentId) || { display_name: 'Élève inconnu' },
             lexByExercice,

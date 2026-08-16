@@ -591,21 +591,19 @@ const DicteesEngine = (() => {
     return state.ordreChoisi === 'grammatical' ? [...gram, ...lexicalSteps()] : [...lexicalSteps(), ...gram];
   }
 
-  /* Chaque tuile d'étape porte aussi dic-tab--gram pour les paliers 2/3/4
-     (classification/trous/transformation) : coloration ambre distincte du
-     bleu lexical (voir css/dictees.css), pour que l'élève voie tout de suite
-     à quel bloc de travail il est en train de passer.
-
-     "Fait" se détermine par l'état RÉEL de chaque palier (unmastered vide),
+  /* "Fait" se détermine par l'état RÉEL de chaque palier (unmastered vide),
      jamais par position dans la séquence : navigation libre entre onglets
      (retour utilisateur) — l'élève peut très bien terminer le palier 3 avant
      le palier 1, un critère positionnel donnerait alors un bandeau
      incohérent. state.exN/classification/trous/transfo restent `null` tant
      que le palier correspondant n'a jamais été démarré cette session (ni
-     "fait" ni "en cours", juste l'état par défaut du bouton). */
-  function stepStatus(s) {
-    if (s.step === state.step) return 'active';
-    const done = {
+     "fait" ni "en cours", juste l'état par défaut du bouton). Extrait de
+     stepStatus (même définition de "terminé") pour être réutilisé par
+     isFullSessionComplete() — voir plus bas, sert à poser
+     dictee_results/dictee_gram_results.session_complete au moment de
+     chaque soumission de résultat. */
+  function isStepDone(step) {
+    return !!{
       0: state.ex0 && state.ex0.unmastered.length === 0,
       0.5: state.ex05 && state.ex05.unmastered.length === 0,
       1: state.ex1 && state.ex1.unmastered.length === 0,
@@ -613,8 +611,51 @@ const DicteesEngine = (() => {
       3: state.trous && (state.trous.unmastered.length === 0 || state.trous.attempts >= state.trous.maxAttempts),
       4: state.transfo && state.transfo.unmastered.length === 0,
       5: state.trousConj && (state.trousConj.unmastered.length === 0 || state.trousConj.attempts >= state.trousConj.maxAttempts)
-    }[s.step];
-    return done ? 'done' : '';
+    }[step];
+  }
+
+  /* Chaque tuile d'étape porte aussi dic-tab--gram pour les paliers 2/3/4
+     (classification/trous/transformation) : coloration ambre distincte du
+     bleu lexical (voir css/dictees.css), pour que l'élève voie tout de suite
+     à quel bloc de travail il est en train de passer. */
+  function stepStatus(s) {
+    if (s.step === state.step) return 'active';
+    return isStepDone(s.step) ? 'done' : '';
+  }
+
+  /* Une "session complète" pour la pastille de niveau (§ voir migration
+     20260914100000) : retour utilisateur — Classification/Trous-conjugaison/
+     Transformation ne doivent plus compter (activés mais non faits, ils ne
+     bloquent plus le statut "complet"). Palier requis = les 3 paliers
+     lexicaux (0/0.5/1, cf. lexicalSteps() — vide si inclut_lexicale ===
+     false) + le palier 3 (Texte à trous) SEULEMENT s'il fait partie de la
+     séquence de cette dictée (gramSteps() ne le renvoie que si l'enseignant
+     l'a renseigné ET inclut_grammaticale !== false) ; PAS "tous les paliers
+     de currentSequence()" comme avant.
+
+     Cas limite explicite : si le sous-ensemble requis est vide (dictée sans
+     volet lexical ET sans Texte à trous, ex. dictée purement Classification/
+     Transformation) — aucune dictée existante n'est dans ce cas au
+     2026-09-14 (vérifié en base : inclut_lexicale = false sur aucune ligne),
+     mais le schéma l'autorise (le formulaire exige seulement qu'AU MOINS un
+     des deux volets lexical/grammatical reste actif, pas spécifiquement le
+     lexical) — retourne false plutôt que le true vacueux de
+     `[].every(...)`, pour ne jamais afficher "session complète" avant que
+     l'élève ait fait quoi que ce soit.
+
+     Appelée à chaque submitResult/submitGramResult, juste avant l'écriture :
+     le palier qui vient de finir a déjà mis à jour son state.xxx.unmastered
+     à ce moment-là (submit est toujours appelé une fois le palier fini), les
+     autres reflètent l'état cumulé depuis le début de la session
+     (sessionStorage), donc au plus UNE ligne par session réellement menée à
+     son terme se retrouve avec session_complete = true — celle du tout
+     dernier palier requis fini, quel que soit l'ordre dans lequel l'élève
+     les a enchaînés. */
+  function isFullSessionComplete() {
+    const required = lexicalSteps().map(s => s.step);
+    if (gramSteps().some(s => s.step === 3)) required.push(3);
+    if (required.length === 0) return false;
+    return required.every(isStepDone);
   }
 
   function tabButtonHTML(s) {
@@ -1831,7 +1872,16 @@ const DicteesEngine = (() => {
     if (!state.trous.submitted) {
       state.trous.submitted = true;
       saveState();
-      submitGramResult('trous', state.trous.masteredBlankIds.length, state.trous.totalBlanks, Math.round((Date.now() - state.trous.startedAt) / 1000));
+      /* Mêmes trous que la synthèse "encore ratés" de renderTrousFinished
+         (missed = blancs jamais dans masteredBlankIds) — mot_attendu stocké
+         en texte, pas l'id dictee_trous_mots (cf. migration
+         20260914100000_dictee_gram_results_wrong_items, même raison que le
+         bug d'ids orphelins corrigé sur wrong_mot_ids). */
+      const wrongItems = gramTrous
+        .flatMap(t => t.dictee_trous_mots)
+        .filter(tag => !state.trous.masteredBlankIds.includes(tag.id))
+        .map(tag => tag.mot_attendu);
+      submitGramResult('trous', state.trous.masteredBlankIds.length, state.trous.totalBlanks, Math.round((Date.now() - state.trous.startedAt) / 1000), wrongItems);
     }
     renderTrousFinished();
   }
@@ -2269,7 +2319,9 @@ const DicteesEngine = (() => {
       sans_faute: sansFaute,
       duration_secs: durationSecs,
       attempts: attempts,
-      wrong_mot_ids: wrongMotIds || []
+      wrong_mot_ids: wrongMotIds || [],
+      niveau: state.niveauChoisi,
+      session_complete: isFullSessionComplete()
     };
     const { error } = await window.lfmDb.from('dictee_results').insert(payload);
     if (!error) return;
@@ -2288,12 +2340,15 @@ const DicteesEngine = (() => {
   }
 
   /* Distinct de submitResult : dictee_gram_results a ses propres colonnes
-     (pas de sans_faute/attempts/wrong_mot_ids) et reste strictement cantonné
-     à l'espace dictée de l'enseignant (jamais exercise_results ni le bilan
-     général — cf. resultats-dictees-enseignant.html). Même filet de secours
-     (nouvel essai + file d'attente) que submitResult, voir commentaire
-     ci-dessus. */
-  async function submitGramResult(type, score, total, durationSecs) {
+     (pas de sans_faute/attempts) et reste strictement cantonné à l'espace
+     dictée de l'enseignant (jamais exercise_results ni le bilan général —
+     cf. resultats-dictees-enseignant.html). Même filet de secours (nouvel
+     essai + file d'attente) que submitResult, voir commentaire ci-dessus.
+     `wrongItems` : mots ratés en texte (pas d'id, cf. finishTrous) —
+     optionnel, seul l'appel depuis 'trous' le renseigne pour l'instant
+     (classification/trous_conjugaison/transformation restent hors
+     périmètre, colonne wrong_items nulle pour eux). */
+  async function submitGramResult(type, score, total, durationSecs, wrongItems) {
     if (!studentId || !window.lfmDb) return;
     const payload = {
       student_id: studentId,
@@ -2302,7 +2357,9 @@ const DicteesEngine = (() => {
       score,
       total,
       duration_secs: durationSecs,
-      niveau: state.niveauChoisi
+      niveau: state.niveauChoisi,
+      wrong_items: wrongItems || null,
+      session_complete: isFullSessionComplete()
     };
     const { error } = await window.lfmDb.from('dictee_gram_results').insert(payload);
     if (!error) return;
