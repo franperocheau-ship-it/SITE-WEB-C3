@@ -65,17 +65,18 @@
           par trou (DicteesSpeech.speak) est le seul support, l'élève
           reproduit le mot entendu. Un seul mot attendu par trou, correction
           tolérante à la ponctuation/aux espaces et à l'apostrophe
-          (DicteesSpeech.normalizeTrouAnswer). 3 tentatives au total sur tout
-          l'exercice (state.trous.attempts/maxAttempts) : succès si plus
-          aucun trou faux à l'issue, sinon synthèse des mots encore ratés à
-          la fin (voir renderTrousFinished).
+          (DicteesSpeech.normalizeTrouAnswer). 3 tentatives par phrase du
+          niveau choisi au total sur tout l'exercice
+          (state.trous.attempts/maxAttempts) : succès si plus aucun trou
+          faux à l'issue, sinon synthèse des mots encore ratés à la fin (voir
+          renderTrousFinished).
      5.   Trous — conjugaison — exercice à part entière (jusqu'au 2026-09,
           un simple sous-type du palier 3 ; scindé en palier indépendant sur
           ses propres tables dictee_trous_conjugaison/
           dictee_trous_conjugaison_mots, cf. migration 20260908100000), même
-          mécanique que le palier 3 (deck/unmastered, 3 tentatives au total,
-          verrouillage des blancs déjà justes) mais l'infinitif du verbe est
-          affiché en clair juste avant chaque trou (jamais caché) — seul
+          mécanique que le palier 3 (deck/unmastered, 3 tentatives par phrase
+          au total, verrouillage des blancs déjà justes) mais l'infinitif du
+          verbe est affiché en clair juste avant chaque trou (jamais caché) — seul
           indice fourni en plus du haut-parleur (voir
           renderTrousConjugaisonExercise).
      4.   Transformation de phrase — phrase de départ + consigne de
@@ -1669,10 +1670,19 @@ const DicteesEngine = (() => {
      par blanc pour réafficher ce que l'élève a réellement écrit une fois
      verrouillé (pas systématiquement l'orthographe canonique, cohérent avec
      la tolérance de DicteesSpeech.normalizeTrouAnswer). L'élève dispose de
-     maxAttempts (3) tentatives « Valider » au total sur tout l'exercice,
-     tous trous confondus — pas par phrase : dès que ce total est atteint (ou
-     que tout est déjà maîtrisé avant), l'exercice s'arrête, cf.
-     renderTrousExercise/renderTrousFinished. */
+     maxAttempts tentatives « Valider » au total sur tout l'exercice, tous
+     trous confondus — pas par phrase : dès que ce total est atteint (ou que
+     tout est déjà maîtrisé avant), l'exercice s'arrête, cf.
+     renderTrousExercise/renderTrousFinished. maxAttempts = 3 × le nombre de
+     phrases du niveau choisi (gramTrous.length), PAS une constante fixe :
+     un budget de 3 pour tout l'exercice suffit au niveau 1 (1 seule phrase)
+     mais s'épuise dès la 1ère phrase des niveaux 2/3 (2 ou 3 phrases) dès
+     qu'elle demande plus d'un essai — la 2e phrase n'est alors jamais
+     dessinée à l'écran (renderTrousExercise rend finishTrous() avant même
+     de tirer la phrase suivante dès que attempts >= maxAttempts), et
+     l'écran de fin affiche à tort la totalité de cette phrase jamais vue
+     comme "mots à travailler" (bug signalé, élève arrivé à l'écran de fin
+     juste après la 1ère phrase du niveau 2 sans jamais voir la 2nde). */
   function trouById(id) { return gramTrous.find(t => t.id === id); }
 
   function drawNextTrou() {
@@ -1692,7 +1702,7 @@ const DicteesEngine = (() => {
         answers: {},   // { [blankId]: dernière saisie } — pour réafficher un blanc verrouillé (déjà juste)
         totalBlanks: gramTrous.reduce((s, t) => s + t.dictee_trous_mots.length, 0),
         attempts: 0,
-        maxAttempts: 3,
+        maxAttempts: 3 * gramTrous.length,
         submitted: false,
         startedAt: Date.now()
       };
@@ -1964,7 +1974,7 @@ const DicteesEngine = (() => {
         answers: {},
         totalBlanks: gramTrousConj.reduce((s, t) => s + t.dictee_trous_conjugaison_mots.length, 0),
         attempts: 0,
-        maxAttempts: 3,
+        maxAttempts: 3 * gramTrousConj.length, // même bug/correction que startTrous — cf. commentaire du palier 3
         submitted: false,
         startedAt: Date.now()
       };

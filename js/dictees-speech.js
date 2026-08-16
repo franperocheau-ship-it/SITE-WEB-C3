@@ -59,9 +59,29 @@ const DicteesSpeech = (() => {
     const synth = window.speechSynthesis;
     const myRequest = ++requestId;
 
+    /* Bug moteur : un énoncé réduit à une seule lettre lisible est traité
+       comme une demande d'épellation ("à" → "a accent grave", "y" → "i
+       grec") plutôt que lu comme un mot. Ni un point final, ni un
+       changement de voix, ni une phrase porteuse ("Le mot : à.") ne
+       contournent le problème — testé manuellement lettre par lettre (voir
+       scratchpad test-tts-lettres.html) : la règle d'épellation s'applique
+       au token lui-même, peu importe ce qui l'entoure dans l'énoncé. Seul un
+       caractère invisible/muet ACCOLÉ SANS ESPACE à la lettre (donc dans le
+       MÊME token) empêche le moteur de le reconnaître comme "une lettre
+       isolée" tout en laissant le son inchangé — mais le caractère qui
+       marche n'est pas le même pour toutes les lettres (probablement lié à
+       la façon dont chacune est phonétisée en interne) : "h" muet pour "à",
+       correcteur grapheme joiner (U+034F) pour "y". Mapping explicite plutôt
+       que règle générale : aucune des deux ne fonctionne pour "s'" (laissé
+       tel quel, non prioritaire). */
+    const SINGLE_LETTER_FIX = { 'à': 'h', 'y': '͏' };
+    const letterCount = (text || '').replace(/[^\p{L}]/gu, '').length;
+    const fixSuffix = letterCount === 1 && text ? SINGLE_LETTER_FIX[text.trim().toLowerCase()] : null;
+    const spokenText = fixSuffix ? text.trim() + fixSuffix : text;
+
     const fire = () => {
       if (myRequest !== requestId) return; // supplanté par un appel plus récent
-      const utter  = new SpeechSynthesisUtterance(text);
+      const utter  = new SpeechSynthesisUtterance(spokenText);
       utter.lang   = 'fr-FR';
       utter.rate   = 0.85;
       utter.pitch  = 1;
@@ -124,9 +144,15 @@ const DicteesSpeech = (() => {
      entendu à l'oral (bouton haut-parleur, jamais affiché à l'écrit avant
      saisie) : une apostrophe oubliée ou d'un mauvais type (' vs ’) est une
      erreur de frappe bénigne, pas la faute que l'exercice cherche à évaluer.
-     Apostrophes droites/courbes retirées des deux côtés avant comparaison. */
+     Apostrophes droites/courbes retirées des deux côtés avant comparaison.
+     Même tolérance sur la ligature "œ" : un clavier standard ne la produit
+     pas facilement (ni au clavier ni à l'oreille, le mot étant seulement
+     entendu via le bouton haut-parleur) — "oeuf"/"œuf" doivent être
+     acceptés l'un pour l'autre quel que soit le sens (réponse attendue en
+     base avec ou sans ligature, saisie élève avec ou sans). Appliqué après
+     normalizeSentence, qui a déjà tout mis en minuscule via normalize(). */
   function normalizeTrouAnswer(str) {
-    return normalizeSentence(str).replace(/['’ʼ`]/g, '');
+    return normalizeSentence(str).replace(/['’ʼ`]/g, '').replace(/œ/g, 'oe');
   }
 
   /* Met en évidence, dans le mot correct, la zone qui diffère de la saisie
