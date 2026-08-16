@@ -191,6 +191,14 @@
     .dic-trou-item-top .dic-form-input { flex: 1 1 auto; min-width: 0; margin: 0; }
     .dic-trou-item-top .dic-mot-niveau-select { flex-shrink: 0; }
     .dic-trou-item-top .dic-btn-danger { flex-shrink: 0; }
+    /* js/teacher-spellcheck.js enveloppe ce champ (classe lfm-verifie) dans
+       une <div class="lfm-verifie-wrap"> dès le chargement de la page — c'est
+       donc elle, et non l'input, qui devient l'enfant flex de
+       .dic-trou-item-top. Sans cette règle elle garde sa largeur par défaut
+       (display: block, pas de flex-basis), ce qui annulait silencieusement le
+       flex: 1 1 auto posé ci-dessus sur .dic-form-input dès que le
+       correcteur s'attachait au champ. */
+    .dic-trou-item-top .lfm-verifie-wrap { flex: 1 1 auto; min-width: 0; }
     /* Flux inline (pas de flex/gap) : la ponctuation issue de tokenizeTrouPhrase
        (espaces et signes compris) reste un texte normal entre les mots, elle
        ne doit jamais hériter de l'espacement réservé aux mots cliquables. */
