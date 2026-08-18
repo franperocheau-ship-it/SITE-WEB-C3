@@ -22,6 +22,6 @@
     "data/vocabulaire.js"
   ];
   DOMAIN_FILES.forEach(function (src) {
-    document.write('<script src="' + src + '?v=7"></script>');
+    document.write('<script src="' + src + '?v=8"></script>');
   });
 })();
