@@ -4832,6 +4832,18 @@
 
     function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
+    /* q.id n'existe que sur les items déjà migrés vers un id stable
+       (scripts/add-item-ids.js) : sans id, no-op — n'affecte aucun type qui
+       n'est pas encore couvert par le suivi granulaire.
+       level : TOUJOURS reçu explicitement depuis la variable de niveau
+       connue au runtime (homoLevelNum / vocState.level via ctx.level) —
+       jamais recalculé depuis le suffixe "-nX-" de l'id, qui reste figé une
+       fois attribué (scripts/add-item-ids.js) même si l'item change de
+       niveau après une restructuration future. */
+    function recordItemResult(q, isCorrect, level) {
+      if (q && q.id) itemResults.push({ item_id: q.id, is_correct: isCorrect, level });
+    }
+
     /* ── State ────────────────────────────────────────────────────────────── */
 
     let questions     = [];
@@ -4840,6 +4852,14 @@
     let sessionData   = null;
     let currentType   = null;   /* set once per session */
     let sessionStartTime = null;
+    /* Suivi granulaire par question (exercise_item_results) : réinitialisés
+       au début de chaque tentative (homophones-niveaux : loadLevel ;
+       vocabulaire-niveaux : vocStartLevel), consommés une seule fois à la
+       fin dans saveExerciseResult (insert groupé, même attemptId que la
+       ligne exercise_results de cette tentative). */
+    let itemResults   = [];
+    let attemptId     = null;
+    let homoLevelNum  = null;   /* homophones-niveaux : niveau courant en entier (1/2/3), pour recordItemResult */
     let wordOrderAnswer  = [];   /* word-order type */
     let conjTableRows    = [];   /* conjugation-table type */
     let pfiSelectedLevel = null; /* produire-3-formes : niveau sélectionné */
@@ -5257,11 +5277,14 @@
       const doShuffle  = sessionData.homoShuffle || [false, true, false];
 
       const loadLevel = (lv) => {
-        homoLevel  = lv;
+        homoLevel    = lv;
+        homoLevelNum = shuffleIdx[lv] + 1;
         const bank = sessionData[bankKeyMap[lv]] || [];
         questions  = doShuffle[shuffleIdx[lv]] ? shuffle([...bank]) : [...bank];
         currentIndex = 0;
         score        = 0;
+        itemResults  = [];
+        attemptId    = crypto.randomUUID();
       };
 
       const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
@@ -6882,7 +6905,13 @@
         level:        activeLevel,
         score,
         total,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        /* itemResults/attemptId ne concernent que homophones-niveaux ici :
+           showResults() est partagée par de nombreux currentType, et des
+           valeurs d'une tentative homophones-niveaux précédente pourraient
+           encore traîner dans ces globales au moment d'un autre type. */
+        attemptId:    currentType === 'homophones-niveaux' ? attemptId   : null,
+        itemResults:  currentType === 'homophones-niveaux' ? itemResults : null
       });
     }
 
@@ -7283,6 +7312,7 @@
         document.getElementById("mc-piege").innerHTML   = "";
 
         const noteHtml = q.note ? `<div class="ex-note">${q.note}</div>` : "";
+        recordItemResult(q, !hasWrong && !hasMissed, homoLevelNum);
         if (!hasWrong && !hasMissed) {
           score++;
           setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>${noteHtml}`);
@@ -7321,6 +7351,7 @@
 
       function finish() {
         document.getElementById("mce-instr").classList.add("ex-hidden");
+        recordItemResult(q, allCorrect, homoLevelNum);
         if (allCorrect) {
           score++;
           setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
@@ -7416,6 +7447,7 @@
         btn.addEventListener("click", () => {
           grid.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
           const isRight = c === q.answer;
+          recordItemResult(q, isRight, homoLevelNum);
           grid.querySelectorAll(".ex-choice").forEach(b => {
             if (b.textContent === q.answer) b.classList.add("is-correct");
           });
@@ -7541,6 +7573,7 @@
 
           const rewriteHtml = q.rewriteSentence ? `<div class="ex-note">📝 « ${q.rewriteSentence} »</div>` : "";
 
+          recordItemResult(q, isRight && step1Correct, homoLevelNum);
           if (isRight && step1Correct) {
             score++;
             setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}${rewriteHtml}</div>`);
@@ -7570,7 +7603,12 @@
        + showNextBtn(). Aucun renderer préexistant n'est concerné.
     ────────────────────────────────────────────────────────────────────── */
     function defaultQuestionCtx() {
-      return { addScore: n => { score += n; }, showNext: showNextBtn };
+      /* level: homoLevelNum — pertinent quand ce ctx par défaut est utilisé
+         par un renderer partagé dispatché sous homophones-niveaux (texte-a-
+         trous, production-libre, double-blanc, gap-saisie, appelés sans ctx
+         explicite) ; sans effet sinon, recordItemResult ignore de toute
+         façon les items sans id. */
+      return { addScore: n => { score += n; }, showNext: showNextBtn, level: homoLevelNum };
     }
 
     /* data-word etc. embed question data straight into an HTML attribute
@@ -7609,6 +7647,7 @@
         btn.addEventListener("click", () => {
           grid.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
           const isRight = c === q.answer;
+          recordItemResult(q, isRight, ctx.level);
           grid.querySelectorAll(".ex-choice").forEach(b => {
             if (b.textContent === q.answer) b.classList.add("is-correct");
           });
@@ -7706,6 +7745,7 @@
         validateBtn.disabled = true;
 
         const isRight = placed.join('|') === q.answer.join('|');
+        recordItemResult(q, isRight, ctx.level);
         slots.querySelectorAll(".cs-slot").forEach((slot, i) => {
           slot.classList.add(placed[i] === q.answer[i] ? "cs-ok-slot" : "cs-err-slot");
         });
@@ -7789,6 +7829,7 @@
             matched++;
             selected = null;
             if (matched === total) {
+              recordItemResult(q, true, ctx.level);
               ctx.addScore(1);
               setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}${q.feedback ? `<br>${q.feedback}` : ''}</div>`);
               ctx.showNext();
@@ -7856,6 +7897,7 @@
             }
             answered++;
             if (answered === total) {
+              recordItemResult(q, allCorrect, ctx.level);
               if (allCorrect) {
                 ctx.addScore(1);
                 setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}${q.feedback ? `<br>${q.feedback}` : ''}</div>`);
@@ -7928,6 +7970,7 @@
             : `✗ La bonne réponse était <strong>${blank.answer}</strong>.${blank.hint ? ` ${blank.hint}` : ''}`;
         });
 
+        recordItemResult(q, allOk, ctx.level);
         if (allOk) {
           ctx.addScore(1);
           setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}<br>${lines.join('<br>')}${q.feedback ? `<br>${q.feedback}` : ''}</div>`);
@@ -7969,6 +8012,7 @@
         card.querySelector('#pl-validate').disabled  = true;
 
         const missing = q.words.filter(w => !plWordPresent(text, w));
+        recordItemResult(q, missing.length === 0, ctx.level);
 
         if (missing.length === 0) {
           ctx.addScore(1);
@@ -8059,6 +8103,7 @@
             : `Blanc ${i + 1} ✗ — la bonne réponse était <strong>${b.answer}</strong>.${b.hint ? ` ${b.hint}` : ''}`;
         });
 
+        recordItemResult(q, allOk, ctx.level);
         if (allOk) {
           ctx.addScore(1);
           setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}<br>${lines.join('<br>')}</div>`);
@@ -8126,6 +8171,7 @@
         input.disabled       = true;
         validateBtn.disabled = true;
         const ok = accepted.includes(val.toLowerCase());
+        recordItemResult(q, ok, ctx.level);
         input.classList.add(ok ? 'is-correct' : 'is-wrong');
         if (ok) {
           ctx.addScore(1);
@@ -8210,6 +8256,7 @@
         btn.addEventListener("click", () => {
           grid.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
           const isRight = c === q.answer;
+          recordItemResult(q, isRight, ctx.level);
           grid.querySelectorAll(".ex-choice").forEach(b => {
             if (b.textContent === q.answer) b.classList.add("is-correct");
           });
@@ -8292,6 +8339,8 @@
          (shuffle dans chaque renderer). */
       const questions = sessionData['level' + lv + 'Bank'];
       vocState = { level: lv, questions, idx: 0, score: 0, total: questions.length };
+      itemResults = [];
+      attemptId   = crypto.randomUUID();
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
       document.getElementById('q-total').textContent = questions.length;
@@ -8300,7 +8349,7 @@
     }
 
     function vocCtx() {
-      return { addScore: n => { vocState.score += n; }, showNext: vocShowNextBtn };
+      return { addScore: n => { vocState.score += n; }, showNext: vocShowNextBtn, level: vocState.level };
     }
 
     function vocRenderQuestion() {
@@ -8413,7 +8462,9 @@
         level:        'Niveau ' + level,
         score:        lvScore,
         total,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
       });
     }
 
