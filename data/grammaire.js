@@ -1,4 +1,4 @@
-/* ── data/grammaire.js — Grammaire (23 exercices) ──────────────────────────
+/* ── data/grammaire.js — Grammaire (24 exercices) ──────────────────────────
    Extrait de exercise-data.js (migration par domaine). Chaque fichier de domaine
    s'enregistre lui-même dans window.EXERCISE_DATA : l'ordre de chargement entre
    fichiers de domaine n'a donc pas d'importance.
@@ -4847,6 +4847,165 @@ Object.assign(window.EXERCISE_DATA, {
         step1Instruction:"Clique sur le complément d'objet.", step1Targets:["nous"],
         step2Instruction:"Ce complément d'objet est-il direct ou indirect ?",
         classifyChoices:["COD (complément d'objet direct)","COI (complément d'objet indirect)"], fixedChoiceOrder:true, step2Answer:"COD (complément d'objet direct)" }
+    ]
+  },
+
+  "identifier-groupe-circonstanciel": {
+    title:      "Identifier un groupe circonstanciel",
+    domaine:    "Français",
+    competence: "Grammaire — Les compléments circonstanciels",
+    type:       "homophones-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+    levelDescs: {
+      "CM1": "Distinguer un complément essentiel d'un complément circonstanciel",
+      "CM2": "Distinguer complément circonstanciel, COD et COI",
+      "6e":  "Cliquer sur le ou les compléments circonstanciels d'une phrase"
+    },
+    homoShuffle: [false, true, false],
+
+    /* Nouvelle compétence (level1Bank/level2Bank/level3Bank), moteur générique
+       "homophones-niveaux" — même schéma qu'identifier-groupe-sujet /
+       distinguer-cod-coi : aucun nouveau moteur, chaque item porte son propre
+       `type`, dispatché vers les renderers standards choix-etiquette /
+       mots-cliquables déjà utilisés ailleurs sur le site.
+       Niveau 1 (choix-etiquette, 2 choix) : un segment de la phrase est
+       surligné (span.ex-teal-hl, même convention que distinguer-attribut-
+       sujet-complement-objet/level1Bank) ; l'élève indique s'il est
+       supprimable (complément circonstanciel) ou non (complément essentiel),
+       préalable indispensable avant de nommer le complément circonstanciel.
+       Niveau 2 (choix-etiquette, 3 choix) : même mécanique de segment
+       surligné, mais l'élève choisit entre complément circonstanciel / COD /
+       COI — items volontairement non groupés par réponse dans le tableau
+       (piège déjà rencontré sur identifier-complement-nom/level3Bank et
+       identifier-groupe-sujet/level3Bank : un ordre trié par catégorie permet
+       de deviner la réponse par la position).
+       Niveau 3 (mots-cliquables) : l'élève clique tous les mots formant le ou
+       les complément(s) circonstanciel(s) de la phrase (nombre variable,
+       jamais de classification COD/COI/essentiel à ce niveau). Deux phrases
+       (parc/mur) ont été légèrement adaptées par rapport à la consigne
+       d'origine pour éviter un mot identique répété dans et hors de la cible
+       (ex. "la"/"le") : le moteur mots-cliquables associe q.targets au texte
+       du mot dans toute la phrase, pas à sa position, donc un mot répété hors
+       cible serait aussi compté comme cible et fausserait la correction. */
+
+    level1Bank: [
+      { type:"choix-etiquette", instruction:"Le segment surligné est-il un complément essentiel ou circonstanciel ?",
+        word:"Pierre va <span class='ex-teal-hl'>à la piscine</span> .", choices:["Complément essentiel","Complément circonstanciel"], fixedChoiceOrder:true, answer:"Complément essentiel",
+        wrongFeedback:"Un complément essentiel ne peut pas être supprimé sans rendre la phrase incorrecte ou incomplète ; un complément circonstanciel peut être supprimé ou déplacé sans problème.",
+        hint:"Le verbe « aller » a besoin d'un complément de lieu pour être complet : on ne peut pas dire seulement « Pierre va. » — « à la piscine » est donc essentiel." },
+      { type:"choix-etiquette", instruction:"Le segment surligné est-il un complément essentiel ou circonstanciel ?",
+        word:"Le magasin ferme <span class='ex-teal-hl'>à dix-neuf heures</span> .", choices:["Complément essentiel","Complément circonstanciel"], fixedChoiceOrder:true, answer:"Complément circonstanciel",
+        wrongFeedback:"Un complément essentiel ne peut pas être supprimé sans rendre la phrase incorrecte ou incomplète ; un complément circonstanciel peut être supprimé ou déplacé sans problème.",
+        hint:"On peut dire « Le magasin ferme. » sans préciser l'heure : « à dix-neuf heures » peut être supprimé, c'est un complément circonstanciel." },
+      { type:"choix-etiquette", instruction:"Le segment surligné est-il un complément essentiel ou circonstanciel ?",
+        word:"Ce trajet dure <span class='ex-teal-hl'>trois heures</span> .", choices:["Complément essentiel","Complément circonstanciel"], fixedChoiceOrder:true, answer:"Complément essentiel",
+        wrongFeedback:"Un complément essentiel ne peut pas être supprimé sans rendre la phrase incorrecte ou incomplète ; un complément circonstanciel peut être supprimé ou déplacé sans problème.",
+        hint:"Le verbe « durer » a besoin d'une durée pour être complet : on ne peut pas dire seulement « Ce trajet dure. » — « trois heures » est donc essentiel." },
+      { type:"choix-etiquette", instruction:"Le segment surligné est-il un complément essentiel ou circonstanciel ?",
+        word:"Nous avons terminé nos devoirs <span class='ex-teal-hl'>rapidement</span> .", choices:["Complément essentiel","Complément circonstanciel"], fixedChoiceOrder:true, answer:"Complément circonstanciel",
+        wrongFeedback:"Un complément essentiel ne peut pas être supprimé sans rendre la phrase incorrecte ou incomplète ; un complément circonstanciel peut être supprimé ou déplacé sans problème.",
+        hint:"On peut dire « Nous avons terminé nos devoirs. » sans préciser comment : « rapidement » peut être supprimé, c'est un complément circonstanciel." },
+      { type:"choix-etiquette", instruction:"Le segment surligné est-il un complément essentiel ou circonstanciel ?",
+        word:"Elle réside <span class='ex-teal-hl'>à Madrid</span> .", choices:["Complément essentiel","Complément circonstanciel"], fixedChoiceOrder:true, answer:"Complément essentiel",
+        wrongFeedback:"Un complément essentiel ne peut pas être supprimé sans rendre la phrase incorrecte ou incomplète ; un complément circonstanciel peut être supprimé ou déplacé sans problème.",
+        hint:"Le verbe « résider » a besoin d'un lieu pour être complet : on ne peut pas dire seulement « Elle réside. » — « à Madrid » est donc essentiel." },
+      { type:"choix-etiquette", instruction:"Le segment surligné est-il un complément essentiel ou circonstanciel ?",
+        word:"Ce mur mesure <span class='ex-teal-hl'>trois mètres</span> .", choices:["Complément essentiel","Complément circonstanciel"], fixedChoiceOrder:true, answer:"Complément essentiel",
+        wrongFeedback:"Un complément essentiel ne peut pas être supprimé sans rendre la phrase incorrecte ou incomplète ; un complément circonstanciel peut être supprimé ou déplacé sans problème.",
+        hint:"Le verbe « mesurer » a besoin d'une mesure pour être complet : on ne peut pas dire seulement « Ce mur mesure. » — « trois mètres » est donc essentiel." },
+      { type:"choix-etiquette", instruction:"Le segment surligné est-il un complément essentiel ou circonstanciel ?",
+        word:"Chaque matin , ils se retrouvent <span class='ex-teal-hl'>devant l'école</span> .", choices:["Complément essentiel","Complément circonstanciel"], fixedChoiceOrder:true, answer:"Complément circonstanciel",
+        wrongFeedback:"Un complément essentiel ne peut pas être supprimé sans rendre la phrase incorrecte ou incomplète ; un complément circonstanciel peut être supprimé ou déplacé sans problème.",
+        hint:"On peut dire « Chaque matin, ils se retrouvent. » sans préciser où : « devant l'école » peut être supprimé, c'est un complément circonstanciel." },
+      { type:"choix-etiquette", instruction:"Le segment surligné est-il un complément essentiel ou circonstanciel ?",
+        word:"Ce livre coûte <span class='ex-teal-hl'>quinze euros</span> .", choices:["Complément essentiel","Complément circonstanciel"], fixedChoiceOrder:true, answer:"Complément essentiel",
+        wrongFeedback:"Un complément essentiel ne peut pas être supprimé sans rendre la phrase incorrecte ou incomplète ; un complément circonstanciel peut être supprimé ou déplacé sans problème.",
+        hint:"Le verbe « coûter » a besoin d'un prix pour être complet : on ne peut pas dire seulement « Ce livre coûte. » — « quinze euros » est donc essentiel." },
+      { type:"choix-etiquette", instruction:"Le segment surligné est-il un complément essentiel ou circonstanciel ?",
+        word:"Le chat dort <span class='ex-teal-hl'>sur le canapé</span> .", choices:["Complément essentiel","Complément circonstanciel"], fixedChoiceOrder:true, answer:"Complément circonstanciel",
+        wrongFeedback:"Un complément essentiel ne peut pas être supprimé sans rendre la phrase incorrecte ou incomplète ; un complément circonstanciel peut être supprimé ou déplacé sans problème.",
+        hint:"On peut dire « Le chat dort. » sans préciser où : « sur le canapé » peut être supprimé, c'est un complément circonstanciel." },
+      { type:"choix-etiquette", instruction:"Le segment surligné est-il un complément essentiel ou circonstanciel ?",
+        word:"Elle ressemble <span class='ex-teal-hl'>à sa mère</span> .", choices:["Complément essentiel","Complément circonstanciel"], fixedChoiceOrder:true, answer:"Complément essentiel",
+        wrongFeedback:"Un complément essentiel ne peut pas être supprimé sans rendre la phrase incorrecte ou incomplète ; un complément circonstanciel peut être supprimé ou déplacé sans problème.",
+        hint:"Le verbe « ressembler » a besoin d'un complément pour être complet : on ne peut pas dire seulement « Elle ressemble. » — « à sa mère » est donc essentiel." }
+    ],
+
+    level2Bank: [
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du segment surligné ?",
+        word:"Il mange <span class='ex-teal-hl'>une pomme</span> .", choices:["Complément circonstanciel","Complément d'objet direct (COD)","Complément d'objet indirect (COI)"], fixedChoiceOrder:true, answer:"Complément d'objet direct (COD)",
+        wrongFeedback:"Le complément d'objet (COD sans préposition, COI avec préposition) complète le sens du verbe et ne peut généralement pas être supprimé ; le complément circonstanciel apporte une précision (temps, lieu, manière…) et peut être supprimé ou déplacé.",
+        hint:"« une pomme » répond à la question « il mange quoi ? » : c'est un complément d'objet direct (COD), sans préposition." },
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du segment surligné ?",
+        word:"Elle pense <span class='ex-teal-hl'>à ses vacances</span> .", choices:["Complément circonstanciel","Complément d'objet direct (COD)","Complément d'objet indirect (COI)"], fixedChoiceOrder:true, answer:"Complément d'objet indirect (COI)",
+        wrongFeedback:"Le complément d'objet (COD sans préposition, COI avec préposition) complète le sens du verbe et ne peut généralement pas être supprimé ; le complément circonstanciel apporte une précision (temps, lieu, manière…) et peut être supprimé ou déplacé.",
+        hint:"« à ses vacances » répond à la question « elle pense à quoi ? » : c'est un complément d'objet indirect (COI), introduit par la préposition « à »." },
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du segment surligné ?",
+        word:"Nous partons <span class='ex-teal-hl'>demain matin</span> .", choices:["Complément circonstanciel","Complément d'objet direct (COD)","Complément d'objet indirect (COI)"], fixedChoiceOrder:true, answer:"Complément circonstanciel",
+        wrongFeedback:"Le complément d'objet (COD sans préposition, COI avec préposition) complète le sens du verbe et ne peut généralement pas être supprimé ; le complément circonstanciel apporte une précision (temps, lieu, manière…) et peut être supprimé ou déplacé.",
+        hint:"« demain matin » précise quand nous partons : ce n'est pas un complément d'objet mais un complément circonstanciel de temps." },
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du segment surligné ?",
+        word:"Léa téléphone <span class='ex-teal-hl'>à sa cousine</span> .", choices:["Complément circonstanciel","Complément d'objet direct (COD)","Complément d'objet indirect (COI)"], fixedChoiceOrder:true, answer:"Complément d'objet indirect (COI)",
+        wrongFeedback:"Le complément d'objet (COD sans préposition, COI avec préposition) complète le sens du verbe et ne peut généralement pas être supprimé ; le complément circonstanciel apporte une précision (temps, lieu, manière…) et peut être supprimé ou déplacé.",
+        hint:"« à sa cousine » répond à la question « Léa téléphone à qui ? » : c'est un complément d'objet indirect (COI)." },
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du segment surligné ?",
+        word:"Le chat griffe <span class='ex-teal-hl'>le canapé</span> .", choices:["Complément circonstanciel","Complément d'objet direct (COD)","Complément d'objet indirect (COI)"], fixedChoiceOrder:true, answer:"Complément d'objet direct (COD)",
+        wrongFeedback:"Le complément d'objet (COD sans préposition, COI avec préposition) complète le sens du verbe et ne peut généralement pas être supprimé ; le complément circonstanciel apporte une précision (temps, lieu, manière…) et peut être supprimé ou déplacé.",
+        hint:"« le canapé » répond à la question « le chat griffe quoi ? » : c'est un complément d'objet direct (COD), sans préposition." },
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du segment surligné ?",
+        word:"Ils jouent <span class='ex-teal-hl'>dans le jardin</span> .", choices:["Complément circonstanciel","Complément d'objet direct (COD)","Complément d'objet indirect (COI)"], fixedChoiceOrder:true, answer:"Complément circonstanciel",
+        wrongFeedback:"Le complément d'objet (COD sans préposition, COI avec préposition) complète le sens du verbe et ne peut généralement pas être supprimé ; le complément circonstanciel apporte une précision (temps, lieu, manière…) et peut être supprimé ou déplacé.",
+        hint:"« dans le jardin » précise où ils jouent : ce n'est pas un complément d'objet mais un complément circonstanciel de lieu." },
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du segment surligné ?",
+        word:"Tu obéis <span class='ex-teal-hl'>à tes parents</span> .", choices:["Complément circonstanciel","Complément d'objet direct (COD)","Complément d'objet indirect (COI)"], fixedChoiceOrder:true, answer:"Complément d'objet indirect (COI)",
+        wrongFeedback:"Le complément d'objet (COD sans préposition, COI avec préposition) complète le sens du verbe et ne peut généralement pas être supprimé ; le complément circonstanciel apporte une précision (temps, lieu, manière…) et peut être supprimé ou déplacé.",
+        hint:"« à tes parents » répond à la question « tu obéis à qui ? » : c'est un complément d'objet indirect (COI)." },
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du segment surligné ?",
+        word:"Marie a peint <span class='ex-teal-hl'>le mur</span> avec soin .", choices:["Complément circonstanciel","Complément d'objet direct (COD)","Complément d'objet indirect (COI)"], fixedChoiceOrder:true, answer:"Complément d'objet direct (COD)",
+        wrongFeedback:"Le complément d'objet (COD sans préposition, COI avec préposition) complète le sens du verbe et ne peut généralement pas être supprimé ; le complément circonstanciel apporte une précision (temps, lieu, manière…) et peut être supprimé ou déplacé.",
+        hint:"« le mur » répond à la question « Marie a peint quoi ? » : c'est un complément d'objet direct (COD) ; « avec soin » est un complément circonstanciel de manière, mais ce n'est pas lui qui est surligné ici." },
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du segment surligné ?",
+        word:"Nous avons marché <span class='ex-teal-hl'>pendant deux heures</span> .", choices:["Complément circonstanciel","Complément d'objet direct (COD)","Complément d'objet indirect (COI)"], fixedChoiceOrder:true, answer:"Complément circonstanciel",
+        wrongFeedback:"Le complément d'objet (COD sans préposition, COI avec préposition) complète le sens du verbe et ne peut généralement pas être supprimé ; le complément circonstanciel apporte une précision (temps, lieu, manière…) et peut être supprimé ou déplacé.",
+        hint:"« pendant deux heures » précise combien de temps a duré la marche : c'est un complément circonstanciel de temps, pas un complément d'objet." },
+      { type:"choix-etiquette", instruction:"Quelle est la fonction du segment surligné ?",
+        word:"Il se souvient <span class='ex-teal-hl'>de son enfance</span> .", choices:["Complément circonstanciel","Complément d'objet direct (COD)","Complément d'objet indirect (COI)"], fixedChoiceOrder:true, answer:"Complément d'objet indirect (COI)",
+        wrongFeedback:"Le complément d'objet (COD sans préposition, COI avec préposition) complète le sens du verbe et ne peut généralement pas être supprimé ; le complément circonstanciel apporte une précision (temps, lieu, manière…) et peut être supprimé ou déplacé.",
+        hint:"« de son enfance » répond à la question « il se souvient de quoi ? » : c'est un complément d'objet indirect (COI), introduit par la préposition « de »." }
+    ],
+
+    level3Bank: [
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).",
+        sentence:"Depuis ce matin , les ouvriers réparent la toiture sans interruption .", targets:["Depuis","ce","matin","sans","interruption"],
+        piege:{ "toiture": "« la toiture » est le complément d'objet du verbe « réparent » (réparent quoi ?), pas un complément circonstanciel." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).",
+        sentence:"Malgré la pluie , Pierre est allé au parc avec ses amis .", targets:["Malgré","la","pluie","avec","ses","amis"],
+        piege:{ "parc": "« au parc » est un complément essentiel du verbe « aller » (on ne peut pas dire seulement « Pierre est allé »), ce n'est pas un complément circonstanciel." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).",
+        sentence:"Dès le mois de juin , les élèves pensent aux vacances d'été .", targets:["Dès","le","mois","de","juin"],
+        piege:{ "vacances": "« aux vacances d'été » est le complément d'objet indirect du verbe « pensent » (pensent à quoi ?), pas un complément circonstanciel." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).",
+        sentence:"Ce trajet , très fréquenté , dure trois heures en période de vacances .", targets:["en","période","de","vacances"],
+        piege:{ "heures": "« trois heures » est un complément essentiel du verbe « dure » (durer a besoin d'une durée pour être complet), ce n'est pas un complément circonstanciel — seul « en période de vacances » peut être supprimé." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).",
+        sentence:"Le soir venu , ils se retrouvent pour discuter tranquillement .", targets:["Le","soir","venu","pour","discuter","tranquillement"],
+        piege:{} },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).",
+        sentence:"Sans hésiter , Léa a téléphoné à sa cousine dès son arrivée .", targets:["Sans","hésiter","dès","son","arrivée"],
+        piege:{ "cousine": "« à sa cousine » est le complément d'objet indirect du verbe « a téléphoné » (téléphoner à qui ?), pas un complément circonstanciel." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).",
+        sentence:"Ce mur mesure trois mètres depuis la rénovation .", targets:["depuis","la","rénovation"],
+        piege:{ "mètres": "« trois mètres » est un complément essentiel du verbe « mesure » (mesurer a besoin d'une mesure pour être complet), ce n'est pas un complément circonstanciel." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).",
+        sentence:"Avec beaucoup de soin , Marie a peint un mur pendant tout le week-end .", targets:["Avec","beaucoup","de","soin","pendant","tout","le","week-end"],
+        piege:{ "mur": "« un mur » est le complément d'objet direct du verbe « a peint » (a peint quoi ?), pas un complément circonstanciel." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).",
+        sentence:"Il se souvient de son enfance avec émotion .", targets:["avec","émotion"],
+        piege:{ "enfance": "« de son enfance » est le complément d'objet indirect du verbe « se souvient » (se souvenir de quoi ?), pas un complément circonstanciel." } },
+      { type:"mots-cliquables", instruction:"Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).",
+        sentence:"Elle ressemble à sa mère depuis toujours .", targets:["depuis","toujours"],
+        piege:{ "mère": "« à sa mère » est le complément (essentiel) du verbe « ressemble » (ressembler a besoin d'un complément pour être complet), pas un complément circonstanciel." } }
     ]
   },
 
