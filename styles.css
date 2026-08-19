@@ -1069,6 +1069,28 @@ body:has(.navbar) { padding-top: 50px; }
   font-weight: 400;
 }
 
+/* ─── Page "à venir" (gabarit générique, voir js/page-a-venir.js) ─────────── */
+
+/* Reprend exactement le style de mathématiques-calcul.html (page de référence) */
+.page-header--a-venir { padding: 28px 0 32px; }
+.page-header--a-venir .page-title {
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.page-a-venir {
+  text-align: center;
+  padding: 80px 24px;
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.page-a-venir-emoji { font-size: 40px; margin-bottom: 14px; }
+.page-a-venir-title { font-weight: 800; font-size: 17px; color: var(--blue); margin-bottom: 8px; }
+.page-a-venir-text { font-size: 14px; color: var(--muted); max-width: 420px; margin: 0 auto; }
+
 /* ─── Hub de cartes (Français, Mathématiques…) ──────────────────────────── */
 
 .hub-grid {

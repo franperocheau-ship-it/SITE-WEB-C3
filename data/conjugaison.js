@@ -1741,60 +1741,60 @@ Object.assign(window.EXERCISE_DATA, {
     ─────────────────────────────────────────────────────────────────────────── */
     level1Bank: [
       /* 1er groupe — participe en -é */
-      {
+      { id:"conjuguer-passe-compose-avoir-n1-01",
         sentence: "Hier, nous ___ (manger) une pizza.",
         blanks: [{ infinitive: "manger", answer: "avons mangé", trap: false, group: 1 }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n1-02",
         sentence: "Elle ___ (chanter) toute la journée.",
         blanks: [{ infinitive: "chanter", answer: "a chanté", trap: false, group: 1 }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n1-03",
         sentence: "J'___ (regarder) un film ce soir.",
         blanks: [{ infinitive: "regarder", answer: "ai regardé", trap: false, group: 1 }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n1-04",
         sentence: "Le chien ___ (sauter) par-dessus la barrière.",
         blanks: [{ infinitive: "sauter", answer: "a sauté", trap: false, group: 1 }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n1-05",
         sentence: "Tu ___ (écouter) de la musique ?",
         blanks: [{ infinitive: "écouter", answer: "as écouté", trap: false, group: 1 }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n1-06",
         sentence: "Elle ___ (dessiner) un château.",
         blanks: [{ infinitive: "dessiner", answer: "a dessiné", trap: false, group: 1 }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n1-07",
         sentence: "Vous ___ (danser) toute la nuit.",
         blanks: [{ infinitive: "danser", answer: "avez dansé", trap: false, group: 1 }]
       },
       /* 2e groupe — participe en -i */
-      {
+      { id:"conjuguer-passe-compose-avoir-n1-08",
         sentence: "Tu ___ (finir) tes devoirs ?",
         blanks: [{ infinitive: "finir", answer: "as fini", trap: false, group: 2 }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n1-09",
         sentence: "Ils ___ (choisir) le chemin le plus court.",
         blanks: [{ infinitive: "choisir", answer: "ont choisi", trap: false, group: 2 }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n1-10",
         sentence: "Vous ___ (remplir) le formulaire.",
         blanks: [{ infinitive: "remplir", answer: "avez rempli", trap: false, group: 2 }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n1-11",
         sentence: "Nous ___ (obéir) aux consignes.",
         blanks: [{ infinitive: "obéir", answer: "avons obéi", trap: false, group: 2 }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n1-12",
         sentence: "Ils ___ (applaudir) très fort.",
         blanks: [{ infinitive: "applaudir", answer: "ont applaudi", trap: false, group: 2 }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n1-13",
         sentence: "J'___ (réfléchir) longtemps avant de répondre.",
         blanks: [{ infinitive: "réfléchir", answer: "ai réfléchi", trap: false, group: 2 }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n1-14",
         sentence: "Nous ___ (avertir) les secours.",
         blanks: [{ infinitive: "avertir", answer: "avons averti", trap: false, group: 2 }]
       }
@@ -1805,79 +1805,79 @@ Object.assign(window.EXERCISE_DATA, {
     ─────────────────────────────────────────────────────────────────────────── */
     level2Bank: [
       /* Participes en -s */
-      {
+      { id:"conjuguer-passe-compose-avoir-n2-01",
         sentence: "J'___ (prendre) le mauvais bus.",
         blanks: [{ infinitive: "prendre", answer: "ai pris", trap: false,
           feedbackBadPP: "prendre → <strong>pris</strong> (même famille : surpris, appris, compris)." }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n2-02",
         sentence: "Elle ___ (mettre) son manteau.",
         blanks: [{ infinitive: "mettre", answer: "a mis", trap: false,
           feedbackBadPP: "mettre → <strong>mis</strong>. Les verbes en -<em>ettre</em> font leur participe en -<em>is</em>." }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n2-03",
         sentence: "Nous ___ (apprendre) une nouvelle chanson.",
         blanks: [{ infinitive: "apprendre", answer: "avons appris", trap: false,
           feedbackBadPP: "apprendre → <strong>appris</strong> (même famille : pris, compris, surpris)." }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n2-04",
         sentence: "Ils ___ (comprendre) la leçon.",
         blanks: [{ infinitive: "comprendre", answer: "ont compris", trap: false,
           feedbackBadPP: "comprendre → <strong>compris</strong> (même famille : pris, appris, surpris)." }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n2-05",
         sentence: "Tu ___ (promettre) de revenir.",
         blanks: [{ infinitive: "promettre", answer: "as promis", trap: false,
           feedbackBadPP: "promettre → <strong>promis</strong>. Les verbes en -<em>ettre</em> font leur participe en -<em>is</em>." }]
       },
       /* Participes en -u */
-      {
+      { id:"conjuguer-passe-compose-avoir-n2-06",
         sentence: "Il ___ (pouvoir) terminer à temps.",
         blanks: [{ infinitive: "pouvoir", answer: "a pu", trap: false,
           feedbackBadPP: "pouvoir → <strong>pu</strong>. Participe passé court et invariable." }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n2-07",
         sentence: "Vous ___ (savoir) répondre.",
         blanks: [{ infinitive: "savoir", answer: "avez su", trap: false,
           feedbackBadPP: "savoir → <strong>su</strong>. Participe passé court et invariable." }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n2-08",
         sentence: "J'___ (vouloir) partir tôt.",
         blanks: [{ infinitive: "vouloir", answer: "ai voulu", trap: false,
           feedbackBadPP: "vouloir → <strong>voulu</strong>. Participe irrégulier en -<em>u</em>." }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n2-09",
         sentence: "Nous ___ (voir) un aigle dans le ciel.",
         blanks: [{ infinitive: "voir", answer: "avons vu", trap: false,
           feedbackBadPP: "voir → <strong>vu</strong>. Participe passé court et invariable." }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n2-10",
         sentence: "Elles ___ (recevoir) une lettre.",
         blanks: [{ infinitive: "recevoir", answer: "ont reçu", trap: false,
           feedbackBadPP: "recevoir → <strong>reçu</strong>. Attention au ç ! Participe en -<em>u</em>." }]
       },
       /* Participes en -t */
-      {
+      { id:"conjuguer-passe-compose-avoir-n2-11",
         sentence: "Tu ___ (faire) un effort.",
         blanks: [{ infinitive: "faire", answer: "as fait", trap: false,
           feedbackBadPP: "faire → <strong>fait</strong>. Verbe irrégulier très fréquent." }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n2-12",
         sentence: "Il ___ (dire) la vérité.",
         blanks: [{ infinitive: "dire", answer: "a dit", trap: false,
           feedbackBadPP: "dire → <strong>dit</strong>. Verbe irrégulier." }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n2-13",
         sentence: "Nous ___ (écrire) une histoire.",
         blanks: [{ infinitive: "écrire", answer: "avons écrit", trap: false,
           feedbackBadPP: "écrire → <strong>écrit</strong>. Les verbes en -<em>ire</em> font leur participe en -<em>it</em>." }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n2-14",
         sentence: "J'___ (conduire) jusqu'à Madrid.",
         blanks: [{ infinitive: "conduire", answer: "ai conduit", trap: false,
           feedbackBadPP: "conduire → <strong>conduit</strong>. Les verbes en -<em>uire</em> font leur participe en -<em>it</em>." }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n2-15",
         sentence: "Elles ___ (peindre) un tableau.",
         blanks: [{ infinitive: "peindre", answer: "ont peint", trap: false,
           feedbackBadPP: "peindre → <strong>peint</strong>. Les verbes en -<em>eindre</em> font leur participe en -<em>eint</em>." }]
@@ -1889,17 +1889,17 @@ Object.assign(window.EXERCISE_DATA, {
        Pièges être (trap:true) : non pénalisants, juste un éveil.
     ─────────────────────────────────────────────────────────────────────────── */
     level3Bank: [
-      {
+      { id:"conjuguer-passe-compose-avoir-n3-01",
         sentence: "Ce matin, Paul et Léa ___ (finir) leur petit-déjeuner rapidement.",
         blanks: [{ infinitive: "finir", answer: "ont fini", trap: false,
           feedbackBadPP: "finir → <strong>fini</strong> (2<sup>e</sup> groupe, participe en -<em>i</em>)." }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n3-02",
         sentence: "Hier soir, nous ___ (voir) un très beau coucher de soleil.",
         blanks: [{ infinitive: "voir", answer: "avons vu", trap: false,
           feedbackBadPP: "voir → <strong>vu</strong> (3<sup>e</sup> groupe, participe irrégulier en -<em>u</em>)." }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n3-03",
         sentence: "Tu ___ (manger) et ensuite tu ___ (partir)… non, attends !",
         blanks: [
           { infinitive: "manger", answer: "as mangé", trap: false,
@@ -1908,12 +1908,12 @@ Object.assign(window.EXERCISE_DATA, {
             trapMessage: "<em>Partir</em> se conjugue avec <strong>être</strong>, pas avoir ! On dit : tu <em>es parti(e)</em>." }
         ]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n3-04",
         sentence: "Elle ___ (écrire) une longue lettre à sa grand-mère.",
         blanks: [{ infinitive: "écrire", answer: "a écrit", trap: false,
           feedbackBadPP: "écrire → <strong>écrit</strong> (3<sup>e</sup> groupe, verbes en -<em>ire</em> → participe en -<em>it</em>)." }]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n3-05",
         sentence: "Ils ___ (choisir) le bon chemin et ___ (prendre) la bonne décision.",
         blanks: [
           { infinitive: "choisir", answer: "ont choisi", trap: false,
@@ -1922,7 +1922,7 @@ Object.assign(window.EXERCISE_DATA, {
             feedbackBadPP: "prendre → <strong>pris</strong> (3<sup>e</sup> groupe, participe en -<em>is</em>)." }
         ]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n3-06",
         sentence: "J'___ (vouloir) appeler mais je n'___ (pouvoir) pas.",
         blanks: [
           { infinitive: "vouloir", answer: "ai voulu", trap: false,
@@ -1931,7 +1931,7 @@ Object.assign(window.EXERCISE_DATA, {
             feedbackBadPP: "pouvoir → <strong>pu</strong> (3<sup>e</sup> groupe, participe irrégulier court)." }
         ]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n3-07",
         sentence: "Vous ___ (apprendre) cette règle et vous ___ (réussir) le test.",
         blanks: [
           { infinitive: "apprendre", answer: "avez appris", trap: false,
@@ -1940,7 +1940,7 @@ Object.assign(window.EXERCISE_DATA, {
             feedbackBadPP: "réussir → <strong>réussi</strong> (2<sup>e</sup> groupe, participe en -<em>i</em>)." }
         ]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n3-08",
         sentence: "Le chat ___ (sauter) sur la table et ___ (renverser) le verre.",
         blanks: [
           { infinitive: "sauter", answer: "a sauté", trap: false,
@@ -1949,7 +1949,7 @@ Object.assign(window.EXERCISE_DATA, {
             feedbackBadPP: "renverser → <strong>renversé</strong> (1<sup>er</sup> groupe, participe en -<em>é</em>)." }
         ]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n3-09",
         sentence: "Nous ___ (dire) bonjour et nous ___ (repartir).",
         blanks: [
           { infinitive: "dire", answer: "avons dit", trap: false,
@@ -1958,7 +1958,7 @@ Object.assign(window.EXERCISE_DATA, {
             trapMessage: "<em>Repartir</em> se conjugue avec <strong>être</strong>, pas avoir ! On dit : nous <em>sommes repartis</em>." }
         ]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n3-10",
         sentence: "Elle ___ (peindre) toute la matinée puis elle ___ (ranger) ses affaires.",
         blanks: [
           { infinitive: "peindre", answer: "a peint", trap: false,
@@ -1967,7 +1967,7 @@ Object.assign(window.EXERCISE_DATA, {
             feedbackBadPP: "ranger → <strong>rangé</strong> (1<sup>er</sup> groupe, participe en -<em>é</em>)." }
         ]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n3-11",
         sentence: "Tu ___ (recevoir) le colis que j'___ (envoyer) ?",
         blanks: [
           { infinitive: "recevoir", answer: "as reçu", trap: false,
@@ -1976,7 +1976,7 @@ Object.assign(window.EXERCISE_DATA, {
             feedbackBadPP: "envoyer → <strong>envoyé</strong> (1<sup>er</sup> groupe, participe en -<em>é</em>)." }
         ]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n3-12",
         sentence: "Ils ___ (mettre) la table et ___ (servir) le repas.",
         blanks: [
           { infinitive: "mettre", answer: "ont mis", trap: false,
@@ -1985,7 +1985,7 @@ Object.assign(window.EXERCISE_DATA, {
             feedbackBadPP: "servir → <strong>servi</strong> (3<sup>e</sup> groupe, participe en -<em>i</em> comme le 2<sup>e</sup> groupe)." }
         ]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n3-13",
         sentence: "Nous ___ (comprendre) la question mais nous ___ (répondre) trop vite.",
         blanks: [
           { infinitive: "comprendre", answer: "avons compris", trap: false,
@@ -1994,7 +1994,7 @@ Object.assign(window.EXERCISE_DATA, {
             feedbackBadPP: "répondre → <strong>répondu</strong> (3<sup>e</sup> groupe, participe en -<em>u</em>)." }
         ]
       },
-      {
+      { id:"conjuguer-passe-compose-avoir-n3-14",
         sentence: "J'___ (conduire) jusqu'au village et j'___ (découvrir) un marché.",
         blanks: [
           { infinitive: "conduire", answer: "ai conduit", trap: false,
@@ -2018,48 +2018,48 @@ Object.assign(window.EXERCISE_DATA, {
 
     /* Niveau 1 — verbes clairement être ou avoir, cas non ambigus */
     level1Bank: [
-      { sentence: "Hier, elle ___ partie tôt.",     auxiliary: "être",  answer: "est"   },
-      { sentence: "Nous ___ mangé une pizza.",       auxiliary: "avoir", answer: "avons" },
-      { sentence: "Ils ___ arrivés en retard.",      auxiliary: "être",  answer: "sont"  },
-      { sentence: "Tu ___ fini tes devoirs ?",       auxiliary: "avoir", answer: "as"    },
-      { sentence: "Je ___ allé au parc.",            auxiliary: "être",  answer: "suis"  },
-      { sentence: "Vous ___ choisi le bon chemin.",  auxiliary: "avoir", answer: "avez"  },
-      { sentence: "Elle ___ née en avril.",          auxiliary: "être",  answer: "est"   },
-      { sentence: "Nous ___ écrit une lettre.",      auxiliary: "avoir", answer: "avons" },
-      { sentence: "Il ___ tombé dans la cour.",      auxiliary: "être",  answer: "est"   },
-      { sentence: "Elles ___ venues nous voir.",     auxiliary: "être",  answer: "sont"  },
-      { sentence: "Tu ___ pris ton sac.",            auxiliary: "avoir", answer: "as"    },
-      { sentence: "J'___ fait un gâteau.",           auxiliary: "avoir", answer: "ai"    }
+      { id:"etre-ou-avoir-n1-01", sentence: "Hier, elle ___ partie tôt.",     auxiliary: "être",  answer: "est"   },
+      { id:"etre-ou-avoir-n1-02", sentence: "Nous ___ mangé une pizza.",       auxiliary: "avoir", answer: "avons" },
+      { id:"etre-ou-avoir-n1-03", sentence: "Ils ___ arrivés en retard.",      auxiliary: "être",  answer: "sont"  },
+      { id:"etre-ou-avoir-n1-04", sentence: "Tu ___ fini tes devoirs ?",       auxiliary: "avoir", answer: "as"    },
+      { id:"etre-ou-avoir-n1-05", sentence: "Je ___ allé au parc.",            auxiliary: "être",  answer: "suis"  },
+      { id:"etre-ou-avoir-n1-06", sentence: "Vous ___ choisi le bon chemin.",  auxiliary: "avoir", answer: "avez"  },
+      { id:"etre-ou-avoir-n1-07", sentence: "Elle ___ née en avril.",          auxiliary: "être",  answer: "est"   },
+      { id:"etre-ou-avoir-n1-08", sentence: "Nous ___ écrit une lettre.",      auxiliary: "avoir", answer: "avons" },
+      { id:"etre-ou-avoir-n1-09", sentence: "Il ___ tombé dans la cour.",      auxiliary: "être",  answer: "est"   },
+      { id:"etre-ou-avoir-n1-10", sentence: "Elles ___ venues nous voir.",     auxiliary: "être",  answer: "sont"  },
+      { id:"etre-ou-avoir-n1-11", sentence: "Tu ___ pris ton sac.",            auxiliary: "avoir", answer: "as"    },
+      { id:"etre-ou-avoir-n1-12", sentence: "J'___ fait un gâteau.",           auxiliary: "avoir", answer: "ai"    }
     ],
 
     /* Niveau 2 — pronominaux + pièges */
     level2Bank: [
-      { sentence: "Elle ___ levée à 7h.",              auxiliary: "être",  answer: "s'est",        feedbackType: "pronominal"  },
-      { sentence: "Il ___ souvenu de moi.",             auxiliary: "être",  answer: "s'est",        feedbackType: "pronominal"  },
-      { sentence: "Elles ___ dépêchées ce matin.",      auxiliary: "être",  answer: "se sont",      feedbackType: "pronominal"  },
-      { sentence: "Il ___ trompé de route.",            auxiliary: "être",  answer: "s'est",        feedbackType: "pronominal"  },
-      { sentence: "Nous ___ promenés dans le parc.",    auxiliary: "être",  answer: "nous sommes",  feedbackType: "pronominal"  },
-      { sentence: "Tu ___ eu peur.",                    auxiliary: "avoir", answer: "as",           feedbackType: "trap-avoir"  },
-      { sentence: "Tu ___ été malade.",                 auxiliary: "avoir", answer: "as",           feedbackType: "trap-etre"   },
-      { sentence: "Ils ___ restés à la maison.",        auxiliary: "être",  answer: "sont"                                      },
-      { sentence: "Elle ___ blessée au genou.",         auxiliary: "être",  answer: "s'est",        feedbackType: "pronominal"  },
-      { sentence: "Vous ___ sortis sans manteau.",      auxiliary: "être",  answer: "êtes"                                      },
-      { sentence: "J'___ passé une bonne journée.",     auxiliary: "avoir", answer: "ai",           feedbackType: "trap-passer" },
-      { sentence: "Nous ___ rentrés à minuit.",         auxiliary: "être",  answer: "sommes"                                    }
+      { id:"etre-ou-avoir-n2-01", sentence: "Elle ___ levée à 7h.",              auxiliary: "être",  answer: "s'est",        feedbackType: "pronominal"  },
+      { id:"etre-ou-avoir-n2-02", sentence: "Il ___ souvenu de moi.",             auxiliary: "être",  answer: "s'est",        feedbackType: "pronominal"  },
+      { id:"etre-ou-avoir-n2-03", sentence: "Elles ___ dépêchées ce matin.",      auxiliary: "être",  answer: "se sont",      feedbackType: "pronominal"  },
+      { id:"etre-ou-avoir-n2-04", sentence: "Il ___ trompé de route.",            auxiliary: "être",  answer: "s'est",        feedbackType: "pronominal"  },
+      { id:"etre-ou-avoir-n2-05", sentence: "Nous ___ promenés dans le parc.",    auxiliary: "être",  answer: "nous sommes",  feedbackType: "pronominal"  },
+      { id:"etre-ou-avoir-n2-06", sentence: "Tu ___ eu peur.",                    auxiliary: "avoir", answer: "as",           feedbackType: "trap-avoir"  },
+      { id:"etre-ou-avoir-n2-07", sentence: "Tu ___ été malade.",                 auxiliary: "avoir", answer: "as",           feedbackType: "trap-etre"   },
+      { id:"etre-ou-avoir-n2-08", sentence: "Ils ___ restés à la maison.",        auxiliary: "être",  answer: "sont"                                      },
+      { id:"etre-ou-avoir-n2-09", sentence: "Elle ___ blessée au genou.",         auxiliary: "être",  answer: "s'est",        feedbackType: "pronominal"  },
+      { id:"etre-ou-avoir-n2-10", sentence: "Vous ___ sortis sans manteau.",      auxiliary: "être",  answer: "êtes"                                      },
+      { id:"etre-ou-avoir-n2-11", sentence: "J'___ passé une bonne journée.",     auxiliary: "avoir", answer: "ai",           feedbackType: "trap-passer" },
+      { id:"etre-ou-avoir-n2-12", sentence: "Nous ___ rentrés à minuit.",         auxiliary: "être",  answer: "sommes"                                    }
     ],
 
     /* Niveau 3 — verbes à double auxiliaire selon le sens */
     level3Bank: [
-      { sentence: "Elle ___ monté les valises.",      auxiliary: "avoir", answer: "a",      cod: "les valises" },
-      { sentence: "Elle ___ montée dans sa chambre.", auxiliary: "être",  answer: "est"                        },
-      { sentence: "Il ___ sorti le chien.",           auxiliary: "avoir", answer: "a",      cod: "le chien"    },
-      { sentence: "Il ___ sorti dans le jardin.",     auxiliary: "être",  answer: "est"                        },
-      { sentence: "Nous ___ descendu les cartons.",   auxiliary: "avoir", answer: "avons",  cod: "les cartons" },
-      { sentence: "Nous ___ descendus à la cave.",    auxiliary: "être",  answer: "sommes"                     },
-      { sentence: "Tu ___ rentré le vélo.",           auxiliary: "avoir", answer: "as",     cod: "le vélo"     },
-      { sentence: "Tu ___ rentré à la maison.",       auxiliary: "être",  answer: "es"                         },
-      { sentence: "Elle ___ retourné la crêpe.",      auxiliary: "avoir", answer: "a",      cod: "la crêpe"    },
-      { sentence: "Elle ___ retournée chez sa mère.", auxiliary: "être",  answer: "est"                        }
+      { id:"etre-ou-avoir-n3-01", sentence: "Elle ___ monté les valises.",      auxiliary: "avoir", answer: "a",      cod: "les valises" },
+      { id:"etre-ou-avoir-n3-02", sentence: "Elle ___ montée dans sa chambre.", auxiliary: "être",  answer: "est"                        },
+      { id:"etre-ou-avoir-n3-03", sentence: "Il ___ sorti le chien.",           auxiliary: "avoir", answer: "a",      cod: "le chien"    },
+      { id:"etre-ou-avoir-n3-04", sentence: "Il ___ sorti dans le jardin.",     auxiliary: "être",  answer: "est"                        },
+      { id:"etre-ou-avoir-n3-05", sentence: "Nous ___ descendu les cartons.",   auxiliary: "avoir", answer: "avons",  cod: "les cartons" },
+      { id:"etre-ou-avoir-n3-06", sentence: "Nous ___ descendus à la cave.",    auxiliary: "être",  answer: "sommes"                     },
+      { id:"etre-ou-avoir-n3-07", sentence: "Tu ___ rentré le vélo.",           auxiliary: "avoir", answer: "as",     cod: "le vélo"     },
+      { id:"etre-ou-avoir-n3-08", sentence: "Tu ___ rentré à la maison.",       auxiliary: "être",  answer: "es"                         },
+      { id:"etre-ou-avoir-n3-09", sentence: "Elle ___ retourné la crêpe.",      auxiliary: "avoir", answer: "a",      cod: "la crêpe"    },
+      { id:"etre-ou-avoir-n3-10", sentence: "Elle ___ retournée chez sa mère.", auxiliary: "être",  answer: "est"                        }
     ]
   }
 

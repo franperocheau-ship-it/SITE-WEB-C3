@@ -1,25 +1,10 @@
 # Audit des banques de questions
 
-Généré le 2026-08-01 par `scripts/audit-questions.js`.
+Généré le 2026-08-19 par `scripts/audit-questions.js`.
 Tri : par nombre total d'items croissant (toutes compétences confondues) — les banques les plus fragiles en premier.
 Seuils d'alerte : Niveau 1 < 12 items → ⚠️ · Niveaux 2/3+ < 8 items → ⚠️ · tout niveau < 5 items → 🔴.
 
-**Résumé global :** 83 exercices audités · 2659 items au total · 68 niveau(x) ⚠️ · 9 niveau(x) 🔴.
-
-## Grammaire — Connecteurs et conjonctions
-
-_Domaine : Français · Exercice : `phrases-connecteurs` — Relier deux phrases avec la bonne conjonction · **4 items au total**_
-
-**Total par niveau :** Niveau 1 (bank) = 4
-
-### 🔴 Niveau 1 (bank) (4 items)
-
-> 🔴 **Banque critique** : 4 item(s) < 5 — répétition quasi certaine, quel que soit le niveau.
-
-1. Quelle conjonction relie le mieux ces deux phrases ? — Léa est triste ___ elle a perdu son jouet.
-2. Quelle conjonction relie le mieux ces deux phrases ? — Les enfants rentrent ___ la cloche sonne.
-3. Quelle conjonction relie le mieux ces deux phrases ? — Tom aime le chocolat ___ sa sœur préfère les fraises.
-4. Quelle conjonction relie le mieux ces deux phrases ? — Le chien aboie ___ le facteur passe dans la rue.
+**Résumé global :** 124 exercices audités · 3936 items au total · 131 niveau(x) ⚠️ · 4 niveau(x) 🔴.
 
 ## Grammaire — Formes de phrases interrogatives
 
@@ -37,34 +22,6 @@ _Domaine : Français · Exercice : `produire-formes-interrogatives` — Produire
 4. Il fait beau aujourd'hui.
 5. Les élèves travaillent en classe.
 6. Nous allons à la piscine.
-
-## Grammaire — Accord sujet-verbe inversé
-
-_Domaine : Français · Exercice : `accord-verbe-sujet-inverse` — Accorder le verbe avec un sujet inversé · **12 items au total**_
-
-**Total par niveau :** Niveau 1 = 6 · Niveau 2 = 6
-
-### ⚠️ Niveau 1 (6 items)
-
-> ⚠️ **Banque faible** : 6 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. display: Que [vouloir] tes amis ? · subjectWords: tes, amis · tense: présent · stem: veul · fullSentence: Que veulent tes amis ?
-2. display: Quand [partir] les invités ? · subjectWords: les, invités · tense: futur · stem: partir · fullSentence: Quand partiront les invités ?
-3. display: Que [penser] les élèves de ce livre ? · subjectWords: les, élèves · tense: présent · stem: pens · fullSentence: Que pensent les élèves de ce livre ?
-4. display: Où [aller] les enfants ? · subjectWords: les, enfants · tense: imparfait · stem: all · fullSentence: Où allaient les enfants ?
-5. display: Comment [chanter] ce chœur ? · subjectWords: ce, chœur · tense: imparfait · stem: chant · fullSentence: Comment chantait ce chœur ?
-6. display: Quand [rentrer] ta sœur ? · subjectWords: ta, sœur · tense: futur · stem: rentrer · fullSentence: Quand rentrera ta sœur ?
-
-### ⚠️ Niveau 2 (6 items)
-
-> ⚠️ **Banque faible** : 6 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. display: — Attention ! [crier] les enfants . · subjectWords: les, enfants · tense: présent · stem: cri · fullSentence: — Attention ! crient les enfants .
-2. display: — On se reverra ! [promettre] les deux amis . · subjectWords: les, deux, amis · tense: futur · stem: promettr · fullSentence: — On se reverra ! promettront les deux amis .
-3. display: — Bonne nuit ! [murmurer] le groupe . · subjectWords: le, groupe · tense: imparfait · stem: murmur · fullSentence: — Bonne nuit ! murmurait le groupe .
-4. display: Sur la branche [chanter] deux oiseaux . · subjectWords: deux, oiseaux · tense: imparfait · stem: chant · fullSentence: Sur la branche chantaient deux oiseaux .
-5. display: Peut-être [arriver] ses cousins ce soir . · subjectWords: ses, cousins · tense: futur · stem: arriver · fullSentence: Peut-être arriveront ses cousins ce soir .
-6. display: Ainsi [parler] autrefois les anciens . · subjectWords: les, anciens · tense: imparfait · stem: parl · fullSentence: Ainsi parlaient autrefois les anciens .
 
 ## Probabilités — Dénombrer les issues
 
@@ -98,113 +55,6 @@ _Domaine : Mathématiques · Exercice : `probabilite-issues` — Dénombrer les 
 2. Boîte de formes : 2 étoiles, 4 cercles, 3 carrés, 1 triangle. — Clique tous les cercles. — Combien d'issues favorables au cercle ?
 3. Un dé équilibré. — Clique tous les multiples de 3. — Combien d'issues favorables aux multiples de 3 ?
 4. Un dé équilibré. — Clique tous les nombres inférieurs ou égaux à 5. — Combien d'issues favorables aux nombres ≤ 5 ?
-
-## Conjugaison — Conditionnel présent
-
-_Domaine : Français · Exercice : `conjuguer-conditionnel-present` — Conjuguer au conditionnel présent · **14 items au total**_
-
-**Total par niveau :** Niveau 1 (identTexts) = 4 · Niveau 2 (writeBank) = 10
-
-### 🔴 Niveau 1 (identTexts) (4 items)
-
-> 🔴 **Banque critique** : 4 item(s) < 5 — répétition quasi certaine, quel que soit le niveau.
-
-1. Si j'avais beaucoup d'argent, j'**achèterais** une grande maison avec un jardin. Quand j'étais enfant, je rêvais d'y habiter chaque soir. La maison **aurait** une piscine et une bibliothèque. Mon frère préférait un appartement en ville.
-2. D'après les explorateurs, cette île **serait** magnifique. On y **trouverait** des plantes inconnues. Les scientifiques étudiaient la région depuis des années. Ils publiaient leurs résultats chaque mois.
-3. Le journaliste annonça : « Il **neigerait** ce week-end sur les sommets et les températures **descendraient** sous zéro. » Les habitants s'inquiétaient pour les routes. Ils préparaient du bois pour se chauffer.
-4. Mes amis **aimeraient** organiser une surprise pour mon anniversaire. Ils décoraient la salle en secret chaque fois. Julia **voudrait** inviter toute la classe. Elle pensait à un thème différent.
-
-### Niveau 2 (writeBank) (10 items)
-
-1. Si j'avais des ailes, j'(aimer) ___ voler au-dessus des nuages.
-2. Avec un peu d'entraînement, tu (chanter) ___ encore mieux !
-3. Il (finir) ___ son travail bien plus vite avec de l'aide.
-4. Nous (voyager) ___ autour du monde si nous avions le temps.
-5. Vous (arriver) ___ à l'heure si vous partiez maintenant.
-6. Elles (choisir) ___ le menu si on leur demandait.
-7. Sans la pluie, ce (être) ___ la journée parfaite.
-8. Elle (avoir) ___ peur si elle voyait une araignée géante.
-9. Tu (aller) ___ jouer dehors si le soleil revenait.
-10. Nous (faire) ___ un gâteau si nous avions assez d'œufs.
-
-## Conjugaison — Impératif présent
-
-_Domaine : Français · Exercice : `conjuguer-imperatif-present` — Conjuguer à l'impératif présent · **14 items au total**_
-
-**Total par niveau :** Niveau 1 (identTexts) = 4 · Niveau 2 (writeBank) = 10
-
-### 🔴 Niveau 1 (identTexts) (4 items)
-
-> 🔴 **Banque critique** : 4 item(s) < 5 — répétition quasi certaine, quel que soit le niveau.
-
-1. Maman ouvrit le livre de cuisine. Elle dit : « **Prends** deux œufs et **mélange**-les bien. » Paul prit les ingrédients sur l'étagère. Il versa le lait dans le bol.
-2. La maîtresse se leva et dit aux élèves : « **Ouvrez** vos cahiers et **écrivez** la date. » Les enfants ouvrirent leurs cahiers en silence. Théo écrit très lentement.
-3. Un lutin apparut devant Hugo. « **Suis**-moi jusqu'à la clairière et **ferme** les yeux. » Hugo suivit le lutin à travers les arbres. Il ferma les yeux comme demandé.
-4. Grand-mère nous regarda et dit : « **Soyez** sages pendant le dîner et **rangez** vos affaires après. » Les enfants se regardèrent et obéirent sans protester. Léa rangea son sac en premier.
-
-### Niveau 2 (writeBank) (10 items)
-
-1. (manger) ___ tes légumes avant d'aller jouer !
-2. (choisir) ___ votre place en silence, s'il vous plaît.
-3. (chanter) ___ la chanson tous ensemble !
-4. (finir) ___ ton exercice avant la récréation.
-5. (être) ___ attentifs pendant toute la leçon !
-6. (avoir) ___ confiance en vous !
-7. (aller) ___ te coucher, il est tard !
-8. Vous êtes prêts ? (avancer) ___ vers la sortie !
-9. (prendre) ___ ton manteau, il fait froid dehors.
-10. (partir) ___ à l'aventure avant que la nuit tombe !
-
-## Conjugaison — Plus-que-parfait
-
-_Domaine : Français · Exercice : `conjuguer-plus-que-parfait` — Conjuguer au plus-que-parfait · **14 items au total**_
-
-**Total par niveau :** Niveau 1 (identTexts) = 4 · Niveau 2 (writeBank) = 10
-
-### 🔴 Niveau 1 (identTexts) (4 items)
-
-> 🔴 **Banque critique** : 4 item(s) < 5 — répétition quasi certaine, quel que soit le niveau.
-
-1. La veille du voyage, maman **avait préparé** les valises avec soin. Le matin, Paul **s'était levé** très tôt. Il réveilla sa sœur qui dormait encore. Ils ont pris le train et sont arrivés à destination.
-2. Ce soir-là, Léa raconta qu'elle **avait vu** un renard dans le jardin. Son frère a dessiné l'animal dans son cahier, mais il **avait oublié** d'écrire son nom. Il est rentré chez lui sans son dessin.
-3. La sorcière habitait un château sombre. Avant l'arrivée du héros, elle **avait préparé** un piège terrible. Les gardes **avaient fermé** toutes les portes. Le héros a frappé à la porte et a crié son nom. Personne ne répondit.
-4. Jules **était arrivé** en avance car il **avait fini** ses devoirs dès le réveil. La maîtresse a regardé son travail et a souri. Il lui a montré fièrement son cahier.
-
-### Niveau 2 (writeBank) (10 items)
-
-1. Quand nous sommes arrivés, le film (commencer) ___ déjà.
-2. Elle (partir) ___ bien avant que la pluie tombe.
-3. Ils (manger) ___ avant d'aller jouer.
-4. Tu (finir) ___ tes devoirs quand le téléphone a sonné.
-5. Il (se lever) ___ si tôt qu'il n'y avait personne dans la rue.
-6. Vous (lire) ___ ce roman avant d'en discuter en classe.
-7. Le chat (manger) ___ toute la nourriture avant notre retour.
-8. Elles (rentrer) ___ depuis une heure quand il a téléphoné.
-9. Nous (faire) ___ nos valises avant que le taxi arrive.
-10. Comme j'(oublier) ___ mon sac, je suis retourné le chercher.
-
-## Grammaire — L'adjectif
-
-_Domaine : Français · Exercice : `identifier-adjectif` — Identifier les adjectifs · **14 items au total**_
-
-**Total par niveau :** Niveau 1 (bank) = 14
-
-### Niveau 1 (bank) (14 items)
-
-1. Clique sur tous les adjectifs parmi ces mots. (Ils peuvent décrire : le chat.)
-2. Clique sur tous les adjectifs parmi ces mots. (Ils peuvent décrire : la fille.)
-3. Clique sur tous les adjectifs dans la phrase.
-4. Clique sur tous les adjectifs dans la phrase.
-5. Clique sur tous les adjectifs dans la phrase.
-6. Clique sur tous les adjectifs dans la phrase.
-7. Clique sur tous les adjectifs dans la phrase.
-8. Clique sur tous les adjectifs dans la phrase.
-9. Clique sur le mot qui N'EST PAS un adjectif (l'intrus).
-10. Clique sur le mot qui N'EST PAS un adjectif (l'intrus).
-11. Clique sur le mot qui N'EST PAS un adjectif (l'intrus).
-12. Clique sur le mot qui N'EST PAS un adjectif (l'intrus).
-13. Clique sur le mot qui N'EST PAS un adjectif (l'intrus).
-14. Clique sur le mot qui N'EST PAS un adjectif (l'intrus).
 
 ## Probabilités — Écrire une probabilité
 
@@ -240,71 +90,6 @@ _Domaine : Mathématiques · Exercice : `probabilite-nombre` — Exprimer la pro
 3. Clique toutes les écritures équivalentes à un dixième.
 4. Clique Pile à chaque fois qu'il apparaît dans cette série de 8 lancers.
 5. Clique Pile à chaque fois qu'il apparaît dans cette série de 10 lancers.
-
-## Grammaire — Déterminants : articles définis
-
-_Domaine : Français · Exercice : `articles-definis` — Les articles définis (le, la, les, l') · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 6 · Niveau 2 = 8 · Niveau 3 = 1
-
-### ⚠️ Niveau 1 (6 items)
-
-> ⚠️ **Banque faible** : 6 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Clique sur tous les articles définis dans ce texte.
-2. Clique sur tous les articles définis dans ce texte.
-3. Clique sur tous les articles définis dans ce texte.
-4. Clique sur tous les articles définis dans ce texte.
-5. Clique sur tous les articles définis dans ce texte.
-6. Clique sur tous les articles définis dans ce texte. Attention, il y a peut-être un piège !
-
-### Niveau 2 (8 items)
-
-1. Quel article défini va avec ce nom ? — chat
-2. Quel article défini va avec ce nom ? — école
-3. Quel article défini va avec ce nom ? — arbre
-4. Quel article défini va avec ce nom ? — chiens
-5. Quel article défini va avec ce nom ? — lune
-6. Quel article défini va avec ce nom ? — ami
-7. Quel article défini va avec ce nom ? — fleurs
-8. Quel article défini va avec ce nom ? — soleil
-
-### 🔴 Niveau 3 (1 items)
-
-> 🔴 **Banque critique** : 1 item(s) < 5 — répétition quasi certaine, quel que soit le niveau.
-
-1. Place les bons articles définis dans les cases. Attention à l'intrus !
-
-## Grammaire — Déterminants possessifs
-
-_Domaine : Français · Exercice : `determinants-possessifs` — Les déterminants possessifs · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 5
-
-### ⚠️ Niveau 1 (10 items)
-
-> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Clique sur tous les déterminants possessifs dans la phrase.
-2. Clique sur tous les déterminants possessifs dans la phrase.
-3. Clique sur tous les déterminants possessifs dans la phrase.
-4. Clique sur tous les déterminants possessifs dans la phrase.
-5. Clique sur tous les déterminants possessifs dans la phrase.
-6. Clique sur tous les déterminants possessifs dans la phrase.
-7. Clique sur tous les déterminants possessifs dans la phrase. Attention au piège !
-8. Clique sur tous les déterminants possessifs dans la phrase. Attention aux pièges !
-9. Clique sur tous les déterminants possessifs dans la phrase. Attention au piège !
-10. Clique sur tous les déterminants possessifs dans la phrase.
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Clique sur tous les déterminants possessifs dans la phrase.
-2. Clique sur tous les déterminants possessifs dans la phrase.
-3. Clique sur tous les déterminants possessifs dans la phrase.
-4. Clique sur tous les déterminants possessifs dans la phrase.
-5. Clique sur tous les déterminants possessifs dans la phrase. Attention au piège !
 
 ## Nombres décimaux — Association fraction / décimal
 
@@ -450,6 +235,582 @@ _Domaine : Mathématiques · Exercice : `probabilite-chances` — Utiliser l'exp
 5. Jeu de 52 cartes. Quelle est la probabilité de tirer une carte rouge ?
 6. Jeu de 52 cartes. Quelle est la probabilité de tirer une carte qui n'est pas rouge ? — Carte pas rouge
 
+## Vocabulaire — Choisir le mot adapté au contexte
+
+_Domaine : Français · Exercice : `mot-adapte-contexte` — Choisir le mot adapté au contexte · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Complète la phrase : « Le chien _____ très fort quand le facteur sonne. »
+2. Quelle phrase utilise le mot le plus adapté pour parler de la démarche d'un éléphant ?
+3. Complète la phrase : « La _____ brillait dans le ciel étoilé de la nuit. »
+4. Dans un compte rendu médical, quel mot est le plus adapté pour parler d'une douleur au ventre ?
+5. Associe chaque animal au verbe qui décrit son cri.
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Complète la phrase : « En automne, les feuilles des arbres _____ et recouvrent le sol. »
+2. Lequel de ces mots est le plus précis pour décrire une lumière très faible et terne ?
+3. Complète : « L'alpiniste avait les jambes _____ après avoir gravi le sommet. »
+4. Complète : « Le conférencier _____ l'assistance avec son exposé passionnant. »
+5. Classe chaque mot selon le contexte où il convient pour décrire le mouvement de l'eau.
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Quel mot convient le mieux dans : « Sa remarque, bien que _____, m'a blessé. » ?
+2. Dans : « Ce discours a _____ l'assemblée », quel verbe convient pour exprimer l'ennui causé par un exposé confus ?
+3. Classe ces adjectifs selon la connotation qu'ils donnent à un sourire.
+4. Dans : « Il la regarda avec une moue _____ », quel adjectif exprime le mieux le dédain ?
+5. Associe chaque mot à la phrase où il est le mieux adapté.
+
+## Vocabulaire — Comprendre l'origine des mots (latin, grec)
+
+_Domaine : Français · Exercice : `origine-mots` — Comprendre l'origine des mots (latin, grec) · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Que signifie la racine latine « aqua » ?
+2. Quelle racine grecque signifie « vie » ?
+3. Associe chaque racine latine ou grecque à sa signification.
+4. Le mot « bibliothèque » vient du grec « biblion » (livre) et « theke » (rangement). Que signifie-t-il littéralement ?
+5. La racine « graph- » (du grec « graphein ») dans « autographe » signifie…
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Associe chaque adjectif savant à son équivalent courant.
+2. Quelle racine grecque se retrouve dans « géographie » et « géologie » ?
+3. Ces mots viennent-ils d'une racine latine ou d'une racine grecque ?
+4. La racine « phon- » (du grec « phone ») dans « microphone » et « téléphone » signifie…
+5. Parmi ces mots, lequel vient de la racine latine « manus » (main) ?
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. La racine grecque « demos » signifie « peuple ». Dans quel mot la retrouve-t-on ?
+2. Associe chaque racine grecque à un mot qui la contient.
+3. Les mots « carnivore », « herbivore » et « omnivore » partagent le suffixe latin « -vore » qui signifie…
+4. Ces racines viennent-elles du latin ou du grec ?
+5. Le mot « philanthrope » (qui aime l'humanité) est formé de…
+
+## Vocabulaire — Comprendre la polysémie d'un mot
+
+_Domaine : Français · Exercice : `polysemie` — Comprendre la polysémie d'un mot · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Un mot qui a plusieurs sens différents s'appelle…
+2. Le mot 'voler' peut signifier : 1. Se déplacer dans les airs  2. Prendre ce qui ne m'appartient pas. Combien de sens a-t-il ?
+3. Dans « Le feu est rouge », que signifie 'feu' ?
+4. Comment trouve-t-on le bon sens d'un mot polysémique ?
+5. Quel mot est polysémique ?
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Le mot 'tête' a plusieurs sens. Associe chaque phrase au sens utilisé.
+2. Dans 'Le boulanger pétrit la pâte', que signifie 'pâte' ?
+3. Associe chaque emploi du mot 'planche' à son sens.
+4. Dans 'Son roman est une mine d'informations', le mot 'mine' signifie…
+5. Pourquoi le mot 'opération' est-il polysémique ?
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Le mot 'pont' signifie 1. ouvrage qui enjambe un cours d'eau 2. partie du navire 3. jour férié entre deux jours chômés. Quel sens 'pont' a-t-il dans 'faire le pont' ?
+2. Associe chaque emploi du mot 'temps' à sa catégorie de sens.
+3. Comment les sens d'un mot polysémique sont-ils souvent liés entre eux ?
+4. Dans 'La vedette du film a du cœur', que signifie 'vedette' ?
+5. Le mot 'lame' a plusieurs sens. Associe chaque emploi à sa définition.
+
+## Vocabulaire — Distinguer les niveaux de langue
+
+_Domaine : Français · Exercice : `niveaux-de-langue` — Distinguer les niveaux de langue · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quelle phrase est au registre familier ?
+2. Classe chaque expression selon son niveau de langue.
+3. Quel mot est de niveau soutenu pour dire « triste » ?
+4. À quel niveau de langue appartient : « Veuillez agréer l'expression de mes sincères salutations » ?
+5. Dans quelle situation utilise-t-on le registre familier ?
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Laquelle de ces phrases est au registre soutenu ?
+2. Classe ces phrases selon leur niveau de langue.
+3. Quel est l'équivalent soutenu de « Il s'est baladé en ville » ?
+4. Associe chaque expression familière à son équivalent courant.
+5. Pourquoi adapter son niveau de langue selon la situation ?
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Classe ces phrases selon leur niveau de langue.
+2. Quel est l'effet produit par l'utilisation d'un registre soutenu dans un texte ?
+3. Associe chaque formule soutenue à son équivalent courant.
+4. Dans un discours officiel ou un exposé, quel niveau de langue est le plus approprié ?
+5. Classe chaque paire selon le niveau de langue : familier ou soutenu ?
+
+## Vocabulaire — Former un mot dérivé
+
+_Domaine : Français · Exercice : `mot-derive` — Former un mot dérivé · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quel mot est dérivé de « fleur » avec un suffixe ?
+2. Comment est formé le mot « malheureux » ?
+3. Associe chaque base à son mot dérivé.
+4. Quel préfixe ajoute-t-on à « possible » pour former son contraire ?
+5. Quel mot est formé par préfixation à partir de « honnête » ?
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Quel est le mot de base (radical sans affixes) de « débranchement » ?
+2. Comment est formé « imperméable » ?
+3. Classe chaque mot selon son type de dérivation.
+4. Quel mot est formé avec à la fois un préfixe ET un suffixe ?
+5. Associe chaque mot à sa structure de dérivation.
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Le mot « invraisemblable » est formé de…
+2. Classe chaque mot : est-il dérivé (préfixe ou suffixe) ou composé (deux mots indépendants réunis) ?
+3. Quelle est la différence entre un mot dérivé et un mot composé ?
+4. Dans « extraordinaire », le préfixe « extra- » signifie…
+5. Associe chaque mot à sa structure morphologique.
+
+## Vocabulaire — Identifier le radical d'un mot
+
+_Domaine : Français · Exercice : `identifier-radical` — Identifier le radical d'un mot · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quel est le radical du mot « chanteur » ?
+2. Quel est le radical commun à « jardiner », « jardinier » et « jardinage » ?
+3. Associe chaque mot à son radical.
+4. Le radical d'un mot, c'est…
+5. Quel est le radical du mot « fleuriste » ?
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Quel est le radical du mot « invisible » ?
+2. Quel est le radical du mot « agrandissement » ?
+3. Associe chaque mot à son radical (attention aux petits changements de forme).
+4. Quel radical partagent « boulanger », « boulangerie » et « boulangère » ?
+5. Quel est le radical du mot « malheureux » ?
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Quel est le radical commun à « portable », « transport » et « importation » ?
+2. Classe chaque mot selon son radical : radical « vis/voir » ou radical « aud/entendre » ?
+3. Dans « biologie », « zoologie » et « psychologie », quel est le radical grec commun ?
+4. Quel est le radical commun à « lumineux », « illuminer » et « luminosité » ?
+5. Associe chaque radical latin à sa signification.
+
+## Vocabulaire — Identifier le sens propre et le sens figuré
+
+_Domaine : Français · Exercice : `sens-propre-figure` — Identifier le sens propre et le sens figuré · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Que signifie 'sens propre' d'un mot ?
+2. Clique sur la bonne colonne pour chaque phrase.
+3. Dans 'Il a un cœur de pierre', le mot 'pierre' est au…
+4. Quelle phrase utilise 'lourd' au sens figuré ?
+5. Dans 'La rivière coule vite', 'couler' est au…
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Clique sur 'Sens propre' ou 'Sens figuré' pour chaque phrase.
+2. Que signifie l'expression 'avoir le cafard' au sens figuré ?
+3. Quelle est la différence entre le sens propre et le sens figuré du mot 'feu' dans 'Mettre le feu aux poudres' ?
+4. Quelle phrase utilise 'tomber' au sens figuré ?
+5. Dans 'Cette musique m'a transporté', quel est le sens figuré de 'transporté' ?
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Classe ces expressions : sens propre ou sens figuré ?
+2. Dans un poème, le poète écrit : 'L'aurore aux doigts de rose ouvre les portes du ciel.' Quelle figure de style utilise-t-il ?
+3. Expliquer le sens figuré de 'La discussion a dégénéré' : que veut dire 'dégénérer' ici ?
+4. Quel énoncé résume le mieux la relation entre sens propre et sens figuré ?
+5. Lequel de ces titres utilise un mot au sens figuré ?
+
+## Vocabulaire — Identifier un champ lexical
+
+_Domaine : Français · Exercice : `champ-lexical` — Identifier un champ lexical · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Classe chaque mot : appartient-il au champ lexical de la mer ?
+2. Quel mot N'appartient PAS au champ lexical de la forêt ?
+3. Classe chaque mot dans son champ lexical.
+4. Qu'est-ce qu'un champ lexical ?
+5. Quel groupe de mots forme le champ lexical de la peur ?
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Classe chaque mot dans son champ lexical.
+2. Quel mot inattendu peut appartenir au champ lexical de la lumière ?
+3. Classe chaque mot dans son champ lexical.
+4. Quelle est la différence entre un champ lexical et une famille de mots ?
+5. Quel est le champ lexical dominant dans : « Le chirurgien prit son bistouri, ausculta le patient et posa un diagnostic » ?
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Un mot peut-il appartenir à plusieurs champs lexicaux ?
+2. Classe chaque mot dans le bon champ lexical du mot « temps ».
+3. Dans quel champ lexical range-t-on le mot « éclipse » ?
+4. Associe chaque mot savant au champ lexical qu'il évoque.
+5. Dans : « Les cordes vibrèrent, la mélodie s'éleva, le maestro leva sa baguette », quel est le champ lexical dominant ?
+
+## Vocabulaire — Identifier un homonyme
+
+_Domaine : Français · Exercice : `identifier-homonyme` — Identifier un homonyme · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Que sont 'mère' et 'mer' ?
+2. Complète : « Nous avons navigué sur la ___ pendant toute la journée. »
+3. Associe chaque homonyme à sa définition.
+4. Qu'est-ce que deux homonymes ont en commun ?
+5. Quel est l'homonyme du mot 'sot' (stupide) ?
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Choisis le bon mot : « Je voudrais un ___ d'eau, s'il vous plaît. »
+2. Quelle phrase utilise correctement 'ou' et 'où' ?
+3. Choisis le bon homonyme : « Il ___ son manteau sur le fauteuil. »
+4. Associe chaque homonyme à la phrase où il doit apparaître.
+5. Pourquoi est-il important de connaître les homonymes ?
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Dans « Ces cèdres cèdent sous le vent », combien de mots se prononcent pareil mais s'écrivent différemment ?
+2. Associe chaque paire d'homophones à leur différence grammaticale.
+3. Lequel de ces couples n'est PAS une paire d'homonymes ?
+4. Dans « Il compte sur ses doigts », 'compte' est un homonyme de…
+5. Quelle stratégie permet de ne PAS confondre 'davantage' et 'd'avantage' ?
+
+## Vocabulaire — Identifier un préfixe
+
+_Domaine : Français · Exercice : `identifier-prefixe` — Identifier un préfixe · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quel est le préfixe dans le mot « déplacer » ?
+2. Que signifie le préfixe « re- » dans « recommencer » ?
+3. Associe chaque préfixe à sa signification.
+4. Quel mot contient un préfixe ?
+5. Quel préfixe faut-il ajouter à « heureux » pour former son contraire ?
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Que signifie le préfixe « anti- » dans « antiviolence » ?
+2. Le préfixe « inter- » dans « intercontinental » signifie…
+3. Classe chaque mot selon le sens de son préfixe.
+4. Quel préfixe donne à « possible » son contraire ?
+5. Que signifie le préfixe « bi- » dans « bilingue » ?
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Quel préfixe grec signifiant « loin » retrouve-t-on dans « téléphone », « télévision » et « télécommunication » ?
+2. Associe chaque préfixe savant à sa signification.
+3. Dans « hypothèse », quel préfixe grec signifie « sous, en dessous » ?
+4. Classe chaque mot selon le sens de son préfixe : « au-delà / trop » ou « en dessous / pas assez » ?
+5. Le préfixe « anthropo- » (dans « anthropologie ») vient du grec et signifie…
+
+## Vocabulaire — Identifier un suffixe
+
+_Domaine : Français · Exercice : `identifier-suffixe` — Identifier un suffixe · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quel est le suffixe dans le mot « jardinage » ?
+2. Que signifie le suffixe « -eur » dans « plongeur » ?
+3. Associe chaque suffixe à ce qu'il exprime.
+4. Quel mot contient un suffixe signifiant « petite taille » ?
+5. Quel suffixe retrouve-t-on dans « épicerie », « boulangerie » et « boucherie » pour désigner un lieu de commerce ?
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Quel suffixe transforme l'adjectif « rapide » en adverbe ?
+2. Associe chaque suffixe à la catégorie grammaticale qu'il crée.
+3. Classe chaque mot : le suffixe désigne-t-il une personne ou une action/résultat ?
+4. Le suffixe « -iste » dans « fleuriste » exprime…
+5. Quel suffixe dans « livraison » crée un nom d'action à partir du verbe « livrer » ?
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Le suffixe « -logie » dans « biologie », « zoologie » et « psychologie » vient du grec et signifie…
+2. Associe chaque suffixe d'origine grecque à sa signification.
+3. Dans « omnivore », quel suffixe signifie « qui mange » ?
+4. Classe chaque suffixe selon son origine : grec ou latin ?
+5. Le suffixe « -graphie » (dans « photographie ») vient du grec « graphein » qui signifie…
+
+## Vocabulaire — Identifier une famille de mots
+
+_Domaine : Français · Exercice : `famille-de-mots` — Identifier une famille de mots · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quel mot appartient à la famille de « chant » ?
+2. Quel mot N'appartient PAS à la famille de « marcher » ?
+3. Associe chaque mot à un autre membre de sa famille.
+4. Quel groupe forme une famille de mots ?
+5. Quel est le radical commun à « porteur », « portage » et « portable » ?
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Quel mot est un intrus dans la famille de « pied » ?
+2. Les mots « chaud », « chauffer » et « surchauffé » forment-ils une famille ?
+3. Associe chaque mot à son dérivé de même famille.
+4. Pourquoi « dent » et « dentifrice » appartiennent-ils à la même famille ?
+5. Parmi ces mots, lequel est de la famille de « lire » ?
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Les mots « main » et « manuel » appartiennent-ils à la même famille ?
+2. Associe chaque mot savant (origine latine ou grecque) à son équivalent courant.
+3. Classe chaque mot dans sa famille : famille de « port » ou famille de « fort » ?
+4. Quel mot n'appartient PAS à la famille de « voir » ?
+5. Pourquoi « dentiste » et « trident » appartiennent-ils à la même famille ?
+
+## Vocabulaire — Ranger dans l'ordre alphabétique
+
+_Domaine : Français · Exercice : `ordre-alphabetique` — Ranger dans l'ordre alphabétique · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Clique sur les mots dans l'ordre alphabétique (du premier au dernier).
+2. Quel groupe de mots est dans l'ordre alphabétique ?
+3. Quel mot vient en PREMIER dans le dictionnaire ?
+4. Clique sur les mots dans l'ordre alphabétique.
+5. Pour classer des mots dans un dictionnaire, on compare d'abord…
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Ces mots commencent tous par la même lettre. Clique-les dans l'ordre alphabétique.
+2. Quel mot vient AVANT 'manger' dans le dictionnaire ?
+3. Clique sur ces fruits dans l'ordre alphabétique.
+4. Dans le dictionnaire, dans quel ordre viennent : 'porte', 'portée', 'portrait' ?
+5. Quel mot vient APRÈS 'fleuve' dans le dictionnaire ?
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Classement délicat ! Clique ces mots dans l'ordre du dictionnaire.
+2. On cherche 'trace' dans le dictionnaire. Entre quels mots se trouve-t-il ?
+3. Classe ces mots dans l'ordre du dictionnaire.
+4. Pour ranger 'acacia' et 'accent' dans le dictionnaire, quelle lettre compare-t-on en 3e position ?
+5. Un élève hésite pour classer 'île' et 'image'. Quelle règle faut-il lui rappeler ?
+
+## Vocabulaire — Regrouper des mots par thème
+
+_Domaine : Français · Exercice : `regrouper-par-theme` — Regrouper des mots par thème · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Classe chaque mot dans son thème.
+2. Quel mot n'appartient PAS au thème des sports ?
+3. Classe chaque mot dans son thème.
+4. Quel groupe de mots appartient entièrement au thème de la cuisine ?
+5. Associe chaque mot à son thème.
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Classe chaque mot dans son thème.
+2. Quel mot est l'intrus dans cette liste liée au thème de la mer ?
+3. Classe chaque mot dans son thème.
+4. À quel thème général appartiennent « flûte », « violon », « batterie » et « trompette » ?
+5. Associe chaque groupe de mots à son thème.
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Classe chaque mot dans son thème.
+2. Quel mot peut appartenir à deux thèmes différents selon le contexte ?
+3. Classe chaque mot dans son thème.
+4. Dans quel thème général range-t-on les mots « épistolaire », « narratif », « lyrique » et « dramatique » ?
+5. Associe chaque mot savant au domaine thématique auquel il appartient.
+
+## Vocabulaire — Trouver un antonyme
+
+_Domaine : Français · Exercice : `trouver-antonyme` — Trouver un antonyme · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quel est l'antonyme (contraire) de 'chaud' ?
+2. Associe chaque mot à son contraire. Clique un mot à gauche puis son antonyme à droite.
+3. Quel est l'antonyme de 'grand' ?
+4. L'antonyme de 'commencer' est…
+5. Associe chaque adjectif à son contraire.
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Comment forme-t-on souvent l'antonyme de 'honnête' ?
+2. Forme l'antonyme de chaque mot en ajoutant le bon préfixe. Associe le mot à son antonyme.
+3. Dans 'La lumière s'allume', l'antonyme du verbe 's'allume' est…
+4. Quel est l'antonyme de 'présent' dans la phrase 'L'élève est présent' ?
+5. Pourquoi un même mot peut-il avoir plusieurs antonymes différents ?
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Dans un texte littéraire, quel antonyme de 'sombre' est le plus évocateur pour décrire un paysage lumineux ?
+2. Associe chaque adjectif à son antonyme le plus précis dans le contexte littéraire.
+3. L'antonyme de 'espoir' dans le sens philosophique est…
+4. Ces verbes ont des antonymes différents selon le contexte. Associe chaque emploi à son contraire.
+5. Dans 'Sa réponse était évasive', l'antonyme exact de 'évasive' est…
+
+## Vocabulaire — Trouver un synonyme
+
+_Domaine : Français · Exercice : `trouver-synonyme` — Trouver un synonyme · **15 items au total**_
+
+**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
+
+### ⚠️ Niveau 1 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quel est le synonyme de 'content' ?
+2. Quel est le synonyme de 'rapide' ?
+3. Associe chaque mot à son synonyme. Clique un mot à gauche, puis son synonyme à droite.
+4. Deux mots sont synonymes quand ils ont…
+5. Quel mot peut remplacer 'courageux' sans changer le sens de la phrase ?
+
+### ⚠️ Niveau 2 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Associe chaque mot à son synonyme. Clique un mot à gauche, puis son synonyme à droite.
+2. Pour parler de la démarche d'un lion, quel synonyme de 'marcher' est le plus précis ?
+3. Dans la phrase 'Le scientifique a analysé le produit', quel synonyme de 'analysé' convient le mieux ?
+4. Associe les synonymes de l'adjectif 'grand' selon leur nuance.
+5. Pourquoi deux synonymes ne sont-ils pas toujours interchangeables ?
+
+### ⚠️ Niveau 3 (5 items)
+
+> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
+
+1. Dans un texte sur la mer, quel synonyme de 'bruit' est le plus précis pour parler des vagues ?
+2. Associe chaque verbe à son synonyme le plus précis dans le contexte indiqué.
+3. La phrase 'Le directeur était irrité' est au niveau courant. Quel synonyme d'irrité convient dans un texte soutenu ?
+4. Pour éviter la répétition du verbe 'dire' dans un récit, quel synonyme ne convient PAS pour une réponse agressive ?
+5. Chaque phrase a un mot souligné. Associe-la au synonyme soutenu qui pourrait le remplacer.
+
 ## Fractions — Encadrer
 
 _Domaine : Mathématiques · Exercice : `encadrer-fraction` — Encadrer une fraction entre deux entiers consécutifs · **16 items au total**_
@@ -474,63 +835,6 @@ _Domaine : Mathématiques · Exercice : `encadrer-fraction` — Encadrer une fra
 14. numerator: 29 · denominator: 6 · lo: 4 · hi: 5 · difficulty: 2
 15. numerator: 41 · denominator: 9 · lo: 4 · hi: 5 · difficulty: 2
 16. numerator: 43 · denominator: 6 · lo: 7 · hi: 8 · difficulty: 2
-
-## Grammaire — Phrase simple et complexe
-
-_Domaine : Français · Exercice : `distinguer-phrase-simple-complexe` — Distinguer phrase simple et phrase complexe · **16 items au total**_
-
-**Total par niveau :** Niveau 1 (bank) = 16
-
-### Niveau 1 (bank) (16 items)
-
-1. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-2. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-3. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (aller = infinitif !) — Clique sur le(s) verbe(s) conjugué(s). Attention à l'infinitif ! — Cette phrase est-elle simple ou complexe ?
-4. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-5. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-6. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (travailler = infinitif !) — Clique sur le(s) verbe(s) conjugué(s). Attention à l'infinitif ! — Cette phrase est-elle simple ou complexe ?
-7. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-8. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-9. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (Même si la phrase est longue !) — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-10. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-11. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (jouer = infinitif !) — Clique sur le(s) verbe(s) conjugué(s). Attention à l'infinitif ! — Cette phrase est-elle simple ou complexe ?
-12. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-13. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-14. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (décoller = infinitif !) — Clique sur le(s) verbe(s) conjugué(s). Attention à l'infinitif ! — Cette phrase est-elle simple ou complexe ?
-15. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-16. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-
-## Grammaire — Déterminants : articles indéfinis
-
-_Domaine : Français · Exercice : `articles-indefinis` — Les articles indéfinis (un, une, des) · **18 items au total**_
-
-**Total par niveau :** Niveau 1 = 6 · Niveau 2 = 12
-
-### ⚠️ Niveau 1 (6 items)
-
-> ⚠️ **Banque faible** : 6 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Clique sur tous les articles indéfinis dans ce texte.
-2. Clique sur tous les articles indéfinis dans ce texte.
-3. Clique sur tous les articles indéfinis dans ce texte.
-4. Clique sur tous les articles indéfinis dans ce texte.
-5. Clique sur tous les articles indéfinis dans ce texte.
-6. Clique sur tous les articles indéfinis dans ce texte.
-
-### Niveau 2 (12 items)
-
-1. Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.
-2. Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.
-3. Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.
-4. Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.
-5. Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.
-6. Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.
-7. Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.
-8. Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.
-9. Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.
-10. Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.
-11. Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.
-12. Première mention → indéfini (un/une). Déjà mentionné → défini (le/la/l'). Place les bons articles.
 
 ## Lecture — Comprendre les implicites
 
@@ -746,68 +1050,37 @@ _Domaine : Mathématiques · Exercice : `representer-fraction` — Représenter 
 9. numerator: 3 · denominator: 6 · partitions: 12
 10. numerator: 5 · denominator: 6 · partitions: 12
 
-## Grammaire — Le nom
+## Grammaire — L'attribut du sujet
 
-_Domaine : Français · Exercice : `identifier-nom-phrase` — Identifier les noms dans une phrase · **20 items au total**_
+_Domaine : Français · Exercice : `identifier-attribut-sujet` — Identifier un attribut du sujet · **20 items au total**_
 
-**Total par niveau :** Niveau 1 (bank) = 20
-
-### Niveau 1 (bank) (20 items)
-
-1. Clique sur tous les noms dans la phrase.
-2. Clique sur tous les noms dans la phrase.
-3. Clique sur tous les noms dans la phrase.
-4. Clique sur tous les noms dans la phrase.
-5. Clique sur tous les noms dans la phrase.
-6. Clique sur tous les noms (communs ET propres) dans la phrase.
-7. Classe ce nom : ville
-8. Classe ce nom : fleuve
-9. Classe ce nom : chien
-10. Classe ce nom : professeur
-11. Classe ce nom : livre
-12. Classe ce nom : Madrid
-13. Classe ce nom : Emma
-14. Classe ce nom : la Seine
-15. Classe ce nom : Léa
-16. Classe ce nom : LFM
-17. Quel nom répond à cette devinette ? On y range les livres de la classe.
-18. Quel nom répond à cette devinette ? Il apporte la lumière pendant la journée.
-19. Quel nom répond à cette devinette ? On y joue avec ses camarades à la récréation.
-20. Quel nom répond à cette devinette ? Elle coule de la montagne vers la mer.
-
-## Grammaire — Transformer une phrase
-
-_Domaine : Français · Exercice : `transformer-phrase` — Transformer une phrase (interrogative, négative) · **20 items au total**_
-
-**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10
-
-### ⚠️ Niveau 1 (10 items)
-
-> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Tu ranges tes affaires.
-2. Il mange une pomme.
-3. Les enfants jouent dans le jardin.
-4. Elle lit un livre.
-5. Vous aimez la musique.
-6. Papa prépare le dîner.
-7. Nous partons en vacances demain.
-8. Le chat dort sur le canapé.
-9. Les élèves écoutent la maîtresse.
-10. Tu viens à la fête samedi.
+**Total par niveau :** Niveau 2 = 10 · Niveau 3 = 10
 
 ### Niveau 2 (10 items)
 
-1. Tu ranges tes affaires.
-2. Il mange des bonbons.
-3. Les enfants jouent dans le jardin.
-4. Elle lit tous les soirs.
-5. Nous aimons la pizza.
-6. Je comprends la leçon.
-7. Le chat dort sur le canapé.
-8. Vous regardez la télévision.
-9. Papa prépare le dîner.
-10. Les élèves écoutent la maîtresse.
+1. Le ciel est gris .
+2. Cette soupe semble délicieuse .
+3. Mes cousins paraissent fatigués .
+4. La forêt reste silencieuse .
+5. Les élèves ont l'air contents .
+6. Ce livre est devenu célèbre .
+7. La maison paraissait abandonnée .
+8. Les enfants semblaient heureux .
+9. Le repas semble savoureux .
+10. Les acteurs paraissent nerveux .
+
+### Niveau 3 (10 items)
+
+1. Le grand chat noir est agile .
+2. Cette jolie fleur rouge semble fanée .
+3. Le vieux pont paraît solide .
+4. Ma petite sœur est timide .
+5. Ce long voyage était fatigant .
+6. Les belles montagnes restent majestueuses .
+7. Un jeune chien curieux semble effrayé .
+8. La nouvelle élève paraît sympathique .
+9. Ce vieux professeur patient reste calme .
+10. Ma jeune cousine timide semble ravie .
 
 ## Grammaire — Épithète et attribut du sujet
 
@@ -894,49 +1167,6 @@ _Domaine : Français · Exercice : `distinguer-epithete-complement-nom` — Dist
 4. une manifestation ___
 5. une recette ___
 6. une autorisation ___
-
-## Grammaire — Pronoms personnels
-
-_Domaine : Français · Exercice : `remplacer-gn-sujet-pronom` — Remplacer un groupe nominal sujet par un pronom personnel sujet · **24 items au total**_
-
-**Total par niveau :** Niveau 1 = 8 · Niveau 2 = 10 · Niveau 3 = 6
-
-### ⚠️ Niveau 1 (8 items)
-
-> ⚠️ **Banque faible** : 8 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. words: Le, chat, dort, sur, le, canapé, . · gnsIndices: 0, 1 · verb: dort · testQ: Qui est-ce qui dort ? · testA: Le chat
-2. words: La, petite, fille, mange, une, pomme, . · gnsIndices: 0, 1, 2 · verb: mange · testQ: Qui est-ce qui mange ? · testA: La petite fille
-3. words: Le, grand, chien, de, mon, voisin, aboie, . · gnsIndices: 0, 1, 2, 3, 4, 5 · verb: aboie · testQ: Qui est-ce qui aboie ? · testA: Le grand chien de mon voisin
-4. words: Les, élèves, de, la, classe, écoutent, la, maîtresse, . · gnsIndices: 0, 1, 2, 3, 4 · verb: écoutent · testQ: Qui est-ce qui écoutent ? · testA: Les élèves de la classe
-5. words: Mon, petit, frère, joue, dans, le, jardin, . · gnsIndices: 0, 1, 2 · verb: joue · testQ: Qui est-ce qui joue ? · testA: Mon petit frère
-6. words: La, vieille, maison, de, mes, grands-parents, est, magnifique, . · gnsIndices: 0, 1, 2, 3, 4, 5 · verb: est · testQ: Qui est-ce qui est magnifique ? · testA: La vieille maison de mes grands-parents
-7. words: Les, oiseaux, chantent, dans, les, arbres, . · gnsIndices: 0, 1 · verb: chantent · testQ: Qui est-ce qui chantent ? · testA: Les oiseaux
-8. words: Le, livre, de, mathématiques, est, sur, la, table, . · gnsIndices: 0, 1, 2, 3 · verb: est · testQ: Qui est-ce qui est sur la table ? · testA: Le livre de mathématiques
-
-### Niveau 2 (10 items)
-
-1. displayHtml: <span class='psc-pronoun-hl'>La fillette</span> court dans la cour. · gnsText: La fillette · noyau: fillette · gender: féminin · number: singulier · pronoun: elle · noyauNote: Le nom-noyau du groupe est « fillette ». · trap: false
-2. displayHtml: <span class='psc-pronoun-hl'>Le grand chien de mon voisin</span> aboie toute la nuit. · gnsText: Le grand chien de mon voisin · noyau: chien · gender: masculin · number: singulier · pronoun: il · noyauNote: Le nom-noyau est « chien » (masculin singulier), et non « voisin » qui fait partie du complément du nom « de mon voisin ». · trap: true
-3. displayHtml: <span class='psc-pronoun-hl'>Les danseuses</span> montent sur scène. · gnsText: Les danseuses · noyau: danseuses · gender: féminin · number: pluriel · pronoun: elles · noyauNote: Le nom-noyau est « danseuses » (féminin pluriel). · trap: false
-4. displayHtml: <span class='psc-pronoun-hl'>Paul et Marie</span> arrivent en retard. · gnsText: Paul et Marie · noyau: Paul et Marie · gender: masculin · number: pluriel · pronoun: ils · noyauNote: « Paul » (masculin) et « Marie » (féminin) forment un groupe de genres mélangés : dès qu'il y a un nom masculin, on emploie « ils ». · trap: true
-5. displayHtml: <span class='psc-pronoun-hl'>Marie</span> chante très bien. · gnsText: Marie · noyau: Marie · gender: féminin · number: singulier · pronoun: elle · noyauNote: « Marie » est un nom propre féminin singulier. · trap: false
-6. displayHtml: <span class='psc-pronoun-hl'>Les enfants de la classe</span> jouent en récréation. · gnsText: Les enfants de la classe · noyau: enfants · gender: masculin · number: pluriel · pronoun: ils · noyauNote: Le nom-noyau est « enfants » (masculin pluriel) ; « de la classe » est complément du nom. · trap: true
-7. displayHtml: <span class='psc-pronoun-hl'>La belle robe de ma mère</span> est accrochée dans l'armoire. · gnsText: La belle robe de ma mère · noyau: robe · gender: féminin · number: singulier · pronoun: elle · noyauNote: Le nom-noyau est « robe » (féminin singulier), pas « mère » qui est complément du nom. · trap: true
-8. displayHtml: <span class='psc-pronoun-hl'>Les Dupont</span> partent en vacances demain. · gnsText: Les Dupont · noyau: Dupont · gender: masculin · number: pluriel · pronoun: ils · noyauNote: « Les Dupont » désigne une famille (nom propre au pluriel) : on emploie « ils ». · trap: true
-9. displayHtml: <span class='psc-pronoun-hl'>Les roses du jardin</span> embaument toute la pièce. · gnsText: Les roses du jardin · noyau: roses · gender: féminin · number: pluriel · pronoun: elles · noyauNote: Le nom-noyau est « roses » (féminin pluriel) ; « du jardin » est complément du nom. · trap: true
-10. displayHtml: <span class='psc-pronoun-hl'>Mon grand frère et sa meilleure amie</span> rentrent de l'école. · gnsText: Mon grand frère et sa meilleure amie · noyau: frère et amie · gender: masculin · number: pluriel · pronoun: ils · noyauNote: Le groupe contient un nom masculin (« frère ») et un nom féminin (« amie ») : genres mélangés → on emploie « ils ». · trap: true
-
-### ⚠️ Niveau 3 (6 items)
-
-> ⚠️ **Banque faible** : 6 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Les enfants jouent dans le jardin .
-2. La directrice de l'école parle aux parents .
-3. Paul et Marie chantent ensemble .
-4. Les danseuses montent sur scène .
-5. Mon petit frère regarde un film .
-6. Les grands arbres du parc donnent de l'ombre .
 
 ## Nombres décimaux — Associer une fraction décimale à un nombre décimal
 
@@ -1429,6 +1659,51 @@ _Domaine : Français · Exercice : `distinguer-pronom-sujet-complement` — Dist
 9. Remplace le groupe en gras par le bon pronom <strong>complément</strong> et réécris la phrase complète.
 10. Remplace le groupe en gras par le bon pronom <strong>sujet</strong> et réécris la phrase complète.
 
+## Grammaire — Pronoms personnels
+
+_Domaine : Français · Exercice : `remplacer-gn-sujet-pronom` — Remplacer un groupe nominal sujet par un pronom personnel sujet · **28 items au total**_
+
+**Total par niveau :** Niveau 1 = 8 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (8 items)
+
+> ⚠️ **Banque faible** : 8 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. words: Le, chat, dort, sur, le, canapé, . · gnsIndices: 0, 1 · verb: dort · testQ: Qui est-ce qui dort ? · testA: Le chat
+2. words: La, petite, fille, mange, une, pomme, . · gnsIndices: 0, 1, 2 · verb: mange · testQ: Qui est-ce qui mange ? · testA: La petite fille
+3. words: Le, grand, chien, de, mon, voisin, aboie, . · gnsIndices: 0, 1, 2, 3, 4, 5 · verb: aboie · testQ: Qui est-ce qui aboie ? · testA: Le grand chien de mon voisin
+4. words: Les, élèves, de, la, classe, écoutent, la, maîtresse, . · gnsIndices: 0, 1, 2, 3, 4 · verb: écoutent · testQ: Qui est-ce qui écoutent ? · testA: Les élèves de la classe
+5. words: Mon, petit, frère, joue, dans, le, jardin, . · gnsIndices: 0, 1, 2 · verb: joue · testQ: Qui est-ce qui joue ? · testA: Mon petit frère
+6. words: La, vieille, maison, de, mes, grands-parents, est, magnifique, . · gnsIndices: 0, 1, 2, 3, 4, 5 · verb: est · testQ: Qui est-ce qui est magnifique ? · testA: La vieille maison de mes grands-parents
+7. words: Les, oiseaux, chantent, dans, les, arbres, . · gnsIndices: 0, 1 · verb: chantent · testQ: Qui est-ce qui chantent ? · testA: Les oiseaux
+8. words: Le, livre, de, mathématiques, est, sur, la, table, . · gnsIndices: 0, 1, 2, 3 · verb: est · testQ: Qui est-ce qui est sur la table ? · testA: Le livre de mathématiques
+
+### Niveau 2 (10 items)
+
+1. displayHtml: <span class='psc-pronoun-hl'>La fillette</span> court dans la cour. · gnsText: La fillette · noyau: fillette · gender: féminin · number: singulier · pronoun: elle · noyauNote: Le nom-noyau du groupe est « fillette ». · trap: false
+2. displayHtml: <span class='psc-pronoun-hl'>Le grand chien de mon voisin</span> aboie toute la nuit. · gnsText: Le grand chien de mon voisin · noyau: chien · gender: masculin · number: singulier · pronoun: il · noyauNote: Le nom-noyau est « chien » (masculin singulier), et non « voisin » qui fait partie du complément du nom « de mon voisin ». · trap: true
+3. displayHtml: <span class='psc-pronoun-hl'>Les danseuses</span> montent sur scène. · gnsText: Les danseuses · noyau: danseuses · gender: féminin · number: pluriel · pronoun: elles · noyauNote: Le nom-noyau est « danseuses » (féminin pluriel). · trap: false
+4. displayHtml: <span class='psc-pronoun-hl'>Paul et Marie</span> arrivent en retard. · gnsText: Paul et Marie · noyau: Paul et Marie · gender: masculin · number: pluriel · pronoun: ils · noyauNote: « Paul » (masculin) et « Marie » (féminin) forment un groupe de genres mélangés : dès qu'il y a un nom masculin, on emploie « ils ». · trap: true
+5. displayHtml: <span class='psc-pronoun-hl'>Marie</span> chante très bien. · gnsText: Marie · noyau: Marie · gender: féminin · number: singulier · pronoun: elle · noyauNote: « Marie » est un nom propre féminin singulier. · trap: false
+6. displayHtml: <span class='psc-pronoun-hl'>Les enfants de la classe</span> jouent en récréation. · gnsText: Les enfants de la classe · noyau: enfants · gender: masculin · number: pluriel · pronoun: ils · noyauNote: Le nom-noyau est « enfants » (masculin pluriel) ; « de la classe » est complément du nom. · trap: true
+7. displayHtml: <span class='psc-pronoun-hl'>La belle robe de ma mère</span> est accrochée dans l'armoire. · gnsText: La belle robe de ma mère · noyau: robe · gender: féminin · number: singulier · pronoun: elle · noyauNote: Le nom-noyau est « robe » (féminin singulier), pas « mère » qui est complément du nom. · trap: true
+8. displayHtml: <span class='psc-pronoun-hl'>Les Dupont</span> partent en vacances demain. · gnsText: Les Dupont · noyau: Dupont · gender: masculin · number: pluriel · pronoun: ils · noyauNote: « Les Dupont » désigne une famille (nom propre au pluriel) : on emploie « ils ». · trap: true
+9. displayHtml: <span class='psc-pronoun-hl'>Les roses du jardin</span> embaument toute la pièce. · gnsText: Les roses du jardin · noyau: roses · gender: féminin · number: pluriel · pronoun: elles · noyauNote: Le nom-noyau est « roses » (féminin pluriel) ; « du jardin » est complément du nom. · trap: true
+10. displayHtml: <span class='psc-pronoun-hl'>Mon grand frère et sa meilleure amie</span> rentrent de l'école. · gnsText: Mon grand frère et sa meilleure amie · noyau: frère et amie · gender: masculin · number: pluriel · pronoun: ils · noyauNote: Le groupe contient un nom masculin (« frère ») et un nom féminin (« amie ») : genres mélangés → on emploie « ils ». · trap: true
+
+### Niveau 3 (10 items)
+
+1. Les enfants jouent dans le jardin .
+2. La directrice de l'école parle aux parents .
+3. Paul et Marie chantent ensemble .
+4. Les danseuses montent sur scène .
+5. Mon petit frère regarde un film .
+6. Les grands arbres du parc donnent de l'ombre .
+7. Le facteur du quartier distribue le courrier .
+8. Ma cousine et son frère habitent à Paris .
+9. Les fleurs du jardin embaument la maison .
+10. Le vieux chat du voisin dort toute la journée .
+
 ## Conjugaison — 1er groupe au présent
 
 _Domaine : Français · Exercice : `conjuguer-1er-groupe-present` — Conjuguer les verbes réguliers du 1er groupe au présent · **30 items au total**_
@@ -1617,6 +1892,53 @@ _Domaine : Français · Exercice : `conjuguer-avoir-present` — Conjuguer le ve
 9. Le vieux chien ________ peur de l'orage.
 10. Mes cousines ________ un chat.
 
+## Conjugaison — Conditionnel présent
+
+_Domaine : Français · Exercice : `conjuguer-conditionnel-present` — Conjuguer au conditionnel présent · **30 items au total**_
+
+**Total par niveau :** Niveau 1 (level: 1) = 10 · Niveau 2 (level: 2) = 10 · Niveau 3 (level: 3) = 10
+
+### ⚠️ Niveau 1 (level: 1) (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. infinitive: aimer · subject: je
+2. infinitive: être · subject: il
+3. infinitive: avoir · subject: elle
+4. infinitive: aller · subject: tu
+5. infinitive: faire · subject: nous
+6. infinitive: chanter · subject: Elle · forms: chanterais, chanterait, chanterions, chanteriez, chanteraient
+7. infinitive: finir · subject: Ils · forms: finirais, finirait, finirions, finiriez, finiraient
+8. infinitive: être · subject: Nous · forms: serais, serait, serions, seriez, seraient
+9. infinitive: avoir · subject: Vous · forms: aurais, aurait, aurions, auriez, auraient
+10. infinitive: voyager · subject: Il · forms: voyagerais, voyagerait, voyagerions, voyageriez, voyageraient
+
+### Niveau 2 (level: 2) (10 items)
+
+1. Si j'avais des ailes, j'________ voler au-dessus des nuages.
+2. Si tu t'entraînais un peu, tu ________ encore mieux !
+3. S'il avait de l'aide, il ________ son travail bien plus vite.
+4. Nous ________ autour du monde si nous avions le temps.
+5. Vous ________ à l'heure si vous partiez maintenant.
+6. Elles ________ le menu si on leur demandait.
+7. S'il ne pleuvait pas, ce ________ la journée parfaite.
+8. Elle ________ peur si elle voyait une araignée géante.
+9. Tu ________ jouer dehors si le soleil revenait.
+10. Nous ________ un gâteau si nous avions assez d'œufs.
+
+### Niveau 3 (level: 3) (10 items)
+
+1. S'il faisait beau, la fête ________ réussie.
+2. Si tout allait bien, les enfants ________ à la piscine samedi.
+3. Si la pluie continuait, le match ________.
+4. Si le week-end durait plus longtemps, mes parents ________ plus de temps libre.
+5. Si tu insistais, mes cousins ________ volontiers.
+6. Si elle avait plus de temps, la maîtresse ________ un projet artistique avec la classe.
+7. Si les visiteurs montaient en haut de la tour, ils ________ toute la ville.
+8. Si l'équipe s'entraînait davantage, elle ________ gagner le tournoi.
+9. Si on aidait les ouvriers, ils ________ le chantier à temps.
+10. Si le train partait à l'heure, les voyageurs ________ avant midi.
+
 ## Conjugaison — Être au présent
 
 _Domaine : Français · Exercice : `conjuguer-etre-present` — Conjuguer le verbe être au présent · **30 items au total**_
@@ -1711,6 +2033,53 @@ _Domaine : Français · Exercice : `conjuguer-futur` — Conjuguer au futur · *
 9. Demain soir, le chœur ________ pour la fête de l'école.
 10. Bientôt, ces petits chatons ________ beaucoup.
 
+## Conjugaison — Identifier l'infinitif et le groupe
+
+_Domaine : Français · Exercice : `retrouver-infinitif-verbe-conjugue` — Retrouver l'infinitif d'un verbe conjugué puis son groupe · **30 items au total**_
+
+**Total par niveau :** Niveau 1 (level: 1) = 10 · Niveau 2 (level: 2) = 10 · Niveau 3 (level: 3) = 10
+
+### ⚠️ Niveau 1 (level: 1) (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Nous mangeons.
+2. Il chantait.
+3. Nous donnons.
+4. Ils finissaient.
+5. Nous choisissons.
+6. Vous obéissez.
+7. Je vendais.
+8. Nous entendions.
+9. Ils dormaient.
+10. Elle servait.
+
+### Niveau 2 (level: 2) (10 items)
+
+1. Ils prennent.
+2. Je voyais.
+3. Ils diront.
+4. Elle écrira.
+5. Je lisais.
+6. Ils couraient.
+7. Elle réfléchissait.
+8. Il faut qu'elle parte.
+9. Ils eurent très peur.
+10. Nous fûmes surpris.
+
+### Niveau 3 (level: 3) (10 items)
+
+1. Nous allons au marché.
+2. Ils iront demain.
+3. Va chercher ton frère !
+4. Il mourra bientôt.
+5. Le champignon croît vite.
+6. Il croit au père Noël.
+7. Ils sortaient tous les soirs.
+8. Elle servait à table.
+9. Elle rougira de honte.
+10. Il punissait sans pitié.
+
 ## Conjugaison — Imparfait
 
 _Domaine : Français · Exercice : `conjuguer-imparfait` — Conjuguer à l'imparfait · **30 items au total**_
@@ -1758,6 +2127,53 @@ _Domaine : Français · Exercice : `conjuguer-imparfait` — Conjuguer à l'impa
 9. La sorcière ________ des potions magiques.
 10. Toi et tes cousins ________ à la ferme chaque été.
 
+## Conjugaison — Impératif présent
+
+_Domaine : Français · Exercice : `conjuguer-imperatif-present` — Conjuguer à l'impératif présent · **30 items au total**_
+
+**Total par niveau :** Niveau 1 (level: 1) = 10 · Niveau 2 (level: 2) = 10 · Niveau 3 (level: 3) = 10
+
+### ⚠️ Niveau 1 (level: 1) (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. infinitive: manger · subject: tu
+2. infinitive: aller · subject: tu
+3. infinitive: être · subject: vous
+4. infinitive: avoir · subject: nous
+5. infinitive: finir · subject: tu
+6. infinitive: chanter · subject: Tu · forms: Chante, Chantons, Chantez
+7. infinitive: finir · subject: Nous · forms: Finis, Finissons, Finissez
+8. infinitive: aller · subject: Vous · forms: Va, Allons, Allez
+9. infinitive: être · subject: Tu · forms: Sois, Soyons, Soyez
+10. infinitive: prendre · subject: Nous · forms: Prends, Prenons, Prenez
+
+### Niveau 2 (level: 2) (10 items)
+
+1. ________ tes légumes avant d'aller jouer !
+2. ________ votre place en silence, s'il vous plaît.
+3. ________ la chanson tous ensemble !
+4. ________ ton exercice avant la récréation.
+5. ________ attentifs pendant toute la leçon !
+6. ________ confiance en vous !
+7. ________ te coucher, il est tard !
+8. ________ que je compte sur vous pour ce projet.
+9. ________ ton manteau, il fait froid dehors.
+10. ________ à l'aventure avant que la nuit tombe !
+
+### Niveau 3 (level: 3) (10 items)
+
+1. ________ tout de suite, il est l'heure !
+2. ________, le bus va partir !
+3. ________ ici, je vous en prie.
+4. Ne ________ pas la bouche pleine !
+5. Ne vous ________ pas maintenant, attendez le signal.
+6. ________ toujours la vérité.
+7. ________ attention en traversant la rue.
+8. ________ ton manteau avant de sortir.
+9. ________ voir ce que j'ai trouvé !
+10. ________, s'il vous plaît, le film commence.
+
 ## Conjugaison — Passé simple
 
 _Domaine : Français · Exercice : `conjuguer-passe-simple` — Conjuguer des verbes au passé simple · **30 items au total**_
@@ -1804,6 +2220,946 @@ _Domaine : Français · Exercice : `conjuguer-passe-simple` — Conjuguer des ve
 8. La reine ________ son discours sous les applaudissements.
 9. Les habitants ________ leur chef après une longue discussion.
 10. Les arbres ________ vite dans cette forêt lointaine.
+
+## Conjugaison — Plus-que-parfait
+
+_Domaine : Français · Exercice : `conjuguer-plus-que-parfait` — Conjuguer au plus-que-parfait · **30 items au total**_
+
+**Total par niveau :** Niveau 1 (level: 1) = 10 · Niveau 2 (level: 2) = 10 · Niveau 3 (level: 3) = 10
+
+### ⚠️ Niveau 1 (level: 1) (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. infinitive: préparer · subject: elle
+2. infinitive: partir · subject: elle
+3. infinitive: manger · subject: nous
+4. infinitive: venir · subject: ils
+5. infinitive: finir · subject: tu
+6. infinitive: chanter · subject: Elle · forms: avais chanté, avait chanté, avions chanté, aviez chanté, avaient chanté
+7. infinitive: finir · subject: Ils · forms: avais fini, avait fini, avions fini, aviez fini, avaient fini
+8. infinitive: partir · subject: Il · forms: étais parti, était parti, étions partis, étiez partis, étaient partis
+9. infinitive: venir · subject: Elles · forms: étais venue, était venue, étions venues, étiez venues, étaient venues
+10. infinitive: manger · subject: Vous · forms: avais mangé, avait mangé, avions mangé, aviez mangé, avaient mangé
+
+### Niveau 2 (level: 2) (10 items)
+
+1. Quand nous sommes arrivés, le film ________.
+2. Elle ________ bien avant que la pluie tombe.
+3. Ils ________ avant d'aller jouer.
+4. Tu ________ tes devoirs quand le téléphone a sonné.
+5. Il ________ si tôt qu'il n'y avait personne dans la rue.
+6. Vous ________ ce roman avant d'en discuter en classe.
+7. Le chat ________ toute la nourriture avant notre retour.
+8. Elles ________ depuis une heure quand il a téléphoné.
+9. Nous ________ nos valises avant que le taxi arrive.
+10. Comme j'________ mon sac, je suis retourné le chercher.
+
+### Niveau 3 (level: 3) (10 items)
+
+1. Le facteur ________ le colis avant midi.
+2. Les enfants ________ leurs devoirs avant le dîner.
+3. La sorcière ________ un piège terrible avant l'arrivée du héros.
+4. Les gardes ________ toutes les portes avant l'aube.
+5. Le chien ________ tout son repas avant notre retour.
+6. Jules ________ en avance ce matin-là.
+7. La reine ________ la première dans la salle du trône.
+8. Les voyageurs ________ tôt ce matin-là, avant le lever du soleil.
+9. Les filles ________ avant la tombée de la nuit.
+10. Paul et Marie ________ ensemble à la fête, main dans la main.
+
+## Grammaire — Attribut du sujet et complément d'objet
+
+_Domaine : Français · Exercice : `distinguer-attribut-sujet-complement-objet` — Distinguer l'attribut du sujet et le complément d'objet · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Ce verbe est-il un verbe d'état ou un verbe d'action ? — Le ciel <span class='ex-teal-hl'>devient</span> gris .
+2. Ce verbe est-il un verbe d'état ou un verbe d'action ? — Le boulanger <span class='ex-teal-hl'>prépare</span> le pain .
+3. Ce verbe est-il un verbe d'état ou un verbe d'action ? — Elle <span class='ex-teal-hl'>semble</span> fatiguée .
+4. Ce verbe est-il un verbe d'état ou un verbe d'action ? — Les enfants <span class='ex-teal-hl'>mangent</span> des fruits .
+5. Ce verbe est-il un verbe d'état ou un verbe d'action ? — Ce plat <span class='ex-teal-hl'>a l'air</span> délicieux .
+6. Ce verbe est-il un verbe d'état ou un verbe d'action ? — Le facteur <span class='ex-teal-hl'>dépose</span> le courrier .
+7. Ce verbe est-il un verbe d'état ou un verbe d'action ? — Mon frère <span class='ex-teal-hl'>est</span> médecin .
+8. Ce verbe est-il un verbe d'état ou un verbe d'action ? — Les élèves <span class='ex-teal-hl'>écoutent</span> la maîtresse .
+9. Ce verbe est-il un verbe d'état ou un verbe d'action ? — Cette histoire <span class='ex-teal-hl'>paraît</span> incroyable .
+10. Ce verbe est-il un verbe d'état ou un verbe d'action ? — Le chat <span class='ex-teal-hl'>griffe</span> le canapé .
+
+### Niveau 2 (10 items)
+
+1. Clique sur le groupe qui suit le verbe, puis indique s'il est attribut du sujet ou complément d'objet. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+2. Clique sur le groupe qui suit le verbe, puis indique s'il est attribut du sujet ou complément d'objet. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+3. Clique sur le groupe qui suit le verbe, puis indique s'il est attribut du sujet ou complément d'objet. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+4. Clique sur le groupe qui suit le verbe, puis indique s'il est attribut du sujet ou complément d'objet. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+5. Clique sur le groupe qui suit le verbe, puis indique s'il est attribut du sujet ou complément d'objet. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+6. Clique sur le groupe qui suit le verbe, puis indique s'il est attribut du sujet ou complément d'objet. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+7. Clique sur le groupe qui suit le verbe, puis indique s'il est attribut du sujet ou complément d'objet. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+8. Clique sur le groupe qui suit le verbe, puis indique s'il est attribut du sujet ou complément d'objet. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+9. Clique sur le groupe qui suit le verbe, puis indique s'il est attribut du sujet ou complément d'objet. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+10. Clique sur le groupe qui suit le verbe, puis indique s'il est attribut du sujet ou complément d'objet. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+
+### Niveau 3 (10 items)
+
+1. 🔍 Dans chaque phrase s'est glissé un complément d'objet ou un attribut du sujet, identifie-les. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+2. 🔍 Dans chaque phrase s'est glissé un complément d'objet ou un attribut du sujet, identifie-les. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+3. 🔍 Dans chaque phrase s'est glissé un complément d'objet ou un attribut du sujet, identifie-les. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+4. 🔍 Dans chaque phrase s'est glissé un complément d'objet ou un attribut du sujet, identifie-les. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+5. 🔍 Dans chaque phrase s'est glissé un complément d'objet ou un attribut du sujet, identifie-les. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+6. 🔍 Dans chaque phrase s'est glissé un complément d'objet ou un attribut du sujet, identifie-les. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+7. 🔍 Dans chaque phrase s'est glissé un complément d'objet ou un attribut du sujet, identifie-les. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+8. 🔍 Dans chaque phrase s'est glissé un complément d'objet ou un attribut du sujet, identifie-les. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+9. 🔍 Dans chaque phrase s'est glissé un complément d'objet ou un attribut du sujet, identifie-les. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+10. 🔍 Dans chaque phrase s'est glissé un complément d'objet ou un attribut du sujet, identifie-les. — Clique sur le groupe qui suit le verbe. — Ce groupe est-il attribut du sujet ou complément d'objet ?
+
+## Grammaire — Compléments d'objet (COD/COI)
+
+_Domaine : Français · Exercice : `distinguer-cod-coi` — Distinguer le complément d'objet direct (COD) et le complément d'objet indirect (COI) · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Clique sur le complément d'objet dans chaque phrase.
+2. Clique sur le complément d'objet dans chaque phrase.
+3. Clique sur le complément d'objet dans chaque phrase.
+4. Clique sur le complément d'objet dans chaque phrase.
+5. Clique sur le complément d'objet dans chaque phrase.
+6. Clique sur le complément d'objet dans chaque phrase.
+7. Clique sur le complément d'objet dans chaque phrase.
+8. Clique sur le complément d'objet dans chaque phrase.
+9. Clique sur le complément d'objet dans chaque phrase.
+10. Clique sur le complément d'objet dans chaque phrase.
+
+### Niveau 2 (10 items)
+
+1. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+2. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+3. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+4. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+5. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+6. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+7. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+8. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+9. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+10. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+
+### Niveau 3 (10 items)
+
+1. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+2. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+3. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+4. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+5. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+6. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+7. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+8. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+9. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+10. Clique sur le complément d'objet, puis indique s'il est direct ou indirect. — Clique sur le complément d'objet. — Ce complément d'objet est-il direct ou indirect ?
+
+## Grammaire — Conjonctions de coordination
+
+_Domaine : Français · Exercice : `identifier-conjonction-coordination` — Identifier une conjonction de coordination · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Clique sur la conjonction de coordination.
+2. Clique sur la conjonction de coordination.
+3. Clique sur la conjonction de coordination.
+4. Clique sur la conjonction de coordination.
+5. Clique sur la conjonction de coordination.
+6. Clique sur la conjonction de coordination.
+7. Clique sur la conjonction de coordination.
+8. Clique sur la conjonction de coordination.
+9. Clique sur la conjonction de coordination.
+10. Clique sur la conjonction de coordination.
+
+### Niveau 2 (10 items)
+
+1. Le mot surligné est-il une préposition ou une conjonction de coordination ? — Il joue <span class='ex-teal-hl'>avec</span> son frère .
+2. Le mot surligné est-il une préposition ou une conjonction de coordination ? — Elle chante <span class='ex-teal-hl'>et</span> danse .
+3. Le mot surligné est-il une préposition ou une conjonction de coordination ? — Je pars <span class='ex-teal-hl'>sans</span> toi .
+4. Le mot surligné est-il une préposition ou une conjonction de coordination ? — Il est fatigué , <span class='ex-teal-hl'>donc</span> il se repose .
+5. Le mot surligné est-il une préposition ou une conjonction de coordination ? — Nous marchons <span class='ex-teal-hl'>pour</span> arriver à temps .
+6. Le mot surligné est-il une préposition ou une conjonction de coordination ? — Tu veux du thé <span class='ex-teal-hl'>ou</span> du café ?
+7. Le mot surligné est-il une préposition ou une conjonction de coordination ? — Le chat dort <span class='ex-teal-hl'>sous</span> la table .
+8. Le mot surligné est-il une préposition ou une conjonction de coordination ? — Il fait froid , <span class='ex-teal-hl'>car</span> l'hiver arrive .
+9. Le mot surligné est-il une préposition ou une conjonction de coordination ? — Elle habite <span class='ex-teal-hl'>chez</span> sa tante .
+10. Le mot surligné est-il une préposition ou une conjonction de coordination ? — Je n'aime <span class='ex-teal-hl'>ni</span> les épinards ni les carottes .
+
+### Niveau 3 (10 items)
+
+1. Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.
+2. Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.
+3. Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.
+4. Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.
+5. Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.
+6. Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.
+7. Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.
+8. Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.
+9. Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.
+10. Clique à l'endroit où il manque la conjonction de coordination, puis écris-la.
+
+## Grammaire — Conjonctions de coordination et de subordination
+
+_Domaine : Français · Exercice : `distinguer-conjonctions` — Distinguer conjonction de coordination et conjonction de subordination · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Il pleut , <span class='ex-teal-hl'>mais</span> je sors .
+2. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Je pense <span class='ex-teal-hl'>que</span> tu as raison .
+3. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Tu veux du thé <span class='ex-teal-hl'>ou</span> du café ?
+4. Le mot surligné est-il une conjonction de coordination ou de subordination ? — <span class='ex-teal-hl'>Quand</span> il pleut , je reste à la maison .
+5. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Il est fatigué , <span class='ex-teal-hl'>donc</span> il se repose .
+6. Le mot surligné est-il une conjonction de coordination ou de subordination ? — <span class='ex-teal-hl'>Comme</span> il est tard , je pars .
+7. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Il fait froid , <span class='ex-teal-hl'>car</span> l'hiver arrive .
+8. Le mot surligné est-il une conjonction de coordination ou de subordination ? — <span class='ex-teal-hl'>Puisque</span> tu insistes , j'accepte .
+9. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Je n'aime <span class='ex-teal-hl'>ni</span> les épinards ni les carottes .
+10. Le mot surligné est-il une conjonction de coordination ou de subordination ? — <span class='ex-teal-hl'>Bien qu'</span>il pleuve , nous sortons .
+
+### Niveau 2 (10 items)
+
+1. Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Il pleut , <span class='ex-teal-hl'>mais</span> je reste à la maison quand il fait froid .
+2. Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Il pleut , mais je reste à la maison <span class='ex-teal-hl'>quand</span> il fait froid .
+3. Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Je pense que tu as raison , <span class='ex-teal-hl'>mais</span> tu devrais réfléchir encore .
+4. Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Je pense <span class='ex-teal-hl'>que</span> tu as raison , mais tu devrais réfléchir encore .
+5. Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Il est fatigué , <span class='ex-teal-hl'>donc</span> il se repose puisqu'il n'a rien à faire .
+6. Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Il est fatigué , donc il se repose <span class='ex-teal-hl'>puisqu'</span>il n'a rien à faire .
+7. Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Tu veux du thé <span class='ex-teal-hl'>ou</span> du café , comme tu préfères ?
+8. Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Tu veux du thé ou du café , <span class='ex-teal-hl'>comme</span> tu préfères ?
+9. Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Il fait froid , <span class='ex-teal-hl'>car</span> l'hiver arrive alors que les feuilles tombent .
+10. Cette phrase contient deux conjonctions. Le mot surligné est-il une conjonction de coordination ou de subordination ? — Il fait froid , car l'hiver arrive <span class='ex-teal-hl'>alors que</span> les feuilles tombent .
+
+### Niveau 3 (10 items)
+
+1. Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la. — Clique sur « quand ». — Quel est son type ?
+2. Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la. — Clique sur « mais ». — Quel est son type ?
+3. Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la. — Clique sur « car ». — Quel est son type ?
+4. Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la. — Clique sur « Comme ». — Quel est son type ?
+5. Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la. — Clique sur « puisqu' ». — Quel est son type ?
+6. Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la. — Clique sur « mais ». — Quel est son type ?
+7. Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la. — Clique sur « quand ». — Quel est son type ?
+8. Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la. — Clique sur « ou ». — Quel est son type ?
+9. Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la. — Clique sur « bien qu' ». — Quel est son type ?
+10. Ce texte contient plusieurs conjonctions. Clique sur celle qui est indiquée, puis classe-la. — Clique sur « donc ». — Quel est son type ?
+
+## Grammaire — Conjonctions de subordination
+
+_Domaine : Français · Exercice : `identifier-conjonction-subordination` — Identifier une conjonction de subordination · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Clique sur la conjonction de subordination.
+2. Clique sur la conjonction de subordination.
+3. Clique sur la conjonction de subordination.
+4. Clique sur la conjonction de subordination.
+5. Clique sur la conjonction de subordination.
+6. Clique sur la conjonction de subordination.
+7. Clique sur la conjonction de subordination (2 mots).
+8. Clique sur la conjonction de subordination (2 mots).
+9. Clique sur la conjonction de subordination (2 mots).
+10. Clique sur la conjonction de subordination (2 mots).
+
+### Niveau 2 (10 items)
+
+1. Clique sur la conjonction de subordination. Attention, un adverbe se cache dans la phrase !
+2. Clique sur la conjonction de subordination. Attention, un adverbe se cache dans la phrase !
+3. Clique sur la conjonction de subordination (2 mots). Attention, un adverbe se cache dans la phrase !
+4. Clique sur la conjonction de subordination. Attention, un adverbe se cache dans la phrase !
+5. Clique sur la conjonction de subordination. Attention, un adverbe se cache dans la phrase !
+6. Clique sur la conjonction de subordination (2 mots). Attention, un adverbe se cache dans la phrase !
+7. Clique sur la conjonction de subordination (2 mots). Attention, un adverbe se cache dans la phrase !
+8. Clique sur la conjonction de subordination. Attention, un adverbe se cache dans la phrase !
+9. Clique sur la conjonction de subordination (2 mots). Attention, un adverbe se cache dans la phrase !
+10. Clique sur la conjonction de subordination (2 mots). Attention, un adverbe se cache dans la phrase !
+
+### Niveau 3 (10 items)
+
+1. Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.
+2. Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.
+3. Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.
+4. Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.
+5. Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.
+6. Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.
+7. Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.
+8. Clique à l'endroit où il manque la conjonction de subordination, puis écris-la.
+9. Clique à l'endroit où il manque la conjonction de subordination (en tout début de phrase), puis écris-la.
+10. Clique à l'endroit où il manque la conjonction de subordination (en tout début de phrase), puis écris-la.
+
+## Grammaire — Déterminants : articles définis et indéfinis
+
+_Domaine : Français · Exercice : `identifier-differencier-articles-definis-indefinis` — Identifier et différencier les articles définis et indéfinis · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. html: <mark class="idi-mark">Le</mark> chien de Léa dort sur son tapis. · explain: « Le » désigne un chien précis : celui de Léa.
+2. html: Léa a vu <mark class="idi-mark">un</mark> renard près de chez elle. · explain: « un » ne précise pas de quel renard il s'agit : un renard parmi d'autres.
+3. html: <mark class="idi-mark">L'</mark>école est fermée aujourd'hui. · explain: « L' » (= la) désigne une école précise, celle qu'on connaît.
+4. html: Il mange <mark class="idi-mark">une</mark> pomme verte. · explain: « une » désigne une pomme quelconque, non précisée.
+5. html: <mark class="idi-mark">Les</mark> enfants de la classe chantent joyeusement. · explain: « Les » désigne un groupe précis : les enfants de cette classe.
+6. html: Nous avons trouvé <mark class="idi-mark">des</mark> coquillages ce matin. · explain: « des » désigne des coquillages non précisés, en quantité indéterminée.
+7. html: <mark class="idi-mark">Les</mark> chats détestent l'eau. · explain: Même si on parle des chats en général (sens générique), « les » reste un article défini.
+8. html: As-tu vu <mark class="idi-mark">l'</mark>oiseau bleu dans l'arbre ? · explain: « l' » (= le) désigne un oiseau précis, que tu as vu.
+9. html: Notre maître a donné <mark class="idi-mark">un</mark> livre à chaque élève. · explain: « un » désigne un livre parmi d'autres, non précisé.
+10. html: <mark class="idi-mark">La</mark> maîtresse que j'aime beaucoup est absente aujourd'hui. · explain: « La » désigne une maîtresse précise : celle que tu connais.
+
+### Niveau 2 (10 items)
+
+1. Léo range un cahier dans son sac .
+2. Le professeur explique son cours .
+3. Elle a mangé une pomme ce matin .
+4. L' oiseau chante sur mon balcon .
+5. Il a trouvé des champignons ce matin .
+6. La maîtresse corrige nos cahiers .
+7. Nous avons vu un dauphin ce matin .
+8. L' arbre perd ses feuilles en automne .
+9. Elle porte des lunettes de soleil .
+10. Les enfants jouent dans mon jardin .
+
+### Niveau 3 (10 items)
+
+1. (item sans champ texte identifiable)
+2. (item sans champ texte identifiable)
+3. (item sans champ texte identifiable)
+4. (item sans champ texte identifiable)
+5. (item sans champ texte identifiable)
+6. (item sans champ texte identifiable)
+7. (item sans champ texte identifiable)
+8. (item sans champ texte identifiable)
+9. (item sans champ texte identifiable)
+10. (item sans champ texte identifiable)
+
+## Grammaire — Déterminants : démonstratifs et possessifs
+
+_Domaine : Français · Exercice : `identifier-differencier-determinants-demonstratifs-possessifs` — Identifier et différencier les déterminants démonstratifs et possessifs · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. html: Je prends <mark class="idi-mark">mon</mark> cartable. · explain: « mon » indique que le cartable appartient à la personne qui parle (1<sup>re</sup> pers. du singulier).
+2. html: Regarde <mark class="idi-mark">cette</mark> fleur ! · explain: « cette » montre une fleur précise, sous les yeux de la personne à qui l'on parle.
+3. html: Il range <mark class="idi-mark">ses</mark> jouets avant de dormir. · explain: « ses » (pluriel) indique que les jouets appartiennent à « il » (3<sup>e</sup> pers. du singulier).
+4. html: <mark class="idi-mark">Ces</mark> nuages annoncent la pluie. · explain: « Ces » désigne des nuages précis, que l'on montre.
+5. html: Nous rangeons <mark class="idi-mark">notre</mark> classe avant la récréation. · explain: « notre » indique que la classe appartient à « nous » (1<sup>re</sup> pers. du pluriel).
+6. html: J'ai vu <mark class="idi-mark">cet</mark> oiseau dans le jardin. · explain: « cet » désigne un oiseau précis ; on emploie <em>cet</em> (et non <em>ce</em>) devant un nom masculin qui commence par une voyelle.
+7. html: Vous avez oublié <mark class="idi-mark">vos</mark> cahiers à la maison. · explain: « vos » indique que les cahiers appartiennent à « vous » (2<sup>e</sup> pers. du pluriel).
+8. html: Elle a choisi <mark class="idi-mark">ce</mark> livre à la bibliothèque. · explain: « ce » désigne un livre précis, devant un nom masculin qui commence par une consonne.
+9. html: Les enfants promènent <mark class="idi-mark">leur</mark> chien tous les soirs. · explain: « leur » indique que le chien appartient aux enfants (3<sup>e</sup> pers. du pluriel).
+10. html: Il faut ranger <mark class="idi-mark">ces</mark> outils dans la remise. · explain: « ces » (pluriel) désigne des outils précis, que l'on montre.
+
+### Niveau 2 (10 items)
+
+1. Léa porte son sac à dos .
+2. Regarde ce nuage étrange .
+3. Nous rangeons nos vélos dans le garage .
+4. Cette histoire est passionnante .
+5. Ils apportent leurs raquettes .
+6. Ces montagnes sont magnifiques .
+7. Tu as perdu ton écharpe .
+8. J'ai goûté cet ananas .
+9. Vous partagez votre goûter .
+10. Elle adore ces vacances .
+
+### Niveau 3 (10 items)
+
+1. Léa porte son manteau et ses bottes .
+2. Regarde cette photo de mon anniversaire !
+3. Nous rangeons notre chambre pendant que vous rangez vos jouets .
+4. Ce livre appartient à ma sœur .
+5. Tu as oublié ton écharpe et tes gants .
+6. Cet exercice est difficile, mais ta persévérance est remarquable .
+7. Ils rangent leurs vélos pendant que leur père répare la voiture .
+8. Sa robe et ces chaussures vont très bien ensemble .
+9. Suivez mes conseils et prenez votre temps .
+10. Regardez ces étoiles : nos ancêtres les observaient déjà .
+
+## Grammaire — Identifier le type et la forme de la phrase
+
+_Domaine : Français · Exercice : `identifier-type-phrase` — Identifier le type et la forme d'une phrase · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Le chien court.
+2. Je mange une pomme.
+3. Emma joue du piano.
+4. Il pleut depuis ce matin.
+5. Où vas-tu ce matin ?
+6. As-tu fini tes devoirs ?
+7. Comment s'appelle ton chat ?
+8. Ferme la porte.
+9. Range tes affaires.
+10. Lis ce livre avec attention.
+
+### Niveau 2 (10 items)
+
+1. Le chat dort sur le canapé.
+2. Le jardin est couvert de fleurs.
+3. As-tu faim ?
+4. Où vas-tu ce matin ?
+5. Viens jouer avec moi.
+6. Je ne mange pas de viande.
+7. Elle ne lit jamais le soir.
+8. Pourquoi tu ne viens pas avec nous ?
+9. N'oublie pas tes affaires.
+10. Ne crie pas dans les couloirs.
+
+### Niveau 3 (10 items)
+
+1. Il fait beau.
+2. Elle chante bien.
+3. Tu cours vite.
+4. Vous êtes gentils.
+5. Nous sommes heureux.
+6. Ils travaillent bien.
+7. Elle est belle.
+8. Cette maison est grande.
+9. Ce gâteau est délicieux.
+10. Il pleut fort.
+
+## Grammaire — L'adverbe
+
+_Domaine : Français · Exercice : `identifier-adverbe` — Identifier les adverbes · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Clique sur l'adverbe parmi ces mots. — lentement · lent · lenteur · ralentir
+2. Clique sur l'adverbe parmi ces mots. — rapidement · rapide · rapidité · accélérer
+3. Clique sur l'adverbe parmi ces mots. — doucement · doux · douceur · adoucir
+4. Clique sur l'adverbe parmi ces mots. — moment · joyeusement · joyeux · réjouir
+5. Clique sur l'adverbe parmi ces mots. — compliment · gentiment · gentil · complimenter
+6. Clique sur l'adverbe parmi ces mots. — bien · bon · bonté · améliorer
+7. Clique sur l'adverbe parmi ces mots. — souvent · fréquent · fréquence · répéter
+8. Clique sur l'adverbe parmi ces mots. — ici · proche · proximité · approcher
+9. Clique sur l'adverbe parmi ces mots. — beaucoup · nombreux · nombre · multiplier
+10. Clique sur l'adverbe parmi ces mots. — appartement · sérieusement · sérieux · sérieuse
+
+### Niveau 2 (10 items)
+
+1. Clique sur l'adverbe de la phrase, puis indique sa catégorie. — Clique sur l'adverbe. — Quelle est sa catégorie ?
+2. Clique sur l'adverbe de la phrase, puis indique sa catégorie. — Clique sur l'adverbe. — Quelle est sa catégorie ?
+3. Clique sur l'adverbe de la phrase, puis indique sa catégorie. — Clique sur l'adverbe. — Quelle est sa catégorie ?
+4. Clique sur l'adverbe de la phrase, puis indique sa catégorie. — Clique sur l'adverbe. — Quelle est sa catégorie ?
+5. Clique sur l'adverbe de la phrase, puis indique sa catégorie. — Clique sur l'adverbe. — Quelle est sa catégorie ?
+6. Clique sur l'adverbe de la phrase, puis indique sa catégorie. — Clique sur l'adverbe. — Quelle est sa catégorie ?
+7. Clique sur l'adverbe de la phrase, puis indique sa catégorie. — Clique sur l'adverbe. — Quelle est sa catégorie ?
+8. Clique sur l'adverbe de la phrase, puis indique sa catégorie. — Clique sur l'adverbe. — Quelle est sa catégorie ?
+9. Clique sur l'adverbe de la phrase, puis indique sa catégorie. — Clique sur l'adverbe. — Quelle est sa catégorie ?
+10. Clique sur l'adverbe de la phrase, puis indique sa catégorie. — Clique sur l'adverbe. — Quelle est sa catégorie ?
+
+### Niveau 3 (10 items)
+
+1. Clique sur tous les adverbes de la phrase.
+2. Clique sur tous les adverbes de la phrase.
+3. Clique sur tous les adverbes de la phrase.
+4. Clique sur tous les adverbes de la phrase.
+5. Clique sur tous les adverbes de la phrase.
+6. Clique sur tous les adverbes de la phrase.
+7. Clique sur tous les adverbes de la phrase.
+8. Clique sur tous les adverbes de la phrase.
+9. Clique sur tous les adverbes de la phrase.
+10. Clique sur tous les adverbes de la phrase.
+
+## Grammaire — La phrase complexe
+
+_Domaine : Français · Exercice : `reperer-propositions` — Repérer les propositions dans une phrase complexe · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.
+2. Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.
+3. Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.
+4. Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.
+5. Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.
+6. Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.
+7. Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.
+8. Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.
+9. Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.
+10. Clique sur le(s) mot(s) du verbe conjugué de chaque proposition, puis indique combien de propositions tu as trouvées.
+
+### Niveau 2 (10 items)
+
+1. Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).
+2. Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).
+3. Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).
+4. Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).
+5. Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).
+6. Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).
+7. Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).
+8. Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).
+9. Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).
+10. Place un curseur à chaque endroit où tu penses que se trouve une frontière entre propositions (il peut y en avoir plusieurs).
+
+### Niveau 3 (10 items)
+
+1. Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.
+2. Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.
+3. Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.
+4. Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.
+5. Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.
+6. Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.
+7. Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.
+8. Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.
+9. Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.
+10. Clique sur tous les verbes conjugués de cette phrase (tu ne sais pas combien il y en a), indique combien de propositions tu as trouvées, puis catégorise chaque lien.
+
+## Grammaire — La préposition
+
+_Domaine : Français · Exercice : `identifier-preposition` — Identifier une préposition · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Complète la phrase avec une préposition (n'importe laquelle qui convient grammaticalement).
+2. Complète la phrase avec une préposition (n'importe laquelle qui convient grammaticalement).
+3. Complète la phrase avec une préposition (n'importe laquelle qui convient grammaticalement).
+4. Complète la phrase avec une préposition (n'importe laquelle qui convient grammaticalement).
+5. Complète la phrase avec une préposition (n'importe laquelle qui convient grammaticalement).
+6. Complète la phrase avec une préposition (n'importe laquelle qui convient grammaticalement).
+7. Complète la phrase avec une préposition (n'importe laquelle qui convient grammaticalement).
+8. Complète la phrase avec une préposition (n'importe laquelle qui convient grammaticalement).
+9. Complète la phrase avec une préposition (n'importe laquelle qui convient grammaticalement).
+10. Complète la phrase avec une préposition (n'importe laquelle qui convient grammaticalement).
+
+### Niveau 2 (10 items)
+
+1. Clique sur la préposition de la phrase, puis indique ce qu'elle exprime. — Clique sur la préposition. — Qu'exprime-t-elle ?
+2. Clique sur la préposition de la phrase, puis indique ce qu'elle exprime. — Clique sur la préposition. — Qu'exprime-t-elle ?
+3. Clique sur la préposition de la phrase, puis indique ce qu'elle exprime. — Clique sur la préposition. — Qu'exprime-t-elle ?
+4. Clique sur la préposition de la phrase, puis indique ce qu'elle exprime. — Clique sur la préposition. — Qu'exprime-t-elle ?
+5. Clique sur la préposition de la phrase, puis indique ce qu'elle exprime. — Clique sur la préposition. — Qu'exprime-t-elle ?
+6. Clique sur la préposition de la phrase, puis indique ce qu'elle exprime. — Clique sur la préposition. — Qu'exprime-t-elle ?
+7. Clique sur la préposition de la phrase, puis indique ce qu'elle exprime. — Clique sur la préposition. — Qu'exprime-t-elle ?
+8. Clique sur la préposition de la phrase, puis indique ce qu'elle exprime. — Clique sur la préposition. — Qu'exprime-t-elle ?
+9. Clique sur la préposition de la phrase, puis indique ce qu'elle exprime. — Clique sur la préposition. — Qu'exprime-t-elle ?
+10. Clique sur la préposition de la phrase, puis indique ce qu'elle exprime. — Clique sur la préposition. — Qu'exprime-t-elle ?
+
+### Niveau 3 (10 items)
+
+1. Clique sur toutes les prépositions de la phrase.
+2. Clique sur toutes les prépositions de la phrase.
+3. Clique sur toutes les prépositions de la phrase.
+4. Clique sur toutes les prépositions de la phrase.
+5. Clique sur toutes les prépositions de la phrase.
+6. Clique sur toutes les prépositions de la phrase.
+7. Clique sur toutes les prépositions de la phrase.
+8. Clique sur toutes les prépositions de la phrase.
+9. Clique sur toutes les prépositions de la phrase.
+10. Clique sur toutes les prépositions de la phrase.
+
+## Grammaire — Le complément du nom
+
+_Domaine : Français · Exercice : `identifier-complement-nom` — Identifier un complément du nom · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas). — le vélo de course
+2. Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas). — une tasse à café
+3. Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas). — le chat de la voisine
+4. Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas). — un roman d'aventure
+5. Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas). — la porte en bois
+6. Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas). — le grand vélo rouge
+7. Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas). — une robe à fleurs
+8. Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas). — le sac de sport
+9. Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas). — un enfant sage
+10. Clique sur le complément du nom (ou « Aucun complément du nom » s'il n'y en a pas). — le gardien du parc
+
+### Niveau 2 (10 items)
+
+1. Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).
+2. Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).
+3. Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).
+4. Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).
+5. Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).
+6. Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).
+7. Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).
+8. Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).
+9. Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).
+10. Clique sur le(s) mot(s) qui forment le complément du nom (préposition incluse).
+
+### Niveau 3 (10 items)
+
+1. Clique sur le complément du nom, puis indique sa nature. — Clique sur le complément du nom (préposition incluse). — Quelle est la nature de ce complément du nom ?
+2. Clique sur le complément du nom, puis indique sa nature. — Clique sur le complément du nom (préposition incluse). — Quelle est la nature de ce complément du nom ?
+3. Clique sur le complément du nom, puis indique sa nature. — Clique sur le complément du nom (préposition incluse). — Quelle est la nature de ce complément du nom ?
+4. Clique sur le complément du nom, puis indique sa nature. — Clique sur le complément du nom (préposition incluse). — Quelle est la nature de ce complément du nom ?
+5. Clique sur le complément du nom, puis indique sa nature. — Clique sur le complément du nom (préposition incluse). — Quelle est la nature de ce complément du nom ?
+6. Clique sur le complément du nom, puis indique sa nature. — Clique sur le complément du nom (préposition incluse). — Quelle est la nature de ce complément du nom ?
+7. Clique sur le complément du nom, puis indique sa nature. — Clique sur le complément du nom (préposition incluse). — Quelle est la nature de ce complément du nom ?
+8. Clique sur le complément du nom, puis indique sa nature. — Clique sur le complément du nom (préposition incluse). — Quelle est la nature de ce complément du nom ?
+9. Clique sur le complément du nom, puis indique sa nature. — Clique sur le complément du nom (préposition incluse). — Quelle est la nature de ce complément du nom ?
+10. Clique sur le complément du nom, puis indique sa nature. — Clique sur le complément du nom (préposition incluse). — Quelle est la nature de ce complément du nom ?
+
+## Grammaire — Le groupe nominal
+
+_Domaine : Français · Exercice : `identifier-nom-noyau-gn` — Identifier le nom noyau d'un groupe nominal · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Clique sur le nom noyau de ce groupe nominal. — le · chat
+2. Clique sur le nom noyau de ce groupe nominal. — une · jolie · plage
+3. Clique sur le nom noyau de ce groupe nominal. — des · enfants · sages
+4. Clique sur le nom noyau de ce groupe nominal. — ma · voiture
+5. Clique sur le nom noyau de ce groupe nominal. — un · grand · jardin
+6. Clique sur le nom noyau de ce groupe nominal. — les · leçons · difficiles
+7. Clique sur le nom noyau de ce groupe nominal. — cette · histoire
+8. Clique sur le nom noyau de ce groupe nominal. — un · vieux · pont
+9. Clique sur le nom noyau de ce groupe nominal. — des · fleurs · colorées
+10. Clique sur le nom noyau de ce groupe nominal. — notre · maison
+
+### Niveau 2 (10 items)
+
+1. Repère les mots du groupe nominal indiqué, puis trouve son nom noyau. — Clique sur tous les mots du groupe nominal « Le petit garçon ». — Quel est le nom noyau de ce groupe ?
+2. Repère les mots du groupe nominal indiqué, puis trouve son nom noyau. — Clique sur tous les mots du groupe nominal « un joli cadeau ». — Quel est le nom noyau de ce groupe ?
+3. Repère les mots du groupe nominal indiqué, puis trouve son nom noyau. — Clique sur tous les mots du groupe nominal « Les élèves attentifs ». — Quel est le nom noyau de ce groupe ?
+4. Repère les mots du groupe nominal indiqué, puis trouve son nom noyau. — Clique sur tous les mots du groupe nominal « une longue histoire ». — Quel est le nom noyau de ce groupe ?
+5. Repère les mots du groupe nominal indiqué, puis trouve son nom noyau. — Clique sur tous les mots du groupe nominal « Cette belle forêt ». — Quel est le nom noyau de ce groupe ?
+6. Repère les mots du groupe nominal indiqué, puis trouve son nom noyau. — Clique sur tous les mots du groupe nominal « un magnifique château médiéval ». — Quel est le nom noyau de ce groupe ?
+7. Repère les mots du groupe nominal indiqué, puis trouve son nom noyau. — Clique sur tous les mots du groupe nominal « Le facteur ». — Quel est le nom noyau de ce groupe ?
+8. Repère les mots du groupe nominal indiqué, puis trouve son nom noyau. — Clique sur tous les mots du groupe nominal « Les gros nuages noirs ». — Quel est le nom noyau de ce groupe ?
+9. Repère les mots du groupe nominal indiqué, puis trouve son nom noyau. — Clique sur tous les mots du groupe nominal « les timbres anciens ». — Quel est le nom noyau de ce groupe ?
+10. Repère les mots du groupe nominal indiqué, puis trouve son nom noyau. — Clique sur tous les mots du groupe nominal « les nouveaux élèves ». — Quel est le nom noyau de ce groupe ?
+
+### Niveau 3 (10 items)
+
+1. Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.
+2. Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.
+3. Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.
+4. Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.
+5. Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.
+6. Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.
+7. Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.
+8. Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.
+9. Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.
+10. Cette phrase contient plusieurs groupes nominaux : clique sur le nom noyau de chacun.
+
+## Grammaire — Le sujet
+
+_Domaine : Français · Exercice : `identifier-groupe-sujet` — Identifier le groupe sujet · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Clique sur le(s) mot(s) qui forment le groupe sujet.
+2. Clique sur le(s) mot(s) qui forment le groupe sujet.
+3. Clique sur le(s) mot(s) qui forment le groupe sujet.
+4. Clique sur le(s) mot(s) qui forment le groupe sujet.
+5. Clique sur le(s) mot(s) qui forment le groupe sujet.
+6. Clique sur le(s) mot(s) qui forment le groupe sujet.
+7. Clique sur le(s) mot(s) qui forment le groupe sujet.
+8. Clique sur le(s) mot(s) qui forment le groupe sujet.
+9. Clique sur le(s) mot(s) qui forment le groupe sujet.
+10. Clique sur le(s) mot(s) qui forment le groupe sujet.
+
+### Niveau 2 (10 items)
+
+1. Clique sur le(s) mot(s) qui forment le groupe sujet.
+2. Clique sur le(s) mot(s) qui forment le groupe sujet.
+3. Clique sur le(s) mot(s) qui forment le groupe sujet.
+4. Clique sur le(s) mot(s) qui forment le groupe sujet.
+5. Clique sur le(s) mot(s) qui forment le groupe sujet.
+6. Clique sur le(s) mot(s) qui forment le groupe sujet.
+7. Clique sur le(s) mot(s) qui forment le groupe sujet.
+8. Clique sur le(s) mot(s) qui forment le groupe sujet.
+9. Clique sur le(s) mot(s) qui forment le groupe sujet.
+10. Clique sur le(s) mot(s) qui forment le groupe sujet.
+
+### Niveau 3 (10 items)
+
+1. Clique sur le groupe sujet, puis indique la nature de son noyau. — Clique sur le(s) mot(s) qui forment le groupe sujet. — Quelle est la nature du mot noyau du sujet ?
+2. Clique sur le groupe sujet, puis indique la nature de son noyau. — Clique sur le(s) mot(s) qui forment le groupe sujet. — Quelle est la nature du mot noyau du sujet ?
+3. Clique sur le groupe sujet, puis indique la nature de son noyau. — Clique sur le(s) mot(s) qui forment le groupe sujet. — Quelle est la nature du mot noyau du sujet ?
+4. Clique sur le groupe sujet, puis indique la nature de son noyau. — Clique sur le(s) mot(s) qui forment le groupe sujet. — Quelle est la nature du mot noyau du sujet ?
+5. Clique sur le groupe sujet, puis indique la nature de son noyau. — Clique sur le(s) mot(s) qui forment le groupe sujet. — Quelle est la nature du mot noyau du sujet ?
+6. Clique sur le groupe sujet, puis indique la nature de son noyau. — Clique sur le(s) mot(s) qui forment le groupe sujet (il est placé après le verbe). — Quelle est la nature du mot noyau du sujet ?
+7. Clique sur le groupe sujet, puis indique la nature de son noyau. — Clique sur le(s) mot(s) qui forment le groupe sujet. — Quelle est la nature du mot noyau du sujet ?
+8. Clique sur le groupe sujet, puis indique la nature de son noyau. — Clique sur le(s) mot(s) qui forment le groupe sujet. — Quelle est la nature du mot noyau du sujet ?
+9. Clique sur le groupe sujet, puis indique la nature de son noyau. — Clique sur le(s) mot(s) qui forment le groupe sujet. — Quelle est la nature du mot noyau du sujet ?
+10. Clique sur le groupe sujet, puis indique la nature de son noyau. — Clique sur le(s) mot(s) qui forment le groupe sujet. — Quelle est la nature du mot noyau du sujet ?
+
+## Grammaire — Les compléments circonstanciels
+
+_Domaine : Français · Exercice : `identifier-groupe-circonstanciel` — Identifier un groupe circonstanciel · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Le segment surligné est-il un complément essentiel ou circonstanciel ? — Pierre va <span class='ex-teal-hl'>à la piscine</span> .
+2. Le segment surligné est-il un complément essentiel ou circonstanciel ? — Le magasin ferme <span class='ex-teal-hl'>à dix-neuf heures</span> .
+3. Le segment surligné est-il un complément essentiel ou circonstanciel ? — Ce trajet dure <span class='ex-teal-hl'>trois heures</span> .
+4. Le segment surligné est-il un complément essentiel ou circonstanciel ? — Nous avons terminé nos devoirs <span class='ex-teal-hl'>rapidement</span> .
+5. Le segment surligné est-il un complément essentiel ou circonstanciel ? — Elle réside <span class='ex-teal-hl'>à Madrid</span> .
+6. Le segment surligné est-il un complément essentiel ou circonstanciel ? — Ce mur mesure <span class='ex-teal-hl'>trois mètres</span> .
+7. Le segment surligné est-il un complément essentiel ou circonstanciel ? — Chaque matin , ils se retrouvent <span class='ex-teal-hl'>devant l'école</span> .
+8. Le segment surligné est-il un complément essentiel ou circonstanciel ? — Ce livre coûte <span class='ex-teal-hl'>quinze euros</span> .
+9. Le segment surligné est-il un complément essentiel ou circonstanciel ? — Le chat dort <span class='ex-teal-hl'>sur le canapé</span> .
+10. Le segment surligné est-il un complément essentiel ou circonstanciel ? — Elle ressemble <span class='ex-teal-hl'>à sa mère</span> .
+
+### Niveau 2 (10 items)
+
+1. Quelle est la fonction du segment surligné ? — Il mange <span class='ex-teal-hl'>une pomme</span> .
+2. Quelle est la fonction du segment surligné ? — Elle pense <span class='ex-teal-hl'>à ses vacances</span> .
+3. Quelle est la fonction du segment surligné ? — Nous partons <span class='ex-teal-hl'>demain matin</span> .
+4. Quelle est la fonction du segment surligné ? — Léa téléphone <span class='ex-teal-hl'>à sa cousine</span> .
+5. Quelle est la fonction du segment surligné ? — Le chat griffe <span class='ex-teal-hl'>le canapé</span> .
+6. Quelle est la fonction du segment surligné ? — Ils jouent <span class='ex-teal-hl'>dans le jardin</span> .
+7. Quelle est la fonction du segment surligné ? — Tu obéis <span class='ex-teal-hl'>à tes parents</span> .
+8. Quelle est la fonction du segment surligné ? — Marie a peint <span class='ex-teal-hl'>le mur</span> avec soin .
+9. Quelle est la fonction du segment surligné ? — Nous avons marché <span class='ex-teal-hl'>pendant deux heures</span> .
+10. Quelle est la fonction du segment surligné ? — Il se souvient <span class='ex-teal-hl'>de son enfance</span> .
+
+### Niveau 3 (10 items)
+
+1. Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).
+2. Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).
+3. Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).
+4. Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).
+5. Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).
+6. Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).
+7. Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).
+8. Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).
+9. Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).
+10. Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).
+
+## Grammaire — Pronoms personnels
+
+_Domaine : Français · Exercice : `remplacer-gn-complement-pronom` — Remplacer un groupe nominal complément par un pronom personnel · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quel pronom personnel remplace le groupe surligné ? — Le chat mange <span class='psc-pronoun-hl'>la souris</span> .
+2. Quel pronom personnel remplace le groupe surligné ? — Paul regarde <span class='psc-pronoun-hl'>le film</span> .
+3. Quel pronom personnel remplace le groupe surligné ? — Les enfants ramassent <span class='psc-pronoun-hl'>les feuilles</span> .
+4. Quel pronom personnel remplace le groupe surligné ? — Elle range <span class='psc-pronoun-hl'>ses jouets</span> .
+5. Quel pronom personnel remplace le groupe surligné ? — Nous rencontrons <span class='psc-pronoun-hl'>notre voisine</span> .
+6. Quel pronom personnel remplace le groupe surligné ? — Tu fermes <span class='psc-pronoun-hl'>la fenêtre</span> .
+7. Quel pronom personnel remplace le groupe surligné ? — Le boulanger vend <span class='psc-pronoun-hl'>des croissants</span> .
+8. Quel pronom personnel remplace le groupe surligné ? — Le directeur salue <span class='psc-pronoun-hl'>la maîtresse</span> .
+9. Quel pronom personnel remplace le groupe surligné ? — Marc répare <span class='psc-pronoun-hl'>le vélo</span> .
+10. Quel pronom personnel remplace le groupe surligné ? — Les élèves corrigent <span class='psc-pronoun-hl'>leurs erreurs</span> .
+
+### Niveau 2 (10 items)
+
+1. Clique sur le groupe complément de la phrase, puis choisis le bon pronom. — Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « à qui ? »</span>). — Quel pronom remplace « à sa sœur » ?
+2. Clique sur le groupe complément de la phrase, puis choisis le bon pronom. — Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « qui ? »</span>). — Quel pronom remplace « les poules » ?
+3. Clique sur le groupe complément de la phrase, puis choisis le bon pronom. — Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « à qui ? »</span>). — Quel pronom remplace « aux élèves » ?
+4. Clique sur le groupe complément de la phrase, puis choisis le bon pronom. — Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « à qui ? »</span>). — Quel pronom remplace « à Léo » ?
+5. Clique sur le groupe complément de la phrase, puis choisis le bon pronom. — Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « qui ? »</span>). — Quel pronom remplace « le chat » ?
+6. Clique sur le groupe complément de la phrase, puis choisis le bon pronom. — Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « qui ? »</span>). — Quel pronom remplace « le patient » ?
+7. Clique sur le groupe complément de la phrase, puis choisis le bon pronom. — Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « à qui ? »</span>). — Quel pronom remplace « à nos grands-parents » ?
+8. Clique sur le groupe complément de la phrase, puis choisis le bon pronom. — Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « quoi ? »</span>). — Quel pronom remplace « tes affaires » ?
+9. Clique sur le groupe complément de la phrase, puis choisis le bon pronom. — Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « à qui ? »</span>). — Quel pronom remplace « à la cliente » ?
+10. Clique sur le groupe complément de la phrase, puis choisis le bon pronom. — Clique sur le groupe complément (<span class='ex-teal-hl'>celui qui répond à « quoi ? »</span>). — Quel pronom remplace « un portrait » ?
+
+### Niveau 3 (10 items)
+
+1. Récris la phrase en remplaçant le ou les compléments par le(s) pronom(s) qui conviennent :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Le facteur apporte le colis à Mme Dupont . »</span>
+2. Récris la phrase en remplaçant le ou les compléments par le(s) pronom(s) qui conviennent :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Les enfants racontent leur journée à leurs parents . »</span>
+3. Récris la phrase en remplaçant le complément par le pronom qui convient :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« La bibliothécaire range les livres . »</span>
+4. Récris la phrase en remplaçant le ou les compléments par le(s) pronom(s) qui conviennent :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« J'envoie un message à mon ami . »</span>
+5. Récris la phrase en remplaçant le complément par le pronom qui convient :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Le chef cuisinier prépare le dessert . »</span>
+6. Récris la phrase en remplaçant le ou les compléments par le(s) pronom(s) qui conviennent :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Elle confie son secret à sa meilleure amie . »</span>
+7. Récris la phrase en remplaçant le complément par le pronom qui convient :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Nous rendons visite à nos cousins . »</span>
+8. Récris la phrase en remplaçant le complément par le pronom qui convient :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Le maître corrige les exercices des élèves . »</span>
+9. Récris la phrase en remplaçant le ou les compléments par le(s) pronom(s) qui conviennent :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Tu donnes ta réponse au professeur . »</span>
+10. Récris la phrase en remplaçant le ou les compléments par le(s) pronom(s) qui conviennent :<br><span class='ex-teal-hl' style='font-size:17px;display:inline-block;margin-top:6px'>« Les voisins prêtent leur tondeuse à mon père . »</span>
+
+## Grammaire — Pronoms personnels
+
+_Domaine : Français · Exercice : `pronom-antecedent` — Mettre en relation un pronom personnel avec son antécédent · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Clique sur le pronom personnel parmi ces mots. — chat · il · doucement · joue
+2. Clique sur le pronom personnel parmi ces mots. — nous · jardin · beau · courons
+3. Clique sur le pronom personnel parmi ces mots. — elle · table · verte · dort
+4. Clique sur le pronom personnel parmi ces mots. — chantent · ils · musique · joyeuse
+5. Clique sur le pronom personnel parmi ces mots. — tu · crayon · rouge · dessines
+6. Clique sur le pronom personnel parmi ces mots. — vous · classe · grande · travaillez
+7. Clique sur le pronom personnel parmi ces mots. — elles · fleurs · jolies · cueillent
+8. Clique sur le pronom personnel parmi ces mots. — on · plage · chaude · se baigne
+9. Clique sur le pronom personnel parmi ces mots. — lui · cadeau · offert · sourit
+10. Clique sur le pronom personnel parmi ces mots. — eux · voyage · lointain · partent
+
+### Niveau 2 (10 items)
+
+1. Le chien aboie car il a peur .
+2. Marie chante bien , elle adore la musique .
+3. Les enfants jouent , ils sont contents .
+4. Paul et Léo courent , ils sont rapides .
+5. La maîtresse explique , elle est patiente .
+6. Le vent souffle fort , il casse les branches .
+7. Les fleurs poussent , elles sentent bon .
+8. Tom et moi partons , nous sommes pressés .
+9. Le facteur arrive , il apporte le courrier .
+10. Les oiseaux chantent , ils annoncent le printemps .
+
+### Niveau 3 (10 items)
+
+1. Léa a offert un livre à sa cousine . Elle l'a beaucoup aimé .
+2. Le vase est tombé du meuble . Il s'est cassé en morceaux .
+3. Paul a caressé le chien de son voisin . Il aboyait fort .
+4. Les enfants ont ramassé des cailloux dans le chemin . Ils les ont mis dans un seau .
+5. La maîtresse a corrigé des copies de la directrice . Elle les a rendues le lendemain .
+6. Mon frère a prêté ses outils à son cousin . Il les a rangés dans le garage .
+7. Les hirondelles ont quitté leur nid pour rejoindre les cigognes . Elles sont parties vers le sud .
+8. Julie a écrit une lettre à sa grand-mère . Elle lui a répondu aussitôt .
+9. Les élèves ont terminé leur exposé avec leurs camarades . Ils l'ont présenté avec fierté .
+10. Le fermier a nourri ses vaches à côté des chèvres . Elles semblaient affamées .
+
+## Grammaire — Pronoms personnels compléments
+
+_Domaine : Français · Exercice : `identifier-pronom-complement-objet` — Identifier un pronom personnel complément d'objet · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Le mot surligné est-il un article défini ou un pronom personnel complément ? — Il <span class='pco-gold-hl'>le</span> mange .
+2. Le mot surligné est-il un article défini ou un pronom personnel complément ? — Il mange <span class='pco-gold-hl'>le</span> gâteau .
+3. Le mot surligné est-il un article défini ou un pronom personnel complément ? — Elle <span class='pco-gold-hl'>la</span> regarde .
+4. Le mot surligné est-il un article défini ou un pronom personnel complément ? — Elle regarde <span class='pco-gold-hl'>la</span> maison .
+5. Le mot surligné est-il un article défini ou un pronom personnel complément ? — Ils <span class='pco-gold-hl'>les</span> invitent .
+6. Le mot surligné est-il un article défini ou un pronom personnel complément ? — Ils invitent <span class='pco-gold-hl'>les</span> voisins .
+7. Le mot surligné est-il un article défini ou un pronom personnel complément ? — Tu <span class='pco-gold-hl'>le</span> lis .
+8. Le mot surligné est-il un article défini ou un pronom personnel complément ? — Tu lis <span class='pco-gold-hl'>le</span> journal .
+9. Le mot surligné est-il un article défini ou un pronom personnel complément ? — Nous <span class='pco-gold-hl'>la</span> connaissons .
+10. Le mot surligné est-il un article défini ou un pronom personnel complément ? — Nous connaissons <span class='pco-gold-hl'>la</span> vérité .
+
+### Niveau 2 (10 items)
+
+1. Clique uniquement sur le pronom personnel complément (pas sur les articles).
+2. Clique uniquement sur le pronom personnel complément (pas sur les articles).
+3. Clique uniquement sur le pronom personnel complément (pas sur les articles).
+4. Clique uniquement sur le pronom personnel complément (pas sur les articles).
+5. Clique uniquement sur le pronom personnel complément (pas sur les articles).
+6. Clique uniquement sur le pronom personnel complément (pas sur les articles).
+7. Clique uniquement sur le pronom personnel complément (pas sur les articles).
+8. Clique uniquement sur le pronom personnel complément (pas sur les articles).
+9. Clique uniquement sur le pronom personnel complément (pas sur les articles).
+10. Clique uniquement sur le pronom personnel complément (pas sur les articles).
+
+### Niveau 3 (10 items)
+
+1. Elle le lui donne .
+2. Je te le prête .
+3. Quelle est la fonction du pronom surligné ? — Il <span class='pco-gold-hl'>la</span> regarde .
+4. Quelle est la fonction du pronom surligné ? — Tu <span class='pco-gold-hl'>lui</span> souris .
+5. Quelle est la fonction du pronom surligné ? — Nous <span class='pco-gold-hl'>les</span> invitons .
+6. Quelle est la fonction du pronom surligné ? — Vous <span class='pco-gold-hl'>leur</span> répondez .
+7. Elle me le raconte .
+8. Ils nous les envoient .
+9. Quelle est la fonction du pronom surligné ? — Le maître <span class='pco-gold-hl'>le</span> félicite .
+10. Quelle est la fonction du pronom surligné ? — La directrice <span class='pco-gold-hl'>leur</span> parle .
+
+## Grammaire — Transformer une phrase
+
+_Domaine : Français · Exercice : `transformer-phrase` — Transformer une phrase à la forme négative · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Tom range sa chambre.
+2. Il mange une pomme.
+3. Léa boit du chocolat chaud.
+4. Nous achetons des fraises.
+5. Vous regardez la télévision.
+6. Le chat attrape une souris.
+7. Les enfants font du bruit.
+8. Tu portes des lunettes.
+9. Papa prépare un gâteau.
+10. Elle aime les épinards.
+
+### Niveau 2 (10 items)
+
+1. Il a mangé son repas.
+2. Elle a fini ses devoirs.
+3. Nous allons partir en vacances.
+4. Tu vas gagner ce match.
+5. Il a acheté des fleurs.
+6. Elle aime regarder des films.
+7. Je pense qu'il viendra demain.
+8. Ils ont trouvé quelque chose dans le grenier.
+9. Elle sait que tu as raison.
+10. Nous allons regarder un film ce soir.
+
+### Niveau 3 (10 items)
+
+1. Il arrive toujours en retard.
+2. Elle mange encore des bonbons.
+3. Tu dis toujours la vérité.
+4. Nous voyons quelqu'un dans le jardin.
+5. Il entend quelque chose derrière la porte.
+6. Elle joue encore avec sa poupée.
+7. Les élèves parlent toujours pendant le cours.
+8. Il voit quelqu'un au loin.
+9. Il achète encore des jouets.
+10. Elle voit quelque chose dans le ciel.
 
 ## Nombres entiers — Arrondi
 
@@ -2124,46 +3480,53 @@ _Domaine : Mathématiques · Exercice : `encadrer-nombre-entier` — Encadrer un
 9. display: 6 305 200 · lower: 6300000 · upper: 6400000 · rang: centaine de milliers
 10. display: 999 999 · lower: 900000 · upper: 1000000 · rang: centaine de milliers
 
-## Conjugaison — Identifier l'infinitif et le groupe
+## Grammaire — Phrase simple et complexe
 
-_Domaine : Français · Exercice : `retrouver-infinitif-verbe-conjugue` — Retrouver l'infinitif d'un verbe conjugué puis son groupe · **32 items au total**_
+_Domaine : Français · Exercice : `distinguer-phrase-simple-complexe` — Distinguer phrase simple et phrase complexe · **31 items au total**_
 
-**Total par niveau :** Niveau 1 (bank) = 32
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 9 · Niveau 3 = 12
 
-### Niveau 1 (bank) (32 items)
+### ⚠️ Niveau 1 (10 items)
 
-1. Nous mangeons.
-2. Ils jouaient.
-3. Il chantait.
-4. Elles parlaient.
-5. Tu aimais.
-6. Nous donnons.
-7. Ils finissaient.
-8. Elle rougira.
-9. Ils grandissaient.
-10. Nous choisissons.
-11. Vous obéissez.
-12. Ils prennent.
-13. Je voyais.
-14. Ils diront.
-15. Ils feront.
-16. Je vendais.
-17. Il venait.
-18. Ils couraient.
-19. Elle écrira.
-20. Nous entendions.
-21. Je lisais.
-22. Ils dormaient.
-23. Elle réfléchissait.
-24. Ils applaudissaient.
-25. Vous réussissez.
-26. Il punissait.
-27. Elle partait.
-28. Ils sortaient.
-29. Il tenait.
-30. Ils sentaient.
-31. Elle servait.
-32. Il mourra.
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. sentence1: Le chat dort. · sentence2: Il a passé toute la nuit dehors. · connector: parce que · blankAnswer: parce qu'il · template: Le chat dort ___ a passé toute la nuit dehors.
+2. sentence1: Léa est triste. · sentence2: Elle sourit quand même. · connector: mais · template: Léa est triste ___ elle sourit quand même.
+3. sentence1: Il pleut. · sentence2: Nous restons à la maison. · connector: donc · template: Il pleut ___ nous restons à la maison.
+4. sentence1: Tom saute de joie. · sentence2: Il vient de gagner le match. · connector: car · template: Tom saute de joie ___ il vient de gagner le match.
+5. sentence1: Les enfants applaudissent. · sentence2: Le clown entre en scène. · connector: quand · template: Les enfants applaudissent ___ le clown entre en scène.
+6. sentence1: Nous restons chez nous. · sentence2: Le temps s'est brusquement dégradé. · connector: parce que · template: Nous restons chez nous ___ le temps s'est brusquement dégradé.
+7. sentence1: J'ai un chat. · sentence2: Il miaule beaucoup. · connector: qui · template: J'ai un chat ___ miaule beaucoup.
+8. sentence1: Le facteur passe. · sentence2: Les enfants sont à l'école. · connector: quand · template: Le facteur passe ___ les enfants sont à l'école.
+9. sentence1: Tu pourras peut-être jouer dehors. · sentence2: Tu ranges ta chambre. · connector: si · template: Tu pourras peut-être jouer dehors ___ tu ranges ta chambre.
+10. sentence1: Le vent souffle fort. · sentence2: Les feuilles tombent des arbres. · connector: et · template: Le vent souffle fort ___ les feuilles tombent des arbres.
+
+### Niveau 2 (9 items)
+
+1. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+2. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (aller = infinitif !) — Clique sur le(s) verbe(s) conjugué(s). Attention à l'infinitif ! — Cette phrase est-elle simple ou complexe ?
+3. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+4. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (Même si la phrase semble courte !) — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+5. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+6. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (Même si la phrase est longue !) — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+7. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+8. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (Même si la phrase semble courte !) — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+9. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+
+### Niveau 3 (12 items)
+
+1. Les enfants rient et courent dans la cour.
+2. La maîtresse demande aux élèves de travailler en silence.
+3. Le soleil brille dans le ciel bleu.
+4. Les oiseaux chantent et les fleurs poussent au printemps.
+5. Mon chat adore jouer avec la pelote de laine.
+6. Les élèves écoutent quand le professeur parle.
+7. La fusée va décoller dans dix secondes.
+8. Paul et Marie regardent un film.
+9. Le chat, le chien et le lapin dorment ensemble dans le panier.
+10. Après une longue journée de classe bien remplie, les élèves rentrent chez eux.
+11. Il tombe, il se relève aussitôt.
+12. Viens si tu peux.
 
 ## Conjugaison — Passé composé avec être (accord du participe)
 
@@ -2214,6 +3577,100 @@ _Domaine : Français · Exercice : `ortho-accorder-participe-passe-etre` — Le 
 11. Ma grand-mère ________ à la maison ce week-end.
 12. Les acteurs ________ célèbres du jour au lendemain.
 
+## Grammaire — L'adjectif
+
+_Domaine : Français · Exercice : `identifier-adjectif` — Identifier un adjectif · **32 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 10 · Niveau 3 = 10
+
+### Niveau 1 (12 items)
+
+1. Clique sur l'adjectif parmi ces mots. — rouge · voiture · manger · les
+2. Clique sur l'adjectif parmi ces mots. — grand · arbre · sauter · un
+3. Clique sur l'adjectif parmi ces mots. — gentil · enfant · parler · des
+4. Clique sur l'adjectif parmi ces mots. — rond · ballon · rouler · ce
+5. Clique sur l'adjectif parmi ces mots. — bleue · robe · danser · cette
+6. Clique sur l'adjectif parmi ces mots. — petit · chat · dormir · mon
+7. Clique sur l'adjectif parmi ces mots. — courageux · pompier · éteindre · le
+8. Clique sur l'adjectif parmi ces mots. — carrée · table · poser · une
+9. Clique sur l'adjectif parmi ces mots. — verte · prairie · brouter · la
+10. Clique sur l'adjectif parmi ces mots. — joyeux · clown · amuser · ces
+11. Clique sur l'adjectif parmi ces mots. — pointu · crayon · tailler · ce
+12. Clique sur l'adjectif parmi ces mots. — timide · élève · répondre · cet
+
+### Niveau 2 (10 items)
+
+1. Clique sur tous les adjectifs de la phrase.
+2. Clique sur tous les adjectifs de la phrase.
+3. Clique sur tous les adjectifs de la phrase.
+4. Clique sur tous les adjectifs de la phrase.
+5. Clique sur tous les adjectifs de la phrase.
+6. Clique sur tous les adjectifs de la phrase.
+7. Clique sur tous les adjectifs de la phrase.
+8. Clique sur tous les adjectifs de la phrase.
+9. Clique sur tous les adjectifs de la phrase.
+10. Clique sur tous les adjectifs de la phrase.
+
+### Niveau 3 (10 items)
+
+1. Clique sur tous les adjectifs de la phrase.
+2. Clique sur tous les adjectifs de la phrase.
+3. Clique sur tous les adjectifs de la phrase.
+4. Clique sur tous les adjectifs de la phrase.
+5. Clique sur tous les adjectifs de la phrase.
+6. Clique sur tous les adjectifs de la phrase.
+7. Clique sur tous les adjectifs de la phrase.
+8. Clique sur tous les adjectifs de la phrase.
+9. Clique sur tous les adjectifs de la phrase.
+10. Clique sur tous les adjectifs de la phrase.
+
+## Grammaire — Le verbe
+
+_Domaine : Français · Exercice : `identifier-verbe-conjugue` — Identifier un verbe conjugué · **32 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 10 · Niveau 3 = 10
+
+### Niveau 1 (12 items)
+
+1. Clique sur le verbe conjugué de la phrase.
+2. Clique sur le verbe conjugué de la phrase.
+3. Clique sur le verbe conjugué de la phrase.
+4. Clique sur le verbe conjugué de la phrase.
+5. Clique sur le verbe conjugué de la phrase.
+6. Clique sur le verbe conjugué de la phrase.
+7. Clique sur le verbe conjugué de la phrase.
+8. Clique sur le verbe conjugué de la phrase.
+9. Clique sur le verbe conjugué de la phrase.
+10. Clique sur le verbe conjugué de la phrase.
+11. Clique sur le verbe conjugué de la phrase.
+12. Clique sur le verbe conjugué de la phrase.
+
+### Niveau 2 (10 items)
+
+1. Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).
+2. Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).
+3. Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).
+4. Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).
+5. Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).
+6. Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).
+7. Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).
+8. Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).
+9. Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).
+10. Clique sur le verbe conjugué de la phrase (un ou deux mots si le verbe est composé).
+
+### Niveau 3 (10 items)
+
+1. Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).
+2. Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).
+3. Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).
+4. Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).
+5. Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).
+6. Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).
+7. Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).
+8. Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).
+9. Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).
+10. Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).
+
 ## Orthographe — Accord participe passé (COD)
 
 _Domaine : Français · Exercice : `ortho-accorder-participe-passe-cod` — Accorder le participe passé avec le COD · **32 items au total**_
@@ -2263,6 +3720,102 @@ _Domaine : Français · Exercice : `ortho-accorder-participe-passe-cod` — Acco
 11. Elle a ___ très tard cette nuit-là.
 12. Ils ont ___ pendant toute la récréation.
 
+## Grammaire — La phrase complexe
+
+_Domaine : Français · Exercice : `identifier-subordination` — Distinguer la juxtaposition de la subordination · **33 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 9 · Niveau 3 = 12
+
+### Niveau 1 (12 items)
+
+1. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+2. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+3. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+4. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+5. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+6. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+7. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+8. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+9. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+10. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+11. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+12. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+
+### Niveau 2 (9 items)
+
+1. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+2. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+3. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+4. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+5. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+6. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+7. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+8. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+9. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+
+### Niveau 3 (12 items)
+
+1. Les enfants jouent dehors quand il fait beau .
+2. Nous irons à la plage si le temps le permet .
+3. Léa est arrivée en retard comme le bus avait du retard .
+4. Le chien qui aboie appartient à mon voisin .
+5. Le livre que je lis est passionnant .
+6. La maison où j'habite est petite .
+7. Voici le stylo dont j'ai besoin .
+8. Le soleil se couche, les étoiles apparaissent .
+9. Il fait chaud ; les enfants jouent dehors .
+10. Le film commence, tout le monde se tait .
+11. Léa court plus vite que Paul, elle gagne toujours la course .
+12. Le chat, le chien et le hamster dorment, ils sont fatigués .
+
+## Grammaire — La phrase complexe
+
+_Domaine : Français · Exercice : `distinguer-coordination-subordination` — Distinguer la coordination de la subordination · **33 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 9 · Niveau 3 = 12
+
+### Niveau 1 (12 items)
+
+1. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+2. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+3. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+4. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+5. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+6. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+7. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+8. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+9. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+10. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+11. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+12. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+
+### Niveau 2 (9 items)
+
+1. Clique sur le mot (ou les mots) qui relient les deux propositions.
+2. Clique sur le mot (ou les mots) qui relient les deux propositions.
+3. Clique sur le mot (ou les mots) qui relient les deux propositions.
+4. Clique sur le mot (ou les mots) qui relient les deux propositions.
+5. Clique sur le mot (ou les mots) qui relient les deux propositions.
+6. Clique sur le mot (ou les mots) qui relient les deux propositions.
+7. Clique sur le mot (ou les mots) qui relient les deux propositions.
+8. Clique sur le mot (ou les mots) qui relient les deux propositions.
+9. Clique sur le mot (ou les mots) qui relient les deux propositions.
+
+### Niveau 3 (12 items)
+
+1. Les élèves applaudissent quand le spectacle commence .
+2. Nous resterons chez nous si la tempête continue .
+3. Léo travaille bien qu'il soit fatigué .
+4. Elle prépare le dîner pendant que son frère met la table .
+5. Ils partiront dès que le bus arrivera .
+6. Paul et Marie jouent au ballon quand la cloche sonne .
+7. Le ciel est bleu et les oiseaux chantent .
+8. Elle est fatiguée car elle a beaucoup travaillé .
+9. Tu peux rester ou tu peux partir .
+10. Il pleuvait donc nous sommes restés à la maison .
+11. Le magasin est fermé or nous avions besoin de pain .
+12. Léa choisit un livre ou un magazine, mais elle repart les mains vides .
+
 ## Conjugaison — Choisir l'auxiliaire être ou avoir au passé composé
 
 _Domaine : Français · Exercice : `etre-ou-avoir` — Être ou avoir ? · **34 items au total**_
@@ -2311,6 +3864,104 @@ _Domaine : Français · Exercice : `etre-ou-avoir` — Être ou avoir ? · **34 
 8. Tu ___ rentré à la maison.
 9. Elle ___ retourné la crêpe.
 10. Elle ___ retournée chez sa mère.
+
+## Grammaire — La phrase complexe
+
+_Domaine : Français · Exercice : `identifier-juxtaposition` — Distinguer la juxtaposition de la coordination · **34 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 10 · Niveau 3 = 12
+
+### Niveau 1 (12 items)
+
+1. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+2. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+3. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+4. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+5. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+6. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+7. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+8. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+9. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+10. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+11. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+12. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+
+### Niveau 2 (10 items)
+
+1. Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).
+2. Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).
+3. Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).
+4. Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).
+5. Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).
+6. Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).
+7. Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).
+8. Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).
+9. Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).
+10. Clique sur ce qui relie les deux propositions (ponctuation ou connecteur).
+
+### Niveau 3 (12 items)
+
+1. Le ciel s'assombrit, l'orage approche .
+2. Léa révise ; son frère regarde la télévision .
+3. Nous avons faim, le repas n'est pas prêt .
+4. Il neige, les routes sont glissantes .
+5. Tom range sa chambre mais il oublie son bureau .
+6. Elle a raté le bus donc elle arrive en retard .
+7. Le film commence or les spectateurs ne sont pas installés .
+8. Ils sont fatigués car ils ont beaucoup marché .
+9. Elle ferme la porte puis elle allume la lumière .
+10. Paul, Marie et Lucas jouent, ils sont heureux .
+11. Le chat, le chien et le lapin dorment, mais le hamster reste éveillé .
+12. Mes parents, mes cousins et moi partons en vacances ; nous sommes impatients .
+
+## Grammaire — Le nom
+
+_Domaine : Français · Exercice : `identifier-nom-phrase` — Identifier un nom · **34 items au total**_
+
+**Total par niveau :** Niveau 1 = 14 · Niveau 2 = 10 · Niveau 3 = 10
+
+### Niveau 1 (14 items)
+
+1. Clique sur le nom parmi ces mots. — table · manger · bleu · doucement
+2. Clique sur le nom parmi ces mots. — chien · courir · rapide · joyeusement
+3. Clique sur le nom parmi ces mots. — bonheur · chanter · triste · vite
+4. Clique sur le nom parmi ces mots. — professeur · enseigner · gentil · lentement
+5. Clique sur le nom parmi ces mots. — liberté · libérer · libre · librement
+6. Clique sur le nom parmi ces mots. — montagne · grimper · haute · difficilement
+7. Clique sur le nom parmi ces mots. — oiseau · voler · léger · silencieusement
+8. Clique sur le nom parmi ces mots. — courage · oser · courageux · courageusement
+9. Clique sur le nom parmi ces mots. — voiture · rouler · rapide · vite
+10. Clique sur le nom parmi ces mots. — enfant · jouer · petit · joyeusement
+11. Clique sur le nom parmi ces mots. — amitié · aimer · amical · amicalement
+12. Clique sur le nom parmi ces mots. — fleur · pousser · jolie · doucement
+13. Clique sur le nom parmi ces mots. — poisson · nager · argenté · silencieusement
+14. Clique sur le nom parmi ces mots. — tristesse · pleurer · triste · tristement
+
+### Niveau 2 (10 items)
+
+1. Clique sur tous les noms de la phrase.
+2. Clique sur tous les noms de la phrase.
+3. Clique sur tous les noms de la phrase.
+4. Clique sur tous les noms de la phrase.
+5. Clique sur tous les noms de la phrase.
+6. Clique sur tous les noms de la phrase.
+7. Clique sur tous les noms de la phrase.
+8. Clique sur tous les noms de la phrase.
+9. Clique sur tous les noms de la phrase.
+10. Clique sur tous les noms de la phrase.
+
+### Niveau 3 (10 items)
+
+1. Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre. — Clique sur le mot qui désigne les habitants de la France (le nom, pas l'adjectif). — Ce mot est-il un nom commun ou un nom propre ?
+2. Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre. — Clique sur le mot qui désigne les habitants de Paris (le nom, pas l'adjectif). — Ce mot est-il un nom commun ou un nom propre ?
+3. Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre. — Clique sur le mot qui désigne les habitants de l'Italie (le nom, pas l'adjectif). — Ce mot est-il un nom commun ou un nom propre ?
+4. Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre. — Clique sur le mot qui désigne les habitants de l'Espagne (le nom, pas l'adjectif). — Ce mot est-il un nom commun ou un nom propre ?
+5. Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre. — Clique sur le mot qui désigne la personne qui vend des livres. — Ce mot est-il un nom commun ou un nom propre ?
+6. Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre. — Clique sur le nom de la ville visitée. — Ce mot est-il un nom commun ou un nom propre ?
+7. Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre. — Clique sur le prénom de l'élève qui raconte l'histoire. — Ce mot est-il un nom commun ou un nom propre ?
+8. Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre. — Clique sur le mot qui désigne cette qualité, malgré la fatigue. — Ce mot est-il un nom commun ou un nom propre ?
+9. Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre. — Clique sur le nom du fleuve traversé par le bateau. — Ce mot est-il un nom commun ou un nom propre ?
+10. Clique sur le nom demandé, puis indique s'il s'agit d'un nom commun ou d'un nom propre. — Clique sur le mot qui désigne l'animal qui cherche de la nourriture. — Ce mot est-il un nom commun ou un nom propre ?
 
 ## Orthographe — Transformer un groupe nominal du masculin au féminin
 
@@ -2463,61 +4114,6 @@ _Domaine : Mathématiques · Exercice : `utiliser-fractions-problemes` — Utili
 11. Un trajet mesure 48 km. Une voiture a déjà parcouru 3/8 du trajet. Combien de kilomètres reste-t-il à parcourir ?
 12. Un spectacle compte 480 places. 5/8 des places ont été vendues. Combien de places restent disponibles ?
 
-## Grammaire — Déterminants démonstratifs
-
-_Domaine : Français · Exercice : `identifier-determinant-demonstratif` — Identifier un déterminant démonstratif · **38 items au total**_
-
-**Total par niveau :** Niveau 1 = 8 · Niveau 2 = 10 · Niveau 3 = 20
-
-### ⚠️ Niveau 1 (8 items)
-
-> ⚠️ **Banque faible** : 8 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Ce matin, le soleil brille dans le ciel.
-2. J'ai lu cet article très intéressant.
-3. Regarde cette belle fleur dans le jardin !
-4. Ces enfants jouent dans la cour de l'école.
-5. Mon voisin promène son chien dans ce parc.
-6. Cet homme est très gentil avec les voisins.
-7. Elle range ses affaires dans cette armoire.
-8. Les élèves rangent leurs livres sur ces étagères.
-
-### Niveau 2 (10 items)
-
-1. ___ avion décolle dans cinq minutes.
-2. ___ homme est arrivé ce matin.
-3. ___ amie est très sympathique.
-4. ___ oiseaux font leurs nids dans les arbres.
-5. ___ livre est vraiment passionnant.
-6. ___ fleur sent très bon.
-7. Regarde ___ beau château !
-8. ___ chaussures sont toutes neuves.
-9. ___ école est vraiment très grande.
-10. ___ jouets sont éparpillés dans le salon.
-
-### Niveau 3 (20 items)
-
-1. ___ chien aboie très fort.
-2. J'aime beaucoup ___ film.
-3. ___ problème est difficile à résoudre.
-4. Regarde ___ beau papillon !
-5. ___ livre est vraiment passionnant.
-6. Elle habite dans ___ quartier depuis longtemps.
-7. Il travaille dans ___ bureau depuis l'an dernier.
-8. Prends ___ chemin, c'est plus court.
-9. Nous allons voir ___ spectacle demain.
-10. ___ matin, Paul se lève tôt.
-11. Le chat ___ lave les pattes.
-12. Il ___ lève tôt chaque matin.
-13. Elle ___ promène dans le parc.
-14. Paul ___ dépêche d'aller à l'école.
-15. Les enfants ___ couchent à vingt et une heures.
-16. Tom ___ regarde dans le miroir.
-17. Ma sœur ___ peigne les cheveux chaque matin.
-18. Il ___ tait quand le professeur parle.
-19. Ils ___ parlent souvent après la classe.
-20. Ce matin, Paul ___ lève tôt.
-
 ## Nombres entiers — Valeur positionnelle
 
 _Domaine : Mathématiques · Exercice : `identifier-valeur-chiffre-position` — Identifier la valeur d'un chiffre selon sa position · **38 items au total**_
@@ -2583,59 +4179,62 @@ _Domaine : Mathématiques · Exercice : `identifier-valeur-chiffre-position` —
 5. 90305
 6. 403026
 
-## Grammaire — L'adverbe
+## Orthographe — Homophones grammaticaux
 
-_Domaine : Français · Exercice : `identifier-adverbe-frequent` — Identifier les adverbes · **39 items au total**_
+_Domaine : Français · Exercice : `ortho-distinguer-quel-quelle-quels-quelles` — Distinguer quel(s), quelle(s), qu'elle(s) · **42 items au total**_
 
-**Total par niveau :** Niveau 1 = 13 · Niveau 2 = 13 · Niveau 3 = 13
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 12 · Niveau 3 = 18
 
-### Niveau 1 (13 items)
+### Niveau 1 (12 items)
 
-1. Clique sur l'adverbe de cette phrase.
-2. Clique sur l'adverbe de cette phrase.
-3. Clique sur l'adverbe de cette phrase.
-4. Clique sur l'adverbe de cette phrase.
-5. Clique sur l'adverbe de cette phrase.
-6. Clique sur l'adverbe de cette phrase.
-7. Clique sur l'adverbe de cette phrase.
-8. Clique sur l'adverbe de cette phrase.
-9. Clique sur l'adverbe de cette phrase.
-10. Clique sur l'adverbe de cette phrase.
-11. Clique sur l'adverbe de cette phrase.
-12. Clique sur l'adverbe de cette phrase.
-13. Clique sur l'adverbe de cette phrase.
+1. Quelle forme complète la phrase : « quel », « quelle », « quels » ou « quelles » ? — ___ livre as-tu choisi ?
+2. Quelle forme complète la phrase : « quel », « quelle », « quels » ou « quelles » ? — ___ heure est-il ?
+3. Quelle forme complète la phrase : « quel », « quelle », « quels » ou « quelles » ? — ___ beaux paysages !
+4. Quelle forme complète la phrase : « quel », « quelle », « quels » ou « quelles » ? — ___ belles fleurs !
+5. Quelle forme complète la phrase : « quel », « quelle », « quels » ou « quelles » ? — Je ne sais pas ___ chemin prendre.
+6. Quelle forme complète la phrase : « quel », « quelle », « quels » ou « quelles » ? — ___ chance tu as !
+7. Quelle forme complète la phrase : « quel », « quelle », « quels » ou « quelles » ? — ___ sont tes sports préférés ?
+8. Quelle forme complète la phrase : « quel », « quelle », « quels » ou « quelles » ? — ___ sont tes matières préférées ?
+9. Quelle forme complète la phrase : « quel », « quelle », « quels » ou « quelles » ? — ___ temps fait-il dehors ?
+10. Quelle forme complète la phrase : « quel », « quelle », « quels » ou « quelles » ? — ___ surprise !
+11. Quelle forme complète la phrase : « quel », « quelle », « quels » ou « quelles » ? — Dis-moi ___ films tu aimes.
+12. Quelle forme complète la phrase : « quel », « quelle », « quels » ou « quelles » ? — Dis-moi ___ chansons tu écoutes.
 
-### Niveau 2 (13 items)
+### Niveau 2 (12 items)
 
-1. Clique sur tous les adverbes de cette phrase.
-2. Clique sur tous les adverbes de cette phrase.
-3. Clique sur tous les adverbes de cette phrase.
-4. Clique sur tous les adverbes de cette phrase.
-5. Clique sur tous les adverbes de cette phrase.
-6. Clique sur tous les adverbes de cette phrase.
-7. Clique sur tous les adverbes de cette phrase.
-8. Clique sur tous les adverbes de cette phrase.
-9. Clique sur tous les adverbes de cette phrase.
-10. Clique sur tous les adverbes de cette phrase.
-11. Clique sur tous les adverbes de cette phrase.
-12. Clique sur tous les adverbes de cette phrase.
-13. Clique sur tous les adverbes de cette phrase.
+1. Quel mot complète la phrase : « quelle » ou « qu'elle » ? — Je sais ___ a raison.
+2. Quel mot complète la phrase : « quelle » ou « qu'elle » ? — ___ belle journée !
+3. Quel mot complète la phrase : « quelle » ou « qu'elle » ? — Il pense ___ viendra demain.
+4. Quel mot complète la phrase : « quelle » ou « qu'elle » ? — Je ne sais pas ___ heure il est.
+5. Quel mot complète la phrase : « quelle » ou « qu'elle » ? — Il espère ___ réussira.
+6. Quel mot complète la phrase : « quelle » ou « qu'elle » ? — ___ surprise de la voir ici !
+7. Quel mot complète la phrase : « quelle » ou « qu'elle » ? — Il dit ___ est malade.
+8. Quel mot complète la phrase : « quelle » ou « qu'elle » ? — ___ est cette odeur ?
+9. Quel mot complète la phrase : « quelles » ou « qu'elles » ? — Je crois ___ sont parties.
+10. Quel mot complète la phrase : « quelles » ou « qu'elles » ? — ___ sont tes couleurs préférées ?
+11. Quel mot complète la phrase : « quelles » ou « qu'elles » ? — Il pense ___ ont raison.
+12. Quel mot complète la phrase : « quelles » ou « qu'elles » ? — ___ belles photos elles ont prises !
 
-### Niveau 3 (13 items)
+### Niveau 3 (18 items)
 
-1. Elle court rapidement .
-2. C' est vraiment beau .
-3. Il parle trop vite .
-4. Heureusement , il est arrivé à temps .
-5. Elle est peu courageuse .
-6. Il marche lentement .
-7. Cette robe est très élégante .
-8. Il conduit assez prudemment .
-9. Malheureusement , le train est parti .
-10. Nous arriverons bientôt .
-11. Ce gâteau est extrêmement bon .
-12. Elle parle si doucement .
-13. Finalement , ils ont gagné le match .
+1. Quel mot complète la phrase ? — ___ film regardes-tu ?
+2. Quel mot complète la phrase ? — Je crois ___ a compris la leçon.
+3. Quel mot complète la phrase ? — ___ jolies fleurs tu as cueillies !
+4. Quel mot complète la phrase ? — Il pense ___ sont en retard.
+5. Quel mot complète la phrase ? — ___ sport pratiques-tu ?
+6. Quel mot complète la phrase ? — ___ chance incroyable !
+7. Quel mot complète la phrase ? — Dis-moi ___ livres tu préfères.
+8. Quel mot complète la phrase ? — Il espère ___ sera là.
+9. Quel mot complète la phrase ? — ___ sont les règles du jeu ?
+10. Quel mot complète la phrase ? — Je sais ___ ont tout préparé.
+11. Quel mot complète la phrase ? — ___ beau tableau !
+12. Quel mot complète la phrase ? — ___ est ton adresse ?
+13. Je sais ___ film elle préfère et ___ elle viendra.
+14. ___ chance ___ a eue !
+15. Dis-moi ___ matières tu aimes et ___ tu réussis le mieux.
+16. ___ sont les équipes et ___ ont gagné ?
+17. Je ne sais pas ___ chemin prendre ni ___ est sûre.
+18. ___ belles photos ! Je crois ___ les a prises elle-même.
 
 ## Conjugaison — Passé composé avec avoir
 
@@ -2694,6 +4293,579 @@ _Domaine : Français · Exercice : `conjuguer-passe-compose-avoir` — Le passé
 12. Ils ___ (mettre) la table et ___ (servir) le repas.
 13. Nous ___ (comprendre) la question mais nous ___ (répondre) trop vite.
 14. J'___ (conduire) jusqu'au village et j'___ (découvrir) un marché.
+
+## Orthographe — Homophones grammaticaux
+
+_Domaine : Français · Exercice : `ortho-distinguer-ces-ses-cest-sest` — ces / ses / c'est / s'est / sait / sais · **44 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 12 · Niveau 3 = 20
+
+### Niveau 1 (12 items)
+
+1. Quel mot complète la phrase : « ces » ou « ses » ? — Il brosse ___ dents avant de se coucher.
+2. Quel mot complète la phrase : « ces » ou « ses » ? — Regarde ___ beaux papillons là-bas !
+3. Quel mot complète la phrase : « ces » ou « ses » ? — Elle peigne ___ cheveux devant le miroir.
+4. Quel mot complète la phrase : « ces » ou « ses » ? — ___ étoiles brillent très fort ce soir.
+5. Quel mot complète la phrase : « ces » ou « ses » ? — Le chat lèche ___ pattes après avoir mangé.
+6. Quel mot complète la phrase : « ces » ou « ses » ? — ___ vagues sont très dangereuses aujourd'hui.
+7. Quel mot complète la phrase : « ces » ou « ses » ? — Il emporte toujours ___ médicaments en voyage.
+8. Quel mot complète la phrase : « ces » ou « ses » ? — ___ fleurs sauvages poussent le long du chemin.
+9. Quel mot complète la phrase : « ces » ou « ses » ? — Elle écrit ___ secrets dans un journal intime.
+10. Quel mot complète la phrase : « ces » ou « ses » ? — On peut voir ___ sommets enneigés depuis ici.
+11. Quel mot complète la phrase : « ces » ou « ses » ? — Il téléphone souvent à ___ grands-parents.
+12. Quel mot complète la phrase : « ces » ou « ses » ? — ___ petits oiseaux reviennent chaque printemps.
+
+### Niveau 2 (12 items)
+
+1. Quel mot complète la phrase : « c'est » ou « s'est » ? — ___ une belle journée.
+2. Quel mot complète la phrase : « c'est » ou « s'est » ? — Il ___ trompé de chemin.
+3. Quel mot complète la phrase : « c'est » ou « s'est » ? — ___ lui qui a gagné.
+4. Quel mot complète la phrase : « c'est » ou « s'est » ? — Elle ___ blessée en tombant.
+5. Quel mot complète la phrase : « c'est » ou « s'est » ? — ___ vrai ce que tu dis.
+6. Quel mot complète la phrase : « c'est » ou « s'est » ? — Le chat ___ caché sous le lit.
+7. Quel mot complète la phrase : « c'est » ou « s'est » ? — ___ difficile à comprendre.
+8. Quel mot complète la phrase : « c'est » ou « s'est » ? — Il ___ endormi pendant le film.
+9. Quel mot complète la phrase : « c'est » ou « s'est » ? — ___ ici que tout a commencé.
+10. Quel mot complète la phrase : « c'est » ou « s'est » ? — Elle ___ souvenue de son rêve.
+11. Quel mot complète la phrase : « c'est » ou « s'est » ? — ___ pour ça qu'il est parti.
+12. Quel mot complète la phrase : « c'est » ou « s'est » ? — Le soleil ___ levé très tôt.
+
+### Niveau 3 (20 items)
+
+1. Quel mot complète la phrase ? — Je ___ que tu as raison.
+2. Quel mot complète la phrase ? — ___ incroyable ce qu'il a fait !
+3. Quel mot complète la phrase ? — Il ___ très bien jouer de la guitare.
+4. Quel mot complète la phrase ? — Elle ___ levée tôt pour prendre le train.
+5. Quel mot complète la phrase ? — ___ montagnes sont couvertes de neige en hiver.
+6. Quel mot complète la phrase ? — Tu ___ ce que tu fais ?
+7. Quel mot complète la phrase ? — ___ grâce à elle que tout s'est arrangé.
+8. Quel mot complète la phrase ? — Il ___ perdu dans la forêt.
+9. Quel mot complète la phrase ? — ___ vagues fascinent les surfeurs.
+10. Quel mot complète la phrase ? — Le chien agite ___ pattes de joie.
+11. Quel mot complète la phrase ? — On ne ___ jamais de quoi demain sera fait.
+12. Quel mot complète la phrase ? — Il ___ souvenu de cet épisode.
+13. Quel mot complète la phrase ? — Il sait ce qui ___ passé.
+14. Il serre ___ enfants dans ___ bras.
+15. Je ___ que ___ lui qui ment.
+16. Le garçon a perdu ___ sandales dans ___ vagues.
+17. Il ___ blessé et je ___ que c'est grave.
+18. ___ dommage qu'il ne ___ pas ce sport.
+19. Tu ___ où il ___ réfugié ?
+20. Je ne ___ pas si ___ vrai.
+
+## Orthographe — Homophones grammaticaux
+
+_Domaine : Français · Exercice : `ortho-distinguer-tout-tous-toute-toutes` — tout, tous, toute, toutes · **46 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 12 · Niveau 3 = 22
+
+### Niveau 1 (12 items)
+
+1. Quelle forme complète la phrase : « toute » ou « toutes » ? — ___ la classe a applaudi.
+2. Quelle forme complète la phrase : « toute » ou « toutes » ? — ___ les filles ont participé.
+3. Quelle forme complète la phrase : « toute » ou « toutes » ? — Elle a mangé ___ la tarte.
+4. Quelle forme complète la phrase : « toute » ou « toutes » ? — ___ les portes sont fermées.
+5. Quelle forme complète la phrase : « toute » ou « toutes » ? — Il a neigé ___ la nuit.
+6. Quelle forme complète la phrase : « toute » ou « toutes » ? — ___ les équipes sont prêtes.
+7. Quelle forme complète la phrase : « toute » ou « toutes » ? — Elle court ___ la journée.
+8. Quelle forme complète la phrase : « toute » ou « toutes » ? — ___ les maisons sont illuminées.
+9. Quelle forme complète la phrase : « toute » ou « toutes » ? — ___ la ville est en fête.
+10. Quelle forme complète la phrase : « toute » ou « toutes » ? — ___ les routes sont barrées.
+11. Quelle forme complète la phrase : « toute » ou « toutes » ? — Il a attendu ___ la matinée.
+12. Quelle forme complète la phrase : « toute » ou « toutes » ? — ___ les fenêtres sont ouvertes.
+
+### Niveau 2 (12 items)
+
+1. Quelle forme complète la phrase : « tout » ou « tous » ? — ___ les garçons sont présents.
+2. Quelle forme complète la phrase : « tout » ou « tous » ? — Il a lu ___ le livre en une nuit.
+3. Quelle forme complète la phrase : « tout » ou « tous » ? — ___ les jours il se lève tôt.
+4. Quelle forme complète la phrase : « tout » ou « tous » ? — Il a mangé ___ le gâteau.
+5. Quelle forme complète la phrase : « tout » ou « tous » ? — ___ les élèves ont réussi.
+6. Quelle forme complète la phrase : « tout » ou « tous » ? — C'est ___ ce que je sais.
+7. Quelle forme complète la phrase : « tout » ou « tous » ? — ___ le monde était là.
+8. Quelle forme complète la phrase : « tout » ou « tous » ? — Ils sont ___ partis à midi.
+9. Quelle forme complète la phrase : « tout » ou « tous » ? — ___ le temps il pleut ici.
+10. Quelle forme complète la phrase : « tout » ou « tous » ? — Il a ___ compris.
+11. Quelle forme complète la phrase : « tout » ou « tous » ? — ___ les arbres ont perdu leurs feuilles.
+12. Quelle forme complète la phrase : « tout » ou « tous » ? — C'est ___ pour aujourd'hui.
+
+### Niveau 3 (22 items)
+
+1. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — ___ la nuit il a pleuré.
+2. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — ___ les enfants adorent les histoires.
+3. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — Elle est ___ contente de son résultat.
+4. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — ___ le village était réveillé.
+5. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — ___ les fleurs ont fané.
+6. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — Il est ___ petit encore.
+7. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — ___ les nuits sont calmes ici.
+8. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — Il a couru ___ le trajet.
+9. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — Elles sont ___ arrivées en retard.
+10. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — ___ la semaine il fait beau.
+11. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — Ils sont ___ fatigués.
+12. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — ___ le monde était là.
+13. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — ___ les équipes étaient là.
+14. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — Elle était ___ rouge de honte.
+15. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — ___ les matins il prend son café.
+16. Quelle forme complète la phrase : « tout », « tous », « toute » ou « toutes » ? — C'est ___ ce qu'il restait.
+17. ___ la famille et ___ les amis étaient présents.
+18. ___ les nuits et ___ le jour il travaille.
+19. Ils ont ___ mangé et ___ les assiettes sont vides.
+20. ___ le groupe est là mais ___ les places ne sont pas prises.
+21. Elle a ___ compris et ___ ses réponses sont correctes.
+22. ___ les élèves et ___ la classe ont applaudi.
+
+## Orthographe — Homophones grammaticaux
+
+_Domaine : Français · Exercice : `ortho-distinguer-leur-leurs` — Distinguer leur / leurs · **48 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 20 · Niveau 3 = 16
+
+### Niveau 1 (12 items)
+
+1. Quel mot complète la phrase : « leur » ou « leurs » ? — Les enfants rangent ___ affaires.
+2. Quel mot complète la phrase : « leur » ou « leurs » ? — Les élèves ont rendu ___ copie.
+3. Quel mot complète la phrase : « leur » ou « leurs » ? — Les chats lèchent ___ pelage.
+4. Quel mot complète la phrase : « leur » ou « leurs » ? — Les joueurs enfilent ___ maillots.
+5. Quel mot complète la phrase : « leur » ou « leurs » ? — Les parents attendent ___ enfants.
+6. Quel mot complète la phrase : « leur » ou « leurs » ? — Les oiseaux regagnent ___ nid.
+7. Quel mot complète la phrase : « leur » ou « leurs » ? — Les élèves ouvrent ___ cahiers.
+8. Quel mot complète la phrase : « leur » ou « leurs » ? — Les pompiers font ___ travail.
+9. Quel mot complète la phrase : « leur » ou « leurs » ? — Les enfants lavent ___ mains.
+10. Quel mot complète la phrase : « leur » ou « leurs » ? — Les coureurs reprennent ___ souffle.
+11. Quel mot complète la phrase : « leur » ou « leurs » ? — Les touristes prennent ___ photos.
+12. Quel mot complète la phrase : « leur » ou « leurs » ? — Les acteurs apprennent ___ rôle.
+
+### Niveau 2 (20 items)
+
+1. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+2. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+3. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+4. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+5. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+6. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+7. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+8. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+9. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « leur » ou « leurs » dans la phrase. — Ce mot est-il « leur » (singulier ou pronom) ou « leurs » (pluriel) ?
+10. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « leur » ou « leurs » dans la phrase. — Ce mot est-il « leur » (singulier ou pronom) ou « leurs » (pluriel) ?
+11. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « leur » ou « leurs » dans la phrase. — Ce mot est-il « leur » (singulier ou pronom) ou « leurs » (pluriel) ?
+12. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « leur » ou « leurs » dans la phrase. — Ce mot est-il « leur » (singulier ou pronom) ou « leurs » (pluriel) ?
+13. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « leur » ou « leurs » dans la phrase. — Ce mot est-il « leur » (singulier ou pronom) ou « leurs » (pluriel) ?
+14. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « leur » ou « leurs » dans la phrase. — Ce mot est-il « leur » (singulier ou pronom) ou « leurs » (pluriel) ?
+15. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « leur » ou « leurs » dans la phrase. — Ce mot est-il « leur » (singulier ou pronom) ou « leurs » (pluriel) ?
+16. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « leur » ou « leurs » dans la phrase. — Ce mot est-il « leur » (singulier ou pronom) ou « leurs » (pluriel) ?
+17. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « leur » ou « leurs » dans la phrase. — Ce mot est-il « leur » (singulier ou pronom) ou « leurs » (pluriel) ?
+18. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « leur » ou « leurs » dans la phrase. — Ce mot est-il « leur » (singulier ou pronom) ou « leurs » (pluriel) ?
+19. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « leur » ou « leurs » dans la phrase. — Ce mot est-il « leur » (singulier ou pronom) ou « leurs » (pluriel) ?
+20. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « leur » ou « leurs » dans la phrase. — Ce mot est-il « leur » (singulier ou pronom) ou « leurs » (pluriel) ?
+
+### Niveau 3 (16 items)
+
+1. Les médecins ont donné ___ avis sur la question.
+2. Les chercheurs ont publié ___ résultats.
+3. Le professeur ___ a expliqué la leçon.
+4. Les athlètes ont battu ___ record.
+5. Les élèves ont rendu ___ travaux.
+6. On ___ a annoncé la nouvelle ce matin.
+7. Les parents lisent une histoire à ___ enfants avant ___ coucher.
+8. Les enseignants corrigent ___ copies et rendent ___ avis.
+9. Les joueurs reprennent ___ entraînements et ___ coach les encourage.
+10. Je ___ ai expliqué ___ erreurs.
+11. Les scientifiques partagent ___ découvertes avec ___ équipe.
+12. On ___ a remis ___ diplômes lors de la cérémonie.
+13. type: production-libre · consigne: Écris une phrase sur des <strong>enfants</strong> qui contient à la fois <strong>leur</strong> et <strong>leurs</strong>. · words: leur, leurs
+14. type: production-libre · consigne: Écris une phrase sur des <strong>sportifs</strong> qui contient à la fois <strong>leur</strong> et <strong>leurs</strong>. · words: leur, leurs
+15. type: production-libre · consigne: Écris une phrase sur des <strong>élèves</strong> qui contient à la fois <strong>leur</strong> et <strong>leurs</strong>. · words: leur, leurs
+16. type: production-libre · consigne: Écris une phrase sur des <strong>animaux</strong> qui contient à la fois <strong>leur</strong> et <strong>leurs</strong>. · words: leur, leurs
+
+## Orthographe — Homophones grammaticaux
+
+_Domaine : Français · Exercice : `ortho-distinguer-a-a` — Distinguer a / à · **50 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 22 · Niveau 3 = 16
+
+### Niveau 1 (12 items)
+
+1. Quel mot complète la phrase : « a » ou « à » ? — Il ___ mangé toute la tarte.
+2. Quel mot complète la phrase : « a » ou « à » ? — Elle pense ___ ses amis.
+3. Quel mot complète la phrase : « a » ou « à » ? — Le chat ___ renversé son bol.
+4. Quel mot complète la phrase : « a » ou « à » ? — Nous allons ___ la piscine.
+5. Quel mot complète la phrase : « a » ou « à » ? — Papa ___ appelé le médecin.
+6. Quel mot complète la phrase : « a » ou « à » ? — Il tient ___ son jouet.
+7. Quel mot complète la phrase : « a » ou « à » ? — Elle ___ oublié son cartable.
+8. Quel mot complète la phrase : « a » ou « à » ? — Le train part ___ midi.
+9. Quel mot complète la phrase : « a » ou « à » ? — Mon frère ___ couru très vite.
+10. Quel mot complète la phrase : « a » ou « à » ? — Ce livre appartient ___ Léa.
+11. Quel mot complète la phrase : « a » ou « à » ? — Il ___ neigé cette nuit.
+12. Quel mot complète la phrase : « a » ou « à » ? — Je pense ___ toi.
+
+### Niveau 2 (22 items)
+
+1. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+2. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+3. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+4. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+5. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+6. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+7. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+8. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+9. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+10. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+11. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « a » ou « à » dans la phrase. — Ce mot est-il verbe avoir ou préposition ?
+12. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « a » ou « à » dans la phrase. — Ce mot est-il verbe avoir ou préposition ?
+13. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « a » ou « à » dans la phrase. — Ce mot est-il verbe avoir ou préposition ?
+14. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « a » ou « à » dans la phrase. — Ce mot est-il verbe avoir ou préposition ?
+15. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « a » ou « à » dans la phrase. — Ce mot est-il verbe avoir ou préposition ?
+16. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « a » ou « à » dans la phrase. — Ce mot est-il verbe avoir ou préposition ?
+17. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « a » ou « à » dans la phrase. — Ce mot est-il verbe avoir ou préposition ?
+18. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « a » ou « à » dans la phrase. — Ce mot est-il verbe avoir ou préposition ?
+19. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « a » ou « à » dans la phrase. — Ce mot est-il verbe avoir ou préposition ?
+20. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « a » ou « à » dans la phrase. — Ce mot est-il verbe avoir ou préposition ?
+21. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « a » ou « à » dans la phrase. — Ce mot est-il verbe avoir ou préposition ?
+22. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « a » ou « à » dans la phrase. — Ce mot est-il verbe avoir ou préposition ?
+
+### Niveau 3 (16 items)
+
+1. Le médecin ___ soigné le blessé.
+2. Elle habite ___ Bordeaux depuis deux ans.
+3. Le professeur ___ expliqué la leçon.
+4. Il tient ___ terminer son travail.
+5. La tempête ___ abîmé les toitures.
+6. Nous pensons ___ partir demain.
+7. Il ___ écrit une lettre ___ sa grand-mère.
+8. Elle ___ couru ___ toute vitesse.
+9. Le chien ___ obéi ___ son maître.
+10. Papa ___ téléphoné ___ son ami.
+11. La maîtresse ___ lu l'histoire ___ voix haute.
+12. Il ___ répondu ___ toutes les questions.
+13. type: production-libre · consigne: Écris une phrase avec le verbe <strong>partir</strong> qui contient à la fois <em>a</em> et <em>à</em>. · words: a, à
+14. type: production-libre · consigne: Écris une phrase avec <strong>l'école</strong> qui contient à la fois <em>a</em> et <em>à</em>. · words: a, à
+15. type: production-libre · consigne: Écris une phrase avec le verbe <strong>manger</strong> qui contient à la fois <em>a</em> et <em>à</em>. · words: a, à
+16. type: production-libre · consigne: Écris une phrase avec le verbe <strong>téléphoner</strong> qui contient à la fois <em>a</em> et <em>à</em>. · words: a, à
+
+## Orthographe — Homophones grammaticaux
+
+_Domaine : Français · Exercice : `ortho-distinguer-ce-se` — Distinguer ce / se · **50 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 22 · Niveau 3 = 16
+
+### Niveau 1 (12 items)
+
+1. Quel mot complète la phrase : « ce » ou « se » ? — Il ___ lave les mains avant de manger.
+2. Quel mot complète la phrase : « ce » ou « se » ? — ___ film est très drôle.
+3. Quel mot complète la phrase : « ce » ou « se » ? — Elle ___ dépêche pour ne pas être en retard.
+4. Quel mot complète la phrase : « ce » ou « se » ? — Il aime ___ quartier depuis toujours.
+5. Quel mot complète la phrase : « ce » ou « se » ? — Le chat ___ cache sous le canapé.
+6. Quel mot complète la phrase : « ce » ou « se » ? — ___ que tu dis est intéressant.
+7. Quel mot complète la phrase : « ce » ou « se » ? — Il ___ souvient de ses vacances.
+8. Quel mot complète la phrase : « ce » ou « se » ? — Regarde ___ beau coucher de soleil.
+9. Quel mot complète la phrase : « ce » ou « se » ? — Elle ___ repose après le sport.
+10. Quel mot complète la phrase : « ce » ou « se » ? — ___ soir, on mange ensemble.
+11. Quel mot complète la phrase : « ce » ou « se » ? — Le bébé ___ réveille souvent la nuit.
+12. Quel mot complète la phrase : « ce » ou « se » ? — Il ne comprend pas ___ qui s'est passé.
+
+### Niveau 2 (22 items)
+
+1. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+2. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+3. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+4. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+5. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+6. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+7. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+8. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+9. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+10. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+11. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ce » ou « se » dans la phrase. — Ce mot est-il déterminant/pronom démonstratif ou pronom réfléchi ?
+12. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ce » ou « se » dans la phrase. — Ce mot est-il déterminant/pronom démonstratif ou pronom réfléchi ?
+13. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ce » ou « se » dans la phrase. — Ce mot est-il déterminant/pronom démonstratif ou pronom réfléchi ?
+14. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ce » ou « se » dans la phrase. — Ce mot est-il déterminant/pronom démonstratif ou pronom réfléchi ?
+15. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ce » ou « se » dans la phrase. — Ce mot est-il déterminant/pronom démonstratif ou pronom réfléchi ?
+16. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ce » ou « se » dans la phrase. — Ce mot est-il déterminant/pronom démonstratif ou pronom réfléchi ?
+17. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ce » ou « se » dans la phrase. — Ce mot est-il déterminant/pronom démonstratif ou pronom réfléchi ?
+18. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ce » ou « se » dans la phrase. — Ce mot est-il déterminant/pronom démonstratif ou pronom réfléchi ?
+19. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ce » ou « se » dans la phrase. — Ce mot est-il déterminant/pronom démonstratif ou pronom réfléchi ?
+20. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ce » ou « se » dans la phrase. — Ce mot est-il déterminant/pronom démonstratif ou pronom réfléchi ?
+21. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ce » ou « se » dans la phrase. — Ce mot est-il déterminant/pronom démonstratif ou pronom réfléchi ?
+22. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ce » ou « se » dans la phrase. — Ce mot est-il déterminant/pronom démonstratif ou pronom réfléchi ?
+
+### Niveau 3 (16 items)
+
+1. Les athlètes ___ préparent pour la compétition.
+2. ___ résultat est inattendu.
+3. Le public ___ lève pour applaudir.
+4. Il ne comprend pas ___ qu'on lui explique.
+5. La situation ___ complique de jour en jour.
+6. ___ projet demande beaucoup de travail.
+7. Il ___ souvient de ___ voyage inoubliable.
+8. ___ problème ___ règle facilement.
+9. Elle ___ demande si ___ qu'on lui dit est vrai.
+10. ___ matin, il ___ lève plus tôt que d'habitude.
+11. Il ___ concentre sur ___ qu'il doit faire.
+12. ___ que je vois ___ passe sous mes yeux.
+13. type: production-libre · consigne: Écris une phrase sur <strong>le matin</strong> qui contient à la fois <em>ce</em> et <em>se</em>. · words: ce, se
+14. type: production-libre · consigne: Écris une phrase sur <strong>un animal</strong> qui contient à la fois <em>ce</em> et <em>se</em>. · words: ce, se
+15. type: production-libre · consigne: Écris une phrase sur <strong>l'école</strong> qui contient à la fois <em>ce</em> et <em>se</em>. · words: ce, se
+16. type: production-libre · consigne: Écris une phrase sur <strong>un souvenir</strong> qui contient à la fois <em>ce</em> et <em>se</em>. · words: ce, se
+
+## Orthographe — Homophones grammaticaux
+
+_Domaine : Français · Exercice : `ortho-distinguer-et-est` — Distinguer et / est · **50 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 22 · Niveau 3 = 16
+
+### Niveau 1 (12 items)
+
+1. Quel mot complète la phrase : « est » ou « et » ? — Le ciel ___ bleu aujourd'hui.
+2. Quel mot complète la phrase : « est » ou « et » ? — Il mange une pomme ___ une poire.
+3. Quel mot complète la phrase : « est » ou « et » ? — La maîtresse ___ absente ce matin.
+4. Quel mot complète la phrase : « est » ou « et » ? — Elle prend son manteau ___ ses gants.
+5. Quel mot complète la phrase : « est » ou « et » ? — Le chien ___ fatigué après sa promenade.
+6. Quel mot complète la phrase : « est » ou « et » ? — Papa lit le journal ___ boit son café.
+7. Quel mot complète la phrase : « est » ou « et » ? — La porte ___ fermée à clé.
+8. Quel mot complète la phrase : « est » ou « et » ? — Il aime le foot ___ le vélo.
+9. Quel mot complète la phrase : « est » ou « et » ? — Le repas ___ prêt.
+10. Quel mot complète la phrase : « est » ou « et » ? — Lucie chante ___ danse très bien.
+11. Quel mot complète la phrase : « est » ou « et » ? — Ce livre ___ très intéressant.
+12. Quel mot complète la phrase : « est » ou « et » ? — Il range ses affaires ___ part à l'école.
+
+### Niveau 2 (22 items)
+
+1. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+2. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+3. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+4. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+5. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+6. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+7. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+8. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+9. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+10. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+11. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « est » ou « et » dans la phrase. — Ce mot est-il le verbe être ou la conjonction ?
+12. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « est » ou « et » dans la phrase. — Ce mot est-il le verbe être ou la conjonction ?
+13. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « est » ou « et » dans la phrase. — Ce mot est-il le verbe être ou la conjonction ?
+14. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « est » ou « et » dans la phrase. — Ce mot est-il le verbe être ou la conjonction ?
+15. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « est » ou « et » dans la phrase. — Ce mot est-il le verbe être ou la conjonction ?
+16. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « est » ou « et » dans la phrase. — Ce mot est-il le verbe être ou la conjonction ?
+17. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « est » ou « et » dans la phrase. — Ce mot est-il le verbe être ou la conjonction ?
+18. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « est » ou « et » dans la phrase. — Ce mot est-il le verbe être ou la conjonction ?
+19. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « est » ou « et » dans la phrase. — Ce mot est-il le verbe être ou la conjonction ?
+20. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « est » ou « et » dans la phrase. — Ce mot est-il le verbe être ou la conjonction ?
+21. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « est » ou « et » dans la phrase. — Ce mot est-il le verbe être ou la conjonction ?
+22. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « est » ou « et » dans la phrase. — Ce mot est-il le verbe être ou la conjonction ?
+
+### Niveau 3 (16 items)
+
+1. Le musée ___ fermé le lundi.
+2. Elle prend son vélo ___ part au marché.
+3. Le résultat ___ surprenant.
+4. Il range sa chambre ___ fait ses devoirs.
+5. La rivière ___ en crue ce matin.
+6. Nous visitons Paris ___ Lyon.
+7. Le film ___ long ___ ennuyeux.
+8. Il ___ courageux ___ travailleur.
+9. La route ___ barrée ___ dangereuse.
+10. Le repas ___ prêt ___ il sent bon.
+11. Elle ___ souriante ___ pleine d'énergie.
+12. Le colis ___ arrivé ___ il attend sur le pas de la porte.
+13. type: production-libre · consigne: Écris une phrase sur un <strong>animal</strong> qui contient à la fois <em>est</em> et <em>et</em>. · words: est, et
+14. type: production-libre · consigne: Écris une phrase sur <strong>l'école</strong> qui contient à la fois <em>est</em> et <em>et</em>. · words: est, et
+15. type: production-libre · consigne: Écris une phrase sur le <strong>sport</strong> qui contient à la fois <em>est</em> et <em>et</em>. · words: est, et
+16. type: production-libre · consigne: Écris une phrase sur la <strong>météo</strong> qui contient à la fois <em>est</em> et <em>et</em>. · words: est, et
+
+## Orthographe — Homophones grammaticaux
+
+_Domaine : Français · Exercice : `ortho-distinguer-on-ont` — Distinguer on / ont · **50 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 22 · Niveau 3 = 16
+
+### Niveau 1 (12 items)
+
+1. Quel mot complète la phrase : « on » ou « ont » ? — Les élèves ___ fini leur travail.
+2. Quel mot complète la phrase : « on » ou « ont » ? — ___ entend les oiseaux chanter.
+3. Quel mot complète la phrase : « on » ou « ont » ? — Mes parents ___ acheté une voiture.
+4. Quel mot complète la phrase : « on » ou « ont » ? — ___ ne sait jamais ce qui peut arriver.
+5. Quel mot complète la phrase : « on » ou « ont » ? — Les enfants ___ joué toute la journée.
+6. Quel mot complète la phrase : « on » ou « ont » ? — ___ dirait qu'il va pleuvoir.
+7. Quel mot complète la phrase : « on » ou « ont » ? — Mes amis ___ organisé une fête.
+8. Quel mot complète la phrase : « on » ou « ont » ? — ___ peut voir la mer depuis ici.
+9. Quel mot complète la phrase : « on » ou « ont » ? — Les pompiers ___ éteint l'incendie.
+10. Quel mot complète la phrase : « on » ou « ont » ? — ___ a sonné à la porte.
+11. Quel mot complète la phrase : « on » ou « ont » ? — Les voisins ___ fait beaucoup de bruit.
+12. Quel mot complète la phrase : « on » ou « ont » ? — ___ apprend beaucoup de choses à l'école.
+
+### Niveau 2 (22 items)
+
+1. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+2. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+3. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+4. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+5. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+6. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+7. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+8. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+9. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+10. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+11. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « on » ou « ont » dans la phrase. — Ce mot est-il verbe avoir ou pronom sujet ?
+12. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « on » ou « ont » dans la phrase. — Ce mot est-il verbe avoir ou pronom sujet ?
+13. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « on » ou « ont » dans la phrase. — Ce mot est-il verbe avoir ou pronom sujet ?
+14. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « on » ou « ont » dans la phrase. — Ce mot est-il verbe avoir ou pronom sujet ?
+15. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « on » ou « ont » dans la phrase. — Ce mot est-il verbe avoir ou pronom sujet ?
+16. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « on » ou « ont » dans la phrase. — Ce mot est-il verbe avoir ou pronom sujet ?
+17. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « on » ou « ont » dans la phrase. — Ce mot est-il verbe avoir ou pronom sujet ?
+18. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « on » ou « ont » dans la phrase. — Ce mot est-il verbe avoir ou pronom sujet ?
+19. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « on » ou « ont » dans la phrase. — Ce mot est-il verbe avoir ou pronom sujet ?
+20. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « on » ou « ont » dans la phrase. — Ce mot est-il verbe avoir ou pronom sujet ?
+21. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « on » ou « ont » dans la phrase. — Ce mot est-il verbe avoir ou pronom sujet ?
+22. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « on » ou « ont » dans la phrase. — Ce mot est-il verbe avoir ou pronom sujet ?
+
+### Niveau 3 (16 items)
+
+1. Les scientifiques ___ publié leurs résultats.
+2. ___ raconte que ce château est hanté.
+3. Les randonneurs ___ atteint le sommet.
+4. ___ ne peut pas tout prévoir.
+5. Les agriculteurs ___ récolté du blé.
+6. ___ voit souvent des renards dans cette forêt.
+7. ___ dit que les loups ___ disparu de cette région.
+8. Les médecins ___ confirmé ce qu'___ suspectait.
+9. ___ apprend que les chercheurs ___ trouvé un remède.
+10. Les élèves ___ compris ce qu'___ leur a expliqué.
+11. ___ pense que les températures ___ augmenté.
+12. Les artistes ___ exposé leurs œuvres et ___ peut les admirer.
+13. type: production-libre · consigne: Écris une phrase sur des <strong>animaux</strong> qui contient à la fois <em>on</em> et <em>ont</em>. · words: on, ont
+14. type: production-libre · consigne: Écris une phrase sur <strong>l'école</strong> qui contient à la fois <em>on</em> et <em>ont</em>. · words: on, ont
+15. type: production-libre · consigne: Écris une phrase sur les <strong>vacances</strong> qui contient à la fois <em>on</em> et <em>ont</em>. · words: on, ont
+16. type: production-libre · consigne: Écris une phrase sur la <strong>météo</strong> qui contient à la fois <em>on</em> et <em>ont</em>. · words: on, ont
+
+## Orthographe — Homophones grammaticaux
+
+_Domaine : Français · Exercice : `ortho-distinguer-ou-ou` — Distinguer ou / où · **50 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 22 · Niveau 3 = 16
+
+### Niveau 1 (12 items)
+
+1. Quel mot complète la phrase : « ou » ou « où » ? — Tu veux du lait ___ du jus d'orange ?
+2. Quel mot complète la phrase : « ou » ou « où » ? — Je ne sais pas ___ j'ai mis mes clés.
+3. Quel mot complète la phrase : « ou » ou « où » ? — Il part en vacances en juillet ___ en août.
+4. Quel mot complète la phrase : « ou » ou « où » ? — La ville ___ je suis né est très belle.
+5. Quel mot complète la phrase : « ou » ou « où » ? — Tu préfères le foot ___ le tennis ?
+6. Quel mot complète la phrase : « ou » ou « où » ? — C'est la forêt ___ nous nous sommes perdus.
+7. Quel mot complète la phrase : « ou » ou « où » ? — Elle viendra demain ___ après-demain.
+8. Quel mot complète la phrase : « ou » ou « où » ? — Le village ___ elle habite est très calme.
+9. Quel mot complète la phrase : « ou » ou « où » ? — On peut y aller à pied ___ en vélo.
+10. Quel mot complète la phrase : « ou » ou « où » ? — Je me souviens du jour ___ tu es arrivé.
+11. Quel mot complète la phrase : « ou » ou « où » ? — Il peut choisir la mer ___ la montagne.
+12. Quel mot complète la phrase : « ou » ou « où » ? — La montagne ___ nous avons campé était superbe.
+
+### Niveau 2 (22 items)
+
+1. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+2. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+3. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+4. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+5. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+6. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+7. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+8. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+9. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+10. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+11. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ou » ou « où » dans la phrase. — Ce mot est-il une conjonction (ou) ou un lieu/temps (où) ?
+12. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ou » ou « où » dans la phrase. — Ce mot est-il une conjonction (ou) ou un lieu/temps (où) ?
+13. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ou » ou « où » dans la phrase. — Ce mot est-il une conjonction (ou) ou un lieu/temps (où) ?
+14. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ou » ou « où » dans la phrase. — Ce mot est-il une conjonction (ou) ou un lieu/temps (où) ?
+15. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ou » ou « où » dans la phrase. — Ce mot est-il une conjonction (ou) ou un lieu/temps (où) ?
+16. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ou » ou « où » dans la phrase. — Ce mot est-il une conjonction (ou) ou un lieu/temps (où) ?
+17. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ou » ou « où » dans la phrase. — Ce mot est-il une conjonction (ou) ou un lieu/temps (où) ?
+18. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ou » ou « où » dans la phrase. — Ce mot est-il une conjonction (ou) ou un lieu/temps (où) ?
+19. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ou » ou « où » dans la phrase. — Ce mot est-il une conjonction (ou) ou un lieu/temps (où) ?
+20. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ou » ou « où » dans la phrase. — Ce mot est-il une conjonction (ou) ou un lieu/temps (où) ?
+21. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ou » ou « où » dans la phrase. — Ce mot est-il une conjonction (ou) ou un lieu/temps (où) ?
+22. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « ou » ou « où » dans la phrase. — Ce mot est-il une conjonction (ou) ou un lieu/temps (où) ?
+
+### Niveau 3 (16 items)
+
+1. Tu veux du thé ___ du café ?
+2. C'est la ville ___ je suis né.
+3. Il viendra lundi ___ mardi.
+4. Je cherche le cahier ___ j'ai noté les devoirs.
+5. Elle reste ici ___ elle part avec nous ?
+6. La forêt ___ nous nous sommes promenés était magnifique.
+7. Je ne sais plus ___ il est allé ___ si quelqu'un l'a vu.
+8. La plage ___ nous nageons est belle ___ dangereuse ?
+9. C'est la forêt ___ nous avons campé l'été dernier ___ l'été d'avant.
+10. Le stade ___ il joue est grand ___ petit ?
+11. La maison ___ elle habite est calme ___ bruyante.
+12. Je ne sais pas ___ tu es allé ___ pourquoi tu es parti si tôt.
+13. type: production-libre · consigne: Écris une phrase sur un <strong>lieu</strong> que tu connais qui contient à la fois <em>ou</em> et <em>où</em>. · words: ou, où
+14. type: production-libre · consigne: Écris une phrase sur le <strong>week-end</strong> qui contient à la fois <em>ou</em> et <em>où</em>. · words: ou, où
+15. type: production-libre · consigne: Écris une phrase sur <strong>l'école</strong> qui contient à la fois <em>ou</em> et <em>où</em>. · words: ou, où
+16. type: production-libre · consigne: Écris une phrase avec le verbe <strong>aller</strong> qui contient à la fois <em>ou</em> et <em>où</em>. · words: ou, où
+
+## Orthographe — Homophones grammaticaux
+
+_Domaine : Français · Exercice : `ortho-distinguer-son-sont` — Distinguer son / sont · **50 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 22 · Niveau 3 = 16
+
+### Niveau 1 (12 items)
+
+1. Quel mot complète la phrase : « son » ou « sont » ? — Les enfants ___ fatigués après la récréation.
+2. Quel mot complète la phrase : « son » ou « sont » ? — Il a oublié ___ cartable à la maison.
+3. Quel mot complète la phrase : « son » ou « sont » ? — Les fleurs ___ écloses ce matin.
+4. Quel mot complète la phrase : « son » ou « sont » ? — Elle range ___ manteau dans l'armoire.
+5. Quel mot complète la phrase : « son » ou « sont » ? — Les élèves ___ attentifs en classe.
+6. Quel mot complète la phrase : « son » ou « sont » ? — Le chien a retrouvé ___ os.
+7. Quel mot complète la phrase : « son » ou « sont » ? — Les nuages ___ très sombres ce soir.
+8. Quel mot complète la phrase : « son » ou « sont » ? — Il prête ___ vélo à un ami.
+9. Quel mot complète la phrase : « son » ou « sont » ? — Les résultats ___ excellents cette année.
+10. Quel mot complète la phrase : « son » ou « sont » ? — Elle a perdu ___ écharpe rouge.
+11. Quel mot complète la phrase : « son » ou « sont » ? — Les portes ___ fermées à clé.
+12. Quel mot complète la phrase : « son » ou « sont » ? — Le chat lèche ___ pelage.
+
+### Niveau 2 (22 items)
+
+1. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+2. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+3. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+4. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+5. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+6. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+7. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+8. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+9. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+10. Clique sur le mot mal orthographié s'il y en a un, puis valide. (Si la phrase est correcte, valide directement sans rien sélectionner.)
+11. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « son » ou « sont » dans la phrase. — Ce mot est-il le verbe être (sont) ou un déterminant possessif (son) ?
+12. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « son » ou « sont » dans la phrase. — Ce mot est-il le verbe être (sont) ou un déterminant possessif (son) ?
+13. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « son » ou « sont » dans la phrase. — Ce mot est-il le verbe être (sont) ou un déterminant possessif (son) ?
+14. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « son » ou « sont » dans la phrase. — Ce mot est-il le verbe être (sont) ou un déterminant possessif (son) ?
+15. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « son » ou « sont » dans la phrase. — Ce mot est-il le verbe être (sont) ou un déterminant possessif (son) ?
+16. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « son » ou « sont » dans la phrase. — Ce mot est-il le verbe être (sont) ou un déterminant possessif (son) ?
+17. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « son » ou « sont » dans la phrase. — Ce mot est-il le verbe être (sont) ou un déterminant possessif (son) ?
+18. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « son » ou « sont » dans la phrase. — Ce mot est-il le verbe être (sont) ou un déterminant possessif (son) ?
+19. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « son » ou « sont » dans la phrase. — Ce mot est-il le verbe être (sont) ou un déterminant possessif (son) ?
+20. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « son » ou « sont » dans la phrase. — Ce mot est-il le verbe être (sont) ou un déterminant possessif (son) ?
+21. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « son » ou « sont » dans la phrase. — Ce mot est-il le verbe être (sont) ou un déterminant possessif (son) ?
+22. Clique sur le mot à classer, puis choisis sa catégorie. — Clique sur « son » ou « sont » dans la phrase. — Ce mot est-il le verbe être (sont) ou un déterminant possessif (son) ?
+
+### Niveau 3 (16 items)
+
+1. Les scientifiques ___ convaincus par les résultats.
+2. Le directeur a exprimé ___ mécontentement.
+3. Les températures ___ en baisse depuis une semaine.
+4. L'artiste a exposé ___ dernier tableau.
+5. Les décisions ___ prises à l'unanimité.
+6. Le médecin a donné ___ accord pour l'opération.
+7. Les élèves ___ studieux et leur professeur est fier de ___ travail.
+8. ___ discours était long et les spectateurs ___ partis avant la fin.
+9. Les résultats ___ bons et le directeur garde ___ calme.
+10. Il a perdu ___ chemin et ses amis ___ inquiets.
+11. Les arbres ___ hauts et ___ ombre est bienfaisante.
+12. ___ équipe a gagné et les supporters ___ en fête.
+13. type: production-libre · consigne: Écris une phrase sur un <strong>sportif</strong> qui contient à la fois <em>son</em> et <em>sont</em>. · words: son, sont
+14. type: production-libre · consigne: Écris une phrase sur <strong>l'école</strong> qui contient à la fois <em>son</em> et <em>sont</em>. · words: son, sont
+15. type: production-libre · consigne: Écris une phrase sur un <strong>animal</strong> qui contient à la fois <em>son</em> et <em>sont</em>. · words: son, sont
+16. type: production-libre · consigne: Écris une phrase sur la <strong>famille</strong> qui contient à la fois <em>son</em> et <em>sont</em>. · words: son, sont
 
 ## Orthographe — Accord sujet-verbe, adjectif attribut et participe passé
 
@@ -3872,122 +6044,3 @@ _Domaine : Français · Exercice : `ortho-mots-invariables` — Les mots invaria
 18. à moins que
 19. pourvu que
 20. quoi que
-
-## Grammaire — Identifier le type et la forme de la phrase
-
-_Domaine : Français · Exercice : `identifier-type-phrase` — Identifier le type et la forme d'une phrase · **101 items au total**_
-
-**Total par niveau :** Niveau 1 = 22 · Niveau 2 = 29 · Niveau 3 = 36 · Niveau 4 = 14
-
-### Niveau 1 (22 items)
-
-1. Le chien court.
-2. Je mange une pomme.
-3. Emma joue du piano.
-4. Il pleut depuis ce matin.
-5. Le train arrive à la gare.
-6. Mon frère lit une bande dessinée.
-7. Les oiseaux chantent dans les arbres.
-8. La maîtresse distribue les cahiers.
-9. Les enfants jouent dans la cour.
-10. Papa prépare le dîner.
-11. Le jardin est couvert de fleurs.
-12. Vous êtes très gentils.
-13. Le soleil se couche derrière les montagnes.
-14. Après la récréation, les élèves retournent calmement dans leur classe.
-15. Dans le jardin, les fleurs poussent rapidement au printemps.
-16. Où vas-tu ce matin ?
-17. As-tu fini tes devoirs ?
-18. Qu'est-ce que tu aimes lire ?
-19. Est-ce que tu viens à la fête ?
-20. Comment s'appelle ton chat ?
-21. Pourquoi es-tu en retard ?
-22. Veux-tu jouer avec nous ?
-
-### Niveau 2 (29 items)
-
-1. Le chien court.
-2. Je mange une pomme.
-3. Emma joue du piano.
-4. Il pleut depuis ce matin.
-5. Le train arrive à la gare.
-6. Mon frère lit une bande dessinée.
-7. Les oiseaux chantent dans les arbres.
-8. La maîtresse distribue les cahiers.
-9. Les enfants jouent dans la cour.
-10. Papa prépare le dîner.
-11. Le jardin est couvert de fleurs.
-12. Vous êtes très gentils.
-13. Le soleil se couche derrière les montagnes.
-14. Après la récréation, les élèves retournent calmement dans leur classe.
-15. Dans le jardin, les fleurs poussent rapidement au printemps.
-16. Où vas-tu ce matin ?
-17. As-tu fini tes devoirs ?
-18. Qu'est-ce que tu aimes lire ?
-19. Est-ce que tu viens à la fête ?
-20. Comment s'appelle ton chat ?
-21. Pourquoi es-tu en retard ?
-22. Veux-tu jouer avec nous ?
-23. Ferme la porte.
-24. Range tes affaires.
-25. Lis ce livre avec attention.
-26. Venez écouter l'histoire.
-27. N'oublie pas ton manteau.
-28. Levez-vous tous ensemble.
-29. Écris ton prénom en haut de la page.
-
-### Niveau 3 (36 items)
-
-1. Le chien court.
-2. Je mange une pomme.
-3. Emma joue du piano.
-4. Il pleut depuis ce matin.
-5. Le train arrive à la gare.
-6. Mon frère lit une bande dessinée.
-7. Les oiseaux chantent dans les arbres.
-8. La maîtresse distribue les cahiers.
-9. Les enfants jouent dans la cour.
-10. Papa prépare le dîner.
-11. Le jardin est couvert de fleurs.
-12. Vous êtes très gentils.
-13. Le soleil se couche derrière les montagnes.
-14. Après la récréation, les élèves retournent calmement dans leur classe.
-15. Dans le jardin, les fleurs poussent rapidement au printemps.
-16. Où vas-tu ce matin ?
-17. As-tu fini tes devoirs ?
-18. Qu'est-ce que tu aimes lire ?
-19. Est-ce que tu viens à la fête ?
-20. Comment s'appelle ton chat ?
-21. Pourquoi es-tu en retard ?
-22. Veux-tu jouer avec nous ?
-23. Ferme la porte.
-24. Range tes affaires.
-25. Lis ce livre avec attention.
-26. Venez écouter l'histoire.
-27. N'oublie pas ton manteau.
-28. Levez-vous tous ensemble.
-29. Écris ton prénom en haut de la page.
-30. Quelle belle journée !
-31. Comme tu es grand !
-32. Quel dommage !
-33. Comme c'est magnifique !
-34. Que tu es intelligent !
-35. Quel beau dessin tu as fait !
-36. Comme il fait froid ce matin !
-
-### Niveau 4 (14 items)
-
-1. Je ne mange pas de viande.
-2. Elle ne lit jamais le soir.
-3. Nous n'allons plus à cette école.
-4. Il n'a pas encore fini ses devoirs.
-5. N'oublie pas tes affaires.
-6. Ne crie pas dans les couloirs.
-7. Il ne dit rien à personne.
-8. Le chat dort sur le canapé.
-9. Mes amis jouent au foot.
-10. Quelle belle histoire !
-11. Viens jouer avec moi.
-12. As-tu faim ?
-13. Prends ton manteau.
-14. La rivière coule doucement.

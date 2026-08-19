@@ -213,6 +213,21 @@
     .skill-card.card-hidden { display: none; }
     .skill-card-locked { opacity: 0.45; cursor: not-allowed; }
     .skill-card-locked:hover { transform: none; box-shadow: none; border-color: var(--border); }
+    .skill-card-construction { opacity: 0.5; filter: grayscale(0.7); cursor: not-allowed; }
+    .skill-card-construction:hover { transform: none; box-shadow: none; border-color: var(--border); }
+    .skill-badge-construction {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 2px 8px;
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      background: var(--border);
+      color: var(--muted);
+      vertical-align: middle;
+    }
 
     .skill-badges {
       display: flex;
@@ -507,14 +522,15 @@
 
     /* ── Skill card rendering ──────────────────────────────────────────────── */
     function renderSkillCard(skill, sectionId) {
-      const inCatalog   = EXERCISE_SLUGS.has(skill.slug) || skill.slug in CUSTOM_HREFS;
-      const isBlocked   = inCatalog && typeof lfmGuidedAccess !== 'undefined' && !lfmGuidedAccess.isAllowedSync(guidedExerciseId(skill));
-      const hasExercise = inCatalog && !isBlocked;
-      const href        = hasExercise ? (CUSTOM_HREFS[skill.slug] || `exercise.html?slug=${skill.slug}`) : "#";
-      const onclick     = hasExercise ? "" : `onclick="return false;"`;
-      const lockedClass = isBlocked ? " skill-card-locked" : "";
+      const inCatalog       = EXERCISE_SLUGS.has(skill.slug) || skill.slug in CUSTOM_HREFS;
+      const isBlocked       = inCatalog && typeof lfmGuidedAccess !== 'undefined' && !lfmGuidedAccess.isAllowedSync(guidedExerciseId(skill));
+      const hasExercise     = inCatalog && !isBlocked;
+      const href            = hasExercise ? (CUSTOM_HREFS[skill.slug] || `exercise.html?slug=${skill.slug}`) : "#";
+      const onclick         = hasExercise ? "" : `onclick="return false;"`;
+      const lockedClass     = isBlocked ? " skill-card-locked" : "";
+      const constructionClass = !inCatalog ? " skill-card-construction" : "";
       return `
-        <a class="skill-card${lockedClass}"
+        <a class="skill-card${lockedClass}${constructionClass}"
            href="${href}"
            data-slug="${skill.slug}"
            ${inCatalog ? `data-exercise-slug="${guidedExerciseId(skill)}"` : ""}
@@ -523,7 +539,7 @@
            data-section="${sectionId}"
            ${onclick}>
           <div class="skill-badges">${renderBadges(skill.levels)}</div>
-          <div class="skill-title">${skill.title}${isBlocked ? ' 🔒' : ''}</div>
+          <div class="skill-title">${skill.title}${isBlocked ? ' 🔒' : ''}${!inCatalog ? ' <span class="skill-badge-construction">En construction</span>' : ''}</div>
         </a>
       `;
     }

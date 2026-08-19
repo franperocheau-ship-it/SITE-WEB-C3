@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/favicon/favicon.ico?v=1" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png?v=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png?v=1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/favicon-192x192.png?v=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512x512.png?v=1">
+  <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
+  <link rel="manifest" href="site.webmanifest?v=1">
+  <title>Audit des compétences — Espace administrateur — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="data/index.js?v=2"></script>
+  <script src="js/competence-preview.js?v=7"></script>
+  <style>
+    .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
+    .dash-content { max-width: 1100px; margin: 0 auto; }
+
+    .breadcrumb {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 24px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
+    }
+    .breadcrumb a { color: var(--blue); text-decoration: none; font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .bc-sep { color: var(--border); user-select: none; }
+    .bc-current { font-weight: 600; color: var(--text); }
+
+    .section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+    .section-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--text); }
+    .section-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+    .aac-search-wrap { position: relative; max-width: 360px; margin-bottom: 28px; }
+    .aac-search-input {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 100px;
+      padding: 10px 16px; font-size: 14px; font-family: inherit; color: var(--text);
+      background: var(--card-bg); outline: none; box-sizing: border-box;
+      transition: border-color 200ms;
+    }
+    .aac-search-input:focus { border-color: var(--blue); }
+
+    .aac-group { margin-bottom: 32px; }
+    .aac-group-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+      padding-bottom: 8px; border-bottom: 2px solid var(--border);
+    }
+    .aac-group-title {
+      font-family: var(--font-display); font-weight: 700; font-size: 15px;
+      color: var(--color-brand-navy, var(--blue)); text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .aac-group-count {
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      background: rgba(16,43,106,0.06); border-radius: 100px; padding: 2px 10px;
+    }
+    .aac-group.aac-group-empty .aac-group-title { color: var(--muted); }
+    .aac-empty-note { font-size: 13px; color: var(--muted); padding: 4px 0 8px; }
+
+    .aac-group-unpublished .aac-group-header { border-bottom-color: #e2b83b; }
+    .aac-group-unpublished .aac-group-title { color: #8a6d1a; }
+    .aac-group-unpublished .aac-group-count { background: rgba(226,184,59,0.18); color: #8a6d1a; }
+    .aac-group-unpublished .aac-intro { font-size: 12.5px; color: var(--muted); margin: -6px 0 12px; }
+    .aac-group-unpublished .skill-card { border-style: dashed; opacity: 0.85; }
+    .aac-unpub-origin { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+
+    .skills-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+    }
+
+    .skill-card {
+      background: var(--bg); border: 1.5px solid var(--border); border-radius: 14px;
+      padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .skill-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+    .skill-title { font-weight: 600; font-size: 13px; color: var(--text); line-height: 1.45; }
+    .skill-slug { font-size: 11px; color: var(--muted); font-family: monospace; margin-top: -2px; }
+
+    .badge { display: inline-flex; align-items: center; justify-content: center; padding: 2px 9px; border-radius: 100px; font-size: 10px; font-weight: 800; color: #fff; }
+    .badge-cm1 { background: #1DBFA0; }
+    .badge-cm2 { background: #4A90D9; }
+    .badge-6e  { background: #F5A623; }
+
+    .aac-card-hidden { display: none; }
+
+    #aac-loading { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
+  </style>
+  <!-- NAVBAR-PROFICIAMUS-CSS -->
+  <style>
+  body{padding-top:50px;}
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+  .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+  .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+  .navbar__brand img{height:34px;width:auto;}
+  .navbar__nav{display:flex;align-items:center;gap:24px;}
+  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-size:14px;font-weight:700;transition:color .2s;}
+  .navbar__nav a:hover{color:#1B4EBF;}
+  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;}
+  .navbar__nav .btn-login{color:#fff!important;}
+  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+  .btn-login:hover{background:#0b1e4d;}
+  @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <div class="dash-wrap">
+    <div class="dash-content">
+
+      <nav class="breadcrumb" aria-label="Fil d'Ariane">
+        <a href="dashboard-admin.html">Espace administrateur</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-current">Audit des compétences</span>
+      </nav>
+
+      <div class="section-header">
+        <h1 class="section-title">Audit des compétences</h1>
+      </div>
+      <p class="section-subtitle">
+        Aperçu en lecture seule des banques de questions (niveau 1/2/3) de chaque compétence.
+        Cliquez sur l'icône 👁 pour ouvrir l'aperçu détaillé — questions et bonnes réponses, sans distracteurs.
+      </p>
+
+      <div class="aac-search-wrap">
+        <input type="text" id="aac-search" class="aac-search-input" placeholder="Rechercher une compétence…" autocomplete="off">
+      </div>
+
+      <div id="aac-loading">Chargement des compétences…</div>
+      <div id="aac-groups"></div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="js/menu.js"></script>
+  <script>
+    /* ── Regroupement par page hub (backLink.href), dans l'ordre d'affichage
+       des menus du site — Grandeurs et mesures n'a pas encore de banque
+       (data/*.js) mais reste listée pour rester visible dès qu'elle existera. */
+    const AAC_GROUPS = [
+      { href: 'français-grammaire.html',                 label: 'Grammaire' },
+      { href: 'français-conjugaison.html',                label: 'Conjugaison' },
+      { href: 'français-orthographe.html',                label: 'Orthographe' },
+      { href: 'français-lecture.html',                    label: 'Lecture' },
+      { href: 'français-lexique.html',                     label: 'Vocabulaire' },
+      { href: 'mathématiques-fractions.html',              label: 'Fractions' },
+      { href: 'mathématiques-nombres-entiers.html',        label: 'Nombres entiers' },
+      { href: 'mathématiques-nombres-decimaux.html',       label: 'Nombres décimaux' },
+      { href: 'mathématiques-probabilites.html',           label: 'Probabilités' },
+      { href: 'mathématiques-grandeurs-et-mesures.html',   label: 'Grandeurs et mesures' },
+    ];
+
+    function renderBadges(levels) {
+      return (levels || []).map(level => {
+        const cls = level === 'CM1' ? 'badge-cm1' : level === 'CM2' ? 'badge-cm2' : 'badge-6e';
+        return `<span class="badge ${cls}">${level}</span>`;
+      }).join('');
+    }
+
+    function escHtml(str) {
+      return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    }
+
+    function competenceCardHtml(slug, ex, originLabel) {
+      const originHtml = originLabel ? `<div class="aac-unpub-origin">${escHtml(originLabel)}</div>` : '';
+      return `
+        <div class="skill-card" data-slug="${escHtml(slug)}" data-exercise-slug="${escHtml(slug)}"
+             data-title="${escHtml((ex.title || ex.competence || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''))}">
+          <div class="skill-badges">${renderBadges(ex.levels)}</div>
+          <div class="skill-title">${escHtml(ex.title || ex.competence || slug)}</div>
+          ${originHtml}
+          <div class="skill-slug">${escHtml(slug)}</div>
+        </div>
+      `;
+    }
+
+    /* ── Détection des compétences réellement publiées ───────────────────────
+       data/*.js peut contenir des compétences qui ne sont référencées par
+       aucune carte cliquable sur le site (banque créée puis jamais reliée à
+       un hub, ou retirée depuis). On lit directement le code source des 10
+       pages hub (même source que les cartes elles-mêmes, pas de liste à
+       maintenir à part) et on en extrait les slugs réellement utilisés :
+       soit `slug: "xxx"` dans SECTIONS, soit `slug=xxx` dans une redirection
+       CUSTOM_HREFS/CUSTOM_PAGES (ex. mathématiques-nombres-decimaux.html,
+       qui redirige vers exercise.html?slug=comparer-decimaux). ──────────── */
+    async function fetchPublishedSlugs() {
+      const published = new Set();
+      await Promise.all(AAC_GROUPS.map(async group => {
+        try {
+          const res = await fetch(group.href, { cache: 'no-store' });
+          if (!res.ok) return;
+          const src = await res.text();
+          let m;
+          const reDirect = /slug:\s*"([a-z0-9-]+)"/g;
+          while ((m = reDirect.exec(src))) published.add(m[1]);
+          const reRedirect = /[?&]slug=([a-z0-9-]+)/g;
+          while ((m = reRedirect.exec(src))) published.add(m[1]);
+        } catch (e) {
+          console.warn('[AuditCompetences] impossible de lire', group.href, e.message);
+        }
+      }));
+      return published;
+    }
+
+    function renderGroups(publishedSlugs) {
+      const data = window.EXERCISE_DATA || {};
+      const bySlugList = Object.entries(data);
+      const unpublished = [];
+
+      const groupsHtml = AAC_GROUPS.map(group => {
+        const allEntries = bySlugList
+          .filter(([, ex]) => ex.backLink && ex.backLink.href === group.href)
+          .sort((a, b) => (a[1].competence || '').localeCompare(b[1].competence || '', 'fr'));
+
+        const entries = allEntries.filter(([slug]) => publishedSlugs.has(slug));
+        allEntries
+          .filter(([slug]) => !publishedSlugs.has(slug))
+          .forEach(([slug, ex]) => unpublished.push({ slug, ex, origin: group.label }));
+
+        const count = entries.length;
+        const isEmpty = count === 0;
+        const cardsHtml = isEmpty
+          ? '<p class="aac-empty-note">Aucune banque de questions disponible pour l\'instant.</p>'
+          : `<div class="skills-grid">${entries.map(([slug, ex]) => competenceCardHtml(slug, ex)).join('')}</div>`;
+
+        return `
+          <div class="aac-group ${isEmpty ? 'aac-group-empty' : ''}" data-group="${escHtml(group.href)}">
+            <div class="aac-group-header">
+              <span class="aac-group-title">${escHtml(group.label)}</span>
+              <span class="aac-group-count">${count} compétence${count > 1 ? 's' : ''}</span>
+            </div>
+            ${cardsHtml}
+          </div>
+        `;
+      }).join('');
+
+      const unpublishedHtml = unpublished.length === 0 ? '' : `
+        <div class="aac-group aac-group-unpublished" data-group="non-publiees">
+          <div class="aac-group-header">
+            <span class="aac-group-title">⚠️ Non publiées</span>
+            <span class="aac-group-count">${unpublished.length} compétence${unpublished.length > 1 ? 's' : ''}</span>
+          </div>
+          <p class="aac-intro">Présentes dans les données mais reliées à aucune carte cliquable sur le site actuellement.</p>
+          <div class="skills-grid">${unpublished.map(u => competenceCardHtml(u.slug, u.ex, u.origin)).join('')}</div>
+        </div>
+      `;
+
+      document.getElementById('aac-groups').innerHTML = groupsHtml + unpublishedHtml;
+      document.getElementById('aac-loading').style.display = 'none';
+    }
+
+    function normalize(str) {
+      return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    }
+
+    function bindSearch() {
+      document.getElementById('aac-search').addEventListener('input', e => {
+        const query = normalize(e.target.value.trim());
+        document.querySelectorAll('.aac-group').forEach(groupEl => {
+          const cards = groupEl.querySelectorAll('.skill-card');
+          let visibleCount = 0;
+          cards.forEach(card => {
+            const matches = !query || card.dataset.title.includes(query);
+            card.classList.toggle('aac-card-hidden', !matches);
+            if (matches) visibleCount++;
+          });
+          if (cards.length > 0) {
+            groupEl.style.display = visibleCount === 0 ? 'none' : '';
+          }
+        });
+      });
+    }
+
+    async function init() {
+      const adminProfile = await lfmAuth.requireRole('admin');
+      if (!adminProfile) return;
+
+      const publishedSlugs = await fetchPublishedSlugs();
+      renderGroups(publishedSlugs);
+      bindSearch();
+      if (typeof CompetencePreview !== 'undefined') {
+        CompetencePreview.decorate(document.getElementById('aac-groups'));
+      }
+    }
+
+    init();
+  </script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

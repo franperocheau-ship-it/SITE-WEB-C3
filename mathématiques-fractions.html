@@ -295,6 +295,21 @@
     .skill-card.card-hidden { display: none; }
     .skill-card-locked { opacity: 0.45; cursor: not-allowed; }
     .skill-card-locked:hover { transform: none; box-shadow: none; border-color: var(--border); }
+    .skill-card-construction { opacity: 0.5; filter: grayscale(0.7); cursor: not-allowed; }
+    .skill-card-construction:hover { transform: none; box-shadow: none; border-color: var(--border); }
+    .skill-badge-construction {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 2px 8px;
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      background: var(--border);
+      color: var(--muted);
+      vertical-align: middle;
+    }
 
     .skill-badges {
       display: flex;
@@ -526,39 +541,50 @@
       }).join("");
     }
 
-    /* Slugs qui ont une page d'exercice active */
-    const EXERCISE_SLUGS = new Set([
-      "lire-fraction",
-      "representer-fraction",
-      "placer-fraction-droite-graduee",
-      "comparer-fractions",
-      "encadrer-fraction",
-      "decomposer-fraction-partie-entiere",
-      "utiliser-fractions-problemes",
-      "fraction-decimale-grille-droite",
-      "fraction-decimale-tableau-numeration"
+    /* ── Custom exercise pages (slug → file) ─────────────────────────────── */
+    const CUSTOM_PAGES = new Map([
+      ["lire-fraction",                        "exercise.html?slug=lire-fraction"],
+      ["representer-fraction",                 "exercise.html?slug=representer-fraction"],
+      ["placer-fraction-droite-graduee",       "maths-fractions-droite.html"],
+      ["comparer-fractions",                   "exercise.html?slug=comparer-fractions"],
+      ["encadrer-fraction",                    "exercise.html?slug=encadrer-fraction"],
+      ["decomposer-fraction-partie-entiere",   "exercise.html?slug=decomposer-fraction-partie-entiere"],
+      ["utiliser-fractions-problemes",         "exercise.html?slug=utiliser-fractions-problemes"],
+      ["fraction-decimale-grille-droite",      "exercise.html?slug=fraction-decimale-grille-droite"],
+      ["fraction-decimale-tableau-numeration", "exercise.html?slug=fraction-decimale-tableau-numeration"],
     ]);
+
+    /* Un CUSTOM_PAGES peut pointer vers une page hors moteur (ex. la droite
+       graduée, qui a sa propre page dédiée) — dans ce cas il n'y a pas de
+       slug exercise.html à résoudre pour le mode guidé. */
+    function guidedExerciseId(skill) {
+      const custom = CUSTOM_PAGES.get(skill.slug);
+      if (!custom) return skill.slug;
+      const m = custom.match(/[?&]slug=([^&]+)/);
+      return m ? decodeURIComponent(m[1]) : skill.slug;
+    }
 
     /* ── Skill card rendering ──────────────────────────────────────────────── */
     function renderSkillCard(skill, sectionId) {
-      const displayLevels = expandLevels(skill.levels);
-      const inCatalog     = EXERCISE_SLUGS.has(skill.slug);
-      const isBlocked     = inCatalog && typeof lfmGuidedAccess !== 'undefined' && !lfmGuidedAccess.isAllowedSync(skill.slug);
-      const hasExercise   = inCatalog && !isBlocked;
-      const href          = hasExercise ? `exercise.html?slug=${skill.slug}` : "#";
-      const onclick       = hasExercise ? "" : `onclick="return false;"`;
-      const lockedClass   = isBlocked ? " skill-card-locked" : "";
+      const displayLevels   = expandLevels(skill.levels);
+      const inCatalog       = CUSTOM_PAGES.has(skill.slug);
+      const isBlocked       = inCatalog && typeof lfmGuidedAccess !== 'undefined' && !lfmGuidedAccess.isAllowedSync(guidedExerciseId(skill));
+      const hasExercise     = inCatalog && !isBlocked;
+      const href            = hasExercise ? CUSTOM_PAGES.get(skill.slug) : "#";
+      const onclick         = hasExercise ? "" : `onclick="return false;"`;
+      const lockedClass     = isBlocked ? " skill-card-locked" : "";
+      const constructionClass = !inCatalog ? " skill-card-construction" : "";
       return `
-        <a class="skill-card${lockedClass}"
+        <a class="skill-card${lockedClass}${constructionClass}"
            href="${href}"
            data-slug="${skill.slug}"
-           ${inCatalog ? `data-exercise-slug="${skill.slug}"` : ""}
+           ${inCatalog ? `data-exercise-slug="${guidedExerciseId(skill)}"` : ""}
            data-levels="${displayLevels.join(",")}"
            data-title="${skill.title.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}"
            data-section="${sectionId}"
            ${onclick}>
           <div class="skill-badges">${renderBadges(displayLevels)}</div>
-          <div class="skill-title">${skill.title}${isBlocked ? ' 🔒' : ''}</div>
+          <div class="skill-title">${skill.title}${isBlocked ? ' 🔒' : ''}${!inCatalog ? ' <span class="skill-badge-construction">En construction</span>' : ''}</div>
         </a>
       `;
     }

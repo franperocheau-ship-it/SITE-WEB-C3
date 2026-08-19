@@ -53,6 +53,8 @@ const Breadcrumb = (() => {
     'Nombres décimaux':       MATHEMATIQUES,
     'Nombres entiers':        MATHEMATIQUES,
     'Probabilités':           MATHEMATIQUES,
+    'Proportionnalité':       MATHEMATIQUES,
+    'Géométrie':              MATHEMATIQUES,
   };
 
   function escapeHTML(str) {

@@ -31,14 +31,14 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Classement précis — mots proches avec accents et 3e lettre"
     },
     level1Bank: [
-      {
+      { id:"ordre-alphabetique-n1-01",
         type: "click-sort",
         instruction: "Clique sur les mots dans l'ordre alphabétique (du premier au dernier).",
         words: ["soleil", "arbre", "nuage", "fleur"],
         answer: ["arbre", "fleur", "nuage", "soleil"],
         feedback: "A vient avant F, F avant N, N avant S : arbre → fleur → nuage → soleil."
       },
-      {
+      { id:"ordre-alphabetique-n1-02",
         type: "mcq",
         instruction: "Quel groupe de mots est dans l'ordre alphabétique ?",
         choices: [
@@ -50,21 +50,21 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "arbre, lune, mer, vent",
         feedback: "A < L < M < V : arbre → lune → mer → vent. C'est le seul groupe dans le bon ordre."
       },
-      {
+      { id:"ordre-alphabetique-n1-03",
         type: "mcq",
         instruction: "Quel mot vient en PREMIER dans le dictionnaire ?",
         choices: ["tigre", "renard", "aigle", "zèbre"],
         answer: "aigle",
         feedback: "A est la première lettre de l'alphabet. Aigle commence par A, donc c'est le premier."
       },
-      {
+      { id:"ordre-alphabetique-n1-04",
         type: "click-sort",
         instruction: "Clique sur les mots dans l'ordre alphabétique.",
         words: ["vache", "canard", "mouton", "lapin"],
         answer: ["canard", "lapin", "mouton", "vache"],
         feedback: "C < L < M < V : canard → lapin → mouton → vache."
       },
-      {
+      { id:"ordre-alphabetique-n1-05",
         type: "mcq",
         instruction: "Pour classer des mots dans un dictionnaire, on compare d'abord…",
         choices: ["le nombre de lettres", "le sens du mot", "la première lettre", "la dernière lettre"],
@@ -73,28 +73,28 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"ordre-alphabetique-n2-01",
         type: "click-sort",
         instruction: "Ces mots commencent tous par la même lettre. Clique-les dans l'ordre alphabétique.",
         words: ["chameau", "chien", "chat", "cheval"],
         answer: ["chameau", "chat", "cheval", "chien"],
         feedback: "On compare la 2e lettre : tous ont 'h'. On regarde donc la 3e : cha < cha… on regarde la 4e : chameau (m) < chat (t) < cheval (v) < chien (i→ non, chi). Attention : cha-t vs cha-m vs che-v vs chi-en. Cha(m) < cha(t) < che(v) < chi(en)."
       },
-      {
+      { id:"ordre-alphabetique-n2-02",
         type: "mcq",
         instruction: "Quel mot vient AVANT 'manger' dans le dictionnaire ?",
         choices: ["manque", "manchot", "marché", "marron"],
         answer: "manchot",
         feedback: "manger = m-a-n-g… manchot = m-a-n-c… La 4e lettre : C vient avant G dans l'alphabet, donc manchot précède manger."
       },
-      {
+      { id:"ordre-alphabetique-n2-03",
         type: "click-sort",
         instruction: "Clique sur ces fruits dans l'ordre alphabétique.",
         words: ["baguette", "banane", "ballon", "barque"],
         answer: ["baguette", "ballon", "banane", "barque"],
         feedback: "ba-g < ba-l < ba-n < ba-r : baguette → ballon → banane → barque."
       },
-      {
+      { id:"ordre-alphabetique-n2-04",
         type: "mcq",
         instruction: "Dans le dictionnaire, dans quel ordre viennent : 'porte', 'portée', 'portrait' ?",
         choices: [
@@ -106,7 +106,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "porte, portée, portrait",
         feedback: "porte (5 lettres) < portée (port-é, 6e lettre é) < portrait (port-r, 6e lettre r). É vient avant R, donc portée précède portrait."
       },
-      {
+      { id:"ordre-alphabetique-n2-05",
         type: "mcq",
         instruction: "Quel mot vient APRÈS 'fleuve' dans le dictionnaire ?",
         choices: ["fleur", "flan", "flûte", "flamme"],
@@ -115,35 +115,35 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"ordre-alphabetique-n3-01",
         type: "click-sort",
         instruction: "Classement délicat ! Clique ces mots dans l'ordre du dictionnaire.",
         words: ["client", "cloche", "clé", "classe", "clown"],
         answer: ["classe", "clé", "client", "cloche", "clown"],
         feedback: "cla- < clé- < cli- < clo-c < clo-w. À la 3e lettre : a < é < i < o. Pour cloche et clown : 4e lettre c < w."
       },
-      {
+      { id:"ordre-alphabetique-n3-02",
         type: "mcq",
         instruction: "On cherche 'trace' dans le dictionnaire. Entre quels mots se trouve-t-il ?",
         choices: ["entre 'tracer' et 'tradition'", "avant 'trac'", "entre 'trac' et 'tracer'", "après 'tradition'"],
         answer: "entre 'trac' et 'tracer'",
         feedback: "trac (4 lettres) < trace (5 lettres, ajoute un e) < tracer (6 lettres, ajoute er). Un mot plus court précède toujours le mot dont il est le début."
       },
-      {
+      { id:"ordre-alphabetique-n3-03",
         type: "click-sort",
         instruction: "Classe ces mots dans l'ordre du dictionnaire.",
         words: ["préférer", "premier", "prendre", "prairie"],
         answer: ["prairie", "préférer", "premier", "prendre"],
         feedback: "pr-a < pr-é (=pré) < pr-e-m < pr-e-n. Prairie commence par pra. Préférer par pré. Premier et prendre par pre : m vient avant n, donc premier < prendre."
       },
-      {
+      { id:"ordre-alphabetique-n3-04",
         type: "mcq",
         instruction: "Pour ranger 'acacia' et 'accent' dans le dictionnaire, quelle lettre compare-t-on en 3e position ?",
         choices: ["a", "c", "c (encore)", "e"],
         answer: "e",
         feedback: "ac-a-cia vs ac-c-ent : la 1re lettre est 'a' pour les deux, la 2e est 'c' pour les deux. On compare la 3e : 'a' (acacia) vs 'c' (accent). A < C, donc acacia vient avant accent."
       },
-      {
+      { id:"ordre-alphabetique-n3-05",
         type: "mcq",
         instruction: "Un élève hésite pour classer 'île' et 'image'. Quelle règle faut-il lui rappeler ?",
         choices: [
@@ -172,21 +172,21 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Reformuler avec un synonyme précis en contexte"
     },
     level1Bank: [
-      {
+      { id:"trouver-synonyme-n1-01",
         type: "mcq",
         instruction: "Quel est le synonyme de 'content' ?",
         choices: ["triste", "heureux", "fâché", "inquiet"],
         answer: "heureux",
         feedback: "Content et heureux expriment tous les deux un sentiment de joie. Ce sont des synonymes : ils ont un sens très proche."
       },
-      {
+      { id:"trouver-synonyme-n1-02",
         type: "mcq",
         instruction: "Quel est le synonyme de 'rapide' ?",
         choices: ["lent", "vif", "calme", "silencieux"],
         answer: "vif",
         feedback: "Rapide et vif signifient tous les deux 'qui se déplace ou agit vite'. Ce sont des synonymes."
       },
-      {
+      { id:"trouver-synonyme-n1-03",
         type: "match",
         instruction: "Associe chaque mot à son synonyme. Clique un mot à gauche, puis son synonyme à droite.",
         pairs: [
@@ -196,7 +196,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Commencer = débuter, fatigué = épuisé, petit = minuscule. Les synonymes peuvent différer légèrement en intensité."
       },
-      {
+      { id:"trouver-synonyme-n1-04",
         type: "mcq",
         instruction: "Deux mots sont synonymes quand ils ont…",
         choices: [
@@ -208,7 +208,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "un sens proche ou identique",
         feedback: "Des synonymes ont un sens très proche. On peut souvent remplacer l'un par l'autre dans une phrase sans changer le sens."
       },
-      {
+      { id:"trouver-synonyme-n1-05",
         type: "mcq",
         instruction: "Quel mot peut remplacer 'courageux' sans changer le sens de la phrase ?",
         choices: ["peureux", "vaillant", "timide", "maladroit"],
@@ -217,7 +217,7 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"trouver-synonyme-n2-01",
         type: "match",
         instruction: "Associe chaque mot à son synonyme. Clique un mot à gauche, puis son synonyme à droite.",
         pairs: [
@@ -228,21 +228,21 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Taciturne (qui parle peu) = silencieux dans ce sens. Étrange = bizarre. Galoper (courir rapidement) ≈ courir. S'exprimer = parler."
       },
-      {
+      { id:"trouver-synonyme-n2-02",
         type: "mcq",
         instruction: "Pour parler de la démarche d'un lion, quel synonyme de 'marcher' est le plus précis ?",
         choices: ["trottiner", "chanceler", "rôder", "traîner"],
         answer: "rôder",
         feedback: "Rôder signifie marcher lentement en cherchant, en surveillant. C'est le synonyme le plus adapté pour un lion qui chasse."
       },
-      {
+      { id:"trouver-synonyme-n2-03",
         type: "mcq",
         instruction: "Dans la phrase 'Le scientifique a analysé le produit', quel synonyme de 'analysé' convient le mieux ?",
         choices: ["regardé", "examiné minutieusement", "goûté", "dessiné"],
         answer: "examiné minutieusement",
         feedback: "Dans un contexte scientifique, analyser implique une observation détaillée et méthodique. 'Examiné minutieusement' rend cette précision mieux que simplement 'regardé'."
       },
-      {
+      { id:"trouver-synonyme-n2-04",
         type: "match",
         instruction: "Associe les synonymes de l'adjectif 'grand' selon leur nuance.",
         pairs: [
@@ -252,7 +252,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Grand peut signifier 'de haute taille', 'célèbre' ou 'intense' selon le contexte. Le synonyme choisi doit correspondre au sens exact."
       },
-      {
+      { id:"trouver-synonyme-n2-05",
         type: "mcq",
         instruction: "Pourquoi deux synonymes ne sont-ils pas toujours interchangeables ?",
         choices: [
@@ -266,14 +266,14 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"trouver-synonyme-n3-01",
         type: "mcq",
         instruction: "Dans un texte sur la mer, quel synonyme de 'bruit' est le plus précis pour parler des vagues ?",
         choices: ["fracas", "tapage", "bavardage", "mélodie"],
         answer: "fracas",
         feedback: "Le fracas évoque un bruit fort et violent, comme celui des vagues qui s'écrasent sur les rochers. C'est le synonyme le plus précis dans ce contexte."
       },
-      {
+      { id:"trouver-synonyme-n3-02",
         type: "match",
         instruction: "Associe chaque verbe à son synonyme le plus précis dans le contexte indiqué.",
         pairs: [
@@ -283,21 +283,21 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Flamboyer = briller avec éclat, geindre = pleurer faiblement, dévaler = descendre en courant. Les synonymes précis enrichissent le style."
       },
-      {
+      { id:"trouver-synonyme-n3-03",
         type: "mcq",
         instruction: "La phrase 'Le directeur était irrité' est au niveau courant. Quel synonyme d'irrité convient dans un texte soutenu ?",
         choices: ["énervé", "en pétard", "courroucé", "de mauvais poil"],
         answer: "courroucé",
         feedback: "Courroucé est un synonyme soutenu et littéraire d'irrité. 'En pétard' et 'de mauvais poil' sont familiers. 'Énervé' reste courant."
       },
-      {
+      { id:"trouver-synonyme-n3-04",
         type: "mcq",
         instruction: "Pour éviter la répétition du verbe 'dire' dans un récit, quel synonyme ne convient PAS pour une réponse agressive ?",
         choices: ["vociférer", "répliquer", "murmurer", "crier"],
         answer: "murmurer",
         feedback: "Murmurer signifie parler très doucement. Ce synonyme de 'dire' ne convient pas pour exprimer une réponse agressive. Vociférer, répliquer ou crier sont adaptés."
       },
-      {
+      { id:"trouver-synonyme-n3-05",
         type: "match",
         instruction: "Chaque phrase a un mot souligné. Associe-la au synonyme soutenu qui pourrait le remplacer.",
         pairs: [
@@ -324,14 +324,14 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Antonymes subtils — registre, nuances et contexte"
     },
     level1Bank: [
-      {
+      { id:"trouver-antonyme-n1-01",
         type: "mcq",
         instruction: "Quel est l'antonyme (contraire) de 'chaud' ?",
         choices: ["tiède", "froid", "brûlant", "chaud"],
         answer: "froid",
         feedback: "Chaud et froid sont des antonymes : ils ont des sens opposés. Tiède est entre les deux, donc pas l'antonyme strict."
       },
-      {
+      { id:"trouver-antonyme-n1-02",
         type: "match",
         instruction: "Associe chaque mot à son contraire. Clique un mot à gauche puis son antonyme à droite.",
         pairs: [
@@ -341,21 +341,21 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Jour ↔ nuit, monter ↔ descendre, gentil ↔ méchant. Les antonymes expriment des idées opposées."
       },
-      {
+      { id:"trouver-antonyme-n1-03",
         type: "mcq",
         instruction: "Quel est l'antonyme de 'grand' ?",
         choices: ["gros", "fort", "petit", "haut"],
         answer: "petit",
         feedback: "Grand et petit désignent des tailles opposées : ce sont des antonymes. Gros concerne le volume, pas la taille."
       },
-      {
+      { id:"trouver-antonyme-n1-04",
         type: "mcq",
         instruction: "L'antonyme de 'commencer' est…",
         choices: ["débuter", "continuer", "terminer", "avancer"],
         answer: "terminer",
         feedback: "Commencer et terminer sont des antonymes : l'un marque le début, l'autre la fin d'une action."
       },
-      {
+      { id:"trouver-antonyme-n1-05",
         type: "match",
         instruction: "Associe chaque adjectif à son contraire.",
         pairs: [
@@ -367,7 +367,7 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"trouver-antonyme-n2-01",
         type: "mcq",
         instruction: "Comment forme-t-on souvent l'antonyme de 'honnête' ?",
         choices: [
@@ -379,7 +379,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "En ajoutant le préfixe dés- ou in-",
         feedback: "Malhonnête (préfixe mal-), déshonnête… Un grand nombre d'antonymes se forment avec un préfixe négatif : in-, dé-/dés-, mal-, im-."
       },
-      {
+      { id:"trouver-antonyme-n2-02",
         type: "match",
         instruction: "Forme l'antonyme de chaque mot en ajoutant le bon préfixe. Associe le mot à son antonyme.",
         pairs: [
@@ -390,21 +390,21 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Impossible (préf. im-), impatient (préf. im-), désordre (préf. dés-), mécontent (préf. mé-)."
       },
-      {
+      { id:"trouver-antonyme-n2-03",
         type: "mcq",
         instruction: "Dans 'La lumière s'allume', l'antonyme du verbe 's'allume' est…",
         choices: ["s'éteint", "brille", "éclaire", "clignote"],
         answer: "s'éteint",
         feedback: "S'allumer et s'éteindre sont des antonymes : quand une lumière s'allume, elle s'éteint au sens contraire."
       },
-      {
+      { id:"trouver-antonyme-n2-04",
         type: "mcq",
         instruction: "Quel est l'antonyme de 'présent' dans la phrase 'L'élève est présent' ?",
         choices: ["absent", "actuel", "passé", "cadeau"],
         answer: "absent",
         feedback: "Dans ce contexte (présence en classe), l'antonyme de présent est absent. Attention : présent peut aussi signifier 'maintenant' ou 'cadeau', avec d'autres antonymes possibles."
       },
-      {
+      { id:"trouver-antonyme-n2-05",
         type: "mcq",
         instruction: "Pourquoi un même mot peut-il avoir plusieurs antonymes différents ?",
         choices: [
@@ -418,14 +418,14 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"trouver-antonyme-n3-01",
         type: "mcq",
         instruction: "Dans un texte littéraire, quel antonyme de 'sombre' est le plus évocateur pour décrire un paysage lumineux ?",
         choices: ["pas sombre", "radieux", "propre", "grand"],
         answer: "radieux",
         feedback: "Radieux (qui rayonne de lumière) est l'antonyme le plus précis et le plus évocateur de 'sombre' dans un contexte littéraire."
       },
-      {
+      { id:"trouver-antonyme-n3-02",
         type: "match",
         instruction: "Associe chaque adjectif à son antonyme le plus précis dans le contexte littéraire.",
         pairs: [
@@ -435,14 +435,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Strident ↔ velouté (doux, chaud), austère ↔ affable (aimable, souriant), aveuglant ↔ tamisé (doux, atténué)."
       },
-      {
+      { id:"trouver-antonyme-n3-03",
         type: "mcq",
         instruction: "L'antonyme de 'espoir' dans le sens philosophique est…",
         choices: ["joie", "désespoir", "bonheur", "inquiétude"],
         answer: "désespoir",
         feedback: "L'espoir est l'attente confiante d'un bien futur. Son contraire le plus fort est le désespoir : l'absence totale d'espoir."
       },
-      {
+      { id:"trouver-antonyme-n3-04",
         type: "match",
         instruction: "Ces verbes ont des antonymes différents selon le contexte. Associe chaque emploi à son contraire.",
         pairs: [
@@ -452,7 +452,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Perdre un match → gagner ; perdre ses clés → retrouver ; perdre du temps → gagner du temps. Un même verbe a des antonymes différents selon le sens exact."
       },
-      {
+      { id:"trouver-antonyme-n3-05",
         type: "mcq",
         instruction: "Dans 'Sa réponse était évasive', l'antonyme exact de 'évasive' est…",
         choices: ["claire", "longue", "sympathique", "étonnante"],
@@ -476,21 +476,21 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Homonymes rares et homophones grammaticaux complexes"
     },
     level1Bank: [
-      {
+      { id:"identifier-homonyme-n1-01",
         type: "mcq",
         instruction: "Que sont 'mère' et 'mer' ?",
         choices: ["Des synonymes", "Des antonymes", "Des homonymes", "Des mots de la même famille"],
         answer: "Des homonymes",
         feedback: "Mère et mer se prononcent de la même façon [mεʁ] mais s'écrivent différemment et ont des sens distincts. Ce sont des homonymes."
       },
-      {
+      { id:"identifier-homonyme-n1-02",
         type: "mcq",
         instruction: "Complète : « Nous avons navigué sur la ___ pendant toute la journée. »",
         choices: ["mère", "mer", "maire", "faire"],
         answer: "mer",
         feedback: "On navigue sur la mer (grande étendue d'eau salée). 'Mère' est le parent féminin, 'maire' est le responsable d'une commune."
       },
-      {
+      { id:"identifier-homonyme-n1-03",
         type: "match",
         instruction: "Associe chaque homonyme à sa définition.",
         pairs: [
@@ -500,14 +500,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Verre (récipient), vert (couleur), vers (direction ou lignes de poème) sont trois homonymes : même son [vɛʁ], sens très différents."
       },
-      {
+      { id:"identifier-homonyme-n1-04",
         type: "mcq",
         instruction: "Qu'est-ce que deux homonymes ont en commun ?",
         choices: ["Le même sens", "La même orthographe", "La même prononciation", "La même longueur"],
         answer: "La même prononciation",
         feedback: "Les homonymes partagent la même prononciation (même son) mais ont des orthographes et/ou des sens différents."
       },
-      {
+      { id:"identifier-homonyme-n1-05",
         type: "mcq",
         instruction: "Quel est l'homonyme du mot 'sot' (stupide) ?",
         choices: ["sol", "sort", "seau", "soif"],
@@ -516,14 +516,14 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"identifier-homonyme-n2-01",
         type: "mcq",
         instruction: "Choisis le bon mot : « Je voudrais un ___ d'eau, s'il vous plaît. »",
         choices: ["verre (récipient pour boire)", "vert (couleur)", "ver (animal)", "vers (direction)"],
         answer: "verre (récipient pour boire)",
         feedback: "On boit dans un verre. Vert est une couleur, ver est un petit animal, vers indique une direction. Même prononciation [vɛʁ], orthographes et sens différents : ce sont des homonymes."
       },
-      {
+      { id:"identifier-homonyme-n2-02",
         type: "mcq",
         instruction: "Quelle phrase utilise correctement 'ou' et 'où' ?",
         choices: [
@@ -535,14 +535,14 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Je ne sais pas où je suis allé.",
         feedback: "'Où' (avec accent) indique un lieu. 'Ou' (sans accent) marque un choix (= ou bien). Test facile : si tu peux remplacer par 'ou bien', pas d'accent. Sinon, accent grave."
       },
-      {
+      { id:"identifier-homonyme-n2-03",
         type: "mcq",
         instruction: "Choisis le bon homonyme : « Il ___ son manteau sur le fauteuil. »",
         choices: ["pose (verbe poser)", "Paul (prénom)", "pot (récipient)", "pauvre"],
         answer: "pose (verbe poser)",
         feedback: "Dans cette phrase, le sujet 'il' a besoin d'un verbe. 'Pose' est le verbe poser conjugué à la 3e personne du singulier. Les homonymes de 'pose' seraient 'peau', 'peut', etc. dans d'autres homonymes."
       },
-      {
+      { id:"identifier-homonyme-n2-04",
         type: "match",
         instruction: "Associe chaque homonyme à la phrase où il doit apparaître.",
         pairs: [
@@ -553,7 +553,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "'A' est le verbe avoir conjugué ; 'à' est une préposition. 'La' est un article défini ; 'là' indique un lieu. Ce sont des homonymes grammaticaux."
       },
-      {
+      { id:"identifier-homonyme-n2-05",
         type: "mcq",
         instruction: "Pourquoi est-il important de connaître les homonymes ?",
         choices: [
@@ -567,14 +567,14 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"identifier-homonyme-n3-01",
         type: "mcq",
         instruction: "Dans « Ces cèdres cèdent sous le vent », combien de mots se prononcent pareil mais s'écrivent différemment ?",
         choices: ["Aucun", "1 paire : ces/cèdres", "1 paire : ces/cèdent", "2 paires : ces/cèdres et ces/cèdent"],
         answer: "1 paire : ces/cèdent",
         feedback: "'Ces' [se] (déterminant) et 'cèdent' [sɛd] ne se prononcent pas exactement pareil. Mais 'cèdres' [sɛdʁ] et 'cèdent' [sɛd] sont proches. La bonne réponse dépend de la prononciation régionale, mais ce sont surtout 'ces' et le début de 'cèdent'/'cèdres' qui sont homophones."
       },
-      {
+      { id:"identifier-homonyme-n3-02",
         type: "match",
         instruction: "Associe chaque paire d'homophones à leur différence grammaticale.",
         pairs: [
@@ -584,21 +584,21 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Son/sont, ce/se, leur/leurs sont des homophones grammaticaux : même son, mais catégorie grammaticale différente. Pour ne pas les confondre, on analyse le rôle du mot dans la phrase."
       },
-      {
+      { id:"identifier-homonyme-n3-03",
         type: "mcq",
         instruction: "Lequel de ces couples n'est PAS une paire d'homonymes ?",
         choices: ["poing / point", "chant / champ", "sain / saint", "maison / manteau"],
         answer: "maison / manteau",
         feedback: "Poing [pwɛ̃] et point [pwɛ̃] sont homonymes. Chant [ʃɑ̃] et champ [ʃɑ̃] sont homonymes. Sain [sɛ̃] et saint [sɛ̃] sont homonymes. Mais maison [mɛzɔ̃] et manteau [mɑ̃to] ne se prononcent pas pareil."
       },
-      {
+      { id:"identifier-homonyme-n3-04",
         type: "mcq",
         instruction: "Dans « Il compte sur ses doigts », 'compte' est un homonyme de…",
         choices: ["comte (noble)", "conte (histoire)", "comte et conte à la fois", "aucun mot"],
         answer: "comte et conte à la fois",
         feedback: "Compte [kɔ̃t] (verbe compter), conte [kɔ̃t] (récit merveilleux) et comte [kɔ̃t] (titre de noblesse) sont trois homonymes ! Même prononciation, orthographes et sens très différents."
       },
-      {
+      { id:"identifier-homonyme-n3-05",
         type: "mcq",
         instruction: "Quelle stratégie permet de ne PAS confondre 'davantage' et 'd'avantage' ?",
         choices: [
@@ -627,28 +627,28 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Analyser la polysémie — liens de sens et glissements de sens"
     },
     level1Bank: [
-      {
+      { id:"polysemie-n1-01",
         type: "mcq",
         instruction: "Un mot qui a plusieurs sens différents s'appelle…",
         choices: ["un synonyme", "un antonyme", "un homonyme", "un mot polysémique"],
         answer: "un mot polysémique",
         feedback: "Polysémique vient du grec 'poly' (plusieurs) et 'sema' (sens). Un mot polysémique possède plusieurs définitions différentes dans le dictionnaire."
       },
-      {
+      { id:"polysemie-n1-02",
         type: "mcq",
         instruction: "Le mot 'voler' peut signifier : 1. Se déplacer dans les airs  2. Prendre ce qui ne m'appartient pas. Combien de sens a-t-il ?",
         choices: ["Un seul sens", "Deux sens", "Trois sens", "Aucun sens"],
         answer: "Deux sens",
         feedback: "Voler est polysémique : il a au moins deux sens différents. 'L'oiseau vole' (dans les airs) et 'Il a volé mon sac' (dérober) n'expriment pas du tout la même idée."
       },
-      {
+      { id:"polysemie-n1-03",
         type: "mcq",
         instruction: "Dans « Le feu est rouge », que signifie 'feu' ?",
         choices: ["Un incendie", "Un signal de circulation", "De la chaleur", "Un feu de cheminée"],
         answer: "Un signal de circulation",
         feedback: "Le contexte (couleur rouge, circulation) indique qu'il s'agit d'un feu tricolore. Le sens d'un mot polysémique se trouve grâce au contexte."
       },
-      {
+      { id:"polysemie-n1-04",
         type: "mcq",
         instruction: "Comment trouve-t-on le bon sens d'un mot polysémique ?",
         choices: [
@@ -660,7 +660,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "En lisant le contexte (les mots autour)",
         feedback: "Le contexte est la clé ! Les mots qui entourent un mot polysémique indiquent quel sens est utilisé dans cette situation."
       },
-      {
+      { id:"polysemie-n1-05",
         type: "mcq",
         instruction: "Quel mot est polysémique ?",
         choices: [
@@ -674,7 +674,7 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"polysemie-n2-01",
         type: "match",
         instruction: "Le mot 'tête' a plusieurs sens. Associe chaque phrase au sens utilisé.",
         pairs: [
@@ -684,7 +684,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Tête peut désigner une partie du corps, une position en tête, ou un caractère difficile. Le contexte révèle le sens polysémique."
       },
-      {
+      { id:"polysemie-n2-02",
         type: "mcq",
         instruction: "Dans 'Le boulanger pétrit la pâte', que signifie 'pâte' ?",
         choices: [
@@ -696,7 +696,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Un mélange de farine et d'eau à travailler",
         feedback: "Le boulanger pétrit une pâte à pain (mélange de farine, eau, levure). Pâte est polysémique : pâtes alimentaires, pâte dentifrice, pâte (tempérament), etc."
       },
-      {
+      { id:"polysemie-n2-03",
         type: "match",
         instruction: "Associe chaque emploi du mot 'planche' à son sens.",
         pairs: [
@@ -706,7 +706,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Planche est polysémique : bois de construction, équipement de sport, page de BD. C'est le contexte qui précise le sens."
       },
-      {
+      { id:"polysemie-n2-04",
         type: "mcq",
         instruction: "Dans 'Son roman est une mine d'informations', le mot 'mine' signifie…",
         choices: [
@@ -718,7 +718,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Une source riche et abondante",
         feedback: "Ici, 'mine d'informations' est une expression figurée : le roman est comme une mine (gisement) très riche. C'est un emploi métaphorique du mot polysémique 'mine'."
       },
-      {
+      { id:"polysemie-n2-05",
         type: "mcq",
         instruction: "Pourquoi le mot 'opération' est-il polysémique ?",
         choices: [
@@ -732,14 +732,14 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"polysemie-n3-01",
         type: "mcq",
         instruction: "Le mot 'pont' signifie 1. ouvrage qui enjambe un cours d'eau 2. partie du navire 3. jour férié entre deux jours chômés. Quel sens 'pont' a-t-il dans 'faire le pont' ?",
         choices: ["Ouvrage sur l'eau", "Partie du navire", "Jour chômé entre deux congés", "Aucun des trois"],
         answer: "Jour chômé entre deux congés",
         feedback: "'Faire le pont' signifie prendre un jour de congé entre deux jours non travaillés (week-end + jour férié). C'est un sens figuré issu de l'idée de 'relier' deux rives."
       },
-      {
+      { id:"polysemie-n3-02",
         type: "match",
         instruction: "Associe chaque emploi du mot 'temps' à sa catégorie de sens.",
         pairs: [
@@ -750,7 +750,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Temps est l'un des mots les plus polysémiques du français. Ses sens (météo, durée, grammaire, moment) ont tous un lien avec la notion de 'durée' ou d''état'."
       },
-      {
+      { id:"polysemie-n3-03",
         type: "mcq",
         instruction: "Comment les sens d'un mot polysémique sont-ils souvent liés entre eux ?",
         choices: [
@@ -762,7 +762,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Ils partagent une image ou une idée commune (métaphore, analogie)",
         feedback: "La polysémie naît souvent d'une métaphore ou d'une analogie. Ex. : 'pied de table' (comme un pied humain qui soutient). Les sens se développent à partir d'une image centrale."
       },
-      {
+      { id:"polysemie-n3-04",
         type: "mcq",
         instruction: "Dans 'La vedette du film a du cœur', que signifie 'vedette' ?",
         choices: [
@@ -774,7 +774,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Une star, une célébrité",
         feedback: "Vedette est polysémique : petit bateau (vedette de la marine), star (vedette du cinéma), mise en relief d'un mot (en vedette). Ici, le contexte 'film' indique qu'il s'agit d'une star."
       },
-      {
+      { id:"polysemie-n3-05",
         type: "match",
         instruction: "Le mot 'lame' a plusieurs sens. Associe chaque emploi à sa définition.",
         pairs: [
@@ -801,7 +801,7 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Analyser et créer des images — métaphore et sens figuré dans les textes"
     },
     level1Bank: [
-      {
+      { id:"sens-propre-figure-n1-01",
         type: "mcq",
         instruction: "Que signifie 'sens propre' d'un mot ?",
         choices: [
@@ -813,7 +813,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Le sens courant et concret du mot",
         feedback: "Le sens propre est le sens premier, concret et littéral. Ex. : 'le chat monte dans l'arbre' → 'monter' au sens propre = se déplacer vers le haut."
       },
-      {
+      { id:"sens-propre-figure-n1-02",
         type: "col-sort",
         instruction: "Clique sur la bonne colonne pour chaque phrase.",
         colA: "Sens propre",
@@ -842,7 +842,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Sens propre = sens concret, littéral. Sens figuré = sens imagé, métaphorique."
       },
-      {
+      { id:"sens-propre-figure-n1-03",
         type: "mcq",
         instruction: "Dans 'Il a un cœur de pierre', le mot 'pierre' est au…",
         choices: [
@@ -854,7 +854,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "sens figuré (dur, sans pitié)",
         feedback: "Le cœur n'est pas fait de pierre ! 'Pierre' est utilisé comme image pour dire que la personne est dure et sans pitié. C'est le sens figuré."
       },
-      {
+      { id:"sens-propre-figure-n1-04",
         type: "mcq",
         instruction: "Quelle phrase utilise 'lourd' au sens figuré ?",
         choices: [
@@ -866,7 +866,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Cette nouvelle est lourde à porter.",
         feedback: "Une nouvelle n'a pas de poids physique. 'Lourde à porter' exprime une douleur morale, un fardeau émotionnel. C'est le sens figuré."
       },
-      {
+      { id:"sens-propre-figure-n1-05",
         type: "mcq",
         instruction: "Dans 'La rivière coule vite', 'couler' est au…",
         choices: ["sens figuré", "sens contraire", "sens propre", "sens polysémique"],
@@ -875,7 +875,7 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"sens-propre-figure-n2-01",
         type: "col-sort",
         instruction: "Clique sur 'Sens propre' ou 'Sens figuré' pour chaque phrase.",
         colA: "Sens propre",
@@ -909,14 +909,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Le sens figuré utilise une image ou une métaphore pour exprimer quelque chose d'abstrait."
       },
-      {
+      { id:"sens-propre-figure-n2-02",
         type: "mcq",
         instruction: "Que signifie l'expression 'avoir le cafard' au sens figuré ?",
         choices: ["Avoir un insecte chez soi", "Être déprimé, triste", "Avoir faim", "Avoir les idées claires"],
         answer: "Être déprimé, triste",
         feedback: "'Avoir le cafard' est une expression figurée qui signifie 'être triste, mélancolique'. L'insecte (le cafard) est utilisé comme image de quelque chose de désagréable et sombre."
       },
-      {
+      { id:"sens-propre-figure-n2-03",
         type: "mcq",
         instruction: "Quelle est la différence entre le sens propre et le sens figuré du mot 'feu' dans 'Mettre le feu aux poudres' ?",
         choices: [
@@ -928,7 +928,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Au sens propre : déclencher une explosion. Au sens figuré : provoquer une dispute ou une crise.",
         feedback: "'Mettre le feu aux poudres' au sens propre = enflammer une poudre explosive. Au sens figuré = déclencher une dispute ou une crise. L'image de l'explosion illustre la soudaineté et la violence de la crise."
       },
-      {
+      { id:"sens-propre-figure-n2-04",
         type: "mcq",
         instruction: "Quelle phrase utilise 'tomber' au sens figuré ?",
         choices: [
@@ -940,7 +940,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "La nuit tombe sur la ville.",
         feedback: "La nuit ne 'tombe' pas physiquement : cette expression signifie 'la nuit arrive progressivement'. C'est un sens figuré. Les autres phrases décrivent des chutes ou des descentes concrètes."
       },
-      {
+      { id:"sens-propre-figure-n2-05",
         type: "mcq",
         instruction: "Dans 'Cette musique m'a transporté', quel est le sens figuré de 'transporté' ?",
         choices: [
@@ -954,7 +954,7 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"sens-propre-figure-n3-01",
         type: "col-sort",
         instruction: "Classe ces expressions : sens propre ou sens figuré ?",
         colA: "Sens propre",
@@ -988,7 +988,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Le sens figuré transforme une action physique en image abstraite : bouillir (chaleur physique → intensité des émotions)."
       },
-      {
+      { id:"sens-propre-figure-n3-02",
         type: "mcq",
         instruction: "Dans un poème, le poète écrit : 'L'aurore aux doigts de rose ouvre les portes du ciel.' Quelle figure de style utilise-t-il ?",
         choices: [
@@ -1000,7 +1000,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Une métaphore (image qui associe l'aurore à une personne aux doigts rosés)",
         feedback: "L'aurore n'a pas vraiment de doigts. 'Aux doigts de rose' est une métaphore (sens figuré) qui compare la lumière orangée du lever de soleil à des doigts roses. C'est une image poétique célèbre (Homère)."
       },
-      {
+      { id:"sens-propre-figure-n3-03",
         type: "mcq",
         instruction: "Expliquer le sens figuré de 'La discussion a dégénéré' : que veut dire 'dégénérer' ici ?",
         choices: [
@@ -1012,7 +1012,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "La discussion a pris une mauvaise tournure, est devenue violente ou agressive",
         feedback: "Au sens propre, dégénérer = perdre ses qualités génétiques. Au sens figuré, une situation 'dégénère' quand elle se dégrade, se détériore et devient violente ou problématique."
       },
-      {
+      { id:"sens-propre-figure-n3-04",
         type: "mcq",
         instruction: "Quel énoncé résume le mieux la relation entre sens propre et sens figuré ?",
         choices: [
@@ -1024,7 +1024,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Le sens figuré naît souvent d'une image tirée du sens propre : on transfère l'idée concrète vers l'abstrait.",
         feedback: "C'est l'essence de la métaphore : on prend une expérience concrète (tomber, brûler, peser) et on l'applique à une réalité abstraite (tomber amoureux, brûler de désir, peser sur la conscience)."
       },
-      {
+      { id:"sens-propre-figure-n3-05",
         type: "mcq",
         instruction: "Lequel de ces titres utilise un mot au sens figuré ?",
         choices: [
@@ -1053,21 +1053,21 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Analyse fine et familles étymologiques"
     },
     level1Bank: [
-      {
+      { id:"famille-de-mots-n1-01",
         type: "mcq",
         instruction: "Quel mot appartient à la famille de « chant » ?",
         choices: ["chanson", "château", "chance", "charme"],
         answer: "chanson",
         feedback: "Chanson vient du radical « chant ». Château, chance et charme ont une origine différente."
       },
-      {
+      { id:"famille-de-mots-n1-02",
         type: "mcq",
         instruction: "Quel mot N'appartient PAS à la famille de « marcher » ?",
         choices: ["marcheur", "démarche", "marché", "marche"],
         answer: "marché",
         feedback: "Marché vient du latin « mercatus » (commerce), alors que marcheur, démarche et marche viennent tous du verbe marcher (aller à pied)."
       },
-      {
+      { id:"famille-de-mots-n1-03",
         type: "match",
         instruction: "Associe chaque mot à un autre membre de sa famille.",
         pairs: [
@@ -1077,7 +1077,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Fleuriste, jardinier et pêcheur sont formés à partir des radicaux fleur-, jardin- et pêch-."
       },
-      {
+      { id:"famille-de-mots-n1-04",
         type: "mcq",
         instruction: "Quel groupe forme une famille de mots ?",
         choices: [
@@ -1089,7 +1089,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "chanter, chanteur, chanson, chant",
         feedback: "Chanter, chanteur, chanson et chant partagent tous le radical « chant ». Les autres groupes mélangent des mots sans lien."
       },
-      {
+      { id:"famille-de-mots-n1-05",
         type: "mcq",
         instruction: "Quel est le radical commun à « porteur », « portage » et « portable » ?",
         choices: ["port", "por", "porte", "portabl"],
@@ -1098,14 +1098,14 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"famille-de-mots-n2-01",
         type: "mcq",
         instruction: "Quel mot est un intrus dans la famille de « pied » ?",
         choices: ["piéton", "trépied", "piège", "piédestal"],
         answer: "piège",
         feedback: "Piège vient du latin « pedica » (entrave), un mot distinct. Piéton (qui va à pied), trépied (trois pieds) et piédestal partagent bien le radical de « pied »."
       },
-      {
+      { id:"famille-de-mots-n2-02",
         type: "mcq",
         instruction: "Les mots « chaud », « chauffer » et « surchauffé » forment-ils une famille ?",
         choices: [
@@ -1117,7 +1117,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Oui, ils partagent le radical « chaud »",
         feedback: "Oui ! « Chaud » est le radical commun. Chauffer = rendre chaud. Surchauffé = trop chauffé. Le préfixe « sur- » ne change pas la famille."
       },
-      {
+      { id:"famille-de-mots-n2-03",
         type: "match",
         instruction: "Associe chaque mot à son dérivé de même famille.",
         pairs: [
@@ -1127,7 +1127,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Embellir = rendre beau, fortifier = rendre fort, agrandir = rendre grand. Ces mots partagent le même radical."
       },
-      {
+      { id:"famille-de-mots-n2-04",
         type: "mcq",
         instruction: "Pourquoi « dent » et « dentifrice » appartiennent-ils à la même famille ?",
         choices: [
@@ -1139,7 +1139,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Car dentifrice contient le radical « dent »",
         feedback: "Dentifrice = dent + latin « fricare » (frotter). Il contient bien le radical « dent ». Même famille que dentiste, dentition…"
       },
-      {
+      { id:"famille-de-mots-n2-05",
         type: "mcq",
         instruction: "Parmi ces mots, lequel est de la famille de « lire » ?",
         choices: ["lilas", "lisible", "lime", "lion"],
@@ -1148,7 +1148,7 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"famille-de-mots-n3-01",
         type: "mcq",
         instruction: "Les mots « main » et « manuel » appartiennent-ils à la même famille ?",
         choices: [
@@ -1160,7 +1160,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Oui, tous deux viennent du latin « manus » (main)",
         feedback: "Manuel (fait à la main) vient du latin « manualis », dérivé de « manus » (la main). C'est la même famille étymologique que « main »."
       },
-      {
+      { id:"famille-de-mots-n3-02",
         type: "match",
         instruction: "Associe chaque mot savant (origine latine ou grecque) à son équivalent courant.",
         pairs: [
@@ -1170,7 +1170,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Pédestre (pes/pedis = pied), aquatique (aqua = eau), solaire (sol = soleil) : des mots savants de même famille que des mots courants."
       },
-      {
+      { id:"famille-de-mots-n3-03",
         type: "col-sort",
         instruction: "Classe chaque mot dans sa famille : famille de « port » ou famille de « fort » ?",
         colA: "Famille de « port »",
@@ -1184,14 +1184,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Port- (porter, portail, portable) et fort- (fortifier, renforcer, fortement) sont deux familles bien distinctes."
       },
-      {
+      { id:"famille-de-mots-n3-04",
         type: "mcq",
         instruction: "Quel mot n'appartient PAS à la famille de « voir » ?",
         choices: ["prévoir", "voile", "revoir", "apercevoir"],
         answer: "voile",
         feedback: "Voile (tissu) n'a aucun lien avec le verbe voir. Prévoir = voir à l'avance, revoir = voir à nouveau, apercevoir = commencer à voir."
       },
-      {
+      { id:"famille-de-mots-n3-05",
         type: "mcq",
         instruction: "Pourquoi « dentiste » et « trident » appartiennent-ils à la même famille ?",
         choices: [
@@ -1220,21 +1220,21 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Radicaux latins et grecs — familles étymologiques"
     },
     level1Bank: [
-      {
+      { id:"identifier-radical-n1-01",
         type: "mcq",
         instruction: "Quel est le radical du mot « chanteur » ?",
         choices: ["chant", "-eur", "chanteuse", "chante"],
         answer: "chant",
         feedback: "Chant-eur : le radical est « chant ». Le suffixe « -eur » indique une personne qui fait l'action."
       },
-      {
+      { id:"identifier-radical-n1-02",
         type: "mcq",
         instruction: "Quel est le radical commun à « jardiner », « jardinier » et « jardinage » ?",
         choices: ["jardin", "jar", "jardinage", "jardiner"],
         answer: "jardin",
         feedback: "Le radical commun est « jardin ». Tous ces mots parlent du jardin et de ce qui lui est lié."
       },
-      {
+      { id:"identifier-radical-n1-03",
         type: "match",
         instruction: "Associe chaque mot à son radical.",
         pairs: [
@@ -1244,7 +1244,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "March-eur, dans-eur, vend-eur : le suffixe « -eur » s'ajoute au radical pour désigner celui qui fait l'action."
       },
-      {
+      { id:"identifier-radical-n1-04",
         type: "mcq",
         instruction: "Le radical d'un mot, c'est…",
         choices: [
@@ -1256,7 +1256,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "La partie du mot qui porte le sens principal",
         feedback: "Le radical est la partie centrale du mot qui en porte le sens. Les préfixes et suffixes viennent s'y ajouter."
       },
-      {
+      { id:"identifier-radical-n1-05",
         type: "mcq",
         instruction: "Quel est le radical du mot « fleuriste » ?",
         choices: ["fleur", "florist", "fleurist", "-iste"],
@@ -1265,21 +1265,21 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"identifier-radical-n2-01",
         type: "mcq",
         instruction: "Quel est le radical du mot « invisible » ?",
         choices: ["in-", "vis", "visible", "-ible"],
         answer: "vis",
         feedback: "Invisible = in- (non) + vis (voir) + -ible (que l'on peut). Le radical « vis- » vient du latin « videre » (voir)."
       },
-      {
+      { id:"identifier-radical-n2-02",
         type: "mcq",
         instruction: "Quel est le radical du mot « agrandissement » ?",
         choices: ["a-", "grand", "-issement", "agrand"],
         answer: "grand",
         feedback: "A-grand-issement : « a- » est un préfixe, « grand » est le radical, « -issement » est le suffixe. Ce mot signifie « rendre plus grand »."
       },
-      {
+      { id:"identifier-radical-n2-03",
         type: "match",
         instruction: "Associe chaque mot à son radical (attention aux petits changements de forme).",
         pairs: [
@@ -1289,14 +1289,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Raccourc-ir (court), allég-er (léger), noire-ir (noir) : le radical peut légèrement changer de forme."
       },
-      {
+      { id:"identifier-radical-n2-04",
         type: "mcq",
         instruction: "Quel radical partagent « boulanger », « boulangerie » et « boulangère » ?",
         choices: ["boulangi", "boulanger", "boulang", "boul"],
         answer: "boulang",
         feedback: "Le radical commun est « boulang- ». Il vient de l'ancien français « boulange » (action de faire le pain)."
       },
-      {
+      { id:"identifier-radical-n2-05",
         type: "mcq",
         instruction: "Quel est le radical du mot « malheureux » ?",
         choices: ["mal-", "heureux", "heur", "-eux"],
@@ -1305,14 +1305,14 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"identifier-radical-n3-01",
         type: "mcq",
         instruction: "Quel est le radical commun à « portable », « transport » et « importation » ?",
         choices: ["port", "trans", "-able", "import"],
         answer: "port",
         feedback: "Le radical « port- » vient du latin « portare » (porter). On le retrouve dans portable, transport (porter d'un lieu à l'autre), importation."
       },
-      {
+      { id:"identifier-radical-n3-02",
         type: "col-sort",
         instruction: "Classe chaque mot selon son radical : radical « vis/voir » ou radical « aud/entendre » ?",
         colA: "Radical « vis » (voir)",
@@ -1334,21 +1334,21 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Vis- (visuel, visible, invisible) vient du latin « videre » (voir). Aud- (audition, inaudible) vient de « audire » (entendre)."
       },
-      {
+      { id:"identifier-radical-n3-03",
         type: "mcq",
         instruction: "Dans « biologie », « zoologie » et « psychologie », quel est le radical grec commun ?",
         choices: ["-logie", "bio", "zoo", "psycho"],
         answer: "-logie",
         feedback: "Le radical grec « logos » (étude, discours) donne le suffixe « -logie ». Biologie = étude du vivant, zoologie = étude des animaux."
       },
-      {
+      { id:"identifier-radical-n3-04",
         type: "mcq",
         instruction: "Quel est le radical commun à « lumineux », « illuminer » et « luminosité » ?",
         choices: ["lumin", "lum", "illumin", "luminosit"],
         answer: "lumin",
         feedback: "Le radical « lumin- » vient du latin « lumen » (lumière). On le retrouve dans lumineux, illuminer, luminosité."
       },
-      {
+      { id:"identifier-radical-n3-05",
         type: "match",
         instruction: "Associe chaque radical latin à sa signification.",
         pairs: [{ left: "aqua-", right: "eau" }, { left: "terr-", right: "terre" }, { left: "igni-", right: "feu" }],
@@ -1371,21 +1371,21 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Préfixes savants d'origine latine et grecque"
     },
     level1Bank: [
-      {
+      { id:"identifier-prefixe-n1-01",
         type: "mcq",
         instruction: "Quel est le préfixe dans le mot « déplacer » ?",
         choices: ["dé-", "place", "-er", "dép"],
         answer: "dé-",
         feedback: "Dé-placer : « dé- » est le préfixe. Il signifie « contraire de » ou « action inverse ». Dé-placer = ne plus être à sa place."
       },
-      {
+      { id:"identifier-prefixe-n1-02",
         type: "mcq",
         instruction: "Que signifie le préfixe « re- » dans « recommencer » ?",
         choices: ["avant", "après", "à nouveau", "sans"],
         answer: "à nouveau",
         feedback: "« Re- » indique la répétition. Recommencer = commencer à nouveau. On retrouve re- dans refaire, relire, revoir…"
       },
-      {
+      { id:"identifier-prefixe-n1-03",
         type: "match",
         instruction: "Associe chaque préfixe à sa signification.",
         pairs: [
@@ -1395,14 +1395,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Im- (non), pré- (avant), sur- (au-dessus) sont des préfixes très courants en français."
       },
-      {
+      { id:"identifier-prefixe-n1-04",
         type: "mcq",
         instruction: "Quel mot contient un préfixe ?",
         choices: ["maison", "soleil", "désordre", "jardin"],
         answer: "désordre",
         feedback: "Désordre = dés- (préfixe = contraire) + ordre. Maison, soleil et jardin n'ont pas de préfixe."
       },
-      {
+      { id:"identifier-prefixe-n1-05",
         type: "mcq",
         instruction: "Quel préfixe faut-il ajouter à « heureux » pour former son contraire ?",
         choices: ["re-", "mal-", "pré-", "sur-"],
@@ -1411,21 +1411,21 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"identifier-prefixe-n2-01",
         type: "mcq",
         instruction: "Que signifie le préfixe « anti- » dans « antiviolence » ?",
         choices: ["avant", "contre", "à nouveau", "sans"],
         answer: "contre",
         feedback: "Anti- vient du grec et signifie « contre ». Antiviolence = contre la violence. Aussi : antibiotique, antidote…"
       },
-      {
+      { id:"identifier-prefixe-n2-02",
         type: "mcq",
         instruction: "Le préfixe « inter- » dans « intercontinental » signifie…",
         choices: ["à l'intérieur", "entre", "au-delà", "contre"],
         answer: "entre",
         feedback: "Inter- (du latin « inter ») signifie « entre ». Intercontinental = entre les continents. Aussi : international, interclasse, interagir."
       },
-      {
+      { id:"identifier-prefixe-n2-03",
         type: "col-sort",
         instruction: "Classe chaque mot selon le sens de son préfixe.",
         colA: "Répétition (re-)",
@@ -1443,14 +1443,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Re- exprime la répétition (refaire, relire, revenir). Dé- et mal- expriment le contraire ou l'action inverse."
       },
-      {
+      { id:"identifier-prefixe-n2-04",
         type: "mcq",
         instruction: "Quel préfixe donne à « possible » son contraire ?",
         choices: ["dé-", "im-", "re-", "sur-"],
         answer: "im-",
         feedback: "Impossible = im- + possible. Im- (variante de in- devant p, b, m) exprime la négation."
       },
-      {
+      { id:"identifier-prefixe-n2-05",
         type: "mcq",
         instruction: "Que signifie le préfixe « bi- » dans « bilingue » ?",
         choices: ["sans", "deux", "entre", "beaucoup"],
@@ -1459,14 +1459,14 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"identifier-prefixe-n3-01",
         type: "mcq",
         instruction: "Quel préfixe grec signifiant « loin » retrouve-t-on dans « téléphone », « télévision » et « télécommunication » ?",
         choices: ["télé-", "téléph-", "tél-", "phon-"],
         answer: "télé-",
         feedback: "Télé- vient du grec « têle » (loin). Téléphone = voix de loin, télévision = vision de loin, télécommunication = communication à distance."
       },
-      {
+      { id:"identifier-prefixe-n3-02",
         type: "match",
         instruction: "Associe chaque préfixe savant à sa signification.",
         pairs: [
@@ -1476,14 +1476,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Micro- (microbe, microscope), macro- (macroéconomie, macrocosme), poly- (polygone, polyglotte) sont des préfixes d'origine grecque."
       },
-      {
+      { id:"identifier-prefixe-n3-03",
         type: "mcq",
         instruction: "Dans « hypothèse », quel préfixe grec signifie « sous, en dessous » ?",
         choices: ["hyp-", "hypo-", "hyper-", "hé-"],
         answer: "hypo-",
         feedback: "Hypo- (du grec « hupo ») signifie « sous, en dessous ». Hypo-thèse = ce qui est posé en dessous (comme base). À ne pas confondre avec hyper- (au-dessus, excessif)."
       },
-      {
+      { id:"identifier-prefixe-n3-04",
         type: "col-sort",
         instruction: "Classe chaque mot selon le sens de son préfixe : « au-delà / trop » ou « en dessous / pas assez » ?",
         colA: "Au-delà / trop (hyper-, sur-, ultra-)",
@@ -1509,7 +1509,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Hyper-, sur-, ultra- expriment l'excès ou le dépassement. Hypo-, sous-, infra- expriment l'insuffisance ou ce qui est en dessous."
       },
-      {
+      { id:"identifier-prefixe-n3-05",
         type: "mcq",
         instruction: "Le préfixe « anthropo- » (dans « anthropologie ») vient du grec et signifie…",
         choices: ["animal", "homme", "nature", "société"],
@@ -1533,21 +1533,21 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Suffixes savants d'origine latine et grecque"
     },
     level1Bank: [
-      {
+      { id:"identifier-suffixe-n1-01",
         type: "mcq",
         instruction: "Quel est le suffixe dans le mot « jardinage » ?",
         choices: ["jardin-", "-age", "-inage", "jard-"],
         answer: "-age",
         feedback: "Jardin-age : le suffixe « -age » indique une action ou son résultat. Jardinage = l'action de jardiner."
       },
-      {
+      { id:"identifier-suffixe-n1-02",
         type: "mcq",
         instruction: "Que signifie le suffixe « -eur » dans « plongeur » ?",
         choices: ["une action", "un endroit", "celui qui fait l'action", "une qualité"],
         answer: "celui qui fait l'action",
         feedback: "Le suffixe « -eur » désigne une personne qui fait l'action. Plongeur = celui qui plonge. Aussi : chanteur, nageur, coureur…"
       },
-      {
+      { id:"identifier-suffixe-n1-03",
         type: "match",
         instruction: "Associe chaque suffixe à ce qu'il exprime.",
         pairs: [
@@ -1557,14 +1557,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "-ette (petite taille), -ment (transforme un adjectif en adverbe), -tion (action ou résultat)."
       },
-      {
+      { id:"identifier-suffixe-n1-04",
         type: "mcq",
         instruction: "Quel mot contient un suffixe signifiant « petite taille » ?",
         choices: ["maison", "jardin", "maisonnette", "soleil"],
         answer: "maisonnette",
         feedback: "Maisonnette = maison + -ette. Le suffixe « -ette » exprime la petite taille ou un diminutif."
       },
-      {
+      { id:"identifier-suffixe-n1-05",
         type: "mcq",
         instruction: "Quel suffixe retrouve-t-on dans « épicerie », « boulangerie » et « boucherie » pour désigner un lieu de commerce ?",
         choices: ["-erie", "-er", "-rie", "-ie"],
@@ -1573,14 +1573,14 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"identifier-suffixe-n2-01",
         type: "mcq",
         instruction: "Quel suffixe transforme l'adjectif « rapide » en adverbe ?",
         choices: ["-ment", "-eur", "-age", "-ette"],
         answer: "-ment",
         feedback: "Rapide-ment. Le suffixe « -ment » transforme un adjectif (au féminin) en adverbe de manière : lente → lentement, douce → doucement."
       },
-      {
+      { id:"identifier-suffixe-n2-02",
         type: "match",
         instruction: "Associe chaque suffixe à la catégorie grammaticale qu'il crée.",
         pairs: [
@@ -1590,7 +1590,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "-eur crée des noms de personne, -ment crée des adverbes, -able crée des adjectifs signifiant « qu'on peut… »."
       },
-      {
+      { id:"identifier-suffixe-n2-03",
         type: "col-sort",
         instruction: "Classe chaque mot : le suffixe désigne-t-il une personne ou une action/résultat ?",
         colA: "Désigne une personne (-eur, -iste, -ien)",
@@ -1620,14 +1620,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "-eur, -iste et -ien désignent des personnes. -age, -tion et -ment désignent des actions ou leurs résultats."
       },
-      {
+      { id:"identifier-suffixe-n2-04",
         type: "mcq",
         instruction: "Le suffixe « -iste » dans « fleuriste » exprime…",
         choices: ["Une petite fleur", "Une profession ou spécialité", "Une action", "Un résultat"],
         answer: "Une profession ou spécialité",
         feedback: "Fleur-iste : le suffixe « -iste » désigne une personne exerçant une profession. Aussi : pianiste, dentiste, journaliste…"
       },
-      {
+      { id:"identifier-suffixe-n2-05",
         type: "mcq",
         instruction: "Quel suffixe dans « livraison » crée un nom d'action à partir du verbe « livrer » ?",
         choices: ["-son", "-aison", "-ison", "livr-"],
@@ -1636,14 +1636,14 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"identifier-suffixe-n3-01",
         type: "mcq",
         instruction: "Le suffixe « -logie » dans « biologie », « zoologie » et « psychologie » vient du grec et signifie…",
         choices: ["voir", "écrire", "étude / discours", "vivre"],
         answer: "étude / discours",
         feedback: "« Logos » signifie « étude, discours » en grec. Biologie = étude du vivant, zoologie = étude des animaux, psychologie = étude de l'esprit."
       },
-      {
+      { id:"identifier-suffixe-n3-02",
         type: "match",
         instruction: "Associe chaque suffixe d'origine grecque à sa signification.",
         pairs: [
@@ -1653,14 +1653,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "-vore (latin vorare = dévorer), -phile (grec philos = ami), -phobe (grec phobos = peur)."
       },
-      {
+      { id:"identifier-suffixe-n3-03",
         type: "mcq",
         instruction: "Dans « omnivore », quel suffixe signifie « qui mange » ?",
         choices: ["omni-", "-vore", "-ore", "omniv-"],
         answer: "-vore",
         feedback: "-vore vient du latin « vorare » (dévorer). Omnivore = mange de tout. Aussi : carnivore (viande), herbivore (herbe), insectivore (insectes)."
       },
-      {
+      { id:"identifier-suffixe-n3-04",
         type: "col-sort",
         instruction: "Classe chaque suffixe selon son origine : grec ou latin ?",
         colA: "Origine grecque",
@@ -1694,7 +1694,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Les suffixes d'origine grecque enrichissent surtout le vocabulaire scientifique (-logie, -phile, -scope). Les suffixes latins sont très courants dans le français quotidien (-tion, -age)."
       },
-      {
+      { id:"identifier-suffixe-n3-05",
         type: "mcq",
         instruction: "Le suffixe « -graphie » (dans « photographie ») vient du grec « graphein » qui signifie…",
         choices: ["voir", "écrire / représenter", "mesurer", "parler"],
@@ -1718,14 +1718,14 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Analyse morphologique avancée"
     },
     level1Bank: [
-      {
+      { id:"mot-derive-n1-01",
         type: "mcq",
         instruction: "Quel mot est dérivé de « fleur » avec un suffixe ?",
         choices: ["fleuve", "flocon", "fleurir", "flûte"],
         answer: "fleurir",
         feedback: "Fleurir = fleur + -ir. C'est un mot dérivé par suffixation. Fleuve, flocon et flûte ont une origine différente."
       },
-      {
+      { id:"mot-derive-n1-02",
         type: "mcq",
         instruction: "Comment est formé le mot « malheureux » ?",
         choices: [
@@ -1737,7 +1737,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "préfixe mal- + radical heur + suffixe -eux",
         feedback: "Mal-heur-eux : mal- (préfixe = mauvais), heur (radical = chance), -eux (suffixe = plein de). C'est un mot à double affixation."
       },
-      {
+      { id:"mot-derive-n1-03",
         type: "match",
         instruction: "Associe chaque base à son mot dérivé.",
         pairs: [
@@ -1747,14 +1747,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Jardin-ier, chant-eur, livr-aison : on ajoute un suffixe à la base pour former un nouveau mot."
       },
-      {
+      { id:"mot-derive-n1-04",
         type: "mcq",
         instruction: "Quel préfixe ajoute-t-on à « possible » pour former son contraire ?",
         choices: ["dé-", "im-", "re-", "sur-"],
         answer: "im-",
         feedback: "Impossible = im- + possible. Im- (variante de in- devant p, b, m) exprime la négation."
       },
-      {
+      { id:"mot-derive-n1-05",
         type: "mcq",
         instruction: "Quel mot est formé par préfixation à partir de « honnête » ?",
         choices: ["honnêteté", "honnêtement", "malhonnête", "honnêteur"],
@@ -1763,14 +1763,14 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"mot-derive-n2-01",
         type: "mcq",
         instruction: "Quel est le mot de base (radical sans affixes) de « débranchement » ?",
         choices: ["débranche", "branche", "débranchement", "branchement"],
         answer: "branche",
         feedback: "Dé-branch-ement : le préfixe « dé- » et le suffixe « -ment » entourent le radical « branch- ». Le mot de base est « branche »."
       },
-      {
+      { id:"mot-derive-n2-02",
         type: "mcq",
         instruction: "Comment est formé « imperméable » ?",
         choices: [
@@ -1782,7 +1782,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "im- (non) + perméable (qui laisse passer l'eau)",
         feedback: "Imperméable = im- (non) + perméable (qui laisse l'eau passer). Un imperméable est un vêtement qui ne laisse pas passer la pluie."
       },
-      {
+      { id:"mot-derive-n2-03",
         type: "col-sort",
         instruction: "Classe chaque mot selon son type de dérivation.",
         colA: "Dérivation par préfixe",
@@ -1796,14 +1796,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "La préfixation ajoute un élément avant le radical ; la suffixation ajoute un élément après."
       },
-      {
+      { id:"mot-derive-n2-04",
         type: "mcq",
         instruction: "Quel mot est formé avec à la fois un préfixe ET un suffixe ?",
         choices: ["jardinier", "malheureux", "chanteur", "fleuri"],
         answer: "malheureux",
         feedback: "Malheureux = mal- (préfixe) + heur (radical) + -eux (suffixe). Les autres n'ont qu'un suffixe."
       },
-      {
+      { id:"mot-derive-n2-05",
         type: "match",
         instruction: "Associe chaque mot à sa structure de dérivation.",
         pairs: [
@@ -1815,14 +1815,14 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"mot-derive-n3-01",
         type: "mcq",
         instruction: "Le mot « invraisemblable » est formé de…",
         choices: ["in- + vraisemblable", "invrai + semblable", "in- + vrai + sembl + -able", "in- + vraisembl + -able"],
         answer: "in- + vraisemblable",
         feedback: "Invraisemblable = in- (non) + vraisemblable. Et vraisemblable lui-même = vrai + sembl- + -able. C'est un mot à plusieurs niveaux de dérivation."
       },
-      {
+      { id:"mot-derive-n3-02",
         type: "col-sort",
         instruction: "Classe chaque mot : est-il dérivé (préfixe ou suffixe) ou composé (deux mots indépendants réunis) ?",
         colA: "Mot dérivé (affixes)",
@@ -1848,7 +1848,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Un mot dérivé est formé d'un radical + affixes (préfixes/suffixes). Un mot composé réunit deux mots qui existent séparément."
       },
-      {
+      { id:"mot-derive-n3-03",
         type: "mcq",
         instruction: "Quelle est la différence entre un mot dérivé et un mot composé ?",
         choices: [
@@ -1860,14 +1860,14 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Un mot dérivé est formé d'un radical + affixes ; un mot composé réunit deux mots indépendants",
         feedback: "Dérivé : chanteur (chant + -eur). Composé : porte-monnaie (porte + monnaie). Les deux enrichissent le vocabulaire mais par des mécanismes différents."
       },
-      {
+      { id:"mot-derive-n3-04",
         type: "mcq",
         instruction: "Dans « extraordinaire », le préfixe « extra- » signifie…",
         choices: ["très", "en dehors de / au-delà de", "entre", "avant"],
         answer: "en dehors de / au-delà de",
         feedback: "Extra- vient du latin « extra » (en dehors de). Extraordinaire = en dehors de l'ordinaire, hors du commun."
       },
-      {
+      { id:"mot-derive-n3-05",
         type: "match",
         instruction: "Associe chaque mot à sa structure morphologique.",
         pairs: [
@@ -1894,21 +1894,21 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Étymologie avancée — familles latines et grecques"
     },
     level1Bank: [
-      {
+      { id:"origine-mots-n1-01",
         type: "mcq",
         instruction: "Que signifie la racine latine « aqua » ?",
         choices: ["feu", "eau", "terre", "air"],
         answer: "eau",
         feedback: "« Aqua » signifie « eau » en latin. On la retrouve dans aquarium, aquatique, aqueduct (conduit d'eau)."
       },
-      {
+      { id:"origine-mots-n1-02",
         type: "mcq",
         instruction: "Quelle racine grecque signifie « vie » ?",
         choices: ["geo", "bio", "photo", "logo"],
         answer: "bio",
         feedback: "« Bios » signifie « vie » en grec. On le retrouve dans biologie (étude du vivant), biographie (récit d'une vie), biodiversité."
       },
-      {
+      { id:"origine-mots-n1-03",
         type: "match",
         instruction: "Associe chaque racine latine ou grecque à sa signification.",
         pairs: [
@@ -1918,14 +1918,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Terra : territoire, terrestre. Photo : photographie, photosynthèse. Chronos : chronologie, chronomètre."
       },
-      {
+      { id:"origine-mots-n1-04",
         type: "mcq",
         instruction: "Le mot « bibliothèque » vient du grec « biblion » (livre) et « theke » (rangement). Que signifie-t-il littéralement ?",
         choices: ["Endroit pour lire", "Rangement de livres", "Collection de livres anciens", "Maison du savoir"],
         answer: "Rangement de livres",
         feedback: "Bibliothèque = biblion (livre) + theke (rangement, coffre). Littéralement : l'endroit où l'on range les livres."
       },
-      {
+      { id:"origine-mots-n1-05",
         type: "mcq",
         instruction: "La racine « graph- » (du grec « graphein ») dans « autographe » signifie…",
         choices: ["lire", "voir", "écrire / tracer", "entendre"],
@@ -1934,7 +1934,7 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"origine-mots-n2-01",
         type: "match",
         instruction: "Associe chaque adjectif savant à son équivalent courant.",
         pairs: [
@@ -1944,14 +1944,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Aquatique (aqua = eau), terrestre (terra = terre), aérien (aer = air) sont formés à partir de racines latines ou grecques."
       },
-      {
+      { id:"origine-mots-n2-02",
         type: "mcq",
         instruction: "Quelle racine grecque se retrouve dans « géographie » et « géologie » ?",
         choices: ["graph", "geo", "log", "bio"],
         answer: "geo",
         feedback: "« Geo » vient du grec « gê » (la Terre). Géographie = description de la Terre, géologie = étude des roches terrestres."
       },
-      {
+      { id:"origine-mots-n2-03",
         type: "col-sort",
         instruction: "Ces mots viennent-ils d'une racine latine ou d'une racine grecque ?",
         colA: "Racine latine",
@@ -1973,14 +1973,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Le latin et le grec ont tous deux enrichi le français, surtout dans les domaines scientifiques et savants."
       },
-      {
+      { id:"origine-mots-n2-04",
         type: "mcq",
         instruction: "La racine « phon- » (du grec « phone ») dans « microphone » et « téléphone » signifie…",
         choices: ["lumière", "voix / son", "eau", "voir"],
         answer: "voix / son",
         feedback: "Phone = voix, son en grec. Microphone = qui amplifie la voix, téléphone = voix à distance, phonologie = étude des sons."
       },
-      {
+      { id:"origine-mots-n2-05",
         type: "mcq",
         instruction: "Parmi ces mots, lequel vient de la racine latine « manus » (main) ?",
         choices: ["manteau", "manuel", "manie", "manège"],
@@ -1989,14 +1989,14 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"origine-mots-n3-01",
         type: "mcq",
         instruction: "La racine grecque « demos » signifie « peuple ». Dans quel mot la retrouve-t-on ?",
         choices: ["démon", "démocratie", "démolir", "démontrer"],
         answer: "démocratie",
         feedback: "Démocratie = demos (peuple) + kratos (pouvoir). C'est le pouvoir du peuple. Démon, démolir et démontrer ont des racines différentes."
       },
-      {
+      { id:"origine-mots-n3-02",
         type: "match",
         instruction: "Associe chaque racine grecque à un mot qui la contient.",
         pairs: [
@@ -2006,14 +2006,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Démocratie (pouvoir du peuple), calligraphie (belle écriture), claustrophobie (peur des espaces fermés)."
       },
-      {
+      { id:"origine-mots-n3-03",
         type: "mcq",
         instruction: "Les mots « carnivore », « herbivore » et « omnivore » partagent le suffixe latin « -vore » qui signifie…",
         choices: ["animal", "qui mange", "qui court", "qui vit"],
         answer: "qui mange",
         feedback: "Vore vient du latin « vorare » (dévorer). Carnivore = mange de la viande, herbivore = mange de l'herbe, omnivore = mange de tout."
       },
-      {
+      { id:"origine-mots-n3-04",
         type: "col-sort",
         instruction: "Ces racines viennent-elles du latin ou du grec ?",
         colA: "Latin",
@@ -2047,7 +2047,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Latin et grec ont souvent des racines qui expriment les mêmes sens (voir, entendre) mais donnent des mots différents en français."
       },
-      {
+      { id:"origine-mots-n3-05",
         type: "mcq",
         instruction: "Le mot « philanthrope » (qui aime l'humanité) est formé de…",
         choices: [
@@ -2076,7 +2076,7 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Thèmes abstraits, intrus difficiles, polysémie"
     },
     level1Bank: [
-      {
+      { id:"regrouper-par-theme-n1-01",
         type: "col-sort",
         instruction: "Classe chaque mot dans son thème.",
         colA: "Animaux de compagnie",
@@ -2090,14 +2090,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Pour regrouper des mots par thème, on cherche ce qu'ils ont en commun : leur catégorie, leur usage, leur domaine."
       },
-      {
+      { id:"regrouper-par-theme-n1-02",
         type: "mcq",
         instruction: "Quel mot n'appartient PAS au thème des sports ?",
         choices: ["natation", "football", "peinture", "tennis"],
         answer: "peinture",
         feedback: "Natation, football et tennis sont des sports. La peinture est un art, pas un sport."
       },
-      {
+      { id:"regrouper-par-theme-n1-03",
         type: "col-sort",
         instruction: "Classe chaque mot dans son thème.",
         colA: "La nature",
@@ -2111,7 +2111,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "La nature désigne le monde naturel (forêts, rivières, montagnes). L'école rassemble les outils et lieux d'apprentissage."
       },
-      {
+      { id:"regrouper-par-theme-n1-04",
         type: "mcq",
         instruction: "Quel groupe de mots appartient entièrement au thème de la cuisine ?",
         choices: [
@@ -2123,7 +2123,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "couteau, fourchette, assiette, casserole",
         feedback: "Couteau, fourchette, assiette et casserole sont tous des ustensiles de cuisine. Les autres groupes appartiennent à d'autres thèmes (école, sport, bricolage)."
       },
-      {
+      { id:"regrouper-par-theme-n1-05",
         type: "match",
         instruction: "Associe chaque mot à son thème.",
         pairs: [
@@ -2135,7 +2135,7 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"regrouper-par-theme-n2-01",
         type: "col-sort",
         instruction: "Classe chaque mot dans son thème.",
         colA: "La météo (temps qu'il fait)",
@@ -2149,14 +2149,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Météo et saisons sont liées mais distinctes : la météo désigne les conditions atmosphériques du moment ; les saisons sont des périodes cycliques de l'année."
       },
-      {
+      { id:"regrouper-par-theme-n2-02",
         type: "mcq",
         instruction: "Quel mot est l'intrus dans cette liste liée au thème de la mer ?",
         choices: ["vague", "écume", "marée", "prairie"],
         answer: "prairie",
         feedback: "Vague, écume et marée appartiennent au champ de la mer. La prairie est un espace terrestre herbu — elle n'a rien à voir avec la mer."
       },
-      {
+      { id:"regrouper-par-theme-n2-03",
         type: "col-sort",
         instruction: "Classe chaque mot dans son thème.",
         colA: "La tristesse",
@@ -2174,14 +2174,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Les thèmes des émotions (joie, tristesse) rassemblent des mots qui décrivent des états intérieurs. Attention : certains mots comme « larme » peuvent parfois évoquer une joie intense !"
       },
-      {
+      { id:"regrouper-par-theme-n2-04",
         type: "mcq",
         instruction: "À quel thème général appartiennent « flûte », « violon », « batterie » et « trompette » ?",
         choices: ["Les sports", "La musique", "Les outils", "Les transports"],
         answer: "La musique",
         feedback: "Ce sont tous des instruments de musique. Les regrouper sous le thème « musique » ou « instruments » est correct."
       },
-      {
+      { id:"regrouper-par-theme-n2-05",
         type: "match",
         instruction: "Associe chaque groupe de mots à son thème.",
         pairs: [
@@ -2193,7 +2193,7 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"regrouper-par-theme-n3-01",
         type: "col-sort",
         instruction: "Classe chaque mot dans son thème.",
         colA: "La guerre",
@@ -2211,14 +2211,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Attention : certains mots comme « armistice » ou « trêve » appartiennent aux deux thèmes — ils désignent des pauses dans la guerre."
       },
-      {
+      { id:"regrouper-par-theme-n3-02",
         type: "mcq",
         instruction: "Quel mot peut appartenir à deux thèmes différents selon le contexte ?",
         choices: ["vague (la mer / l'imprécision)", "marée", "écume", "phare"],
         answer: "vague (la mer / l'imprécision)",
         feedback: "« Vague » appartient au thème de la mer (une vague d'eau) ET au thème de l'imprécision (une réponse vague). Cette double appartenance s'appelle la polysémie."
       },
-      {
+      { id:"regrouper-par-theme-n3-03",
         type: "col-sort",
         instruction: "Classe chaque mot dans son thème.",
         colA: "L'argent / le commerce",
@@ -2236,14 +2236,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Commerce et droit sont deux domaines bien distincts, même si certains mots (comme « contrat ») peuvent appartenir aux deux."
       },
-      {
+      { id:"regrouper-par-theme-n3-04",
         type: "mcq",
         instruction: "Dans quel thème général range-t-on les mots « épistolaire », « narratif », « lyrique » et « dramatique » ?",
         choices: ["La géographie", "Les genres littéraires", "La biologie", "Les arts plastiques"],
         answer: "Les genres littéraires",
         feedback: "Épistolaire (lettres), narratif (récit), lyrique (poésie) et dramatique (théâtre) désignent les grands genres de la littérature."
       },
-      {
+      { id:"regrouper-par-theme-n3-05",
         type: "match",
         instruction: "Associe chaque mot savant au domaine thématique auquel il appartient.",
         pairs: [
@@ -2270,7 +2270,7 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Polysémie et analyse fine du champ lexical dans un texte"
     },
     level1Bank: [
-      {
+      { id:"champ-lexical-n1-01",
         type: "col-sort",
         instruction: "Classe chaque mot : appartient-il au champ lexical de la mer ?",
         colA: "Champ lexical de la mer",
@@ -2296,14 +2296,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Le champ lexical de la mer rassemble tous les mots qui évoquent la mer : ses mouvements, ses habitants, ses outils de navigation…"
       },
-      {
+      { id:"champ-lexical-n1-02",
         type: "mcq",
         instruction: "Quel mot N'appartient PAS au champ lexical de la forêt ?",
         choices: ["arbre", "feuille", "bûcheron", "assiette"],
         answer: "assiette",
         feedback: "Arbre, feuille et bûcheron évoquent tous la forêt. L'assiette est un objet de cuisine qui n'a aucun lien avec la forêt."
       },
-      {
+      { id:"champ-lexical-n1-03",
         type: "col-sort",
         instruction: "Classe chaque mot dans son champ lexical.",
         colA: "Champ lexical de l'école",
@@ -2317,7 +2317,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Un champ lexical peut regrouper des personnes, des lieux, des objets et des actions qui partagent un même domaine."
       },
-      {
+      { id:"champ-lexical-n1-04",
         type: "mcq",
         instruction: "Qu'est-ce qu'un champ lexical ?",
         choices: [
@@ -2329,7 +2329,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Des mots qui appartiennent au même thème et évoquent la même réalité",
         feedback: "Le champ lexical d'un mot ou d'un thème regroupe tous les mots qui s'y rapportent, quelle que soit leur famille grammaticale (noms, verbes, adjectifs…)."
       },
-      {
+      { id:"champ-lexical-n1-05",
         type: "mcq",
         instruction: "Quel groupe de mots forme le champ lexical de la peur ?",
         choices: [
@@ -2343,7 +2343,7 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"champ-lexical-n2-01",
         type: "col-sort",
         instruction: "Classe chaque mot dans son champ lexical.",
         colA: "Champ lexical de la joie",
@@ -2357,14 +2357,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Les champs lexicaux des émotions sont très riches. Un mot comme « larme » peut parfois appartenir aux deux (larmes de joie), selon le contexte."
       },
-      {
+      { id:"champ-lexical-n2-02",
         type: "mcq",
         instruction: "Quel mot inattendu peut appartenir au champ lexical de la lumière ?",
         choices: ["éclat", "songe", "marmite", "tabouret"],
         answer: "éclat",
         feedback: "« Éclat » peut appartenir au champ lexical de la lumière (un éclat de lumière), mais aussi au bruit (un éclat de rire) ou à la violence. C'est un mot polysémique."
       },
-      {
+      { id:"champ-lexical-n2-03",
         type: "col-sort",
         instruction: "Classe chaque mot dans son champ lexical.",
         colA: "Le voyage",
@@ -2378,7 +2378,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Voyage et corps humain sont deux champs bien distincts. Certains mots peuvent néanmoins appartenir aux deux : « circuit » (tour du corps / circuit touristique)."
       },
-      {
+      { id:"champ-lexical-n2-04",
         type: "mcq",
         instruction: "Quelle est la différence entre un champ lexical et une famille de mots ?",
         choices: [
@@ -2390,7 +2390,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Le champ lexical regroupe des mots par thème ; la famille de mots regroupe des mots ayant le même radical",
         feedback: "Champ lexical de la mer : vague, marin, voile, sel, tempête (radical différent, même thème). Famille de « pêche » : pêcher, pêcheur, pêcherie (même radical, sens lié)."
       },
-      {
+      { id:"champ-lexical-n2-05",
         type: "mcq",
         instruction: "Quel est le champ lexical dominant dans : « Le chirurgien prit son bistouri, ausculta le patient et posa un diagnostic » ?",
         choices: ["La gastronomie", "La médecine", "L'architecture", "Le sport"],
@@ -2399,7 +2399,7 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"champ-lexical-n3-01",
         type: "mcq",
         instruction: "Un mot peut-il appartenir à plusieurs champs lexicaux ?",
         choices: [
@@ -2411,7 +2411,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Oui, selon le contexte, un même mot peut appartenir à des champs différents",
         feedback: "Exemple : « court » appartient au champ lexical du tennis (un court de tennis), de l'espace (un trajet court) ou du temps (un délai court). Le contexte est décisif."
       },
-      {
+      { id:"champ-lexical-n3-02",
         type: "col-sort",
         instruction: "Classe chaque mot dans le bon champ lexical du mot « temps ».",
         colA: "Le temps qui passe (durée)",
@@ -2425,14 +2425,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Le mot « temps » est polysémique : il a deux champs lexicaux distincts selon qu'on parle de durée ou de météorologie."
       },
-      {
+      { id:"champ-lexical-n3-03",
         type: "mcq",
         instruction: "Dans quel champ lexical range-t-on le mot « éclipse » ?",
         choices: ["La cuisine", "L'astronomie", "La médecine", "L'architecture"],
         answer: "L'astronomie",
         feedback: "Une éclipse se produit quand un astre en cache un autre (éclipse de Soleil, de Lune). Ce mot appartient au champ lexical de l'astronomie."
       },
-      {
+      { id:"champ-lexical-n3-04",
         type: "match",
         instruction: "Associe chaque mot savant au champ lexical qu'il évoque.",
         pairs: [
@@ -2442,7 +2442,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Axiome (vérité de base en maths), allitération (répétition de sons en poésie), photosynthèse (fabrication de sucre par les plantes)."
       },
-      {
+      { id:"champ-lexical-n3-05",
         type: "mcq",
         instruction: "Dans : « Les cordes vibrèrent, la mélodie s'éleva, le maestro leva sa baguette », quel est le champ lexical dominant ?",
         choices: ["Le sport", "La musique", "La cuisine", "La guerre"],
@@ -2466,14 +2466,14 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Connotations, registres et précision stylistique"
     },
     level1Bank: [
-      {
+      { id:"mot-adapte-contexte-n1-01",
         type: "mcq",
         instruction: "Complète la phrase : « Le chien _____ très fort quand le facteur sonne. »",
         choices: ["chante", "aboie", "siffle", "miaule"],
         answer: "aboie",
         feedback: "Le chien aboie : c'est le verbe spécifique à son cri. Chanter est pour les oiseaux, siffler pour certains animaux, miauler pour le chat."
       },
-      {
+      { id:"mot-adapte-contexte-n1-02",
         type: "mcq",
         instruction: "Quelle phrase utilise le mot le plus adapté pour parler de la démarche d'un éléphant ?",
         choices: [
@@ -2485,21 +2485,21 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "L'éléphant avançait lourdement.",
         feedback: "Un éléphant est lourd et lent. « Avancer lourdement » est le plus précis. Sautiller, voltiger et gambader évoquent légèreté et vivacité, inadaptées à cet animal."
       },
-      {
+      { id:"mot-adapte-contexte-n1-03",
         type: "mcq",
         instruction: "Complète la phrase : « La _____ brillait dans le ciel étoilé de la nuit. »",
         choices: ["lune", "carotte", "brosse", "chaussure"],
         answer: "lune",
         feedback: "La lune est l'astre qui éclaire la nuit. Les autres mots n'ont aucun rapport avec le ciel."
       },
-      {
+      { id:"mot-adapte-contexte-n1-04",
         type: "mcq",
         instruction: "Dans un compte rendu médical, quel mot est le plus adapté pour parler d'une douleur au ventre ?",
         choices: ["bobo", "mal au bidon", "douleur abdominale", "c'est nul"],
         answer: "douleur abdominale",
         feedback: "Dans un contexte médical et formel, on utilise des termes précis : « douleur abdominale » (ventre). « Bobo » et « bidon » sont des mots familiers, inadaptés à ce contexte."
       },
-      {
+      { id:"mot-adapte-contexte-n1-05",
         type: "match",
         instruction: "Associe chaque animal au verbe qui décrit son cri.",
         pairs: [
@@ -2511,35 +2511,35 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"mot-adapte-contexte-n2-01",
         type: "mcq",
         instruction: "Complète la phrase : « En automne, les feuilles des arbres _____ et recouvrent le sol. »",
         choices: ["tombent", "poussent", "fleurissent", "gèlent"],
         answer: "tombent",
         feedback: "En automne, les feuilles tombent. Pousser et fleurir décrivent le printemps, geler évoque l'hiver."
       },
-      {
+      { id:"mot-adapte-contexte-n2-02",
         type: "mcq",
         instruction: "Lequel de ces mots est le plus précis pour décrire une lumière très faible et terne ?",
         choices: ["éblouissante", "vive", "blafarde", "lumineuse"],
         answer: "blafarde",
         feedback: "Blafarde décrit une lumière faible, froide et sans éclat. Éblouissante, vive et lumineuse désignent au contraire des lumières intenses."
       },
-      {
+      { id:"mot-adapte-contexte-n2-03",
         type: "mcq",
         instruction: "Complète : « L'alpiniste avait les jambes _____ après avoir gravi le sommet. »",
         choices: ["légères", "cotonneuses", "bronzées", "parfumées"],
         answer: "cotonneuses",
         feedback: "« Avoir les jambes cotonneuses (en coton) » exprime la fatigue musculaire extrême. Légères est le contraire, bronzées et parfumées ne correspondent pas à ce contexte."
       },
-      {
+      { id:"mot-adapte-contexte-n2-04",
         type: "mcq",
         instruction: "Complète : « Le conférencier _____ l'assistance avec son exposé passionnant. »",
         choices: ["ennuyait", "captivait", "dormait", "criait"],
         answer: "captivait",
         feedback: "Captiver = retenir entièrement l'attention. Un exposé passionnant captive son auditoire. Ennuyer est le contraire."
       },
-      {
+      { id:"mot-adapte-contexte-n2-05",
         type: "col-sort",
         instruction: "Classe chaque mot selon le contexte où il convient pour décrire le mouvement de l'eau.",
         colA: "Un ruisseau calme",
@@ -2567,21 +2567,21 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"mot-adapte-contexte-n3-01",
         type: "mcq",
         instruction: "Quel mot convient le mieux dans : « Sa remarque, bien que _____, m'a blessé. » ?",
         choices: ["anodine", "hurlée", "parfumée", "froide"],
         answer: "anodine",
         feedback: "Anodine = sans importance apparente, sans gravité. La phrase dit que la remarque semblait insignifiante mais a pourtant blessé — c'est le sens voulu."
       },
-      {
+      { id:"mot-adapte-contexte-n3-02",
         type: "mcq",
         instruction: "Dans : « Ce discours a _____ l'assemblée », quel verbe convient pour exprimer l'ennui causé par un exposé confus ?",
         choices: ["fasciné", "lassé", "réjoui", "émerveillé"],
         answer: "lassé",
         feedback: "Lasser = ennuyer, fatiguer par excès ou manque d'intérêt. Un discours confus lasse son auditoire. Fasciner, réjouir, émerveiller expriment tous des réactions positives."
       },
-      {
+      { id:"mot-adapte-contexte-n3-03",
         type: "col-sort",
         instruction: "Classe ces adjectifs selon la connotation qu'ils donnent à un sourire.",
         colA: "Sourire positif (chaleur, sincérité)",
@@ -2607,14 +2607,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Le choix de l'adjectif change complètement l'image donnée. Un sourire « radieux » et un sourire « narquois » ne traduisent pas du tout la même attitude."
       },
-      {
+      { id:"mot-adapte-contexte-n3-04",
         type: "mcq",
         instruction: "Dans : « Il la regarda avec une moue _____ », quel adjectif exprime le mieux le dédain ?",
         choices: ["admirative", "méprisante", "affectueuse", "attendrie"],
         answer: "méprisante",
         feedback: "Une moue méprisante exprime le dédain, le peu d'estime. Une moue admirative, affectueuse ou attendrie exprimerait au contraire des sentiments positifs."
       },
-      {
+      { id:"mot-adapte-contexte-n3-05",
         type: "match",
         instruction: "Associe chaque mot à la phrase où il est le mieux adapté.",
         pairs: [
@@ -2641,7 +2641,7 @@ Object.assign(window.EXERCISE_DATA, {
       "3": "Analyse fine, effets de style et maîtrise des registres"
     },
     level1Bank: [
-      {
+      { id:"niveaux-de-langue-n1-01",
         type: "mcq",
         instruction: "Quelle phrase est au registre familier ?",
         choices: [
@@ -2653,7 +2653,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "J'ai pas vu ce film.",
         feedback: "« J'ai pas vu » omet la première partie de la négation (ne). C'est typique du registre familier. Le registre courant dirait « Je n'ai pas vu » ; le soutenu, « Je n'ai point visionné »."
       },
-      {
+      { id:"niveaux-de-langue-n1-02",
         type: "col-sort",
         instruction: "Classe chaque expression selon son niveau de langue.",
         colA: "Registre familier",
@@ -2683,21 +2683,21 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Le registre familier se reconnaît à l'absence de la négation complète, aux mots argotiques ou au verlan. Le registre courant respecte les règles grammaticales standard."
       },
-      {
+      { id:"niveaux-de-langue-n1-03",
         type: "mcq",
         instruction: "Quel mot est de niveau soutenu pour dire « triste » ?",
         choices: ["cafardeux", "triste", "mélancolique", "déprimé"],
         answer: "mélancolique",
         feedback: "Mélancolique est un terme littéraire et soutenu. Triste est courant. Cafardeux est familier (avoir le cafard = être triste). Déprimé est courant/médical."
       },
-      {
+      { id:"niveaux-de-langue-n1-04",
         type: "mcq",
         instruction: "À quel niveau de langue appartient : « Veuillez agréer l'expression de mes sincères salutations » ?",
         choices: ["Familier", "Courant", "Soutenu", "Argotique"],
         answer: "Soutenu",
         feedback: "Cette formule de politesse très formelle appartient au registre soutenu. Elle est utilisée dans les lettres officielles, les courriers administratifs."
       },
-      {
+      { id:"niveaux-de-langue-n1-05",
         type: "mcq",
         instruction: "Dans quelle situation utilise-t-on le registre familier ?",
         choices: [
@@ -2711,7 +2711,7 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level2Bank: [
-      {
+      { id:"niveaux-de-langue-n2-01",
         type: "mcq",
         instruction: "Laquelle de ces phrases est au registre soutenu ?",
         choices: [
@@ -2723,7 +2723,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Cet ouvrage m'a profondément marqué.",
         feedback: "« Ouvrage » est plus soutenu que « livre » ou « bouquin ». « Profondément marqué » est une formulation recherchée. Les autres phrases sont familières ou courantes."
       },
-      {
+      { id:"niveaux-de-langue-n2-02",
         type: "col-sort",
         instruction: "Classe ces phrases selon leur niveau de langue.",
         colA: "Registre familier",
@@ -2757,14 +2757,14 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Entre le familier et le soutenu, le registre courant est celui qu'on utilise dans la vie quotidienne normale : correct sans être recherché."
       },
-      {
+      { id:"niveaux-de-langue-n2-03",
         type: "mcq",
         instruction: "Quel est l'équivalent soutenu de « Il s'est baladé en ville » ?",
         choices: ["Il s'est promené en ville.", "Il a déambulé dans la cité.", "Il a tourné en rond.", "Il a traîné."],
         answer: "Il a déambulé dans la cité.",
         feedback: "Déambuler = se promener sans but précis. C'est un terme soutenu. « Cité » pour désigner la ville est aussi plus soutenu. Se promener est courant, traîner et tourner en rond sont familiers."
       },
-      {
+      { id:"niveaux-de-langue-n2-04",
         type: "match",
         instruction: "Associe chaque expression familière à son équivalent courant.",
         pairs: [
@@ -2774,7 +2774,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Passer du familier au courant consiste souvent à changer le vocabulaire et à respecter la syntaxe standard (negation complète, pronoms corrects)."
       },
-      {
+      { id:"niveaux-de-langue-n2-05",
         type: "mcq",
         instruction: "Pourquoi adapter son niveau de langue selon la situation ?",
         choices: [
@@ -2788,7 +2788,7 @@ Object.assign(window.EXERCISE_DATA, {
       }
     ],
     level3Bank: [
-      {
+      { id:"niveaux-de-langue-n3-01",
         type: "col-sort",
         instruction: "Classe ces phrases selon leur niveau de langue.",
         colA: "Registre courant",
@@ -2818,7 +2818,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Le registre soutenu se reconnaît à l'emploi de termes rares, de tournures complexes et d'un vocabulaire précis et recherché."
       },
-      {
+      { id:"niveaux-de-langue-n3-02",
         type: "mcq",
         instruction: "Quel est l'effet produit par l'utilisation d'un registre soutenu dans un texte ?",
         choices: [
@@ -2830,7 +2830,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Le texte gagne en précision, en élégance et en distance",
         feedback: "Le registre soutenu permet d'exprimer des nuances fines, de créer de la distance ou de donner un ton solennel. Mais utilisé de façon excessive, il peut aussi paraître artificiel."
       },
-      {
+      { id:"niveaux-de-langue-n3-03",
         type: "match",
         instruction: "Associe chaque formule soutenue à son équivalent courant.",
         pairs: [
@@ -2840,7 +2840,7 @@ Object.assign(window.EXERCISE_DATA, {
         ],
         feedback: "Solliciter = demander (soutenu), convenir = être nécessaire (soutenu), fort agréable = très agréable (soutenu). Le registre soutenu ajoute formalité et distance."
       },
-      {
+      { id:"niveaux-de-langue-n3-04",
         type: "mcq",
         instruction: "Dans un discours officiel ou un exposé, quel niveau de langue est le plus approprié ?",
         choices: [
@@ -2852,7 +2852,7 @@ Object.assign(window.EXERCISE_DATA, {
         answer: "Courant, avec des touches soutenues selon les passages",
         feedback: "Un exposé ou un discours officiel appelle un registre courant soigné, parfois soutenu pour les passages importants. Le registre familier ou argotique serait inadapté et ferait perdre en crédibilité."
       },
-      {
+      { id:"niveaux-de-langue-n3-05",
         type: "col-sort",
         instruction: "Classe chaque paire selon le niveau de langue : familier ou soutenu ?",
         colA: "Registre familier",
