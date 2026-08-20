@@ -1815,11 +1815,18 @@
       const qa   = lfmAnalytics.resolveItemText(it.exercise_slug, it.level, it.item_id);
       const questionText = qa && qa.q ? qa.q : '(question retirée du catalogue depuis)';
       const pct  = Math.round(it.failRate * 100);
+      /* "sur les 5 dernières" n'a de sens que si la fenêtre de 5 est
+         effectivement remplie — sinon ("1 tentative sur les 5 dernières")
+         c'est ambigu, on lit "5" comme un total attendu. En dessous de 5,
+         "enregistrée(s)" ne présuppose aucun total. */
+      const attemptsLabel = it.attempts === 5
+        ? `${it.attempts} tentatives sur les 5 dernières`
+        : `${it.attempts} tentative${it.attempts > 1 ? 's' : ''} enregistrée${it.attempts > 1 ? 's' : ''}`;
       return `
       <div class="consolider-item">
         <div>
           <div class="ci-comp">${escHtml(questionText)}</div>
-          <div class="ci-meta">${escHtml(meta.competence)} · Niveau ${it.level} · ${it.attempts} tentative${it.attempts > 1 ? 's' : ''} sur les 5 dernières · <span class="ci-flag">${pct}% d'échec</span></div>
+          <div class="ci-meta">${escHtml(meta.competence)} · Niveau ${it.level} · ${attemptsLabel} · <span class="ci-flag">${pct}% d'échec</span></div>
         </div>
       </div>`;
     }).join('');

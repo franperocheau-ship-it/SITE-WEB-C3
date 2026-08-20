@@ -674,10 +674,12 @@ const lfmAnalytics = (() => {
      Fenêtre glissante : 5 dernières tentatives par item_id (rows déjà
      triées created_at desc par getStudentItemResultsRaw, donc les 5
      premières rencontrées par groupe = les 5 dernières). Seuil : au moins
-     2 tentatives et un taux d'échec > 0, sinon l'item n'est pas affiché.
-     Triées par taux d'échec décroissant, 10 pires au maximum. */
+     1 tentative et un taux d'échec > 0, sinon l'item n'est pas affiché —
+     un item raté dès le premier essai doit remonter, pas seulement à partir
+     de la 2e tentative. Triées par taux d'échec décroissant, 10 pires au
+     maximum. */
   const WORST_ITEMS_WINDOW = 5;
-  const WORST_ITEMS_MIN_ATTEMPTS = 2;
+  const WORST_ITEMS_MIN_ATTEMPTS = 1;
   const WORST_ITEMS_MAX_DISPLAY = 10;
 
   function computeWorstItems(itemRows) {
