@@ -19,9 +19,11 @@
   <script src="js/utils.js"></script>
   <script src="js/teacher.js?v=3"></script>
   <script src="js/teacher-analytics.js?v=7"></script>
-  <!-- Résolution du texte des « Questions les plus ratées » (fiche élève) —
-       réutilise extractLevelBuckets/describeQA du module aperçu admin,
-       voir renderWorstItems() / lfmAnalytics.resolveItemText(). -->
+  <!-- Résolution dynamique du texte d'un item depuis EXERCISE_DATA (jamais
+       stocké en dur) — réutilise extractLevelBuckets/describeQA du module
+       aperçu admin, voir lfmAnalytics.resolveItemText(). Pas encore
+       consommée à cet endroit : à nouveau câblée par l'onglet "Exercices
+       chutés" (chantier en cours). -->
   <script src="js/competence-preview.js?v=8"></script>
   <script src="js/niveau-pastilles.js?v=2"></script>
   <script src="js/level-badge.js?v=1"></script>
@@ -896,16 +898,6 @@
           <div id="niveaux-content"></div>
         </div>
 
-        <!-- Questions les plus ratées — fenêtre glissante sur les 5
-             dernières tentatives par item_id (≥ 2 tentatives, taux
-             d'échec > 0), voir lfmAnalytics.computeWorstItems /
-             renderWorstItems. Texte de la question résolu dynamiquement
-             depuis EXERCISE_DATA via item_id (jamais stocké en dur). -->
-        <div class="overview-card" id="student-questions-ratees" style="margin-bottom:20px;display:none">
-          <div class="overview-card-title">Questions les plus ratées</div>
-          <div id="questions-ratees-list"></div>
-        </div>
-
         <!-- Mes questionnaires de lecture — même présentation que le
              dashboard élève (détail par questionnaire + moyenne générale),
              voir computeQuestionnairesSummary/renderStudentQuestionnaires. -->
@@ -1727,16 +1719,13 @@
     _studentRows    = [];
     document.getElementById('student-rank-line').innerHTML = '';
     document.getElementById('print-student-btn').style.display = 'none';
-    ['student-consolider', 'student-reussies', 'student-niveaux', 'student-questions-ratees', 'student-questionnaires'].forEach(id => {
+    ['student-consolider', 'student-reussies', 'student-niveaux', 'student-questionnaires'].forEach(id => {
       document.getElementById(id).style.display = 'none';
     });
 
     try {
       await loadCatalogAssets();
-      const [rows, itemRows] = await Promise.all([
-        lfmTeacher.getStudentResultsRaw(authUserId),
-        lfmTeacher.getStudentItemResultsRaw(authUserId)
-      ]);
+      const rows = await lfmTeacher.getStudentResultsRaw(authUserId);
       _studentRows = rows;
       if (rows.length === 0) return;
       logUnmatchedCatalogSlugs(rows, _catalogMap);
@@ -1753,7 +1742,6 @@
       renderConsoliderList(profile.consolider);
       renderReussiesList(profile.reussies);
       renderStudentNiveaux(profile);
-      renderWorstItems(itemRows);
       renderStudentQuestionnaires(rows);
 
       document.getElementById('print-student-btn').style.display = '';
@@ -1805,39 +1793,6 @@
     if (!html) { el.style.display = 'none'; return; }
     el.style.display = '';
     document.getElementById('niveaux-content').innerHTML = html;
-  }
-
-  /* ── Questions les plus ratées — fenêtre glissante 5 dernières tentatives
-     par item_id, seuil 2 tentatives, taux d'échec > 0, triées décroissant
-     (voir lfmAnalytics.computeWorstItems). Texte de la question résolu à
-     l'affichage via resolveItemText (EXERCISE_DATA), jamais stocké en dur :
-     si l'item ou l'exercice a été retiré du catalogue depuis, on affiche un
-     repli explicite plutôt que de masquer la ligne. ─────────────────────── */
-  function renderWorstItems(itemRows) {
-    const el = document.getElementById('student-questions-ratees');
-    const worst = lfmAnalytics.computeWorstItems(itemRows || []);
-    if (worst.length === 0) { el.style.display = 'none'; return; }
-    el.style.display = '';
-    document.getElementById('questions-ratees-list').innerHTML = worst.map(it => {
-      const meta = lfmAnalytics.metaFor(_catalogMap, it.exercise_slug);
-      const qa   = lfmAnalytics.resolveItemText(it.exercise_slug, it.level, it.item_id);
-      const questionText = qa && qa.q ? qa.q : '(question retirée du catalogue depuis)';
-      const pct  = Math.round(it.failRate * 100);
-      /* "sur les 5 dernières" n'a de sens que si la fenêtre de 5 est
-         effectivement remplie — sinon ("1 tentative sur les 5 dernières")
-         c'est ambigu, on lit "5" comme un total attendu. En dessous de 5,
-         "enregistrée(s)" ne présuppose aucun total. */
-      const attemptsLabel = it.attempts === 5
-        ? `${it.attempts} tentatives sur les 5 dernières`
-        : `${it.attempts} tentative${it.attempts > 1 ? 's' : ''} enregistrée${it.attempts > 1 ? 's' : ''}`;
-      return `
-      <div class="consolider-item">
-        <div>
-          <div class="ci-comp">${escHtml(questionText)}</div>
-          <div class="ci-meta">${escHtml(meta.competence)} · Niveau ${it.level} · ${attemptsLabel} · <span class="ci-flag">${pct}% d'échec</span></div>
-        </div>
-      </div>`;
-    }).join('');
   }
 
   /* ── Mes questionnaires de lecture — même présentation (détail par
