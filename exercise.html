@@ -15501,6 +15501,8 @@
         prevAnswers: [],
         rawScore: 0, rawMax: 0
       };
+      itemResults = [];
+      attemptId   = crypto.randomUUID();
 
       document.getElementById('q-total').textContent = items.length;
       pcaRenderQuestion(document.getElementById('ex-card'));
@@ -15575,6 +15577,11 @@
         input.disabled = true;
         vbtn.disabled  = true;
         pcaState.rawMax += 1;
+        /* item.id identifie la phrase entière (une entrée de level*Bank), pas
+           le blanc individuel : une phrase à 2 verbes produit 2 lignes sous
+           le même item_id, une par blanc — pas de granularité plus fine que
+           l'item dans le schéma exercise_item_results. */
+        recordItemResult(item, isRight, lv);
 
         if (isRight) {
           pcaState.rawScore += 1;
@@ -15739,7 +15746,9 @@
         level:        'Niveau ' + lv,
         score:        s20,
         total:        20,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
       });
     }
 
@@ -15891,6 +15900,8 @@
       const items   = eoaShuffle([...bank]).slice(0, n);
 
       eoaState = { lv, items, idx: 0, rawScore: 0, rawMax: 0 };
+      itemResults = [];
+      attemptId   = crypto.randomUUID();
 
       document.getElementById('q-total').textContent = items.length;
       eoaRenderQuestion(document.getElementById('ex-card'));
@@ -15991,6 +16002,10 @@
             if (step1FirstClick && step2FirstTry)    eoaState.rawScore += 2;
             else if (step1FirstClick)                 eoaState.rawScore += 1;
             /* 0 pt si step1FirstClick === false */
+            /* is_correct = crédit plein (2 pts, 1er coup) uniquement — un
+               1 pt (auxiliaire bon, forme ratée) compte comme faux ici, même
+               principe binaire que partout ailleurs dans le suivi granulaire. */
+            recordItemResult(q, step1FirstClick && step2FirstTry, lv);
           }
           const praise = (step1FirstClick && step2FirstTry)
             ? EOA_POSITIFS[Math.floor(Math.random() * EOA_POSITIFS.length)]
@@ -16110,7 +16125,9 @@
         level:        'Niveau ' + lv,
         score:        s20,
         total:        20,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
       });
     }
 
@@ -31650,6 +31667,8 @@
       const bankKey = 'level' + lv + 'Bank';
       const items   = shuffle([...(sessionData[bankKey] || [])]);
       ijState = { lv, items, idx: 0, score: 0, total: items.length };
+      itemResults = [];
+      attemptId   = crypto.randomUUID();
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
@@ -31761,6 +31780,7 @@
       document.getElementById('ij-instr').textContent = 'Voilà les deux propositions repérées !';
 
       const ok = step1Correct && step2Correct;
+      recordItemResult(ijState.items[ijState.idx], ok, ijState.lv);
       if (ok) ijState.score++;
       document.getElementById('ij-fb1').innerHTML = ok
         ? `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`
@@ -31845,6 +31865,7 @@
           const isRight = c === q.linkType;
           if (!isRight) btn.classList.add('is-wrong');
 
+          recordItemResult(q, isRight && step1Correct, ijState.lv);
           if (isRight && step1Correct) {
             ijState.score++;
             document.getElementById('ij2-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
@@ -31890,6 +31911,7 @@
           const isRight = c === q.answer;
           if (!isRight) btn.classList.add('is-wrong');
 
+          recordItemResult(q, isRight, ijState.lv);
           if (isRight) {
             ijState.score++;
             document.getElementById('ij3-fb').innerHTML =
@@ -31985,7 +32007,9 @@
         level:        'Niveau ' + lv,
         score:        s20,
         total:        20,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
       });
     }
 
@@ -32048,6 +32072,8 @@
       const bankKey = 'level' + lv + 'Bank';
       const items   = shuffle([...(sessionData[bankKey] || [])]);
       isState = { lv, items, idx: 0, score: 0, total: items.length };
+      itemResults = [];
+      attemptId   = crypto.randomUUID();
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
@@ -32157,6 +32183,7 @@
       document.getElementById('is-instr').textContent = 'Voilà les deux propositions repérées !';
 
       const ok = step1Correct && step2Correct;
+      recordItemResult(isState.items[isState.idx], ok, isState.lv);
       if (ok) isState.score++;
       document.getElementById('is-fb1').innerHTML = ok
         ? `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`
@@ -32244,6 +32271,7 @@
           const isRight = c === q.linkType;
           if (!isRight) btn.classList.add('is-wrong');
 
+          recordItemResult(q, isRight && step1Correct, isState.lv);
           if (isRight && step1Correct) {
             isState.score++;
             document.getElementById('is2-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
@@ -32289,6 +32317,7 @@
           const isRight = c === q.answer;
           if (!isRight) btn.classList.add('is-wrong');
 
+          recordItemResult(q, isRight, isState.lv);
           if (isRight) {
             isState.score++;
             document.getElementById('is3-fb').innerHTML =
@@ -32384,7 +32413,9 @@
         level:        'Niveau ' + lv,
         score:        s20,
         total:        20,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
       });
     }
 
