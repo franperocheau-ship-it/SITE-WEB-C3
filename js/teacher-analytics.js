@@ -14,6 +14,7 @@ const lfmAnalytics = (() => {
   const JAUGE_LEVELS       = ['CM1', 'CM2', '6e'];
   const DOMAIN_ORDER       = ['Français', 'Mathématiques'];
   const MIN_STUDENTS_COMP  = 5;     /* seuil "au moins 5 élèves" pour top/bottom compétences et exercices */
+  const MIN_STUDENTS_COMP_LEVEL = 3; /* seuil dédié top/bottom exercice+niveau (computeClassOverview) — distinct de MIN_STUDENTS_COMP, qui reste utilisé tel quel par computeCompetenceStats */
   const DAY  = 86400000;
   const WEEK = 7 * DAY;
 
@@ -311,6 +312,52 @@ const lfmAnalytics = (() => {
     }));
   }
 
+  /* ── Dédoublonnage : meilleur pct par (élève × exercice × palier interne 1/2/3) ──
+     Distinct de dedupeBestByNiveau (qui résout le niveau SCOLAIRE CM1/CM2/6e
+     via meta.levels/paliers — approximatif, pensé pour les jauges de
+     progression). Ici on veut le palier interne (1/2/3) tel quel, via
+     levelToPalierKey directement sur la valeur brute stockée — donc
+     disponible pour tout exercice, y compris les types standalone sans
+     `levels` déclarés dans le catalogue (contrairement à resolveNiveau). */
+  function dedupeBestBySlugPalier(rows) {
+    const map = new Map();
+    rows.forEach(r => {
+      const palier = levelToPalierKey(r.level);
+      const key    = r.student_id + '|' + r.exercise_slug + '|' + palier;
+      const pct    = parseFloat(r.pct);
+      const prev   = map.get(key);
+      if (!prev || pct > prev.pct) map.set(key, { ...r, pct, palier });
+    });
+    return Array.from(map.values());
+  }
+
+  /* ── Agrégation par exercice ET palier interne (1/2/3) ────────────────────
+     Même principe qu'aggregateByCompetence, mais à partir de bestBySlugPalier
+     (dedupeBestBySlugPalier ci-dessus) au lieu de best (dedupeBestBySlug, qui
+     ignore le niveau). Clé d'agrégation = exercice + palier : un exercice
+     progressif apparaît donc jusqu'à 3 fois (une ligne par palier réellement
+     tenté par la classe). */
+  function aggregateByCompetenceLevel(bestBySlugPalier, catalogMap) {
+    const compAgg = new Map();
+    bestBySlugPalier.forEach(r => {
+      const meta = metaFor(catalogMap, r.exercise_slug);
+      const key  = meta.domaine + '||' + meta.sousDomaine + '||' + r.exercise_slug + '||' + r.palier;
+      if (!compAgg.has(key)) {
+        compAgg.set(key, { meta, title: exerciseTitleFor(meta.title, r), palier: r.palier, sum: 0, count: 0, students: new Set() });
+      }
+      const agg = compAgg.get(key);
+      agg.sum += r.pct; agg.count++; agg.students.add(r.student_id);
+    });
+    return Array.from(compAgg.values()).map(agg => ({
+      domaine: agg.meta.domaine,
+      competence: agg.title,
+      niveau: agg.palier,
+      avgPct: Math.round(agg.sum / agg.count),
+      attemptCount: agg.count,
+      studentCount: agg.students.size
+    }));
+  }
+
   /* ── Nombre d'exercices distincts travaillés (même source/filtre que
      computeNiveauJauge : bestByNiveau + catalogMap) — pour l'affichage
      "N exercices" à côté du nom de sous-domaine, cohérent avec ce qui
@@ -378,13 +425,25 @@ const lfmAnalytics = (() => {
     const classAvgFrancais = classAvgForDomaine('Français');
     const classAvgMaths    = classAvgForDomaine('Mathématiques');
 
-    /* ── Compétences (top 5 / bottom 5) ─────────────────────────────────────
-       Seuil de 5 élèves appliqué aux deux classements pour éviter qu'une
-       compétence travaillée par un seul élève ne fausse le résultat. */
-    const compList = aggregateByCompetence(best, catalogMap)
-      .filter(c => c.studentCount >= MIN_STUDENTS_COMP);
+    /* ── Compétences (top 5 / bottom 5), granularité exercice + niveau ───────
+       dedupeBestBySlugPalier (palier interne 1/2/3, cf. levelToPalierKey)
+       plutôt que best/dedupeBestBySlug : un exercice progressif est ici
+       décomposé en autant de lignes que de paliers réellement tentés par la
+       classe. Seuil de 3 élèves (MIN_STUDENTS_COMP_LEVEL, pas
+       MIN_STUDENTS_COMP) — plus bas que le seuil "par exercice" car un
+       palier précis d'un exercice rassemble mécaniquement moins d'élèves que
+       l'exercice entier. */
+    const bestBySlugPalier = dedupeBestBySlugPalier(rows);
+    const compList = aggregateByCompetenceLevel(bestBySlugPalier, catalogMap)
+      .filter(c => c.studentCount >= MIN_STUDENTS_COMP_LEVEL);
     const top5    = [...compList].sort((a, b) => b.avgPct - a.avgPct).slice(0, 5);
     const bottom5 = [...compList].sort((a, b) => a.avgPct - b.avgPct).slice(0, 5);
+    /* Le pire exercice/niveau parmi ceux qui passent le seuil, pour l'encart
+       dédié — équivalent à bottom5[0], recalculé explicitement pour rester
+       correct si bottom5 changeait un jour de taille. */
+    const worst = compList.length
+      ? [...compList].sort((a, b) => a.avgPct - b.avgPct)[0]
+      : null;
 
     /* ── Élèves en réussite / à attention particulière ────────────────────
        Score composite = 50% taux de réussite global + 50% proportion de
@@ -422,7 +481,7 @@ const lfmAnalytics = (() => {
         activeStudents7d, exercisesWeek, exercisesTotal, staleStudents14d, enrolledCount,
         classAvg, classAvgFrancais, classAvgMaths
       },
-      top5, bottom5, topStudents, bottomStudents
+      top5, bottom5, worst, topStudents, bottomStudents
     };
   }
 

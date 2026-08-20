@@ -1170,20 +1170,29 @@
       </div>
     </div>`;
 
+    /* c.competence / c.avgPct / c.studentCount comme avant + c.niveau
+       (granularité exercice+niveau, voir aggregateByCompetenceLevel). */
     const compBar = (c, cls) => `
       <div class="comp-bar-row">
-        <div class="comp-bar-label"><span>${escHtml(c.competence)}</span><span class="n">${c.avgPct}% · ${c.studentCount} élève${c.studentCount > 1 ? 's' : ''}</span></div>
+        <div class="comp-bar-label"><span>${escHtml(c.competence)} · Niveau ${escHtml(String(c.niveau))}</span><span class="n">${c.avgPct}% · ${c.studentCount} élève${c.studentCount > 1 ? 's' : ''}</span></div>
         <div class="comp-bar-track"><div class="comp-bar-fill ${cls}" style="width:${c.avgPct}%"></div></div>
       </div>`;
+
+    if (ov.worst) {
+      html += `<div class="overview-card" style="border-left:4px solid var(--red);margin-bottom:20px">
+        <div class="overview-card-title" style="color:var(--red)">⚠ Exercice/niveau le plus en difficulté</div>
+        ${compBar(ov.worst, 'down')}
+      </div>`;
+    }
 
     html += `<div class="overview-grid">
       <div class="overview-card">
         <div class="overview-card-title">Compétences les mieux réussies</div>
-        ${ov.top5.length ? ov.top5.map(c => compBar(c, 'up')).join('') : '<div class="empty-inline">Pas assez de données (min. 5 élèves par compétence).</div>'}
+        ${ov.top5.length ? ov.top5.map(c => compBar(c, 'up')).join('') : '<div class="empty-inline">Pas assez de données (min. 3 élèves par exercice/niveau).</div>'}
       </div>
       <div class="overview-card">
         <div class="overview-card-title">Compétences les moins réussies</div>
-        ${ov.bottom5.length ? ov.bottom5.map(c => compBar(c, 'down')).join('') : '<div class="empty-inline">Pas assez de données (min. 5 élèves par compétence).</div>'}
+        ${ov.bottom5.length ? ov.bottom5.map(c => compBar(c, 'down')).join('') : '<div class="empty-inline">Pas assez de données (min. 3 élèves par exercice/niveau).</div>'}
       </div>
     </div>`;
 
