@@ -630,6 +630,18 @@ const lfmTeacher = (() => {
     return data || [];
   }
 
+  /* ── Résultats bruts item par item d'un élève (fiche élève enrichie —
+     « Questions les plus ratées ») ─────────────────────────────────────────
+     RPC plutôt qu'un .from().limit() côté client : garantit exactement les
+     5 dernières tentatives par item_id quel que soit le volume d'activité
+     de l'élève (voir migration get_student_item_results_window). */
+  async function getStudentItemResultsRaw(authUserId) {
+    const { data, error } = await db
+      .rpc('get_student_item_results_window', { p_student_id: authUserId, p_window: 5 });
+    if (error) throw error;
+    return data || [];
+  }
+
   /* ── Résultats d'un élève ────────────────────────────────────────────────── */
 
   async function getStudentResults(authUserId, limit = 1000) {
@@ -751,7 +763,7 @@ const lfmTeacher = (() => {
     getClasses, createClass, updateClass, updateClassAccessMode, deleteClass,
     getStudents, getAllStudents, createStudent, createStudentsBulk, updateStudent,
     deleteStudent, moveStudent, resetStudentPassword, retryStudentAuth,
-    getClassResults, getClassResultsRaw, getStudentResults, getStudentResultsRaw, getStudentStats,
+    getClassResults, getClassResultsRaw, getStudentResults, getStudentResultsRaw, getStudentItemResultsRaw, getStudentStats,
     getActiveExercises, addActiveExercise, removeActiveExercise,
     addActiveExercisesBulk, removeActiveExercisesBulk,
     getGroups, createGroup, updateGroup, deleteGroup, assignStudentToGroup,

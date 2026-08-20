@@ -611,10 +611,57 @@ const lfmAnalytics = (() => {
     };
   }
 
+  /* ── Questions les plus ratées (fiche élève enrichie) ─────────────────────
+     Fenêtre glissante : 5 dernières tentatives par item_id (rows déjà
+     triées created_at desc par getStudentItemResultsRaw, donc les 5
+     premières rencontrées par groupe = les 5 dernières). Seuil : au moins
+     2 tentatives et un taux d'échec > 0, sinon l'item n'est pas affiché.
+     Triées par taux d'échec décroissant, 10 pires au maximum. */
+  const WORST_ITEMS_WINDOW = 5;
+  const WORST_ITEMS_MIN_ATTEMPTS = 2;
+  const WORST_ITEMS_MAX_DISPLAY = 10;
+
+  function computeWorstItems(itemRows) {
+    const byItem = new Map();
+    for (const r of itemRows) {
+      const g = byItem.get(r.item_id) || [];
+      if (g.length < WORST_ITEMS_WINDOW) g.push(r);
+      byItem.set(r.item_id, g);
+    }
+    return [...byItem.entries()]
+      .map(([item_id, rows]) => ({
+        item_id,
+        exercise_slug: rows[0].exercise_slug,
+        level:         rows[0].level,
+        attempts:      rows.length,
+        failRate:      rows.filter(r => !r.is_correct).length / rows.length
+      }))
+      .filter(it => it.attempts >= WORST_ITEMS_MIN_ATTEMPTS && it.failRate > 0)
+      .sort((a, b) => b.failRate - a.failRate)
+      .slice(0, WORST_ITEMS_MAX_DISPLAY);
+  }
+
+  /* item_id → texte de la question, résolu dynamiquement depuis EXERCISE_DATA
+     (jamais stocké en dur) — réutilise CompetencePreview.extractLevelBuckets/
+     describeQA (js/competence-preview.js), déjà responsable de ce même
+     format d'aperçu côté admin. Retourne null si l'exercice ou l'item n'est
+     plus dans le catalogue (compétence retirée depuis) : l'appelant décide
+     de l'affichage de repli. */
+  function resolveItemText(exerciseSlug, level, itemId) {
+    if (typeof EXERCISE_DATA === 'undefined' || typeof CompetencePreview === 'undefined') return null;
+    const ex = EXERCISE_DATA[exerciseSlug];
+    if (!ex) return null;
+    const bucket = CompetencePreview.extractLevelBuckets(ex).find(b => b.level === level);
+    const item = bucket && bucket.items.find(it => it && it.id === itemId);
+    if (!item) return null;
+    return CompetencePreview.describeQA(item, ex);
+  }
+
   return {
     SUCCESS_THRESHOLD, JAUGE_LEVELS, DOMAIN_ORDER, MIN_STUDENTS_COMP,
     buildCatalogMap, dedupeBestBySlug, computeSousDomaineRates,
     computeClassOverview, computeStudentProfile, computeCompetenceStats,
+    computeWorstItems, resolveItemText,
     metaFor, exerciseTitleFor
   };
 })();

@@ -999,5 +999,10 @@ const CompetencePreview = (() => {
     });
   }
 
-  return { decorate };
+  /* extractLevelBuckets/describeQA : exportées pour réemploi hors de ce
+     module (fiche élève enseignant — « Questions les plus ratées », voir
+     js/teacher-analytics.js) — fonctions pures, aucun lien avec le gating
+     admin de decorate()/checkAdmin() ci-dessus, qui ne s'applique qu'à
+     l'aperçu admin lui-même. */
+  return { decorate, extractLevelBuckets, describeQA };
 })();
