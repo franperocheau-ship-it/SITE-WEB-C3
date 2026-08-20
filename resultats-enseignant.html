@@ -1014,21 +1014,29 @@
     if (typeof EXERCISE_DATA !== 'undefined') { _catalogMap = lfmAnalytics.buildCatalogMap(); return Promise.resolve(); }
     if (_catalogAssetsPromise) return _catalogAssetsPromise;
     _catalogAssetsPromise = Promise.all([
-        'data/conjugaison.js?v=2',
-        'data/grammaire.js?v=9',
-        'data/orthographe.js?v=2',
+        /* Versions bumpées (conjugaison/grammaire/orthographe/orthographe-
+           homophones/vocabulaire) : ces 5 fichiers ont reçu des ids d'item
+           stables (scripts/add-item-ids.js, étape 1) sans que ce numéro de
+           cache-busting soit incrémenté — un navigateur ayant déjà mis en
+           cache l'ancienne URL continuait de servir des items sans id,
+           silencieusement (recordItemResult no-op si q.id est absent, voir
+           investigation "Questions les plus ratées" ne s'affiche pas pour
+           Luis/Valentina). Même correctif que data/index.js. */
+        'data/conjugaison.js?v=3',
+        'data/grammaire.js?v=10',
+        'data/orthographe.js?v=3',
         /* Manquait ici : sans ce fichier, EXERCISE_DATA n'a aucune des 10
            compétences homophones-niveaux qui y vivent — la résolution du
            texte des « Questions les plus ratées » (resolveItemText) et
            logUnmatchedCatalogSlugs() les signaleraient à tort comme
            retirées du catalogue. */
-        'data/orthographe-homophones.js?v=1',
+        'data/orthographe-homophones.js?v=2',
         'data/lecture.js?v=2',
         'data/nombres-entiers.js?v=2',
         'data/fractions.js?v=2',
         'data/nombres-decimaux.js?v=2',
         'data/probabilites.js?v=2',
-        'data/vocabulaire.js?v=2'
+        'data/vocabulaire.js?v=3'
       ].map(loadScript))
       .then(() => { _catalogMap = lfmAnalytics.buildCatalogMap(); })
       .catch(err => { _catalogAssetsPromise = null; throw err; });
