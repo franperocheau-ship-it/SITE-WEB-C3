@@ -32,6 +32,10 @@ Tous les fichiers CSS/JS chargés avec un paramètre `?v=N` (ex. `<script src="j
 
 - Oublier d'incrémenter expose les utilisateurs à une version mise en cache par leur navigateur — bug silencieux, difficile à diagnostiquer à distance.
 - Avant de commiter, grep le nom du fichier modifié dans tout le repo pour s'assurer que chaque balise `<script src="...">` ou `<link href="...">` qui le cible a bien été mise à jour, pas seulement la première trouvée.
+- **Cas particulier `data/*.js`** : ces fichiers ne sont jamais référencés directement par une balise `<script src="data/xxx.js?v=N">` dans les pages — ils passent par **deux emplacements de version indépendants**, tous les deux à bumper :
+  1. Le tableau `DOMAIN_FILES`/`document.write` dans `data/index.js` (un seul `?v=N` partagé par les 10 fichiers de domaine — le bumper suffit pour ce chargeur, mais grep le nom du fichier ne le fait pas remonter puisqu'il est construit dynamiquement en JS, pas écrit en dur dans une balise `<script>`).
+  2. La liste `loadCatalogAssets()` dans `resultats-enseignant.html` (un `?v=N` propre à chaque fichier de domaine, indépendant de celui de `data/index.js`).
+  - Un script batch qui modifie plusieurs fichiers `data/*.js` d'un coup (ex. `scripts/add-item-ids.js`) ne rappelle pas ce point — à vérifier manuellement après coup, pas seulement pour les fichiers édités à la main.
 
 ## 5. Modifications sur `data/*.js` ou le moteur d'exercice : tester toutes les catégories
 
