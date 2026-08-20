@@ -11660,6 +11660,8 @@
       const items   = apcShuffle([...bank]).slice(0, n);
 
       apcState = { lv, items, idx: 0, score: 0, total: items.length };
+      itemResults = [];
+      attemptId   = crypto.randomUUID();
 
       document.getElementById('q-total').textContent = items.length;
       apcLevelSelect.renderBadges(lv);
@@ -11896,6 +11898,7 @@
         input.disabled = true;
         vbtn.disabled  = true;
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+        recordItemResult(q, isRight, apcState.lv);
 
         if (isRight) {
           apcState.score++;
@@ -11992,7 +11995,9 @@
         level:        'Niveau ' + lv,
         score:        lvScore,
         total,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
       });
     }
 
@@ -16216,6 +16221,8 @@
       const items   = pceShuffle([...bank]).slice(0, n);
 
       pceState = { lv, items, idx: 0, score: 0, total: items.length };
+      itemResults = [];
+      attemptId   = crypto.randomUUID();
 
       document.getElementById('q-total').textContent = items.length;
       pceLevelSelect.renderBadges(lv);
@@ -16426,6 +16433,7 @@
         input.disabled = true;
         vbtn.disabled  = true;
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+        recordItemResult(q, isRight, pceState.lv);
 
         if (isRight) {
           pceState.score++;
@@ -16521,7 +16529,9 @@
         level:        'Niveau ' + lv,
         score:        lvScore,
         total,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
       });
     }
 
@@ -31250,6 +31260,8 @@
       const bankKey = 'level' + lv + 'Bank';
       const items   = shuffle([...(sessionData[bankKey] || [])]);
       dpscState = { lv, items, idx: 0, score: 0, total: items.length };
+      itemResults = [];
+      attemptId   = crypto.randomUUID();
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
@@ -31365,6 +31377,7 @@
           blank.classList.add('is-filled', isRight ? 'is-correct' : 'is-wrong');
         }
 
+        recordItemResult(q, isRight && step1Correct, dpscState.lv);
         if (isRight && step1Correct) {
           dpscState.score++;
           document.getElementById('dpsc-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
@@ -31465,6 +31478,7 @@
           const isRight = c === q.step2Answer;
           if (!isRight) btn.classList.add('is-wrong');
 
+          recordItemResult(q, isRight && step1Correct, dpscState.lv);
           if (isRight && step1Correct) {
             dpscState.score++;
             document.getElementById('dpsc-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
@@ -31510,6 +31524,7 @@
           const isRight = c === q.answer;
           if (!isRight) btn.classList.add('is-wrong');
 
+          recordItemResult(q, isRight, dpscState.lv);
           if (isRight) {
             dpscState.score++;
             document.getElementById('dpsc-fb3').innerHTML =
@@ -31605,7 +31620,9 @@
         level:        'Niveau ' + lv,
         score:        s20,
         total:        20,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
       });
     }
 
@@ -32502,6 +32519,8 @@
       const bankKey = 'level' + lv + 'Bank';
       const items   = shuffle([...(sessionData[bankKey] || [])]);
       dcsState = { lv, items, idx: 0, score: 0, total: items.length };
+      itemResults = [];
+      attemptId   = crypto.randomUUID();
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
@@ -32646,6 +32665,7 @@
                   const isRight = choice.value === q.connectorType;
                   if (!isRight) cbtn.classList.add('is-wrong');
 
+                  recordItemResult(q, isRight && step1Correct && step2Correct, dcsState.lv);
                   if (isRight && step1Correct && step2Correct) dcsState.score++;
                   document.getElementById('dcs-fb3').innerHTML = isRight
                     ? `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`
@@ -32745,6 +32765,7 @@
           const isRight = label === correctLabel;
           if (!isRight) btn.classList.add('is-wrong');
 
+          recordItemResult(q, isRight && step1Correct, dcsState.lv);
           if (isRight && step1Correct) {
             dcsState.score++;
             document.getElementById('dcs2-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
@@ -32791,6 +32812,7 @@
           const isRight = label === correctLabel;
           if (!isRight) btn.classList.add('is-wrong');
 
+          recordItemResult(q, isRight, dcsState.lv);
           if (isRight) {
             dcsState.score++;
             document.getElementById('dcs3-fb').innerHTML =
@@ -32886,7 +32908,9 @@
         level:        'Niveau ' + lv,
         score:        s20,
         total:        20,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
       });
     }
 
