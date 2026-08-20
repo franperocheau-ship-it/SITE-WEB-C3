@@ -1003,6 +1003,12 @@
         'data/conjugaison.js?v=2',
         'data/grammaire.js?v=9',
         'data/orthographe.js?v=2',
+        /* Manquait ici : sans ce fichier, EXERCISE_DATA n'a aucune des 10
+           compétences homophones-niveaux qui y vivent — la résolution du
+           texte des « Questions les plus ratées » (resolveItemText) et
+           logUnmatchedCatalogSlugs() les signaleraient à tort comme
+           retirées du catalogue. */
+        'data/orthographe-homophones.js?v=1',
         'data/lecture.js?v=2',
         'data/nombres-entiers.js?v=2',
         'data/fractions.js?v=2',
