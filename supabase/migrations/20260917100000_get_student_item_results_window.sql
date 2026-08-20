@@ -34,7 +34,13 @@ as $$
   select item_id, exercise_slug, level, is_correct, created_at
   from (
     select eir.item_id, eir.exercise_slug, eir.level, eir.is_correct, eir.created_at,
-           row_number() over (partition by eir.item_id order by eir.created_at desc) as rn
+           /* student_id inclus dans la partition en plus du filtre WHERE
+              ci-dessous : redondant tant que ce filtre reste en place (une
+              seule valeur de student_id dans le jeu de données à ce stade),
+              mais protège une future réutilisation de cette requête (ex.
+              étape 6 admin_worst_items()) où le filtre par élève pourrait
+              ne plus être appliqué en amont. */
+           row_number() over (partition by eir.student_id, eir.item_id order by eir.created_at desc) as rn
     from exercise_item_results eir
     where eir.student_id = p_student_id
   ) ranked
