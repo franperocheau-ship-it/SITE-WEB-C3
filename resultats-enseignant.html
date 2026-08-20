@@ -2154,6 +2154,28 @@
     return `exercise.html?slug=${encodeURIComponent(exampleSlug)}`;
   }
 
+  /* Bouton d'action d'une compétence à consolider : "Voir les erreurs" ouvre
+     le détail par question (openExerciceChuteDetailEleve, onglet "Exercices
+     chutés"), scopé au même exercise_slug (exampleSlug ici === granularité
+     exercice de computeStudentExercisesChutes) — tant que le score n'est
+     pas 100%. Repli sur l'ancien lien "Revoir →" (exercise.html) sinon, cas
+     qui ne se produit pas aujourd'hui pour "à consolider" (toujours ≤60%
+     ou échec répété) mais gardé par cohérence avec l'énoncé de la règle. */
+  function consoliderActionBtn(c) {
+    return c.avgPct < 100
+      ? `<button type="button" class="btn btn-outline btn-sm" onclick="voirErreursExercice('${escJs(c.exampleSlug)}')">Voir les erreurs</button>`
+      : `<a class="btn btn-outline btn-sm" href="${reviewHrefFor(c.exampleSlug)}" target="_blank">Revoir →</a>`;
+  }
+
+  /* Bascule sur l'onglet "Exercices chutés" puis ouvre directement le
+     détail de l'exercice concerné (même vue qu'un clic dans l'arborescence
+     de cet onglet) — switchStudentTab charge/rafraîchit la liste avant
+     qu'on ne l'écrase par le détail. */
+  async function voirErreursExercice(exerciseSlug) {
+    await switchStudentTab('exercices-chutes');
+    openExerciceChuteDetailEleve(exerciseSlug);
+  }
+
   function renderConsoliderList(consolider) {
     const el = document.getElementById('student-consolider');
     if (!consolider || consolider.length === 0) { el.style.display = 'none'; return; }
@@ -2164,7 +2186,7 @@
           <div class="ci-comp">${escHtml(c.competence)}</div>
           <div class="ci-meta">${escHtml(c.domaine)} · moyenne ${c.avgPct}%${c.hasRepeatedFailure ? ' · <span class="ci-flag">échecs répétés</span>' : ''}</div>
         </div>
-        <a class="btn btn-outline btn-sm" href="${reviewHrefFor(c.exampleSlug)}" target="_blank">Revoir →</a>
+        ${consoliderActionBtn(c)}
       </div>`).join('');
   }
 
