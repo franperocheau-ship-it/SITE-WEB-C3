@@ -33120,6 +33120,8 @@
       const bankKey = 'level' + lv + 'Bank';
       const items   = shuffle([...(sessionData[bankKey] || [])]);
       rpState = { lv, items, idx: 0, score: 0, total: items.length };
+      itemResults = [];
+      attemptId   = crypto.randomUUID();
 
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
@@ -33198,6 +33200,7 @@
             const isRight = n === N;
             if (!isRight) cbtn.classList.add('is-wrong');
 
+            recordItemResult(q, isRight && step1Correct, rpState.lv);
             if (isRight && step1Correct) {
               rpState.score++;
               document.getElementById('rp-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
@@ -33371,6 +33374,7 @@
             ? `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`
             : `<div class="ex-feedback-wrong">❌ Le(s) mot(s) de jonction sont surlignés en violet.</div>`;
 
+          recordItemResult(q, step1Correct && step2Correct, rpState.lv);
           if (step1Correct && step2Correct) rpState.score++;
           document.getElementById('next-btn').classList.remove('ex-hidden');
         });
@@ -33453,6 +33457,7 @@
             if (linkIdx < totalLinks) {
               setTimeout(renderLinkStep, 700);
             } else {
+              recordItemResult(q, step1Correct && step2Correct && linksCorrect, rpState.lv);
               if (step1Correct && step2Correct && linksCorrect) rpState.score++;
               document.getElementById('next-btn').classList.remove('ex-hidden');
             }
@@ -33584,7 +33589,9 @@
         level:        'Niveau ' + lv,
         score:        s20,
         total:        20,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
       });
     }
 
@@ -33652,6 +33659,8 @@
       idiSession    = idiBuildQuestions(lv);
       idiSessionIdx = 0;
       idiScore      = 0;
+      itemResults   = [];
+      attemptId     = crypto.randomUUID();
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
       document.getElementById('q-total').textContent = idiSession.length;
@@ -33736,6 +33745,7 @@
           });
           if (!isRight) btn.classList.add('is-wrong');
           const fb = document.getElementById('idi-feedback');
+          recordItemResult(q, isRight, idiActiveLevel);
           if (isRight) {
             idiScore++; idiUpdateProgress();
             fb.innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}<br>${q.explain}</div>`;
@@ -33854,6 +33864,7 @@
         "Clique sur l'article de cette phrase, puis dis s'il est défini ou indéfini.",
         q,
         (correct) => {
+          recordItemResult(q, correct, idiActiveLevel);
           if (correct) { idiScore++; idiUpdateProgress(); }
           idiShowNextBtn();
         }
@@ -33894,6 +33905,7 @@
             card.scrollIntoView({ behavior: 'smooth', block: 'start' });
           };
         } else {
+          recordItemResult(q, idiL3AllCorrect, idiActiveLevel);
           if (idiL3AllCorrect) { idiScore++; idiUpdateProgress(); }
           idiShowNextBtn();
         }
@@ -34104,7 +34116,9 @@
         level:        'Niveau ' + level,
         score:        s20,
         total:        20,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
       });
     }
 
@@ -34178,6 +34192,8 @@
       ddpSession    = ddpBuildQuestions(lv);
       ddpSessionIdx = 0;
       ddpScore      = 0;
+      itemResults   = [];
+      attemptId     = crypto.randomUUID();
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
       document.getElementById('q-total').textContent = ddpSession.length;
@@ -34263,6 +34279,7 @@
           });
           if (!isRight) btn.classList.add('is-wrong');
           const fb = document.getElementById('ddp-feedback');
+          recordItemResult(q, isRight, ddpActiveLevel);
           if (isRight) {
             ddpScore++; ddpUpdateProgress();
             fb.innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}<br>${q.explain}</div>`;
@@ -34384,6 +34401,7 @@
         "Clique sur le déterminant possessif ou démonstratif de cette phrase, puis dis lequel c'est.",
         q,
         (correct) => {
+          recordItemResult(q, correct, ddpActiveLevel);
           if (correct) { ddpScore++; ddpUpdateProgress(); }
           ddpShowNextBtn();
         }
@@ -34404,6 +34422,7 @@
         "Clique sur tous les déterminants possessifs et démonstratifs de cette phrase, puis qualifie-les un par un.",
         q,
         (correct) => {
+          recordItemResult(q, correct, ddpActiveLevel);
           if (correct) { ddpScore++; ddpUpdateProgress(); }
           ddpShowNextBtn();
         }
@@ -34614,7 +34633,9 @@
         level:        'Niveau ' + level,
         score:        s20,
         total:        20,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
       });
     }
 
