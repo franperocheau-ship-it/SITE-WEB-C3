@@ -618,6 +618,23 @@ const lfmTeacher = (() => {
     return { students, results };
   }
 
+  /* ── Résultats bruts item par item de la classe, pour UN exercice ─────────
+     Onglet "Exercices chutés" classe : appelée seulement au clic sur un
+     exercice de la liste (pas préchargée pour toute la classe), authIds déjà
+     connus par l'appelant (issus du getClassResultsRaw de la liste) pour
+     éviter un second appel getStudents() redondant. Pas de pagination
+     .range() comme getClassResultsRaw : un seul exercice, volume borné. */
+  async function getClassItemResultsRaw(authIds, exerciseSlug) {
+    if (!authIds || authIds.length === 0) return [];
+    const { data, error } = await db
+      .from('exercise_item_results')
+      .select('student_id, exercise_slug, level, item_id, is_correct, created_at')
+      .in('student_id', authIds)
+      .eq('exercise_slug', exerciseSlug);
+    if (error) throw error;
+    return data || [];
+  }
+
   /* ── Résultats bruts d'un élève (fiche élève enrichie + bulletin) ─────────── */
   async function getStudentResultsRaw(authUserId) {
     const { data, error } = await db
@@ -630,8 +647,8 @@ const lfmTeacher = (() => {
     return data || [];
   }
 
-  /* ── Résultats bruts item par item d'un élève (fiche élève enrichie —
-     « Questions les plus ratées ») ─────────────────────────────────────────
+  /* ── Résultats bruts item par item d'un élève (onglet "Exercices chutés"
+     élève) ───────────────────────────────────────────────────────────────
      RPC plutôt qu'un .from().limit() côté client : garantit exactement les
      5 dernières tentatives par item_id quel que soit le volume d'activité
      de l'élève (voir migration get_student_item_results_window). */
@@ -763,7 +780,7 @@ const lfmTeacher = (() => {
     getClasses, createClass, updateClass, updateClassAccessMode, deleteClass,
     getStudents, getAllStudents, createStudent, createStudentsBulk, updateStudent,
     deleteStudent, moveStudent, resetStudentPassword, retryStudentAuth,
-    getClassResults, getClassResultsRaw, getStudentResults, getStudentResultsRaw, getStudentItemResultsRaw, getStudentStats,
+    getClassResults, getClassResultsRaw, getClassItemResultsRaw, getStudentResults, getStudentResultsRaw, getStudentItemResultsRaw, getStudentStats,
     getActiveExercises, addActiveExercise, removeActiveExercise,
     addActiveExercisesBulk, removeActiveExercisesBulk,
     getGroups, createGroup, updateGroup, deleteGroup, assignStudentToGroup,

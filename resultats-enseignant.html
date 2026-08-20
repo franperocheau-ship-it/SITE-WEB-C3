@@ -354,6 +354,37 @@
 
     .bnav-leaf-summary { display: flex; align-items: center; gap: 12px; }
 
+    /* ── Exercices chutés (classe + élève) ────────────────────────────────────
+       Arborescence toujours dépliée (pas de navigation pas-à-pas comme
+       bnav-*) : recherche + filtres au-dessus filtrent les lignes visibles.
+       Les lignes exercice réutilisent .bnav-row/-label/-meta/-arrow tels
+       quels (même forme visuelle que la navigation "Par compétence"). */
+    .ec-filters {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px;
+    }
+    .ec-search {
+      flex: 1; min-width: 200px; border: 1.5px solid var(--border); border-radius: 100px;
+      padding: 9px 16px; font-size: 13.5px; font-family: inherit; color: var(--text);
+      background: var(--card-bg); outline: none;
+    }
+    .ec-search:focus { border-color: var(--blue); }
+    .ec-filters select {
+      border: 1.5px solid var(--border); border-radius: 100px; padding: 9px 14px;
+      font-size: 13px; font-family: inherit; color: var(--text); background: var(--card-bg);
+      outline: none; cursor: pointer;
+    }
+    .ec-domaine { margin-bottom: 20px; }
+    .ec-domaine-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--font-display); font-weight: 700; font-size: 15px;
+      color: var(--blue); padding-bottom: 8px; margin-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+    }
+    .ec-domaine-header .n { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: none; letter-spacing: 0; }
+    .ec-sous-domaine { margin-bottom: 14px; }
+    .ec-sous-domaine:last-child { margin-bottom: 0; }
+    .ec-sous-domaine-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+
     /* ── Impression PDF ─────────────────────────────────────────────────────── */
     .print-header, .print-footer { display: none; }
     #bilan-print-full { display: none; }
@@ -808,6 +839,7 @@
           <button class="tab-btn active" id="tab-btn-overview" onclick="switchClassTab('overview')">Vue d'ensemble</button>
           <button class="tab-btn" id="tab-btn-eleves" onclick="switchClassTab('eleves')">Élèves</button>
           <button class="tab-btn" id="tab-btn-bilan" onclick="switchClassTab('bilan')">Par compétence</button>
+          <button class="tab-btn" id="tab-btn-exercices-chutes" onclick="switchClassTab('exercices-chutes')">Exercices chutés</button>
         </div>
 
         <!-- Panneau Vue d'ensemble -->
@@ -849,6 +881,11 @@
           <div id="bilan-print-full"></div>
           <!-- Pied de page impression uniquement -->
           <div class="print-footer">© François Pérocheau</div>
+        </div>
+
+        <!-- Panneau Exercices chutés -->
+        <div id="panel-exercices-chutes" style="display:none">
+          <div id="exercices-chutes-content"><div class="view-loading">Chargement…</div></div>
         </div>
 
         <div class="nav-footer">
@@ -955,6 +992,11 @@
   let _bilanSousDomaineRates = null; // idem, pour les jauges du bilan imprimé
   let _overviewLoaded   = false;
   let _overviewClassId  = null;
+  let _exercicesChutesLoaded  = false;
+  let _exercicesChutesClassId = null;
+  let _exercicesChutesList    = [];  // liste plate {domaine, sousDomaine, competence, exerciseSlug, avgPct, studentCount}, triée pire d'abord
+  let _exercicesChutesAuthIds = [];  // auth_user_id des élèves de la classe, réutilisés pour le détail au clic (évite un 2e getStudents())
+  let _exercicesChutesFilter  = { search: '', domaine: '', sousDomaine: '' };
   let _catalogMap        = null;   // lfmAnalytics.buildCatalogMap(), une fois exercise-data.js chargé
   let _studentProfile     = null;  // dernier profil calculé (fiche élève courante), réutilisé par le bulletin
   let _studentRows         = [];   // dernières lignes brutes de l'élève courant (pour filtrage par période)
@@ -1061,9 +1103,11 @@
     document.getElementById('tab-btn-overview').classList.toggle('active', tab === 'overview');
     document.getElementById('tab-btn-eleves').classList.toggle('active', tab === 'eleves');
     document.getElementById('tab-btn-bilan').classList.toggle('active',  tab === 'bilan');
+    document.getElementById('tab-btn-exercices-chutes').classList.toggle('active', tab === 'exercices-chutes');
     document.getElementById('panel-overview').style.display = tab === 'overview' ? '' : 'none';
     document.getElementById('panel-eleves').style.display   = tab === 'eleves'   ? '' : 'none';
     document.getElementById('panel-bilan').style.display    = tab === 'bilan'    ? '' : 'none';
+    document.getElementById('panel-exercices-chutes').style.display = tab === 'exercices-chutes' ? '' : 'none';
     document.getElementById('print-bilan-btn').style.display = tab === 'bilan' ? '' : 'none';
 
     const classId = new URLSearchParams(window.location.search).get('class');
@@ -1071,6 +1115,8 @@
       await renderCompetences(classId);
     } else if (tab === 'overview') {
       await renderOverview(classId);
+    } else if (tab === 'exercices-chutes') {
+      await renderExercicesChutesClasse(classId);
     }
   }
 
@@ -1197,6 +1243,163 @@
     </div>`;
 
     return html;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     EXERCICES CHUTÉS (classe) — arborescence domaine > sous-domaine > exercice,
+     recherche + filtres, détail par question au clic (agrégation classe).
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function renderExercicesChutesClasse(classId) {
+    if (_exercicesChutesLoaded && _exercicesChutesClassId === classId) return;
+    _exercicesChutesLoaded  = false;
+    _exercicesChutesClassId = classId;
+    _exercicesChutesFilter  = { search: '', domaine: '', sousDomaine: '' };
+
+    const container = document.getElementById('exercices-chutes-content');
+    container.innerHTML = '<div class="view-loading">Chargement…</div>';
+
+    try {
+      await loadCatalogAssets();
+      const { students, results } = await lfmTeacher.getClassResultsRaw(classId);
+      _exercicesChutesAuthIds = students.filter(s => s.auth_user_id).map(s => s.auth_user_id);
+
+      if (results.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Aucun résultat enregistré pour cette classe.</div></div>';
+        _exercicesChutesLoaded = true;
+        return;
+      }
+
+      _exercicesChutesList = lfmAnalytics.computeClassExercisesChutes(results, _catalogMap);
+      renderExercicesChutesListView();
+      _exercicesChutesLoaded = true;
+    } catch (e) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Erreur lors du chargement.</div></div>';
+      console.warn('[LFM] renderExercicesChutesClasse:', e.message);
+    }
+  }
+
+  /* Regroupe la liste plate (déjà triée pire d'abord par computeClassExercisesChutes)
+     en domaine > sous-domaine > [exercices], en appliquant _exercicesChutesFilter.
+     L'ordre d'insertion (Map) préserve le tri "pire d'abord" à l'intérieur de
+     chaque sous-domaine puisque la liste source est déjà triée. */
+  function filterExercicesChutesTree(list, filter) {
+    const search = filter.search.trim().toLowerCase();
+    const tree = new Map();
+    list.forEach(c => {
+      if (filter.domaine && c.domaine !== filter.domaine) return;
+      if (filter.sousDomaine && c.sousDomaine !== filter.sousDomaine) return;
+      if (search && !c.competence.toLowerCase().includes(search)) return;
+      if (!tree.has(c.domaine)) tree.set(c.domaine, new Map());
+      const sousMap = tree.get(c.domaine);
+      if (!sousMap.has(c.sousDomaine)) sousMap.set(c.sousDomaine, []);
+      sousMap.get(c.sousDomaine).push(c);
+    });
+    return tree;
+  }
+
+  function renderExercicesChutesListView() {
+    const container = document.getElementById('exercices-chutes-content');
+    const allDomaines     = [...new Set(_exercicesChutesList.map(c => c.domaine))];
+    const allSousDomaines = [...new Set(_exercicesChutesList.map(c => c.sousDomaine))];
+    const domaineKeys = DOMAIN_ORDER.filter(d => allDomaines.includes(d));
+    allDomaines.forEach(d => { if (!domaineKeys.includes(d)) domaineKeys.push(d); });
+
+    const f = _exercicesChutesFilter;
+    const domaineOptions = `<option value="">Tous</option>` + domaineKeys.map(d =>
+      `<option value="${escHtml(d)}"${f.domaine === d ? ' selected' : ''}>${escHtml(d)}</option>`).join('');
+    const sousDomaineOptions = `<option value="">Tous</option>` + allSousDomaines.slice().sort((a, b) => a.localeCompare(b, 'fr')).map(sd =>
+      `<option value="${escHtml(sd)}"${f.sousDomaine === sd ? ' selected' : ''}>${escHtml(sd)}</option>`).join('');
+
+    const tree = filterExercicesChutesTree(_exercicesChutesList, f);
+
+    let treeHtml = '';
+    domaineKeys.forEach(domaine => {
+      const sousMap = tree.get(domaine);
+      if (!sousMap) return;
+      const icon = DOMAIN_ICONS[domaine] || '📖';
+      const domaineAvg = Math.round(
+        [...sousMap.values()].flat().reduce((s, c) => s + c.avgPct, 0) / [...sousMap.values()].flat().length
+      );
+      treeHtml += `<div class="ec-domaine">
+        <div class="ec-domaine-header"><span>${icon} ${escHtml(domaine)}</span><span class="n">${domaineAvg}% moy.</span></div>`;
+      sousMap.forEach((exercices, sousDomaine) => {
+        treeHtml += `<div class="ec-sous-domaine">
+          <div class="ec-sous-domaine-title">${escHtml(sousDomaine)}</div>
+          <div class="bnav-row-list">
+          ${exercices.map(c => `
+            <button type="button" class="bnav-row" onclick="openExerciceChuteDetailClasse('${escJs(c.exerciseSlug)}')">
+              <span class="bnav-row-label">${escHtml(c.competence)}</span>
+              <span class="bnav-row-meta">${c.avgPct}% · ${c.studentCount} élève${c.studentCount > 1 ? 's' : ''}</span>
+              <span class="bnav-row-arrow">›</span>
+            </button>`).join('')}
+          </div>
+        </div>`;
+      });
+      treeHtml += `</div>`;
+    });
+    if (!treeHtml) treeHtml = '<div class="empty-inline">Aucun exercice ne correspond (ou pas assez de données — min. 3 élèves par exercice).</div>';
+
+    container.innerHTML = `
+      <div class="ec-filters">
+        <input type="text" class="ec-search" id="ec-search-input" placeholder="🔍 Rechercher un exercice…"
+               value="${escHtml(f.search)}" oninput="onExercicesChutesFilterChange()">
+        <select id="ec-filter-domaine" onchange="onExercicesChutesFilterChange()">${domaineOptions}</select>
+        <select id="ec-filter-sous-domaine" onchange="onExercicesChutesFilterChange()">${sousDomaineOptions}</select>
+      </div>
+      <div class="ec-tree">${treeHtml}</div>`;
+  }
+
+  function onExercicesChutesFilterChange() {
+    _exercicesChutesFilter = {
+      search:      document.getElementById('ec-search-input').value,
+      domaine:     document.getElementById('ec-filter-domaine').value,
+      sousDomaine: document.getElementById('ec-filter-sous-domaine').value
+    };
+    renderExercicesChutesListView();
+    /* Remet le focus sur la recherche après re-render (innerHTML détruit le
+       champ précédent) — sinon chaque frappe perd le focus. */
+    const input = document.getElementById('ec-search-input');
+    if (document.activeElement !== input && _exercicesChutesFilter.search) {
+      input.focus();
+      input.setSelectionRange(input.value.length, input.value.length);
+    }
+  }
+
+  async function openExerciceChuteDetailClasse(exerciseSlug) {
+    const container = document.getElementById('exercices-chutes-content');
+    const meta = lfmAnalytics.metaFor(_catalogMap, exerciseSlug);
+    const entry = _exercicesChutesList.find(c => c.exerciseSlug === exerciseSlug);
+    container.innerHTML = '<div class="view-loading">Chargement…</div>';
+
+    try {
+      const itemRows = await lfmTeacher.getClassItemResultsRaw(_exercicesChutesAuthIds, exerciseSlug);
+      const worst = lfmAnalytics.computeClassWorstItems(itemRows);
+
+      const rowsHtml = worst.length
+        ? worst.map(it => {
+            const qa = lfmAnalytics.resolveItemText(it.exercise_slug, it.level, it.item_id);
+            const questionText = qa && qa.q ? qa.q : '(question retirée du catalogue depuis)';
+            const pct = Math.round(it.failRate * 100);
+            return `
+            <div class="consolider-item">
+              <div>
+                <div class="ci-comp">${escHtml(questionText)}</div>
+                <div class="ci-meta">Niveau ${it.level} · ${it.studentCount} élève${it.studentCount > 1 ? 's' : ''} · ${it.attempts} tentative${it.attempts > 1 ? 's' : ''} · <span class="ci-flag">${pct}% d'échec</span></div>
+              </div>
+            </div>`;
+          }).join('')
+        : '<div class="empty-inline">Pas assez de données par question sur cet exercice (min. 3 élèves distincts par question).</div>';
+
+      container.innerHTML = `
+        <button type="button" class="btn btn-ghost btn-sm" onclick="renderExercicesChutesListView()">← Retour à la liste</button>
+        <div class="overview-card" style="margin-top:14px">
+          <div class="overview-card-title">${escHtml(meta.competence)}${entry ? ` — ${entry.avgPct}% moyenne classe · ${entry.studentCount} élève${entry.studentCount > 1 ? 's' : ''}` : ''}</div>
+          <div style="margin-top:10px">${rowsHtml}</div>
+        </div>`;
+    } catch (e) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Erreur lors du chargement du détail.</div></div>';
+      console.warn('[LFM] openExerciceChuteDetailClasse:', e.message);
+    }
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════

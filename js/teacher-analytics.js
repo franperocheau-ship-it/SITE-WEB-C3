@@ -14,7 +14,7 @@ const lfmAnalytics = (() => {
   const JAUGE_LEVELS       = ['CM1', 'CM2', '6e'];
   const DOMAIN_ORDER       = ['Français', 'Mathématiques'];
   const MIN_STUDENTS_COMP  = 5;     /* seuil "au moins 5 élèves" pour top/bottom compétences et exercices */
-  const MIN_STUDENTS_COMP_LEVEL = 3; /* seuil dédié top/bottom exercice+niveau (computeClassOverview) — distinct de MIN_STUDENTS_COMP, qui reste utilisé tel quel par computeCompetenceStats */
+  const MIN_STUDENTS_COMP_LEVEL = 3; /* seuil "au moins 3 élèves distincts" — top/bottom exercice+niveau (computeClassOverview), liste et détail "Exercices chutés" classe (computeClassExercisesChutes/computeClassWorstItems). Distinct de MIN_STUDENTS_COMP, qui reste utilisé tel quel par computeCompetenceStats */
   const DAY  = 86400000;
   const WEEK = 7 * DAY;
 
@@ -298,18 +298,67 @@ const lfmAnalytics = (() => {
       const meta = metaFor(catalogMap, r.exercise_slug);
       const key  = meta.domaine + '||' + meta.sousDomaine + '||' + r.exercise_slug;
       if (!compAgg.has(key)) {
-        compAgg.set(key, { meta, title: exerciseTitleFor(meta.title, r), sum: 0, count: 0, students: new Set() });
+        compAgg.set(key, { meta, title: exerciseTitleFor(meta.title, r), exerciseSlug: r.exercise_slug, sum: 0, count: 0, students: new Set() });
       }
       const agg = compAgg.get(key);
       agg.sum += r.pct; agg.count++; agg.students.add(r.student_id);
     });
     return Array.from(compAgg.values()).map(agg => ({
       domaine: agg.meta.domaine,
+      sousDomaine: agg.meta.sousDomaine,
       competence: agg.title,
+      exerciseSlug: agg.exerciseSlug,
       avgPct: Math.round(agg.sum / agg.count),
       attemptCount: agg.count,
       studentCount: agg.students.size
     }));
+  }
+
+  /* ── Onglet "Exercices chutés", niveau classe — liste ─────────────────────
+     Granularité par exercice seul (pas exercice+niveau comme l'étape 5) :
+     aggregateByCompetence sur dedupeBestBySlug, exactement comme top5/bottom5
+     de la Vue d'ensemble. Seuil de 3 élèves distincts (MIN_STUDENTS_COMP_LEVEL)
+     appliqué ici, encapsulé dans la fonction plutôt que délégué à l'appelant —
+     un exercice tenté par 1-2 élèves ne doit jamais apparaître, même en tête
+     de liste : sinon un score extrême non représentatif fausserait le
+     classement "du plus chuté au moins chuté". Triée par taux croissant
+     (le plus chuté en premier). */
+  function computeClassExercisesChutes(rows, catalogMap) {
+    const best = dedupeBestBySlug(rows);
+    return aggregateByCompetence(best, catalogMap)
+      .filter(c => c.studentCount >= MIN_STUDENTS_COMP_LEVEL)
+      .sort((a, b) => a.avgPct - b.avgPct);
+  }
+
+  /* ── Onglet "Exercices chutés", niveau classe — détail par question ───────
+     Équivalent computeWorstItems (étape 4) côté classe : regroupe par
+     item_id, mais SANS fenêtre glissante par élève (toutes les tentatives de
+     tous les élèves comptent, décision explicite — contrairement à
+     computeWorstItems qui limite à 5 tentatives par item côté élève, il n'y
+     a pas ici de "5 dernières" par élève à respecter). Seuil : au moins 3
+     élèves DISTINCTS ayant tenté l'item (pas 3 tentatives — un seul élève
+     qui retente 5 fois ne doit pas suffire à faire remonter une question).
+     Pas de filtre failRate > 0 ici contrairement à computeWorstItems : côté
+     classe, une question à 0% d'échec parmi celles qui passent le seuil
+     n'est simplement jamais la pire (sort ascendant to top), inutile de
+     l'exclure explicitement. */
+  function computeClassWorstItems(itemRows) {
+    const byItem = new Map();
+    itemRows.forEach(r => {
+      if (!byItem.has(r.item_id)) byItem.set(r.item_id, []);
+      byItem.get(r.item_id).push(r);
+    });
+    return [...byItem.entries()]
+      .map(([item_id, rows]) => ({
+        item_id,
+        exercise_slug: rows[0].exercise_slug,
+        level:         rows[0].level,
+        studentCount:  new Set(rows.map(r => r.student_id)).size,
+        attempts:      rows.length,
+        failRate:      rows.filter(r => !r.is_correct).length / rows.length
+      }))
+      .filter(it => it.studentCount >= MIN_STUDENTS_COMP_LEVEL)
+      .sort((a, b) => b.failRate - a.failRate);
   }
 
   /* ── Dédoublonnage : meilleur pct par (élève × exercice × palier interne 1/2/3) ──
@@ -723,6 +772,7 @@ const lfmAnalytics = (() => {
     buildCatalogMap, dedupeBestBySlug, computeSousDomaineRates,
     computeClassOverview, computeStudentProfile, computeCompetenceStats,
     computeWorstItems, resolveItemText,
+    computeClassExercisesChutes, computeClassWorstItems,
     metaFor, exerciseTitleFor
   };
 })();
