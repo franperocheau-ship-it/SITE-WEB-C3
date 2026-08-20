@@ -361,6 +361,28 @@ const lfmAnalytics = (() => {
       .sort((a, b) => b.failRate - a.failRate);
   }
 
+  /* ── Onglet "Exercices chutés", niveau élève — liste ───────────────────────
+     Même principe que computeClassExercisesChutes (aggregateByCompetence sur
+     dedupeBestBySlug, granularité par exercice seul), mais SANS seuil : un
+     seul élève, dès la 1ère tentative (cohérent avec computeWorstItems côté
+     détail, qui n'a pas non plus de seuil minimal). Triée du plus chuté au
+     moins chuté.
+     Note : aggregateByCompetence compte les lignes "best" (une par élève et
+     par exercice après dedupeBestBySlug) — pour un seul élève, ce compte
+     vaut donc toujours 1 et ne peut pas servir de "nombre de tentatives"
+     (contrairement au niveau classe, où il coïncide avec studentCount).
+     On recalcule ici le vrai nombre de tentatives par exercice à partir des
+     lignes brutes (non dédupliquées) et on l'utilise pour écraser
+     attemptCount avant affichage. */
+  function computeStudentExercisesChutes(rows, catalogMap) {
+    const best = dedupeBestBySlug(rows);
+    const attemptsBySlug = new Map();
+    rows.forEach(r => attemptsBySlug.set(r.exercise_slug, (attemptsBySlug.get(r.exercise_slug) || 0) + 1));
+    return aggregateByCompetence(best, catalogMap)
+      .map(c => ({ ...c, attemptCount: attemptsBySlug.get(c.exerciseSlug) || c.attemptCount }))
+      .sort((a, b) => a.avgPct - b.avgPct);
+  }
+
   /* ── Dédoublonnage : meilleur pct par (élève × exercice × palier interne 1/2/3) ──
      Distinct de dedupeBestByNiveau (qui résout le niveau SCOLAIRE CM1/CM2/6e
      via meta.levels/paliers — approximatif, pensé pour les jauges de
@@ -772,7 +794,7 @@ const lfmAnalytics = (() => {
     buildCatalogMap, dedupeBestBySlug, computeSousDomaineRates,
     computeClassOverview, computeStudentProfile, computeCompetenceStats,
     computeWorstItems, resolveItemText,
-    computeClassExercisesChutes, computeClassWorstItems,
+    computeClassExercisesChutes, computeClassWorstItems, computeStudentExercisesChutes,
     metaFor, exerciseTitleFor
   };
 })();

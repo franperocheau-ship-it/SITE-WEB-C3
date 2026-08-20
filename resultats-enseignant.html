@@ -908,43 +908,60 @@
           </div>
         </div>
 
-        <!-- Couronne de lauriers (même composant que côté élève) — layout
-             2 colonnes propre à cette page, voir .laurel-context-teacher
-             dans laurels.css -->
-        <div id="laurels-root" class="laurel-context-teacher"></div>
+        <!-- Onglets -->
+        <div class="view-tabs">
+          <button class="tab-btn active" id="tab-btn-student-general" onclick="switchStudentTab('general')">Général</button>
+          <button class="tab-btn" id="tab-btn-student-exercices-chutes" onclick="switchStudentTab('exercices-chutes')">Exercices chutés</button>
+        </div>
 
-        <div class="stats-row-4" id="student-stats-row"></div>
+        <!-- Panneau Général -->
+        <div id="panel-student-general">
+          <!-- Couronne de lauriers (même composant que côté élève) — layout
+               2 colonnes propre à cette page, voir .laurel-context-teacher
+               dans laurels.css -->
+          <div id="laurels-root" class="laurel-context-teacher"></div>
 
-        <!-- Compétences réussies / à consolider -->
-        <div class="overview-grid" style="margin-bottom:20px">
-          <div class="overview-card" id="student-reussies" style="display:none">
-            <div class="overview-card-title">Compétences réussies</div>
-            <div class="consolider-list" id="reussies-list"></div>
+          <div class="stats-row-4" id="student-stats-row"></div>
+
+          <!-- Compétences réussies / à consolider -->
+          <div class="overview-grid" style="margin-bottom:20px">
+            <div class="overview-card" id="student-reussies" style="display:none">
+              <div class="overview-card-title">Compétences réussies</div>
+              <div class="consolider-list" id="reussies-list"></div>
+            </div>
+            <div class="overview-card" id="student-consolider" style="display:none">
+              <div class="overview-card-title">Compétences à consolider</div>
+              <div class="consolider-list" id="consolider-list"></div>
+            </div>
           </div>
-          <div class="overview-card" id="student-consolider" style="display:none">
-            <div class="overview-card-title">Compétences à consolider</div>
-            <div class="consolider-list" id="consolider-list"></div>
+
+          <!-- Bilan par compétences — arborescence Domaine > Sous-domaine >
+               Compétence en pastilles, même composant que la synthèse PDF et
+               le dashboard élève (voir js/niveau-pastilles.js). -->
+          <div class="overview-card" id="student-niveaux" style="margin-bottom:20px;display:none">
+            <div class="overview-card-title">Bilan par compétences</div>
+            <div id="niveaux-content"></div>
+          </div>
+
+          <!-- Mes questionnaires de lecture — même présentation que le
+               dashboard élève (détail par questionnaire + moyenne générale),
+               voir computeQuestionnairesSummary/renderStudentQuestionnaires. -->
+          <div class="overview-card" id="student-questionnaires" style="margin-bottom:20px;display:none">
+            <div class="overview-card-title">Questionnaires de lecture</div>
+            <div style="display:flex;gap:24px;margin-bottom:14px;">
+              <div><span style="font-size:22px;font-weight:800;color:var(--blue)" id="student-qz-avg">—</span> <span style="font-size:12px;color:var(--muted)">moyenne générale</span></div>
+              <div><span style="font-size:22px;font-weight:800;color:var(--blue)" id="student-qz-total">0</span> <span style="font-size:12px;color:var(--muted)">questionnaire(s) passé(s)</span></div>
+            </div>
+            <div id="student-qz-list"></div>
           </div>
         </div>
 
-        <!-- Bilan par compétences — arborescence Domaine > Sous-domaine >
-             Compétence en pastilles, même composant que la synthèse PDF et
-             le dashboard élève (voir js/niveau-pastilles.js). -->
-        <div class="overview-card" id="student-niveaux" style="margin-bottom:20px;display:none">
-          <div class="overview-card-title">Bilan par compétences</div>
-          <div id="niveaux-content"></div>
-        </div>
-
-        <!-- Mes questionnaires de lecture — même présentation que le
-             dashboard élève (détail par questionnaire + moyenne générale),
-             voir computeQuestionnairesSummary/renderStudentQuestionnaires. -->
-        <div class="overview-card" id="student-questionnaires" style="margin-bottom:20px;display:none">
-          <div class="overview-card-title">Questionnaires de lecture</div>
-          <div style="display:flex;gap:24px;margin-bottom:14px;">
-            <div><span style="font-size:22px;font-weight:800;color:var(--blue)" id="student-qz-avg">—</span> <span style="font-size:12px;color:var(--muted)">moyenne générale</span></div>
-            <div><span style="font-size:22px;font-weight:800;color:var(--blue)" id="student-qz-total">0</span> <span style="font-size:12px;color:var(--muted)">questionnaire(s) passé(s)</span></div>
-          </div>
-          <div id="student-qz-list"></div>
+        <!-- Panneau Exercices chutés (élève) — même arborescence que le
+             panneau classe (voir renderExercicesChutesClasse), scopée à
+             l'élève courant, sans seuil de plusieurs élèves (dès la 1ère
+             tentative) : voir lfmAnalytics.computeStudentExercisesChutes. -->
+        <div id="panel-student-exercices-chutes" style="display:none">
+          <div id="exercices-chutes-eleve-content"><div class="view-loading">Chargement…</div></div>
         </div>
 
         <div class="nav-footer" id="student-nav-footer"></div>
@@ -997,6 +1014,11 @@
   let _exercicesChutesList    = [];  // liste plate {domaine, sousDomaine, competence, exerciseSlug, avgPct, studentCount}, triée pire d'abord
   let _exercicesChutesAuthIds = [];  // auth_user_id des élèves de la classe, réutilisés pour le détail au clic (évite un 2e getStudents())
   let _exercicesChutesFilter  = { search: '', domaine: '', sousDomaine: '' };
+  let _studentExercicesChutesLoaded    = false;
+  let _studentExercicesChutesStudentId = null;
+  let _studentExercicesChutesList      = [];  // liste plate, même forme que _exercicesChutesList, sans seuil (1 élève)
+  let _studentExercicesChutesItemRows  = [];  // lignes item (fenêtre 5 dernières tentatives) de l'élève courant, filtrées par exercise_slug au clic — pas de refetch
+  let _studentExercicesChutesFilter    = { search: '', domaine: '', sousDomaine: '' };
   let _catalogMap        = null;   // lfmAnalytics.buildCatalogMap(), une fois exercise-data.js chargé
   let _studentProfile     = null;  // dernier profil calculé (fiche élève courante), réutilisé par le bulletin
   let _studentRows         = [];   // dernières lignes brutes de l'élève courant (pour filtrage par période)
@@ -1117,6 +1139,20 @@
       await renderOverview(classId);
     } else if (tab === 'exercices-chutes') {
       await renderExercicesChutesClasse(classId);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     ONGLETS FICHE ÉLÈVE (Général / Exercices chutés)
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function switchStudentTab(tab) {
+    document.getElementById('tab-btn-student-general').classList.toggle('active', tab === 'general');
+    document.getElementById('tab-btn-student-exercices-chutes').classList.toggle('active', tab === 'exercices-chutes');
+    document.getElementById('panel-student-general').style.display = tab === 'general' ? '' : 'none';
+    document.getElementById('panel-student-exercices-chutes').style.display = tab === 'exercices-chutes' ? '' : 'none';
+
+    if (tab === 'exercices-chutes') {
+      await renderExercicesChutesEleve();
     }
   }
 
@@ -1400,6 +1436,153 @@
       container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Erreur lors du chargement du détail.</div></div>';
       console.warn('[LFM] openExerciceChuteDetailClasse:', e.message);
     }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     EXERCICES CHUTÉS (élève) — même arborescence que côté classe, scopée à
+     l'élève courant, SANS seuil de plusieurs élèves (dès la 1ère tentative,
+     cohérent avec computeWorstItems côté détail). Réutilise _studentRows,
+     déjà chargées par renderStudentProfile pour la liste ; les lignes item
+     (fenêtre 5 dernières tentatives par question) ne sont récupérées qu'une
+     fois par élève, puis filtrées en mémoire par exercise_slug au clic —
+     pas de nouvel appel réseau pour ouvrir le détail.
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function renderExercicesChutesEleve() {
+    const s = _currentStudent;
+    if (_studentExercicesChutesLoaded && _studentExercicesChutesStudentId === s.auth_user_id) {
+      renderExercicesChutesEleveListView();
+      return;
+    }
+    _studentExercicesChutesLoaded    = false;
+    _studentExercicesChutesStudentId = s.auth_user_id;
+    _studentExercicesChutesFilter    = { search: '', domaine: '', sousDomaine: '' };
+
+    const container = document.getElementById('exercices-chutes-eleve-content');
+    container.innerHTML = '<div class="view-loading">Chargement…</div>';
+
+    try {
+      if (_studentRows.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Cet élève n\'a pas encore réalisé d\'exercice.</div></div>';
+        _studentExercicesChutesLoaded = true;
+        return;
+      }
+      _studentExercicesChutesItemRows = await lfmTeacher.getStudentItemResultsRaw(s.auth_user_id);
+      _studentExercicesChutesList = lfmAnalytics.computeStudentExercisesChutes(_studentRows, _catalogMap);
+      renderExercicesChutesEleveListView();
+      _studentExercicesChutesLoaded = true;
+    } catch (e) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Erreur lors du chargement.</div></div>';
+      console.warn('[LFM] renderExercicesChutesEleve:', e.message);
+    }
+  }
+
+  /* Même regroupement domaine > sous-domaine > [exercices] que côté classe
+     (filterExercicesChutesTree, générique, réutilisée telle quelle). Ids DOM
+     distincts (ecs-*) : les deux panneaux (classe et fiche élève) coexistent
+     dans le document, même si un seul est visible à la fois. */
+  function renderExercicesChutesEleveListView() {
+    const container = document.getElementById('exercices-chutes-eleve-content');
+    const allDomaines     = [...new Set(_studentExercicesChutesList.map(c => c.domaine))];
+    const allSousDomaines = [...new Set(_studentExercicesChutesList.map(c => c.sousDomaine))];
+    const domaineKeys = DOMAIN_ORDER.filter(d => allDomaines.includes(d));
+    allDomaines.forEach(d => { if (!domaineKeys.includes(d)) domaineKeys.push(d); });
+
+    const f = _studentExercicesChutesFilter;
+    const domaineOptions = `<option value="">Tous</option>` + domaineKeys.map(d =>
+      `<option value="${escHtml(d)}"${f.domaine === d ? ' selected' : ''}>${escHtml(d)}</option>`).join('');
+    const sousDomaineOptions = `<option value="">Tous</option>` + allSousDomaines.slice().sort((a, b) => a.localeCompare(b, 'fr')).map(sd =>
+      `<option value="${escHtml(sd)}"${f.sousDomaine === sd ? ' selected' : ''}>${escHtml(sd)}</option>`).join('');
+
+    const tree = filterExercicesChutesTree(_studentExercicesChutesList, f);
+
+    let treeHtml = '';
+    domaineKeys.forEach(domaine => {
+      const sousMap = tree.get(domaine);
+      if (!sousMap) return;
+      const icon = DOMAIN_ICONS[domaine] || '📖';
+      const domaineAvg = Math.round(
+        [...sousMap.values()].flat().reduce((s, c) => s + c.avgPct, 0) / [...sousMap.values()].flat().length
+      );
+      treeHtml += `<div class="ec-domaine">
+        <div class="ec-domaine-header"><span>${icon} ${escHtml(domaine)}</span><span class="n">${domaineAvg}% moy.</span></div>`;
+      sousMap.forEach((exercices, sousDomaine) => {
+        treeHtml += `<div class="ec-sous-domaine">
+          <div class="ec-sous-domaine-title">${escHtml(sousDomaine)}</div>
+          <div class="bnav-row-list">
+          ${exercices.map(c => `
+            <button type="button" class="bnav-row" onclick="openExerciceChuteDetailEleve('${escJs(c.exerciseSlug)}')">
+              <span class="bnav-row-label">${escHtml(c.competence)}</span>
+              <span class="bnav-row-meta">${c.avgPct}% · ${c.attemptCount} tentative${c.attemptCount > 1 ? 's' : ''}</span>
+              <span class="bnav-row-arrow">›</span>
+            </button>`).join('')}
+          </div>
+        </div>`;
+      });
+      treeHtml += `</div>`;
+    });
+    if (!treeHtml) treeHtml = '<div class="empty-inline">Aucun exercice ne correspond.</div>';
+
+    container.innerHTML = `
+      <div class="ec-filters">
+        <input type="text" class="ec-search" id="ecs-search-input" placeholder="🔍 Rechercher un exercice…"
+               value="${escHtml(f.search)}" oninput="onExercicesChutesEleveFilterChange()">
+        <select id="ecs-filter-domaine" onchange="onExercicesChutesEleveFilterChange()">${domaineOptions}</select>
+        <select id="ecs-filter-sous-domaine" onchange="onExercicesChutesEleveFilterChange()">${sousDomaineOptions}</select>
+      </div>
+      <div class="ec-tree">${treeHtml}</div>`;
+  }
+
+  function onExercicesChutesEleveFilterChange() {
+    _studentExercicesChutesFilter = {
+      search:      document.getElementById('ecs-search-input').value,
+      domaine:     document.getElementById('ecs-filter-domaine').value,
+      sousDomaine: document.getElementById('ecs-filter-sous-domaine').value
+    };
+    renderExercicesChutesEleveListView();
+    const input = document.getElementById('ecs-search-input');
+    if (document.activeElement !== input && _studentExercicesChutesFilter.search) {
+      input.focus();
+      input.setSelectionRange(input.value.length, input.value.length);
+    }
+  }
+
+  /* Détail au clic : synchrone, pas de nouvel appel réseau — filtre les
+     lignes item déjà chargées (fenêtre 5 dernières tentatives par question,
+     voir getStudentItemResultsRaw) par exercise_slug, puis réutilise
+     computeWorstItems/resolveItemText tels quels (ex-renderWorstItems). */
+  function openExerciceChuteDetailEleve(exerciseSlug) {
+    const container = document.getElementById('exercices-chutes-eleve-content');
+    const meta  = lfmAnalytics.metaFor(_catalogMap, exerciseSlug);
+    const entry = _studentExercicesChutesList.find(c => c.exerciseSlug === exerciseSlug);
+    const itemRows = _studentExercicesChutesItemRows.filter(r => r.exercise_slug === exerciseSlug);
+    const worst = lfmAnalytics.computeWorstItems(itemRows);
+
+    const rowsHtml = worst.length
+      ? worst.map(it => {
+          const qa = lfmAnalytics.resolveItemText(it.exercise_slug, it.level, it.item_id);
+          const questionText = qa && qa.q ? qa.q : '(question retirée du catalogue depuis)';
+          const pct = Math.round(it.failRate * 100);
+          /* "sur les 5 dernières" n'a de sens que si la fenêtre de 5 est
+             effectivement remplie (voir ex-renderWorstItems). */
+          const attemptsLabel = it.attempts === 5
+            ? `${it.attempts} tentatives sur les 5 dernières`
+            : `${it.attempts} tentative${it.attempts > 1 ? 's' : ''} enregistrée${it.attempts > 1 ? 's' : ''}`;
+          return `
+          <div class="consolider-item">
+            <div>
+              <div class="ci-comp">${escHtml(questionText)}</div>
+              <div class="ci-meta">Niveau ${it.level} · ${attemptsLabel} · <span class="ci-flag">${pct}% d'échec</span></div>
+            </div>
+          </div>`;
+        }).join('')
+      : '<div class="empty-inline">Aucune erreur enregistrée sur cet exercice.</div>';
+
+    container.innerHTML = `
+      <button type="button" class="btn btn-ghost btn-sm" onclick="renderExercicesChutesEleveListView()">← Retour à la liste</button>
+      <div class="overview-card" style="margin-top:14px">
+        <div class="overview-card-title">${escHtml(meta.competence)}${entry ? ` — ${entry.avgPct}%` : ''}</div>
+        <div style="margin-top:10px">${rowsHtml}</div>
+      </div>`;
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -1847,6 +2030,16 @@
   ═══════════════════════════════════════════════════════════════════════════ */
   async function renderStudentDetail() {
     const s = _currentStudent;
+
+    /* Réinitialise l'onglet "Exercices chutés" — Général redevient l'onglet
+       par défaut à l'ouverture de chaque nouvelle fiche élève (même motif
+       que renderStudents() côté classe). */
+    _studentExercicesChutesLoaded = false;
+    document.getElementById('tab-btn-student-general').classList.add('active');
+    document.getElementById('tab-btn-student-exercices-chutes').classList.remove('active');
+    document.getElementById('panel-student-general').style.display = '';
+    document.getElementById('panel-student-exercices-chutes').style.display = 'none';
+
     if (!s?.auth_user_id) {
       document.getElementById('view-student').style.display = '';
       document.getElementById('student-stats-row').innerHTML =
