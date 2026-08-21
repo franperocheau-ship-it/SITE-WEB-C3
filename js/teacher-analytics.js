@@ -14,7 +14,7 @@ const lfmAnalytics = (() => {
   const JAUGE_LEVELS       = ['CM1', 'CM2', '6e'];
   const DOMAIN_ORDER       = ['Français', 'Mathématiques'];
   const MIN_STUDENTS_COMP  = 5;     /* seuil "au moins 5 élèves" pour top/bottom compétences et exercices */
-  const MIN_STUDENTS_COMP_LEVEL = 3; /* seuil "au moins 3 élèves distincts" — top/bottom exercice+niveau (computeClassOverview), liste et détail "Exercices chutés" classe (computeClassExercisesChutes/computeClassWorstItems). Distinct de MIN_STUDENTS_COMP, qui reste utilisé tel quel par computeCompetenceStats */
+  const MIN_STUDENTS_COMP_LEVEL = 3; /* seuil "au moins 3 élèves distincts" — top/bottom exercice+niveau (computeClassOverview), liste "Détail par compétence" classe (computeClassExercisesChutes). Distinct de MIN_STUDENTS_COMP, qui reste utilisé tel quel par computeCompetenceStats */
   const DAY  = 86400000;
   const WEEK = 7 * DAY;
 
@@ -51,6 +51,19 @@ const lfmAnalytics = (() => {
     'determinants-possessifs':               'identifier-differencier-determinants-demonstratifs-possessifs',
     'identifier-determinant-demonstratif':   'identifier-differencier-determinants-demonstratifs-possessifs',
   };
+
+  /* Résout un exercise_slug brut vers son slug canonique (cible de fusion
+     s'il s'agit d'un ancien slug retiré du catalogue, sinon inchangé).
+     Distinct de metaFor(), qui ne résout l'alias QUE pour l'affichage
+     (titre/domaine) sans jamais changer le exercise_slug lui-même — d'où
+     un même exercice pouvant apparaître sous plusieurs lignes distinctes
+     dans l'arborescence "Détail par compétence" (une par ancien slug
+     tenté), toutes affichant le même titre. À utiliser à la source, dans
+     dedupeBestBySlug/dedupeBestBySlugPalier, AVANT tout regroupement par
+     exercice — pas seulement pour l'affichage. */
+  function canonicalSlug(slug) {
+    return LEGACY_SLUG_ALIASES[slug] || slug;
+  }
 
   /* Pages d'exercices autonomes (hors moteur exercise.html / catalogue
      EXERCISE_DATA) dont l'exercise_slug n'a jamais existé dans le
@@ -150,14 +163,23 @@ const lfmAnalytics = (() => {
     return UNKNOWN_META;
   }
 
-  /* ── Dédoublonnage : meilleur pct par (élève × exercice) ─────────────────── */
+  /* ── Dédoublonnage : meilleur pct par (élève × exercice) ─────────────────────
+     exercise_slug résolu via canonicalSlug() avant de servir de clé — un
+     ancien slug fusionné (Lot 6, ex. identifier-phrase-declarative) et son
+     exercice cible (identifier-type-phrase) comptent donc comme UN seul
+     exercice, avec le meilleur score toutes tentatives confondues (ancien
+     ET nouveau slug). exercise_slug est aussi réécrit dans la ligne
+     conservée, pour que tout le code en aval (aggregateByCompetence,
+     computeClassLeafStudents…) qui lit r.exercise_slug voie déjà la forme
+     canonique sans avoir à refaire la résolution lui-même. */
   function dedupeBestBySlug(rows) {
     const map = new Map();
     rows.forEach(r => {
-      const key  = r.student_id + '|' + r.exercise_slug;
+      const slug = canonicalSlug(r.exercise_slug);
+      const key  = r.student_id + '|' + slug;
       const pct  = parseFloat(r.pct);
       const prev = map.get(key);
-      if (!prev || pct > prev.pct) map.set(key, { ...r, pct });
+      if (!prev || pct > prev.pct) map.set(key, { ...r, exercise_slug: slug, pct });
     });
     return Array.from(map.values());
   }
@@ -330,37 +352,6 @@ const lfmAnalytics = (() => {
       .sort((a, b) => a.avgPct - b.avgPct);
   }
 
-  /* ── Onglet "Exercices chutés", niveau classe — détail par question ───────
-     Équivalent computeWorstItems (étape 4) côté classe : regroupe par
-     item_id, mais SANS fenêtre glissante par élève (toutes les tentatives de
-     tous les élèves comptent, décision explicite — contrairement à
-     computeWorstItems qui limite à 5 tentatives par item côté élève, il n'y
-     a pas ici de "5 dernières" par élève à respecter). Seuil : au moins 3
-     élèves DISTINCTS ayant tenté l'item (pas 3 tentatives — un seul élève
-     qui retente 5 fois ne doit pas suffire à faire remonter une question).
-     Pas de filtre failRate > 0 ici contrairement à computeWorstItems : côté
-     classe, une question à 0% d'échec parmi celles qui passent le seuil
-     n'est simplement jamais la pire (sort ascendant to top), inutile de
-     l'exclure explicitement. */
-  function computeClassWorstItems(itemRows) {
-    const byItem = new Map();
-    itemRows.forEach(r => {
-      if (!byItem.has(r.item_id)) byItem.set(r.item_id, []);
-      byItem.get(r.item_id).push(r);
-    });
-    return [...byItem.entries()]
-      .map(([item_id, rows]) => ({
-        item_id,
-        exercise_slug: rows[0].exercise_slug,
-        level:         rows[0].level,
-        studentCount:  new Set(rows.map(r => r.student_id)).size,
-        attempts:      rows.length,
-        failRate:      rows.filter(r => !r.is_correct).length / rows.length
-      }))
-      .filter(it => it.studentCount >= MIN_STUDENTS_COMP_LEVEL)
-      .sort((a, b) => b.failRate - a.failRate);
-  }
-
   /* ── Onglet "Exercices chutés", niveau élève — liste ───────────────────────
      Même principe que computeClassExercisesChutes (aggregateByCompetence sur
      dedupeBestBySlug, granularité par exercice seul), mais SANS seuil : un
@@ -373,11 +364,19 @@ const lfmAnalytics = (() => {
      (contrairement au niveau classe, où il coïncide avec studentCount).
      On recalcule ici le vrai nombre de tentatives par exercice à partir des
      lignes brutes (non dédupliquées) et on l'utilise pour écraser
-     attemptCount avant affichage. */
+     attemptCount avant affichage. Clé résolue via canonicalSlug() comme
+     dedupeBestBySlug : sinon les tentatives d'un ancien slug fusionné (Lot
+     6) resteraient comptées sous leur ancienne clé et ne seraient jamais
+     retrouvées par c.exerciseSlug (déjà canonique via aggregateByCompetence/
+     dedupeBestBySlug) — le compte affiché doit additionner les tentatives
+     de l'ancien ET du nouveau slug. */
   function computeStudentExercisesChutes(rows, catalogMap) {
     const best = dedupeBestBySlug(rows);
     const attemptsBySlug = new Map();
-    rows.forEach(r => attemptsBySlug.set(r.exercise_slug, (attemptsBySlug.get(r.exercise_slug) || 0) + 1));
+    rows.forEach(r => {
+      const slug = canonicalSlug(r.exercise_slug);
+      attemptsBySlug.set(slug, (attemptsBySlug.get(slug) || 0) + 1);
+    });
     return aggregateByCompetence(best, catalogMap)
       .map(c => ({ ...c, attemptCount: attemptsBySlug.get(c.exerciseSlug) || c.attemptCount }))
       .sort((a, b) => a.avgPct - b.avgPct);
@@ -389,15 +388,21 @@ const lfmAnalytics = (() => {
      progression). Ici on veut le palier interne (1/2/3) tel quel, via
      levelToPalierKey directement sur la valeur brute stockée — donc
      disponible pour tout exercice, y compris les types standalone sans
-     `levels` déclarés dans le catalogue (contrairement à resolveNiveau). */
+     `levels` déclarés dans le catalogue (contrairement à resolveNiveau).
+     exercise_slug résolu via canonicalSlug() avant de servir de clé, même
+     principe que dedupeBestBySlug — un ancien exercice mono-niveau fusionné
+     (level souvent absent) retombe sur le palier 1 du nouvel exercice via
+     le repli par défaut de levelToPalierKey, seule approximation possible
+     puisque l'ancien exercice n'avait justement aucune notion de palier. */
   function dedupeBestBySlugPalier(rows) {
     const map = new Map();
     rows.forEach(r => {
+      const slug   = canonicalSlug(r.exercise_slug);
       const palier = levelToPalierKey(r.level);
-      const key    = r.student_id + '|' + r.exercise_slug + '|' + palier;
+      const key    = r.student_id + '|' + slug + '|' + palier;
       const pct    = parseFloat(r.pct);
       const prev   = map.get(key);
-      if (!prev || pct > prev.pct) map.set(key, { ...r, pct, palier });
+      if (!prev || pct > prev.pct) map.set(key, { ...r, exercise_slug: slug, pct, palier });
     });
     return Array.from(map.values());
   }
@@ -814,7 +819,7 @@ const lfmAnalytics = (() => {
     buildCatalogMap, dedupeBestBySlug, computeSousDomaineRates,
     computeClassOverview, computeStudentProfile, computeCompetenceStats,
     computeWorstItems, resolveItemText,
-    computeClassExercisesChutes, computeClassWorstItems, computeStudentExercisesChutes,
+    computeClassExercisesChutes, computeStudentExercisesChutes,
     dedupeBestBySlugPalier, aggregateByCompetenceLevel, computeClassLeafStudents,
     levelToPalierKey,
     metaFor, exerciseTitleFor

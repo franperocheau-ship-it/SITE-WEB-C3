@@ -44,7 +44,6 @@ const PROJECT_GLOBALS = {
   lfmTeacher: 'readonly',
   lfmGuidedAccess: 'readonly',
   lfmLevelUnlock: 'readonly',
-  lfmLevelBadge: 'readonly',
   lfmNiveauMode: 'readonly',
   lfmJoggingTeacher: 'readonly',
 
