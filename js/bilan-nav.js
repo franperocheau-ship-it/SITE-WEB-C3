@@ -1,12 +1,24 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   bilan-nav.js — Navigation progressive à 5 étapes pour le "Bilan par
-   compétence" (onglet classe ET fiche élève) : matière → sous-domaine →
-   compétence → niveau → élèves. Remplace l'ancien arbre à plat (accordéons
-   domaine/sous-domaine affichant tout d'un coup).
+   bilan-nav.js — Navigation progressive à 5 étapes pour l'onglet "Détail par
+   compétence" (classe ET fiche élève) : matière → sous-domaine → compétence
+   (un exercice, triée du moins réussi au mieux réussi) → niveau (palier
+   interne 1/2/3, avec %) → feuille (élèves pour la classe, détail par
+   question pour l'élève — voir resultats-enseignant.html).
 
-   Ne fait aucun appel réseau et ne construit pas byDomaine — reçoit la
-   structure déjà groupée par la page appelante (voir resultats-enseignant.html
-   /renderCompetences, /renderStudentBilan) et se contente de la parcourir.
+   Ne fait aucun appel réseau. Ne construit aucune structure imbriquée lui-
+   même : la structure de l'arbre (quels domaines/sous-domaines/compétences/
+   niveaux existent) est dérivée à la volée des clés de `competenceRates`/
+   `niveauRates` (Maps "domaine||sousDomaine[||slug[||palier]]" → { ... }),
+   fournies déjà agrégées et déjà filtrées par seuil par la page appelante
+   (voir resultats-enseignant.html /renderCompetences). Dériver depuis ces
+   Maps plutôt que depuis un arbre à part garantit qu'un domaine/sous-domaine
+   sans aucune compétence qualifiée (seuil non atteint) n'apparaît pas.
+
+   Le contenu de la feuille (étape 5) est résolu à la demande via le callback
+   `getLeafItems(path)` fourni par la page — jamais précalculé pour tous les
+   noeuds à l'avance (les données sont déjà en mémoire côté page, ce n'est
+   qu'un filtrage, pas un appel réseau).
+
    L'état (chemin de navigation courant) est isolé par conteneur DOM, pas
    global, pour que la vue classe et la fiche élève ne se marchent pas dessus.
    ───────────────────────────────────────────────────────────────────────────── */
@@ -23,50 +35,49 @@ const lfmBilanNav = (() => {
     return pct >= 70 ? 'score-high' : pct >= 50 ? 'score-mid' : 'score-low';
   }
 
-  function fmtDate(iso) {
-    return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' });
-  }
+  const KEY_SEP = '||';
+  const rateKey = (...parts) => parts.join(KEY_SEP);
 
-  /* Nombre de résultats sous un nœud, quelle que soit sa profondeur (domaine,
-     sous-domaine ou compétence) — un nœud feuille est un tableau d'items. */
-  function countLeaves(node) {
-    if (Array.isArray(node)) return node.length;
-    return Object.values(node).reduce((sum, child) => sum + countLeaves(child), 0);
+  /* ── Dérivation de l'arbre depuis les clés de competenceRates ────────────── */
+  function domainesOf(competenceRates) {
+    const set = new Set();
+    competenceRates.forEach((v, key) => set.add(key.split(KEY_SEP)[0]));
+    return set;
   }
-
-  /* Ordre des niveaux d'une compétence, même logique que l'ancien arbre
-     (badges CM1/CM2/6e dans l'ordre réel de l'exercice, sinon fin de liste). */
-  function levelSort(levelsMap, levelBadge) {
-    const idx = level => levelBadge.resolveIndex(level === '—' ? null : level, levelsMap[level][0]?.exerciseType);
-    return Object.keys(levelsMap).sort((a, b) => {
-      const ia = idx(a), ib = idx(b);
-      return (ia == null ? 99 : ia) - (ib == null ? 99 : ib);
+  function sousDomainesOf(competenceRates, domaine) {
+    const set = new Set();
+    competenceRates.forEach((v, key) => {
+      const [d, sd] = key.split(KEY_SEP);
+      if (d === domaine) set.add(sd);
     });
+    return set;
   }
-
-  /* ── Agrégation étape 5 (élèves), mode 'classe' ──────────────────────────
-     items = [{name, exTitle, exerciseType, score, total, pct, date}, ...]
-     -> une ligne par élève, % moyen de ses tentatives à ce niveau, triée
-     du plus faible au plus élevé. */
-  function aggregateStudents(items) {
-    const byName = new Map();
-    items.forEach(it => {
-      if (!byName.has(it.name)) byName.set(it.name, []);
-      byName.get(it.name).push(it);
+  function slugsOf(competenceRates, domaine, sousDomaine) {
+    const list = [];
+    competenceRates.forEach((v, key) => {
+      const [d, sd, slug] = key.split(KEY_SEP);
+      if (d === domaine && sd === sousDomaine) list.push(slug);
     });
-    return Array.from(byName.entries())
-      .map(([name, attempts]) => ({
-        name,
-        avgPct: Math.round(attempts.reduce((s, a) => s + a.pct, 0) / attempts.length),
-        attempts
-      }))
-      .sort((a, b) => a.avgPct - b.avgPct);
+    return list;
+  }
+  /* Paliers réellement présents dans niveauRates pour cette compétence,
+     triés numériquement (1, 2, 3) — utilisé tel quel côté élève (seuls les
+     niveaux tentés apparaissent). Côté classe, renderStep complète avec les
+     paliers attendus mais non tentés (voir competenceRates[key].paliers). */
+  function paliersOf(niveauRates, domaine, sousDomaine, slug) {
+    const list = [];
+    niveauRates.forEach((v, key) => {
+      const [d, sd, s, palier] = key.split(KEY_SEP);
+      if (d === domaine && sd === sousDomaine && s === slug) list.push(palier);
+    });
+    return list.sort((a, b) => Number(a) - Number(b));
   }
 
-  function renderCrumbs(path) {
-    const labels = ['Toutes les matières', ...path];
-    return `<div class="bnav-crumbs">${labels.map((label, i) => {
-      const isLast = i === labels.length - 1;
+  /* labels : chemin déjà résolu en libellés humains (voir renderStep). */
+  function renderCrumbs(labels) {
+    const all = ['Toutes les matières', ...labels];
+    return `<div class="bnav-crumbs">${all.map((label, i) => {
+      const isLast = i === all.length - 1;
       const sep = i > 0 ? '<span class="bnav-sep">›</span>' : '';
       return sep + (isLast
         ? `<span class="bnav-crumb-current">${escHtml(label)}</span>`
@@ -87,96 +98,89 @@ const lfmBilanNav = (() => {
     </button>`;
   }
 
-  function renderClasseLeaf(items) {
-    const students = aggregateStudents(items);
-    if (students.length === 0) return '<div class="empty-inline">Aucun résultat.</div>';
-    const rows = students.map(s => `
-      <div class="bnav-leaf-row">
-        <span class="bnav-leaf-name">${escHtml(s.name)}</span>
-        <span class="bnav-leaf-meta">${s.attempts.length} tentative${s.attempts.length > 1 ? 's' : ''}</span>
-        <span class="score-pill ${pctClass(s.avgPct)}">${s.avgPct}%</span>
-      </div>`).join('');
-    return `<div class="bnav-leaf-list">${rows}</div>`;
+  function disabledRow(label, meta) {
+    return `<div class="bnav-row bnav-row-disabled">
+      <span class="bnav-row-label">${label}</span>
+      <span class="bnav-row-meta">${meta}</span>
+    </div>`;
   }
 
-  function renderEleveLeaf(items) {
-    if (items.length === 0) return '<div class="empty-inline">Aucun résultat.</div>';
-    const avg = Math.round(items.reduce((s, it) => s + it.pct, 0) / items.length);
-    const rows = items.slice()
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
-      .map(it => {
-        const t = it.exTitle.charAt(0).toUpperCase() + it.exTitle.slice(1);
-        return `<tr>
-          <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
-              title="${escHtml(t)}">${escHtml(t)}</td>
-          <td>${it.score}/${it.total}</td>
-          <td><span class="score-pill ${pctClass(it.pct)}">${Math.round(it.pct)}%</span></td>
-          <td style="color:var(--muted);font-size:13px">${fmtDate(it.date)}</td>
-        </tr>`;
-      }).join('');
-    return `
-      <div class="bnav-leaf-summary">
-        <span class="score-pill ${pctClass(avg)}" style="font-size:15px;padding:6px 14px">${avg}%</span>
-        <span class="bnav-leaf-meta">${items.length} tentative${items.length > 1 ? 's' : ''}</span>
-      </div>
-      <div class="table-wrap" style="border-radius:8px;margin-top:10px">
-        <table class="result-table">
-          <thead><tr><th>Exercice</th><th>Score</th><th>Résultat</th><th>Date</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>`;
+  /* ── Feuille "classe" — une ligne par élève, triée pire d'abord (items déjà
+     triés par getLeafItems), score individuel. Items minimaux {name, pct} :
+     tout champ supplémentaire (score/total/date…) est ignoré ici. */
+  function renderClasseLeaf(items) {
+    if (!items || items.length === 0) return '<div class="empty-inline">Aucun résultat.</div>';
+    const rows = items.map(it => `
+      <div class="bnav-leaf-row">
+        <span class="bnav-leaf-name">${escHtml(it.name)}</span>
+        <span class="score-pill ${pctClass(it.pct)}">${Math.round(it.pct)}%</span>
+      </div>`).join('');
+    return `<div class="bnav-leaf-list">${rows}</div>`;
   }
 
   function renderStep(container) {
     const state = container.__bilanNav;
     const { path, config } = state;
-    const { byDomaine, mode, domainOrder = [], domainIcons = {}, sousDomaineRates, levelBadge } = config;
+    const { mode, domainOrder = [], domainIcons = {}, sousDomaineRates, competenceRates, niveauRates, getLeafItems } = config;
     let body = '';
+    const crumbLabels = [];
 
     if (path.length === 0) {
       /* Étape 1 — matières */
-      const keys = domainOrder.filter(d => byDomaine[d]);
-      Object.keys(byDomaine).forEach(d => { if (!keys.includes(d)) keys.push(d); });
-      const rows = keys.map(domaine => {
-        const count = countLeaves(byDomaine[domaine]);
+      const keys = [...domainesOf(competenceRates)];
+      const domaineKeys = domainOrder.filter(d => keys.includes(d));
+      keys.forEach(d => { if (!domaineKeys.includes(d)) domaineKeys.push(d); });
+      const rows = domaineKeys.map(domaine => {
         const icon = domainIcons[domaine] || '📖';
-        return navRow(domaine, `${icon} ${escHtml(domaine)}`, `${count} résultat${count > 1 ? 's' : ''}`);
+        return navRow(domaine, `${icon} ${escHtml(domaine)}`, '');
       });
       body = renderRowList(rows);
 
     } else if (path.length === 1) {
-      /* Étape 2 — sous-domaines */
+      /* Étape 2 — sous-domaines (ordre naturel, pas de tri par taux) */
       const [domaine] = path;
-      const sousDomaineMap = byDomaine[domaine] || {};
-      const rows = Object.keys(sousDomaineMap).map(sousDomaine => {
-        const count = countLeaves(sousDomaineMap[sousDomaine]);
-        const rate  = sousDomaineRates && sousDomaineRates.get(domaine + '||' + sousDomaine);
-        const meta  = (rate ? `${rate.avgPct}% · ` : '') + `${count} résultat${count > 1 ? 's' : ''}`;
+      const rows = [...sousDomainesOf(competenceRates, domaine)].map(sousDomaine => {
+        const rate = sousDomaineRates && sousDomaineRates.get(rateKey(domaine, sousDomaine));
+        const meta = rate ? `${rate.avgPct}%` : '';
         return navRow(sousDomaine, escHtml(sousDomaine), meta);
       });
       body = renderRowList(rows);
 
     } else if (path.length === 2) {
-      /* Étape 3 — compétences */
+      /* Étape 3 — compétences (un exercice), triées du moins bien réussi au
+         mieux réussi ; % + métatexte (page-fourni : "N élèves"/"N tentatives"). */
       const [domaine, sousDomaine] = path;
-      const comps = (byDomaine[domaine] || {})[sousDomaine] || {};
-      const rows = Object.keys(comps).map(compLabel => {
-        const count = countLeaves(comps[compLabel]);
-        return navRow(compLabel, escHtml(compLabel), `${count} résultat${count > 1 ? 's' : ''}`);
-      });
+      const slugs = slugsOf(competenceRates, domaine, sousDomaine)
+        .map(slug => ({ slug, rate: competenceRates.get(rateKey(domaine, sousDomaine, slug)) }))
+        .sort((a, b) => a.rate.avgPct - b.rate.avgPct);
+      const rows = slugs.map(({ slug, rate }) =>
+        navRow(slug, escHtml(rate.title), `${rate.avgPct}% · ${rate.metaText}`));
       body = renderRowList(rows);
 
     } else if (path.length === 3) {
-      /* Étape 4 — niveaux de la compétence choisie */
-      const [domaine, sousDomaine, compLabel] = path;
-      const levels = ((byDomaine[domaine] || {})[sousDomaine] || {})[compLabel] || {};
-      const rows = levelSort(levels, levelBadge).map(level => {
-        const items = levels[level];
-        const badge = levelBadge.html(level === '—' ? null : level, items[0]?.exerciseType)
-          || `<span class="badge" style="background:var(--border);color:var(--muted)">${escHtml(level)}</span>`;
-        const count = mode === 'classe' ? aggregateStudents(items).length : items.length;
-        const unit  = mode === 'classe' ? `élève${count > 1 ? 's' : ''}` : `tentative${count > 1 ? 's' : ''}`;
-        return navRow(level, badge, `${count} ${unit}`);
+      /* Étape 4 — niveaux (paliers internes 1/2/3) de la compétence choisie.
+         Mode classe : montre aussi les paliers attendus (competenceRates
+         .paliers) mais jamais tentés, en ligne grisée non cliquable. Mode
+         élève : seuls les paliers réellement tentés (paliersOf). */
+      const [domaine, sousDomaine, slug] = path;
+      const compRate = competenceRates.get(rateKey(domaine, sousDomaine, slug));
+      const tried = paliersOf(niveauRates, domaine, sousDomaine, slug);
+      /* Union avec `tried` (jamais juste `1..paliers`) : un palier réellement
+         présent dans niveauRates ne doit jamais être masqué, même si le
+         nombre de paliers attendu (catalogue) était sous-estimé pour une
+         raison quelconque — cohérent avec les limites déjà documentées de
+         la résolution palier/niveau ailleurs dans teacher-analytics.js. */
+      const expected = mode === 'classe' && compRate && compRate.paliers
+        ? Array.from({ length: compRate.paliers }, (_, i) => String(i + 1))
+        : [];
+      const palierKeys = mode === 'classe'
+        ? [...new Set([...expected, ...tried])].sort((a, b) => Number(a) - Number(b))
+        : tried;
+      const rows = palierKeys.map(palier => {
+        const rate = niveauRates.get(rateKey(domaine, sousDomaine, slug, palier));
+        const label = `Niveau ${escHtml(palier)}`;
+        if (!rate) return disabledRow(label, 'pas encore travaillé');
+        return navRow(palier, label, `${rate.avgPct}% · ${rate.metaText}`);
       });
       body = renderRowList(rows);
       if (config.onPrintCompetence) {
@@ -186,13 +190,28 @@ const lfmBilanNav = (() => {
       }
 
     } else {
-      /* Étape 5 — élèves (feuille) */
-      const [domaine, sousDomaine, compLabel, level] = path;
-      const items = (((byDomaine[domaine] || {})[sousDomaine] || {})[compLabel] || {})[level] || [];
-      body = mode === 'classe' ? renderClasseLeaf(items) : renderEleveLeaf(items);
+      /* Étape 5 — feuille, résolue à la demande par la page (getLeafItems) :
+         liste d'élèves (classe) ou détail par question (élève, voir
+         resultats-enseignant.html sous-étape D). */
+      const items = getLeafItems(path);
+      body = mode === 'classe' ? renderClasseLeaf(items) : (config.renderEleveLeaf ? config.renderEleveLeaf(items) : '');
     }
 
-    container.innerHTML = renderCrumbs(path) + body;
+    /* Libellés de fil d'Ariane lisibles : le domaine/sous-domaine/palier
+       sont déjà lisibles tels quels ; le slug (étape 3+) est remplacé par
+       son titre humain via competenceRates. */
+    path.forEach((p, i) => {
+      if (i === 2) {
+        const rate = competenceRates.get(rateKey(path[0], path[1], path[2]));
+        crumbLabels.push(rate ? rate.title : p);
+      } else if (i === 3) {
+        crumbLabels.push(`Niveau ${p}`);
+      } else {
+        crumbLabels.push(p);
+      }
+    });
+
+    container.innerHTML = renderCrumbs(crumbLabels) + body;
   }
 
   function persistMatiere(state) {
@@ -235,13 +254,14 @@ const lfmBilanNav = (() => {
   /* ── API publique ────────────────────────────────────────────────────── */
 
   /** (Ré)initialise la navigation dans `container` avec les données fournies.
-      config: { byDomaine, mode: 'classe'|'eleve', domainOrder, domainIcons,
-                sousDomaineRates, levelBadge, rememberKey, onPrintCompetence } */
+      config: { mode: 'classe'|'eleve', domainOrder, domainIcons,
+                sousDomaineRates, competenceRates, niveauRates, getLeafItems,
+                renderEleveLeaf, rememberKey, onPrintCompetence } */
   function mount(container, config) {
     let initialPath = [];
     if (config.rememberKey) {
       const saved = sessionStorage.getItem('lfm-bilan-matiere-' + config.rememberKey);
-      if (saved && config.byDomaine[saved]) initialPath = [saved];
+      if (saved && domainesOf(config.competenceRates).has(saved)) initialPath = [saved];
     }
     container.__bilanNav = { path: initialPath, config };
     bindEvents(container);
@@ -249,30 +269,26 @@ const lfmBilanNav = (() => {
   }
 
   /* ── Rendu impression (arbre complet, données → HTML direct, sans DOM) ──
-     Utilisé par printBilan() pour le bilan classe entier. Reprend le même
-     balisage (.bilan-domaine / .bilan-sous-domaine / .bilan-competence /
-     .bilan-level-block) que l'ancien arbre, dont le CSS d'impression est
-     conservé pour cet usage. */
-  function renderFullTreeHtml(byDomaine, opts) {
-    const { domainOrder = [], domainIcons = {}, sousDomaineRates = null, levelBadge } = opts;
-    const domaineKeys = domainOrder.filter(d => byDomaine[d]);
-    Object.keys(byDomaine).forEach(d => { if (!domaineKeys.includes(d)) domaineKeys.push(d); });
+     Utilisé par printBilan() pour le bilan classe entier. Repli sur les
+     mêmes Maps rates + getLeafItems que l'écran — pas de structure séparée
+     à maintenir. Ne montre que les paliers réellement tentés (pas de ligne
+     "pas encore travaillé" dans un document imprimé). */
+  function renderFullTreeHtml(opts) {
+    const { domainOrder = [], domainIcons = {}, sousDomaineRates, competenceRates, niveauRates, getLeafItems } = opts;
+    const domaineKeys = domainOrder.filter(d => domainesOf(competenceRates).has(d));
+    domainesOf(competenceRates).forEach(d => { if (!domaineKeys.includes(d)) domaineKeys.push(d); });
 
     let html = '';
     domaineKeys.forEach(domaine => {
-      const sousDomaineMap = byDomaine[domaine];
-      const totalRows = countLeaves(sousDomaineMap);
       const icon = domainIcons[domaine] || '📖';
-
       html += `<div class="bilan-domaine">
         <div class="bilan-domaine-header">
           <span class="bilan-domaine-title">${icon} ${escHtml(domaine)}</span>
-          <span class="bilan-domaine-count">${totalRows} résultat${totalRows > 1 ? 's' : ''}</span>
         </div>
         <div class="bilan-domaine-body">`;
 
-      Object.entries(sousDomaineMap).forEach(([sousDomaine, comps]) => {
-        const rate = sousDomaineRates && sousDomaineRates.get(domaine + '||' + sousDomaine);
+      [...sousDomainesOf(competenceRates, domaine)].forEach(sousDomaine => {
+        const rate = sousDomaineRates && sousDomaineRates.get(rateKey(domaine, sousDomaine));
         const gaugeHtml = rate ? `
           <div class="subdom-gauge-row">
             <div class="subdom-gauge-label"><span>${escHtml(sousDomaine)}</span><span class="n">${rate.avgPct}%</span></div>
@@ -282,40 +298,37 @@ const lfmBilanNav = (() => {
         html += `<div class="bilan-sous-domaine">
           <div class="bilan-sous-domaine-header">${gaugeHtml}</div>`;
 
-        Object.entries(comps).forEach(([compLabel, levels]) => {
-          html += `<div class="bilan-competence">
-            <div class="bilan-competence-title">${escHtml(compLabel)}</div>`;
+        slugsOf(competenceRates, domaine, sousDomaine)
+          .map(slug => ({ slug, rate: competenceRates.get(rateKey(domaine, sousDomaine, slug)) }))
+          .sort((a, b) => a.rate.avgPct - b.rate.avgPct)
+          .forEach(({ slug, rate: compRate }) => {
+            html += `<div class="bilan-competence">
+              <div class="bilan-competence-title">${escHtml(compRate.title)} — ${compRate.avgPct}% · ${escHtml(compRate.metaText)}</div>`;
 
-          levelSort(levels, levelBadge).forEach(level => {
-            const items = levels[level];
-            const badge = levelBadge.html(level === '—' ? null : level, items[0]?.exerciseType)
-              || `<span class="badge" style="background:var(--border);color:var(--muted)">${escHtml(level)}</span>`;
+            paliersOf(niveauRates, domaine, sousDomaine, slug).forEach(palier => {
+              const niveauRate = niveauRates.get(rateKey(domaine, sousDomaine, slug, palier));
+              const items = getLeafItems([domaine, sousDomaine, slug, palier]);
 
-            html += `<div class="bilan-level-block">
-              <span style="margin-bottom:8px;display:inline-block">${badge}</span>
-              <div class="table-wrap" style="border-radius:8px">
-                <table class="result-table">
-                  <thead><tr><th>Élève</th><th>Exercice</th><th>Score</th><th>Résultat</th><th>Date</th></tr></thead>
-                  <tbody>`;
+              html += `<div class="bilan-level-block">
+                <span style="margin-bottom:8px;display:inline-block" class="badge">Niveau ${escHtml(palier)} — ${niveauRate.avgPct}%</span>
+                <div class="table-wrap" style="border-radius:8px">
+                  <table class="result-table">
+                    <thead><tr><th>Élève</th><th>Résultat</th></tr></thead>
+                    <tbody>`;
 
-            items.slice().sort((a, b) => a.name.localeCompare(b.name, 'fr')).forEach(item => {
-              const t = item.exTitle.charAt(0).toUpperCase() + item.exTitle.slice(1);
-              html += `<tr>
-                <td style="font-weight:600">${escHtml(item.name)}</td>
-                <td style="font-size:12px;color:var(--muted);max-width:180px;
-                    overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
-                    title="${escHtml(t)}">${escHtml(t)}</td>
-                <td>${item.score}/${item.total}</td>
-                <td><span class="score-pill ${pctClass(item.pct)}">${Math.round(item.pct)}%</span></td>
-                <td style="color:var(--muted);font-size:13px">${fmtDate(item.date)}</td>
-              </tr>`;
+              items.slice().sort((a, b) => a.name.localeCompare(b.name, 'fr')).forEach(item => {
+                const pct = Math.round(item.pct);
+                html += `<tr>
+                  <td style="font-weight:600">${escHtml(item.name)}</td>
+                  <td><span class="score-pill ${pctClass(pct)}">${pct}%</span></td>
+                </tr>`;
+              });
+
+              html += `</tbody></table></div></div>`;
             });
 
-            html += `</tbody></table></div></div>`;
+            html += `</div>`; /* bilan-competence */
           });
-
-          html += `</div>`; /* bilan-competence */
-        });
 
         html += `</div>`; /* bilan-sous-domaine */
       });
@@ -326,5 +339,5 @@ const lfmBilanNav = (() => {
     return html;
   }
 
-  return { mount, renderFullTreeHtml, levelSort };
+  return { mount, renderFullTreeHtml };
 })();

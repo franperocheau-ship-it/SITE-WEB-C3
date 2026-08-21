@@ -18,7 +18,7 @@
   <script src="js/auth.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/teacher.js?v=3"></script>
-  <script src="js/teacher-analytics.js?v=7"></script>
+  <script src="js/teacher-analytics.js?v=8"></script>
   <!-- Résolution dynamique du texte d'un item depuis EXERCISE_DATA (jamais
        stocké en dur) — réutilise extractLevelBuckets/describeQA du module
        aperçu admin, voir lfmAnalytics.resolveItemText(). Pas encore
@@ -26,8 +26,7 @@
        chutés" (chantier en cours). -->
   <script src="js/competence-preview.js?v=8"></script>
   <script src="js/niveau-pastilles.js?v=2"></script>
-  <script src="js/level-badge.js?v=1"></script>
-  <script src="js/bilan-nav.js?v=1"></script>
+  <script src="js/bilan-nav.js?v=2"></script>
   <!-- Sources de données réutilisées pour la synthèse PDF (dictées/corpus/
        joggings) — voir printStudentBilan(), aucune de ces sections n'est
        affichée à l'écran ici, uniquement à l'impression. -->
@@ -337,6 +336,12 @@
     .bnav-row-label { font-weight: 700; font-size: 14px; color: var(--text); flex: 1; }
     .bnav-row-meta  { font-size: 12px; color: var(--muted); white-space: nowrap; }
     .bnav-row-arrow { color: var(--muted); font-size: 16px; }
+    /* Palier attendu (catalogue) mais jamais tenté — ligne informative,
+       non cliquable (voir "Niveau N — pas encore travaillé", étape 4
+       classe de l'arborescence "Détail par compétence"). */
+    .bnav-row-disabled { cursor: default; opacity: 0.55; }
+    .bnav-row-disabled:hover { background: none; }
+    .bnav-row-disabled .bnav-row-label { color: var(--muted); font-weight: 600; }
 
     .bnav-actions { margin-bottom: 12px; }
 
@@ -838,7 +843,7 @@
         <div class="view-tabs">
           <button class="tab-btn active" id="tab-btn-overview" onclick="switchClassTab('overview')">Vue d'ensemble</button>
           <button class="tab-btn" id="tab-btn-eleves" onclick="switchClassTab('eleves')">Élèves</button>
-          <button class="tab-btn" id="tab-btn-bilan" onclick="switchClassTab('bilan')">Par compétence</button>
+          <button class="tab-btn" id="tab-btn-bilan" onclick="switchClassTab('bilan')">Détail par compétence</button>
         </div>
 
         <!-- Panneau Vue d'ensemble -->
@@ -1003,8 +1008,11 @@
   let _currentStudent = null;   // { auth_user_id, display_name, class_name }
   let _bilanLoaded    = false;
   let _bilanClassId   = null;
-  let _bilanByDomaine       = null;  // dernier arbre groupé (classe), réutilisé par printBilan()/printCompetence()
-  let _bilanSousDomaineRates = null; // idem, pour les jauges du bilan imprimé
+  let _bilanBestBySlugPalier = null; // lignes dédupliquées élève×exercice×palier (dedupeBestBySlugPalier), réutilisées par getBilanLeafItems (écran + PDF) sans nouvel appel réseau
+  let _bilanStudentMap       = null; // auth_user_id -> display_name, pour résoudre les noms à la feuille
+  let _bilanSousDomaineRates = null; // Map "domaine||sousDomaine" -> {avgPct}, étape 2 (écran + PDF)
+  let _bilanCompetenceRates  = null; // Map "domaine||sousDomaine||exerciseSlug" -> {title, avgPct, metaText, paliers}, étape 3
+  let _bilanNiveauRates      = null; // Map "domaine||sousDomaine||exerciseSlug||palier" -> {avgPct, metaText}, étape 4
   let _overviewLoaded   = false;
   let _overviewClassId  = null;
   let _catalogMap        = null;   // lfmAnalytics.buildCatalogMap(), une fois exercise-data.js chargé
@@ -1258,7 +1266,11 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
-     BILAN PAR COMPÉTENCE
+     DÉTAIL PAR COMPÉTENCE (classe) — arborescence domaine > sous-domaine >
+     compétence (exercice, triée pire d'abord) > niveau (palier) > élèves,
+     voir js/bilan-nav.js. Remplace l'ancien "Bilan par compétences" (groupé
+     par libellé de compétence, pouvant fusionner plusieurs exercices, sans
+     tri par taux) — même onglet (tab-btn-bilan), même bouton d'impression.
   ═══════════════════════════════════════════════════════════════════════════ */
   async function renderCompetences(classId) {
     if (_bilanLoaded && _bilanClassId === classId) return;
@@ -1269,81 +1281,64 @@
     container.innerHTML = '<div class="view-loading">Chargement du bilan…</div>';
 
     try {
-      const students = await lfmTeacher.getStudents(classId);
-      const authIds  = students.filter(s => s.auth_user_id).map(s => s.auth_user_id);
+      await loadCatalogAssets();
+      const { students, results } = await lfmTeacher.getClassResultsRaw(classId);
       const studentMap = {};
       students.forEach(s => { if (s.auth_user_id) studentMap[s.auth_user_id] = s.display_name; });
 
-      if (authIds.length === 0) {
-        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Aucun élève connecté dans cette classe.</div></div>';
-        return;
-      }
-
-      const { data, error } = await window.lfmDb
-        .from('exercise_results')
-        .select('student_id, exercise_slug, exercise_title, exercise_type, level, score, total, pct, completed_at')
-        .in('student_id', authIds)
-        .order('completed_at', { ascending: false });
-
-      if (error) throw error;
-
-      /* Un seul résultat par (élève × exercice) : le plus récent (déjà ordonné DESC) */
-      const seen   = new Set();
-      const latest = [];
-      for (const r of (data || [])) {
-        const key = r.student_id + '|' + r.exercise_slug;
-        if (!seen.has(key)) { seen.add(key); latest.push(r); }
-      }
-
-      if (latest.length === 0) {
+      if (results.length === 0) {
         container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Aucun résultat enregistré pour cette classe.</div></div>';
+        _bilanLoaded = true;
         return;
       }
 
       /* Jauges de taux de réussite par sous-domaine (même calcul que les taux
          généraux/français/maths — meilleur score par élève × exercice) */
-      await loadCatalogAssets();
-      const sousDomaineRates = lfmAnalytics.computeSousDomaineRates(data, _catalogMap);
+      const sousDomaineRates = lfmAnalytics.computeSousDomaineRates(results, _catalogMap);
 
-      /* Grouper domaine → compétence → niveau */
-      const byDomaine    = {};
-
-      for (const r of latest) {
-        /* metaFor() (et non catalogMap[slug] direct) : seul catalogMap[slug]
-           couvre EXERCISE_DATA — les slugs STANDALONE_META (ortho-*, lex-*,
-           questionnaire-lecture-<id>, ...) y étaient invisibles et tombaient
-           silencieusement dans "Autres", hors de DOMAIN_ORDER (Français/
-           Mathématiques) donc jamais affichés dans ce Bilan. */
-        const meta = lfmAnalytics.metaFor(_catalogMap, r.exercise_slug);
-        const { domaine, competence } = meta;
-        const sep         = competence.indexOf(' — ');
-        const sousDomaine = sep >= 0 ? competence.slice(0, sep)      : competence;
-        const compLabel   = sep >= 0 ? competence.slice(sep + 3)     : competence;
-        const level       = r.level || '—';
-        const studentName = studentMap[r.student_id] || '?';
-        const exTitle     = r.exercise_title || meta.title || r.exercise_slug.replace(/-/g, ' ');
-
-        if (!byDomaine[domaine])                                   byDomaine[domaine] = {};
-        if (!byDomaine[domaine][sousDomaine])                      byDomaine[domaine][sousDomaine] = {};
-        if (!byDomaine[domaine][sousDomaine][compLabel])           byDomaine[domaine][sousDomaine][compLabel] = {};
-        if (!byDomaine[domaine][sousDomaine][compLabel][level])    byDomaine[domaine][sousDomaine][compLabel][level] = [];
-        byDomaine[domaine][sousDomaine][compLabel][level].push({
-          name: studentName, exTitle, exerciseType: r.exercise_type,
-          score: r.score, total: r.total,
-          pct: parseFloat(r.pct), date: r.completed_at
+      /* Étape 3 (compétences) : granularité par exercice, seuil de 3 élèves
+         distincts déjà appliqué — même liste/tri que l'ex-"Exercices chutés"
+         classe, réutilisée telle quelle. */
+      const compList = lfmAnalytics.computeClassExercisesChutes(results, _catalogMap);
+      const competenceRates = new Map();
+      compList.forEach(c => {
+        const paliers = lfmAnalytics.metaFor(_catalogMap, c.exerciseSlug).paliers || null;
+        competenceRates.set([c.domaine, c.sousDomaine, c.exerciseSlug].join('||'), {
+          title: c.competence,
+          avgPct: c.avgPct,
+          metaText: `${c.studentCount} élève${c.studentCount > 1 ? 's' : ''}`,
+          paliers
         });
-      }
+      });
 
-      _bilanByDomaine        = byDomaine;
+      /* Étape 4 (niveaux/paliers) : granularité exercice + palier interne,
+         restreinte aux exercices qui ont passé le seuil ci-dessus (un palier
+         précis d'un exercice sous le seuil ne doit pas réapparaître). */
+      const qualifyingSlugs = new Set(compList.map(c => c.exerciseSlug));
+      const bestBySlugPalier = lfmAnalytics.dedupeBestBySlugPalier(results);
+      const niveauRates = new Map();
+      lfmAnalytics.aggregateByCompetenceLevel(bestBySlugPalier, _catalogMap).forEach(n => {
+        if (!qualifyingSlugs.has(n.exerciseSlug)) return;
+        niveauRates.set([n.domaine, n.sousDomaine, n.exerciseSlug, n.niveau].join('||'), {
+          avgPct: n.avgPct,
+          metaText: `${n.studentCount} élève${n.studentCount > 1 ? 's' : ''}`
+        });
+      });
+
+      _bilanBestBySlugPalier = bestBySlugPalier;
+      _bilanStudentMap       = studentMap;
       _bilanSousDomaineRates = sousDomaineRates;
+      _bilanCompetenceRates  = competenceRates;
+      _bilanNiveauRates      = niveauRates;
 
       lfmBilanNav.mount(container, {
         mode: 'classe',
-        byDomaine,
         domainOrder: DOMAIN_ORDER,
         domainIcons: DOMAIN_ICONS,
         sousDomaineRates,
-        levelBadge: lfmLevelBadge,
+        competenceRates,
+        niveauRates,
+        getLeafItems: getBilanLeafItems,
         rememberKey: 'classe',
         onPrintCompetence: printCompetence
       });
@@ -1355,6 +1350,16 @@
     }
   }
 
+  /* Feuille (étape 5) : liste des élèves ayant travaillé cet exercice+palier
+     précis, avec leur meilleur score — computeClassLeafStudents filtre à la
+     volée _bilanBestBySlugPalier (déjà en mémoire, pas de nouvel appel
+     réseau), déjà triée pire d'abord. Réutilisée telle quelle par l'écran
+     (lfmBilanNav) et par l'impression (printBilan/printCompetence). */
+  function getBilanLeafItems([domaine, sousDomaine, exerciseSlug, palier]) {
+    return lfmAnalytics.computeClassLeafStudents(_bilanBestBySlugPalier, exerciseSlug, palier)
+      .map(x => ({ name: _bilanStudentMap[x.studentId] || '?', pct: x.pct }));
+  }
+
   /* ═══════════════════════════════════════════════════════════════════════════
      IMPRESSION PDF
   ═══════════════════════════════════════════════════════════════════════════ */
@@ -1363,11 +1368,13 @@
        l'impression a besoin de l'arbre complet, généré à la volée à partir
        des données (jamais affiché) — voir #bilan-print-full et le CSS
        @media print associé. */
-    document.getElementById('bilan-print-full').innerHTML = lfmBilanNav.renderFullTreeHtml(_bilanByDomaine, {
+    document.getElementById('bilan-print-full').innerHTML = lfmBilanNav.renderFullTreeHtml({
       domainOrder: DOMAIN_ORDER,
       domainIcons: DOMAIN_ICONS,
       sousDomaineRates: _bilanSousDomaineRates,
-      levelBadge: lfmLevelBadge
+      competenceRates: _bilanCompetenceRates,
+      niveauRates: _bilanNiveauRates,
+      getLeafItems: getBilanLeafItems
     });
 
     const p     = new URLSearchParams(window.location.search);
@@ -1381,10 +1388,10 @@
 
   /* ── PDF par compétence ────────────────────────────────────────────────── */
   function printCompetence(path) {
-    const [domaine, sousDomaine, compLabel] = path;
-    const levels = ((_bilanByDomaine[domaine] || {})[sousDomaine] || {})[compLabel];
-    if (!levels) return;
-    const competence = sousDomaine ? `${sousDomaine} — ${compLabel}` : compLabel;
+    const [domaine, sousDomaine, exerciseSlug] = path;
+    const compRate = _bilanCompetenceRates.get([domaine, sousDomaine, exerciseSlug].join('||'));
+    if (!compRate) return;
+    const competence = compRate.title;
 
     const p     = new URLSearchParams(window.location.search);
     const cname = decodeURIComponent(p.get('cname') || (_currentClass?.name || 'Classe'));
@@ -1393,41 +1400,38 @@
 
     /* Construire les tableaux par niveau directement à partir des données
        (plus de scraping DOM : à l'étape "niveaux" de la navigation, seule
-       la compétence choisie est présente dans le DOM). */
+       la compétence choisie est présente dans le DOM). Un tableau par
+       palier réellement tenté (comme l'écran), Élève + Résultat (le détail
+       Exercice/Score brut/Date de l'ancien "Bilan par compétences" n'a
+       plus de sens à cette granularité : un seul exercice, meilleur score
+       retenu par palier — voir plan federated-popping-finch). */
     let tablesHtml = '';
-    lfmBilanNav.levelSort(levels, lfmLevelBadge).forEach(level => {
-      const items = levels[level];
-      const badgeHtml = lfmLevelBadge.html(level === '—' ? null : level, items[0]?.exerciseType)
-        || `<span class="badge">${escHtml(level)}</span>`;
-      const tmp = document.createElement('div');
-      tmp.innerHTML = badgeHtml;
-      const badgeEl  = tmp.firstElementChild;
-      const badgeTxt = badgeEl.textContent.trim();
-      const badgeCls = badgeEl.className.replace('badge', '').trim();
+    const palierKeys = [];
+    _bilanNiveauRates.forEach((v, key) => {
+      const parts = key.split('||');
+      if (parts[0] === domaine && parts[1] === sousDomaine && parts[2] === exerciseSlug) palierKeys.push(parts[3]);
+    });
+    palierKeys.sort((a, b) => Number(a) - Number(b)).forEach(palier => {
+      const niveauRate = _bilanNiveauRates.get([domaine, sousDomaine, exerciseSlug, palier].join('||'));
+      const items = getBilanLeafItems([domaine, sousDomaine, exerciseSlug, palier]);
 
       let rows = '';
       items.slice().sort((a, b) => a.name.localeCompare(b.name, 'fr')).forEach(item => {
         const pct   = Math.round(item.pct);
         const color = pct >= 70 ? '#15803d' : pct >= 50 ? '#a16207' : '#D62839';
-        const date  = new Date(item.date).toLocaleDateString('fr-FR',
-          { day: '2-digit', month: '2-digit', year: '2-digit' });
-        const t = item.exTitle.charAt(0).toUpperCase() + item.exTitle.slice(1);
         rows += `<tr>
           <td style="font-weight:600">${escHtml(item.name)}</td>
-          <td style="font-size:9pt;color:#555">${escHtml(t)}</td>
-          <td>${item.score}/${item.total}</td>
           <td><span style="color:${color};font-weight:700">${pct}%</span></td>
-          <td style="color:#555">${date}</td>
         </tr>`;
       });
 
       tablesHtml += `
         <p style="margin:12px 0 4px">
-          <span class="badge ${badgeCls}">${badgeTxt}</span>
+          <span class="badge">Niveau ${escHtml(palier)} — ${niveauRate.avgPct}%</span>
         </p>
         <table>
           <thead><tr>
-            <th>Élève</th><th>Exercice</th><th>Score</th><th>Résultat</th><th>Date</th>
+            <th>Élève</th><th>Résultat</th>
           </tr></thead>
           <tbody>${rows}</tbody>
         </table>`;
@@ -1446,7 +1450,7 @@
     th    { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
             border: 1px solid #333; padding: 5px 8px; background: #f0f4f8; text-align: left; }
     td    { font-size: 10pt; border: 1px solid #ccc; padding: 5px 8px; }
-    .badge       { display:inline-block; padding:2px 9px; border-radius:4px; font-size:10pt; font-weight:700; }
+    .badge       { display:inline-block; padding:2px 9px; border-radius:4px; font-size:10pt; font-weight:700; background:#102B6A; color:#fff; }
     footer { margin-top:24px; font-size:9pt; color:#666; border-top:1px solid #ccc; padding-top:6px; }
     @media print { body { margin: 12px; } }
   </style>
