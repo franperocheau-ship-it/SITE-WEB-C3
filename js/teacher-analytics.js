@@ -407,26 +407,52 @@ const lfmAnalytics = (() => {
      (dedupeBestBySlugPalier ci-dessus) au lieu de best (dedupeBestBySlug, qui
      ignore le niveau). Clé d'agrégation = exercice + palier : un exercice
      progressif apparaît donc jusqu'à 3 fois (une ligne par palier réellement
-     tenté par la classe). */
+     tenté par la classe).
+     sousDomaine/exerciseSlug ajoutés en sortie (additif, même principe que
+     l'extension d'aggregateByCompetence) : nécessaires à l'arborescence
+     "Détail par compétence" (étape 2 sous-domaine, clé de navigation par
+     slug plutôt que par libellé de compétence — voir plan
+     federated-popping-finch, sous-étape B). */
   function aggregateByCompetenceLevel(bestBySlugPalier, catalogMap) {
     const compAgg = new Map();
     bestBySlugPalier.forEach(r => {
       const meta = metaFor(catalogMap, r.exercise_slug);
       const key  = meta.domaine + '||' + meta.sousDomaine + '||' + r.exercise_slug + '||' + r.palier;
       if (!compAgg.has(key)) {
-        compAgg.set(key, { meta, title: exerciseTitleFor(meta.title, r), palier: r.palier, sum: 0, count: 0, students: new Set() });
+        compAgg.set(key, { meta, title: exerciseTitleFor(meta.title, r), exerciseSlug: r.exercise_slug, palier: r.palier, sum: 0, count: 0, students: new Set() });
       }
       const agg = compAgg.get(key);
       agg.sum += r.pct; agg.count++; agg.students.add(r.student_id);
     });
     return Array.from(compAgg.values()).map(agg => ({
       domaine: agg.meta.domaine,
+      sousDomaine: agg.meta.sousDomaine,
       competence: agg.title,
+      exerciseSlug: agg.exerciseSlug,
       niveau: agg.palier,
       avgPct: Math.round(agg.sum / agg.count),
       attemptCount: agg.count,
       studentCount: agg.students.size
     }));
+  }
+
+  /* ── Arborescence "Détail par compétence", feuille classe (étape 5) ───────
+     Liste des élèves ayant travaillé un exercice+palier précis, avec leur
+     meilleur score à ce palier — remplace le détail par question
+     (computeClassWorstItems) au niveau feuille de la nouvelle arborescence,
+     conformément à l'énoncé ("par élève, pas par question cette fois").
+     Filtre à la volée bestBySlugPalier (déjà calculé une fois pour toute la
+     classe par dedupeBestBySlugPalier, réutilisé tel quel — pas de nouvel
+     appel réseau au clic). Aucun seuil ici (voir plan, décision 6) : le
+     seuil de 3 élèves distincts est déjà appliqué en amont, à la liste des
+     compétences (étape 3, computeClassExercisesChutes). Triée du score le
+     plus faible au plus élevé ; la page résout studentId → nom via son
+     studentMap déjà construit. */
+  function computeClassLeafStudents(bestBySlugPalier, exerciseSlug, palier) {
+    return bestBySlugPalier
+      .filter(r => r.exercise_slug === exerciseSlug && r.palier === palier)
+      .map(r => ({ studentId: r.student_id, pct: r.pct }))
+      .sort((a, b) => a.pct - b.pct);
   }
 
   /* ── Nombre d'exercices distincts travaillés (même source/filtre que
@@ -789,6 +815,8 @@ const lfmAnalytics = (() => {
     computeClassOverview, computeStudentProfile, computeCompetenceStats,
     computeWorstItems, resolveItemText,
     computeClassExercisesChutes, computeClassWorstItems, computeStudentExercisesChutes,
+    dedupeBestBySlugPalier, aggregateByCompetenceLevel, computeClassLeafStudents,
+    levelToPalierKey,
     metaFor, exerciseTitleFor
   };
 })();
