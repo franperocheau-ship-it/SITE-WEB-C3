@@ -21,6 +21,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "comprendre-implicites-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Indices explicites dans le texte",
+      "CM2": "Indices un peu plus discrets",
+      "6e":  "Indices indirects, à déduire"
+    },
     backLink:   { href: "français-lecture.html", label: "Lecture" },
 
     lvl1: [
@@ -166,6 +171,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "comprendre-mot-contexte-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Indices explicites dans le texte",
+      "CM2": "Indices un peu plus discrets",
+      "6e":  "Indices indirects, à déduire"
+    },
     backLink:   { href: "français-lecture.html", label: "Lecture" },
 
     lvl1: [

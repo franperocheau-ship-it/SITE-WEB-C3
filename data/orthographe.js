@@ -322,6 +322,11 @@ Object.assign(window.EXERCISE_DATA, {
     competence: "Orthographe — Accord participe passé (COD)",
     type:       "accord-cod-niveaux",
     levels:     ["CM1", "CM2", "6e"],
+    levelDescs: {
+      "CM1": "Identifie le COD, son genre et son nombre, puis écris la forme accordée",
+      "CM2": "Écris directement le participe accordé (COD repris par un pronom)",
+      "6e":  "Détermine si le participe s'accorde, puis écris la forme correcte"
+    },
     questionsPerSession: 10,
     backLink: { href: "français-orthographe.html", label: "Orthographe" },
 
@@ -457,6 +462,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "gn-pluriel-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Pluriels réguliers en -s — déterminant + nom simple",
+      "CM2": "Pluriels irréguliers (-aux, -eux, -x, invariables) + adjectif",
+      "6e":  "Adjectifs irréguliers (bel/vieil/nouvel), exceptions et noms composés"
+    },
     backLink:   { href: "français-orthographe.html", label: "Orthographe" },
 
     pools: {
@@ -552,6 +562,11 @@ Object.assign(window.EXERCISE_DATA, {
     competence: "Orthographe — Transformer un groupe nominal du masculin au féminin",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Féminisation régulière : un chat → une chatte, le nageur → la nageuse…",
+      "CM2": "GN avec adjectif : le vieux chat gris → la vieille chatte grise…",
+      "6e":  "Féminins supplétifs : un roi → une reine, un neveu → une nièce…"
+    },
     type: "genre-niveaux",
     backLink: { href: "français-orthographe.html", label: "Orthographe" },
 
@@ -618,6 +633,10 @@ Object.assign(window.EXERCISE_DATA, {
     competence: "Orthographe — Identifier le donneur d'accord",
     levels: ["CM1", "CM2", "6e"],
     paliers: 2, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Clique sur le nom donneur dans un groupe nominal",
+      "6e":  "Identifie le sujet donneur dans une phrase complète"
+    },
     type: "donneur-niveaux",
     backLink: { href: "français-orthographe.html", label: "Orthographe" },
 
@@ -749,6 +768,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "pc-etre-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Identifie le sujet, son genre et son nombre, puis écris la forme accordée",
+      "CM2": "Écris la forme accordée (sujet pronom ou groupe simple)",
+      "6e":  "Écris la forme accordée avec un sujet non pronominal"
+    },
     questionsPerSession: 10,
     backLink: { href: "français-orthographe.html", label: "l'Orthographe" },
 
@@ -826,6 +850,11 @@ Object.assign(window.EXERCISE_DATA, {
     competence: "Orthographe — Modifier le temps et effectuer les accords nécessaires",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    5, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Présent ↔ Futur simple / Présent ↔ Imparfait",
+      "CM2": "Présent → Passé simple",
+      "6e":  "Présent → Conditionnel présent"
+    },
     type:       "change-temps-niveaux",
     questionsPerSession: 10,
     backLink:   { href: "français-orthographe.html", label: "Orthographe" },
@@ -1414,6 +1443,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:        "change-sujet-niveaux",
     levels:      ["CM1", "CM2", "6e"],
     paliers:     4, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Changement de nombre — présent, groupes 1 et 2",
+      "CM2": "Participe passé avec être et avoir — passé composé et plus-que-parfait",
+      "6e":  "Pronoms indéfinis, sujets coordonnés et sujets inversés"
+    },
     backLink:    { href: "français-orthographe.html", label: "Orthographe" },
     questionsPerSession: 10,
 
@@ -1825,6 +1859,11 @@ Object.assign(window.EXERCISE_DATA, {
     competence: "Orthographe — Mots invariables",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "40 mots invariables courants — enchaîne un maximum de mots sans erreur",
+      "CM2": "40 mots invariables moins fréquents ou plus longs",
+      "6e":  "20 mots difficiles et homophones grammaticaux pièges"
+    },
     type: "mots-invariables-serie",
     backLink: { href: "français-orthographe.html", label: "Orthographe" },
 

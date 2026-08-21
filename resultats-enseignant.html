@@ -471,7 +471,7 @@
     .student-rank-line {
       display: flex; align-items: center; gap: 10px; margin-top: 6px; flex-wrap: wrap;
     }
-    .student-rank-line .laurel-rank { font-size: 13px; font-weight: 800; }
+    .student-rank-line .laurel-rank { font-size: 13px; font-weight: 800; margin-bottom: 0; }
     .student-rank-line .laurel-rank-progress-bg { width: 120px; height: 6px; }
     .student-rank-line .laurel-rank-next { font-size: 11.5px; }
 
@@ -1309,6 +1309,7 @@
         competenceRates,
         niveauRates,
         getLeafItems: getBilanLeafItems,
+        getLevelDesc: (slug, palier) => lfmAnalytics.levelDescFor(_catalogMap, slug, palier),
         rememberKey: 'classe',
         onPrintCompetence: printCompetence
       });
@@ -1396,6 +1397,7 @@
         niveauRates,
         getLeafItems: getBilanEleveLeafItems,
         renderEleveLeaf: renderBilanEleveLeafHtml,
+        getLevelDesc: (slug, palier) => lfmAnalytics.levelDescFor(_catalogMap, slug, palier),
         rememberKey: 'eleve'
       });
       _bilanEleveLoaded = true;
@@ -1971,7 +1973,7 @@
      dashboard élève, voir js/niveau-pastilles.js (lfmNiveauPastilles.renderTable). */
   function renderStudentNiveaux(profile) {
     const el = document.getElementById('student-niveaux');
-    const html = lfmNiveauPastilles.renderTable(profile);
+    const html = lfmNiveauPastilles.renderTable(profile, _currentStudent?.class_level);
     if (!html) { el.style.display = 'none'; return; }
     el.style.display = '';
     document.getElementById('niveaux-content').innerHTML = html;
@@ -2185,7 +2187,7 @@
        domaine/sous-domaine avec pastille par niveau, puis une ligne par
        compétence effectivement travaillée sous chaque sous-domaine) — même
        composant que l'écran, voir js/niveau-pastilles.js. */
-    const jaugesHtml = lfmNiveauPastilles.renderTable(profile)
+    const jaugesHtml = lfmNiveauPastilles.renderTable(profile, _currentStudent?.class_level)
       || '<div style="font-size:9.5pt;color:#888">Pas assez de données.</div>';
 
     /* Dictées préparées — même donnée que resultats-dictees-enseignant.html

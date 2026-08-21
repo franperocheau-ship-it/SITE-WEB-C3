@@ -32,6 +32,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "infinitif-groupe-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "QCM : trouve l'infinitif et le groupe",
+      "CM2": "Écris l'infinitif et trouve le groupe",
+      "6e":  "Pièges classiques : trouve l'infinitif et le groupe"
+    },
     questionsPerSession: 10,
     backLink:   { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -81,6 +86,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "etre-present-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "QCM et association : trouve la bonne forme",
+      "CM2": "Écris la forme du verbe avec le pronom donné",
+      "6e":  "Écris la forme du verbe avec un autre sujet"
+    },
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -148,6 +158,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "premier-groupe-present-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "QCM et association : trouve la bonne forme",
+      "CM2": "Écris la forme du verbe avec le pronom donné",
+      "6e":  "Écris la forme du verbe avec un autre sujet"
+    },
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -207,6 +222,11 @@ Object.assign(window.EXERCISE_DATA, {
     type: "verbes-particuliers-niveaux",
     levels: ["CM1", "CM2", "6e"],
     paliers: 5, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Le ç devant a et o : nous commençons, nous avançons",
+      "CM2": "Le y devient i devant un e muet : je nettoie, ils emploient",
+      "6e":  "Un accent grave devant un e muet : j'achète, je gèle"
+    },
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -333,6 +353,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "deuxieme-groupe-present-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "QCM et association : trouve la bonne forme",
+      "CM2": "Écris la forme du verbe avec le pronom donné",
+      "6e":  "Écris la forme du verbe avec un autre sujet"
+    },
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -393,6 +418,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "troisieme-groupe-present-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "QCM et association : trouve la bonne forme",
+      "CM2": "Écris la forme du verbe avec le pronom donné",
+      "6e":  "Écris la forme du verbe avec un autre sujet"
+    },
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -453,6 +483,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "imparfait-groupes-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "QCM et association : trouve la bonne forme",
+      "CM2": "Verbes en -ir : avec ou sans -iss- ?",
+      "6e":  "Écris la forme du verbe avec un autre sujet"
+    },
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -534,6 +569,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "futur-groupes-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "QCM et association : trouve la bonne forme",
+      "CM2": "Radical régulier ou irrégulier ?",
+      "6e":  "Écris la forme du verbe avec un autre sujet"
+    },
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -613,6 +653,10 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "passe-simple-groupes-niveaux",
     levels:     ["CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM2": "QCM et association : trouve la bonne forme",
+      "6e":  "Écris la forme du verbe avec un autre sujet"
+    },
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -664,6 +708,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "avoir-present-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "QCM et association : trouve la bonne forme",
+      "CM2": "Écris la forme du verbe avec le pronom donné",
+      "6e":  "Écris la forme du verbe avec un autre sujet"
+    },
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -731,6 +780,11 @@ Object.assign(window.EXERCISE_DATA, {
     verb: "faire",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Présent, Imparfait, Futur simple, Passé composé",
+      "CM2": "Passé simple, Plus-que-parfait",
+      "6e":  "Impératif, Conditionnel"
+    },
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -824,6 +878,11 @@ Object.assign(window.EXERCISE_DATA, {
     verb: "aller",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Présent, Imparfait, Futur simple, Passé composé",
+      "CM2": "Passé simple, Plus-que-parfait",
+      "6e":  "Impératif, Conditionnel"
+    },
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -922,6 +981,11 @@ Object.assign(window.EXERCISE_DATA, {
     verb: "dire",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Présent, Imparfait, Futur simple, Passé composé",
+      "CM2": "Passé simple, Plus-que-parfait",
+      "6e":  "Impératif, Conditionnel"
+    },
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -1020,6 +1084,11 @@ Object.assign(window.EXERCISE_DATA, {
     verb: "venir",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Présent, Imparfait, Futur simple, Passé composé",
+      "CM2": "Passé simple, Plus-que-parfait",
+      "6e":  "Impératif, Conditionnel"
+    },
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -1118,6 +1187,11 @@ Object.assign(window.EXERCISE_DATA, {
     verb: "pouvoir",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Présent, Imparfait, Futur simple, Passé composé",
+      "CM2": "Passé simple, Plus-que-parfait",
+      "6e":  "Impératif, Conditionnel"
+    },
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -1217,6 +1291,11 @@ Object.assign(window.EXERCISE_DATA, {
     verb: "voir",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Présent, Imparfait, Futur simple, Passé composé",
+      "CM2": "Passé simple, Plus-que-parfait",
+      "6e":  "Impératif, Conditionnel"
+    },
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -1315,6 +1394,11 @@ Object.assign(window.EXERCISE_DATA, {
     verb: "vouloir",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Présent, Imparfait, Futur simple, Passé composé",
+      "CM2": "Passé simple, Plus-que-parfait",
+      "6e":  "Impératif, Conditionnel"
+    },
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -1414,6 +1498,11 @@ Object.assign(window.EXERCISE_DATA, {
     verb: "prendre",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Présent, Imparfait, Futur simple, Passé composé",
+      "CM2": "Passé simple, Plus-que-parfait",
+      "6e":  "Impératif, Conditionnel"
+    },
     type: "faire-niveaux",
     questionsPerSession: 8,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
@@ -1529,6 +1618,10 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "plus-que-parfait-groupes-niveaux",
     levels:     ["CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM2": "QCM et association : trouve la bonne forme",
+      "6e":  "Écris la forme du verbe avec un autre sujet"
+    },
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -1608,6 +1701,10 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "imperatif-groupes-niveaux",
     levels:     ["CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM2": "QCM et association : trouve la bonne forme",
+      "6e":  "Phrases plus complexes : pronominaux, négation…"
+    },
     questionsPerSession: 10,
     backLink:   { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -1682,6 +1779,9 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "conditionnel-groupes-niveaux",
     levels:     ["6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "6e": "Écris la forme du verbe avec un autre sujet"
+    },
     questionsPerSession: 10,
     backLink:   { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -1733,6 +1833,11 @@ Object.assign(window.EXERCISE_DATA, {
     type: "pc-avoir-niveaux",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Participes en -é et -i (1er et 2e groupe)",
+      "CM2": "Participes irréguliers en -s, -u, -t (3e groupe)",
+      "6e":  "Mélange des trois groupes · phrases complexes"
+    },
     questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
@@ -2013,6 +2118,11 @@ Object.assign(window.EXERCISE_DATA, {
     type: "etre-ou-avoir-niveaux",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Verbes courants — être ou avoir, cas non ambigu",
+      "CM2": "Pronominaux et pièges (avoir lui-même, être lui-même, passer…)",
+      "6e":  "Verbes à double auxiliaire selon le sens (monter, sortir…)"
+    },
     questionsPerSession: 12,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 

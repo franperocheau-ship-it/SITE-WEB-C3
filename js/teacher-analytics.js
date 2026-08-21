@@ -184,6 +184,59 @@ const lfmAnalytics = (() => {
     return Array.from(map.values());
   }
 
+  /* ── Dédoublonnage : meilleur pct par (élève × exercice), TOUS PALIERS
+     REQUIS, réservé au numérateur de computeNiveauJauge. Une compétence ne
+     compte comme "acquise" que si CHAQUE palier déclaré (meta.paliers,
+     nombre réel de paliers du moteur — repli sur meta.levels.length si non
+     déclaré, même convention que levelDescFor) atteint individuellement
+     SUCCESS_THRESHOLD ; un seul palier sous le seuil, ou jamais tenté,
+     empêche la compétence entière d'être comptée (bug constaté : "Encadrer
+     une fraction..." validée à tort avec Niveau 1 à 100% alors que Niveau 2
+     n'était qu'à 67% — l'ancienne version ne gardait que le meilleur score
+     TOUS paliers confondus). Le pct renvoyé par compétence est donc le
+     MINIMUM des meilleurs scores par palier (palier jamais tenté = 0), pas
+     le meilleur score global — pour que la comparaison `pct >= SUCCESS_THRESHOLD`
+     déjà faite en aval par computeNiveauJauge reste inchangée.
+     Même garde que précédemment : exclut, via metaFor(), toute ligne dont
+     l'exercise_slug brut n'a pas de `levels` fiables — notamment les anciens
+     slugs LEGACY_SLUG_ALIASES (metaFor leur renvoie `levels: []`, leur
+     numérotation de palier, flat/mono-niveau, étant incompatible avec celle
+     du nouvel exercice fusionné). */
+  function dedupeBestBySlugForJauge(rows, catalogMap) {
+    const bestByPalier      = new Map(); // 'student|slug' -> Map(palier -> meilleur pct)
+    const totalPaliersBySlug = new Map(); // slug -> nombre de paliers requis
+
+    rows.forEach(r => {
+      const meta = metaFor(catalogMap, r.exercise_slug);
+      if (!meta || !meta.levels || meta.levels.length === 0) return;
+      const slug = canonicalSlug(r.exercise_slug);
+      const totalPaliers = typeof meta.paliers === 'number' && meta.paliers >= 1 ? meta.paliers : meta.levels.length;
+      totalPaliersBySlug.set(slug, totalPaliers);
+      const palier = levelToPalierKey(r.level);
+      const key    = r.student_id + '|' + slug;
+      const pct    = parseFloat(r.pct);
+      if (!bestByPalier.has(key)) bestByPalier.set(key, new Map());
+      const paliersMap = bestByPalier.get(key);
+      const prevPct = paliersMap.get(palier);
+      if (prevPct === undefined || pct > prevPct) paliersMap.set(palier, pct);
+    });
+
+    const out = [];
+    bestByPalier.forEach((paliersMap, key) => {
+      const sep = key.indexOf('|');
+      const studentId = key.slice(0, sep);
+      const slug = key.slice(sep + 1);
+      const totalPaliers = totalPaliersBySlug.get(slug) || 1;
+      let effectivePct = 100;
+      for (let p = 1; p <= totalPaliers; p++) {
+        const pct = paliersMap.get(String(p));
+        effectivePct = Math.min(effectivePct, pct !== undefined ? pct : 0);
+      }
+      out.push({ student_id: studentId, exercise_slug: slug, pct: effectivePct });
+    });
+    return out;
+  }
+
   /* ── Résolution du niveau scolaire (CM1/CM2/6e) d'une tentative ──────────────
      La colonne `level` stocke la valeur brute du palier joué, sous 3 formats
      selon le type d'exercice : "Niveau N", "CM1"/"CM2"/"6e", ou un entier brut
@@ -267,39 +320,59 @@ const lfmAnalytics = (() => {
     return out;
   }
 
-  /* ── État par niveau (non travaillé / en cours / atteint) pour un ensemble
-     d'exercices catalogue sélectionné par `matchSlug(meta)` — factorisé pour
-     être utilisé à la fois pour la jauge domaine (jauges) et pour chaque
-     jauge sous-domaine (sousDomaineJauges, voir computeStudentProfile).
-     Dénominateur = exercices catalogue avec `levels` déclarés correspondant
-     au filtre ; numérateur = meilleur score ≥80% au niveau scolaire résolu
-     (voir resolveNiveau). */
-  function computeNiveauJauge(bestByNiveau, catalogMap, matchSlug) {
+  /* ── État par niveau scolaire (non travaillé / en cours / atteint) pour un
+     ensemble d'exercices catalogue sélectionné par `matchSlug(meta)` —
+     factorisé pour être utilisé à la fois pour la jauge domaine (jauges) et
+     pour chaque jauge sous-domaine (sousDomaineJauges, voir
+     computeStudentProfile).
+     Portée hiérarchique cumulative (CM1 ⊂ CM2 ⊂ 6e, voir JAUGE_LEVELS) :
+     une compétence "CM1/CM2/6e" compte dans les 3 jauges, une compétence
+     "CM2/6e" compte dans CM2 et 6e (pas CM1), une compétence "6e" seule ne
+     compte que dans 6e — le dénominateur d'un niveau L inclut donc toute
+     compétence dont AU MOINS un niveau déclaré (`meta.levels`) est ≤ L dans
+     JAUGE_LEVELS. Une compétence est "validée" (numérateur) sur la base de
+     son meilleur score GLOBAL toutes tentatives confondues (`best`, voir
+     dedupeBestBySlug) — indépendamment du palier atteint, contrairement à
+     l'ancien calcul par niveau scolaire résolu palier par palier
+     (resolveNiveau/niveauForPalier, qui reste utilisé ailleurs : détail par
+     palier de niveauAggByComp/levelsPctFor ci-dessous, et levelDescFor pour
+     bilan-nav.js). */
+  function computeNiveauJauge(best, catalogMap, matchSlug) {
+    const bestPctBySlug = new Map(best.map(r => [r.exercise_slug, r.pct]));
     const expectedByLevel = {};
     JAUGE_LEVELS.forEach(level => { expectedByLevel[level] = []; });
     Object.keys(catalogMap).forEach(slug => {
       const m = catalogMap[slug];
       if (!matchSlug(m)) return;
-      (m.levels || []).forEach(level => {
-        if (expectedByLevel[level]) expectedByLevel[level].push(slug);
+      const scopeIdx = (m.levels || [])
+        .map(lv => JAUGE_LEVELS.indexOf(lv))
+        .filter(idx => idx >= 0);
+      if (scopeIdx.length === 0) return;
+      const minIdx = Math.min(...scopeIdx);
+      JAUGE_LEVELS.forEach((level, idx) => {
+        if (minIdx <= idx) expectedByLevel[level].push(slug);
       });
     });
 
     return JAUGE_LEVELS.map(level => {
-      const matching = bestByNiveau.filter(r =>
-        r.niveau === level && catalogMap[r.exercise_slug] && matchSlug(catalogMap[r.exercise_slug]));
-      const achieved  = new Set(matching.filter(r => r.pct >= SUCCESS_THRESHOLD).map(r => r.exercise_slug));
-      const attempted = new Set(matching.map(r => r.exercise_slug));
-      const denom = expectedByLevel[level].length;
-      const ratio = denom > 0 ? achieved.size / denom : 0;
+      const slugs = expectedByLevel[level];
+      let achieved = 0, attempted = 0;
+      slugs.forEach(slug => {
+        const pct = bestPctBySlug.get(slug);
+        if (pct === undefined) return;
+        attempted++;
+        if (pct >= SUCCESS_THRESHOLD) achieved++;
+      });
+      const denom = slugs.length;
+      const ratio = denom > 0 ? achieved / denom : 0;
       /* "en cours" dès la 1ère tentative enregistrée, même sans réussite ≥80% —
          "non travaillé" seulement en l'absence totale d'exercice fait à ce
          niveau (voir discussion Objectif jauges sous-domaine, 2026-07-18). */
       const status = denom === 0 ? 'non-concerne'
         : ratio >= 0.7 ? 'atteint'
-        : (ratio >= 0.15 || attempted.size > 0) ? 'en-cours' /* TEMP test seuil : 0.3 → 0.15, à revenir en arrière après validation visuelle */
+        : (ratio >= 0.15 || attempted > 0) ? 'en-cours' /* TEMP test seuil : 0.3 → 0.15, à revenir en arrière après validation visuelle */
         : 'non-travaille';
-      return { level, ratio, status, denom, achieved: achieved.size, attempted: attempted.size };
+      return { level, ratio, status, denom, achieved, attempted };
     });
   }
 
@@ -460,8 +533,9 @@ const lfmAnalytics = (() => {
       .sort((a, b) => a.pct - b.pct);
   }
 
-  /* ── Nombre d'exercices distincts travaillés (même source/filtre que
-     computeNiveauJauge : bestByNiveau + catalogMap) — pour l'affichage
+  /* ── Nombre d'exercices distincts travaillés (bestByNiveau + catalogMap,
+     donc uniquement les exercices avec `levels` déclarés — même périmètre
+     que le dénominateur de computeNiveauJauge) — pour l'affichage
      "N exercices" à côté du nom de sous-domaine, cohérent avec ce qui
      alimente les segments plutôt qu'un comptage plus large (metaFor). */
   function countExercisesTravailles(bestByNiveau, catalogMap, matchSlug) {
@@ -592,6 +666,7 @@ const lfmAnalytics = (() => {
   function computeStudentProfile(rows, catalogMap) {
     const best        = dedupeBestBySlug(rows);
     const bestByNiveau = dedupeBestByNiveau(rows, catalogMap);
+    const bestForJauge = dedupeBestBySlugForJauge(rows, catalogMap);
 
     /* ── Détail par niveau scolaire (CM1/CM2/6e) pour chaque exercice ──────
        Réutilise bestByNiveau (déjà calculé pour les jauges) plutôt que de
@@ -609,7 +684,7 @@ const lfmAnalytics = (() => {
       const meta = metaFor(catalogMap, r.exercise_slug);
       const key  = meta.domaine + '||' + meta.sousDomaine + '||' + r.exercise_slug;
       if (!niveauAggByComp.has(key)) {
-        niveauAggByComp.set(key, { meta, title: exerciseTitleFor(meta.title, r), byLevel: {} });
+        niveauAggByComp.set(key, { meta, slug: r.exercise_slug, title: exerciseTitleFor(meta.title, r), byLevel: {} });
       }
       const byLevel = niveauAggByComp.get(key).byLevel;
       if (!byLevel[r.niveau]) byLevel[r.niveau] = { sum: 0, count: 0 };
@@ -627,13 +702,15 @@ const lfmAnalytics = (() => {
     }
 
     /* ── Jauges de niveau par domaine ─────────────────────────────────────
-       Dénominateur = exercices du catalogue pour ce domaine × niveau.
-       Numérateur = combien de ces exercices ont un meilleur score ≥80% au
-       niveau scolaire résolu (voir resolveNiveau) ; les exercices hors
-       catalogue ou sans `levels` déclaré ne comptent dans aucun segment. */
+       Dénominateur = exercices du catalogue pour ce domaine dont la portée
+       (`levels`) couvre ce niveau scolaire ou un niveau inférieur (héritage
+       cumulatif CM1 ⊂ CM2 ⊂ 6e, voir computeNiveauJauge). Numérateur =
+       combien de ces exercices ont un meilleur score global ≥80% (`best`,
+       tous paliers confondus) ; les exercices hors catalogue ou sans
+       `levels` déclaré ne comptent dans aucun segment. */
     const jauges = {};
     DOMAIN_ORDER.forEach(domaine => {
-      jauges[domaine] = computeNiveauJauge(bestByNiveau, catalogMap, m => m.domaine === domaine);
+      jauges[domaine] = computeNiveauJauge(bestForJauge, catalogMap, m => m.domaine === domaine);
     });
 
     /* ── Jauges de niveau par sous-domaine ─────────────────────────────────
@@ -657,6 +734,7 @@ const lfmAnalytics = (() => {
           competences.push({
             title: entry.title,
             competence: entry.meta.competence,
+            slug: entry.slug,
             levels: levelsPctFor(key)
           });
         }
@@ -665,7 +743,7 @@ const lfmAnalytics = (() => {
       sousDomaineJauges[domaine].push({
         sousDomaine,
         exerciseCount: countExercisesTravailles(bestByNiveau, catalogMap, matchFn),
-        segments: computeNiveauJauge(bestByNiveau, catalogMap, matchFn),
+        segments: computeNiveauJauge(bestForJauge, catalogMap, matchFn),
         competences
       });
     });
@@ -818,11 +896,39 @@ const lfmAnalytics = (() => {
     return CompetencePreview.describeQA(item, ex);
   }
 
+  /* Intitulé de spécificité du niveau (levelDescs, data/*.js) pour un palier
+     interne (1/2/3) d'une compétence — sert à enrichir les lignes "Niveau X"
+     de l'arborescence "Détail par compétence" (bilan-nav.js), au même titre
+     que niveau-pastilles.js pour les pastilles CM1/CM2/6e. Même traduction
+     palier→niveau scolaire que niveauForPalier, à une différence près : ici
+     le repli quand `paliers` n'est pas déclaré est `meta.levels.length` et
+     non 1. Ce composant affiche le palier interne (1/2/3) tel quel — jamais
+     résolu vers un niveau scolaire agrégé comme resolveNiveau — donc rien
+     n'exploite le défaut à 1 pour rester "cohérent" avec un pct déjà mal
+     agrégé ailleurs (voir resolveNiveau) ; le repli sur levels.length est
+     simplement la meilleure hypothèse en l'absence d'information, et évite
+     qu'un défaut pensé pour un autre usage n'attribue ici la description du
+     palier 1 à tous les paliers d'une compétence (cas réel : 8 compétences
+     grammaire.js encore sans `paliers:`, voir audit). Retourne null si
+     l'exercice n'a pas de levelDescs, pas de niveaux déclarés, ou si le
+     palier n'a pas de correspondance. */
+  function levelDescFor(catalogMap, slug, palier) {
+    if (typeof EXERCISE_DATA === 'undefined') return null;
+    const meta = metaFor(catalogMap, slug);
+    if (!meta || !meta.levels || meta.levels.length === 0) return null;
+    const paliers = typeof meta.paliers === 'number' && meta.paliers >= 1 ? meta.paliers : meta.levels.length;
+    const palierIdx = parseInt(palier, 10);
+    const safeIdx = Number.isFinite(palierIdx) && palierIdx > 0 ? palierIdx : 1;
+    const grade = niveauForPalier(safeIdx, paliers, meta.levels);
+    const ex = EXERCISE_DATA[slug];
+    return (ex && ex.levelDescs && ex.levelDescs[grade]) || null;
+  }
+
   return {
     SUCCESS_THRESHOLD, JAUGE_LEVELS, DOMAIN_ORDER, MIN_STUDENTS_COMP,
     buildCatalogMap, dedupeBestBySlug, computeSousDomaineRates,
     computeClassOverview, computeStudentProfile, computeCompetenceStats,
-    computeWorstItems, resolveItemText,
+    computeWorstItems, resolveItemText, levelDescFor,
     computeClassExercisesChutes, computeStudentExercisesChutes,
     dedupeBestBySlugPalier, aggregateByCompetenceLevel, computeClassLeafStudents,
     levelToPalierKey,

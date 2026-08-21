@@ -1022,7 +1022,7 @@
     }
 
     /* ── Rendu du dashboard ────────────────────────────────────────────────── */
-    function renderDashboard(profile, results) {
+    function renderDashboard(profile, results, studentLevel) {
       /* En-tête */
       const initial = (profile.display_name || '?')[0].toUpperCase();
       document.getElementById('dash-avatar').textContent = initial;
@@ -1078,7 +1078,7 @@
          (non dédupliquées, elle s'en charge) + le catalogue EXERCISE_DATA. */
       if (!_catalogMap) _catalogMap = lfmAnalytics.buildCatalogMap();
       const niveauProfile = lfmAnalytics.computeStudentProfile(results, _catalogMap);
-      const niveauHtml = lfmNiveauPastilles.renderTable(niveauProfile);
+      const niveauHtml = lfmNiveauPastilles.renderTable(niveauProfile, studentLevel);
       if (niveauHtml) {
         document.getElementById('niveaux-content').innerHTML = niveauHtml;
         document.getElementById('section-niveaux').style.display = '';
@@ -1093,14 +1093,18 @@
     async function refreshResultsTab() {
       if (!_profile) return;
 
-      const { data: results, error: resultsErr } = await window.lfmDb
-        .from('exercise_results')
-        .select('*')
-        .order('completed_at', { ascending: false });
+      /* studentLevel (CM1/CM2/6e) : pilote la jauge unique domaine/sous-
+         domaine du "Bilan par compétences" (voir js/niveau-pastilles.js,
+         renderGaugeRow) — même RPC que initLaurels ci-dessous, en parallèle
+         plutôt qu'en série pour ne pas ajouter de latence perçue. */
+      const [{ data: results, error: resultsErr }, studentLevel] = await Promise.all([
+        window.lfmDb.from('exercise_results').select('*').order('completed_at', { ascending: false }),
+        fetchStudentClassLevel(_profile.id)
+      ]);
 
       if (resultsErr) console.warn('[LFM] refreshResultsTab:', resultsErr.message);
 
-      renderDashboard(_profile, results || []);
+      renderDashboard(_profile, results || [], studentLevel);
       initLaurels(_profile.id);
     }
 

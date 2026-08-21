@@ -37,6 +37,36 @@
     conic-gradient(#F5A623 0deg 180deg, #D9DEE7 180deg 360deg);
 }
 .bjt-pastille.non-travaille { background: #D9DEE7; }
+
+/* Jauge unique domaine/sous-domaine (à côté du nom, voir renderGaugeRow dans
+   js/niveau-pastilles.js) — même technique d'anneau (disque blanc +
+   conic-gradient) à 5 paliers fixes (pas continu) : vide (gris plein), 1/4,
+   1/2, 3/4 (anneau orange), plein (anneau vert à 360deg — même famille
+   visuelle que les paliers orange, pas un disque plein type .atteint, pour
+   qu'on lise "même jauge, complète" plutôt qu'un symbole différent). */
+.bjt-jauge { display: inline-block; width: 13px; height: 13px; border-radius: 50%; vertical-align: middle; margin-left: 2px; }
+.bjt-jauge-0 { background: #D9DEE7; }
+.bjt-jauge-1 {
+  background:
+    radial-gradient(closest-side, #fff 58%, transparent 60%),
+    conic-gradient(#F5A623 0deg 90deg, #D9DEE7 90deg 360deg);
+}
+.bjt-jauge-2 {
+  background:
+    radial-gradient(closest-side, #fff 58%, transparent 60%),
+    conic-gradient(#F5A623 0deg 180deg, #D9DEE7 180deg 360deg);
+}
+.bjt-jauge-3 {
+  background:
+    radial-gradient(closest-side, #fff 58%, transparent 60%),
+    conic-gradient(#F5A623 0deg 270deg, #D9DEE7 270deg 360deg);
+}
+.bjt-jauge-4 {
+  background:
+    radial-gradient(closest-side, #fff 58%, transparent 60%),
+    conic-gradient(#1DBFA0 0deg 360deg);
+}
+
 .bjt-comp td:first-child { padding-left: 32px; font-weight: 400; color: #5F6368; font-size: 11.5px; }
 .bcp-pastille {
   display: inline-flex; align-items: center; justify-content: center;

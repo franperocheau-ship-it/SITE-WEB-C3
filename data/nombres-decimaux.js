@@ -15,6 +15,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "comparer-decimaux-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Compare deux nombres décimaux simples, de même longueur",
+      "CM2": "Pièges : longueurs différentes, zéros intercalés, encadrement",
+      "6e":  "Nombres à trois décimales, tri et justification de comparaison"
+    },
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [
@@ -58,6 +63,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "ranger-decimaux-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Ranger 3 nombres simples, mêmes longueurs",
+      "CM2": "Ranger 4 nombres, zéros pièges et intrus",
+      "6e":  "Ranger des nombres à trois décimales, écritures équivalentes"
+    },
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [
@@ -104,6 +114,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "encadrer-decimaux-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Encadrer à l'unité près, encadrement simple",
+      "CM2": "Encadrer au dixième et au centième, pièges avec zéros",
+      "6e":  "Encadrer au millième, encadrements multiples et arrondi"
+    },
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [
@@ -160,6 +175,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "decomposer-decimaux-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Décomposer un nombre à une décimale (partie entière + dixièmes)",
+      "CM2": "Décomposer un nombre à deux décimales, avec zéros pièges",
+      "6e":  "Décomposer un nombre à trois décimales et écritures équivalentes"
+    },
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [
@@ -203,6 +223,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "composer-decimaux-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Décomposition à une décimale (dixièmes)",
+      "CM2": "Décomposition à deux décimales, avec zéros pièges",
+      "6e":  "Décomposition à trois décimales et écritures équivalentes"
+    },
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [
@@ -248,6 +273,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "intercaler-decimaux-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Intercaler un nombre décimal entre deux entiers ou deux dixièmes",
+      "CM2": "Intercaler un nombre décimal en tenant compte des zéros pièges",
+      "6e":  "Intercaler un nombre décimal au millième ou dix-millième près"
+    },
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [
@@ -305,6 +335,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "placer-decimaux-droite-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Dixièmes et centièmes, toutes les graduations sont étiquetées",
+      "CM2": "Millièmes, graduations partiellement étiquetées",
+      "6e":  "Graduations non unitaires, abscisses et estimation"
+    },
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [
@@ -348,6 +383,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "associer-decimal-fraction-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Lis la fraction, remplis le tableau, place sur la droite, écris le décimal.",
+      "CM2": "Lis le décimal, observe le tableau, écris la fraction et place sur la droite.",
+      "6e":  "Choisis la bonne réponse parmi 4 propositions et place le nombre sur la droite."
+    },
     backLink:   { href: "mathématiques-nombres-decimaux.html", label: "Nombres décimaux" },
 
     lvl1: [

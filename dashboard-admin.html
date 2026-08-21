@@ -16,6 +16,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/utils.js"></script>
+  <script src="js/eoy-banner-settings.js"></script>
   <script src="js/admin.js?v=2"></script>
   <script src="js/teacher-analytics.js?v=9"></script>
   <style>
@@ -220,6 +221,19 @@
     }
     .btn-danger:hover:not(:disabled) { background: #b01423; }
     .btn-danger:disabled { opacity: 0.5; cursor: default; }
+
+    /* ── Pilotage du bandeau fin d'année (espace enseignant) ─────────────────── */
+    .eoy-pilot-toggle {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 20px; border-radius: 100px;
+      border: 1.5px solid var(--border); background: var(--card-bg);
+      font-family: inherit; font-size: 13px; font-weight: 700; color: var(--muted);
+      cursor: pointer; transition: background 180ms, border-color 180ms, color 180ms;
+    }
+    .eoy-pilot-toggle:hover:not(:disabled) { border-color: #16a34a; }
+    .eoy-pilot-toggle.is-active { background: #16a34a; border-color: #16a34a; color: #fff; }
+    .eoy-pilot-toggle:disabled { opacity: 0.6; cursor: default; }
+    .eoy-pilot-status { font-size: 12.5px; color: var(--muted); }
 
     /* ── Suppression des données élèves (fin d'année) — zone dangereuse ─────── */
     .eoy-danger-zone {
@@ -569,6 +583,26 @@
         </div>
         <div id="feedback-body">
           <div class="tbl-loading">Chargement…</div>
+        </div>
+      </div>
+
+      <!-- Section : Pilotage du bandeau fin d'année sur l'espace enseignant
+           (admin_settings, clé 'bandeau_fin_annee' — voir
+           js/eoy-banner-settings.js). Actif automatiquement du 25/05 au
+           15/07, ou forcé ON/OFF ici ; le forçage retombe sur 'auto' au
+           cycle suivant. Sans effet sur l'option "hémisphère sud"
+           (profiles.hemisphere_sud), pilotée séparément par l'enseignant. -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-card-title">Bandeau fin d'année — espace enseignant</div>
+        </div>
+        <div style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+          <div style="font-size:13px;color:var(--muted);max-width:480px">
+            Contrôle l'affichage, sur l'espace enseignant, du bandeau d'avertissement de suppression des
+            données élèves de fin d'année.
+            <br><span id="eoy-pilot-status" class="eoy-pilot-status">Chargement…</span>
+          </div>
+          <button class="eoy-pilot-toggle" id="eoy-pilot-toggle" type="button" disabled>…</button>
         </div>
       </div>
 
@@ -1192,6 +1226,40 @@
     });
 
     await loadClassManagement();
+
+    /* ── Pilotage du bandeau fin d'année (espace enseignant) ─────────────── */
+    const pilotBtn    = document.getElementById('eoy-pilot-toggle');
+    const pilotStatus = document.getElementById('eoy-pilot-status');
+
+    function renderPilotState({ actif, mode, autoActivationDateStr }) {
+      pilotBtn.classList.toggle('is-active', actif);
+      pilotBtn.textContent = actif ? '✓ Bandeau activé' : 'Bandeau désactivé';
+      pilotStatus.textContent =
+        mode === 'manuel_off' ? 'Désactivé manuellement par l\'administrateur'
+        : mode === 'manuel_on' ? 'Activé manuellement par l\'administrateur'
+        : actif ? `Activé automatiquement le ${autoActivationDateStr}`
+        : 'Inactif (hors période — mode automatique du 25/05 au 15/07)';
+    }
+
+    try {
+      renderPilotState(await lfmEoyBanner.getBandeauState());
+      pilotBtn.disabled = false;
+    } catch (e) {
+      pilotStatus.textContent = 'Erreur : ' + e.message;
+    }
+
+    pilotBtn.addEventListener('click', async () => {
+      const nextMode = pilotBtn.classList.contains('is-active') ? 'manuel_off' : 'manuel_on';
+      pilotBtn.disabled = true;
+      try {
+        await lfmEoyBanner.setBandeauMode(nextMode);
+        renderPilotState(await lfmEoyBanner.getBandeauState());
+      } catch (e) {
+        showToast('Erreur : ' + e.message, 'error');
+      } finally {
+        pilotBtn.disabled = false;
+      }
+    });
 
     /* ── Suppression des données élèves — fin d'année scolaire ───────────── */
     let _eoyData      = [];  // aperçu courant (enseignants > classes > élèves)

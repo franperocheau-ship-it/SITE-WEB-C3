@@ -1500,6 +1500,10 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "distinguer-phrase-simple-complexe-niveaux",
     levels:     ["CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM2": "Construire une phrase complexe avec un connecteur",
+      "6e":  "Juger seul : phrase simple ou complexe ?"
+    },
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
     /* Refonte en 3 niveaux (même schéma que identifier-type-phrase /
@@ -1722,6 +1726,9 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "reperer-propositions-niveaux",
     levels:     ["6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "6e": "Repérer 3 ou 4 propositions et catégoriser chaque lien"
+    },
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
     /* Synthèse qui réinvestit identifier-juxtaposition / identifier-
@@ -1943,6 +1950,9 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "identifier-juxtaposition-niveaux",
     levels:     ["6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "6e": "Juger seul : juxtaposition ou coordination ?"
+    },
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
     /* 3 niveaux (même schéma que distinguer-phrase-simple-complexe-niveaux).
@@ -2118,6 +2128,9 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "identifier-subordination-niveaux",
     levels:     ["6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "6e": "Juger seul : subordination ou juxtaposition ?"
+    },
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
     /* 3 niveaux (même schéma que identifier-juxtaposition-niveaux).
@@ -2288,6 +2301,9 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "distinguer-coordination-subordination-niveaux",
     levels:     ["6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "6e": "Juger seul : coordonnée ou subordonnée ?"
+    },
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
     /* 3 niveaux (même primitive mots-cliquables que identifier-juxtaposition-
@@ -2917,6 +2933,11 @@ Object.assign(window.EXERCISE_DATA, {
     competence: "Grammaire — Formes de phrases interrogatives",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "2 formes : intonation + est-ce que (inversion en bonus)",
+      "CM2": "3 formes : intonation, est-ce que et inversion",
+      "6e":  "3 formes : intonation, est-ce que et inversion"
+    },
     type: "produire-3-formes",
     questionsPerSession: 6,
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
@@ -2973,6 +2994,10 @@ Object.assign(window.EXERCISE_DATA, {
     competence: "Grammaire — Épithète et attribut du sujet",
     levels:  ["CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM2": "Le prérequis : reconnaître les verbes d'état",
+      "6e":  "Reformule la phrase en changeant la fonction de l'adjectif"
+    },
     type:    "epithete-attribut-niveaux",
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
 
@@ -3173,6 +3198,9 @@ Object.assign(window.EXERCISE_DATA, {
     competence: "Grammaire — Épithète et complément du nom",
     levels:  ["6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "6e": "Réécris le GN en changeant le type d'expansion"
+    },
     type:    "ecn-niveaux",
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
 
@@ -3550,6 +3578,11 @@ Object.assign(window.EXERCISE_DATA, {
     competence: "Grammaire — Pronoms personnels",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Clique sur le pronom personnel sujet dans la phrase",
+      "CM2": "Identifie la fonction du pronom mis en évidence",
+      "6e":  "Réécris la phrase en remplaçant un groupe par le bon pronom"
+    },
     type: "psc-niveaux",
     questionsPerSession: 10,
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
@@ -3869,6 +3902,11 @@ Object.assign(window.EXERCISE_DATA, {
     type: "gnsp-niveaux",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Clique sur tous les mots qui composent le GNS",
+      "CM2": "Trouve le genre et le nombre, puis choisis le pronom",
+      "6e":  "Remplace le GNS par le bon pronom dans la phrase entière"
+    },
     backLink: { href: "français-grammaire.html", label: "Grammaire" },
 
     /* ════════════════════════════════════════════════════════════════════
@@ -5053,6 +5091,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "identifier-type-phrase-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Identifier le type : déclarative, interrogative, impérative",
+      "CM2": "Identifier la forme : affirmative ou négative",
+      "6e":  "Transformer une phrase à la forme exclamative"
+    },
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
     /* Fusion de identifier-phrase-declarative/interrogative/imperative/exclamative
@@ -5112,6 +5155,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "transformer-phrase-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Négation simple : ne...pas",
+      "CM2": "Négation avec temps composés et phrases plus longues",
+      "6e":  "Négations variées : ne...jamais, ne...plus, ne...rien, ne...personne"
+    },
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
     /* Le volet « interrogative » a été retiré (redondant avec
@@ -5173,6 +5221,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "articles-def-indef-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Repérer si un article surligné est défini ou indéfini",
+      "CM2": "Cliquer sur l'article d'une phrase, puis le qualifier",
+      "6e":  "Identifier et qualifier l'article dans 2 phrases"
+    },
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
     /* Fusion de articles-definis et articles-indefinis en une seule
@@ -5306,6 +5359,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "det-demo-poss-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Repérer si un déterminant surligné est possessif ou démonstratif",
+      "CM2": "Cliquer sur le déterminant possessif ou démonstratif d'une phrase, puis le qualifier",
+      "6e":  "Identifier et qualifier tous les déterminants possessifs et démonstratifs d'une phrase"
+    },
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
 
     /* Fusion de determinants-possessifs et identifier-determinant-

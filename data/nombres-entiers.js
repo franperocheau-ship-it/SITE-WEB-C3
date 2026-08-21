@@ -324,6 +324,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "decomposer-nombre-entier-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "4 champs numériques : milliers, centaines, dizaines, unités",
+      "CM2": "Étiquettes positionnelles à placer",
+      "6e":  "Écriture additive, en produits et en lettres"
+    },
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — 4 champs numériques (milliers / centaines / dizaines / unités) ── */
@@ -376,6 +381,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "comparer-nombres-entiers-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "4 chiffres — pièges : zéros intercalés, chiffres identiques sauf un rang",
+      "CM2": "Nombres plus grands, comparaisons plus fines",
+      "6e":  "Niveau expert"
+    },
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — 4 chiffres, pièges : zéros intercalés, chiffres identiques sauf un rang ── */
@@ -428,6 +438,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "composer-nombre-entier-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Décomposition canonique → 1 champ numérique",
+      "CM2": "Somme de parties non canoniques → 1 champ numérique",
+      "6e":  "Somme de produits avec grandes puissances → 1 champ numérique"
+    },
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — décomposition canonique → trouver le nombre ── */
@@ -465,6 +480,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "ranger-nombres-entiers-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "4 nombres à 4 chiffres",
+      "CM2": "Nombres plus grands, écarts plus fins",
+      "6e":  "Niveau expert"
+    },
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — 4 nombres à 4 chiffres ────────────────────────────────── */
@@ -511,6 +531,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "encadrer-nombre-entier-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Dizaine / centaine — nombres à 3-4 chiffres",
+      "CM2": "Millier / dizaine de milliers — 5-6 chiffres",
+      "6e":  "Centaine de milliers / million — jusqu'à 8 chiffres"
+    },
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — dizaine / centaine, 3–4 chiffres ─────────────────────── */
@@ -563,6 +588,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "droite-graduee-nombres-entiers-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Nombres à 3-4 chiffres — 2/4/5/6/10 intervalles",
+      "CM2": "Nombres à 5-6 chiffres — 4/5/6/10 intervalles",
+      "6e":  "Jusqu'au million et au-delà — 2/4/5/10 intervalles"
+    },
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — nombres à 3–4 chiffres, 2/4/5/6/10 intervalles ── */
@@ -615,6 +645,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "arrondir-nombre-entier-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "à la dizaine près (chiffre décisif : unités)",
+      "CM2": "à la centaine près (chiffre décisif : dizaines)",
+      "6e":  "au millier près (chiffre décisif : centaines)"
+    },
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — dizaine près, 3–4 chiffres ────────────────────────────
@@ -673,6 +708,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "arrondi-adapte-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "2 choix — excès ou défaut, 2 valeurs proches",
+      "CM2": "3 choix — choisir le rang d'arrondi adapté au contexte",
+      "6e":  "2 à 3 choix — raisonnement sur excès / défaut et rang"
+    },
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     /* ── Niveau 1 — 2 choix, excès ou défaut au rang le plus proche ── */

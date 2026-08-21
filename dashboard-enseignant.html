@@ -15,6 +15,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/eoy-banner-settings.js"></script>
   <script src="js/teacher.js?v=4"></script>
   <style>
     .dash-wrap {
@@ -343,8 +344,9 @@
         </div>
       </div>
 
-      <!-- Bandeau fin d'année scolaire -->
-      <div class="eoy-banner">
+      <!-- Bandeau fin d'année scolaire — masqué par défaut, affiché en JS
+           selon l'état lu via lfmEoyBanner.getBandeauState() (admin_settings). -->
+      <div class="eoy-banner" id="eoy-banner" style="display:none">
         <div class="eoy-banner-text">
           ⚠️ Fin d'année scolaire : toutes les données de vos élèves (comptes, classes, résultats, progression)
           seront définitivement supprimées. Seuls vos dictées préparées, questionnaires de
@@ -498,6 +500,13 @@
       document.title = 'Espace enseignant — ' + profile.display_name + ' — LFM';
 
       document.getElementById('dash-logout-btn').addEventListener('click', () => lfmAuth.signOut());
+
+      /* Affichage du bandeau fin d'année, piloté depuis l'espace admin */
+      lfmEoyBanner.getBandeauState()
+        .then(({ actif }) => {
+          if (actif) document.getElementById('eoy-banner').style.display = '';
+        })
+        .catch((e) => console.error('[eoy-banner] Erreur de lecture de l\'état :', e.message));
 
       /* Toggle hémisphère sud (fin d'année scolaire) */
       const hemBtn  = document.getElementById('eoy-hemisphere-btn');

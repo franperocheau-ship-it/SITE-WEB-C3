@@ -94,9 +94,21 @@
   color: var(--text, #1E2532);
 }
 
+.ls-lock {
+  margin-right: 2px;
+}
+
 .ls-card-desc {
   display: block;
   font-size: 12px;
+  color: var(--muted, #5F6368);
+  margin-top: 2px;
+}
+
+.ls-card-lock-hint {
+  display: block;
+  font-size: 11px;
+  font-style: italic;
   color: var(--muted, #5F6368);
   margin-top: 2px;
 }

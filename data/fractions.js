@@ -15,6 +15,10 @@ Object.assign(window.EXERCISE_DATA, {
     type: "representer-fraction",
     levels: ["CM1", "CM2"],
     paliers: 2, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Fraction simple — la bande est partagée selon le dénominateur",
+      "CM2": "Partage différent — introduction aux fractions équivalentes"
+    },
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
@@ -62,6 +66,10 @@ Object.assign(window.EXERCISE_DATA, {
     type: "lire-fraction",
     levels: ["CM1", "CM2"],
     paliers: 2, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Fractions simples avec petits nombres",
+      "CM2": "Fractions variées, y compris supérieures à 1"
+    },
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
@@ -107,6 +115,11 @@ Object.assign(window.EXERCISE_DATA, {
     type: "decomposer-fraction",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Choisis la bonne décomposition",
+      "CM2": "Trouve la partie entière et le numérateur",
+      "6e":  "Écris la décomposition complète"
+    },
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
@@ -181,6 +194,11 @@ Object.assign(window.EXERCISE_DATA, {
     type: "fractions-problemes",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Lis l'énoncé et choisis la bonne fraction",
+      "CM2": "Calcule une fraction d'une quantité",
+      "6e":  "Résous un problème à étapes"
+    },
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
@@ -378,6 +396,10 @@ Object.assign(window.EXERCISE_DATA, {
     type: "placer-fraction-droite",
     levels: ["CM1", "CM2"],
     paliers: 2, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Fractions inférieures à 1",
+      "CM2": "Fractions supérieures à 1"
+    },
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
@@ -422,6 +444,10 @@ Object.assign(window.EXERCISE_DATA, {
     competence: "Fractions — Encadrer",
     levels: ["CM1", "CM2"],
     paliers: 2, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Avec droite graduée pour t'aider",
+      "CM2": "Par le calcul, sans droite graduée"
+    },
     type: "encadrer-fraction",
     questionsPerSession: 6,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
@@ -465,6 +491,11 @@ Object.assign(window.EXERCISE_DATA, {
     competence: "Fractions — Comparer",
     levels: ["CM1", "CM2", "6e"],
     paliers: 3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Même dénominateur — compare les parts coloriées",
+      "CM2": "Dénominateurs différents — compare les aires visuellement",
+      "6e":  "Fractions < 1 et > 1 — place-les sur une droite graduée"
+    },
     type: "comparer-fractions",
     questionsPerSession: 6,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
@@ -518,6 +549,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "fraction-decimale-grille-droite-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Dixièmes (/10) — grille 10 cases + droite graduée + saisie",
+      "CM2": "Centièmes (/100) — grille 10×10 + droite graduée + saisie",
+      "6e":  "Millièmes (/1000) — droite graduée + saisie"
+    },
     backLink:   { href: "mathématiques-fractions.html", label: "Fractions" },
 
     /* ── Niveau 1 — /10 ── */
@@ -566,6 +602,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "fraction-decimale-tableau-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Colonnes Unités + Dixièmes (/10)",
+      "CM2": "Colonnes Unités + Dixièmes + Centièmes (/100)",
+      "6e":  "Colonnes Unités + Dixièmes + Centièmes + Millièmes (/1000)"
+    },
     backLink:   { href: "mathématiques-fractions.html", label: "Fractions" },
 
     /* tab : { u, di, ce, mi } — null = colonne non active */

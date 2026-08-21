@@ -15,6 +15,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "probabilite-chances",
     levels:     ["niveau1", "niveau2", "niveau3"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "niveau1": "Billes et cubes dans un sac",
+      "niveau2": "Pièce et dé équilibrés",
+      "niveau3": "Urne de formes et jeu de cartes"
+    },
     questionsPerSession: 6,
     backLink:   { href: "mathématiques-probabilites.html", label: "Probabilités" },
 
@@ -57,6 +62,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "probabilite-issues",
     levels:     ["niveau1", "niveau2", "niveau3"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "niveau1": "Lister les issues possibles",
+      "niveau2": "Dénombrer les issues favorables",
+      "niveau3": "Situations combinées"
+    },
     questionsPerSession: 6,
     backLink:   { href: "mathématiques-probabilites.html", label: "Probabilités" },
 
@@ -97,6 +107,11 @@ Object.assign(window.EXERCISE_DATA, {
     type:       "probabilite-nombre",
     levels:     ["niveau1", "niveau2", "niveau3"],
     paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "niveau1": "Placer des événements sur une échelle de 0 à 1",
+      "niveau2": "Écrire une probabilité (fraction, décimal, pourcentage)",
+      "niveau3": "Conversions et approche fréquentiste"
+    },
     questionsPerSession: 6,
     backLink:   { href: "mathématiques-probabilites.html", label: "Probabilités" },
 

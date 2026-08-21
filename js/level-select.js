@@ -132,15 +132,18 @@ const LevelSelect = (() => {
             const done     = validated.includes(lvl.id);
             const cls      = !unlocked ? ' ls-card--locked' : '';
             const disabled = !unlocked ? ' disabled' : '';
-            const desc     = !unlocked
-              ? 'Valide le niveau précédent pour débloquer'
-              : done ? `${lvl.description} · Niveau validé !` : lvl.description;
+            const desc     = done ? `${lvl.description} · Niveau validé !` : lvl.description;
+            const lock     = !unlocked ? '<span class="ls-lock" aria-hidden="true">🔒</span> ' : '';
+            const lockHint = !unlocked
+              ? '<span class="ls-card-lock-hint">Valide le niveau précédent pour débloquer</span>'
+              : '';
             return `
               <button class="ls-card${cls}" data-level="${lvl.id}"${disabled}>
                 <span class="ls-pastille" style="--ls-color:${colorFor(i)}">Niveau ${i + 1}</span>
                 <span class="ls-card-body">
-                  <span class="ls-card-name">${lvl.label || `Niveau ${i + 1}`}</span>
+                  <span class="ls-card-name">${lock}${lvl.label || `Niveau ${i + 1}`}</span>
                   <span class="ls-card-desc">${desc}</span>
+                  ${lockHint}
                 </span>
               </button>`;
           }).join('')}

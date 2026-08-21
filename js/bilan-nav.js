@@ -184,7 +184,8 @@ const lfmBilanNav = (() => {
         : tried;
       const rows = palierKeys.map(palier => {
         const rate = niveauRates.get(rateKey(domaine, sousDomaine, slug, palier));
-        const label = `Niveau ${escHtml(palier)}`;
+        const desc  = config.getLevelDesc ? config.getLevelDesc(slug, palier) : null;
+        const label = desc ? `Niveau ${escHtml(palier)} — ${escHtml(desc)}` : `Niveau ${escHtml(palier)}`;
         if (!rate) return disabledRow(label, 'pas encore travaillé');
         return navRow(palier, label, pctMeta(rate.avgPct, rate.metaText));
       });
@@ -262,7 +263,12 @@ const lfmBilanNav = (() => {
   /** (Ré)initialise la navigation dans `container` avec les données fournies.
       config: { mode: 'classe'|'eleve', domainOrder, domainIcons,
                 sousDomaineRates, competenceRates, niveauRates, getLeafItems,
-                renderEleveLeaf, rememberKey, onPrintCompetence } */
+                renderEleveLeaf, rememberKey, onPrintCompetence, getLevelDesc }
+      getLevelDesc(slug, palier) optionnel : intitulé de spécificité du
+      niveau (levelDescs, data/*.js — voir lfmAnalytics.levelDescFor), affiché
+      à côté de "Niveau X" à l'étape 4. Appelé pour CHAQUE palier affiché, y
+      compris ceux jamais tentés (lignes grisées) — pas seulement ceux
+      présents dans niveauRates. */
   function mount(container, config) {
     let initialPath = [];
     if (config.rememberKey) {

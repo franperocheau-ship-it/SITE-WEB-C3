@@ -32,22 +32,6 @@
     .bc-sep { color: var(--border); user-select: none; }
     .bc-current { font-weight: 600; color: var(--text); }
 
-    /* ── Navigation principale (4 onglets espace enseignant) ────────────────── */
-    .main-tabs {
-      display: flex; flex-wrap: wrap; gap: 4px;
-      background: var(--card-bg); border-radius: 14px; box-shadow: var(--shadow-sm);
-      padding: 5px; margin-bottom: 20px; width: fit-content;
-    }
-    .main-tab {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 9px 18px; border-radius: 10px;
-      font-family: inherit; font-size: 13px; font-weight: 700;
-      color: var(--muted); text-decoration: none;
-      transition: background 180ms, color 180ms;
-    }
-    .main-tab.is-active { background: var(--blue); color: #fff; }
-    .main-tab:hover:not(.is-active) { background: rgba(16,43,106,0.06); color: var(--blue); }
-
     /* ── En-tête fiche ───────────────────────────────────────────────────────── */
     .fiche-header {
       background: var(--card-bg); border-radius: var(--radius-card); box-shadow: var(--shadow-sm);
@@ -138,14 +122,6 @@
         <a href="remediations-enseignant.html" id="bc-remediations">Remédiations</a>
         <span class="bc-sep">›</span>
         <span class="bc-current" id="bc-competence">…</span>
-      </nav>
-
-      <!-- Navigation principale (4 onglets) -->
-      <nav class="main-tabs" aria-label="Navigation espace enseignant">
-        <a class="main-tab" href="classes-enseignant.html">🏫 Mes classes</a>
-        <a class="main-tab" href="pilotage-enseignant.html">🎯 Pilotage des compétences</a>
-        <a class="main-tab" href="resultats-enseignant.html">📊 Résultats</a>
-        <a class="main-tab is-active" href="remediations-enseignant.html">🧩 Remédiations</a>
       </nav>
 
       <div id="fiche-not-found" style="display:none">
