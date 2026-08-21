@@ -23,7 +23,19 @@
 .bjt-sous td:first-child { padding-left: 20px; font-weight: 500; color: #5F6368; font-size: 12px; text-decoration: underline; }
 .bjt-pastille { display: inline-block; width: 13px; height: 13px; border-radius: 50%; }
 .bjt-pastille.atteint       { background: #1DBFA0; }
-.bjt-pastille.en-cours      { background: #F5A623; }
+/* "En cours" : anneau semi-rempli (orange/gris) plutôt qu'un plein orange qui
+   se lisait comme un échec — lecture "jauge de progression". Anneau obtenu
+   par 2 fonds superposés (pas de mask CSS, pour un rendu fiable à
+   l'impression) : un disque blanc "perce" le centre du camembert
+   conic-gradient. #fff = --card-bg en dur (voir note de fichier ci-dessus),
+   seul fond hôte de ce composant. Arrêts en % : la même règle vaut pour la
+   pastille 13px écran et la version 11px de la synthèse PDF
+   (.bulletin-jauges .bjt-pastille). */
+.bjt-pastille.en-cours {
+  background:
+    radial-gradient(closest-side, #fff 58%, transparent 60%),
+    conic-gradient(#F5A623 0deg 180deg, #D9DEE7 180deg 360deg);
+}
 .bjt-pastille.non-travaille { background: #D9DEE7; }
 .bjt-comp td:first-child { padding-left: 32px; font-weight: 400; color: #5F6368; font-size: 11.5px; }
 .bcp-pastille {

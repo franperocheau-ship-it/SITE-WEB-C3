@@ -58,34 +58,6 @@
     .bc-sep { color: var(--border); user-select: none; }
     .bc-current { font-weight: 600; color: var(--text); }
 
-    /* ── Navigation principale (8 onglets espace enseignant) ────────────────── */
-    .main-tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      background: var(--card-bg);
-      border-radius: 14px;
-      box-shadow: var(--shadow-sm);
-      padding: 5px;
-      margin-bottom: 20px;
-      width: fit-content;
-    }
-    .main-tab {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 18px;
-      border-radius: 10px;
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--muted);
-      text-decoration: none;
-      transition: background 180ms, color 180ms;
-    }
-    .main-tab.is-active { background: var(--blue); color: #fff; }
-    .main-tab:hover:not(.is-active) { background: rgba(16,43,106,0.06); color: var(--blue); }
-
     /* ── Section header ──────────────────────────────────────────────────────── */
     .section-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -398,7 +370,7 @@
       body:not(.printing-bulletin) .header, body:not(.printing-bulletin) footer,
       body:not(.printing-bulletin) nav.breadcrumb, body:not(.printing-bulletin) .main-tabs,
       body:not(.printing-bulletin) .nav-footer, body:not(.printing-bulletin) .view-tabs,
-      body:not(.printing-bulletin) #export-class-btn, body:not(.printing-bulletin) #print-bilan-btn,
+      body:not(.printing-bulletin) #print-bilan-btn,
       body:not(.printing-bulletin) #view-classes, body:not(.printing-bulletin) #view-student,
       body:not(.printing-bulletin) #view-loading, body:not(.printing-bulletin) #panel-eleves,
       body:not(.printing-bulletin) #panel-overview, body:not(.printing-bulletin) #bilan-content,
@@ -439,6 +411,10 @@
       background: var(--card-bg); border-radius: var(--radius-card);
       box-shadow: var(--shadow-sm); padding: 20px 22px;
     }
+    /* Élèves en réussite / à attention particulière : fond légèrement teinté
+       (vert/orange) pour distinguer les deux cases d'un coup d'œil. */
+    .overview-card--success { background: rgba(29,191,160,0.08); }
+    .overview-card--alert   { background: rgba(245,166,35,0.10); }
     .overview-card-title {
       font-size: 12px; font-weight: 700; color: var(--blue);
       letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 14px;
@@ -470,9 +446,10 @@
       display: inline-flex; align-items: center; justify-content: center;
       font-size: 11px; font-weight: 800; background: var(--bg); color: var(--muted);
     }
-    .student-rank-name { flex: 1; font-weight: 600; font-size: 13.5px; color: var(--text); }
+    .student-rank-body { flex: 1; min-width: 0; }
+    .student-rank-name { font-weight: 600; font-size: 13.5px; color: var(--text); }
     .student-rank-meta { font-size: 11.5px; color: var(--muted); }
-    .student-rank-pct { font-weight: 700; font-size: 13px; }
+    .student-rank-pct { font-weight: 800; font-size: 15px; white-space: nowrap; flex-shrink: 0; }
 
     /* ── Jauge de taux de réussite par sous-domaine ──────────────────────────── */
     .subdom-gauge-row { margin-bottom: 10px; }
@@ -694,6 +671,8 @@
       body.printing-bulletin #laurels-root, body.printing-bulletin #student-niveaux,
       body.printing-bulletin #student-consolider, body.printing-bulletin #student-reussies,
       body.printing-bulletin #student-questionnaires,
+      body.printing-bulletin .view-tabs, body.printing-bulletin #panel-student-general,
+      body.printing-bulletin #panel-student-exercices-chutes,
       body.printing-bulletin .nav-footer,
       body.printing-bulletin .navbar {
         display: none !important;
@@ -765,19 +744,11 @@
         <span class="bc-current" id="bc-page">Résultats</span>
       </nav>
 
-      <!-- Navigation principale (8 onglets) -->
-      <nav class="main-tabs" aria-label="Navigation espace enseignant">
-        <a class="main-tab" href="classes-enseignant.html">🏫 Mes classes</a>
-        <a class="main-tab" href="pilotage-enseignant.html">🎯 Pilotage des compétences</a>
-        <a class="main-tab is-active" href="resultats-enseignant.html">📊 Résultats</a>
-        <a class="main-tab" href="remediations-enseignant.html">🧩 Remédiations</a>
-        <a class="main-tab" data-feature="jogging" href="synthese-joggings-enseignant.html">✍️ Joggings d'écriture</a>
-        <a class="main-tab" href="dictees-enseignant.html">📖 Dictées préparées</a>
-        <a class="main-tab" href="questionnaires-enseignant.html">📚 Questionnaires de lecture</a>
-        <a class="main-tab" href="vocabulaire-corpus-enseignant.html">🔤 Corpus lexical</a>
-        <a class="main-tab" href="evaluations-enseignant.html">📝 Évaluations</a>
-      </nav>
-      <script src="js/feature-flags.js?v=1"></script><script>LFM_FEATURES.hideDisabled();</script>
+      <!-- Chargement des feature flags (utilisé par la synthèse PDF pour
+           masquer la section Joggings tant que le module est désactivé,
+           voir printStudentBilan()) — plus de bandeau d'onglets à filtrer
+           ici. -->
+      <script src="js/feature-flags.js?v=1"></script>
 
       <!-- Sous-navigation résultats -->
       <div id="resultats-nav-mount"></div>
@@ -835,7 +806,6 @@
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-ghost btn-sm" id="print-bilan-btn" style="display:none"
               onclick="printBilan()">📄 Imprimer les résultats</button>
-            <button class="btn btn-ghost btn-sm" id="export-class-btn">⬇ Export CSV</button>
           </div>
         </div>
 
@@ -1207,21 +1177,6 @@
       </div>
     </div>`;
 
-    html += `<div class="stats-row-3">
-      <div class="stat-card">
-        <div class="stat-label">Actifs (7 derniers jours)</div>
-        <div class="stat-value">${b.activeStudents7d}<span class="stat-unit">/ ${b.enrolledCount}</span></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Exercices (semaine / total)</div>
-        <div class="stat-value" style="font-size:24px">${b.exercisesWeek} <span class="stat-unit">/ ${b.exercisesTotal}</span></div>
-      </div>
-      <div class="stat-card ${b.staleStudents14d > 0 ? 'stat-alert' : ''}">
-        <div class="stat-label">Sans activité (14j+)</div>
-        <div class="stat-value">${b.staleStudents14d}</div>
-      </div>
-    </div>`;
-
     const studentRankRow = (s, i) => `
       <div class="student-rank-row" onclick="navigate({
         view:'eleve', student:'${escJs(s.studentId)}',
@@ -1230,23 +1185,27 @@
         class:'${classId}'
       })">
         <div class="student-rank-num">${i + 1}</div>
-        <div>
+        <div class="student-rank-body">
           <div class="student-rank-name">${escHtml(s.name)}</div>
-          <div class="student-rank-meta">${s.notAcquiredCount} compétence${s.notAcquiredCount > 1 ? 's' : ''} à consolider</div>
+          <div class="student-rank-meta">${s.notAcquiredCount > 0
+            ? `${s.notAcquiredCount} compétence${s.notAcquiredCount > 1 ? 's' : ''} à consolider`
+            : 'en progression sur les compétences vues'}</div>
         </div>
-        <div class="student-rank-pct" style="color:${s.avgPct >= 70 ? '#15803d' : s.avgPct >= 50 ? '#a16207' : 'var(--red)'}">${s.avgPct}%</div>
+        <div class="student-rank-pct" style="color:var(--blue)">${s.avgPct}%</div>
       </div>`;
 
     html += `<div class="overview-grid">
-      <div class="overview-card">
+      <div class="overview-card overview-card--success">
         <div class="overview-card-title">Élèves en réussite</div>
         ${ov.topStudents.length ? `<div class="student-rank-list">${ov.topStudents.map(studentRankRow).join('')}</div>`
           : '<div class="empty-inline">Pas assez de données (min. 10 exercices par élève).</div>'}
       </div>
-      <div class="overview-card">
+      <div class="overview-card overview-card--alert">
         <div class="overview-card-title">Élèves à attention particulière</div>
         ${ov.bottomStudents.length ? `<div class="student-rank-list">${ov.bottomStudents.map(studentRankRow).join('')}</div>`
-          : '<div class="empty-inline">Pas assez de données (min. 10 exercices par élève).</div>'}
+          : ov.topStudents.length
+            ? '<div class="empty-inline">Aucun élève sous 80% de réussite pour l\'instant.</div>'
+            : '<div class="empty-inline">Pas assez de données (min. 10 exercices par élève).</div>'}
       </div>
     </div>`;
 
@@ -1258,10 +1217,6 @@
         <div class="comp-bar-track"><div class="comp-bar-fill ${cls}" style="width:${c.avgPct}%"></div></div>
       </div>`;
 
-    html += `<div style="display:flex;justify-content:flex-end;margin-bottom:8px">
-      <button type="button" class="btn btn-ghost btn-sm" onclick="switchClassTab('bilan')">Voir le détail par compétence →</button>
-    </div>`;
-
     html += `<div class="overview-grid">
       <div class="overview-card">
         <div class="overview-card-title">Compétences les mieux réussies</div>
@@ -1271,6 +1226,10 @@
         <div class="overview-card-title">Compétences les moins réussies</div>
         ${ov.bottom5.length ? ov.bottom5.map(c => compBar(c, 'down')).join('') : '<div class="empty-inline">Pas assez de données (min. 3 élèves par exercice/niveau).</div>'}
       </div>
+    </div>`;
+
+    html += `<div style="display:flex;justify-content:center;margin-top:16px">
+      <button type="button" class="btn btn-ghost btn-sm" onclick="switchClassTab('bilan')">Voir le détail par compétence →</button>
     </div>`;
 
     return html;
@@ -1759,12 +1718,6 @@
       console.warn('[LFM] getClassResults :', e.message);
     }
 
-    /* Export CSV */
-    document.getElementById('export-class-btn').onclick = async () => {
-      const raw = await lfmTeacher.getStudents(classId);
-      lfmTeacher.exportCSV(raw, cname || 'classe');
-    };
-
     const tbody = document.getElementById('students-tbody');
     if (students.length === 0) {
       tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--muted)">
@@ -2202,7 +2155,11 @@
     const rankBlockSrc = laurelsSrc?.querySelector('.laurel-rank-block');
     if (crownWrapSrc && rankBlockSrc) {
       const crownWrap = crownWrapSrc.cloneNode(true);
-      crownWrap.querySelector('.laurel-crown-count')?.remove();
+      /* Ne cibler que le compteur texte "X/20" (rang max, pas de badge à
+         afficher) — l'image du badge de rang en cours porte aussi la classe
+         .laurel-crown-count (styles partagés) et ne doit pas être retirée,
+         sinon le centre de la couronne reste vide à l'impression. */
+      crownWrap.querySelector('text.laurel-crown-count')?.remove();
       const breakdownEl = crownWrap.querySelector('.laurel-leaf-breakdown');
       const breakdownText = breakdownEl ? breakdownEl.textContent : '';
       const totalMatch = breakdownText.match(/(\d+)\s*feuille/);

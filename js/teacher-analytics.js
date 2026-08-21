@@ -542,12 +542,16 @@ const lfmAnalytics = (() => {
     const bottom5 = [...compList].sort((a, b) => a.avgPct - b.avgPct).slice(0, 5);
 
     /* ── Élèves en réussite / à attention particulière ────────────────────
-       Score composite = 50% taux de réussite global + 50% proportion de
-       compétences acquises (1 − compétences à consolider / compétences
-       travaillées, voir computeStudentProfile). Seuil d'activité minimal
-       pour être classé : un élève avec 1-2 résultats fausserait le
-       classement (moyenne non représentative). */
+       Classées par taux de réussite global (avgPct) plutôt qu'un score
+       composite : l'ordre affiché doit toujours correspondre au % affiché
+       (retour utilisateur — un score caché produisait un classement
+       incohérent à l'œil). Seuil d'activité minimal pour être classé : un
+       élève avec 1-2 résultats fausserait le classement (moyenne non
+       représentative). "Attention particulière" est en plus limitée aux
+       élèves sous ATTENTION_THRESHOLD : lister systématiquement 5 noms
+       faisait apparaître des élèves à 90%+ de réussite dans cette case. */
     const MIN_ATTEMPTS_RANKING = 10;
+    const ATTENTION_THRESHOLD  = 80;
     const rowsByStudent = new Map();
     rows.forEach(r => {
       if (!rowsByStudent.has(r.student_id)) rowsByStudent.set(r.student_id, []);
@@ -559,18 +563,18 @@ const lfmAnalytics = (() => {
       if (studentRows.length < MIN_ATTEMPTS_RANKING) return;
       const profile = computeStudentProfile(studentRows, catalogMap);
       if (profile.rates.general === null || profile.totalCompetences === 0) return;
-      const notAcquiredRate = profile.consolider.length / profile.totalCompetences;
-      const compositeScore  = Math.round(0.5 * profile.rates.general + 0.5 * (100 * (1 - notAcquiredRate)));
       ranked.push({
         studentId,
         name: studentNames.get(studentId) || '?',
         avgPct: profile.rates.general,
-        notAcquiredCount: profile.consolider.length,
-        compositeScore
+        notAcquiredCount: profile.consolider.length
       });
     });
-    const topStudents    = [...ranked].sort((a, b) => b.compositeScore - a.compositeScore).slice(0, 5);
-    const bottomStudents = [...ranked].sort((a, b) => a.compositeScore - b.compositeScore).slice(0, 5);
+    const topStudents    = [...ranked].sort((a, b) => b.avgPct - a.avgPct).slice(0, 5);
+    const bottomStudents = ranked
+      .filter(s => s.avgPct < ATTENTION_THRESHOLD)
+      .sort((a, b) => a.avgPct - b.avgPct)
+      .slice(0, 5);
 
     return {
       bandeau: {

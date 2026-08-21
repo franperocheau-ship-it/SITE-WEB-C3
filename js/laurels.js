@@ -428,8 +428,8 @@ function renderLaurelCrown(earnedList, isGolden, targetRank) {
     <div class="laurel-crown-wrap">
       <svg class="laurel-crown-svg ${isGolden ? 'laurel-crown-svg--golden' : ''}" viewBox="0 0 220 220" aria-hidden="true">
         ${stems}
-        ${leaves}
         ${centerContent}
+        ${leaves}
       </svg>
       ${counterHtml}
       ${breakdownHtml}
