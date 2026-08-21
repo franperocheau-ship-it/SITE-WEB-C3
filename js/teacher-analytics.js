@@ -509,12 +509,6 @@ const lfmAnalytics = (() => {
       .filter(c => c.studentCount >= MIN_STUDENTS_COMP_LEVEL);
     const top5    = [...compList].sort((a, b) => b.avgPct - a.avgPct).slice(0, 5);
     const bottom5 = [...compList].sort((a, b) => a.avgPct - b.avgPct).slice(0, 5);
-    /* Le pire exercice/niveau parmi ceux qui passent le seuil, pour l'encart
-       dédié — équivalent à bottom5[0], recalculé explicitement pour rester
-       correct si bottom5 changeait un jour de taille. */
-    const worst = compList.length
-      ? [...compList].sort((a, b) => a.avgPct - b.avgPct)[0]
-      : null;
 
     /* ── Élèves en réussite / à attention particulière ────────────────────
        Score composite = 50% taux de réussite global + 50% proportion de
@@ -552,7 +546,7 @@ const lfmAnalytics = (() => {
         activeStudents7d, exercisesWeek, exercisesTotal, staleStudents14d, enrolledCount,
         classAvg, classAvgFrancais, classAvgMaths
       },
-      top5, bottom5, worst, topStudents, bottomStudents
+      top5, bottom5, topStudents, bottomStudents
     };
   }
 
