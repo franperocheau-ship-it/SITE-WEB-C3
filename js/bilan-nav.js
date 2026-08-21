@@ -38,6 +38,12 @@ const lfmBilanNav = (() => {
   const KEY_SEP = '||';
   const rateKey = (...parts) => parts.join(KEY_SEP);
 
+  /* metaText peut être vide (mode élève, étape 4 : pas de "N tentatives"
+     affiché à ce niveau, voir maquette) — pas de séparateur orphelin. */
+  function pctMeta(avgPct, metaText) {
+    return metaText ? `${avgPct}% · ${metaText}` : `${avgPct}%`;
+  }
+
   /* ── Dérivation de l'arbre depuis les clés de competenceRates ────────────── */
   function domainesOf(competenceRates) {
     const set = new Set();
@@ -154,7 +160,7 @@ const lfmBilanNav = (() => {
         .map(slug => ({ slug, rate: competenceRates.get(rateKey(domaine, sousDomaine, slug)) }))
         .sort((a, b) => a.rate.avgPct - b.rate.avgPct);
       const rows = slugs.map(({ slug, rate }) =>
-        navRow(slug, escHtml(rate.title), `${rate.avgPct}% · ${rate.metaText}`));
+        navRow(slug, escHtml(rate.title), pctMeta(rate.avgPct, rate.metaText)));
       body = renderRowList(rows);
 
     } else if (path.length === 3) {
@@ -180,7 +186,7 @@ const lfmBilanNav = (() => {
         const rate = niveauRates.get(rateKey(domaine, sousDomaine, slug, palier));
         const label = `Niveau ${escHtml(palier)}`;
         if (!rate) return disabledRow(label, 'pas encore travaillé');
-        return navRow(palier, label, `${rate.avgPct}% · ${rate.metaText}`);
+        return navRow(palier, label, pctMeta(rate.avgPct, rate.metaText));
       });
       body = renderRowList(rows);
       if (config.onPrintCompetence) {
@@ -268,6 +274,17 @@ const lfmBilanNav = (() => {
     renderStep(container);
   }
 
+  /** Navigue directement vers `path` (ex. [domaine, sousDomaine, slug,
+      palier] pour ouvrir la feuille) sans repartir de l'étape 1 — utilisé
+      par le bouton "Voir les erreurs" (compétences à consolider, fiche
+      élève). `container` doit déjà avoir été monté (mount()). */
+  function navigateTo(container, path) {
+    if (!container.__bilanNav) return;
+    container.__bilanNav.path = path;
+    persistMatiere(container.__bilanNav);
+    renderStep(container);
+  }
+
   /* ── Rendu impression (arbre complet, données → HTML direct, sans DOM) ──
      Utilisé par printBilan() pour le bilan classe entier. Repli sur les
      mêmes Maps rates + getLeafItems que l'écran — pas de structure séparée
@@ -339,5 +356,5 @@ const lfmBilanNav = (() => {
     return html;
   }
 
-  return { mount, renderFullTreeHtml };
+  return { mount, navigateTo, renderFullTreeHtml };
 })();

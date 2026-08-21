@@ -26,7 +26,7 @@
        chutés" (chantier en cours). -->
   <script src="js/competence-preview.js?v=8"></script>
   <script src="js/niveau-pastilles.js?v=2"></script>
-  <script src="js/bilan-nav.js?v=2"></script>
+  <script src="js/bilan-nav.js?v=3"></script>
   <!-- Sources de données réutilisées pour la synthèse PDF (dictées/corpus/
        joggings) — voir printStudentBilan(), aucune de ces sections n'est
        affichée à l'écran ici, uniquement à l'impression. -->
@@ -910,7 +910,7 @@
         <!-- Onglets -->
         <div class="view-tabs">
           <button class="tab-btn active" id="tab-btn-student-general" onclick="switchStudentTab('general')">Général</button>
-          <button class="tab-btn" id="tab-btn-student-exercices-chutes" onclick="switchStudentTab('exercices-chutes')">Exercices chutés</button>
+          <button class="tab-btn" id="tab-btn-student-exercices-chutes" onclick="switchStudentTab('exercices-chutes')">Détail par compétence</button>
         </div>
 
         <!-- Panneau Général -->
@@ -959,12 +959,13 @@
           </div>
         </div>
 
-        <!-- Panneau Exercices chutés (élève) — contenu retiré (refonte en
-             cours vers une arborescence "Par compétence" unifiée, voir
-             plan federated-popping-finch) ; onglet gardé, sera renommé et
-             reconstruit dans une sous-étape suivante. -->
+        <!-- Panneau Détail par compétence (élève) — même arborescence que
+             côté classe (lfmBilanNav mode 'eleve'), scopée à l'élève
+             courant, sans seuil (dès la 1ère tentative). Feuille (étape 5) =
+             détail des erreurs par question sur le niveau précis choisi,
+             au lieu de la liste d'élèves côté classe. -->
         <div id="panel-student-exercices-chutes" style="display:none">
-          <div class="empty-state"><div class="empty-icon">🚧</div><div class="empty-text">Cette section est en cours de refonte.</div></div>
+          <div id="bilan-eleve-content"><div class="view-loading">Chargement…</div></div>
         </div>
 
         <div class="nav-footer" id="student-nav-footer"></div>
@@ -1015,6 +1016,11 @@
   let _bilanNiveauRates      = null; // Map "domaine||sousDomaine||exerciseSlug||palier" -> {avgPct, metaText}, étape 4
   let _overviewLoaded   = false;
   let _overviewClassId  = null;
+  let _bilanEleveLoaded        = false;
+  let _bilanEleveStudentId     = null;
+  let _bilanEleveCompetenceRates = null; // Map "domaine||sousDomaine||exerciseSlug" -> {title, avgPct, metaText}, étape 3 (sans seuil)
+  let _bilanEleveNiveauRates     = null; // Map "...||palier" -> {avgPct, metaText:''}, étape 4
+  let _bilanEleveItemRows        = null; // lignes item (fenêtre 5 dernières tentatives) de l'élève courant, pour la feuille (détail par question)
   let _catalogMap        = null;   // lfmAnalytics.buildCatalogMap(), une fois exercise-data.js chargé
   let _studentProfile     = null;  // dernier profil calculé (fiche élève courante), réutilisé par le bulletin
   let _studentRows         = [];   // dernières lignes brutes de l'élève courant (pour filtrage par période)
@@ -1135,16 +1141,17 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
-     ONGLETS FICHE ÉLÈVE (Général / Exercices chutés)
-     Le panneau "Exercices chutés" est en cours de refonte (voir plan
-     federated-popping-finch) : contenu retiré, onglet gardé (sera renommé
-     "Par compétence" et reconstruit dans une sous-étape suivante).
+     ONGLETS FICHE ÉLÈVE (Général / Détail par compétence)
   ═══════════════════════════════════════════════════════════════════════════ */
   async function switchStudentTab(tab) {
     document.getElementById('tab-btn-student-general').classList.toggle('active', tab === 'general');
     document.getElementById('tab-btn-student-exercices-chutes').classList.toggle('active', tab === 'exercices-chutes');
     document.getElementById('panel-student-general').style.display = tab === 'general' ? '' : 'none';
     document.getElementById('panel-student-exercices-chutes').style.display = tab === 'exercices-chutes' ? '' : 'none';
+
+    if (tab === 'exercices-chutes') {
+      await renderCompetencesEleve();
+    }
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -1358,6 +1365,114 @@
   function getBilanLeafItems([domaine, sousDomaine, exerciseSlug, palier]) {
     return lfmAnalytics.computeClassLeafStudents(_bilanBestBySlugPalier, exerciseSlug, palier)
       .map(x => ({ name: _bilanStudentMap[x.studentId] || '?', pct: x.pct }));
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     DÉTAIL PAR COMPÉTENCE (élève) — même arborescence que côté classe,
+     scopée à l'élève courant, SANS seuil (dès la 1ère tentative, cohérent
+     avec computeWorstItems côté détail). Feuille (étape 5) = détail des
+     erreurs par question sur le niveau précis choisi (computeWorstItems/
+     resolveItemText, ex-onglet "Exercices chutés" élève), au lieu de la
+     liste d'élèves côté classe.
+  ═══════════════════════════════════════════════════════════════════════════ */
+  async function renderCompetencesEleve() {
+    const s = _currentStudent;
+    const container = document.getElementById('bilan-eleve-content');
+
+    if (_bilanEleveLoaded && _bilanEleveStudentId === s.auth_user_id) return;
+    _bilanEleveLoaded    = false;
+    _bilanEleveStudentId = s.auth_user_id;
+
+    container.innerHTML = '<div class="view-loading">Chargement…</div>';
+
+    try {
+      if (_studentRows.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Cet élève n\'a pas encore réalisé d\'exercice.</div></div>';
+        _bilanEleveLoaded = true;
+        return;
+      }
+
+      /* Étape 3 (compétences) : granularité par exercice, sans seuil —
+         computeStudentExercisesChutes réutilisée telle quelle. */
+      const compList = lfmAnalytics.computeStudentExercisesChutes(_studentRows, _catalogMap);
+      const competenceRates = new Map();
+      const slugMeta = new Map();
+      compList.forEach(c => {
+        slugMeta.set(c.exerciseSlug, { domaine: c.domaine, sousDomaine: c.sousDomaine });
+        competenceRates.set([c.domaine, c.sousDomaine, c.exerciseSlug].join('||'), {
+          title: c.competence,
+          avgPct: c.avgPct,
+          metaText: `${c.attemptCount} tentative${c.attemptCount > 1 ? 's' : ''}`
+        });
+      });
+
+      /* Étape 4 (niveaux/paliers) : un seul élève — dedupeBestBySlugPalier
+         donne déjà directement le meilleur score par palier, pas besoin
+         d'aggregateByCompetenceLevel (pensée pour agréger plusieurs
+         élèves). Pas de métatexte (voir maquette : "Niveau 1 — 67%", sans
+         compte de tentatives à ce niveau). */
+      const niveauRates = new Map();
+      lfmAnalytics.dedupeBestBySlugPalier(_studentRows).forEach(r => {
+        const meta = slugMeta.get(r.exercise_slug);
+        if (!meta) return;
+        niveauRates.set([meta.domaine, meta.sousDomaine, r.exercise_slug, r.palier].join('||'), {
+          avgPct: Math.round(r.pct), metaText: ''
+        });
+      });
+
+      _bilanEleveItemRows        = await lfmTeacher.getStudentItemResultsRaw(s.auth_user_id);
+      _bilanEleveCompetenceRates = competenceRates;
+      _bilanEleveNiveauRates     = niveauRates;
+
+      lfmBilanNav.mount(container, {
+        mode: 'eleve',
+        domainOrder: DOMAIN_ORDER,
+        domainIcons: DOMAIN_ICONS,
+        sousDomaineRates: lfmAnalytics.computeSousDomaineRates(_studentRows, _catalogMap),
+        competenceRates,
+        niveauRates,
+        getLeafItems: getBilanEleveLeafItems,
+        renderEleveLeaf: renderBilanEleveLeafHtml,
+        rememberKey: 'eleve'
+      });
+      _bilanEleveLoaded = true;
+
+    } catch (e) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Erreur lors du chargement.</div></div>';
+      console.warn('[LFM] renderCompetencesEleve:', e.message);
+    }
+  }
+
+  /* Feuille (étape 5), élève : lignes item déjà chargées une fois par élève
+     (fenêtre 5 dernières tentatives par question, getStudentItemResultsRaw),
+     filtrées en mémoire par exercise_slug ET palier — pas de nouvel appel
+     réseau au clic. */
+  function getBilanEleveLeafItems([domaine, sousDomaine, exerciseSlug, palier]) {
+    return _bilanEleveItemRows.filter(r => r.exercise_slug === exerciseSlug && String(r.level) === palier);
+  }
+
+  /* Détail des erreurs par question sur CE palier précis (computeWorstItems/
+     resolveItemText, ex-openExerciceChuteDetailEleve) — le niveau n'a plus
+     besoin d'être répété dans chaque ligne, déjà visible dans le fil
+     d'Ariane (étape 4 déjà sélectionnée). */
+  function renderBilanEleveLeafHtml(itemRows) {
+    const worst = lfmAnalytics.computeWorstItems(itemRows);
+    if (worst.length === 0) return '<div class="empty-inline">Aucune erreur enregistrée sur ce niveau.</div>';
+    return worst.map(it => {
+      const qa = lfmAnalytics.resolveItemText(it.exercise_slug, it.level, it.item_id);
+      const questionText = qa && qa.q ? qa.q : '(question retirée du catalogue depuis)';
+      const pct = Math.round(it.failRate * 100);
+      const attemptsLabel = it.attempts === 5
+        ? `${it.attempts} tentatives sur les 5 dernières`
+        : `${it.attempts} tentative${it.attempts > 1 ? 's' : ''} enregistrée${it.attempts > 1 ? 's' : ''}`;
+      return `
+      <div class="consolider-item">
+        <div>
+          <div class="ci-comp">${escHtml(questionText)}</div>
+          <div class="ci-meta">${attemptsLabel} · <span class="ci-flag">${pct}% d'échec</span></div>
+        </div>
+      </div>`;
+    }).join('');
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -1707,9 +1822,10 @@
   async function renderStudentDetail() {
     const s = _currentStudent;
 
-    /* Réinitialise l'onglet "Exercices chutés" — Général redevient l'onglet
-       par défaut à l'ouverture de chaque nouvelle fiche élève (même motif
-       que renderStudents() côté classe). */
+    /* Réinitialise l'onglet "Détail par compétence" — Général redevient
+       l'onglet par défaut à l'ouverture de chaque nouvelle fiche élève
+       (même motif que renderStudents() côté classe). */
+    _bilanEleveLoaded = false;
     document.getElementById('tab-btn-student-general').classList.add('active');
     document.getElementById('tab-btn-student-exercices-chutes').classList.remove('active');
     document.getElementById('panel-student-general').style.display = '';
@@ -1830,16 +1946,12 @@
   }
 
   /* Bouton d'action d'une compétence à consolider : "Voir les erreurs" ouvre
-     l'onglet "Exercices chutés" — tant que le score n'est pas 100%. Repli
-     sur l'ancien lien "Revoir →" (exercise.html) sinon, cas qui ne se
-     produit pas aujourd'hui pour "à consolider" (toujours ≤60% ou échec
-     répété) mais gardé par cohérence avec l'énoncé de la règle.
-     TEMPORAIRE (refonte "Par compétence" en cours, plan
-     federated-popping-finch) : le détail par exercice
-     (openExerciceChuteDetailEleve) a été retiré en sous-étape A avec le
-     reste du contenu de cet onglet — voirErreursExercice se contente pour
-     l'instant de basculer sur l'onglet, sans cibler l'exercice. Sera
-     reconnecté à la nouvelle arborescence en sous-étape D. */
+     l'onglet "Détail par compétence" et navigue directement jusqu'à la
+     feuille (étape 5, détail des erreurs) du palier le plus faible de cet
+     exercice — tant que le score n'est pas 100%. Repli sur l'ancien lien
+     "Revoir →" (exercise.html) sinon, cas qui ne se produit pas aujourd'hui
+     pour "à consolider" (toujours ≤60% ou échec répété) mais gardé par
+     cohérence avec l'énoncé de la règle. */
   function consoliderActionBtn(c) {
     return c.avgPct < 100
       ? `<button type="button" class="btn btn-outline btn-sm" onclick="voirErreursExercice('${escJs(c.exampleSlug)}')">Voir les erreurs</button>`
@@ -1848,6 +1960,27 @@
 
   async function voirErreursExercice(exerciseSlug) {
     await switchStudentTab('exercices-chutes');
+
+    /* Filet défensif : si l'élève n'a aucun résultat, renderCompetencesEleve
+       marque _bilanEleveLoaded=true sans jamais appeler mount() (branche
+       "aucun résultat"), donc _bilanEleveCompetenceRates reste null — ce
+       bouton n'est normalement jamais atteignable dans cet état (aucune
+       compétence à consolider sans résultat), mais on ne dépend pas de
+       cette garantie implicite pour éviter un TypeError. */
+    if (!_bilanEleveCompetenceRates) return;
+
+    const compKey = [..._bilanEleveCompetenceRates.keys()].find(k => k.endsWith('||' + exerciseSlug));
+    if (!compKey) return;
+    const [domaine, sousDomaine] = compKey.split('||');
+
+    let worstPalier = null, worstPct = Infinity;
+    _bilanEleveNiveauRates.forEach((rate, key) => {
+      if (!key.startsWith(compKey + '||')) return;
+      if (rate.avgPct < worstPct) { worstPct = rate.avgPct; worstPalier = key.split('||')[3]; }
+    });
+    if (!worstPalier) return;
+
+    lfmBilanNav.navigateTo(document.getElementById('bilan-eleve-content'), [domaine, sousDomaine, exerciseSlug, worstPalier]);
   }
 
   function renderConsoliderList(consolider) {
