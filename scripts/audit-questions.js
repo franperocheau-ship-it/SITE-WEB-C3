@@ -70,6 +70,20 @@ const NUMBERED_KEY_RE = /^(?:level|lvl|step)(\d+)(?:Bank|Words|Pool)?$/i;
 const UNNUMBERED_BANK_RE = /(bank|identtexts)$/i;
 
 function extractLevelBuckets(ex) {
+  // Cas particulier : type "produire-3-formes" (ex. produire-formes-
+  // interrogatives) — une seule banque de phrases réutilisée à chaque
+  // palier, la progression venant du nombre de formes exigées par le
+  // moteur (pas d'un sous-ensemble de contenu par niveau). Signaler "1 seul
+  // niveau" serait trompeur ; on l'affiche comme banque unique × N paliers.
+  if (ex.type === "produire-3-formes" && Array.isArray(ex.bank) && typeof ex.paliers === "number") {
+    return [{
+      level: 1,
+      label: `Banque unique (${ex.bank.length} items) × ${ex.paliers} paliers de rigueur croissante`,
+      items: ex.bank,
+      omitCountSuffix: true,
+    }];
+  }
+
   // Cas particulier : "pools" est un objet (pas un tableau) dont chaque clé
   // (ex. "CM1"/"CM2"/"6e" ou "1"/"2"/"3") pointe vers un tableau d'items pour
   // ce niveau, dans l'ordre de déclaration des clés.
@@ -311,12 +325,13 @@ function buildReport(data) {
       continue;
     }
 
-    body.push(`**Total par niveau :** ${buckets.map((b) => `${b.label} = ${b.items.length}`).join(" · ")}`);
+    body.push(`**Total par niveau :** ${buckets.map((b) => b.omitCountSuffix ? b.label : `${b.label} = ${b.items.length}`).join(" · ")}`);
     body.push("");
 
     for (const bucket of buckets) {
       const badge = badgeForCount(bucket.level, bucket.items.length);
-      body.push(`### ${badge ? badge + " " : ""}${bucket.label} (${bucket.items.length} items)`);
+      const countSuffix = bucket.omitCountSuffix ? "" : ` (${bucket.items.length} items)`;
+      body.push(`### ${badge ? badge + " " : ""}${bucket.label}${countSuffix}`);
       if (badge === "🔴") {
         criticalCount++;
         body.push("");

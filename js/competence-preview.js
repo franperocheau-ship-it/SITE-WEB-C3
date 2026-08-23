@@ -50,6 +50,19 @@ const CompetencePreview = (() => {
   const UNNUMBERED_BANK_RE = /(bank|identtexts)$/i;
 
   function extractLevelBuckets(ex) {
+    // Cas particulier : type "produire-3-formes" — banque unique réutilisée
+    // à chaque palier, la progression venant du nombre de formes exigées
+    // par le moteur, pas d'un sous-ensemble de contenu par niveau (même
+    // logique que scripts/audit-questions.js).
+    if (ex.type === "produire-3-formes" && Array.isArray(ex.bank) && typeof ex.paliers === "number") {
+      return [{
+        level: 1,
+        label: `Banque unique (${ex.bank.length} items) × ${ex.paliers} paliers de rigueur croissante`,
+        items: ex.bank,
+        omitCountSuffix: true,
+      }];
+    }
+
     if (ex.pools && typeof ex.pools === "object" && !Array.isArray(ex.pools)) {
       return Object.entries(ex.pools).map(([key, items], i) => ({
         level: i + 1,
@@ -967,7 +980,7 @@ const CompetencePreview = (() => {
         const consigneHtml = consigne ? `<p class="cp-level-consigne">📋 ${escapeHtml(consigne)}</p>` : "";
         return `
           <section class="cp-level">
-            <h3 class="cp-level-title">${bucket.label} <span class="cp-level-count">(${bucket.items.length} question${bucket.items.length > 1 ? "s" : ""})</span></h3>
+            <h3 class="cp-level-title">${bucket.label}${bucket.omitCountSuffix ? "" : ` <span class="cp-level-count">(${bucket.items.length} question${bucket.items.length > 1 ? "s" : ""})</span>`}</h3>
             ${consigneHtml}
             <ol class="cp-qa-list">${rows}</ol>
           </section>
