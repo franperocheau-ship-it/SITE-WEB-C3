@@ -62,6 +62,7 @@ const CompetencePreview = (() => {
     const numbered = new Map();
     const unnumbered = [];
     let plainBankWithLevelField = null;
+    let plainBankLevelKey = null; // "level" ou "difficulty" selon le champ trouvé
 
     for (const key of arrayKeys) {
       if (key === "levels") continue;
@@ -73,9 +74,19 @@ const CompetencePreview = (() => {
         continue;
       }
 
-      if (key === "bank" && ex[key].length && ex[key][0] && typeof ex[key][0] === "object" && "level" in ex[key][0]) {
-        plainBankWithLevelField = ex[key];
-        continue;
+      // "level" (banques manuellement regroupées) ou "difficulty" (ex. type
+      // accord-ecrit : une banque unique filtrée par palier de difficulté).
+      if (key === "bank" && ex[key].length && ex[key][0] && typeof ex[key][0] === "object") {
+        if ("level" in ex[key][0]) {
+          plainBankWithLevelField = ex[key];
+          plainBankLevelKey = "level";
+          continue;
+        }
+        if ("difficulty" in ex[key][0]) {
+          plainBankWithLevelField = ex[key];
+          plainBankLevelKey = "difficulty";
+          continue;
+        }
       }
 
       if (UNNUMBERED_BANK_RE.test(key)) {
@@ -92,7 +103,7 @@ const CompetencePreview = (() => {
       const order = [];
       const groups = new Map();
       for (const item of plainBankWithLevelField) {
-        const lvl = item.level;
+        const lvl = item[plainBankLevelKey];
         if (!groups.has(lvl)) { groups.set(lvl, []); order.push(lvl); }
         groups.get(lvl).push(item);
       }

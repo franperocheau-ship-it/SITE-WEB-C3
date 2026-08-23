@@ -86,6 +86,7 @@ function extractLevelBuckets(ex) {
   const numbered = new Map(); // niveau (1-based) -> items[]
   const unnumbered = []; // [{ key, items }] dans l'ordre de déclaration
   let plainBankWithLevelField = null;
+  let plainBankLevelKey = null; // "level" ou "difficulty" selon le champ trouvé
 
   for (const key of arrayKeys) {
     if (key === "levels") continue; // métadonnée (liste de libellés CM1/CM2/6e...), pas une banque
@@ -98,9 +99,19 @@ function extractLevelBuckets(ex) {
       continue;
     }
 
-    if (key === "bank" && ex[key].length && ex[key][0] && typeof ex[key][0] === "object" && "level" in ex[key][0]) {
-      plainBankWithLevelField = ex[key];
-      continue;
+    // "level" (banques manuellement regroupées) ou "difficulty" (ex. type
+    // accord-ecrit : une banque unique filtrée par palier de difficulté).
+    if (key === "bank" && ex[key].length && ex[key][0] && typeof ex[key][0] === "object") {
+      if ("level" in ex[key][0]) {
+        plainBankWithLevelField = ex[key];
+        plainBankLevelKey = "level";
+        continue;
+      }
+      if ("difficulty" in ex[key][0]) {
+        plainBankWithLevelField = ex[key];
+        plainBankLevelKey = "difficulty";
+        continue;
+      }
     }
 
     if (UNNUMBERED_BANK_RE.test(key)) {
@@ -120,7 +131,7 @@ function extractLevelBuckets(ex) {
     const order = [];
     const groups = new Map();
     for (const item of plainBankWithLevelField) {
-      const lvl = item.level;
+      const lvl = item[plainBankLevelKey];
       if (!groups.has(lvl)) {
         groups.set(lvl, []);
         order.push(lvl);
@@ -129,7 +140,7 @@ function extractLevelBuckets(ex) {
     }
     return order.map((lvl, i) => ({
       level: i + 1,
-      label: `Niveau ${i + 1} (level: ${JSON.stringify(lvl)})`,
+      label: `Niveau ${i + 1} (${plainBankLevelKey}: ${JSON.stringify(lvl)})`,
       items: groups.get(lvl),
     }));
   }
