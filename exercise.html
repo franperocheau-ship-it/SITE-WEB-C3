@@ -5955,6 +5955,9 @@
       } else if (currentType === "pc-etre-niveaux") {
         pceInitSession();
         return;
+      } else if (currentType === "attribut-accord-niveaux") {
+        aasInitSession();
+        return;
       } else if (currentType === "accord-cod-niveaux") {
         apcInitSession();
         return;
@@ -6293,6 +6296,8 @@
         /* session managed by eoaInitSession — no-op here */
       } else if (currentType === "pc-etre-niveaux") {
         /* session managed by pceInitSession — no-op here */
+      } else if (currentType === "attribut-accord-niveaux") {
+        /* session managed by aasInitSession — no-op here */
       } else if (currentType === "change-temps-niveaux") {
         /* session managed by ctInitSession — no-op here */
       } else if (currentType === "verbes-particuliers-niveaux") {
@@ -16526,6 +16531,388 @@
       saveExerciseResult({
         exerciseSlug: slug, subject, category,
         exerciseType: 'pc-etre-niveaux',
+        level:        'Niveau ' + lv,
+        score:        lvScore,
+        total,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
+      });
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       TYPE : attribut-accord-niveaux — « Accorder l'attribut du sujet avec
+       le sujet »
+       Niveau 1 : raisonnement guidé en 2 étapes — genre + nombre du sujet
+                  (deux groupes de boutons fixes, non noté, cf. donneur-
+                  niveaux/daRenderSelectors) → choix-étiquette de la forme
+                  accordée parmi les 4 combinaisons possibles (notée, seule
+                  étape comptée dans le score — même logique que l'étape
+                  finale de pc-etre-niveaux : les étapes de raisonnement
+                  guidé sont formatives, non scorées).
+       Niveau 2/3 : écriture directe de la forme accordée.
+       3 niveaux déverrouillables à 80 %. Un seul essai par question.
+    ══════════════════════════════════════════════════════════════════════════ */
+
+    const AAS_SEUIL     = 0.80;
+    const AAS_LEVEL_DEFS = [
+      { lv: 1, desc: "Identifier le genre et le nombre du sujet, puis choisir la forme accordée" },
+      { lv: 2, desc: "Écrire l'attribut accordé avec un sujet pluriel ou coordonné de même genre" },
+      { lv: 3, desc: "Écrire l'attribut accordé avec un sujet coordonné de genres différents, un sujet collectif ou un vouvoiement" }
+    ];
+
+    let aasState = null;
+    let aasLevelSelect = null;
+
+    function aasNorm(str) {
+      return str.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[''`´'']/g, "'");
+    }
+    function aasShuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function aasBackToSelectScreen() {
+      aasState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    /* ── Init session ──────────────────────────────────────────────────────── */
+    function aasInitSession() {
+      aasState = null;
+      score = 0; currentIndex = 0;
+      sessionStartTime = Date.now();
+
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      aasLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: AAS_LEVEL_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: AAS_SEUIL,
+        onSelectLevel: lv => aasStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: aasBackToSelectScreen
+      });
+      aasLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Démarre un niveau ─────────────────────────────────────────────────── */
+    function aasStartLevel(lv) {
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+
+      const bankKey = lv === 1 ? 'level1Bank' : lv === 2 ? 'level2Bank' : 'level3Bank';
+      const bank    = sessionData[bankKey] || [];
+      const n       = sessionData.questionsPerSession || bank.length;
+      const items   = aasShuffle([...bank]).slice(0, n);
+
+      aasState = { lv, items, idx: 0, score: 0, total: items.length };
+      itemResults = [];
+      attemptId   = crypto.randomUUID();
+
+      document.getElementById('q-total').textContent = items.length;
+      aasLevelSelect.renderBadges(lv);
+      aasRenderQuestion(document.getElementById('ex-card'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── Dispatch niveau ───────────────────────────────────────────────────── */
+    function aasRenderQuestion(card) {
+      const { lv, items, idx, total } = aasState;
+      const q = items[idx];
+
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+
+      if (lv === 1) aasRenderLevel1(card, q);
+      else          aasRenderLevel23(card, q);
+    }
+
+    /* ── Avance à la question suivante ─────────────────────────────────────── */
+    function aasAdvance() {
+      aasState.idx++;
+      if (aasState.idx >= aasState.items.length) {
+        aasShowLevelResults();
+      } else {
+        aasRenderQuestion(document.getElementById('ex-card'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    /* ── Niveau 1 — raisonnement guidé : genre + nombre (boutons fixes) →
+       choix-étiquette de la forme accordée ─────────────────────────────── */
+    function aasRenderLevel1(card, q) {
+      const { idx, total } = aasState;
+      const sentenceHtml = q.sentence
+        .replace(q.subjectPhrase, `<span class="ex-teal-hl">${q.subjectPhrase}</span>`)
+        .replace('________', '<span class="ex-blank" style="cursor:default"></span>');
+
+      card.innerHTML = `
+        <p class="ex-question-label">Accorde l'attribut du sujet</p>
+        <div class="ex-verb-display">${q.base}</div>
+        <div class="ex-sentence-display">${sentenceHtml}</div>
+
+        <div id="aas-step1" class="ex-classify-step" style="margin-top:6px">
+          <div class="ex-classify-step-title">Étape 1 — Genre et nombre du sujet</div>
+          <div style="display:grid;grid-template-columns:56px 1fr;align-items:center;gap:10px 12px;margin-bottom:6px">
+            <span style="font-weight:700;font-size:13px;color:var(--muted)">Genre</span>
+            <div class="ex-choices-grid" id="aas-genre-grid" style="margin:0;grid-template-columns:repeat(2,1fr)"></div>
+            <span style="font-weight:700;font-size:13px;color:var(--muted)">Nombre</span>
+            <div class="ex-choices-grid" id="aas-nombre-grid" style="margin:0;grid-template-columns:repeat(2,1fr)"></div>
+          </div>
+          <div class="ex-feedback-area" id="aas-fb1"></div>
+        </div>
+
+        <div id="aas-step2" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title">Étape 2 — Choisis la forme correctement accordée</div>
+          <div class="ex-choices-grid" id="aas-choices2"></div>
+          <div class="ex-feedback-area" id="aas-fb2"></div>
+        </div>
+
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      /* ── Étape 1 : genre + nombre (pattern donneur-niveaux/daRenderSelectors) ── */
+      let selGenre = null, selNombre = null;
+      const genreGrid  = document.getElementById('aas-genre-grid');
+      const nombreGrid = document.getElementById('aas-nombre-grid');
+
+      function checkStep1Done() {
+        if (selGenre === null || selNombre === null) return;
+        document.getElementById('aas-fb1').innerHTML =
+          (selGenre === q.gender && selNombre === q.number)
+            ? `<div class="ex-feedback-correct" style="font-size:13px">✅ Exact ! Maintenant choisis la forme accordée.</div>`
+            : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Les bonnes réponses sont en vert.</div>`;
+        setTimeout(() => {
+          const s2 = document.getElementById('aas-step2');
+          s2.classList.remove('ex-hidden');
+          s2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 500);
+      }
+
+      [['masculin', 'm'], ['féminin', 'f']].forEach(([label, key]) => {
+        const btn = document.createElement('button');
+        btn.className = 'ex-choice';
+        btn.textContent = label;
+        btn.addEventListener('click', () => {
+          if (selGenre !== null) return;
+          selGenre = key;
+          genreGrid.querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === (q.gender === 'm' ? 'masculin' : 'féminin')) b.classList.add('is-correct');
+          });
+          if (key !== q.gender) btn.classList.add('is-wrong');
+          checkStep1Done();
+        });
+        genreGrid.appendChild(btn);
+      });
+
+      [['singulier', 's'], ['pluriel', 'p']].forEach(([label, key]) => {
+        const btn = document.createElement('button');
+        btn.className = 'ex-choice';
+        btn.textContent = label;
+        btn.addEventListener('click', () => {
+          if (selNombre !== null) return;
+          selNombre = key;
+          nombreGrid.querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === (q.number === 's' ? 'singulier' : 'pluriel')) b.classList.add('is-correct');
+          });
+          if (key !== q.number) btn.classList.add('is-wrong');
+          checkStep1Done();
+        });
+        nombreGrid.appendChild(btn);
+      });
+
+      /* ── Étape 2 : choix-étiquette parmi les 4 formes, dédoublonnées
+         (certains adjectifs ont des formes identiques entre masculin et
+         féminin — ex. "calme" — ou entre singulier et pluriel au masculin
+         — ex. "silencieux" — deux boutons au texte identique seraient
+         source de confusion). ─────────────────────────────────────────── */
+      const forms       = [q.ms, q.mp, q.fs, q.fp];
+      const uniqueForms = [...new Set(forms)];
+      const choices2El  = document.getElementById('aas-choices2');
+
+      aasShuffle(uniqueForms).forEach(form => {
+        const btn = document.createElement('button');
+        btn.className = 'ex-choice';
+        btn.textContent = form;
+        btn.addEventListener('click', () => {
+          const isRight = form === q.answer;
+          choices2El.querySelectorAll('.ex-choice').forEach(b => {
+            b.disabled = true;
+            if (b.textContent === q.answer) b.classList.add('is-correct');
+          });
+          if (!isRight) btn.classList.add('is-wrong');
+          recordItemResult(q, isRight, aasState.lv);
+
+          if (isRight) {
+            aasState.score++;
+            document.getElementById('aas-fb2').innerHTML =
+              `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
+          } else {
+            document.getElementById('aas-fb2').innerHTML =
+              `<div class="ex-feedback-wrong">❌ La forme correcte est <strong>${q.answer}</strong>.</div>`;
+          }
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        });
+        choices2El.appendChild(btn);
+      });
+
+      document.getElementById('next-btn').addEventListener('click', aasAdvance);
+    }
+
+    /* ── Niveaux 2 et 3 — écriture directe ──────────────────────────────── */
+    function aasRenderLevel23(card, q) {
+      const { idx, total } = aasState;
+      const sentDisplay = q.sentence.replace('________', '<span class="ex-blank" style="cursor:default"></span>');
+
+      card.innerHTML = `
+        <p class="ex-question-label">Accorde l'attribut du sujet</p>
+        <div class="ex-verb-display">${q.base}</div>
+        <div class="ex-sentence-display">${sentDisplay}</div>
+        <div class="ex-input-row">
+          <input type="text" id="aas-input" class="ex-text-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                 placeholder="Forme accordée…">
+          <button class="ex-validate-btn" id="aas-val-btn">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="aas-fb"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn">${
+          idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'
+        }</button>
+      `;
+
+      setTimeout(() => document.getElementById('aas-input')?.focus(), 60);
+      aasWireTextInput(q, 'aas-input', 'aas-val-btn', 'aas-fb');
+      document.getElementById('next-btn').addEventListener('click', aasAdvance);
+    }
+
+    /* ── Saisie de la forme accordée — partagée niveaux 2/3 ────────────────
+       Un seul essai : succès → 1 pt + bouton suivant ; échec → réponse
+       affichée puis passage automatique à la question suivante. `note`
+       (Niveau 3) : rappel de règle affiché dans les deux cas. ────────── */
+    function aasWireTextInput(q, inputId, btnId, fbId) {
+      const input = document.getElementById(inputId);
+      const vbtn  = document.getElementById(btnId);
+      const noteHtml = q.note ? `<br><span style="font-weight:400">${q.note}</span>` : '';
+
+      const doValidate = () => {
+        if (!input || input.disabled || !input.value.trim()) return;
+        const isRight = aasNorm(input.value) === aasNorm(q.answer);
+        input.disabled = true;
+        vbtn.disabled  = true;
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+        recordItemResult(q, isRight, aasState.lv);
+
+        if (isRight) {
+          aasState.score++;
+          document.getElementById(fbId).innerHTML =
+            `<div class="ex-feedback-correct">${rand(SUCCESS)}${noteHtml}</div>`;
+          document.getElementById('next-btn').classList.remove('ex-hidden');
+        } else {
+          document.getElementById(fbId).innerHTML =
+            `<div class="ex-feedback-wrong">❌ La forme correcte est <strong>${q.answer}</strong>.${noteHtml}</div>`;
+          setTimeout(() => aasAdvance(), 2200);
+        }
+      };
+
+      vbtn.addEventListener('click', doValidate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') doValidate(); });
+    }
+
+    /* ── Résultats d'un niveau ───────────────────────────────────────────── */
+    function aasShowLevelResults() {
+      const { lv, score: lvScore, total } = aasState;
+      const { passed, pct, isLast } = aasLevelSelect.completeLevel(lv, lvScore, total);
+      const pctPct = Math.round(pct * 100);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = lvScore + ' / ' + total;
+      document.getElementById('score-pct').textContent   = pctPct + ' %';
+
+      const stars     = pctPct === 100 ? '🌟🌟🌟' : pctPct >= 80 ? '⭐⭐' : pctPct >= 50 ? '⭐' : '';
+      const backHref  = sessionData.backLink?.href  || 'français-grammaire.html';
+      const backLabel = `← Retour à ${sessionData.backLink?.label || 'la Grammaire'}`;
+      const backToSelectBtn = aasLevelSelect.backToSelectButtonHTML();
+
+      let msg, btnsHTML;
+      if (passed && isLast) {
+        msg = `${stars} Bravo ! Tu maîtrises l'accord de l'attribut du sujet aux trois niveaux !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="aas-restart-btn">Recommencer</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      } else if (passed) {
+        msg = `${stars} Niveau ${lv} validé ! 🏆 Le Niveau ${lv + 1} est débloqué !`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="aas-next-btn">Niveau ${lv + 1} →</button>
+          <button class="ex-btn-secondary" id="aas-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+        </div>
+        <a href="${backHref}" class="ex-results-back-link">${backLabel}</a>`;
+      } else {
+        msg = `${stars || '💪'} Pas encore… il faut 80 % pour passer au niveau suivant. On réessaie ?`;
+        btnsHTML = `<div class="ex-results-btns">
+          <button class="ex-btn-primary" id="aas-retry-btn">Recommencer ce niveau</button>
+          ${backToSelectBtn}
+          <a href="${backHref}" class="ex-btn-secondary">${backLabel}</a>
+        </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      const resultsBtnsWrap = document.getElementById('ex-results-btns-wrap');
+      resultsBtnsWrap.innerHTML = btnsHTML;
+
+      document.getElementById('aas-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        aasStartLevel(aasState.lv);
+      });
+      document.getElementById('aas-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        aasStartLevel(lv + 1);
+      });
+      document.getElementById('aas-restart-btn')?.addEventListener('click', () => {
+        aasLevelSelect.reset();
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        aasInitSession();
+      });
+      aasLevelSelect.wireBackToSelectButton(resultsBtnsWrap);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'attribut-accord-niveaux',
         level:        'Niveau ' + lv,
         score:        lvScore,
         total,

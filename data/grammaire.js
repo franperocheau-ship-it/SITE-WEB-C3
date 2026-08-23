@@ -526,6 +526,110 @@ Object.assign(window.EXERCISE_DATA, {
     ]
   },
 
+  /* Compétence sœur de identifier-attribut-sujet : ici le sujet et
+     l'attribut sont déjà donnés/indiqués dans la phrase (sujet surligné),
+     on ne demande que l'accord. Moteur dédié "attribut-accord-niveaux"
+     (exercise.html) — pas de moteur générique existant pour le mécanisme du
+     Niveau 1, inspiré de ortho-accorder-participe-passe-etre (data/orthographe.js) :
+       Étape 1 — deux groupes de boutons fixes (genre puis nombre), marquage
+                 immédiat correct/incorrect par clic, non noté (scaffolding) ;
+       Étape 2 — débloquée une fois les deux choisis : choix-étiquette parmi
+                 les formes accordées de l'adjectif (masc.s/masc.p/fém.s/fém.p),
+                 dédoublonnées si deux formes sont identiques (ex. adjectifs
+                 en -e ou -x invariables au masculin) ; seule cette étape est
+                 notée (recordItemResult), comme l'étape finale de pc-etre-niveaux.
+     Niveau 2/3 : saisie libre directe (sans étapes), sujet pluriel/coordonné
+     au Niveau 2, pièges (coordination de genres différents, sujet collectif
+     singulier, vouvoiement de politesse vs "vous" réellement pluriel) au
+     Niveau 3 — champ `note` affiché en complément du feedback. */
+  "accorder-attribut-sujet": {
+    title:      "Accorder l'attribut du sujet avec le sujet",
+    domaine:    "Français",
+    competence: "Grammaire — Accord de l'attribut du sujet",
+    type:       "attribut-accord-niveaux",
+    levels:     ["CM2", "6e"],
+    paliers:    3,
+    questionsPerSession: 10,
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+    levelDescs: {
+      "niveau1": "Identifier le genre et le nombre du sujet, puis choisir la forme accordée",
+      "niveau2": "Écrire l'attribut accordé avec un sujet pluriel ou coordonné de même genre",
+      "niveau3": "Écrire l'attribut accordé avec un sujet coordonné de genres différents, un sujet collectif ou un vouvoiement"
+    },
+
+    /* ── Niveau 1 — raisonnement guidé en 2 étapes (10 items) ────────────
+       gender/number : genre et nombre du sujet (attendus étape 1).
+       ms/mp/fs/fp    : les 4 formes accordées possibles de l'adjectif
+                        (masculin singulier/pluriel, féminin singulier/pluriel).
+       answer         : forme correcte, attendue étape 2.
+    ─────────────────────────────────────────────────────────────────── */
+    level1Bank: [
+      { id:"accorder-attribut-sujet-n1-01", subjectPhrase:"Elle", sentence:"Elle est ________ .",
+        base:"fatigué", gender:"f", number:"s", ms:"fatigué", mp:"fatigués", fs:"fatiguée", fp:"fatiguées", answer:"fatiguée" },
+      { id:"accorder-attribut-sujet-n1-02", subjectPhrase:"Les enfants", sentence:"Les enfants sont ________ .",
+        base:"content", gender:"m", number:"p", ms:"content", mp:"contents", fs:"contente", fp:"contentes", answer:"contents" },
+      { id:"accorder-attribut-sujet-n1-03", subjectPhrase:"Il", sentence:"Il semble ________ .",
+        base:"inquiet", gender:"m", number:"s", ms:"inquiet", mp:"inquiets", fs:"inquiète", fp:"inquiètes", answer:"inquiet" },
+      { id:"accorder-attribut-sujet-n1-04", subjectPhrase:"Mes sœurs", sentence:"Mes sœurs paraissent ________ .",
+        base:"heureux", gender:"f", number:"p", ms:"heureux", mp:"heureux", fs:"heureuse", fp:"heureuses", answer:"heureuses" },
+      { id:"accorder-attribut-sujet-n1-05", subjectPhrase:"Le chat", sentence:"Le chat reste ________ .",
+        base:"calme", gender:"m", number:"s", ms:"calme", mp:"calmes", fs:"calme", fp:"calmes", answer:"calme" },
+      { id:"accorder-attribut-sujet-n1-06", subjectPhrase:"La maison", sentence:"La maison est ________ .",
+        base:"ancien", gender:"f", number:"s", ms:"ancien", mp:"anciens", fs:"ancienne", fp:"anciennes", answer:"ancienne" },
+      { id:"accorder-attribut-sujet-n1-07", subjectPhrase:"Les élèves", sentence:"Les élèves deviennent ________ .",
+        base:"silencieux", gender:"m", number:"p", ms:"silencieux", mp:"silencieux", fs:"silencieuse", fp:"silencieuses", answer:"silencieux" },
+      { id:"accorder-attribut-sujet-n1-08", subjectPhrase:"Cette histoire", sentence:"Cette histoire a l'air ________ .",
+        base:"vrai", gender:"f", number:"s", ms:"vrai", mp:"vrais", fs:"vraie", fp:"vraies", answer:"vraie" },
+      { id:"accorder-attribut-sujet-n1-09", subjectPhrase:"Tes cousines", sentence:"Tes cousines semblent ________ .",
+        base:"gentil", gender:"f", number:"p", ms:"gentil", mp:"gentils", fs:"gentille", fp:"gentilles", answer:"gentilles" },
+      { id:"accorder-attribut-sujet-n1-10", subjectPhrase:"Le film", sentence:"Le film est ________ .",
+        base:"long", gender:"m", number:"s", ms:"long", mp:"longs", fs:"longue", fp:"longues", answer:"long" }
+    ],
+
+    /* ── Niveau 2 — saisie libre, sujets pluriels/coordonnés de même genre (10 items) ── */
+    level2Bank: [
+      { id:"accorder-attribut-sujet-n2-01", base:"joli",       sentence:"Les fleurs sont ________ .",              answer:"jolies" },
+      { id:"accorder-attribut-sujet-n2-02", base:"épuisé",     sentence:"Paul et Marc semblent ________ .",        answer:"épuisés" },
+      { id:"accorder-attribut-sujet-n2-03", base:"discret",    sentence:"Mes amies restent ________ .",            answer:"discrètes" },
+      { id:"accorder-attribut-sujet-n2-04", base:"curieux",    sentence:"Les enfants paraissent ________ .",       answer:"curieux" },
+      { id:"accorder-attribut-sujet-n2-05", base:"motivé",     sentence:"Sophie et Léa sont ________ .",           answer:"motivées" },
+      { id:"accorder-attribut-sujet-n2-06", base:"surprenant", sentence:"Les résultats sont ________ .",           answer:"surprenants" },
+      { id:"accorder-attribut-sujet-n2-07", base:"brun",       sentence:"Les feuilles deviennent ________ .",      answer:"brunes" },
+      { id:"accorder-attribut-sujet-n2-08", base:"déçu",       sentence:"Tom et Léo ont l'air ________ .",         answer:"déçus" },
+      { id:"accorder-attribut-sujet-n2-09", base:"agité",      sentence:"Les vagues étaient ________ .",           answer:"agitées" },
+      { id:"accorder-attribut-sujet-n2-10", base:"fier",       sentence:"Les enfants semblent ________ .",         answer:"fiers" }
+    ],
+
+    /* ── Niveau 3 — saisie libre, phrases complexes (10 items) ────────────
+       Sujets coordonnés de genres différents (→ masculin pluriel), sujets
+       collectifs singuliers, vouvoiement de politesse (singulier) vs "vous"
+       réellement pluriel. Pas de sujet "on" (ambiguïté singulier/pluriel
+       volontairement exclue). `note` : rappel de la règle, affiché avec le
+       feedback (succès et échec). ─────────────────────────────────────── */
+    level3Bank: [
+      { id:"accorder-attribut-sujet-n3-01", base:"ravi",       sentence:"Paul et Marie sont ________ .",              answer:"ravis",
+        note:"Sujets coordonnés de genres différents → masculin pluriel." },
+      { id:"accorder-attribut-sujet-n3-02", base:"studieux",   sentence:"La classe est ________ .",                   answer:"studieuse",
+        note:"« La classe » est un sujet collectif singulier (féminin)." },
+      { id:"accorder-attribut-sujet-n3-03", base:"fatigué",    sentence:"Vous êtes ________ , Madame.",               answer:"fatiguée",
+        note:"Vouvoiement de politesse : « vous » désigne une seule personne, féminine." },
+      { id:"accorder-attribut-sujet-n3-04", base:"épanoui",    sentence:"Léa et Thomas paraissent ________ .",        answer:"épanouis",
+        note:"Sujets coordonnés de genres différents → masculin pluriel." },
+      { id:"accorder-attribut-sujet-n3-05", base:"déterminé",  sentence:"L'équipe est ________ .",                    answer:"déterminée",
+        note:"« L'équipe » est un sujet collectif singulier (féminin)." },
+      { id:"accorder-attribut-sujet-n3-06", base:"inquiet",    sentence:"Vous semblez ________ , Monsieur.",          answer:"inquiet",
+        note:"Vouvoiement de politesse : « vous » désigne une seule personne, masculine." },
+      { id:"accorder-attribut-sujet-n3-07", base:"content",    sentence:"Ma sœur et mon frère sont ________ .",       answer:"contents",
+        note:"Sujets coordonnés de genres différents → masculin pluriel." },
+      { id:"accorder-attribut-sujet-n3-08", base:"bruyant",    sentence:"La foule était ________ .",                  answer:"bruyante",
+        note:"« La foule » est un sujet collectif singulier (féminin)." },
+      { id:"accorder-attribut-sujet-n3-09", base:"épuisé",     sentence:"Vous paraissez ________ , les enfants.",     answer:"épuisés",
+        note:"Piège : ici « vous » est un vrai pluriel (« les enfants »), pas un vouvoiement de politesse." },
+      { id:"accorder-attribut-sujet-n3-10", base:"silencieux", sentence:"Le groupe reste ________ .",                 answer:"silencieux",
+        note:"« Le groupe » est un sujet collectif singulier (masculin)." }
+    ]
+  },
+
   "identifier-adverbe": {
     title: "Identifier les adverbes",
     domaine:    "Français",
