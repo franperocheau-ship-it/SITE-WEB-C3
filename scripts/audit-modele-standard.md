@@ -7,10 +7,10 @@ Norme auditée : chaque compétence doit utiliser exactement le moteur standard 
 ## Résumé
 
 - Compétences auditées : 126
-- STRUCTURE ANORMALE (moteur/rendu dédié ou nombre de niveaux ≠ 3) : 70
+- STRUCTURE ANORMALE (moteur/rendu dédié ou nombre de niveaux ≠ 3) : 69
 - Au moins un niveau en MANQUE (< 10 items) : 0
 - Au moins un niveau en SURPLUS (> 10 items) : 21
-- Entièrement OK (3 × 10 items, moteur standard) : 35
+- Entièrement OK (3 × 10 items, moteur standard) : 36
 
 ---
 
@@ -428,12 +428,6 @@ Fichier : data/fractions.js
 Statut : STRUCTURE ANORMALE
 Détail : Banque unique "bank" filtrée par champ "level" (3 valeur(s) distinctes) au lieu de level1Bank/level2Bank/level3Bank — level="CM1": 12 · level="CM2": 12 · level="6e": 12.
 
-## identifier-attribut-sujet — Identifier un attribut du sujet
-
-Fichier : data/grammaire.js
-Statut : STRUCTURE ANORMALE
-Détail : 2 niveau(x) détecté(s) via level*Bank (level2Bank, level3Bank) au lieu de 3 (level1Bank/level2Bank/level3Bank).
-
 ## ortho-distinguer-a-a — Distinguer a / à
 
 Fichier : data/orthographe-homophones.js
@@ -570,6 +564,7 @@ Détail : Niveau 3 : 12/10 items (2 en surplus)
 - distinguer-conjonctions — Distinguer conjonction de coordination et conjonction de subordination (data/grammaire.js)
 - famille-de-mots — Identifier une famille de mots (data/vocabulaire.js)
 - identifier-adverbe — Identifier les adverbes (data/grammaire.js)
+- identifier-attribut-sujet — Identifier un attribut du sujet (data/grammaire.js)
 - identifier-complement-nom — Identifier un complément du nom (data/grammaire.js)
 - identifier-conjonction-coordination — Identifier une conjonction de coordination (data/grammaire.js)
 - identifier-conjonction-subordination — Identifier une conjonction de subordination (data/grammaire.js)

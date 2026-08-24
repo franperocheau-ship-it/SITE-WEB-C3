@@ -157,40 +157,85 @@ Object.assign(window.EXERCISE_DATA, {
     competence: "Grammaire — L'attribut du sujet",
     type:       "homophones-niveaux",
     levels:     ["CM2", "6e"],
+    paliers:    3,
     backLink:   { href: "français-grammaire.html", label: "Grammaire" },
     levelDescs: {
-      "CM2": "Relier dans l'ordre le nom, l'adjectif attribut et le verbe d'état",
-      "6e":  "Distinguer l'adjectif attribut du sujet de l'adjectif épithète"
+      "niveau1": "Reconnaître un verbe d'état parmi des verbes d'action",
+      "niveau2": "Relier dans l'ordre le nom, l'adjectif attribut et le verbe d'état",
+      "niveau3": "Distinguer l'adjectif attribut du sujet de l'adjectif épithète"
     },
     homoShuffle: [false, true, false],
 
-    /* Refonte en niveaux CM2/6e (level2Bank/level3Bank), moteur générique
-       "homophones-niveaux" — même schéma qu'identifier-adjectif/
+    /* Refonte en 3 niveaux (level1Bank/level2Bank/level3Bank), moteur
+       générique "homophones-niveaux" — même schéma qu'identifier-adjectif/
        identifier-nom-phrase (aucun nouveau moteur dédié : chaque item porte
        son propre `type`, dispatché dans showQuestion() vers les renderers
-       standards). Les deux niveaux s'appuient sur une extension générique
+       standards). Les niveaux 2 et 3 s'appuient sur une extension générique
        et rétrocompatible ajoutée pour cette compétence : renderMotsCliquables
        accepte désormais un champ `steps` optionnel (liste ordonnée de
        { instruction, targets, cssClass }) pour un enchaînement de clics à
        rôles distincts — sans `steps`, un item "mots-cliquables" se comporte
        exactement comme avant. Réutilisable par toute future compétence.
 
-       Notion introduite au programme à partir du CM2 (pas de niveau CM1) :
-       bankKeyMap dans exercise.html mappe les clés de niveau par leur nom
-       ("CM2"→level2Bank, "6e"→level3Bank), donc les clés de banque restent
-       level2Bank/level3Bank même si level1Bank n'existe plus.
+       Historique : level1Bank a été retiré par erreur dans un commit sans
+       rapport (daea045, module dictées) avec le raisonnement "notion non
+       abordée avant le CM2", en coupant levels à ["CM2","6e"]. Mais la
+       notion d'attribut du sujet n'est en effet pas enseignée avant le CM2
+       (cf. distinguer-attribut-sujet-complement-objet, qui cite cette
+       compétence en précédent) — la bonne solution, adoptée depuis pour
+       cette compétence sœur, n'est pas de supprimer le niveau mais de garder
+       3 paliers de difficulté interne génériques (paliers:3, onglets
+       "niveau1/niveau2/niveau3" non liés aux classes) : restauré ici à
+       l'identique du contenu d'origine (commit 5bd05e8).
 
-       Niveau CM2 (level2Bank) : mots-cliquables en 3 étapes séquentielles
+       Niveau 1 (level1Bank) : choix-etiquette — trouver le verbe d'état
+       parmi 3 verbes d'action, temps variés (présent/imparfait/passé
+       composé) pour ne pas faire reposer la reconnaissance sur la
+       terminaison plutôt que sur le sens.
+       Niveau 2 (level2Bank) : mots-cliquables en 3 étapes séquentielles
        (nom → jaune, adjectif attribut → turquoise, verbe d'état → navy
        encadré) sur des phrases à un seul GN sujet et un seul adjectif
        candidat (pas de piège nom/adjectif à ce niveau, l'enjeu est
        l'enchaînement des 3 rôles).
-       Niveau 6e (level3Bank) : mots-cliquables en 3 étapes (nom → jaune,
+       Niveau 3 (level3Bank) : mots-cliquables en 3 étapes (nom → jaune,
        adjectif attribut → turquoise, TOUS les adjectifs épithètes de la
        phrase → gold) sur des phrases contenant 1 ou 2 épithètes en plus de
        l'attribut — l'étape 3 accepte plusieurs cibles (cf. `targets` à 2
        éléments) et l'attribut déjà trouvé à l'étape 2 est verrouillé
        (disabled), donc jamais re-cliquable par erreur à l'étape 3. */
+
+    level1Bank: [
+      { id:"identifier-attribut-sujet-n1-01", type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"est · court · joue · mange", choices:["est","court","joue","mange"], answer:"est",
+        hint:"« être » est un verbe d'état : il ne montre pas une action, il relie le sujet à ce qu'on dit de lui." },
+      { id:"identifier-attribut-sujet-n1-02", type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"semble · dessine · chante · saute", choices:["semble","dessine","chante","saute"], answer:"semble",
+        hint:"« sembler » est un verbe d'état : il indique une apparence, pas une action." },
+      { id:"identifier-attribut-sujet-n1-03", type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"deviennent · parlent · écoutent · lisent", choices:["deviennent","parlent","écoutent","lisent"], answer:"deviennent",
+        hint:"« devenir » est un verbe d'état : il indique un changement d'état, pas une action." },
+      { id:"identifier-attribut-sujet-n1-04", type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"paraît · travaille · nage · écrit", choices:["paraît","travaille","nage","écrit"], answer:"paraît",
+        hint:"« paraître » est un verbe d'état : il indique une apparence, pas une action." },
+      { id:"identifier-attribut-sujet-n1-05", type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"reste · marche · dort · crie", choices:["reste","marche","dort","crie"], answer:"reste",
+        hint:"« rester » est un verbe d'état ici : le sujet garde un état, il ne fait pas d'action." },
+      { id:"identifier-attribut-sujet-n1-06", type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes (ou groupes de mots).",
+        word:"ont l'air · construisent · réparent · jettent", choices:["ont l'air","construisent","réparent","jettent"], answer:"ont l'air",
+        hint:"« avoir l'air » est une expression verbale d'état : elle indique une apparence, comme « sembler »." },
+      { id:"identifier-attribut-sujet-n1-07", type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"étaient · couraient · dansaient · pleuraient", choices:["étaient","couraient","dansaient","pleuraient"], answer:"étaient",
+        hint:"« être » à l'imparfait reste un verbe d'état : il ne montre pas d'action." },
+      { id:"identifier-attribut-sujet-n1-08", type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"semblait · regardait · tombait · criait", choices:["semblait","regardait","tombait","criait"], answer:"semblait",
+        hint:"« sembler » à l'imparfait est un verbe d'état : il indique une apparence." },
+      { id:"identifier-attribut-sujet-n1-09", type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes (ou groupes de mots).",
+        word:"est devenu · a grandi · a couru · a sauté", choices:["est devenu","a grandi","a couru","a sauté"], answer:"est devenu",
+        hint:"« devenir » au passé composé reste un verbe d'état : il indique un changement d'état, pas une action." },
+      { id:"identifier-attribut-sujet-n1-10", type:"choix-etiquette", instruction:"Trouve le verbe d'état parmi ces 4 verbes.",
+        word:"restent · jouent · mangent · dessinent", choices:["restent","jouent","mangent","dessinent"], answer:"restent",
+        hint:"« rester » est un verbe d'état ici : le sujet garde un état, il ne fait pas d'action." }
+    ],
 
     level2Bank: [
       { id:"identifier-attribut-sujet-n2-01", type:"mots-cliquables", sentence:"Le ciel est gris .",
