@@ -2123,7 +2123,7 @@ Object.assign(window.EXERCISE_DATA, {
       "CM2": "Pronominaux et pièges (avoir lui-même, être lui-même, passer…)",
       "6e":  "Verbes à double auxiliaire selon le sens (monter, sortir…)"
     },
-    questionsPerSession: 12,
+    questionsPerSession: 10,
     backLink: { href: "français-conjugaison.html", label: "Conjugaison" },
 
     /* Niveau 1 — verbes clairement être ou avoir, cas non ambigus */

@@ -4832,6 +4832,50 @@
 
     function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
+    /* ── Rotation anti-répétition ─────────────────────────────────────────────
+       Tire `n` items dans `bank` pour une compétence/niveau dont la banque
+       peut dépasser le format standard (10 items servis). Sans effet quand
+       la banque compte déjà n items ou moins : sert la banque telle quelle
+       (ou mélangée si opts.alwaysShuffleOrder, pour préserver le comportement
+       des appelants qui mélangeaient déjà l'ordre inconditionnellement) — les
+       compétences à effectif exact ne sont donc pas affectées.
+       Quand la banque dépasse n : tire n items au hasard en excluant si
+       possible le lot exact servi à la tentative précédente (IDs mémorisés en
+       sessionStorage sous `examRotation:<rotationKey>`, propre à cet onglet) ;
+       si la banque ne contient pas assez d'items hors de ce lot, retombe sur
+       un tirage simple dans la banque entière. Voir scripts/rapport-rotation.md
+       pour le détail par compétence. ────────────────────────────────────── */
+    function pickRotatedItems(bank, rotationKey, n, opts) {
+      opts = opts || {};
+      if (!Array.isArray(bank) || bank.length === 0) return [];
+      const count = n || bank.length;
+      if (bank.length <= count) {
+        return opts.alwaysShuffleOrder ? shuffle([...bank]) : [...bank];
+      }
+
+      const keyed = bank.map((item, i) => ({
+        item,
+        key: (item && item.id != null) ? String(item.id) : ('idx-' + i)
+      }));
+
+      const storageKey = 'examRotation:' + rotationKey;
+      let previousKeys = [];
+      try {
+        previousKeys = JSON.parse(sessionStorage.getItem(storageKey) || '[]');
+      } catch (e) { previousKeys = []; }
+      const previousSet = new Set(previousKeys);
+
+      const complement = keyed.filter(k => !previousSet.has(k.key));
+      const pool         = complement.length >= count ? complement : keyed;
+      const pickedKeyed  = shuffle(pool).slice(0, count);
+
+      try {
+        sessionStorage.setItem(storageKey, JSON.stringify(pickedKeyed.map(k => k.key)));
+      } catch (e) { /* sessionStorage indisponible (navigation privée…) : tirage non mémorisé, sans impact fonctionnel */ }
+
+      return pickedKeyed.map(k => k.item);
+    }
+
     /* q.id n'existe que sur les items déjà migrés vers un id stable
        (scripts/add-item-ids.js) : sans id, no-op — n'affecte aucun type qui
        n'est pas encore couvert par le suivi granulaire.
@@ -5280,7 +5324,9 @@
         homoLevel    = lv;
         homoLevelNum = shuffleIdx[lv] + 1;
         const bank = sessionData[bankKeyMap[lv]] || [];
-        questions  = doShuffle[shuffleIdx[lv]] ? shuffle([...bank]) : [...bank];
+        const n    = sessionData.questionsPerSession || 10;
+        const selected = pickRotatedItems(bank, slug + ':homo:' + lv, n);
+        questions  = doShuffle[shuffleIdx[lv]] ? shuffle(selected) : selected;
         currentIndex = 0;
         score        = 0;
         itemResults  = [];
@@ -11662,7 +11708,8 @@
       const bankKey = lv === 1 ? 'level1Bank' : lv === 2 ? 'level2Bank' : 'level3Bank';
       const bank    = sessionData[bankKey] || [];
       const n       = sessionData.questionsPerSession || bank.length;
-      const items   = apcShuffle([...bank]).slice(0, n);
+      const slug    = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      const items   = pickRotatedItems(bank, slug + ':apc:' + lv, n, { alwaysShuffleOrder: true });
 
       apcState = { lv, items, idx: 0, score: 0, total: items.length };
       itemResults = [];
@@ -15503,7 +15550,8 @@
       const bankKey = lv === 1 ? 'level1Bank' : lv === 2 ? 'level2Bank' : 'level3Bank';
       const bank    = sessionData[bankKey] || [];
       const n       = sessionData.questionsPerSession || 10;
-      const items   = pcaShuffle([...bank]).slice(0, n);
+      const slug    = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      const items   = pickRotatedItems(bank, slug + ':pca:' + lv, n, { alwaysShuffleOrder: true });
 
       pcaState = {
         lv, items,
@@ -15907,7 +15955,8 @@
       const bankKey = lv === 1 ? 'level1Bank' : lv === 2 ? 'level2Bank' : 'level3Bank';
       const bank    = sessionData[bankKey] || [];
       const n       = sessionData.questionsPerSession || bank.length;
-      const items   = eoaShuffle([...bank]).slice(0, n);
+      const slug    = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      const items   = pickRotatedItems(bank, slug + ':eoa:' + lv, n, { alwaysShuffleOrder: true });
 
       eoaState = { lv, items, idx: 0, rawScore: 0, rawMax: 0 };
       itemResults = [];
@@ -16223,7 +16272,8 @@
       const bankKey = lv === 1 ? 'level1Bank' : lv === 2 ? 'level2Bank' : 'level3Bank';
       const bank    = sessionData[bankKey] || [];
       const n       = sessionData.questionsPerSession || bank.length;
-      const items   = pceShuffle([...bank]).slice(0, n);
+      const slug    = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      const items   = pickRotatedItems(bank, slug + ':pce:' + lv, n, { alwaysShuffleOrder: true });
 
       pceState = { lv, items, idx: 0, score: 0, total: items.length };
       itemResults = [];
@@ -31645,7 +31695,10 @@
 
     function dpscStartLevel(lv) {
       const bankKey = 'level' + lv + 'Bank';
-      const items   = shuffle([...(sessionData[bankKey] || [])]);
+      const bank    = sessionData[bankKey] || [];
+      const n       = sessionData.questionsPerSession || 10;
+      const slug    = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      const items   = pickRotatedItems(bank, slug + ':dpsc:' + lv, n, { alwaysShuffleOrder: true });
       dpscState = { lv, items, idx: 0, score: 0, total: items.length };
       itemResults = [];
       attemptId   = crypto.randomUUID();
@@ -32069,7 +32122,10 @@
 
     function ijStartLevel(lv) {
       const bankKey = 'level' + lv + 'Bank';
-      const items   = shuffle([...(sessionData[bankKey] || [])]);
+      const bank    = sessionData[bankKey] || [];
+      const n       = sessionData.questionsPerSession || 10;
+      const slug    = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      const items   = pickRotatedItems(bank, slug + ':ij:' + lv, n, { alwaysShuffleOrder: true });
       ijState = { lv, items, idx: 0, score: 0, total: items.length };
       itemResults = [];
       attemptId   = crypto.randomUUID();
@@ -32474,7 +32530,10 @@
 
     function isStartLevel(lv) {
       const bankKey = 'level' + lv + 'Bank';
-      const items   = shuffle([...(sessionData[bankKey] || [])]);
+      const bank    = sessionData[bankKey] || [];
+      const n       = sessionData.questionsPerSession || 10;
+      const slug    = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      const items   = pickRotatedItems(bank, slug + ':is:' + lv, n, { alwaysShuffleOrder: true });
       isState = { lv, items, idx: 0, score: 0, total: items.length };
       itemResults = [];
       attemptId   = crypto.randomUUID();
@@ -32904,7 +32963,10 @@
 
     function dcsStartLevel(lv) {
       const bankKey = 'level' + lv + 'Bank';
-      const items   = shuffle([...(sessionData[bankKey] || [])]);
+      const bank    = sessionData[bankKey] || [];
+      const n       = sessionData.questionsPerSession || 10;
+      const slug    = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      const items   = pickRotatedItems(bank, slug + ':dcs:' + lv, n, { alwaysShuffleOrder: true });
       dcsState = { lv, items, idx: 0, score: 0, total: items.length };
       itemResults = [];
       attemptId   = crypto.randomUUID();

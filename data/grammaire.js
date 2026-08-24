@@ -1756,6 +1756,15 @@ Object.assign(window.EXERCISE_DATA, {
         step2Instruction: "Cette phrase est-elle simple ou complexe ?",
         classifyChoices: ["simple", "complexe"],
         step2Answer: "complexe"
+      },
+      { id:"distinguer-phrase-simple-complexe-n2-10",
+        instruction: "Identifie le(s) verbe(s) conjugué(s), puis classe la phrase.",
+        sentence: "Théo range sa chambre puis il descend goûter.",
+        step1Instruction: "Clique sur le(s) verbe(s) conjugué(s).",
+        step1Targets: ["range", "descend"],
+        step2Instruction: "Cette phrase est-elle simple ou complexe ?",
+        classifyChoices: ["simple", "complexe"],
+        step2Answer: "complexe"
       }
     ],
 
@@ -2367,6 +2376,10 @@ Object.assign(window.EXERCISE_DATA, {
       { id:"identifier-subordination-n2-09",
         instruction: "Clique sur le mot ou la ponctuation qui relie les deux propositions.",
         partA: "Le vent souffle fort", partB: "les feuilles tombent", link: ";", linkType: "juxtaposition"
+      },
+      { id:"identifier-subordination-n2-10",
+        instruction: "Clique sur le mot ou la ponctuation qui relie les deux propositions.",
+        partA: "Le réveil sonne", partB: "Léo se lève aussitôt", link: ",", linkType: "juxtaposition"
       }
     ],
 
@@ -2551,6 +2564,10 @@ Object.assign(window.EXERCISE_DATA, {
       { id:"distinguer-coordination-subordination-n2-09",
         instruction: "Clique sur le mot (ou les mots) qui relient les deux propositions.",
         partA: "Le ciel devient sombre", partB: "l'orage approche", link: "or", linkType: "coordination"
+      },
+      { id:"distinguer-coordination-subordination-n2-10",
+        instruction: "Clique sur le mot (ou les mots) qui relient les deux propositions.",
+        partA: "Le chat dort", partB: "le chien surveille la maison", link: "et", linkType: "coordination"
       }
     ],
 
