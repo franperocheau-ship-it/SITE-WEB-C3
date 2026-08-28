@@ -1146,7 +1146,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       { id:"polysemie-n1-02",
         type: "mcq",
-        instruction: "Le mot 'voler' peut signifier : 1. Se déplacer dans les airs  2. Prendre ce qui ne m'appartient pas. Combien de sens a-t-il ?",
+        instruction: "Le mot 'voler' peut désigner le fait de se déplacer dans les airs comme un oiseau, ou bien le fait de prendre ce qui ne nous appartient pas. Ce mot a-t-il un seul sens ou plusieurs sens différents ?",
         choices: ["Un seul sens", "Deux sens", "Trois sens", "Aucun sens"],
         answer: "Deux sens",
         feedback: "Voler est polysémique : il a au moins deux sens différents. 'L'oiseau vole' (dans les airs) et 'Il a volé mon sac' (dérober) n'expriment pas du tout la même idée."
@@ -1174,20 +1174,20 @@ Object.assign(window.EXERCISE_DATA, {
         type: "mcq",
         instruction: "Quel mot est polysémique ?",
         choices: [
-          "stylo (un seul sens)",
-          "table (meuble, repas, liste…)",
-          "crayon (un seul sens)",
-          "gomme (uniquement pour effacer)"
+          "stylo",
+          "table",
+          "crayon",
+          "gomme"
         ],
-        answer: "table (meuble, repas, liste…)",
+        answer: "table",
         feedback: "Table est polysémique : meuble (table de cuisine), repas (tenir une bonne table), liste (table de multiplication). Les autres mots ont un sens principal."
       },
       { id:"polysemie-n1-06",
         type: "mcq",
-        instruction: "Combien de sens différents le mot 'glace' peut-il avoir : 1. Eau gelée  2. Dessert froid sucré  3. Miroir ?",
-        choices: ["Un seul sens", "Deux sens", "Trois sens", "Aucun sens"],
-        answer: "Trois sens",
-        feedback: "Glace est polysémique : on patine sur la glace (eau gelée), on mange une glace (dessert), on se regarde dans la glace (miroir). Trois sens bien différents."
+        instruction: "Dans « La glace du lac a craqué sous nos pas », que signifie 'glace' ?",
+        choices: ["De l'eau gelée", "Un dessert froid et sucré", "Un miroir", "Une couleur"],
+        answer: "De l'eau gelée",
+        feedback: "Le contexte (le lac, craquer sous les pas) indique l'eau gelée. Glace est aussi polysémique : on mange une glace (dessert), on se regarde dans la glace (miroir)."
       },
       { id:"polysemie-n1-07",
         type: "mcq",
@@ -1203,21 +1203,21 @@ Object.assign(window.EXERCISE_DATA, {
       },
       { id:"polysemie-n1-08",
         type: "mcq",
-        instruction: "Le mot 'note' peut signifier : 1. Un résultat scolaire  2. Un son de musique. Combien de sens a-t-il dans ces deux exemples ?",
-        choices: ["Un seul sens", "Deux sens", "Trois sens", "Aucun sens"],
-        answer: "Deux sens",
-        feedback: "Note est polysémique : 'j'ai eu une bonne note' (résultat scolaire) et 'jouer une note' (son de musique) sont deux sens bien distincts."
+        instruction: "Dans « Elle a eu une bonne note à son contrôle », que signifie 'note' ?",
+        choices: ["Un résultat scolaire", "Un son de musique", "Un message écrit", "Un ticket de caisse"],
+        answer: "Un résultat scolaire",
+        feedback: "Le contexte (contrôle) indique le résultat scolaire. Note est aussi polysémique : 'jouer une note' (son de musique), 'laisser une note' (message écrit)."
       },
       { id:"polysemie-n1-09",
         type: "mcq",
         instruction: "Quel mot est polysémique ?",
         choices: [
-          "trousse (un seul sens)",
-          "carte (jeu, géographie, restaurant…)",
-          "taille-crayon (un seul sens)",
-          "agrafeuse (un seul sens)"
+          "trousse",
+          "carte",
+          "taille-crayon",
+          "agrafeuse"
         ],
-        answer: "carte (jeu, géographie, restaurant…)",
+        answer: "carte",
         feedback: "Carte est polysémique : carte à jouer, carte de géographie, carte de restaurant, carte bancaire. Les autres mots ont un sens unique."
       },
       { id:"polysemie-n1-10",
@@ -1225,11 +1225,11 @@ Object.assign(window.EXERCISE_DATA, {
         instruction: "Dans « Range ta feuille dans ton classeur », que signifie 'feuille' ?",
         choices: [
           "Une partie d'une plante",
-          "Une feuille de papier",
+          "Un morceau de papier pour écrire",
           "Une fine plaque de métal",
           "Un journal"
         ],
-        answer: "Une feuille de papier",
+        answer: "Un morceau de papier pour écrire",
         feedback: "Le contexte (ranger dans un classeur) indique une feuille de papier. 'Feuille' peut aussi désigner une partie de plante ou une fine plaque de métal."
       }
     ],

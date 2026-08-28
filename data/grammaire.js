@@ -5048,6 +5048,183 @@ Object.assign(window.EXERCISE_DATA, {
     ]
   },
 
+  "differencier-cc-temps-lieu-cause": {
+    title:      "Différencier les compléments circonstanciels de temps, de lieu et de cause",
+    domaine:    "Français",
+    competence: "Grammaire — Les compléments circonstanciels",
+    type:       "homophones-niveaux",
+    levels:     ["CM2", "6e"],
+    paliers:    3,
+    backLink:   { href: "français-grammaire.html", label: "Grammaire" },
+    levelDescs: {
+      "niveau1": "Reconnaître la nature d'un complément circonstanciel déjà repéré",
+      "niveau2": "Repérer par soi-même le complément circonstanciel d'une phrase, puis indiquer sa nature",
+      "niveau3": "Repérer un complément circonstanciel précis parmi deux compléments de nature différente"
+    },
+    homoShuffle: [false, true, false],
+
+    /* Compétence réservée à CM2/6e (levels:["CM2","6e"]) avec 3 paliers de
+       difficulté internes (progression de repérage, pas de contenu propre
+       à chaque classe) : mêmes onglets génériques "niveau1/niveau2/niveau3"
+       qu'identifier-pronom-complement-objet. Moteur générique
+       "homophones-niveaux" — aucun moteur dédié.
+
+       Niveau 1 (choix-etiquette) : CC déjà surligné dans la phrase, QCM à
+       3 choix fixes "Lieu"/"Temps"/"Cause" (fixedChoiceOrder), aucun piège
+       de nature — l'enjeu est uniquement de reconnaître le sens du CC.
+       Niveau 2 (classification-etapes, une phrase dédiée par item — pas de
+       texte partagé) : un seul CC réel par phrase, consigne générique
+       ("Clique sur le complément circonstanciel de cette phrase.") qui ne
+       révèle pas la réponse — retour utilisateur du 2026-08-23 : nommer les
+       mots à cliquer "n'était pas intéressant pédagogiquement". Chaque
+       phrase est construite pour n'avoir qu'un seul segment qui corresponde
+       à Lieu/Temps/Cause (vérifié à la main), plusieurs avec un piège de
+       complément essentiel déjà éprouvé sur identifier-groupe-circonstanciel
+       (verbes "aller"/"regagner" + lieu) — le moteur classification-etapes
+       n'a pas de piège cliquable avec message (contrairement à
+       mots-cliquables), donc un clic sur le piège est juste marqué faux
+       (feedback générique), sans explication dédiée.
+       Niveau 3 (mots-cliquables) : chaque phrase contient 2 CC de nature
+       différente, une question à la fois (clique sur celui demandé),
+       piège informatif au clic sur l'autre CC. Item "à la maison / à cause
+       de la pluie" reformulé en "chez lui / à cause de la pluie" pour
+       éviter la collision « à »/« la » répétés (targets.includes(clean)
+       matche par chaîne, pas par position — cf. documentation du moteur).
+       Niveau 2 et 3 permutés le 2026-08-23 sur demande utilisateur : "un cc
+       à identifier" (seul, sans indice de nature) en niveau 2, "plusieurs"
+       (deux CC par phrase) en niveau 3 — contenu inchangé, seuls les ids
+       (n2- et n3-) et l'ordre des deux banques ont été échangés. */
+
+    level1Bank: [
+      { id:"differencier-cc-temps-lieu-cause-n1-01", type:"choix-etiquette", instruction:"Quelle est la nature du complément circonstanciel souligné ?",
+        word:"Il range ses affaires <span class='ex-teal-hl'>dans son armoire</span> .", choices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, answer:"Lieu",
+        wrongFeedback:"Pose-toi la question adaptée : lieu → « où ? », temps → « quand ? », cause → « pourquoi ? ».",
+        hint:"« dans son armoire » répond à la question où ? : c'est un complément circonstanciel de lieu." },
+      { id:"differencier-cc-temps-lieu-cause-n1-02", type:"choix-etiquette", instruction:"Quelle est la nature du complément circonstanciel souligné ?",
+        word:"Nous partirons <span class='ex-teal-hl'>demain matin</span> .", choices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, answer:"Temps",
+        wrongFeedback:"Pose-toi la question adaptée : lieu → « où ? », temps → « quand ? », cause → « pourquoi ? ».",
+        hint:"« demain matin » répond à la question quand ? : c'est un complément circonstanciel de temps." },
+      { id:"differencier-cc-temps-lieu-cause-n1-03", type:"choix-etiquette", instruction:"Quelle est la nature du complément circonstanciel souligné ?",
+        word:"Elle a réussi <span class='ex-teal-hl'>grâce à ses efforts</span> .", choices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, answer:"Cause",
+        wrongFeedback:"Pose-toi la question adaptée : lieu → « où ? », temps → « quand ? », cause → « pourquoi ? ».",
+        hint:"« grâce à ses efforts » répond à la question pourquoi ? : c'est un complément circonstanciel de cause." },
+      { id:"differencier-cc-temps-lieu-cause-n1-04", type:"choix-etiquette", instruction:"Quelle est la nature du complément circonstanciel souligné ?",
+        word:"Les enfants jouent <span class='ex-teal-hl'>dans le jardin</span> .", choices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, answer:"Lieu",
+        wrongFeedback:"Pose-toi la question adaptée : lieu → « où ? », temps → « quand ? », cause → « pourquoi ? ».",
+        hint:"« dans le jardin » répond à la question où ? : c'est un complément circonstanciel de lieu." },
+      { id:"differencier-cc-temps-lieu-cause-n1-05", type:"choix-etiquette", instruction:"Quelle est la nature du complément circonstanciel souligné ?",
+        word:"<span class='ex-teal-hl'>Pendant les vacances</span> , nous irons à la mer .", choices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, answer:"Temps",
+        wrongFeedback:"Pose-toi la question adaptée : lieu → « où ? », temps → « quand ? », cause → « pourquoi ? ».",
+        hint:"« Pendant les vacances » répond à la question quand ? : c'est un complément circonstanciel de temps." },
+      { id:"differencier-cc-temps-lieu-cause-n1-06", type:"choix-etiquette", instruction:"Quelle est la nature du complément circonstanciel souligné ?",
+        word:"Il a raté le bus <span class='ex-teal-hl'>à cause de la pluie</span> .", choices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, answer:"Cause",
+        wrongFeedback:"Pose-toi la question adaptée : lieu → « où ? », temps → « quand ? », cause → « pourquoi ? ».",
+        hint:"« à cause de la pluie » répond à la question pourquoi ? : c'est un complément circonstanciel de cause." },
+      { id:"differencier-cc-temps-lieu-cause-n1-07", type:"choix-etiquette", instruction:"Quelle est la nature du complément circonstanciel souligné ?",
+        word:"Il se sent bien <span class='ex-teal-hl'>chez ses grands-parents</span> .", choices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, answer:"Lieu",
+        wrongFeedback:"Pose-toi la question adaptée : lieu → « où ? », temps → « quand ? », cause → « pourquoi ? ».",
+        hint:"« chez ses grands-parents » répond à la question où ? : c'est un complément circonstanciel de lieu." },
+      { id:"differencier-cc-temps-lieu-cause-n1-08", type:"choix-etiquette", instruction:"Quelle est la nature du complément circonstanciel souligné ?",
+        word:"<span class='ex-teal-hl'>Avant de partir</span> , vérifie que tout est éteint .", choices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, answer:"Temps",
+        wrongFeedback:"Pose-toi la question adaptée : lieu → « où ? », temps → « quand ? », cause → « pourquoi ? ».",
+        hint:"« Avant de partir » répond à la question quand ? : c'est un complément circonstanciel de temps." },
+      { id:"differencier-cc-temps-lieu-cause-n1-09", type:"choix-etiquette", instruction:"Quelle est la nature du complément circonstanciel souligné ?",
+        word:"<span class='ex-teal-hl'>Comme il était fatigué</span> , il s'est couché tôt .", choices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, answer:"Cause",
+        wrongFeedback:"Pose-toi la question adaptée : lieu → « où ? », temps → « quand ? », cause → « pourquoi ? ».",
+        hint:"« Comme il était fatigué » répond à la question pourquoi ? : c'est un complément circonstanciel de cause." },
+      { id:"differencier-cc-temps-lieu-cause-n1-10", type:"choix-etiquette", instruction:"Quelle est la nature du complément circonstanciel souligné ?",
+        word:"Le chat dort <span class='ex-teal-hl'>sur le canapé</span> .", choices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, answer:"Lieu",
+        wrongFeedback:"Pose-toi la question adaptée : lieu → « où ? », temps → « quand ? », cause → « pourquoi ? ».",
+        hint:"« sur le canapé » répond à la question où ? : c'est un complément circonstanciel de lieu." }
+    ],
+
+    level2Bank: [
+      { id:"differencier-cc-temps-lieu-cause-n2-01", type:"classification-etapes",
+        instruction:"Trouve le complément circonstanciel de la phrase, puis indique sa nature.",
+        sentence:"Les campeurs ont installé leur tente au bord du lac .",
+        step1Instruction:"Clique sur le complément circonstanciel de cette phrase.", step1Targets:["au","bord","du","lac"],
+        step2Instruction:"Quelle est la nature de ce complément circonstanciel ?", classifyChoices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, step2Answer:"Lieu" },
+      { id:"differencier-cc-temps-lieu-cause-n2-02", type:"classification-etapes",
+        instruction:"Trouve le complément circonstanciel de la phrase, puis indique sa nature.",
+        sentence:"Les résultats seront publiés en fin de semaine .",
+        step1Instruction:"Clique sur le complément circonstanciel de cette phrase.", step1Targets:["en","fin","de","semaine"],
+        step2Instruction:"Quelle est la nature de ce complément circonstanciel ?", classifyChoices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, step2Answer:"Temps" },
+      { id:"differencier-cc-temps-lieu-cause-n2-03", type:"classification-etapes",
+        instruction:"Trouve le complément circonstanciel de la phrase, puis indique sa nature.",
+        sentence:"La sortie a été annulée en raison de la pluie .",
+        step1Instruction:"Clique sur le complément circonstanciel de cette phrase.", step1Targets:["en","raison","de","la","pluie"],
+        step2Instruction:"Quelle est la nature de ce complément circonstanciel ?", classifyChoices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, step2Answer:"Cause" },
+      { id:"differencier-cc-temps-lieu-cause-n2-04", type:"classification-etapes",
+        instruction:"Trouve le complément circonstanciel de la phrase, puis indique sa nature.",
+        sentence:"Chaque samedi , Léa va au marché .",
+        step1Instruction:"Clique sur le complément circonstanciel de cette phrase.", step1Targets:["Chaque","samedi"],
+        step2Instruction:"Quelle est la nature de ce complément circonstanciel ?", classifyChoices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, step2Answer:"Temps" },
+      { id:"differencier-cc-temps-lieu-cause-n2-05", type:"classification-etapes",
+        instruction:"Trouve le complément circonstanciel de la phrase, puis indique sa nature.",
+        sentence:"Comme il était très fatigué , Tom s'est couché .",
+        step1Instruction:"Clique sur le complément circonstanciel de cette phrase.", step1Targets:["Comme","il","était","très","fatigué"],
+        step2Instruction:"Quelle est la nature de ce complément circonstanciel ?", classifyChoices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, step2Answer:"Cause" },
+      { id:"differencier-cc-temps-lieu-cause-n2-06", type:"classification-etapes",
+        instruction:"Trouve le complément circonstanciel de la phrase, puis indique sa nature.",
+        sentence:"Le facteur dépose le courrier dans la boîte aux lettres .",
+        step1Instruction:"Clique sur le complément circonstanciel de cette phrase.", step1Targets:["dans","la","boîte","aux","lettres"],
+        step2Instruction:"Quelle est la nature de ce complément circonstanciel ?", classifyChoices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, step2Answer:"Lieu" },
+      { id:"differencier-cc-temps-lieu-cause-n2-07", type:"classification-etapes",
+        instruction:"Trouve le complément circonstanciel de la phrase, puis indique sa nature.",
+        sentence:"Avant la tombée de la nuit , les oiseaux regagnent leur nid .",
+        step1Instruction:"Clique sur le complément circonstanciel de cette phrase.", step1Targets:["Avant","la","tombée","de","la","nuit"],
+        step2Instruction:"Quelle est la nature de ce complément circonstanciel ?", classifyChoices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, step2Answer:"Temps" },
+      { id:"differencier-cc-temps-lieu-cause-n2-08", type:"classification-etapes",
+        instruction:"Trouve le complément circonstanciel de la phrase, puis indique sa nature.",
+        sentence:"Grâce à l' aide de ses amis , Marc a terminé son exposé .",
+        step1Instruction:"Clique sur le complément circonstanciel de cette phrase.", step1Targets:["Grâce","à","l","aide","de","ses","amis"],
+        step2Instruction:"Quelle est la nature de ce complément circonstanciel ?", classifyChoices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, step2Answer:"Cause" },
+      { id:"differencier-cc-temps-lieu-cause-n2-09", type:"classification-etapes",
+        instruction:"Trouve le complément circonstanciel de la phrase, puis indique sa nature.",
+        sentence:"Les moutons paissent tranquillement dans la prairie .",
+        step1Instruction:"Clique sur le complément circonstanciel de cette phrase.", step1Targets:["dans","la","prairie"],
+        step2Instruction:"Quelle est la nature de ce complément circonstanciel ?", classifyChoices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, step2Answer:"Lieu" },
+      { id:"differencier-cc-temps-lieu-cause-n2-10", type:"classification-etapes",
+        instruction:"Trouve le complément circonstanciel de la phrase, puis indique sa nature.",
+        sentence:"Dès son arrivée , l'équipe a commencé les préparatifs .",
+        step1Instruction:"Clique sur le complément circonstanciel de cette phrase.", step1Targets:["Dès","son","arrivée"],
+        step2Instruction:"Quelle est la nature de ce complément circonstanciel ?", classifyChoices:["Lieu","Temps","Cause"], fixedChoiceOrder:true, step2Answer:"Temps" }
+    ],
+
+    level3Bank: [
+      { id:"differencier-cc-temps-lieu-cause-n3-01", type:"mots-cliquables", instruction:"Clique sur le complément circonstanciel de temps.",
+        sentence:"Hier , les élèves ont couru dans la cour .", targets:["Hier"],
+        piege:{ "cour":"« dans la cour » est un complément circonstanciel de lieu, pas de temps." } },
+      { id:"differencier-cc-temps-lieu-cause-n3-02", type:"mots-cliquables", instruction:"Clique sur le complément circonstanciel de lieu.",
+        sentence:"Hier , les élèves ont couru dans la cour .", targets:["dans","la","cour"],
+        piege:{ "Hier":"« Hier » est un complément circonstanciel de temps, pas de lieu." } },
+      { id:"differencier-cc-temps-lieu-cause-n3-03", type:"mots-cliquables", instruction:"Clique sur le complément circonstanciel de lieu.",
+        sentence:"Il a fait ses devoirs chez lui à cause de la pluie .", targets:["chez","lui"],
+        piege:{ "pluie":"« à cause de la pluie » est un complément circonstanciel de cause, pas de lieu." } },
+      { id:"differencier-cc-temps-lieu-cause-n3-04", type:"mots-cliquables", instruction:"Clique sur le complément circonstanciel de cause.",
+        sentence:"Il a fait ses devoirs chez lui à cause de la pluie .", targets:["à","cause","de","la","pluie"],
+        piege:{ "lui":"« chez lui » est un complément circonstanciel de lieu, pas de cause." } },
+      { id:"differencier-cc-temps-lieu-cause-n3-05", type:"mots-cliquables", instruction:"Clique sur le complément circonstanciel de cause.",
+        sentence:"Comme il pleuvait , nous sommes rentrés avant la nuit .", targets:["Comme","il","pleuvait"],
+        piege:{ "nuit":"« avant la nuit » est un complément circonstanciel de temps, pas de cause." } },
+      { id:"differencier-cc-temps-lieu-cause-n3-06", type:"mots-cliquables", instruction:"Clique sur le complément circonstanciel de temps.",
+        sentence:"Comme il pleuvait , nous sommes rentrés avant la nuit .", targets:["avant","la","nuit"],
+        piege:{ "pleuvait":"« Comme il pleuvait » est un complément circonstanciel de cause, pas de temps." } },
+      { id:"differencier-cc-temps-lieu-cause-n3-07", type:"mots-cliquables", instruction:"Clique sur le complément circonstanciel de temps.",
+        sentence:"Ce matin , le fermier travaillait dans les champs .", targets:["Ce","matin"],
+        piege:{ "champs":"« dans les champs » est un complément circonstanciel de lieu, pas de temps." } },
+      { id:"differencier-cc-temps-lieu-cause-n3-08", type:"mots-cliquables", instruction:"Clique sur le complément circonstanciel de lieu.",
+        sentence:"Ce matin , le fermier travaillait dans les champs .", targets:["dans","les","champs"],
+        piege:{ "matin":"« Ce matin » est un complément circonstanciel de temps, pas de lieu." } },
+      { id:"differencier-cc-temps-lieu-cause-n3-09", type:"mots-cliquables", instruction:"Clique sur le complément circonstanciel de cause.",
+        sentence:"Grâce à son courage , le pompier a sauvé un enfant dans l'immeuble .", targets:["Grâce","à","son","courage"],
+        piege:{ "immeuble":"« dans l'immeuble » est un complément circonstanciel de lieu, pas de cause." } },
+      { id:"differencier-cc-temps-lieu-cause-n3-10", type:"mots-cliquables", instruction:"Clique sur le complément circonstanciel de lieu.",
+        sentence:"Grâce à son courage , le pompier a sauvé un enfant dans l'immeuble .", targets:["dans","l'immeuble"],
+        piege:{ "courage":"« Grâce à son courage » est un complément circonstanciel de cause, pas de lieu." } }
+    ]
+  },
+
   "pronom-antecedent": {
     title:      "Mettre en relation un pronom personnel avec son antécédent",
     domaine:    "Français",

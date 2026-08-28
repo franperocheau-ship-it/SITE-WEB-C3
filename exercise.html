@@ -2031,6 +2031,88 @@
       .fp-ardoise-wrap { flex-direction: column; }
     }
 
+    /* ── Type : proportionnalite-probleme-libre ──────────────────────────────
+       Énoncé en 2 blocs (contexte/données, puis question posée) au lieu d'un
+       paragraphe .ex-question-label unique — trop compact (12px) pour un
+       énoncé de 2-3 phrases. Majuscules conservées (cohérence avec le reste
+       du moteur), mais taille et espacement augmentés pour la lisibilité. ── */
+    .pp-enonce { margin-bottom: 20px; }
+    .pp-enonce-contexte {
+      display: block;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .pp-enonce-question {
+      display: block;
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--blue);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      line-height: 1.5;
+    }
+    @media (max-width: 600px) {
+      .pp-enonce-contexte { font-size: 12px; }
+      .pp-enonce-question { font-size: 14px; }
+    }
+
+    /* ── Type : completer-tableau-proportionnalite ──────────────────────────── */
+    .prop-table {
+      border-collapse: collapse;
+      margin: 16px auto;
+      font-size: 16px;
+    }
+    .prop-table th, .prop-table td {
+      border: 2px solid var(--border);
+      padding: 10px 14px;
+      text-align: center;
+    }
+    .prop-table th {
+      background: rgba(16,43,106,0.06);
+      color: var(--blue);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .prop-table-input {
+      width: 64px;
+      text-align: center;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 4px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+    .prop-table-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(16,43,106,0.10);
+    }
+    .prop-table-input.is-correct {
+      border-color: #16a34a;
+      background: rgba(22,163,74,0.06);
+      color: #15803d;
+    }
+    .prop-table-input.is-wrong {
+      border-color: var(--red);
+      background: rgba(214,40,57,0.06);
+      color: var(--red);
+    }
+    .prop-table-input:disabled { cursor: default; }
+    @media (max-width: 600px) {
+      .prop-table { font-size: 14px; }
+      .prop-table th, .prop-table td { padding: 8px 8px; }
+      .prop-table-input { width: 52px; font-size: 14px; }
+    }
+
     /* ── Type : representer-fraction ─────────────────────────────────────── */
     .rfrac-question-area {
       text-align: center;
@@ -4928,6 +5010,16 @@
     let probaIssuesLevelSelect  = null; /* probabilite-issues  : instance LevelSelect */
     let probaNombreLevel        = null; /* probabilite-nombre  : niveau sélectionné (id "niveauN") */
     let probaNombreLevelSelect  = null; /* probabilite-nombre  : instance LevelSelect */
+    let propSituationLevel       = null; /* identifier-situation-proportionnalite : niveau sélectionné */
+    let propSituationLevelSelect = null; /* identifier-situation-proportionnalite : instance LevelSelect */
+    /* propProblemeLevel/LevelSelect : partagés par resoudre-probleme-proportionnalite
+       ET resoudre-problemes-echelles (même mécanique saisie libre, une seule
+       compétence active à la fois via ?slug=, cf. accord-ecrit partagé par
+       plusieurs compétences de grammaire). */
+    let propProblemeLevel        = null;
+    let propProblemeLevelSelect  = null;
+    let propTableauLevel         = null; /* completer-tableau-proportionnalite : niveau sélectionné */
+    let propTableauLevelSelect   = null; /* completer-tableau-proportionnalite : instance LevelSelect */
 
     /* Suivi générique du niveau courant (tous exercices à niveaux) */
     let sessionLevelList   = [];   /* liste ordonnée des valeurs de niveau */
@@ -4994,7 +5086,8 @@
 
     const SPEECH_TARGET_SELECTOR = [
       '.ex-question-label', '.cd-q-prompt', '.aa-enonce', '.pl-prompt',
-      '.ct-instruction', '.ecn-prompt', '.rd-followup-prompt', '.ex-classify-step-title'
+      '.ct-instruction', '.ecn-prompt', '.rd-followup-prompt', '.ex-classify-step-title',
+      '.pp-enonce-contexte', '.pp-enonce-question'
     ].join(', ');
 
     const ITEM_TARGET_SELECTOR = [
@@ -5128,6 +5221,9 @@
       probaChancesLevel = null;
       probaIssuesLevel  = null;
       probaNombreLevel  = null;
+      propSituationLevel = null;
+      propProblemeLevel  = null;
+      propTableauLevel   = null;
       sessionLevelList   = [];
       sessionLevelLabels = [];
       sessionLevelIdx    = -1;
@@ -5622,7 +5718,8 @@
       const levels  = sessionData.levels || ["CM1", "CM2"];
       const descs   = {
         "CM1": "Nombres jusqu'à 999 999",
-        "CM2": "Nombres jusqu'à 999 999 999"
+        "CM2": "Nombres jusqu'à 999 999 999",
+        "6e":  "Nombres supérieurs au milliard"
       };
 
       const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
@@ -5919,6 +6016,156 @@
         badgesContainer: document.getElementById("ex-badges")
       });
       probaNombreLevelSelect.renderSelectScreen();
+    }
+
+    /* ── Type : identifier-situation-proportionnalite ────────────────────────
+       Niveau 1 (CM1) et 3 (6e) : QCM (renderChoixEtiquette, q.mode absent
+       ou "qcm"). Niveau 2 (CM2) : classification-étapes (q.mode === "etapes").
+       descs lus dynamiquement depuis sessionData.levelDescs (cf. accord-ecrit),
+       pas de texte codé en dur ici. ──────────────────────────────────────── */
+    function showPropSituationLevelSelect() {
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels = sessionData.levels || ["CM1", "CM2", "6e"];
+      const descs  = sessionData.levelDescs || {};
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      propSituationLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          propSituationLevel = l;
+          const filtered = sessionData.bank.filter(it => it.level === propSituationLevel);
+          questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
+          currentIndex = 0;
+          score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(l);
+          sessionLevelLoader = (lv) => {
+            propSituationLevel = lv;
+            const fq = sessionData.bank.filter(it => it.level === propSituationLevel);
+            questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+            propSituationLevelSelect.renderBadges(lv);
+          };
+          document.getElementById('q-total').textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          propSituationLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      propSituationLevelSelect.renderSelectScreen();
+    }
+
+    /* ── Type : proportionnalite-probleme-libre ──────────────────────────────
+       Partagé par resoudre-probleme-proportionnalite (CM1/CM2/6e) et
+       resoudre-problemes-echelles (niveau1/2/3) : même mécanique (saisie
+       libre d'un nombre), seul le contenu de la banque change. ───────────── */
+    function showPropProblemeLevelSelect() {
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels = sessionData.levels || ["CM1", "CM2", "6e"];
+      const descs  = sessionData.levelDescs || {};
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      propProblemeLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          propProblemeLevel = l;
+          const filtered = sessionData.bank.filter(it => it.level === propProblemeLevel);
+          questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
+          currentIndex = 0;
+          score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(l);
+          sessionLevelLoader = (lv) => {
+            propProblemeLevel = lv;
+            const fq = sessionData.bank.filter(it => it.level === propProblemeLevel);
+            questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+            propProblemeLevelSelect.renderBadges(lv);
+          };
+          document.getElementById('q-total').textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          propProblemeLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      propProblemeLevelSelect.renderSelectScreen();
+    }
+
+    /* ── Type : completer-tableau-proportionnalite ──────────────────────────
+       6e uniquement, onglets génériques niveau1/2/3 (pas de pastille CM1/CM2 —
+       cf. probabilite-* / LEVEL_LABELS). ────────────────────────────────── */
+    function showPropTableauLevelSelect() {
+      document.getElementById("level-select-screen").classList.remove("ex-hidden");
+      document.getElementById("exercise-screen").classList.add("ex-hidden");
+      document.getElementById("results-screen").classList.add("ex-hidden");
+
+      const levels = sessionData.levels || ["niveau1", "niveau2", "niveau3"];
+      const descs  = sessionData.levelDescs || {};
+
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      propTableauLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
+        threshold: 0.8,
+        onSelectLevel: (l) => {
+          propTableauLevel = l;
+          const filtered = sessionData.bank.filter(it => it.level === propTableauLevel);
+          questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
+          currentIndex = 0;
+          score        = 0;
+          sessionLevelList   = [...levels];
+          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
+          sessionLevelIdx    = levels.indexOf(l);
+          sessionLevelLoader = (lv) => {
+            propTableauLevel = lv;
+            const fq = sessionData.bank.filter(it => it.level === propTableauLevel);
+            questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
+            document.getElementById('q-total').textContent = questions.length;
+            document.getElementById('ex-bar-fill').style.width = '0%';
+            currentIndex = 0;
+            score        = 0;
+            showQuestion(0);
+            propTableauLevelSelect.renderBadges(lv);
+          };
+          document.getElementById('q-total').textContent = questions.length;
+          document.getElementById("level-select-screen").classList.add("ex-hidden");
+          document.getElementById("exercise-screen").classList.remove("ex-hidden");
+          showQuestion(0);
+          propTableauLevelSelect.renderBadges(l);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        selectContainer: document.getElementById("level-select-screen"),
+        badgesContainer: document.getElementById("ex-badges")
+      });
+      propTableauLevelSelect.renderSelectScreen();
     }
 
     function startSessionWithType(type) {
@@ -6218,6 +6465,21 @@
         return;
       }
 
+      if (currentType === "identifier-situation-proportionnalite" && propSituationLevel === null) {
+        showPropSituationLevelSelect();
+        return;
+      }
+
+      if (currentType === "proportionnalite-probleme-libre" && propProblemeLevel === null) {
+        showPropProblemeLevelSelect();
+        return;
+      }
+
+      if (currentType === "completer-tableau-proportionnalite" && propTableauLevel === null) {
+        showPropTableauLevelSelect();
+        return;
+      }
+
       document.getElementById("results-screen").classList.add("ex-hidden");
       document.getElementById("exercise-screen").classList.remove("ex-hidden");
 
@@ -6288,6 +6550,12 @@
         renderClassificationEtapes(card, q);
       } else if (currentType === "probabilite-nombre") {
         renderMotsCliquables(card, q);
+      } else if (currentType === "identifier-situation-proportionnalite") {
+        renderIdentifierSituationProportionnalite(card, q);
+      } else if (currentType === "proportionnalite-probleme-libre") {
+        renderProportionnaliteProblemeLibre(card, q);
+      } else if (currentType === "completer-tableau-proportionnalite") {
+        renderCompleterTableauProportionnalite(card, q);
       } else if (currentType === "lire-fraction") {
         renderLireFraction(card, q);
       } else if (currentType === "representer-fraction") {
@@ -6826,6 +7094,9 @@
           else if (currentType === 'probabilite-chances') showProbaChancesLevelSelect();
           else if (currentType === 'probabilite-issues') showProbaIssuesLevelSelect();
           else if (currentType === 'probabilite-nombre') showProbaNombreLevelSelect();
+          else if (currentType === 'identifier-situation-proportionnalite') showPropSituationLevelSelect();
+          else if (currentType === 'proportionnalite-probleme-libre') showPropProblemeLevelSelect();
+          else if (currentType === 'completer-tableau-proportionnalite') showPropTableauLevelSelect();
         });
 
       } else if (hasMulti && isLast) {
@@ -6931,6 +7202,15 @@
       if (currentType === 'probabilite-nombre' && probaNombreLevel && probaNombreLevelSelect) {
         probaNombreLevelSelect.completeLevel(probaNombreLevel, score, total);
       }
+      if (currentType === 'identifier-situation-proportionnalite' && propSituationLevel && propSituationLevelSelect) {
+        propSituationLevelSelect.completeLevel(propSituationLevel, score, total);
+      }
+      if (currentType === 'proportionnalite-probleme-libre' && propProblemeLevel && propProblemeLevelSelect) {
+        propProblemeLevelSelect.completeLevel(propProblemeLevel, score, total);
+      }
+      if (currentType === 'completer-tableau-proportionnalite' && propTableauLevel && propTableauLevelSelect) {
+        propTableauLevelSelect.completeLevel(propTableauLevel, score, total);
+      }
 
       _setupResultsScreen(pct);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -6947,7 +7227,8 @@
       const activeLevel = pfiSelectedLevel || accordLevel || homoLevel
         || (sessionLevelIdTypes.includes(currentType) ? sessionLevelList[sessionLevelIdx] : null)
         || nbEntierLevel || encadrLevel || decompLevel || fpLevel
-        || probaChancesLevel || probaIssuesLevel || probaNombreLevel || null;
+        || probaChancesLevel || probaIssuesLevel || probaNombreLevel
+        || propSituationLevel || propProblemeLevel || propTableauLevel || null;
       saveExerciseResult({
         exerciseSlug: slug,
         subject,
@@ -7530,7 +7811,6 @@
     function renderClassificationEtapes(card, q) {
       card.innerHTML = `
         <p class="ex-question-label">${q.instruction || 'Identifie, puis classe.'}</p>
-        <div class="ex-sentence-display">${q.sentence}</div>
 
         <div id="ce-step1" class="ex-classify-step">
           <div class="ex-classify-step-title">Étape 1 — ${q.step1Instruction}</div>
@@ -10351,6 +10631,175 @@
 
       vBtn.addEventListener('click', validate);
       input.addEventListener('keydown', e => { if (e.key === 'Enter') validate(); });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       TYPE : identifier-situation-proportionnalite
+       Niveau 1 (CM1) et niveau 3 (6e) : QCM (renderChoixEtiquette, réutilisée
+       telle quelle — cf. probabilite-chances). Niveau 2 (CM2) : classification-
+       étapes (renderClassificationEtapes — cf. probabilite-issues), pour les
+       pièges additifs ("+30 ans" n'est pas proportionnel à l'âge, etc.).
+       q.mode: "etapes" bascule vers ce second rendu ; absent/"qcm" = QCM.
+       ═══════════════════════════════════════════════════════════════════════ */
+    function renderIdentifierSituationProportionnalite(card, q) {
+      if (q.mode === 'etapes') {
+        renderClassificationEtapes(card, q);
+      } else {
+        renderChoixEtiquette(card, q);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       TYPE : proportionnalite-probleme-libre
+       Partagé par resoudre-probleme-proportionnalite (CM1/CM2/6e) et
+       resoudre-problemes-echelles (niveau1/2/3, 6e) : un problème rédigé,
+       réponse en saisie libre. Jamais de tableau de proportionnalité ni de
+       produit en croix dans les données de ces deux compétences — uniquement
+       du raisonnement en langage naturel (linéarité, retour à l'unité).
+       Réutilise fpParseQuantityAnswer (extraction du nombre en tête de
+       saisie, tolérante à une unité derrière) déjà définie pour
+       fractions-problemes. q.resultat : nombre attendu. q.unite : optionnel,
+       affiché dans le feedback générique si q.explication est absent.
+       ═══════════════════════════════════════════════════════════════════════ */
+    /* Sépare la (les) phrase(s) de contexte/données de la question posée :
+       q.question est stocké comme une seule chaîne (pas de champs distincts
+       dans data/proportionnalite.js) ; on la scinde ici au dernier ". "
+       trouvé, ce qui isole systématiquement la phrase interrogative finale
+       même quand le contexte tient sur deux phrases (cas resoudre-problemes-
+       echelles : "Sur un plan, [...]. Une terrasse mesure [...]. Quelle [...] ?").
+       Vérifié sur les 64 items des deux compétences : un seul point de
+       coupure valide à chaque fois. Pas de champ dédié à ajouter côté
+       données pour ce simple besoin d'affichage. */
+    function ppSplitEnonce(str) {
+      const idx = str.lastIndexOf('. ');
+      if (idx === -1) return { contexte: '', question: str };
+      return { contexte: str.slice(0, idx + 1), question: str.slice(idx + 2) };
+    }
+
+    function renderProportionnaliteProblemeLibre(card, q) {
+      const { contexte, question } = ppSplitEnonce(q.question);
+      card.innerHTML = `
+        <div class="pp-enonce">
+          ${contexte ? `<span class="pp-enonce-contexte">${contexte}</span>` : ''}
+          <span class="pp-enonce-question">${question}</span>
+        </div>
+        <div class="ex-input-row">
+          <input type="text" class="ex-text-input" id="pp-free-input"
+                 autocomplete="off" autocorrect="off" autocapitalize="off"
+                 spellcheck="false" placeholder="Ta réponse">
+          <button class="ex-validate-btn" id="pp-free-validate">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const input = document.getElementById('pp-free-input');
+      const vBtn  = document.getElementById('pp-free-validate');
+      setTimeout(() => input.focus(), 50);
+
+      function validate() {
+        if (!input.value.trim()) return;
+        input.disabled = true;
+        vBtn.disabled  = true;
+
+        const value   = fpParseQuantityAnswer(input.value);
+        const isRight = value !== null && Math.abs(value - q.resultat) < 0.01;
+
+        input.classList.add(isRight ? 'is-correct' : 'is-wrong');
+
+        if (isRight) {
+          score++;
+          setFeedback('feedback1', `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+        } else {
+          setFeedback('feedback1', `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>
+              ${q.explication || `La bonne réponse était : ${q.resultat}${q.unite ? ' ' + q.unite : ''}`}
+            </div>`);
+        }
+        showNextBtn();
+      }
+
+      vBtn.addEventListener('click', validate);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') validate(); });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════
+       TYPE : completer-tableau-proportionnalite (6e uniquement)
+       Tableau à trous à 2 lignes (grandeur 1 / grandeur 2) : q.col1/q.col2
+       sont des tableaux de valeurs alignées, une case de q.col2 valant `null`
+       devient un champ de saisie ; q.answers contient les valeurs attendues
+       dans l'ordre des trous (gauche → droite). Niveau 2 : plusieurs trous
+       (q.answers.length > 1). Toutes les cases doivent être correctes pour
+       valider la question (comme renderDecompFillTwo). ─────────────────────
+       ═══════════════════════════════════════════════════════════════════════ */
+    function renderCompleterTableauProportionnalite(card, q) {
+      let blankIdx = 0;
+      const col2Cells = q.col2.map(v => {
+        if (v === null) {
+          const idx = blankIdx++;
+          return `<td class="prop-table-blank"><input type="text" inputmode="decimal" class="prop-table-input" id="prop-blank-${idx}"
+                    autocomplete="off" autocorrect="off" spellcheck="false" placeholder="?"></td>`;
+        }
+        return `<td>${v}</td>`;
+      }).join('');
+      const instructionText = q.answers.length > 1
+        ? 'Complète les cases manquantes du tableau.'
+        : 'Complète la case manquante du tableau.';
+
+      card.innerHTML = `
+        <p class="ex-question-label">${q.contexte}</p>
+        <p class="ex-question-label" style="font-size:14px;font-weight:400;margin-top:-6px">${instructionText}</p>
+        <table class="prop-table">
+          <tr><th>${q.col1Label}</th>${q.col1.map(v => `<td>${v}</td>`).join('')}</tr>
+          <tr><th>${q.col2Label}</th>${col2Cells}</tr>
+        </table>
+        <div class="ex-input-row" style="justify-content:center;margin-top:16px">
+          <button class="ex-validate-btn" id="prop-table-validate">Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const inputs = [];
+      for (let i = 0; i < q.answers.length; i++) inputs.push(document.getElementById('prop-blank-' + i));
+      setTimeout(() => { if (inputs[0]) inputs[0].focus(); }, 50);
+
+      const vBtn = document.getElementById('prop-table-validate');
+
+      function validate() {
+        if (inputs.some(inp => !inp.value.trim())) return;
+        inputs.forEach(inp => inp.disabled = true);
+        vBtn.disabled = true;
+
+        let allRight = true;
+        inputs.forEach((inp, i) => {
+          const value = fpParseQuantityAnswer(inp.value);
+          const right = value !== null && Math.abs(value - q.answers[i]) < 0.01;
+          inp.classList.add(right ? 'is-correct' : 'is-wrong');
+          if (!right) allRight = false;
+        });
+
+        if (allRight) {
+          score++;
+          setFeedback('feedback1', `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`);
+        } else {
+          setFeedback('feedback1', `
+            <div class="ex-feedback-wrong">
+              ❌ Ce n'est pas la bonne réponse.<br>${q.explication}
+            </div>`);
+        }
+        showNextBtn();
+      }
+
+      inputs.forEach((inp, i) => {
+        inp.addEventListener('keydown', e => {
+          if (e.key !== 'Enter') return;
+          if (i < inputs.length - 1) inputs[i + 1].focus();
+          else validate();
+        });
+      });
+      vBtn.addEventListener('click', validate);
     }
 
     /* ═══════════════════════════════════════════════════════════════════════

@@ -19,6 +19,7 @@
     "data/fractions.js",
     "data/nombres-decimaux.js",
     "data/probabilites.js",
+    "data/proportionnalite.js",
     "data/vocabulaire.js"
   ];
   DOMAIN_FILES.forEach(function (src) {

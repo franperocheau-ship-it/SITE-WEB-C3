@@ -13,14 +13,14 @@ Object.assign(window.EXERCISE_DATA, {
     domaine:    "Mathématiques",
     competence: "Nombres entiers — Écriture chiffrée",
     type: "nombre-entier",
-    levels: ["CM1", "CM2"],
-    paliers: 2, /* nombre réel de paliers du moteur */
-    questionsPerSession: 12,
+    levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
+    questionsPerSession: 10,
     backLink: { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
     bank: [
 
-      /* ── Niveau 1 — 15 questions, jusqu'à 999 999 ──────────────────────────── */
+      /* ── Niveau 1 — 10 questions, jusqu'à 999 999 ──────────────────────────── */
       { level: "CM1", inputMode: "qcm",
         instruction: "Écris en chiffres :", word: "soixante-cinq",
         answer: "65", choices: ["65", "56", "605", "650"] },
@@ -48,26 +48,11 @@ Object.assign(window.EXERCISE_DATA, {
       { level: "CM1", inputMode: "qcm",
         instruction: "Écris en chiffres :", word: "quarante-cinq-mille-trois-cents",
         answer: "45 300", choices: ["45 300", "45 030", "45 003", "43 500"] },
-      { level: "CM1", inputMode: "saisie",
-        instruction: "Écris ce nombre en chiffres :", word: "quatre-vingt-sept-mille-six-cent-trente-neuf",
-        answer: "87 639" },
       { level: "CM1", inputMode: "qcm",
         instruction: "Écris en chiffres :", word: "cent-mille-huit",
         answer: "100 008", choices: ["100 008", "100 080", "10 008", "100 800"] },
-      { level: "CM1", inputMode: "saisie",
-        instruction: "Écris ce nombre en chiffres :", word: "deux-cent-mille-cent",
-        answer: "200 100" },
-      { level: "CM1", inputMode: "qcm",
-        instruction: "Écris en chiffres :", word: "cinq-cent-mille-deux-cent-soixante",
-        answer: "500 260", choices: ["500 260", "500 026", "500 206", "502 060"] },
-      { level: "CM1", inputMode: "saisie",
-        instruction: "Écris ce nombre en chiffres :", word: "six-cent-quarante-deux-mille-treize",
-        answer: "642 013" },
-      { level: "CM1", inputMode: "qcm",
-        instruction: "Écris en chiffres :", word: "neuf-cent-mille-neuf-cent-un",
-        answer: "900 901", choices: ["900 901", "990 901", "900 191", "900 910"] },
 
-      /* ── Niveau 2 — 15 questions, jusqu'à 999 999 999 ──────────────────────── */
+      /* ── Niveau 2 — 10 questions, jusqu'à 999 999 999 ──────────────────────── */
       { level: "CM2", inputMode: "qcm",
         instruction: "Écris en chiffres :", word: "un-million",
         answer: "1 000 000", choices: ["1 000 000", "100 000", "1 000", "10 000 000"] },
@@ -98,21 +83,38 @@ Object.assign(window.EXERCISE_DATA, {
       { level: "CM2", inputMode: "saisie",
         instruction: "Écris ce nombre en chiffres :", word: "deux-cent-millions",
         answer: "200 000 000" },
-      { level: "CM2", inputMode: "qcm",
-        instruction: "Écris en chiffres :", word: "trois-cent-quarante-cinq-millions-six-cent-soixante-dix-huit-mille-neuf-cent-douze",
-        answer: "345 678 912", choices: ["345 678 912", "345 768 912", "354 678 912", "345 678 921"] },
-      { level: "CM2", inputMode: "saisie",
-        instruction: "Écris ce nombre en chiffres :", word: "huit-cent-millions-huit-cents",
-        answer: "800 000 800" },
-      { level: "CM2", inputMode: "qcm",
-        instruction: "Écris en chiffres :", word: "deux-cent-cinquante-quatre-millions-sept-cent-trente-deux-mille-cent-neuf",
-        answer: "254 732 109", choices: ["254 732 109", "254 732 190", "254 732 019", "254 730 109"] },
-      { level: "CM2", inputMode: "saisie",
-        instruction: "Écris ce nombre en chiffres :", word: "neuf-millions-neuf-cent-mille-neuf-cents",
-        answer: "9 900 900" },
-      { level: "CM2", inputMode: "qcm",
-        instruction: "Écris en chiffres :", word: "quatre-cent-millions-dix-mille-soixante",
-        answer: "400 010 060", choices: ["400 010 060", "400 100 060", "400 010 600", "400 001 060"] }
+
+      /* ── Niveau 3 — 10 questions, nombres supérieurs au milliard ────────────── */
+      { level: "6e", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "un-milliard-cinquante-millions",
+        answer: "1 050 000 000", choices: ["1 050 000 000", "1 005 000 000", "1 500 000 000", "1 050 000 000 000"] },
+      { level: "6e", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "deux-milliards-trois-cent-millions",
+        answer: "2 300 000 000" },
+      { level: "6e", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "cinq-milliards-cinquante-mille",
+        answer: "5 000 050 000", choices: ["5 000 050 000", "5 000 500 000", "5 050 000 000", "5 000 005 000"] },
+      { level: "6e", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "dix-milliards-quatre-cent-vingt-millions",
+        answer: "10 420 000 000" },
+      { level: "6e", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "vingt-cinq-milliards",
+        answer: "25 000 000 000", choices: ["25 000 000 000", "2 500 000 000", "250 000 000 000", "25 000 000 000 000"] },
+      { level: "6e", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "cinquante-milliards-six-millions",
+        answer: "50 006 000 000" },
+      { level: "6e", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "un-milliard-deux-cent-millions",
+        answer: "1 200 000 000", choices: ["1 200 000 000", "1 020 000 000", "1 002 000 000", "12 000 000 000"] },
+      { level: "6e", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "soixante-quinze-milliards-trois-cent-millions-quarante-deux-mille",
+        answer: "75 300 042 000" },
+      { level: "6e", inputMode: "qcm",
+        instruction: "Écris en chiffres :", word: "cent-milliards",
+        answer: "100 000 000 000", choices: ["100 000 000 000", "10 000 000 000", "1 000 000 000 000", "100 000 000"] },
+      { level: "6e", inputMode: "saisie",
+        instruction: "Écris ce nombre en chiffres :", word: "deux-cent-milliards",
+        answer: "200 000 000 000" }
     ]
   },
 
@@ -121,13 +123,13 @@ Object.assign(window.EXERCISE_DATA, {
     domaine:    "Mathématiques",
     competence: "Nombres entiers — Écriture en lettres",
     type: "nombre-entier",
-    levels: ["CM1", "CM2"],
-    paliers: 2, /* nombre réel de paliers du moteur */
-    questionsPerSession: 12,
+    levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
+    questionsPerSession: 10,
     backLink: { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
     bank: [
 
-      /* ── Niveau 1 — 15 questions, jusqu'à 999 999 ──────────────────────────── */
+      /* ── Niveau 1 — 10 questions, jusqu'à 999 999 ──────────────────────────── */
       /* Pièges : accord de -vingts/-cent/-cents, invariabilité de mille     */
       { level: "CM1", inputMode: "qcm",
         instruction: "Choisis l'écriture correcte en lettres :", word: "80",
@@ -165,25 +167,8 @@ Object.assign(window.EXERCISE_DATA, {
         instruction: "Choisis l'écriture correcte en lettres :", word: "1 201",
         answer: "mille-deux-cent-un",
         choices: ["mille-deux-cent-un", "mille-deux-cents-un", "mille-deux-cent-et-un", "mille-deux-cents-et-un"] },
-      { level: "CM1", inputMode: "saisie",
-        instruction: "Écris ce nombre en lettres :", word: "3 500",
-        answer: "trois-mille-cinq-cents" },
-      { level: "CM1", inputMode: "qcm",
-        instruction: "Choisis l'écriture correcte en lettres :", word: "80 000",
-        answer: "quatre-vingt-mille",
-        choices: ["quatre-vingt-mille", "quatre-vingts-mille", "quatre-vingt-milles", "quatre-vingts-milles"] },
-      { level: "CM1", inputMode: "saisie",
-        instruction: "Écris ce nombre en lettres :", word: "100 000",
-        answer: "cent-mille" },
-      { level: "CM1", inputMode: "qcm",
-        instruction: "Choisis l'écriture correcte en lettres :", word: "45 300",
-        answer: "quarante-cinq-mille-trois-cents",
-        choices: ["quarante-cinq-mille-trois-cents", "quarante-cinq-mille-trois-cent", "quarante-cinq-milles-trois-cents", "quarante-cinq-mille-trois-centaines"] },
-      { level: "CM1", inputMode: "saisie",
-        instruction: "Écris ce nombre en lettres :", word: "200 400",
-        answer: "deux-cent-mille-quatre-cents" },
 
-      /* ── Niveau 2 — 15 questions, millions et milliards ─────────────────────── */
+      /* ── Niveau 2 — 10 questions, millions et milliards ─────────────────────── */
       /* Pièges : million/millions, cent devant million, milliard             */
       { level: "CM2", inputMode: "qcm",
         instruction: "Choisis l'écriture correcte en lettres :", word: "1 000 000",
@@ -220,29 +205,44 @@ Object.assign(window.EXERCISE_DATA, {
       { level: "CM2", inputMode: "saisie",
         instruction: "Écris ce nombre en lettres :", word: "750 000 000",
         answer: "sept-cent-cinquante-millions" },
-      { level: "CM2", inputMode: "qcm",
-        instruction: "Choisis l'écriture correcte en lettres :", word: "500 000 000",
-        answer: "cinq-cent-millions",
-        choices: ["cinq-cent-millions", "cinq-cents-millions", "cinq-cent-million", "cinq-mille-cent-mille"] },
-      { level: "CM2", inputMode: "saisie",
-        instruction: "Écris ce nombre en lettres :", word: "2 500 000",
-        answer: "deux-millions-cinq-cent-mille" },
-      { level: "CM2", inputMode: "qcm",
-        instruction: "Choisis l'écriture correcte en lettres :", word: "25 000 000",
-        answer: "vingt-cinq-millions",
-        choices: ["vingt-cinq-millions", "vingt-cinq-million", "vingt-cinq-milles-mille", "vingt-et-cinq-millions"] },
-      { level: "CM2", inputMode: "saisie",
-        instruction: "Écris ce nombre en lettres :", word: "300 045 000",
-        answer: "trois-cent-millions-quarante-cinq-mille" },
-      { level: "CM2", inputMode: "qcm",
-        instruction: "Choisis l'écriture correcte en lettres :", word: "99 099 099",
-        answer: "quatre-vingt-dix-neuf-millions-quatre-vingt-dix-neuf-mille-quatre-vingt-dix-neuf",
-        choices: [
-          "quatre-vingt-dix-neuf-millions-quatre-vingt-dix-neuf-mille-quatre-vingt-dix-neuf",
-          "quatre-vingts-dix-neuf-millions-quatre-vingt-dix-neuf-mille-quatre-vingt-dix-neuf",
-          "quatre-vingt-dix-neuf-millions-quatre-vingt-dix-neuf-mille-quatre-vingt-neuf",
-          "quatre-vingt-dix-neuf-millions-quatre-vingt-dix-mille-quatre-vingt-dix-neuf"
-        ] }
+
+      /* ── Niveau 3 — 10 questions, nombres supérieurs au milliard ────────────── */
+      /* Pièges : invariabilité de "un milliard", accord de milliard(s), cent devant milliard */
+      { level: "6e", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "1 000 000 500",
+        answer: "un-milliard-cinq-cents",
+        choices: ["un-milliard-cinq-cents", "un-milliards-cinq-cents", "un-milliard-cinq-cent", "un-million-cinq-cents"] },
+      { level: "6e", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "2 000 000 000",
+        answer: "deux-milliards" },
+      { level: "6e", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "100 000 000 000",
+        answer: "cent-milliards",
+        choices: ["cent-milliards", "cent-milliard", "cents-milliards", "cent-milliars"] },
+      { level: "6e", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "5 002 000 000",
+        answer: "cinq-milliards-deux-millions" },
+      { level: "6e", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "12 000 000 000",
+        answer: "douze-milliards",
+        choices: ["douze-milliards", "douze-milliard", "douze-millions", "douze-cent-milliards"] },
+      { level: "6e", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "1 200 000 000",
+        answer: "un-milliard-deux-cent-millions" },
+      { level: "6e", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "750 000 000 000",
+        answer: "sept-cent-cinquante-milliards",
+        choices: ["sept-cent-cinquante-milliards", "sept-cents-cinquante-milliards", "sept-cent-cinquante-milliard", "soixante-quinze-milliards"] },
+      { level: "6e", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "2 500 000 000",
+        answer: "deux-milliards-cinq-cent-millions" },
+      { level: "6e", inputMode: "qcm",
+        instruction: "Choisis l'écriture correcte en lettres :", word: "25 000 000 000",
+        answer: "vingt-cinq-milliards",
+        choices: ["vingt-cinq-milliards", "vingt-cinq-milliard", "vingt-cinq-millions", "deux-cent-cinquante-milliards"] },
+      { level: "6e", inputMode: "saisie",
+        instruction: "Écris ce nombre en lettres :", word: "99 099 099 099",
+        answer: "quatre-vingt-dix-neuf-milliards-quatre-vingt-dix-neuf-millions-quatre-vingt-dix-neuf-mille-quatre-vingt-dix-neuf" }
     ]
   },
 

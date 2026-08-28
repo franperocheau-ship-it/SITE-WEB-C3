@@ -53,6 +53,7 @@ const LAUREL_BADGE_ICONS = {
   'Nombres entiers':  'assets/Badges dores/nombres entiers dorés.png',
   'Probabilités':     'assets/Badges dores/probabilité doré.png',
   'Algèbre':          'assets/Badges dores/algèbre doré.png',
+  'Proportionnalité': 'assets/Badges dores/proportionnalité doré.png',
 };
 
 /* ── Table de correspondance slug → domaine/notion ────────────────────────────

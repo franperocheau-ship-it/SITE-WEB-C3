@@ -1,18 +1,18 @@
 # Audit des banques de questions
 
-Généré le 2026-08-19 par `scripts/audit-questions.js`.
+Généré le 2026-08-28 par `scripts/audit-questions.js`.
 Tri : par nombre total d'items croissant (toutes compétences confondues) — les banques les plus fragiles en premier.
 Seuils d'alerte : Niveau 1 < 12 items → ⚠️ · Niveaux 2/3+ < 8 items → ⚠️ · tout niveau < 5 items → 🔴.
 
-**Résumé global :** 124 exercices audités · 3936 items au total · 131 niveau(x) ⚠️ · 4 niveau(x) 🔴.
+**Résumé global :** 130 exercices audités · 4435 items au total · 105 niveau(x) ⚠️ · 0 niveau(x) 🔴.
 
 ## Grammaire — Formes de phrases interrogatives
 
 _Domaine : Français · Exercice : `produire-formes-interrogatives` — Produire différentes formes de phrases interrogatives · **6 items au total**_
 
-**Total par niveau :** Niveau 1 (bank) = 6
+**Total par niveau :** Banque unique (6 items) × 3 paliers de rigueur croissante
 
-### ⚠️ Niveau 1 (bank) (6 items)
+### ⚠️ Banque unique (6 items) × 3 paliers de rigueur croissante
 
 > ⚠️ **Banque faible** : 6 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
 
@@ -22,74 +22,6 @@ _Domaine : Français · Exercice : `produire-formes-interrogatives` — Produire
 4. Il fait beau aujourd'hui.
 5. Les élèves travaillent en classe.
 6. Nous allons à la piscine.
-
-## Probabilités — Dénombrer les issues
-
-_Domaine : Mathématiques · Exercice : `probabilite-issues` — Dénombrer les issues possibles et favorables · **12 items au total**_
-
-**Total par niveau :** Niveau 1 (level: "niveau1") = 3 · Niveau 2 (level: "niveau2") = 5 · Niveau 3 (level: "niveau3") = 4
-
-### 🔴 Niveau 1 (level: "niveau1") (3 items)
-
-> 🔴 **Banque critique** : 3 item(s) < 5 — répétition quasi certaine, quel que soit le niveau.
-
-1. Un dé à six faces. — Clique toutes les issues possibles avec ce dé. — Combien d'issues possibles au total ?
-2. Une roue à 8 secteurs : 6 noirs, 2 blancs. — Clique tous les secteurs. — Combien d'issues possibles au total ?
-3. Une roue à 8 secteurs : 6 noirs, 2 blancs. — Clique tous les secteurs noirs. — Combien d'issues favorables au noir ?
-
-### ⚠️ Niveau 2 (level: "niveau2") (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Un dé équilibré. — Clique tous les nombres pairs. — Combien d'issues favorables aux nombres pairs ?
-2. Un dé équilibré. — Clique tous les nombres impairs. — Combien d'issues favorables aux nombres impairs ?
-3. Un dé équilibré. — Clique le nombre 6. — Combien d'issues favorables à obtenir 6 ?
-4. Urne : 4 rouges, 2 jaunes, 5 bleues. — Clique toutes les boules rouges. — Combien d'issues favorables au rouge ?
-5. Urne : 4 rouges, 2 jaunes, 5 bleues. — Clique toutes les boules bleues. — Combien d'issues favorables au bleu ?
-
-### 🔴 Niveau 3 (level: "niveau3") (4 items)
-
-> 🔴 **Banque critique** : 4 item(s) < 5 — répétition quasi certaine, quel que soit le niveau.
-
-1. Boîte de formes : 2 étoiles, 4 cercles, 3 carrés, 1 triangle. — Clique toutes les étoiles. — Combien d'issues favorables à l'étoile ?
-2. Boîte de formes : 2 étoiles, 4 cercles, 3 carrés, 1 triangle. — Clique tous les cercles. — Combien d'issues favorables au cercle ?
-3. Un dé équilibré. — Clique tous les multiples de 3. — Combien d'issues favorables aux multiples de 3 ?
-4. Un dé équilibré. — Clique tous les nombres inférieurs ou égaux à 5. — Combien d'issues favorables aux nombres ≤ 5 ?
-
-## Probabilités — Écrire une probabilité
-
-_Domaine : Mathématiques · Exercice : `probabilite-nombre` — Exprimer la probabilité comme un nombre · **14 items au total**_
-
-**Total par niveau :** Niveau 1 (level: "niveau1") = 5 · Niveau 2 (level: "niveau2") = 4 · Niveau 3 (level: "niveau3") = 5
-
-### ⚠️ Niveau 1 (level: "niveau1") (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Clique le mot qui décrit la probabilité d'obtenir un 7 avec un dé normal.
-2. Clique le mot qui décrit la probabilité d'obtenir un chiffre entre 1 et 6 avec ce dé.
-3. On lance une pièce. Clique le mot qui décrit la probabilité d'obtenir Pile.
-4. Clique le mot qui décrit la probabilité de gagner au loto avec un seul billet.
-5. Clique le mot qui décrit la probabilité d'obtenir dix fois de suite un 1 avec un dé.
-
-### 🔴 Niveau 2 (level: "niveau2") (4 items)
-
-> 🔴 **Banque critique** : 4 item(s) < 5 — répétition quasi certaine, quel que soit le niveau.
-
-1. Urne : 3 boules noires, 7 blanches. Clique toutes les écritures correctes de la probabilité de tirer une noire.
-2. Dé équilibré. Clique la probabilité (en fraction) d'obtenir un multiple de 3.
-3. Dé équilibré. Clique la probabilité (en fraction) d'obtenir un nombre supérieur à 2.
-4. Dé équilibré. Clique la probabilité (en fraction) d'obtenir un nombre inférieur à 2.
-
-### ⚠️ Niveau 3 (level: "niveau3") (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Clique toutes les écritures équivalentes à un demi.
-2. Clique toutes les écritures équivalentes à trois quarts.
-3. Clique toutes les écritures équivalentes à un dixième.
-4. Clique Pile à chaque fois qu'il apparaît dans cette série de 8 lancers.
-5. Clique Pile à chaque fois qu'il apparaît dans cette série de 10 lancers.
 
 ## Nombres décimaux — Association fraction / décimal
 
@@ -199,625 +131,15 @@ _Domaine : Mathématiques · Exercice : `decomposer-nombre-entier` — Décompos
 4. display: 1 800 605 · add: 1000000+800000+600+5 · vp: 1×1000000, 8×100000, 6×100, 5×1 · lettres: huit · chiffre: 8
 5. display: 450 002 · add: 400000+50000+2 · vp: 4×100000, 5×10000, 2×1 · lettres: quatre · chiffre: 4
 
-## Probabilités — Exprimer une chance
-
-_Domaine : Mathématiques · Exercice : `probabilite-chances` — Utiliser l'expression « a chances sur b » · **15 items au total**_
-
-**Total par niveau :** Niveau 1 (level: "niveau1") = 5 · Niveau 2 (level: "niveau2") = 4 · Niveau 3 (level: "niveau3") = 6
-
-### ⚠️ Niveau 1 (level: "niveau1") (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Sac de billes : 5 rouges, 3 bleues. Quelle est la probabilité de tirer une bille rouge ?
-2. Sac de billes : 5 rouges, 3 bleues. Quelle est la probabilité de tirer une bille bleue ?
-3. Boîte de cubes : 4 verts, 2 jaunes, 1 rouge. Quelle est la probabilité de tirer un cube vert ?
-4. Boîte de cubes : 4 verts, 2 jaunes, 1 rouge. Quelle est la probabilité de tirer un cube jaune ?
-5. Boîte de cubes : 4 verts, 2 jaunes, 1 rouge. Quelle est la probabilité de tirer un cube rouge ?
-
-### 🔴 Niveau 2 (level: "niveau2") (4 items)
-
-> 🔴 **Banque critique** : 4 item(s) < 5 — répétition quasi certaine, quel que soit le niveau.
-
-1. Pièce équilibrée. Quelle est la probabilité d'obtenir Pile ?
-2. Pièce équilibrée. Quelle est la probabilité d'obtenir Face ?
-3. Dé équilibré. Quelle est la probabilité d'obtenir 2 ?
-4. Dé équilibré. Quelle est la probabilité de NE PAS obtenir 2 ?
-
-### ⚠️ Niveau 3 (level: "niveau3") (6 items)
-
-> ⚠️ **Banque faible** : 6 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Urne : 2 étoiles, 4 cercles, 3 carrés, 1 triangle. Quelle est la probabilité de tirer une étoile ?
-2. Urne : 2 étoiles, 4 cercles, 3 carrés, 1 triangle. Quelle est la probabilité de tirer un cercle ?
-3. Urne : 2 étoiles, 4 cercles, 3 carrés, 1 triangle. Quelle est la probabilité de tirer un carré ?
-4. Urne : 2 étoiles, 4 cercles, 3 carrés, 1 triangle. Quelle est la probabilité de tirer un triangle ?
-5. Jeu de 52 cartes. Quelle est la probabilité de tirer une carte rouge ?
-6. Jeu de 52 cartes. Quelle est la probabilité de tirer une carte qui n'est pas rouge ? — Carte pas rouge
-
-## Vocabulaire — Choisir le mot adapté au contexte
-
-_Domaine : Français · Exercice : `mot-adapte-contexte` — Choisir le mot adapté au contexte · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Complète la phrase : « Le chien _____ très fort quand le facteur sonne. »
-2. Quelle phrase utilise le mot le plus adapté pour parler de la démarche d'un éléphant ?
-3. Complète la phrase : « La _____ brillait dans le ciel étoilé de la nuit. »
-4. Dans un compte rendu médical, quel mot est le plus adapté pour parler d'une douleur au ventre ?
-5. Associe chaque animal au verbe qui décrit son cri.
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Complète la phrase : « En automne, les feuilles des arbres _____ et recouvrent le sol. »
-2. Lequel de ces mots est le plus précis pour décrire une lumière très faible et terne ?
-3. Complète : « L'alpiniste avait les jambes _____ après avoir gravi le sommet. »
-4. Complète : « Le conférencier _____ l'assistance avec son exposé passionnant. »
-5. Classe chaque mot selon le contexte où il convient pour décrire le mouvement de l'eau.
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Quel mot convient le mieux dans : « Sa remarque, bien que _____, m'a blessé. » ?
-2. Dans : « Ce discours a _____ l'assemblée », quel verbe convient pour exprimer l'ennui causé par un exposé confus ?
-3. Classe ces adjectifs selon la connotation qu'ils donnent à un sourire.
-4. Dans : « Il la regarda avec une moue _____ », quel adjectif exprime le mieux le dédain ?
-5. Associe chaque mot à la phrase où il est le mieux adapté.
-
-## Vocabulaire — Comprendre l'origine des mots (latin, grec)
-
-_Domaine : Français · Exercice : `origine-mots` — Comprendre l'origine des mots (latin, grec) · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Que signifie la racine latine « aqua » ?
-2. Quelle racine grecque signifie « vie » ?
-3. Associe chaque racine latine ou grecque à sa signification.
-4. Le mot « bibliothèque » vient du grec « biblion » (livre) et « theke » (rangement). Que signifie-t-il littéralement ?
-5. La racine « graph- » (du grec « graphein ») dans « autographe » signifie…
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Associe chaque adjectif savant à son équivalent courant.
-2. Quelle racine grecque se retrouve dans « géographie » et « géologie » ?
-3. Ces mots viennent-ils d'une racine latine ou d'une racine grecque ?
-4. La racine « phon- » (du grec « phone ») dans « microphone » et « téléphone » signifie…
-5. Parmi ces mots, lequel vient de la racine latine « manus » (main) ?
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. La racine grecque « demos » signifie « peuple ». Dans quel mot la retrouve-t-on ?
-2. Associe chaque racine grecque à un mot qui la contient.
-3. Les mots « carnivore », « herbivore » et « omnivore » partagent le suffixe latin « -vore » qui signifie…
-4. Ces racines viennent-elles du latin ou du grec ?
-5. Le mot « philanthrope » (qui aime l'humanité) est formé de…
-
-## Vocabulaire — Comprendre la polysémie d'un mot
-
-_Domaine : Français · Exercice : `polysemie` — Comprendre la polysémie d'un mot · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Un mot qui a plusieurs sens différents s'appelle…
-2. Le mot 'voler' peut signifier : 1. Se déplacer dans les airs  2. Prendre ce qui ne m'appartient pas. Combien de sens a-t-il ?
-3. Dans « Le feu est rouge », que signifie 'feu' ?
-4. Comment trouve-t-on le bon sens d'un mot polysémique ?
-5. Quel mot est polysémique ?
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Le mot 'tête' a plusieurs sens. Associe chaque phrase au sens utilisé.
-2. Dans 'Le boulanger pétrit la pâte', que signifie 'pâte' ?
-3. Associe chaque emploi du mot 'planche' à son sens.
-4. Dans 'Son roman est une mine d'informations', le mot 'mine' signifie…
-5. Pourquoi le mot 'opération' est-il polysémique ?
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Le mot 'pont' signifie 1. ouvrage qui enjambe un cours d'eau 2. partie du navire 3. jour férié entre deux jours chômés. Quel sens 'pont' a-t-il dans 'faire le pont' ?
-2. Associe chaque emploi du mot 'temps' à sa catégorie de sens.
-3. Comment les sens d'un mot polysémique sont-ils souvent liés entre eux ?
-4. Dans 'La vedette du film a du cœur', que signifie 'vedette' ?
-5. Le mot 'lame' a plusieurs sens. Associe chaque emploi à sa définition.
-
-## Vocabulaire — Distinguer les niveaux de langue
-
-_Domaine : Français · Exercice : `niveaux-de-langue` — Distinguer les niveaux de langue · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Quelle phrase est au registre familier ?
-2. Classe chaque expression selon son niveau de langue.
-3. Quel mot est de niveau soutenu pour dire « triste » ?
-4. À quel niveau de langue appartient : « Veuillez agréer l'expression de mes sincères salutations » ?
-5. Dans quelle situation utilise-t-on le registre familier ?
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Laquelle de ces phrases est au registre soutenu ?
-2. Classe ces phrases selon leur niveau de langue.
-3. Quel est l'équivalent soutenu de « Il s'est baladé en ville » ?
-4. Associe chaque expression familière à son équivalent courant.
-5. Pourquoi adapter son niveau de langue selon la situation ?
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Classe ces phrases selon leur niveau de langue.
-2. Quel est l'effet produit par l'utilisation d'un registre soutenu dans un texte ?
-3. Associe chaque formule soutenue à son équivalent courant.
-4. Dans un discours officiel ou un exposé, quel niveau de langue est le plus approprié ?
-5. Classe chaque paire selon le niveau de langue : familier ou soutenu ?
-
-## Vocabulaire — Former un mot dérivé
-
-_Domaine : Français · Exercice : `mot-derive` — Former un mot dérivé · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Quel mot est dérivé de « fleur » avec un suffixe ?
-2. Comment est formé le mot « malheureux » ?
-3. Associe chaque base à son mot dérivé.
-4. Quel préfixe ajoute-t-on à « possible » pour former son contraire ?
-5. Quel mot est formé par préfixation à partir de « honnête » ?
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Quel est le mot de base (radical sans affixes) de « débranchement » ?
-2. Comment est formé « imperméable » ?
-3. Classe chaque mot selon son type de dérivation.
-4. Quel mot est formé avec à la fois un préfixe ET un suffixe ?
-5. Associe chaque mot à sa structure de dérivation.
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Le mot « invraisemblable » est formé de…
-2. Classe chaque mot : est-il dérivé (préfixe ou suffixe) ou composé (deux mots indépendants réunis) ?
-3. Quelle est la différence entre un mot dérivé et un mot composé ?
-4. Dans « extraordinaire », le préfixe « extra- » signifie…
-5. Associe chaque mot à sa structure morphologique.
-
-## Vocabulaire — Identifier le radical d'un mot
-
-_Domaine : Français · Exercice : `identifier-radical` — Identifier le radical d'un mot · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Quel est le radical du mot « chanteur » ?
-2. Quel est le radical commun à « jardiner », « jardinier » et « jardinage » ?
-3. Associe chaque mot à son radical.
-4. Le radical d'un mot, c'est…
-5. Quel est le radical du mot « fleuriste » ?
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Quel est le radical du mot « invisible » ?
-2. Quel est le radical du mot « agrandissement » ?
-3. Associe chaque mot à son radical (attention aux petits changements de forme).
-4. Quel radical partagent « boulanger », « boulangerie » et « boulangère » ?
-5. Quel est le radical du mot « malheureux » ?
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Quel est le radical commun à « portable », « transport » et « importation » ?
-2. Classe chaque mot selon son radical : radical « vis/voir » ou radical « aud/entendre » ?
-3. Dans « biologie », « zoologie » et « psychologie », quel est le radical grec commun ?
-4. Quel est le radical commun à « lumineux », « illuminer » et « luminosité » ?
-5. Associe chaque radical latin à sa signification.
-
-## Vocabulaire — Identifier le sens propre et le sens figuré
-
-_Domaine : Français · Exercice : `sens-propre-figure` — Identifier le sens propre et le sens figuré · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Que signifie 'sens propre' d'un mot ?
-2. Clique sur la bonne colonne pour chaque phrase.
-3. Dans 'Il a un cœur de pierre', le mot 'pierre' est au…
-4. Quelle phrase utilise 'lourd' au sens figuré ?
-5. Dans 'La rivière coule vite', 'couler' est au…
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Clique sur 'Sens propre' ou 'Sens figuré' pour chaque phrase.
-2. Que signifie l'expression 'avoir le cafard' au sens figuré ?
-3. Quelle est la différence entre le sens propre et le sens figuré du mot 'feu' dans 'Mettre le feu aux poudres' ?
-4. Quelle phrase utilise 'tomber' au sens figuré ?
-5. Dans 'Cette musique m'a transporté', quel est le sens figuré de 'transporté' ?
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Classe ces expressions : sens propre ou sens figuré ?
-2. Dans un poème, le poète écrit : 'L'aurore aux doigts de rose ouvre les portes du ciel.' Quelle figure de style utilise-t-il ?
-3. Expliquer le sens figuré de 'La discussion a dégénéré' : que veut dire 'dégénérer' ici ?
-4. Quel énoncé résume le mieux la relation entre sens propre et sens figuré ?
-5. Lequel de ces titres utilise un mot au sens figuré ?
-
-## Vocabulaire — Identifier un champ lexical
-
-_Domaine : Français · Exercice : `champ-lexical` — Identifier un champ lexical · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Classe chaque mot : appartient-il au champ lexical de la mer ?
-2. Quel mot N'appartient PAS au champ lexical de la forêt ?
-3. Classe chaque mot dans son champ lexical.
-4. Qu'est-ce qu'un champ lexical ?
-5. Quel groupe de mots forme le champ lexical de la peur ?
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Classe chaque mot dans son champ lexical.
-2. Quel mot inattendu peut appartenir au champ lexical de la lumière ?
-3. Classe chaque mot dans son champ lexical.
-4. Quelle est la différence entre un champ lexical et une famille de mots ?
-5. Quel est le champ lexical dominant dans : « Le chirurgien prit son bistouri, ausculta le patient et posa un diagnostic » ?
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Un mot peut-il appartenir à plusieurs champs lexicaux ?
-2. Classe chaque mot dans le bon champ lexical du mot « temps ».
-3. Dans quel champ lexical range-t-on le mot « éclipse » ?
-4. Associe chaque mot savant au champ lexical qu'il évoque.
-5. Dans : « Les cordes vibrèrent, la mélodie s'éleva, le maestro leva sa baguette », quel est le champ lexical dominant ?
-
-## Vocabulaire — Identifier un homonyme
-
-_Domaine : Français · Exercice : `identifier-homonyme` — Identifier un homonyme · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Que sont 'mère' et 'mer' ?
-2. Complète : « Nous avons navigué sur la ___ pendant toute la journée. »
-3. Associe chaque homonyme à sa définition.
-4. Qu'est-ce que deux homonymes ont en commun ?
-5. Quel est l'homonyme du mot 'sot' (stupide) ?
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Choisis le bon mot : « Je voudrais un ___ d'eau, s'il vous plaît. »
-2. Quelle phrase utilise correctement 'ou' et 'où' ?
-3. Choisis le bon homonyme : « Il ___ son manteau sur le fauteuil. »
-4. Associe chaque homonyme à la phrase où il doit apparaître.
-5. Pourquoi est-il important de connaître les homonymes ?
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Dans « Ces cèdres cèdent sous le vent », combien de mots se prononcent pareil mais s'écrivent différemment ?
-2. Associe chaque paire d'homophones à leur différence grammaticale.
-3. Lequel de ces couples n'est PAS une paire d'homonymes ?
-4. Dans « Il compte sur ses doigts », 'compte' est un homonyme de…
-5. Quelle stratégie permet de ne PAS confondre 'davantage' et 'd'avantage' ?
-
-## Vocabulaire — Identifier un préfixe
-
-_Domaine : Français · Exercice : `identifier-prefixe` — Identifier un préfixe · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Quel est le préfixe dans le mot « déplacer » ?
-2. Que signifie le préfixe « re- » dans « recommencer » ?
-3. Associe chaque préfixe à sa signification.
-4. Quel mot contient un préfixe ?
-5. Quel préfixe faut-il ajouter à « heureux » pour former son contraire ?
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Que signifie le préfixe « anti- » dans « antiviolence » ?
-2. Le préfixe « inter- » dans « intercontinental » signifie…
-3. Classe chaque mot selon le sens de son préfixe.
-4. Quel préfixe donne à « possible » son contraire ?
-5. Que signifie le préfixe « bi- » dans « bilingue » ?
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Quel préfixe grec signifiant « loin » retrouve-t-on dans « téléphone », « télévision » et « télécommunication » ?
-2. Associe chaque préfixe savant à sa signification.
-3. Dans « hypothèse », quel préfixe grec signifie « sous, en dessous » ?
-4. Classe chaque mot selon le sens de son préfixe : « au-delà / trop » ou « en dessous / pas assez » ?
-5. Le préfixe « anthropo- » (dans « anthropologie ») vient du grec et signifie…
-
-## Vocabulaire — Identifier un suffixe
-
-_Domaine : Français · Exercice : `identifier-suffixe` — Identifier un suffixe · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Quel est le suffixe dans le mot « jardinage » ?
-2. Que signifie le suffixe « -eur » dans « plongeur » ?
-3. Associe chaque suffixe à ce qu'il exprime.
-4. Quel mot contient un suffixe signifiant « petite taille » ?
-5. Quel suffixe retrouve-t-on dans « épicerie », « boulangerie » et « boucherie » pour désigner un lieu de commerce ?
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Quel suffixe transforme l'adjectif « rapide » en adverbe ?
-2. Associe chaque suffixe à la catégorie grammaticale qu'il crée.
-3. Classe chaque mot : le suffixe désigne-t-il une personne ou une action/résultat ?
-4. Le suffixe « -iste » dans « fleuriste » exprime…
-5. Quel suffixe dans « livraison » crée un nom d'action à partir du verbe « livrer » ?
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Le suffixe « -logie » dans « biologie », « zoologie » et « psychologie » vient du grec et signifie…
-2. Associe chaque suffixe d'origine grecque à sa signification.
-3. Dans « omnivore », quel suffixe signifie « qui mange » ?
-4. Classe chaque suffixe selon son origine : grec ou latin ?
-5. Le suffixe « -graphie » (dans « photographie ») vient du grec « graphein » qui signifie…
-
-## Vocabulaire — Identifier une famille de mots
-
-_Domaine : Français · Exercice : `famille-de-mots` — Identifier une famille de mots · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Quel mot appartient à la famille de « chant » ?
-2. Quel mot N'appartient PAS à la famille de « marcher » ?
-3. Associe chaque mot à un autre membre de sa famille.
-4. Quel groupe forme une famille de mots ?
-5. Quel est le radical commun à « porteur », « portage » et « portable » ?
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Quel mot est un intrus dans la famille de « pied » ?
-2. Les mots « chaud », « chauffer » et « surchauffé » forment-ils une famille ?
-3. Associe chaque mot à son dérivé de même famille.
-4. Pourquoi « dent » et « dentifrice » appartiennent-ils à la même famille ?
-5. Parmi ces mots, lequel est de la famille de « lire » ?
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Les mots « main » et « manuel » appartiennent-ils à la même famille ?
-2. Associe chaque mot savant (origine latine ou grecque) à son équivalent courant.
-3. Classe chaque mot dans sa famille : famille de « port » ou famille de « fort » ?
-4. Quel mot n'appartient PAS à la famille de « voir » ?
-5. Pourquoi « dentiste » et « trident » appartiennent-ils à la même famille ?
-
-## Vocabulaire — Ranger dans l'ordre alphabétique
-
-_Domaine : Français · Exercice : `ordre-alphabetique` — Ranger dans l'ordre alphabétique · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Clique sur les mots dans l'ordre alphabétique (du premier au dernier).
-2. Quel groupe de mots est dans l'ordre alphabétique ?
-3. Quel mot vient en PREMIER dans le dictionnaire ?
-4. Clique sur les mots dans l'ordre alphabétique.
-5. Pour classer des mots dans un dictionnaire, on compare d'abord…
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Ces mots commencent tous par la même lettre. Clique-les dans l'ordre alphabétique.
-2. Quel mot vient AVANT 'manger' dans le dictionnaire ?
-3. Clique sur ces fruits dans l'ordre alphabétique.
-4. Dans le dictionnaire, dans quel ordre viennent : 'porte', 'portée', 'portrait' ?
-5. Quel mot vient APRÈS 'fleuve' dans le dictionnaire ?
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Classement délicat ! Clique ces mots dans l'ordre du dictionnaire.
-2. On cherche 'trace' dans le dictionnaire. Entre quels mots se trouve-t-il ?
-3. Classe ces mots dans l'ordre du dictionnaire.
-4. Pour ranger 'acacia' et 'accent' dans le dictionnaire, quelle lettre compare-t-on en 3e position ?
-5. Un élève hésite pour classer 'île' et 'image'. Quelle règle faut-il lui rappeler ?
-
-## Vocabulaire — Regrouper des mots par thème
-
-_Domaine : Français · Exercice : `regrouper-par-theme` — Regrouper des mots par thème · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Classe chaque mot dans son thème.
-2. Quel mot n'appartient PAS au thème des sports ?
-3. Classe chaque mot dans son thème.
-4. Quel groupe de mots appartient entièrement au thème de la cuisine ?
-5. Associe chaque mot à son thème.
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Classe chaque mot dans son thème.
-2. Quel mot est l'intrus dans cette liste liée au thème de la mer ?
-3. Classe chaque mot dans son thème.
-4. À quel thème général appartiennent « flûte », « violon », « batterie » et « trompette » ?
-5. Associe chaque groupe de mots à son thème.
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Classe chaque mot dans son thème.
-2. Quel mot peut appartenir à deux thèmes différents selon le contexte ?
-3. Classe chaque mot dans son thème.
-4. Dans quel thème général range-t-on les mots « épistolaire », « narratif », « lyrique » et « dramatique » ?
-5. Associe chaque mot savant au domaine thématique auquel il appartient.
-
-## Vocabulaire — Trouver un antonyme
-
-_Domaine : Français · Exercice : `trouver-antonyme` — Trouver un antonyme · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Quel est l'antonyme (contraire) de 'chaud' ?
-2. Associe chaque mot à son contraire. Clique un mot à gauche puis son antonyme à droite.
-3. Quel est l'antonyme de 'grand' ?
-4. L'antonyme de 'commencer' est…
-5. Associe chaque adjectif à son contraire.
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Comment forme-t-on souvent l'antonyme de 'honnête' ?
-2. Forme l'antonyme de chaque mot en ajoutant le bon préfixe. Associe le mot à son antonyme.
-3. Dans 'La lumière s'allume', l'antonyme du verbe 's'allume' est…
-4. Quel est l'antonyme de 'présent' dans la phrase 'L'élève est présent' ?
-5. Pourquoi un même mot peut-il avoir plusieurs antonymes différents ?
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Dans un texte littéraire, quel antonyme de 'sombre' est le plus évocateur pour décrire un paysage lumineux ?
-2. Associe chaque adjectif à son antonyme le plus précis dans le contexte littéraire.
-3. L'antonyme de 'espoir' dans le sens philosophique est…
-4. Ces verbes ont des antonymes différents selon le contexte. Associe chaque emploi à son contraire.
-5. Dans 'Sa réponse était évasive', l'antonyme exact de 'évasive' est…
-
-## Vocabulaire — Trouver un synonyme
-
-_Domaine : Français · Exercice : `trouver-synonyme` — Trouver un synonyme · **15 items au total**_
-
-**Total par niveau :** Niveau 1 = 5 · Niveau 2 = 5 · Niveau 3 = 5
-
-### ⚠️ Niveau 1 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
-
-1. Quel est le synonyme de 'content' ?
-2. Quel est le synonyme de 'rapide' ?
-3. Associe chaque mot à son synonyme. Clique un mot à gauche, puis son synonyme à droite.
-4. Deux mots sont synonymes quand ils ont…
-5. Quel mot peut remplacer 'courageux' sans changer le sens de la phrase ?
-
-### ⚠️ Niveau 2 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Associe chaque mot à son synonyme. Clique un mot à gauche, puis son synonyme à droite.
-2. Pour parler de la démarche d'un lion, quel synonyme de 'marcher' est le plus précis ?
-3. Dans la phrase 'Le scientifique a analysé le produit', quel synonyme de 'analysé' convient le mieux ?
-4. Associe les synonymes de l'adjectif 'grand' selon leur nuance.
-5. Pourquoi deux synonymes ne sont-ils pas toujours interchangeables ?
-
-### ⚠️ Niveau 3 (5 items)
-
-> ⚠️ **Banque faible** : 5 item(s) < 8 (seuil Niveau 2/3+) — risque de répétition perçue par l'élève.
-
-1. Dans un texte sur la mer, quel synonyme de 'bruit' est le plus précis pour parler des vagues ?
-2. Associe chaque verbe à son synonyme le plus précis dans le contexte indiqué.
-3. La phrase 'Le directeur était irrité' est au niveau courant. Quel synonyme d'irrité convient dans un texte soutenu ?
-4. Pour éviter la répétition du verbe 'dire' dans un récit, quel synonyme ne convient PAS pour une réponse agressive ?
-5. Chaque phrase a un mot souligné. Associe-la au synonyme soutenu qui pourrait le remplacer.
-
 ## Fractions — Encadrer
 
 _Domaine : Mathématiques · Exercice : `encadrer-fraction` — Encadrer une fraction entre deux entiers consécutifs · **16 items au total**_
 
-**Total par niveau :** Niveau 1 (bank) = 16
+**Total par niveau :** Niveau 1 (difficulty: 1) = 8 · Niveau 2 (difficulty: 2) = 8
 
-### Niveau 1 (bank) (16 items)
+### ⚠️ Niveau 1 (difficulty: 1) (8 items)
+
+> ⚠️ **Banque faible** : 8 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
 
 1. numerator: 7 · denominator: 4 · lo: 1 · hi: 2 · difficulty: 1
 2. numerator: 5 · denominator: 2 · lo: 2 · hi: 3 · difficulty: 1
@@ -827,14 +149,17 @@ _Domaine : Mathématiques · Exercice : `encadrer-fraction` — Encadrer une fra
 6. numerator: 7 · denominator: 2 · lo: 3 · hi: 4 · difficulty: 1
 7. numerator: 13 · denominator: 5 · lo: 2 · hi: 3 · difficulty: 1
 8. numerator: 9 · denominator: 2 · lo: 4 · hi: 5 · difficulty: 1
-9. numerator: 47 · denominator: 10 · lo: 4 · hi: 5 · difficulty: 2
-10. numerator: 23 · denominator: 4 · lo: 5 · hi: 6 · difficulty: 2
-11. numerator: 38 · denominator: 5 · lo: 7 · hi: 8 · difficulty: 2
-12. numerator: 31 · denominator: 7 · lo: 4 · hi: 5 · difficulty: 2
-13. numerator: 53 · denominator: 8 · lo: 6 · hi: 7 · difficulty: 2
-14. numerator: 29 · denominator: 6 · lo: 4 · hi: 5 · difficulty: 2
-15. numerator: 41 · denominator: 9 · lo: 4 · hi: 5 · difficulty: 2
-16. numerator: 43 · denominator: 6 · lo: 7 · hi: 8 · difficulty: 2
+
+### Niveau 2 (difficulty: 2) (8 items)
+
+1. numerator: 47 · denominator: 10 · lo: 4 · hi: 5 · difficulty: 2
+2. numerator: 23 · denominator: 4 · lo: 5 · hi: 6 · difficulty: 2
+3. numerator: 38 · denominator: 5 · lo: 7 · hi: 8 · difficulty: 2
+4. numerator: 31 · denominator: 7 · lo: 4 · hi: 5 · difficulty: 2
+5. numerator: 53 · denominator: 8 · lo: 6 · hi: 7 · difficulty: 2
+6. numerator: 29 · denominator: 6 · lo: 4 · hi: 5 · difficulty: 2
+7. numerator: 41 · denominator: 9 · lo: 4 · hi: 5 · difficulty: 2
+8. numerator: 43 · denominator: 6 · lo: 7 · hi: 8 · difficulty: 2
 
 ## Lecture — Comprendre les implicites
 
@@ -991,9 +316,11 @@ _Domaine : Mathématiques · Exercice : `placer-fraction-droite-graduee` — Pla
 
 _Domaine : Mathématiques · Exercice : `lire-fraction` — Lire une fraction · **20 items au total**_
 
-**Total par niveau :** Niveau 1 (bank) = 20
+**Total par niveau :** Niveau 1 (difficulty: 1) = 10 · Niveau 2 (difficulty: 2) = 10
 
-### Niveau 1 (bank) (20 items)
+### ⚠️ Niveau 1 (difficulty: 1) (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
 
 1. parts: 2 · colored: 1 · shape: strip · difficulty: 1
 2. parts: 4 · colored: 1 · shape: strip · difficulty: 1
@@ -1005,16 +332,19 @@ _Domaine : Mathématiques · Exercice : `lire-fraction` — Lire une fraction ·
 8. parts: 6 · colored: 5 · shape: circle · difficulty: 1
 9. parts: 4 · colored: 2 · shape: rect · cols: 2 · difficulty: 1
 10. parts: 6 · colored: 4 · shape: rect · cols: 3 · difficulty: 1
-11. parts: 4 · colored: 5 · shape: strip · difficulty: 2
-12. parts: 4 · colored: 7 · shape: strip · difficulty: 2
-13. parts: 3 · colored: 4 · shape: circle · difficulty: 2
-14. parts: 5 · colored: 6 · shape: strip · difficulty: 2
-15. parts: 3 · colored: 5 · shape: circle · difficulty: 2
-16. parts: 4 · colored: 9 · shape: strip · difficulty: 2
-17. parts: 8 · colored: 5 · shape: rect · cols: 4 · difficulty: 2
-18. parts: 10 · colored: 7 · shape: rect · cols: 5 · difficulty: 2
-19. parts: 6 · colored: 4 · shape: circle · difficulty: 2
-20. parts: 9 · colored: 6 · shape: rect · cols: 3 · difficulty: 2
+
+### Niveau 2 (difficulty: 2) (10 items)
+
+1. parts: 4 · colored: 5 · shape: strip · difficulty: 2
+2. parts: 4 · colored: 7 · shape: strip · difficulty: 2
+3. parts: 3 · colored: 4 · shape: circle · difficulty: 2
+4. parts: 5 · colored: 6 · shape: strip · difficulty: 2
+5. parts: 3 · colored: 5 · shape: circle · difficulty: 2
+6. parts: 4 · colored: 9 · shape: strip · difficulty: 2
+7. parts: 8 · colored: 5 · shape: rect · cols: 4 · difficulty: 2
+8. parts: 10 · colored: 7 · shape: rect · cols: 5 · difficulty: 2
+9. parts: 6 · colored: 4 · shape: circle · difficulty: 2
+10. parts: 9 · colored: 6 · shape: rect · cols: 3 · difficulty: 2
 
 ## Fractions — Représenter
 
@@ -1049,38 +379,6 @@ _Domaine : Mathématiques · Exercice : `representer-fraction` — Représenter 
 8. numerator: 4 · denominator: 5 · partitions: 10
 9. numerator: 3 · denominator: 6 · partitions: 12
 10. numerator: 5 · denominator: 6 · partitions: 12
-
-## Grammaire — L'attribut du sujet
-
-_Domaine : Français · Exercice : `identifier-attribut-sujet` — Identifier un attribut du sujet · **20 items au total**_
-
-**Total par niveau :** Niveau 2 = 10 · Niveau 3 = 10
-
-### Niveau 2 (10 items)
-
-1. Le ciel est gris .
-2. Cette soupe semble délicieuse .
-3. Mes cousins paraissent fatigués .
-4. La forêt reste silencieuse .
-5. Les élèves ont l'air contents .
-6. Ce livre est devenu célèbre .
-7. La maison paraissait abandonnée .
-8. Les enfants semblaient heureux .
-9. Le repas semble savoureux .
-10. Les acteurs paraissent nerveux .
-
-### Niveau 3 (10 items)
-
-1. Le grand chat noir est agile .
-2. Cette jolie fleur rouge semble fanée .
-3. Le vieux pont paraît solide .
-4. Ma petite sœur est timide .
-5. Ce long voyage était fatigant .
-6. Les belles montagnes restent majestueuses .
-7. Un jeune chien curieux semble effrayé .
-8. La nouvelle élève paraît sympathique .
-9. Ce vieux professeur patient reste calme .
-10. Ma jeune cousine timide semble ravie .
 
 ## Grammaire — Épithète et attribut du sujet
 
@@ -2268,6 +1566,53 @@ _Domaine : Français · Exercice : `conjuguer-plus-que-parfait` — Conjuguer au
 9. Les filles ________ avant la tombée de la nuit.
 10. Paul et Marie ________ ensemble à la fête, main dans la main.
 
+## Grammaire — Accord de l'attribut du sujet
+
+_Domaine : Français · Exercice : `accorder-attribut-sujet` — Accorder l'attribut du sujet avec le sujet · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Elle est ________ .
+2. Les enfants sont ________ .
+3. Il semble ________ .
+4. Mes sœurs paraissent ________ .
+5. Le chat reste ________ .
+6. La maison est ________ .
+7. Les élèves deviennent ________ .
+8. Cette histoire a l'air ________ .
+9. Tes cousines semblent ________ .
+10. Le film est ________ .
+
+### Niveau 2 (10 items)
+
+1. Les fleurs sont ________ .
+2. Paul et Marc semblent ________ .
+3. Mes amies restent ________ .
+4. Les enfants paraissent ________ .
+5. Sophie et Léa sont ________ .
+6. Les résultats sont ________ .
+7. Les feuilles deviennent ________ .
+8. Tom et Léo ont l'air ________ .
+9. Les vagues étaient ________ .
+10. Les enfants semblent ________ .
+
+### Niveau 3 (10 items)
+
+1. Paul et Marie sont ________ .
+2. La classe est ________ .
+3. Vous êtes ________ , Madame.
+4. Léa et Thomas paraissent ________ .
+5. L'équipe est ________ .
+6. Vous semblez ________ , Monsieur.
+7. Ma sœur et mon frère sont ________ .
+8. La foule était ________ .
+9. Vous paraissez ________ , les enfants.
+10. Le groupe reste ________ .
+
 ## Grammaire — Attribut du sujet et complément d'objet
 
 _Domaine : Français · Exercice : `distinguer-attribut-sujet-complement-objet` — Distinguer l'attribut du sujet et le complément d'objet · **30 items au total**_
@@ -2691,6 +2036,53 @@ _Domaine : Français · Exercice : `identifier-adverbe` — Identifier les adver
 9. Clique sur tous les adverbes de la phrase.
 10. Clique sur tous les adverbes de la phrase.
 
+## Grammaire — L'attribut du sujet
+
+_Domaine : Français · Exercice : `identifier-attribut-sujet` — Identifier un attribut du sujet · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Trouve le verbe d'état parmi ces 4 verbes. — est · court · joue · mange
+2. Trouve le verbe d'état parmi ces 4 verbes. — semble · dessine · chante · saute
+3. Trouve le verbe d'état parmi ces 4 verbes. — deviennent · parlent · écoutent · lisent
+4. Trouve le verbe d'état parmi ces 4 verbes. — paraît · travaille · nage · écrit
+5. Trouve le verbe d'état parmi ces 4 verbes. — reste · marche · dort · crie
+6. Trouve le verbe d'état parmi ces 4 verbes (ou groupes de mots). — ont l'air · construisent · réparent · jettent
+7. Trouve le verbe d'état parmi ces 4 verbes. — étaient · couraient · dansaient · pleuraient
+8. Trouve le verbe d'état parmi ces 4 verbes. — semblait · regardait · tombait · criait
+9. Trouve le verbe d'état parmi ces 4 verbes (ou groupes de mots). — est devenu · a grandi · a couru · a sauté
+10. Trouve le verbe d'état parmi ces 4 verbes. — restent · jouent · mangent · dessinent
+
+### Niveau 2 (10 items)
+
+1. Le ciel est gris .
+2. Cette soupe semble délicieuse .
+3. Mes cousins paraissent fatigués .
+4. La forêt reste silencieuse .
+5. Les élèves ont l'air contents .
+6. Ce livre est devenu célèbre .
+7. La maison paraissait abandonnée .
+8. Les enfants semblaient heureux .
+9. Le repas semble savoureux .
+10. Les acteurs paraissent nerveux .
+
+### Niveau 3 (10 items)
+
+1. Le grand chat noir est agile .
+2. Cette jolie fleur rouge semble fanée .
+3. Le vieux pont paraît solide .
+4. Ma petite sœur est timide .
+5. Ce long voyage était fatigant .
+6. Les belles montagnes restent majestueuses .
+7. Un jeune chien curieux semble effrayé .
+8. La nouvelle élève paraît sympathique .
+9. Ce vieux professeur patient reste calme .
+10. Ma jeune cousine timide semble ravie .
+
 ## Grammaire — La phrase complexe
 
 _Domaine : Français · Exercice : `reperer-propositions` — Repérer les propositions dans une phrase complexe · **30 items au total**_
@@ -2972,6 +2364,53 @@ _Domaine : Français · Exercice : `identifier-groupe-circonstanciel` — Identi
 8. Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).
 9. Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).
 10. Clique sur le(s) mot(s) qui forment le ou les complément(s) circonstanciel(s).
+
+## Grammaire — Les compléments circonstanciels
+
+_Domaine : Français · Exercice : `differencier-cc-temps-lieu-cause` — Différencier les compléments circonstanciels de temps, de lieu et de cause · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quelle est la nature du complément circonstanciel souligné ? — Il range ses affaires <span class='ex-teal-hl'>dans son armoire</span> .
+2. Quelle est la nature du complément circonstanciel souligné ? — Nous partirons <span class='ex-teal-hl'>demain matin</span> .
+3. Quelle est la nature du complément circonstanciel souligné ? — Elle a réussi <span class='ex-teal-hl'>grâce à ses efforts</span> .
+4. Quelle est la nature du complément circonstanciel souligné ? — Les enfants jouent <span class='ex-teal-hl'>dans le jardin</span> .
+5. Quelle est la nature du complément circonstanciel souligné ? — <span class='ex-teal-hl'>Pendant les vacances</span> , nous irons à la mer .
+6. Quelle est la nature du complément circonstanciel souligné ? — Il a raté le bus <span class='ex-teal-hl'>à cause de la pluie</span> .
+7. Quelle est la nature du complément circonstanciel souligné ? — Il se sent bien <span class='ex-teal-hl'>chez ses grands-parents</span> .
+8. Quelle est la nature du complément circonstanciel souligné ? — <span class='ex-teal-hl'>Avant de partir</span> , vérifie que tout est éteint .
+9. Quelle est la nature du complément circonstanciel souligné ? — <span class='ex-teal-hl'>Comme il était fatigué</span> , il s'est couché tôt .
+10. Quelle est la nature du complément circonstanciel souligné ? — Le chat dort <span class='ex-teal-hl'>sur le canapé</span> .
+
+### Niveau 2 (10 items)
+
+1. Trouve le complément circonstanciel de la phrase, puis indique sa nature. — Clique sur le complément circonstanciel de cette phrase. — Quelle est la nature de ce complément circonstanciel ?
+2. Trouve le complément circonstanciel de la phrase, puis indique sa nature. — Clique sur le complément circonstanciel de cette phrase. — Quelle est la nature de ce complément circonstanciel ?
+3. Trouve le complément circonstanciel de la phrase, puis indique sa nature. — Clique sur le complément circonstanciel de cette phrase. — Quelle est la nature de ce complément circonstanciel ?
+4. Trouve le complément circonstanciel de la phrase, puis indique sa nature. — Clique sur le complément circonstanciel de cette phrase. — Quelle est la nature de ce complément circonstanciel ?
+5. Trouve le complément circonstanciel de la phrase, puis indique sa nature. — Clique sur le complément circonstanciel de cette phrase. — Quelle est la nature de ce complément circonstanciel ?
+6. Trouve le complément circonstanciel de la phrase, puis indique sa nature. — Clique sur le complément circonstanciel de cette phrase. — Quelle est la nature de ce complément circonstanciel ?
+7. Trouve le complément circonstanciel de la phrase, puis indique sa nature. — Clique sur le complément circonstanciel de cette phrase. — Quelle est la nature de ce complément circonstanciel ?
+8. Trouve le complément circonstanciel de la phrase, puis indique sa nature. — Clique sur le complément circonstanciel de cette phrase. — Quelle est la nature de ce complément circonstanciel ?
+9. Trouve le complément circonstanciel de la phrase, puis indique sa nature. — Clique sur le complément circonstanciel de cette phrase. — Quelle est la nature de ce complément circonstanciel ?
+10. Trouve le complément circonstanciel de la phrase, puis indique sa nature. — Clique sur le complément circonstanciel de cette phrase. — Quelle est la nature de ce complément circonstanciel ?
+
+### Niveau 3 (10 items)
+
+1. Clique sur le complément circonstanciel de temps.
+2. Clique sur le complément circonstanciel de lieu.
+3. Clique sur le complément circonstanciel de lieu.
+4. Clique sur le complément circonstanciel de cause.
+5. Clique sur le complément circonstanciel de cause.
+6. Clique sur le complément circonstanciel de temps.
+7. Clique sur le complément circonstanciel de temps.
+8. Clique sur le complément circonstanciel de lieu.
+9. Clique sur le complément circonstanciel de cause.
+10. Clique sur le complément circonstanciel de lieu.
 
 ## Grammaire — Pronoms personnels
 
@@ -3353,9 +2792,11 @@ _Domaine : Mathématiques · Exercice : `droite-graduee-nombres-entiers` — Lir
 
 _Domaine : Mathématiques · Exercice : `ecrire-nombre-entier-chiffres` — Écrire un nombre en chiffres · **30 items au total**_
 
-**Total par niveau :** Niveau 1 (level: "CM1") = 15 · Niveau 2 (level: "CM2") = 15
+**Total par niveau :** Niveau 1 (level: "CM1") = 10 · Niveau 2 (level: "CM2") = 10 · Niveau 3 (level: "6e") = 10
 
-### Niveau 1 (level: "CM1") (15 items)
+### ⚠️ Niveau 1 (level: "CM1") (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
 
 1. Écris en chiffres : — soixante-cinq
 2. Écris ce nombre en chiffres : — soixante-treize
@@ -3366,14 +2807,9 @@ _Domaine : Mathématiques · Exercice : `ecrire-nombre-entier-chiffres` — Écr
 7. Écris en chiffres : — cinq-mille-soixante
 8. Écris ce nombre en chiffres : — douze-mille-cinq
 9. Écris en chiffres : — quarante-cinq-mille-trois-cents
-10. Écris ce nombre en chiffres : — quatre-vingt-sept-mille-six-cent-trente-neuf
-11. Écris en chiffres : — cent-mille-huit
-12. Écris ce nombre en chiffres : — deux-cent-mille-cent
-13. Écris en chiffres : — cinq-cent-mille-deux-cent-soixante
-14. Écris ce nombre en chiffres : — six-cent-quarante-deux-mille-treize
-15. Écris en chiffres : — neuf-cent-mille-neuf-cent-un
+10. Écris en chiffres : — cent-mille-huit
 
-### Niveau 2 (level: "CM2") (15 items)
+### Niveau 2 (level: "CM2") (10 items)
 
 1. Écris en chiffres : — un-million
 2. Écris ce nombre en chiffres : — deux-millions-trois-cent-mille
@@ -3385,19 +2821,29 @@ _Domaine : Mathématiques · Exercice : `ecrire-nombre-entier-chiffres` — Écr
 8. Écris ce nombre en chiffres : — soixante-quinze-millions-trois-cent-mille-quarante-deux
 9. Écris en chiffres : — cent-millions
 10. Écris ce nombre en chiffres : — deux-cent-millions
-11. Écris en chiffres : — trois-cent-quarante-cinq-millions-six-cent-soixante-dix-huit-mille-neuf-cent-douze
-12. Écris ce nombre en chiffres : — huit-cent-millions-huit-cents
-13. Écris en chiffres : — deux-cent-cinquante-quatre-millions-sept-cent-trente-deux-mille-cent-neuf
-14. Écris ce nombre en chiffres : — neuf-millions-neuf-cent-mille-neuf-cents
-15. Écris en chiffres : — quatre-cent-millions-dix-mille-soixante
+
+### Niveau 3 (level: "6e") (10 items)
+
+1. Écris en chiffres : — un-milliard-cinquante-millions
+2. Écris ce nombre en chiffres : — deux-milliards-trois-cent-millions
+3. Écris en chiffres : — cinq-milliards-cinquante-mille
+4. Écris ce nombre en chiffres : — dix-milliards-quatre-cent-vingt-millions
+5. Écris en chiffres : — vingt-cinq-milliards
+6. Écris ce nombre en chiffres : — cinquante-milliards-six-millions
+7. Écris en chiffres : — un-milliard-deux-cent-millions
+8. Écris ce nombre en chiffres : — soixante-quinze-milliards-trois-cent-millions-quarante-deux-mille
+9. Écris en chiffres : — cent-milliards
+10. Écris ce nombre en chiffres : — deux-cent-milliards
 
 ## Nombres entiers — Écriture en lettres
 
 _Domaine : Mathématiques · Exercice : `ecrire-nombre-entier-lettres` — Écrire un nombre en lettres · **30 items au total**_
 
-**Total par niveau :** Niveau 1 (level: "CM1") = 15 · Niveau 2 (level: "CM2") = 15
+**Total par niveau :** Niveau 1 (level: "CM1") = 10 · Niveau 2 (level: "CM2") = 10 · Niveau 3 (level: "6e") = 10
 
-### Niveau 1 (level: "CM1") (15 items)
+### ⚠️ Niveau 1 (level: "CM1") (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
 
 1. Choisis l'écriture correcte en lettres : — 80
 2. Écris ce nombre en lettres : — 21
@@ -3409,13 +2855,8 @@ _Domaine : Mathématiques · Exercice : `ecrire-nombre-entier-lettres` — Écri
 8. Choisis l'écriture correcte en lettres : — 2 000
 9. Écris ce nombre en lettres : — 1 200
 10. Choisis l'écriture correcte en lettres : — 1 201
-11. Écris ce nombre en lettres : — 3 500
-12. Choisis l'écriture correcte en lettres : — 80 000
-13. Écris ce nombre en lettres : — 100 000
-14. Choisis l'écriture correcte en lettres : — 45 300
-15. Écris ce nombre en lettres : — 200 400
 
-### Niveau 2 (level: "CM2") (15 items)
+### Niveau 2 (level: "CM2") (10 items)
 
 1. Choisis l'écriture correcte en lettres : — 1 000 000
 2. Écris ce nombre en lettres : — 2 000 000
@@ -3427,11 +2868,19 @@ _Domaine : Mathématiques · Exercice : `ecrire-nombre-entier-lettres` — Écri
 8. Écris ce nombre en lettres : — 12 000 000
 9. Choisis l'écriture correcte en lettres : — 1 200 000
 10. Écris ce nombre en lettres : — 750 000 000
-11. Choisis l'écriture correcte en lettres : — 500 000 000
-12. Écris ce nombre en lettres : — 2 500 000
-13. Choisis l'écriture correcte en lettres : — 25 000 000
-14. Écris ce nombre en lettres : — 300 045 000
-15. Choisis l'écriture correcte en lettres : — 99 099 099
+
+### Niveau 3 (level: "6e") (10 items)
+
+1. Choisis l'écriture correcte en lettres : — 1 000 000 500
+2. Écris ce nombre en lettres : — 2 000 000 000
+3. Choisis l'écriture correcte en lettres : — 100 000 000 000
+4. Écris ce nombre en lettres : — 5 002 000 000
+5. Choisis l'écriture correcte en lettres : — 12 000 000 000
+6. Écris ce nombre en lettres : — 1 200 000 000
+7. Choisis l'écriture correcte en lettres : — 750 000 000 000
+8. Écris ce nombre en lettres : — 2 500 000 000
+9. Choisis l'écriture correcte en lettres : — 25 000 000 000
+10. Écris ce nombre en lettres : — 99 099 099 099
 
 ## Nombres entiers — Encadrement
 
@@ -3480,53 +2929,757 @@ _Domaine : Mathématiques · Exercice : `encadrer-nombre-entier` — Encadrer un
 9. display: 6 305 200 · lower: 6300000 · upper: 6400000 · rang: centaine de milliers
 10. display: 999 999 · lower: 900000 · upper: 1000000 · rang: centaine de milliers
 
-## Grammaire — Phrase simple et complexe
+## Vocabulaire — Choisir le mot adapté au contexte
 
-_Domaine : Français · Exercice : `distinguer-phrase-simple-complexe` — Distinguer phrase simple et phrase complexe · **31 items au total**_
+_Domaine : Français · Exercice : `mot-adapte-contexte` — Choisir le mot adapté au contexte · **30 items au total**_
 
-**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 9 · Niveau 3 = 12
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
 
 ### ⚠️ Niveau 1 (10 items)
 
 > ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
 
-1. sentence1: Le chat dort. · sentence2: Il a passé toute la nuit dehors. · connector: parce que · blankAnswer: parce qu'il · template: Le chat dort ___ a passé toute la nuit dehors.
-2. sentence1: Léa est triste. · sentence2: Elle sourit quand même. · connector: mais · template: Léa est triste ___ elle sourit quand même.
-3. sentence1: Il pleut. · sentence2: Nous restons à la maison. · connector: donc · template: Il pleut ___ nous restons à la maison.
-4. sentence1: Tom saute de joie. · sentence2: Il vient de gagner le match. · connector: car · template: Tom saute de joie ___ il vient de gagner le match.
-5. sentence1: Les enfants applaudissent. · sentence2: Le clown entre en scène. · connector: quand · template: Les enfants applaudissent ___ le clown entre en scène.
-6. sentence1: Nous restons chez nous. · sentence2: Le temps s'est brusquement dégradé. · connector: parce que · template: Nous restons chez nous ___ le temps s'est brusquement dégradé.
-7. sentence1: J'ai un chat. · sentence2: Il miaule beaucoup. · connector: qui · template: J'ai un chat ___ miaule beaucoup.
-8. sentence1: Le facteur passe. · sentence2: Les enfants sont à l'école. · connector: quand · template: Le facteur passe ___ les enfants sont à l'école.
-9. sentence1: Tu pourras peut-être jouer dehors. · sentence2: Tu ranges ta chambre. · connector: si · template: Tu pourras peut-être jouer dehors ___ tu ranges ta chambre.
-10. sentence1: Le vent souffle fort. · sentence2: Les feuilles tombent des arbres. · connector: et · template: Le vent souffle fort ___ les feuilles tombent des arbres.
+1. Complète la phrase : « Le chien _____ très fort quand le facteur sonne. »
+2. Quelle phrase utilise le mot le plus adapté pour parler de la démarche d'un éléphant ?
+3. Complète la phrase : « La _____ brillait dans le ciel étoilé de la nuit. »
+4. Dans un compte rendu médical, quel mot est le plus adapté pour parler d'une douleur au ventre ?
+5. Associe chaque animal au verbe qui décrit son cri.
+6. Complète la phrase : « Le boulanger sort le pain tout chaud de son _____. »
+7. Quelle phrase utilise le mot le plus adapté pour parler du déplacement d'un serpent ?
+8. Complète la phrase : « Le _____ chantait joyeusement sur la branche de l'arbre. »
+9. Dans un magasin, quel mot utilise-t-on pour parler du prix d'un objet ?
+10. Associe chaque animal au verbe qui décrit son cri.
 
-### Niveau 2 (9 items)
+### Niveau 2 (10 items)
 
-1. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-2. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (aller = infinitif !) — Clique sur le(s) verbe(s) conjugué(s). Attention à l'infinitif ! — Cette phrase est-elle simple ou complexe ?
-3. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-4. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (Même si la phrase semble courte !) — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-5. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-6. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (Même si la phrase est longue !) — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-7. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-8. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (Même si la phrase semble courte !) — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
-9. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+1. Complète la phrase : « En automne, les feuilles des arbres _____ et recouvrent le sol. »
+2. Lequel de ces mots est le plus précis pour décrire une lumière très faible et terne ?
+3. Complète : « L'alpiniste avait les jambes _____ après avoir gravi le sommet. »
+4. Complète : « Le conférencier _____ l'assistance avec son exposé passionnant. »
+5. Classe chaque mot selon le contexte où il convient pour décrire le mouvement de l'eau.
+6. Complète la phrase : « Au printemps, les bourgeons des arbres _____ et donnent de nouvelles feuilles. »
+7. Lequel de ces mots est le plus précis pour décrire une odeur désagréable et forte ?
+8. Complète : « Après la course, le sportif avait le souffle _____. »
+9. Complète : « Le clown _____ les enfants avec ses grimaces amusantes. »
+10. Classe chaque mot selon le contexte où il convient pour décrire le vent.
 
-### Niveau 3 (12 items)
+### Niveau 3 (10 items)
 
-1. Les enfants rient et courent dans la cour.
-2. La maîtresse demande aux élèves de travailler en silence.
-3. Le soleil brille dans le ciel bleu.
-4. Les oiseaux chantent et les fleurs poussent au printemps.
-5. Mon chat adore jouer avec la pelote de laine.
-6. Les élèves écoutent quand le professeur parle.
-7. La fusée va décoller dans dix secondes.
-8. Paul et Marie regardent un film.
-9. Le chat, le chien et le lapin dorment ensemble dans le panier.
-10. Après une longue journée de classe bien remplie, les élèves rentrent chez eux.
-11. Il tombe, il se relève aussitôt.
-12. Viens si tu peux.
+1. Quel mot convient le mieux dans : « Sa remarque, bien que _____, m'a blessé. » ?
+2. Dans : « Ce discours a _____ l'assemblée », quel verbe convient pour exprimer l'ennui causé par un exposé confus ?
+3. Classe ces adjectifs selon la connotation qu'ils donnent à un sourire.
+4. Dans : « Il la regarda avec une moue _____ », quel adjectif exprime le mieux le dédain ?
+5. Associe chaque mot à la phrase où il est le mieux adapté.
+6. Quel mot convient le mieux dans : « Son silence, pourtant _____, en disait long. » ?
+7. Dans : « Ses propos ont _____ toute l'assistance », quel verbe convient pour exprimer une indignation collective ?
+8. Classe ces adjectifs selon la connotation qu'ils donnent à un regard.
+9. Dans : « Il répondit d'un ton _____ », quel adjectif exprime le mieux l'arrogance ?
+10. Associe chaque mot à la phrase où il est le mieux adapté.
+
+## Vocabulaire — Comprendre l'origine des mots (latin, grec)
+
+_Domaine : Français · Exercice : `origine-mots` — Comprendre l'origine des mots (latin, grec) · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Que signifie la racine latine « aqua » ?
+2. Quelle racine grecque signifie « vie » ?
+3. Associe chaque racine latine ou grecque à sa signification.
+4. Le mot « bibliothèque » vient du grec « biblion » (livre) et « theke » (rangement). Que signifie-t-il littéralement ?
+5. La racine « graph- » (du grec « graphein ») dans « autographe » signifie…
+6. Que signifie la racine latine « dict- » (dicere) ?
+7. Quelle racine grecque signifie « plusieurs » ?
+8. Associe chaque racine latine ou grecque à sa signification.
+9. Le mot « thermomètre » vient du grec « thermos » (chaud) et « metron » (mesure). Que signifie-t-il littéralement ?
+10. La racine « path- » (du grec « pathos », sentiment/souffrance) dans « sympathie » signifie…
+
+### Niveau 2 (10 items)
+
+1. Associe chaque adjectif savant à son équivalent courant.
+2. Quelle racine grecque se retrouve dans « géographie » et « géologie » ?
+3. Ces mots viennent-ils d'une racine latine ou d'une racine grecque ?
+4. La racine « phon- » (du grec « phone ») dans « microphone » et « téléphone » signifie…
+5. Parmi ces mots, lequel vient de la racine latine « manus » (main) ?
+6. Associe chaque adjectif savant à son équivalent courant.
+7. Quelle racine grecque se retrouve dans « métamorphose » et « morphologie » ?
+8. Ces mots viennent-ils d'une racine latine ou d'une racine grecque ?
+9. Quelle racine latine se retrouve dans « sonore » et « résonance » ?
+10. Parmi ces mots, lequel vient de la racine grecque « astron » (astre, étoile) ?
+
+### Niveau 3 (10 items)
+
+1. La racine grecque « demos » signifie « peuple ». Dans quel mot la retrouve-t-on ?
+2. Associe chaque racine grecque à un mot qui la contient.
+3. Les mots « carnivore », « herbivore » et « omnivore » partagent le suffixe latin « -vore » qui signifie…
+4. Ces racines viennent-elles du latin ou du grec ?
+5. Le mot « philanthrope » (qui aime l'humanité) est formé de…
+6. La racine grecque « hydro » signifie « eau », tout comme le latin « aqua ». Dans quel mot retrouve-t-on la racine grecque ?
+7. Associe chaque racine à un mot qui la contient.
+8. Les racines « andro- » (grec, homme) et « anthropo- » (grec, être humain) sont souvent confondues. Que signifie précisément « androïde » ?
+9. Ces racines viennent-elles du latin ou du grec ?
+10. Le mot « gynécologue » est composé de « gynê » (femme, grec) et « logos » (étude, parole). Que signifie-t-il littéralement ?
+
+## Vocabulaire — Comprendre la polysémie d'un mot
+
+_Domaine : Français · Exercice : `polysemie` — Comprendre la polysémie d'un mot · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Un mot qui a plusieurs sens différents s'appelle…
+2. Le mot 'voler' peut désigner le fait de se déplacer dans les airs comme un oiseau, ou bien le fait de prendre ce qui ne nous appartient pas. Ce mot a-t-il un seul sens ou plusieurs sens différents ?
+3. Dans « Le feu est rouge », que signifie 'feu' ?
+4. Comment trouve-t-on le bon sens d'un mot polysémique ?
+5. Quel mot est polysémique ?
+6. Dans « La glace du lac a craqué sous nos pas », que signifie 'glace' ?
+7. Dans « Elle range ses affaires dans le bureau », que signifie 'bureau' ?
+8. Dans « Elle a eu une bonne note à son contrôle », que signifie 'note' ?
+9. Quel mot est polysémique ?
+10. Dans « Range ta feuille dans ton classeur », que signifie 'feuille' ?
+
+### Niveau 2 (10 items)
+
+1. Le mot 'tête' a plusieurs sens. Associe chaque phrase au sens utilisé.
+2. Dans 'Le boulanger pétrit la pâte', que signifie 'pâte' ?
+3. Associe chaque emploi du mot 'planche' à son sens.
+4. Dans 'Son roman est une mine d'informations', le mot 'mine' signifie…
+5. Pourquoi le mot 'opération' est-il polysémique ?
+6. Le mot 'pièce' a plusieurs sens. Associe chaque phrase au sens utilisé.
+7. Dans « Le facteur dépose le courrier dans la boîte », que signifie 'boîte' ?
+8. Associe chaque emploi du mot 'langue' à son sens.
+9. Dans « La curiosité est le moteur de ses recherches », le mot 'moteur' signifie…
+10. Pourquoi le mot 'sac' est-il polysémique ?
+
+### Niveau 3 (10 items)
+
+1. Le mot 'pont' signifie 1. ouvrage qui enjambe un cours d'eau 2. partie du navire 3. jour férié entre deux jours chômés. Quel sens 'pont' a-t-il dans 'faire le pont' ?
+2. Associe chaque emploi du mot 'temps' à sa catégorie de sens.
+3. Comment les sens d'un mot polysémique sont-ils souvent liés entre eux ?
+4. Dans 'La vedette du film a du cœur', que signifie 'vedette' ?
+5. Le mot 'lame' a plusieurs sens. Associe chaque emploi à sa définition.
+6. Le mot 'cœur' signifie 1. organe qui fait circuler le sang  2. centre d'une chose  3. siège des sentiments. Quel sens a 'cœur' dans 'le cœur du problème' ?
+7. Associe chaque emploi du mot 'porte' à sa catégorie de sens.
+8. Comment appelle-t-on l'emploi d'un mot polysémique dans un sens détourné, comme dans 'dévorer un livre' (= lire avec avidité) ?
+9. Dans « L'entreprise a pris du volume ces dernières années », que signifie 'volume' ?
+10. Le mot 'clé' (ou 'clef') a plusieurs sens. Associe chaque emploi à sa définition.
+
+## Vocabulaire — Distinguer les niveaux de langue
+
+_Domaine : Français · Exercice : `niveaux-de-langue` — Distinguer les niveaux de langue · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quelle phrase est au registre familier ?
+2. Classe chaque expression selon son niveau de langue.
+3. Quel mot est de niveau soutenu pour dire « triste » ?
+4. À quel niveau de langue appartient : « Veuillez agréer l'expression de mes sincères salutations » ?
+5. Dans quelle situation utilise-t-on le registre familier ?
+6. Quelle phrase est au registre soutenu pour dire qu'on va manger ?
+7. Classe chaque expression selon son niveau de langue.
+8. Quel mot est de niveau soutenu pour dire « content » ?
+9. À quel niveau de langue appartient : « Puis-je me permettre de vous interrompre un instant ? »
+10. Dans quelle situation utilise-t-on plutôt le registre soutenu ?
+
+### Niveau 2 (10 items)
+
+1. Laquelle de ces phrases est au registre soutenu ?
+2. Classe ces phrases selon leur niveau de langue.
+3. Quel est l'équivalent soutenu de « Il s'est baladé en ville » ?
+4. Associe chaque expression familière à son équivalent courant.
+5. Pourquoi adapter son niveau de langue selon la situation ?
+6. Quelle phrase relève du registre courant (ni familier, ni soutenu) ?
+7. Classe ces phrases selon leur niveau de langue.
+8. Quel est l'équivalent soutenu de « Il a flippé pendant l'examen » ?
+9. Associe chaque expression familière à son équivalent courant.
+10. Pourquoi certains mots familiers sont-ils à éviter dans un travail scolaire écrit ?
+
+### Niveau 3 (10 items)
+
+1. Classe ces phrases selon leur niveau de langue.
+2. Quel est l'effet produit par l'utilisation d'un registre soutenu dans un texte ?
+3. Associe chaque formule soutenue à son équivalent courant.
+4. Dans un discours officiel ou un exposé, quel niveau de langue est le plus approprié ?
+5. Classe chaque paire selon le niveau de langue : familier ou soutenu ?
+6. Classe ces phrases selon leur niveau de langue.
+7. Quel effet produit l'emploi d'un mot familier dans un texte globalement soutenu ?
+8. Associe chaque formule soutenue à son équivalent courant.
+9. Dans un dialogue de roman, un auteur fait parler un personnage en registre très familier. Quel est l'intérêt de ce choix ?
+10. Classe chaque mot selon le niveau de langue : courant ou soutenu ?
+
+## Vocabulaire — Former un mot dérivé
+
+_Domaine : Français · Exercice : `mot-derive` — Former un mot dérivé · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quel mot est dérivé de « fleur » avec un suffixe ?
+2. Comment est formé le mot « malheureux » ?
+3. Associe chaque base à son mot dérivé.
+4. Quel préfixe ajoute-t-on à « possible » pour former son contraire ?
+5. Quel mot est formé par préfixation à partir de « honnête » ?
+6. Quel mot est dérivé de « dent » avec un suffixe ?
+7. Comment est formé le mot « improbable » ?
+8. Associe chaque base à son mot dérivé.
+9. Quel préfixe ajoute-t-on à « content » pour former son contraire ?
+10. Quel mot est formé par préfixation à partir de « faire » ?
+
+### Niveau 2 (10 items)
+
+1. Quel est le mot de base (radical sans affixes) de « débranchement » ?
+2. Comment est formé « imperméable » ?
+3. Classe chaque mot selon son type de dérivation.
+4. Quel mot est formé avec à la fois un préfixe ET un suffixe ?
+5. Associe chaque mot à sa structure de dérivation.
+6. Quel est le mot de base (radical sans affixes) de « refroidissement » ?
+7. Comment est formé « inconfortable » ?
+8. Classe chaque mot selon son type de dérivation.
+9. Quel mot est formé avec à la fois un préfixe ET un suffixe ?
+10. Associe chaque mot à sa structure de dérivation.
+
+### Niveau 3 (10 items)
+
+1. Le mot « invraisemblable » est formé de…
+2. Classe chaque mot : est-il dérivé (préfixe ou suffixe) ou composé (deux mots indépendants réunis) ?
+3. Quelle est la différence entre un mot dérivé et un mot composé ?
+4. Dans « extraordinaire », le préfixe « extra- » signifie…
+5. Associe chaque mot à sa structure morphologique.
+6. Le mot « incontestable » est formé de…
+7. Classe chaque mot : est-il dérivé (préfixe ou suffixe) ou composé (deux mots indépendants réunis) ?
+8. Quelle est la différence entre un préfixe et un suffixe ?
+9. Dans « interplanétaire », le préfixe « inter- » signifie…
+10. Associe chaque mot à sa structure morphologique.
+
+## Vocabulaire — Identifier le radical d'un mot
+
+_Domaine : Français · Exercice : `identifier-radical` — Identifier le radical d'un mot · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quel est le radical du mot « chanteur » ?
+2. Quel est le radical commun à « jardiner », « jardinier » et « jardinage » ?
+3. Associe chaque mot à son radical.
+4. Le radical d'un mot, c'est…
+5. Quel est le radical du mot « fleuriste » ?
+6. Quel est le radical du mot « laitier » ?
+7. Quel est le radical commun à « chocolatier », « chocolaterie » et « chocolaté » ?
+8. Associe chaque mot à son radical.
+9. Quel est le radical du mot « poissonnier » ?
+10. Quel est le radical du mot « dentiste » ?
+
+### Niveau 2 (10 items)
+
+1. Quel est le radical du mot « invisible » ?
+2. Quel est le radical du mot « agrandissement » ?
+3. Associe chaque mot à son radical (attention aux petits changements de forme).
+4. Quel radical partagent « boulanger », « boulangerie » et « boulangère » ?
+5. Quel est le radical du mot « malheureux » ?
+6. Quel est le radical du mot « éclaircir » ?
+7. Quel est le radical du mot « embellissement » ?
+8. Associe chaque mot à son radical (attention aux petits changements de forme).
+9. Quel radical partagent « pâtissier », « pâtisserie » et « pâtissière » ?
+10. Quel est le radical du mot « infortuné » ?
+
+### Niveau 3 (10 items)
+
+1. Quel est le radical commun à « portable », « transport » et « importation » ?
+2. Classe chaque mot selon son radical : radical « vis/voir » ou radical « aud/entendre » ?
+3. Dans « biologie », « zoologie » et « psychologie », quel est le radical grec commun ?
+4. Quel est le radical commun à « lumineux », « illuminer » et « luminosité » ?
+5. Associe chaque radical latin à sa signification.
+6. Quel est le radical latin commun à « capable », « capture » et « captif » ?
+7. Classe chaque mot selon son radical : radical « scrip » (écrire) ou radical « phon » (son) ?
+8. Quel radical grec signifie « chaleur » dans « thermomètre », « thermal » et « hypothermie » ?
+9. Quel est le radical commun à « manuel », « manœuvre » et « manufacture » ?
+10. Associe chaque radical grec à sa signification.
+
+## Vocabulaire — Identifier le sens propre et le sens figuré
+
+_Domaine : Français · Exercice : `sens-propre-figure` — Identifier le sens propre et le sens figuré · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Que signifie 'sens propre' d'un mot ?
+2. Clique sur la bonne colonne pour chaque phrase.
+3. Dans 'Il a un cœur de pierre', le mot 'pierre' est au…
+4. Quelle phrase utilise 'lourd' au sens figuré ?
+5. Dans 'La rivière coule vite', 'couler' est au…
+6. Que signifie 'sens figuré' d'un mot ?
+7. Clique sur la bonne colonne pour chaque phrase.
+8. Dans 'Il a pris la porte', l'expression est au…
+9. Quelle phrase utilise 'dur' au sens figuré ?
+10. Dans 'Elle a un appétit de loup', l'expression signifie qu'elle…
+
+### Niveau 2 (10 items)
+
+1. Clique sur 'Sens propre' ou 'Sens figuré' pour chaque phrase.
+2. Que signifie l'expression 'avoir le cafard' au sens figuré ?
+3. Quelle est la différence entre le sens propre et le sens figuré du mot 'feu' dans 'Mettre le feu aux poudres' ?
+4. Quelle phrase utilise 'tomber' au sens figuré ?
+5. Dans 'Cette musique m'a transporté', quel est le sens figuré de 'transporté' ?
+6. Clique sur 'Sens propre' ou 'Sens figuré' pour chaque phrase.
+7. Que signifie l'expression 'avoir un poil dans la main' au sens figuré ?
+8. Quelle est la différence entre le sens propre et le sens figuré de 'couper' dans 'Couper la parole à quelqu'un' ?
+9. Quelle phrase utilise 'briller' au sens figuré ?
+10. Dans 'Cette histoire m'a glacé le sang', quel est le sens figuré de 'glacé' ?
+
+### Niveau 3 (10 items)
+
+1. Classe ces expressions : sens propre ou sens figuré ?
+2. Dans un poème, le poète écrit : 'L'aurore aux doigts de rose ouvre les portes du ciel.' Quelle figure de style utilise-t-il ?
+3. Expliquer le sens figuré de 'La discussion a dégénéré' : que veut dire 'dégénérer' ici ?
+4. Quel énoncé résume le mieux la relation entre sens propre et sens figuré ?
+5. Lequel de ces titres utilise un mot au sens figuré ?
+6. Classe ces expressions : sens propre ou sens figuré ?
+7. Dans l'expression 'Le vaisseau de l'État vogue sur une mer démontée', quelle figure de style désigne l'État ?
+8. Expliquer le sens figuré de 'Son argument ne tient pas debout' : que signifie cette expression ?
+9. Pourquoi les auteurs emploient-ils souvent des verbes de mouvement concret (couler, s'effondrer, exploser) au sens figuré pour parler des émotions ?
+10. Lequel de ces titres utilise une expression au sens figuré ?
+
+## Vocabulaire — Identifier un champ lexical
+
+_Domaine : Français · Exercice : `champ-lexical` — Identifier un champ lexical · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Classe chaque mot : appartient-il au champ lexical de la mer ?
+2. Quel mot N'appartient PAS au champ lexical de la forêt ?
+3. Classe chaque mot dans son champ lexical.
+4. Qu'est-ce qu'un champ lexical ?
+5. Quel groupe de mots forme le champ lexical de la peur ?
+6. Quel mot appartient au champ lexical de l'hiver ?
+7. Classe chaque mot dans son champ lexical.
+8. Quel mot N'appartient PAS au champ lexical de l'hôpital ?
+9. Quel groupe de mots forme le champ lexical du cirque ?
+10. Classe chaque mot dans son champ lexical.
+
+### Niveau 2 (10 items)
+
+1. Classe chaque mot dans son champ lexical.
+2. Quel mot inattendu peut appartenir au champ lexical de la lumière ?
+3. Classe chaque mot dans son champ lexical.
+4. Quelle est la différence entre un champ lexical et une famille de mots ?
+5. Quel est le champ lexical dominant dans : « Le chirurgien prit son bistouri, ausculta le patient et posa un diagnostic » ?
+6. Quel mot polysémique appartient à la fois au champ lexical de l'arbre et à celui de l'école ?
+7. Classe chaque mot dans son champ lexical.
+8. Quelle est la différence entre un champ lexical et des synonymes ?
+9. Quel est le champ lexical dominant dans : « Le juge écouta les témoins, consulta le dossier et rendit son verdict » ?
+10. Classe chaque mot dans son champ lexical.
+
+### Niveau 3 (10 items)
+
+1. Un mot peut-il appartenir à plusieurs champs lexicaux ?
+2. Classe chaque mot dans le bon champ lexical du mot « temps ».
+3. Dans quel champ lexical range-t-on le mot « éclipse » ?
+4. Associe chaque mot savant au champ lexical qu'il évoque.
+5. Dans : « Les cordes vibrèrent, la mélodie s'éleva, le maestro leva sa baguette », quel est le champ lexical dominant ?
+6. Quel mot peut appartenir soit au champ lexical des animaux, soit à celui de la file d'attente ?
+7. Classe chaque mot dans son champ lexical.
+8. Dans « L'orateur martela ses arguments, plaida sa cause et convainquit l'assemblée », quel est le champ lexical dominant ?
+9. Associe chaque mot savant au champ lexical qu'il évoque.
+10. Dans « Le funambule avança sur le fil, garda son équilibre et salua la foule sous les applaudissements », quel est le champ lexical dominant ?
+
+## Vocabulaire — Identifier un homonyme
+
+_Domaine : Français · Exercice : `identifier-homonyme` — Identifier un homonyme · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Que sont 'mère' et 'mer' ?
+2. Complète : « Nous avons navigué sur la ___ pendant toute la journée. »
+3. Associe chaque homonyme à sa définition.
+4. Qu'est-ce que deux homonymes ont en commun ?
+5. Quel est l'homonyme du mot 'sot' (stupide) ?
+6. Que sont 'cent', 'sang' et 'sans' ?
+7. Complète : « Le boulanger vend du ___ frais tous les matins. »
+8. Associe chaque homonyme à sa définition.
+9. Quel est l'homonyme du mot 'air' (ce qu'on respire) ?
+10. Complète : « Il a acheté une bouteille de ___ pour le dîner. »
+
+### Niveau 2 (10 items)
+
+1. Choisis le bon mot : « Je voudrais un ___ d'eau, s'il vous plaît. »
+2. Quelle phrase utilise correctement 'ou' et 'où' ?
+3. Choisis le bon homonyme : « Il ___ son manteau sur le fauteuil. »
+4. Associe chaque homonyme à la phrase où il doit apparaître.
+5. Pourquoi est-il important de connaître les homonymes ?
+6. Quelle phrase utilise correctement 'ces' et 'ses' ?
+7. Choisis le bon mot : « Je te laisse le choix, prends la ___ que tu préfères. »
+8. Quelle phrase utilise correctement 'quand', 'quant' et 'qu'en' ?
+9. Associe chaque homonyme à la phrase où il doit apparaître.
+10. Pourquoi confond-on souvent 'quel(le)' et 'qu'elle' ?
+
+### Niveau 3 (10 items)
+
+1. Dans « Ces cèdres cèdent sous le vent », combien de mots se prononcent pareil mais s'écrivent différemment ?
+2. Associe chaque paire d'homophones à leur différence grammaticale.
+3. Lequel de ces couples n'est PAS une paire d'homonymes ?
+4. Dans « Il compte sur ses doigts », 'compte' est un homonyme de…
+5. Quelle stratégie permet de ne PAS confondre 'davantage' et 'd'avantage' ?
+6. Lequel de ces couples n'est PAS une paire d'homophones ?
+7. Associe chaque série d'homophones rares à leur différence de nature.
+8. Dans « Le foie du canard est cuit », combien de mots ont un homophone ?
+9. Quelle stratégie permet de ne PAS confondre 'plus tôt' et 'plutôt' ?
+10. Lequel de ces mots n'est PAS homophone de 'père' ?
+
+## Vocabulaire — Identifier un préfixe
+
+_Domaine : Français · Exercice : `identifier-prefixe` — Identifier un préfixe · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quel est le préfixe dans le mot « déplacer » ?
+2. Que signifie le préfixe « re- » dans « recommencer » ?
+3. Associe chaque préfixe à sa signification.
+4. Quel mot contient un préfixe ?
+5. Quel préfixe faut-il ajouter à « heureux » pour former son contraire ?
+6. Quel est le préfixe dans le mot « redire » ?
+7. Que signifie le préfixe « in- » dans « inutile » ?
+8. Associe chaque préfixe à sa signification.
+9. Quel mot contient un préfixe ?
+10. Quel préfixe trouve-t-on dans « prévenir » et que signifie-t-il ?
+
+### Niveau 2 (10 items)
+
+1. Que signifie le préfixe « anti- » dans « antiviolence » ?
+2. Le préfixe « inter- » dans « intercontinental » signifie…
+3. Classe chaque mot selon le sens de son préfixe.
+4. Quel préfixe donne à « possible » son contraire ?
+5. Que signifie le préfixe « bi- » dans « bilingue » ?
+6. Que signifie le préfixe « co- » dans « coéquipier » ?
+7. Le préfixe « sous- » dans « sous-marin » signifie…
+8. Classe chaque mot selon le sens de son préfixe.
+9. Quel préfixe donne à « légal » son contraire ?
+10. Que signifie le préfixe « tri- » dans « tricycle » ?
+
+### Niveau 3 (10 items)
+
+1. Quel préfixe grec signifiant « loin » retrouve-t-on dans « téléphone », « télévision » et « télécommunication » ?
+2. Associe chaque préfixe savant à sa signification.
+3. Dans « hypothèse », quel préfixe grec signifie « sous, en dessous » ?
+4. Classe chaque mot selon le sens de son préfixe : « au-delà / trop » ou « en dessous / pas assez » ?
+5. Le préfixe « anthropo- » (dans « anthropologie ») vient du grec et signifie…
+6. Quel préfixe grec signifiant « seul » retrouve-t-on dans « monologue » et « monopole » ?
+7. Associe chaque préfixe savant à sa signification.
+8. Dans « rétrograde », quel préfixe latin signifie « en arrière » ?
+9. Classe chaque mot selon le sens de son préfixe : « autour » ou « à travers » ?
+10. Le préfixe « xéno- » (dans « xénophobie ») vient du grec et signifie…
+
+## Vocabulaire — Identifier un suffixe
+
+_Domaine : Français · Exercice : `identifier-suffixe` — Identifier un suffixe · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quel est le suffixe dans le mot « jardinage » ?
+2. Que signifie le suffixe « -eur » dans « plongeur » ?
+3. Associe chaque suffixe à ce qu'il exprime.
+4. Quel mot contient un suffixe signifiant « petite taille » ?
+5. Quel suffixe retrouve-t-on dans « épicerie », « boulangerie » et « boucherie » pour désigner un lieu de commerce ?
+6. Quel est le suffixe dans le mot « chanteuse » ?
+7. Que signifie le suffixe « -able » dans « lavable » ?
+8. Associe chaque suffixe à ce qu'il exprime.
+9. Quel mot contient un suffixe désignant un objet qui sert à faire quelque chose ?
+10. Quel suffixe retrouve-t-on dans « politesse » et « tristesse » pour exprimer une qualité ou un état ?
+
+### Niveau 2 (10 items)
+
+1. Quel suffixe transforme l'adjectif « rapide » en adverbe ?
+2. Associe chaque suffixe à la catégorie grammaticale qu'il crée.
+3. Classe chaque mot : le suffixe désigne-t-il une personne ou une action/résultat ?
+4. Le suffixe « -iste » dans « fleuriste » exprime…
+5. Quel suffixe dans « livraison » crée un nom d'action à partir du verbe « livrer » ?
+6. Quel suffixe transforme l'adjectif « franche » en adverbe ?
+7. Associe chaque suffixe à la catégorie grammaticale qu'il crée.
+8. Classe chaque mot : le suffixe désigne-t-il une personne ou une qualité/état ?
+9. Le suffixe « -ien » dans « électricien » exprime…
+10. Quel suffixe dans « guérison » crée un nom d'action à partir du verbe « guérir » ?
+
+### Niveau 3 (10 items)
+
+1. Le suffixe « -logie » dans « biologie », « zoologie » et « psychologie » vient du grec et signifie…
+2. Associe chaque suffixe d'origine grecque à sa signification.
+3. Dans « omnivore », quel suffixe signifie « qui mange » ?
+4. Classe chaque suffixe selon son origine : grec ou latin ?
+5. Le suffixe « -graphie » (dans « photographie ») vient du grec « graphein » qui signifie…
+6. Le suffixe « -cide » dans « insecticide » vient du latin « caedere » et signifie…
+7. Associe chaque suffixe d'origine grecque ou latine à sa signification.
+8. Dans « thermomètre », quel suffixe grec signifie « mesure » ?
+9. Classe chaque suffixe selon son origine : grec ou latin ?
+10. Le suffixe « -phage » (dans « anthropophage ») vient du grec « phagein » et signifie…
+
+## Vocabulaire — Identifier une famille de mots
+
+_Domaine : Français · Exercice : `famille-de-mots` — Identifier une famille de mots · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quel mot appartient à la famille de « chant » ?
+2. Quel mot N'appartient PAS à la famille de « marcher » ?
+3. Associe chaque mot à un autre membre de sa famille.
+4. Quel groupe forme une famille de mots ?
+5. Quel est le radical commun à « porteur », « portage » et « portable » ?
+6. Quel mot appartient à la famille de « terre » ?
+7. Quel mot N'appartient PAS à la famille de « lait » ?
+8. Associe chaque mot à un autre membre de sa famille.
+9. Quel groupe forme une famille de mots ?
+10. Quel est le radical commun à « osseux », « ossature » et « désosser » ?
+
+### Niveau 2 (10 items)
+
+1. Quel mot est un intrus dans la famille de « pied » ?
+2. Les mots « chaud », « chauffer » et « surchauffé » forment-ils une famille ?
+3. Associe chaque mot à son dérivé de même famille.
+4. Pourquoi « dent » et « dentifrice » appartiennent-ils à la même famille ?
+5. Parmi ces mots, lequel est de la famille de « lire » ?
+6. Quel mot est un intrus dans la famille de « voix » ?
+7. Les mots « clair », « éclaircir » et « clairvoyant » forment-ils une famille ?
+8. Associe chaque mot à son dérivé de même famille.
+9. Pourquoi « lune » et « lunette » appartiennent-ils à la même famille ?
+10. Parmi ces mots, lequel est de la famille de « nombre » ?
+
+### Niveau 3 (10 items)
+
+1. Les mots « main » et « manuel » appartiennent-ils à la même famille ?
+2. Associe chaque mot savant (origine latine ou grecque) à son équivalent courant.
+3. Classe chaque mot dans sa famille : famille de « port » ou famille de « fort » ?
+4. Quel mot n'appartient PAS à la famille de « voir » ?
+5. Pourquoi « dentiste » et « trident » appartiennent-ils à la même famille ?
+6. Les mots « cœur » et « courage » appartiennent-ils à la même famille ?
+7. Associe chaque mot savant (origine latine) à son équivalent courant.
+8. Classe chaque mot selon le sens de son radical grec : « écrire » ou « son » ?
+9. Quel mot n'appartient PAS à la famille étymologique de « chronomètre » (temps) ?
+10. Pourquoi « biologie » et « symbiose » appartiennent-ils à la même famille étymologique ?
+
+## Vocabulaire — Ranger dans l'ordre alphabétique
+
+_Domaine : Français · Exercice : `ordre-alphabetique` — Ranger dans l'ordre alphabétique · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Clique sur les mots dans l'ordre alphabétique (du premier au dernier).
+2. Quel groupe de mots est dans l'ordre alphabétique ?
+3. Quel mot vient en PREMIER dans le dictionnaire ?
+4. Clique sur les mots dans l'ordre alphabétique.
+5. Pour classer des mots dans un dictionnaire, on compare d'abord…
+6. Clique sur les mots dans l'ordre alphabétique (du premier au dernier).
+7. Quel groupe de mots est dans l'ordre alphabétique ?
+8. Quel mot vient en DERNIER dans le dictionnaire ?
+9. Clique sur les mots dans l'ordre alphabétique.
+10. Pour savoir si 'jardin' vient avant ou après 'lampe' dans le dictionnaire, que dois-tu comparer ?
+
+### Niveau 2 (10 items)
+
+1. Ces mots commencent tous par la même lettre. Clique-les dans l'ordre alphabétique.
+2. Quel mot vient AVANT 'manger' dans le dictionnaire ?
+3. Clique sur ces fruits dans l'ordre alphabétique.
+4. Dans le dictionnaire, dans quel ordre viennent : 'porte', 'portée', 'portrait' ?
+5. Quel mot vient APRÈS 'fleuve' dans le dictionnaire ?
+6. Ces mots commencent tous par la même lettre. Clique-les dans l'ordre alphabétique.
+7. Quel mot vient AVANT 'tourner' dans le dictionnaire ?
+8. Clique sur ces légumes dans l'ordre alphabétique.
+9. Dans le dictionnaire, dans quel ordre viennent : 'chanter', 'chantier', 'chanteur' ?
+10. Quel mot vient APRÈS 'garder' dans le dictionnaire ?
+
+### Niveau 3 (10 items)
+
+1. Classement délicat ! Clique ces mots dans l'ordre du dictionnaire.
+2. On cherche 'trace' dans le dictionnaire. Entre quels mots se trouve-t-il ?
+3. Classe ces mots dans l'ordre du dictionnaire.
+4. Pour ranger 'acacia' et 'accent' dans le dictionnaire, quelle lettre compare-t-on en 3e position ?
+5. Un élève hésite pour classer 'île' et 'image'. Quelle règle faut-il lui rappeler ?
+6. Classement délicat ! Clique ces mots dans l'ordre du dictionnaire.
+7. On cherche 'montage' dans le dictionnaire. Entre quels mots se trouve-t-il ?
+8. Classe ces mots dans l'ordre du dictionnaire.
+9. Pour ranger 'chagrin' et 'chrome' dans le dictionnaire, quelle lettre compare-t-on en 3e position ?
+10. Un élève hésite pour classer 'pêche' et 'pelle'. Quelle règle faut-il lui rappeler ?
+
+## Vocabulaire — Regrouper des mots par thème
+
+_Domaine : Français · Exercice : `regrouper-par-theme` — Regrouper des mots par thème · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Classe chaque mot dans son thème.
+2. Quel mot n'appartient PAS au thème des sports ?
+3. Classe chaque mot dans son thème.
+4. Quel groupe de mots appartient entièrement au thème de la cuisine ?
+5. Associe chaque mot à son thème.
+6. Classe chaque mot dans son thème.
+7. Quel mot n'appartient PAS au thème des couleurs ?
+8. Classe chaque mot dans son thème.
+9. Quel groupe de mots appartient entièrement au thème du corps humain ?
+10. Associe chaque mot à son thème.
+
+### Niveau 2 (10 items)
+
+1. Classe chaque mot dans son thème.
+2. Quel mot est l'intrus dans cette liste liée au thème de la mer ?
+3. Classe chaque mot dans son thème.
+4. À quel thème général appartiennent « flûte », « violon », « batterie » et « trompette » ?
+5. Associe chaque groupe de mots à son thème.
+6. Classe chaque mot dans son thème.
+7. Quel mot est l'intrus dans cette liste liée au thème de la montagne ?
+8. Classe chaque mot dans son thème.
+9. À quel thème général appartiennent « micro-ondes », « réfrigérateur », « grille-pain » et « bouilloire » ?
+10. Associe chaque groupe de mots à son thème.
+
+### Niveau 3 (10 items)
+
+1. Classe chaque mot dans son thème.
+2. Quel mot peut appartenir à deux thèmes différents selon le contexte ?
+3. Classe chaque mot dans son thème.
+4. Dans quel thème général range-t-on les mots « épistolaire », « narratif », « lyrique » et « dramatique » ?
+5. Associe chaque mot savant au domaine thématique auquel il appartient.
+6. Classe chaque mot dans son thème.
+7. Quel mot peut appartenir à deux thèmes différents selon le contexte ?
+8. Classe chaque mot dans son thème.
+9. Dans quel thème général range-t-on les mots « ellipse », « métonymie », « antithèse » et « hyperbole » ?
+10. Associe chaque mot savant au domaine thématique auquel il appartient.
+
+## Vocabulaire — Trouver un antonyme
+
+_Domaine : Français · Exercice : `trouver-antonyme` — Trouver un antonyme · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quel est l'antonyme (contraire) de 'chaud' ?
+2. Associe chaque mot à son contraire. Clique un mot à gauche puis son antonyme à droite.
+3. Quel est l'antonyme de 'grand' ?
+4. L'antonyme de 'commencer' est…
+5. Associe chaque adjectif à son contraire.
+6. Quel est l'antonyme de 'joyeux' ?
+7. Quel est l'antonyme de 'dur' ?
+8. Associe chaque mot à son contraire.
+9. L'antonyme de 'ouvrir' est…
+10. Associe chaque adjectif à son contraire.
+
+### Niveau 2 (10 items)
+
+1. Comment forme-t-on souvent l'antonyme de 'honnête' ?
+2. Forme l'antonyme de chaque mot en ajoutant le bon préfixe. Associe le mot à son antonyme.
+3. Dans 'La lumière s'allume', l'antonyme du verbe 's'allume' est…
+4. Quel est l'antonyme de 'présent' dans la phrase 'L'élève est présent' ?
+5. Pourquoi un même mot peut-il avoir plusieurs antonymes différents ?
+6. Quel est l'antonyme de 'légal' formé avec un préfixe ?
+7. Forme l'antonyme de chaque mot en ajoutant le bon préfixe. Associe le mot à son antonyme.
+8. Dans 'Le ciel est clair ce soir', l'antonyme contextuel de 'clair' est…
+9. Quel est l'antonyme de 'accepter' dans un contexte de négociation ?
+10. Quel est l'antonyme de 'obéir' ?
+
+### Niveau 3 (10 items)
+
+1. Dans un texte littéraire, quel antonyme de 'sombre' est le plus évocateur pour décrire un paysage lumineux ?
+2. Associe chaque adjectif à son antonyme le plus précis dans le contexte littéraire.
+3. L'antonyme de 'espoir' dans le sens philosophique est…
+4. Ces verbes ont des antonymes différents selon le contexte. Associe chaque emploi à son contraire.
+5. Dans 'Sa réponse était évasive', l'antonyme exact de 'évasive' est…
+6. Dans un texte littéraire, quel antonyme de 'silence' est le plus évocateur pour décrire une foule en délire ?
+7. Associe chaque adjectif à son antonyme le plus précis dans le contexte littéraire.
+8. L'antonyme de 'magnanime' dans un texte classique est…
+9. Ce verbe a des antonymes différents selon le contexte. Associe chaque emploi à son contraire.
+10. Dans 'Sa décision fut abrupte', l'antonyme exact de 'abrupte' (soudaine et brutale) est…
+
+## Vocabulaire — Trouver un synonyme
+
+_Domaine : Français · Exercice : `trouver-synonyme` — Trouver un synonyme · **30 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 10
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Quel est le synonyme de 'content' ?
+2. Quel est le synonyme de 'rapide' ?
+3. Associe chaque mot à son synonyme. Clique un mot à gauche, puis son synonyme à droite.
+4. Deux mots sont synonymes quand ils ont…
+5. Quel mot peut remplacer 'courageux' sans changer le sens de la phrase ?
+6. Quel est le synonyme de 'beau' ?
+7. Quel est le synonyme de 'difficile' ?
+8. Associe chaque mot à son synonyme. Clique un mot à gauche, puis son synonyme à droite.
+9. Quel est le synonyme de 'gentil' ?
+10. Quel mot peut remplacer 'aimer' sans changer le sens de la phrase 'J'aime beaucoup ce gâteau' ?
+
+### Niveau 2 (10 items)
+
+1. Associe chaque mot à son synonyme. Clique un mot à gauche, puis son synonyme à droite.
+2. Pour parler de la démarche d'un lion, quel synonyme de 'marcher' est le plus précis ?
+3. Dans la phrase 'Le scientifique a analysé le produit', quel synonyme de 'analysé' convient le mieux ?
+4. Associe les synonymes de l'adjectif 'grand' selon leur nuance.
+5. Pourquoi deux synonymes ne sont-ils pas toujours interchangeables ?
+6. Pour décrire une petite pluie fine et froide, quel synonyme de 'pluie' est le plus précis ?
+7. Associe chaque emploi de 'regarder' au synonyme qui correspond le mieux à sa nuance.
+8. Dans la phrase 'Le client a demandé un remboursement', quel synonyme de 'demandé' convient le mieux dans un contexte commercial soutenu ?
+9. Associe chaque action à son synonyme le plus précis selon l'intensité indiquée.
+10. Quel facteur ne détermine PAS le choix d'un synonyme précis dans une phrase ?
+
+### Niveau 3 (10 items)
+
+1. Dans un texte sur la mer, quel synonyme de 'bruit' est le plus précis pour parler des vagues ?
+2. Associe chaque verbe à son synonyme le plus précis dans le contexte indiqué.
+3. La phrase 'Le directeur était irrité' est au niveau courant. Quel synonyme d'irrité convient dans un texte soutenu ?
+4. Pour éviter la répétition du verbe 'dire' dans un récit, quel synonyme ne convient PAS pour une réponse agressive ?
+5. Chaque phrase a un mot souligné. Associe-la au synonyme soutenu qui pourrait le remplacer.
+6. Dans un texte descriptif sur l'automne, quel synonyme de 'vent' est le plus précis pour décrire un vent froid et sec ?
+7. Associe chaque déplacement à son synonyme le plus précis dans le contexte indiqué.
+8. La phrase 'Il a mangé rapidement' est courante. Quel synonyme soutenu de 'mangé' convient dans un texte littéraire ?
+9. Pour décrire une réflexion profonde et prolongée, quel synonyme de 'penser' ne convient PAS ?
+10. Chaque phrase a un mot souligné. Associe-la au synonyme soutenu qui pourrait le remplacer.
 
 ## Conjugaison — Passé composé avec être (accord du participe)
 
@@ -3671,6 +3824,55 @@ _Domaine : Français · Exercice : `identifier-verbe-conjugue` — Identifier un
 9. Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).
 10. Clique sur le(s) verbe(s) conjugué(s) de la phrase (il peut y en avoir deux).
 
+## Grammaire — Phrase simple et complexe
+
+_Domaine : Français · Exercice : `distinguer-phrase-simple-complexe` — Distinguer phrase simple et phrase complexe · **32 items au total**_
+
+**Total par niveau :** Niveau 1 = 10 · Niveau 2 = 10 · Niveau 3 = 12
+
+### ⚠️ Niveau 1 (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. sentence1: Le chat dort. · sentence2: Il a passé toute la nuit dehors. · connector: parce que · blankAnswer: parce qu'il · template: Le chat dort ___ a passé toute la nuit dehors.
+2. sentence1: Léa est triste. · sentence2: Elle sourit quand même. · connector: mais · template: Léa est triste ___ elle sourit quand même.
+3. sentence1: Il pleut. · sentence2: Nous restons à la maison. · connector: donc · template: Il pleut ___ nous restons à la maison.
+4. sentence1: Tom saute de joie. · sentence2: Il vient de gagner le match. · connector: car · template: Tom saute de joie ___ il vient de gagner le match.
+5. sentence1: Les enfants applaudissent. · sentence2: Le clown entre en scène. · connector: quand · template: Les enfants applaudissent ___ le clown entre en scène.
+6. sentence1: Nous restons chez nous. · sentence2: Le temps s'est brusquement dégradé. · connector: parce que · template: Nous restons chez nous ___ le temps s'est brusquement dégradé.
+7. sentence1: J'ai un chat. · sentence2: Il miaule beaucoup. · connector: qui · template: J'ai un chat ___ miaule beaucoup.
+8. sentence1: Le facteur passe. · sentence2: Les enfants sont à l'école. · connector: quand · template: Le facteur passe ___ les enfants sont à l'école.
+9. sentence1: Tu pourras peut-être jouer dehors. · sentence2: Tu ranges ta chambre. · connector: si · template: Tu pourras peut-être jouer dehors ___ tu ranges ta chambre.
+10. sentence1: Le vent souffle fort. · sentence2: Les feuilles tombent des arbres. · connector: et · template: Le vent souffle fort ___ les feuilles tombent des arbres.
+
+### Niveau 2 (10 items)
+
+1. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+2. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (aller = infinitif !) — Clique sur le(s) verbe(s) conjugué(s). Attention à l'infinitif ! — Cette phrase est-elle simple ou complexe ?
+3. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+4. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (Même si la phrase semble courte !) — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+5. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+6. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (Même si la phrase est longue !) — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+7. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+8. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. (Même si la phrase semble courte !) — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+9. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+10. Identifie le(s) verbe(s) conjugué(s), puis classe la phrase. — Clique sur le(s) verbe(s) conjugué(s). — Cette phrase est-elle simple ou complexe ?
+
+### Niveau 3 (12 items)
+
+1. Les enfants rient et courent dans la cour.
+2. La maîtresse demande aux élèves de travailler en silence.
+3. Le soleil brille dans le ciel bleu.
+4. Les oiseaux chantent et les fleurs poussent au printemps.
+5. Mon chat adore jouer avec la pelote de laine.
+6. Les élèves écoutent quand le professeur parle.
+7. La fusée va décoller dans dix secondes.
+8. Paul et Marie regardent un film.
+9. Le chat, le chien et le lapin dorment ensemble dans le panier.
+10. Après une longue journée de classe bien remplie, les élèves rentrent chez eux.
+11. Il tombe, il se relève aussitôt.
+12. Viens si tu peux.
+
 ## Orthographe — Accord participe passé (COD)
 
 _Domaine : Français · Exercice : `ortho-accorder-participe-passe-cod` — Accorder le participe passé avec le COD · **32 items au total**_
@@ -3720,101 +3922,295 @@ _Domaine : Français · Exercice : `ortho-accorder-participe-passe-cod` — Acco
 11. Elle a ___ très tard cette nuit-là.
 12. Ils ont ___ pendant toute la récréation.
 
-## Grammaire — La phrase complexe
+## Probabilités — Dénombrer les issues
 
-_Domaine : Français · Exercice : `identifier-subordination` — Distinguer la juxtaposition de la subordination · **33 items au total**_
+_Domaine : Mathématiques · Exercice : `probabilite-issues` — Dénombrer les issues possibles et favorables · **32 items au total**_
 
-**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 9 · Niveau 3 = 12
+**Total par niveau :** Niveau 1 (level: "niveau1") = 12 · Niveau 2 (level: "niveau2") = 10 · Niveau 3 (level: "niveau3") = 10
 
-### Niveau 1 (12 items)
+### Niveau 1 (level: "niveau1") (12 items)
 
-1. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
-2. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
-3. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
-4. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
-5. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
-6. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
-7. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
-8. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
-9. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
-10. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
-11. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
-12. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+1. Un dé à six faces. — Clique sur toutes les issues possibles avec ce dé. — Combien d'issues possibles au total ?
+2. Sac de billes : 6 noires, 2 blanches. — Clique sur toutes les billes. — Combien d'issues possibles au total ?
+3. Sac de billes : 6 noires, 2 blanches. — Clique sur toutes les billes noires. — Combien d'issues favorables au noir ?
+4. Sac de billes : 2 rouges, 3 vertes. — Clique sur toutes les billes possibles. — Combien de billes possibles au total ?
+5. Sac de billes : 2 rouges, 3 vertes. — Clique sur toutes les billes rouges. — Combien d'issues favorables au rouge ?
+6. Un jeu de 7 cartes de cœur, numérotées de 1 à 7. — Clique sur toutes les cartes possibles. — Combien de cartes possibles au total ?
+7. Un jeu de 7 cartes de cœur, numérotées de 1 à 7. — Clique sur la carte 7. — Combien d'issues favorables à tirer un 7 ?
+8. Sac de billes : 3 rouges, 2 bleues. — Clique sur toutes les issues possibles. — Combien d'issues possibles au total ?
+9. Sac de billes : 3 rouges, 2 bleues. — Clique sur toutes les billes bleues. — Combien d'issues favorables au bleu ?
+10. Sac de billes : 1 jaune, 3 violettes. — Clique sur toutes les billes violettes. — Combien d'issues favorables au violet ?
+11. Boîte de jetons : 5 verts, 3 jaunes. — Clique sur tous les jetons verts. — Combien d'issues favorables au vert ?
+12. Sac de billes : 4 rouges, 4 bleues. — Clique sur toutes les billes possibles. — Combien de billes possibles au total ?
 
-### Niveau 2 (9 items)
+### Niveau 2 (level: "niveau2") (10 items)
 
-1. Clique sur le mot ou la ponctuation qui relie les deux propositions.
-2. Clique sur le mot ou la ponctuation qui relie les deux propositions.
-3. Clique sur le mot ou la ponctuation qui relie les deux propositions.
-4. Clique sur le mot ou la ponctuation qui relie les deux propositions.
-5. Clique sur le mot ou la ponctuation qui relie les deux propositions.
-6. Clique sur le mot ou la ponctuation qui relie les deux propositions.
-7. Clique sur le mot ou la ponctuation qui relie les deux propositions.
-8. Clique sur le mot ou la ponctuation qui relie les deux propositions.
-9. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+1. Un dé équilibré. — Clique sur tous les nombres pairs. — Combien d'issues favorables aux nombres pairs ?
+2. Un dé équilibré. — Clique sur tous les nombres impairs. — Combien d'issues favorables aux nombres impairs ?
+3. Un dé équilibré. — Clique sur le nombre 6. — Combien d'issues favorables à obtenir 6 ?
+4. Urne : 4 rouges, 2 jaunes, 5 bleues. — Clique sur toutes les boules rouges. — Combien d'issues favorables au rouge ?
+5. Urne : 4 rouges, 2 jaunes, 5 bleues. — Clique sur toutes les boules bleues. — Combien d'issues favorables au bleu ?
+6. Sac de billes : 6 bleues, 4 oranges. — Clique sur toutes les billes bleues. — Combien d'issues favorables au bleu ?
+7. Sac de billes : 6 bleues, 4 oranges. — Clique sur toutes les billes oranges. — Combien d'issues favorables à l'orange ?
+8. Un jeu de 10 cartes de pique, numérotées de 1 à 10. — Clique sur tous les nombres supérieurs à 7. — Combien d'issues favorables aux nombres supérieurs à 7 ?
+9. Un jeu de 10 cartes de pique, numérotées de 1 à 10. — Clique sur tous les multiples de 5. — Combien d'issues favorables aux multiples de 5 ?
+10. Urne : 6 vertes, 3 jaunes, 1 rouge. — Clique sur toutes les boules vertes. — Combien d'issues favorables au vert ?
 
-### Niveau 3 (12 items)
+### Niveau 3 (level: "niveau3") (10 items)
 
-1. Les enfants jouent dehors quand il fait beau .
-2. Nous irons à la plage si le temps le permet .
-3. Léa est arrivée en retard comme le bus avait du retard .
-4. Le chien qui aboie appartient à mon voisin .
-5. Le livre que je lis est passionnant .
-6. La maison où j'habite est petite .
-7. Voici le stylo dont j'ai besoin .
-8. Le soleil se couche, les étoiles apparaissent .
-9. Il fait chaud ; les enfants jouent dehors .
-10. Le film commence, tout le monde se tait .
-11. Léa court plus vite que Paul, elle gagne toujours la course .
-12. Le chat, le chien et le hamster dorment, ils sont fatigués .
+1. Boîte de formes : 2 étoiles, 4 cercles, 3 carrés, 1 triangle. — Clique sur toutes les étoiles. — Combien d'issues favorables à l'étoile ?
+2. Boîte de formes : 2 étoiles, 4 cercles, 3 carrés, 1 triangle. — Clique sur tous les cercles. — Combien d'issues favorables au cercle ?
+3. Un dé équilibré. — Clique sur tous les multiples de 3. — Combien d'issues favorables aux multiples de 3 ?
+4. Un dé équilibré. — Clique sur tous les nombres inférieurs ou égaux à 5. — Combien d'issues favorables aux nombres ≤ 5 ?
+5. On lance un dé, puis on lance une pièce. Voici les 12 combinaisons possibles (dé-pièce). — Clique sur toutes les combinaisons qui donnent Pile. — Combien y a-t-il de combinaisons avec Pile ?
+6. On lance un dé, puis on lance une pièce. Voici les 12 combinaisons possibles (dé-pièce). — Clique sur toutes les combinaisons qui donnent Face. — Combien y a-t-il de combinaisons avec Face ?
+7. On lance un dé, puis on lance une pièce. Voici les 12 combinaisons possibles (dé-pièce). — Clique sur toutes les combinaisons possibles. — Combien y a-t-il de combinaisons possibles au total ?
+8. On lance un dé, puis on lance une pièce. Voici les 12 combinaisons possibles (dé-pièce). — Clique sur toutes les combinaisons où le dé donne un nombre pair. — Combien y a-t-il de combinaisons avec un nombre pair au dé ?
+9. Un dé vient de tomber sur 6. On le relance. — Clique sur toutes les issues possibles pour ce nouveau lancer. — Quelle est la probabilité d'obtenir 6 à ce nouveau lancer ?
+10. Une pièce vient de tomber 3 fois de suite sur Pile. On la relance. — Clique sur toutes les issues possibles pour ce nouveau lancer. — Quelle est la probabilité d'obtenir Pile à ce nouveau lancer ?
 
-## Grammaire — La phrase complexe
+## Probabilités — Exprimer une chance
 
-_Domaine : Français · Exercice : `distinguer-coordination-subordination` — Distinguer la coordination de la subordination · **33 items au total**_
+_Domaine : Mathématiques · Exercice : `probabilite-chances` — Utiliser l'expression « a chances sur b » · **32 items au total**_
 
-**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 9 · Niveau 3 = 12
+**Total par niveau :** Niveau 1 (level: "niveau1") = 12 · Niveau 2 (level: "niveau2") = 10 · Niveau 3 (level: "niveau3") = 10
 
-### Niveau 1 (12 items)
+### Niveau 1 (level: "niveau1") (12 items)
 
-1. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
-2. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
-3. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
-4. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
-5. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
-6. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
-7. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
-8. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
-9. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
-10. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
-11. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
-12. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+1. Sac de billes : 5 rouges, 3 bleues.<br>Quelle est la probabilité de tirer une bille rouge ?
+2. Sac de billes : 5 rouges, 3 bleues.<br>Quelle est la probabilité de tirer une bille bleue ?
+3. Boîte de cubes : 4 verts, 2 jaunes, 1 rouge.<br>Quelle est la probabilité de tirer un cube vert ?
+4. Boîte de cubes : 4 verts, 2 jaunes, 1 rouge.<br>Quelle est la probabilité de tirer un cube jaune ?
+5. Boîte de cubes : 4 verts, 2 jaunes, 1 rouge.<br>Quelle est la probabilité de tirer un cube rouge ?
+6. Sac de billes : 6 rouges, 2 bleues.<br>A-t-on plus de chances de tirer une bille rouge, une bille bleue, ou est-ce autant de chances ? — Rouge ou bleue ?
+7. Sac de billes : 3 rouges, 3 bleues.<br>A-t-on plus de chances de tirer une bille rouge, une bille bleue, ou est-ce autant de chances ? — Rouge ou bleue ?
+8. Boîte de jetons : 2 verts, 6 jaunes.<br>A-t-on plus de chances de tirer un jeton vert, un jeton jaune, ou est-ce autant de chances ? — Vert ou jaune ?
+9. Sac de billes : 4 rouges, 4 vertes.<br>A-t-on plus de chances de tirer une bille rouge, une bille verte, ou est-ce autant de chances ? — Rouge ou vert ?
+10. Sac de billes : 5 oranges, 3 violettes.<br>A-t-on plus de chances de tirer une bille orange, une bille violette, ou est-ce autant de chances ? — Orange ou violet ?
+11. Boîte : 9 jetons verts, 1 jeton rouge.<br>Y a-t-il autant de chances de tirer un jeton vert que de tirer un jeton rouge ? — Vert ou rouge ?
+12. Boîte : 1 jeton noir, 9 jetons blancs.<br>Y a-t-il autant de chances de tirer un jeton noir que de tirer un jeton blanc ? — Noir ou blanc ?
 
-### Niveau 2 (9 items)
+### Niveau 2 (level: "niveau2") (10 items)
 
-1. Clique sur le mot (ou les mots) qui relient les deux propositions.
-2. Clique sur le mot (ou les mots) qui relient les deux propositions.
-3. Clique sur le mot (ou les mots) qui relient les deux propositions.
-4. Clique sur le mot (ou les mots) qui relient les deux propositions.
-5. Clique sur le mot (ou les mots) qui relient les deux propositions.
-6. Clique sur le mot (ou les mots) qui relient les deux propositions.
-7. Clique sur le mot (ou les mots) qui relient les deux propositions.
-8. Clique sur le mot (ou les mots) qui relient les deux propositions.
-9. Clique sur le mot (ou les mots) qui relient les deux propositions.
+1. Pièce équilibrée.<br>Quelle est la probabilité d'obtenir Pile ?
+2. Pièce équilibrée.<br>Quelle est la probabilité d'obtenir Face ?
+3. Dé équilibré.<br>Quelle est la probabilité d'obtenir 2 ?
+4. Dé équilibré.<br>Quelle est la probabilité de NE PAS obtenir 2 ?
+5. Cette boîte a des jetons noirs et blancs.<br>Compte-les toi-même, puis donne la probabilité de tirer un jeton noir.
+6. Cette boîte a des jetons noirs et blancs.<br>Compte-les toi-même, puis donne la probabilité de tirer un jeton blanc.
+7. Cette boîte a des jetons bleus et jaunes.<br>Compte-les toi-même, puis donne la probabilité de tirer un jeton bleu.
+8. Cette boîte a des jetons bleus et jaunes.<br>Compte-les toi-même, puis donne la probabilité de tirer un jeton jaune.
+9. Cette boîte a des jetons rouges, verts et violets.<br>Compte-les toi-même, puis donne la probabilité de tirer un jeton vert.
+10. Cette boîte a des jetons rouges, verts et violets.<br>Compte-les toi-même, puis donne la probabilité de tirer un jeton violet.
 
-### Niveau 3 (12 items)
+### Niveau 3 (level: "niveau3") (10 items)
 
-1. Les élèves applaudissent quand le spectacle commence .
-2. Nous resterons chez nous si la tempête continue .
-3. Léo travaille bien qu'il soit fatigué .
-4. Elle prépare le dîner pendant que son frère met la table .
-5. Ils partiront dès que le bus arrivera .
-6. Paul et Marie jouent au ballon quand la cloche sonne .
-7. Le ciel est bleu et les oiseaux chantent .
-8. Elle est fatiguée car elle a beaucoup travaillé .
-9. Tu peux rester ou tu peux partir .
-10. Il pleuvait donc nous sommes restés à la maison .
-11. Le magasin est fermé or nous avions besoin de pain .
-12. Léa choisit un livre ou un magazine, mais elle repart les mains vides .
+1. Urne : 2 étoiles, 4 cercles, 3 carrés, 1 triangle (10 formes).<br>Quelle est la probabilité de tirer une étoile, en fraction, en décimal et en pourcentage ?
+2. Urne : 2 étoiles, 4 cercles, 3 carrés, 1 triangle (10 formes).<br>Quelle est la probabilité de tirer un cercle, en fraction, en décimal et en pourcentage ?
+3. Urne : 2 étoiles, 4 cercles, 3 carrés, 1 triangle (10 formes).<br>Quelle est la probabilité de tirer un carré, en fraction, en décimal et en pourcentage ?
+4. Urne : 2 étoiles, 4 cercles, 3 carrés, 1 triangle (10 formes).<br>Quelle est la probabilité de tirer un triangle, en fraction, en décimal et en pourcentage ?
+5. Jeu de 52 cartes, 26 rouges.<br>Quelle est la probabilité de tirer une carte rouge, en fraction, en décimal et en pourcentage ?
+6. Jeu de 52 cartes, 13 trèfles.<br>Quelle est la probabilité de tirer un trèfle, en fraction, en décimal et en pourcentage ?
+7. Urne de 20 billes, 5 rouges.<br>Quelle est la probabilité de tirer une bille rouge, en fraction, en décimal et en pourcentage ?
+8. Urne de 25 boules, 10 vertes.<br>Quelle est la probabilité de tirer une boule verte, en fraction, en décimal et en pourcentage ?
+9. Sac de 50 jetons, 8 jetons rouges.<br>Quelle est la probabilité de tirer un jeton rouge, en fraction, en décimal et en pourcentage ?
+10. Urne de 40 billes, 6 bleues.<br>Quelle est la probabilité de tirer une bille bleue, en fraction, en décimal et en pourcentage ?
+
+## Proportionnalité — Compléter un tableau
+
+_Domaine : Mathématiques · Exercice : `completer-tableau-proportionnalite` — Compléter un tableau de proportionnalité · **32 items au total**_
+
+**Total par niveau :** Niveau 1 (level: "niveau1") = 10 · Niveau 2 (level: "niveau2") = 10 · Niveau 3 (level: "niveau3") = 12
+
+### ⚠️ Niveau 1 (level: "niveau1") (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. contexte: Prix des pommes au kilo · col1Label: Masse (kg) · col2Label: Prix (€) · col1: 1, 4
+2. contexte: Prix du jus d'orange au litre · col1Label: Volume (L) · col2Label: Prix (€) · col1: 1, 5
+3. contexte: Prix des crayons · col1Label: Nombre de crayons · col2Label: Prix (€) · col1: 1, 6
+4. contexte: Prix de l'essence au litre · col1Label: Volume (L) · col2Label: Prix (€) · col1: 1, 8
+5. contexte: Prix des sachets de bonbons · col1Label: Nombre de sachets · col2Label: Prix (€) · col1: 1, 7
+6. contexte: Prix des tablettes de chocolat · col1Label: Nombre de tablettes · col2Label: Prix (€) · col1: 1, 9
+7. contexte: Prix des cahiers · col1Label: Nombre de cahiers · col2Label: Prix (€) · col1: 1, 10
+8. contexte: Prix des boîtes d'œufs · col1Label: Nombre de boîtes · col2Label: Prix (€) · col1: 1, 6
+9. contexte: Prix des paquets de biscuits · col1Label: Nombre de paquets · col2Label: Prix (€) · col1: 1, 8
+10. contexte: Prix des billets de bus · col1Label: Nombre de billets · col2Label: Prix (€) · col1: 1, 7
+
+### Niveau 2 (level: "niveau2") (10 items)
+
+1. contexte: Prix des pommes au kilo · col1Label: Masse (kg) · col2Label: Prix (€) · col1: 1, 5, 8
+2. contexte: Vitesse d'une voiture · col1Label: Temps (h) · col2Label: Distance (km) · col1: 1, 3, 5
+3. contexte: Prix du jus de fruits · col1Label: Volume (L) · col2Label: Prix (€) · col1: 1, 6, 9
+4. contexte: Vitesse d'un cycliste · col1Label: Temps (h) · col2Label: Distance (km) · col1: 1, 4, 6
+5. contexte: Prix du riz au kilo · col1Label: Masse (kg) · col2Label: Prix (€) · col1: 1, 5, 10
+6. contexte: Vitesse d'un train · col1Label: Temps (h) · col2Label: Distance (km) · col1: 1, 2, 4
+7. contexte: Prix de l'essence au litre · col1Label: Volume (L) · col2Label: Prix (€) · col1: 1, 10, 15
+8. contexte: Vitesse d'un avion · col1Label: Temps (h) · col2Label: Distance (km) · col1: 1, 3, 5
+9. contexte: Prix du chocolat au kilo · col1Label: Masse (kg) · col2Label: Prix (€) · col1: 1, 6, 12
+10. contexte: Vitesse d'un coureur · col1Label: Temps (h) · col2Label: Distance (km) · col1: 1, 2, 3
+
+### Niveau 3 (level: "niveau3") (12 items)
+
+1. contexte: Prix des cerises au kilo · col1Label: Masse (kg) · col2Label: Prix (€) · col1: 3, 7
+2. contexte: Vitesse d'une voiture · col1Label: Temps (h) · col2Label: Distance (km) · col1: 4, 9
+3. contexte: Prix de la farine au kilo · col1Label: Masse (kg) · col2Label: Prix (€) · col1: 5, 8
+4. contexte: Vitesse d'un cycliste · col1Label: Temps (h) · col2Label: Distance (km) · col1: 3, 7
+5. contexte: Prix du riz au kilo · col1Label: Masse (kg) · col2Label: Prix (€) · col1: 4, 9
+6. contexte: Débit d'un robinet · col1Label: Temps (min) · col2Label: Volume (L) · col1: 6, 10
+7. contexte: Vitesse d'un train · col1Label: Temps (h) · col2Label: Distance (km) · col1: 2, 7
+8. contexte: Prix du tissu au mètre · col1Label: Longueur (m) · col2Label: Prix (€) · col1: 3, 8
+9. contexte: Vitesse d'un avion · col1Label: Temps (h) · col2Label: Distance (km) · col1: 3, 5
+10. contexte: Prix des pommes de terre au kilo · col1Label: Masse (kg) · col2Label: Prix (€) · col1: 5, 12
+11. contexte: Débit d'une pompe · col1Label: Temps (h) · col2Label: Volume (L) · col1: 4, 9
+12. contexte: Prix du bois au mètre · col1Label: Longueur (m) · col2Label: Prix (€) · col1: 6, 10
+
+## Proportionnalité — Identifier une situation
+
+_Domaine : Mathématiques · Exercice : `identifier-situation-proportionnalite` — Identifier une situation de proportionnalité · **32 items au total**_
+
+**Total par niveau :** Niveau 1 (level: "CM1") = 10 · Niveau 2 (level: "CM2") = 10 · Niveau 3 (level: "6e") = 12
+
+### ⚠️ Niveau 1 (level: "CM1") (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. 3 stylos coûtent 6 €. 6 stylos coûtent 12 €. Est-ce une situation de proportionnalité ? — 3 stylos → 6 €<br>6 stylos → 12 €
+2. Une voiture consomme 6 L pour 100 km, et 12 L pour 200 km. Est-ce une situation de proportionnalité ? — 6 L → 100 km<br>12 L → 200 km
+3. 2 cahiers coûtent 4 €. 5 cahiers coûtent 8 €. Est-ce une situation de proportionnalité ? — 2 cahiers → 4 €<br>5 cahiers → 8 €
+4. 1 paquet contient 4 biscuits. 3 paquets contiennent 12 biscuits. Est-ce une situation de proportionnalité ? — 1 paquet → 4 biscuits<br>3 paquets → 12 biscuits
+5. Pour 4 personnes, une recette utilise 200 g de farine. Pour 8 personnes, elle utilise 400 g. Est-ce une situation de proportionnalité ? — 4 pers. → 200 g<br>8 pers. → 400 g
+6. Une pizza coûte 8 €. Deux pizzas coûtent 14 € (offre spéciale). Est-ce une situation de proportionnalité ? — 1 pizza → 8 €<br>2 pizzas → 14 €
+7. Une voiture consomme 6 L pour 100 km, et 10 L pour 150 km. Est-ce une situation de proportionnalité ? — 6 L → 100 km<br>10 L → 150 km
+8. 2 kg de pommes coûtent 4 €. 4 kg de pommes coûtent 8 €. Est-ce une situation de proportionnalité ? — 2 kg → 4 €<br>4 kg → 8 €
+9. Pour 4 personnes, une recette utilise 200 g de farine. Pour 6 personnes, elle utilise 250 g. Est-ce une situation de proportionnalité ? — 4 pers. → 200 g<br>6 pers. → 250 g
+10. En 1 heure, Nora parcourt 12 km à vélo. En 3 heures, elle parcourt 36 km. Est-ce une situation de proportionnalité ? — 1 h → 12 km<br>3 h → 36 km
+
+### Niveau 2 (level: "CM2") (10 items)
+
+1. Chaque billet de concert coûte 8 €. — Clique tous les prix payés. — Le prix payé est-il proportionnel au nombre de billets ?
+2. L'âge de Léa augmente chaque année. Sa maman, elle, a toujours 30 ans de plus que Léa, quel que soit son âge. — Clique tous les âges possibles de la maman. — L'âge de la maman est-il proportionnel à l'âge de Léa ?
+3. Une plante était déjà haute de 5 cm quand on l'a plantée. Elle grandit ensuite de 2 cm chaque semaine. — Clique toutes les hauteurs possibles de la plante. — La hauteur de la plante est-elle proportionnelle au nombre de semaines ?
+4. Un poussin pèse déjà 8 g à la naissance. Il grossit ensuite de 3 g chaque jour. — Clique tous les poids possibles du poussin. — Le poids du poussin est-il proportionnel à son âge en jours ?
+5. Dans une course, Tom part avec 10 m d'avance sur la ligne de départ. Ensuite, comme les autres coureurs, il court à une vitesse de 2 m par seconde. — Clique toutes les distances possibles parcourues par Tom depuis le départ. — La distance de Tom est-elle proportionnelle au temps écoulé ?
+6. L'essence coûte 1,40 € le litre. — Clique tous les prix payés. — Le prix payé est-il proportionnel au nombre de litres ?
+7. Léo avait déjà 20 € dans sa tirelire. Il ajoute ensuite 5 € chaque semaine. — Clique toutes les sommes possibles dans la tirelire. — La somme dans la tirelire est-elle proportionnelle au nombre de semaines ?
+8. Un taxi facture 3 € de prise en charge fixe, puis 2 € par kilomètre parcouru. — Clique tous les prix payés possibles. — Le prix du trajet est-il proportionnel à la distance parcourue ?
+9. Une recette utilise 50 g de farine par œuf. — Clique toutes les quantités de farine possibles. — La quantité de farine est-elle proportionnelle au nombre d'œufs ?
+10. Un abonnement de salle de sport coûte 15 € par mois, plus 4 € par séance. — Clique tous les prix payés possibles. — Le prix payé est-il proportionnel au nombre de séances ?
+
+### Niveau 3 (level: "6e") (12 items)
+
+1. Ce tableau donne le prix des pommes au kilo. Quelle valeur complète le tableau pour qu'il reste proportionnel ? — <div style="display:flex;gap:22px;justify-content:center;font-size:15px;font-weight:600"><div>Masse (kg)<br>2 — 4 — 6</div><div>Prix (€)<br>3 — 6 — ?</div></div>
+2. Une voiture roule à vitesse constante. Quelle distance a-t-elle parcourue en 3 h ? — <div style="display:flex;gap:22px;justify-content:center;font-size:15px;font-weight:600"><div>Temps (h)<br>1 — 2 — 3</div><div>Distance (km)<br>60 — 120 — ?</div></div>
+3. Ce tableau donne le prix des cerises au kilo. Quelle valeur manque-t-il ? — <div style="display:flex;gap:22px;justify-content:center;font-size:15px;font-weight:600"><div>Masse (kg)<br>1 — 3 — 5</div><div>Prix (€)<br>5 — 15 — ?</div></div>
+4. Un vélo roule à vitesse constante. Quelle distance a-t-il parcourue en 4 h ? — <div style="display:flex;gap:22px;justify-content:center;font-size:15px;font-weight:600"><div>Temps (h)<br>1 — 2 — 4</div><div>Distance (km)<br>10 — 20 — ?</div></div>
+5. Ce tableau donne le prix du jus d'orange au litre. Quelle valeur manque-t-il ? — <div style="display:flex;gap:22px;justify-content:center;font-size:15px;font-weight:600"><div>Volume (L)<br>2 — 4 — 10</div><div>Prix (€)<br>3 — 6 — ?</div></div>
+6. Un train roule à vitesse constante. Quelle distance a-t-il parcourue en 3 h ? — <div style="display:flex;gap:22px;justify-content:center;font-size:15px;font-weight:600"><div>Temps (h)<br>1 — 2 — 3</div><div>Distance (km)<br>90 — 180 — ?</div></div>
+7. Ce tableau donne le prix du riz au kilo. Quelle valeur manque-t-il ? — <div style="display:flex;gap:22px;justify-content:center;font-size:15px;font-weight:600"><div>Masse (kg)<br>3 — 6 — 9</div><div>Prix (€)<br>6 — 12 — ?</div></div>
+8. Un coureur avance à vitesse constante. Quelle distance a-t-il parcourue en 5 h ? — <div style="display:flex;gap:22px;justify-content:center;font-size:15px;font-weight:600"><div>Temps (h)<br>1 — 2 — 5</div><div>Distance (km)<br>8 — 16 — ?</div></div>
+9. Ce tableau donne le prix de l'essence au litre. Quelle valeur manque-t-il ? — <div style="display:flex;gap:22px;justify-content:center;font-size:15px;font-weight:600"><div>Volume (L)<br>5 — 10 — 15</div><div>Prix (€)<br>8 — 16 — ?</div></div>
+10. Un avion vole à vitesse constante. Quelle distance a-t-il parcourue en 3 h ? — <div style="display:flex;gap:22px;justify-content:center;font-size:15px;font-weight:600"><div>Temps (h)<br>1 — 2 — 3</div><div>Distance (km)<br>800 — 1 600 — ?</div></div>
+11. Ce tableau donne le prix du chocolat au kilo. Quelle valeur manque-t-il ? — <div style="display:flex;gap:22px;justify-content:center;font-size:15px;font-weight:600"><div>Masse (kg)<br>2 — 4 — 7</div><div>Prix (€)<br>10 — 20 — ?</div></div>
+12. Une personne marche à vitesse constante. Quelle distance a-t-elle parcourue en 1 h 30 ? — <div style="display:flex;gap:22px;justify-content:center;font-size:15px;font-weight:600"><div>Temps (h)<br>1 — 2 — 1,5</div><div>Distance (km)<br>5 — 10 — ?</div></div>
+
+## Proportionnalité — Résoudre un problème
+
+_Domaine : Mathématiques · Exercice : `resoudre-probleme-proportionnalite` — Résoudre un problème de proportionnalité · **32 items au total**_
+
+**Total par niveau :** Niveau 1 (level: "CM1") = 10 · Niveau 2 (level: "CM2") = 10 · Niveau 3 (level: "6e") = 12
+
+### ⚠️ Niveau 1 (level: "CM1") (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. 3 crayons coûtent 6 €. Combien coûtent 9 crayons ?
+2. 2 kg de pommes coûtent 4 €. Combien coûtent 6 kg de pommes ?
+3. Un paquet de gâteaux coûte 2 €. Combien coûtent 3 paquets ?
+4. 5 billets d'entrée coûtent 25 €. Combien coûtent 10 billets ?
+5. 4 stylos coûtent 8 €. Combien coûtent 2 stylos ?
+6. 6 œufs coûtent 3 €. Combien coûtent 12 œufs ?
+7. 8 gâteaux coûtent 16 €. Combien coûtent 4 gâteaux ?
+8. 2 litres de jus coûtent 3 €. Combien coûtent 8 litres ?
+9. 10 ballons coûtent 20 €. Combien coûtent 5 ballons ?
+10. 3 sacs contiennent 15 billes. Combien de billes y a-t-il dans 6 sacs ?
+
+### Niveau 2 (level: "CM2") (10 items)
+
+1. 3 kg de pommes coûtent 6 €, et 2 kg de pommes coûtent 4 €. Combien coûtent 5 kg de pommes ?
+2. 4 cahiers coûtent 8 €, et 2 cahiers coûtent 4 €. Combien coûtent 6 cahiers ?
+3. 3 tickets de manège coûtent 9 €, et 4 tickets coûtent 12 €. Combien coûtent 7 tickets ?
+4. 5 stylos coûtent 10 €, et 3 stylos coûtent 6 €. Combien coûtent 8 stylos ?
+5. 6 œufs coûtent 3 €, et 2 œufs coûtent 1 €. Combien coûtent 8 œufs ?
+6. 4 packs d'eau coûtent 8 €, et 3 packs coûtent 6 €. Combien coûtent 7 packs ?
+7. 2 kg de farine coûtent 4 €, et 1 kg coûte 2 €. Combien coûtent 5 kg ?
+8. 3 L de lait coûtent 6 €, et 1 L coûte 2 €. Combien coûtent 7 L ?
+9. 1 jouet coûte 3 €, et 4 jouets coûtent 12 €. Combien coûtent 9 jouets ?
+10. 1 ticket de manège coûte 4 €, et 5 tickets coûtent 20 €. Combien coûtent 11 tickets ?
+
+### Niveau 3 (level: "6e") (12 items)
+
+1. Un robinet remplit 15 L en 3 min. Combien de litres remplit-il en 7 min ?
+2. Une voiture parcourt 180 km avec 12 L d'essence. Combien de km parcourt-elle avec 5 L ?
+3. 8 ouvriers posent 40 briques en une heure. Combien de briques 3 ouvriers posent-ils en une heure ?
+4. Pour 6 personnes, une recette utilise 300 g de riz. Combien de grammes faut-il pour 10 personnes ?
+5. Un cycliste parcourt 45 km en 3 h. Combien de km parcourt-il en 5 h ?
+6. 12 billets de cinéma coûtent 84 €. Combien coûtent 5 billets ?
+7. Une pompe remplit une piscine de 2400 L en 8 h. Combien de litres remplit-elle en 3 h ?
+8. Un boulanger utilise 4 kg de farine pour 50 pains. Combien de kg utilise-t-il pour 75 pains ?
+9. 6 tickets de bus coûtent 12 €. Combien coûtent 10 tickets ?
+10. Une machine produit 250 objets en 5 h. Combien d'objets produit-elle en 8 h ?
+11. 3 packs de jus coûtent 12 €. Combien coûtent 7 packs ?
+12. 100 g de fromage coûtent 4 €. Combien coûtent 250 g ?
+
+## Proportionnalité — Résoudre un problème d'échelle
+
+_Domaine : Mathématiques · Exercice : `resoudre-problemes-echelles` — Résoudre des problèmes d'échelles · **32 items au total**_
+
+**Total par niveau :** Niveau 1 (level: "niveau1") = 10 · Niveau 2 (level: "niveau2") = 10 · Niveau 3 (level: "niveau3") = 12
+
+### ⚠️ Niveau 1 (level: "niveau1") (10 items)
+
+> ⚠️ **Banque faible** : 10 item(s) < 12 (seuil Niveau 1) — risque de répétition perçue par l'élève.
+
+1. Sur un plan, 1 cm représente 2 m dans la réalité. Une pièce mesure 4 cm sur le plan. Quelle est sa longueur réelle ?
+2. Sur un plan, 1 cm représente 5 m dans la réalité. Un couloir mesure 3 cm sur le plan. Quelle est sa longueur réelle ?
+3. Sur une carte, 1 cm représente 10 m dans la réalité. Un jardin mesure 6 cm sur la carte. Quelle est sa longueur réelle ?
+4. Sur un plan, 1 cm représente 3 m dans la réalité. Une chambre mesure 5 cm sur le plan. Quelle est sa longueur réelle ?
+5. Sur un plan, 1 cm représente 4 m dans la réalité. Un garage mesure 2 cm sur le plan. Quelle est sa longueur réelle ?
+6. Sur une carte, 1 cm représente 20 m dans la réalité. Un terrain mesure 7 cm sur la carte. Quelle est sa longueur réelle ?
+7. Sur un plan, 1 cm représente 2 m dans la réalité. Une terrasse mesure 9 cm sur le plan. Quelle est sa longueur réelle ?
+8. Sur un plan, 1 cm représente 6 m dans la réalité. Un mur mesure 3 cm sur le plan. Quelle est sa longueur réelle ?
+9. Sur une carte, 1 cm représente 50 m dans la réalité. Un chemin mesure 4 cm sur la carte. Quelle est sa longueur réelle ?
+10. Sur un plan, 1 cm représente 3 m dans la réalité. Un salon mesure 4 cm sur le plan. Quelle est sa longueur réelle ?
+
+### Niveau 2 (level: "niveau2") (10 items)
+
+1. Sur une carte, 1 cm représente 500 m dans la réalité. Deux villages sont distants de 6 cm sur la carte. Quelle est la distance réelle, en km ?
+2. Sur une carte, 1 cm représente 250 m dans la réalité. Deux fermes sont distantes de 12 cm sur la carte. Quelle est la distance réelle, en km ?
+3. Sur une carte, 1 cm représente 2 km dans la réalité. La distance entre deux villes mesure 40 mm sur la carte. Quelle est la distance réelle, en km ?
+4. Sur une carte, 1 cm représente 5 km dans la réalité. La distance entre deux villes mesure 60 mm sur la carte. Quelle est la distance réelle, en km ?
+5. Sur une carte, 1 cm représente 400 m dans la réalité. Deux quartiers sont distants de 25 cm sur la carte. Quelle est la distance réelle, en km ?
+6. Sur une carte, 1 cm représente 3 km dans la réalité. La distance entre deux villes mesure 90 mm sur la carte. Quelle est la distance réelle, en km ?
+7. Sur une carte, 1 cm représente 200 m dans la réalité. Deux stations sont distantes de 30 cm sur la carte. Quelle est la distance réelle, en km ?
+8. Sur une carte, 1 cm représente 4 km dans la réalité. La distance entre deux villes mesure 80 mm sur la carte. Quelle est la distance réelle, en km ?
+9. Sur une carte, 1 cm représente 600 m dans la réalité. Deux plages sont distantes de 5 cm sur la carte. Quelle est la distance réelle, en km ?
+10. Sur une carte, 1 cm représente 7 km dans la réalité. La distance entre deux villes mesure 20 mm sur la carte. Quelle est la distance réelle, en km ?
+
+### Niveau 3 (level: "niveau3") (12 items)
+
+1. Sur un plan à l'échelle 1 cm pour 50 m, une piscine mesure 8 mm sur le plan. Quelle est sa longueur réelle, en m ?
+2. Une route réelle mesure 12 km. Sur la carte, l'échelle est 1 cm pour 3 km. Quelle est la longueur de la route sur la carte, en cm ?
+3. Sur un plan à l'échelle 1 cm pour 2 m, une pièce mesure 550 mm sur le plan. Quelle est sa longueur réelle, en m ?
+4. Un pont réel mesure 300 m. L'échelle du plan est 1 cm pour 25 m. Quelle est la longueur du pont sur le plan, en cm ?
+5. Sur une carte à l'échelle 1 cm pour 4 km, la distance entre deux villes mesure 70 mm. Quelle est la distance réelle, en km ?
+6. Une rivière réelle mesure 45 km. L'échelle de la carte est 1 cm pour 9 km. Quelle est la longueur de la rivière sur la carte, en cm ?
+7. Sur un plan à l'échelle 1 cm pour 150 cm, une table mesure 12 mm sur le plan. Quelle est sa longueur réelle, en cm ?
+8. Un stade réel mesure 120 m de long. L'échelle du plan est 1 cm pour 15 m. Quelle est la longueur du stade sur le plan, en cm ?
+9. Sur une carte à l'échelle 1 cm pour 6 km, la distance entre deux villages mesure 80 mm. Quelle est la distance réelle, en km ?
+10. Un mur réel mesure 18 m. L'échelle du plan est 1 cm pour 3 m. Quelle est la longueur du mur sur le plan, en cm ?
+11. Sur un plan à l'échelle 1 cm pour 5 m, un court de tennis mesure 480 mm sur le plan. Quelle est sa longueur réelle, en m ?
+12. Une avenue réelle mesure 21 km. L'échelle de la carte est 1 cm pour 7 km. Quelle est la longueur de l'avenue sur la carte, en cm ?
 
 ## Conjugaison — Choisir l'auxiliaire être ou avoir au passé composé
 
@@ -3914,6 +4310,104 @@ _Domaine : Français · Exercice : `identifier-juxtaposition` — Distinguer la 
 11. Le chat, le chien et le lapin dorment, mais le hamster reste éveillé .
 12. Mes parents, mes cousins et moi partons en vacances ; nous sommes impatients .
 
+## Grammaire — La phrase complexe
+
+_Domaine : Français · Exercice : `identifier-subordination` — Distinguer la juxtaposition de la subordination · **34 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 10 · Niveau 3 = 12
+
+### Niveau 1 (12 items)
+
+1. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+2. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+3. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+4. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+5. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+6. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+7. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+8. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+9. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+10. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+11. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+12. Clique sur le verbe conjugué de la proposition principale, puis sur celui de la proposition subordonnée.
+
+### Niveau 2 (10 items)
+
+1. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+2. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+3. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+4. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+5. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+6. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+7. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+8. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+9. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+10. Clique sur le mot ou la ponctuation qui relie les deux propositions.
+
+### Niveau 3 (12 items)
+
+1. Les enfants jouent dehors quand il fait beau .
+2. Nous irons à la plage si le temps le permet .
+3. Léa est arrivée en retard comme le bus avait du retard .
+4. Le chien qui aboie appartient à mon voisin .
+5. Le livre que je lis est passionnant .
+6. La maison où j'habite est petite .
+7. Voici le stylo dont j'ai besoin .
+8. Le soleil se couche, les étoiles apparaissent .
+9. Il fait chaud ; les enfants jouent dehors .
+10. Le film commence, tout le monde se tait .
+11. Léa court plus vite que Paul, elle gagne toujours la course .
+12. Le chat, le chien et le hamster dorment, ils sont fatigués .
+
+## Grammaire — La phrase complexe
+
+_Domaine : Français · Exercice : `distinguer-coordination-subordination` — Distinguer la coordination de la subordination · **34 items au total**_
+
+**Total par niveau :** Niveau 1 = 12 · Niveau 2 = 10 · Niveau 3 = 12
+
+### Niveau 1 (12 items)
+
+1. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+2. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+3. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+4. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+5. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+6. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+7. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+8. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+9. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+10. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+11. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+12. Clique sur le verbe conjugué de la 1ʳᵉ proposition, puis sur celui de la 2ᵉ.
+
+### Niveau 2 (10 items)
+
+1. Clique sur le mot (ou les mots) qui relient les deux propositions.
+2. Clique sur le mot (ou les mots) qui relient les deux propositions.
+3. Clique sur le mot (ou les mots) qui relient les deux propositions.
+4. Clique sur le mot (ou les mots) qui relient les deux propositions.
+5. Clique sur le mot (ou les mots) qui relient les deux propositions.
+6. Clique sur le mot (ou les mots) qui relient les deux propositions.
+7. Clique sur le mot (ou les mots) qui relient les deux propositions.
+8. Clique sur le mot (ou les mots) qui relient les deux propositions.
+9. Clique sur le mot (ou les mots) qui relient les deux propositions.
+10. Clique sur le mot (ou les mots) qui relient les deux propositions.
+
+### Niveau 3 (12 items)
+
+1. Les élèves applaudissent quand le spectacle commence .
+2. Nous resterons chez nous si la tempête continue .
+3. Léo travaille bien qu'il soit fatigué .
+4. Elle prépare le dîner pendant que son frère met la table .
+5. Ils partiront dès que le bus arrivera .
+6. Paul et Marie jouent au ballon quand la cloche sonne .
+7. Le ciel est bleu et les oiseaux chantent .
+8. Elle est fatiguée car elle a beaucoup travaillé .
+9. Tu peux rester ou tu peux partir .
+10. Il pleuvait donc nous sommes restés à la maison .
+11. Le magasin est fermé or nous avions besoin de pain .
+12. Léa choisit un livre ou un magazine, mais elle repart les mains vides .
+
 ## Grammaire — Le nom
 
 _Domaine : Français · Exercice : `identifier-nom-phrase` — Identifier un nom · **34 items au total**_
@@ -4011,6 +4505,56 @@ _Domaine : Français · Exercice : `ortho-transformer-gn-feminin` — Change de 
 8. masculine: le comte riche · hintNoun: comtesse · rule: Comte → comtesse : forme féminine irrégulière à mémoriser. Riche est invariable.
 9. masculine: un compagnon loyal · hintNoun: compagne · rule: Compagnon → compagne : féminin supplétif à mémoriser. Loyal → loyale (+e).
 10. masculine: le traître rusé · hintNoun: traîtresse · rule: Traître → traîtresse : forme féminine irrégulière à mémoriser. Rusé → rusée (+e).
+
+## Probabilités — Écrire une probabilité
+
+_Domaine : Mathématiques · Exercice : `probabilite-nombre` — Exprimer la probabilité comme un nombre · **35 items au total**_
+
+**Total par niveau :** Niveau 1 (level: "niveau1") = 12 · Niveau 2 (level: "niveau2") = 10 · Niveau 3 (level: "niveau3") = 13
+
+### Niveau 1 (level: "niveau1") (12 items)
+
+1. Clique sur le mot qui décrit la probabilité d'obtenir un 7 avec un dé normal.
+2. Clique sur le mot qui décrit la probabilité d'obtenir un chiffre entre 1 et 6 avec ce dé.
+3. On lance une pièce.<br>Clique sur le mot qui décrit la probabilité d'obtenir Pile.
+4. Clique sur le mot qui décrit la probabilité de gagner au loto avec un seul billet.
+5. Clique sur le mot qui décrit la probabilité d'obtenir dix fois de suite un 1 avec un dé.
+6. Sac de billes : elles sont toutes rouges.<br>Clique sur le mot qui décrit la probabilité de tirer une bille bleue.
+7. Sac de billes : 8 rouges, 2 bleues.<br>Clique sur le mot qui décrit la probabilité de tirer une bille rouge.
+8. Boîte de jetons : 1 noir, 1 blanc.<br>Clique sur le mot qui décrit la probabilité de tirer le jeton noir.
+9. Boîte de jetons : 9 verts, 1 rouge.<br>Clique sur le mot qui décrit la probabilité de tirer le jeton rouge.
+10. On tire une carte dans un jeu de 52 cartes.<br>Clique sur le mot qui décrit la probabilité de tirer une carte (n'importe laquelle).
+11. Sac de billes : 5 rouges, 5 bleues.<br>Clique sur le mot qui décrit la probabilité de tirer une bille rouge.
+12. Boîte de jetons : 10 jetons, tous jaunes.<br>Clique sur le mot qui décrit la probabilité de tirer un jeton vert.
+
+### Niveau 2 (level: "niveau2") (10 items)
+
+1. Urne : 3 boules noires, 7 blanches.<br>Clique sur toutes les écritures correctes de la probabilité de tirer une noire.
+2. Dé équilibré.<br>Clique sur la probabilité (en fraction) d'obtenir un multiple de 3.
+3. Dé équilibré.<br>Clique sur la probabilité (en fraction) d'obtenir un nombre supérieur à 2.
+4. Dé équilibré.<br>Clique sur la probabilité (en fraction) d'obtenir un nombre inférieur à 2.
+5. Urne : 4 boules vertes, 16 boules jaunes.<br>Clique sur toutes les écritures correctes de la probabilité de tirer une verte.
+6. Sac : 6 billes rouges, 14 billes bleues.<br>Clique sur toutes les écritures correctes de la probabilité de tirer une bille rouge.
+7. Boîte : 12 jetons jaunes, 8 jetons verts.<br>Clique sur toutes les écritures correctes de la probabilité de tirer un jeton vert.
+8. Urne : 9 boules blanches, 1 boule noire.<br>Clique sur toutes les écritures correctes de la probabilité de tirer une boule noire.
+9. Sac : 45 billes vertes, 5 billes oranges.<br>Clique sur toutes les écritures correctes de la probabilité de tirer une bille orange.
+10. Urne : 7 boules rouges, 3 boules noires.<br>Clique sur toutes les écritures correctes de la probabilité de tirer une boule noire.
+
+### Niveau 3 (level: "niveau3") (13 items)
+
+1. Clique sur toutes les écritures équivalentes à un demi.
+2. Clique sur toutes les écritures équivalentes à trois quarts.
+3. Clique sur toutes les écritures équivalentes à un dixième.
+4. Clique sur Pile à chaque fois qu'il apparaît dans cette série de 8 lancers.
+5. Clique sur Pile à chaque fois qu'il apparaît dans cette série de 10 lancers.
+6. On lance 200 fois une pièce. Face sort 104 fois.<br>La fréquence observée est-elle proche ou éloignée de la probabilité théorique (1 chance sur 2) ?
+7. On lance 200 fois une pièce. Face sort 40 fois.<br>La fréquence observée est-elle proche ou éloignée de la probabilité théorique (1 chance sur 2) ?
+8. On lance un dé 60 fois. Le 6 sort 11 fois.<br>La fréquence observée est-elle proche ou éloignée de la probabilité théorique (1 chance sur 6) ?
+9. On lance un dé 60 fois. Le 6 sort 2 fois.<br>La fréquence observée est-elle proche ou éloignée de la probabilité théorique (1 chance sur 6) ?
+10. On tire 100 fois une bille dans une urne (5 rouges, 5 bleues), en la remettant à chaque fois. La bille rouge sort 48 fois.<br>La fréquence observée est-elle proche ou éloignée de la probabilité théorique (1 chance sur 2) ?
+11. On tire 100 fois une bille dans la même urne (5 rouges, 5 bleues), en la remettant à chaque fois. La bille rouge sort 12 fois.<br>La fréquence observée est-elle proche ou éloignée de la probabilité théorique (1 chance sur 2) ?
+12. On lance 500 fois une pièce. Pile sort 251 fois.<br>La fréquence observée est-elle proche ou éloignée de la probabilité théorique (1 chance sur 2) ?
+13. On tire 90 fois une bille dans un sac à 3 couleurs en nombres égaux (rouge, vert, bleu), en la remettant à chaque fois. La bille rouge sort 29 fois.<br>La fréquence observée est-elle proche ou éloignée de la probabilité théorique (1 chance sur 3) ?
 
 ## Fractions — Décomposer
 
@@ -5527,9 +6071,9 @@ _Domaine : Français · Exercice : `conjuguer-vouloir` — Conjuguer le verbe VO
 
 _Domaine : Français · Exercice : `ortho-accorder-adjectif-nom` — Accorder l'adjectif avec le nom · **60 items au total**_
 
-**Total par niveau :** Niveau 1 (bank) = 60
+**Total par niveau :** Niveau 1 (difficulty: 1) = 20 · Niveau 2 (difficulty: 2) = 20 · Niveau 3 (difficulty: 3) = 20
 
-### Niveau 1 (bank) (60 items)
+### Niveau 1 (difficulty: 1) (20 items)
 
 1. Mets ce groupe nominal au pluriel.
 2. Mets ce groupe nominal au pluriel.
@@ -5551,46 +6095,52 @@ _Domaine : Français · Exercice : `ortho-accorder-adjectif-nom` — Accorder l'
 18. Mets ce groupe nominal au féminin pluriel.
 19. Mets ce groupe nominal au féminin pluriel.
 20. Mets ce groupe nominal au pluriel.
-21. Mets ce groupe nominal au masculin pluriel.
-22. Mets ce groupe nominal au masculin pluriel.
-23. Mets ce groupe nominal au masculin pluriel.
-24. Mets ce groupe nominal au masculin pluriel.
-25. Mets ce groupe nominal au masculin pluriel.
-26. Mets ce groupe nominal au masculin pluriel.
-27. Mets ce groupe nominal au féminin singulier.
-28. Mets ce groupe nominal au féminin singulier.
-29. Mets ce groupe nominal au féminin singulier.
-30. Mets ce groupe nominal au féminin singulier.
-31. Mets ce groupe nominal au féminin singulier.
-32. Mets ce groupe nominal au féminin singulier.
-33. Mets ce groupe nominal au féminin.
-34. Mets ce groupe nominal au féminin.
-35. Mets ce groupe nominal au féminin.
-36. Mets ce groupe nominal au féminin.
-37. Mets ce groupe nominal au féminin.
-38. Mets ce groupe nominal au féminin.
-39. Mets ce groupe nominal au féminin.
-40. Mets ce groupe nominal au féminin pluriel.
-41. Mets ce groupe nominal au pluriel.
-42. Mets ce groupe nominal au féminin pluriel.
-43. Mets ce groupe nominal au pluriel.
-44. Mets ce groupe nominal au pluriel.
-45. Mets ce groupe nominal au féminin pluriel.
-46. Mets ce groupe nominal au pluriel.
-47. Mets ce groupe nominal au pluriel.
-48. Mets ce groupe nominal au pluriel.
-49. Mets ce groupe nominal au féminin.
-50. Mets ce groupe nominal au féminin.
-51. Mets ce groupe nominal au féminin.
-52. Mets ce groupe nominal au féminin.
-53. Mets ce groupe nominal au féminin.
-54. Mets ce groupe nominal au féminin pluriel.
-55. Mets ce groupe nominal au masculin pluriel.
-56. Mets ce groupe nominal au pluriel.
-57. Mets ce groupe nominal au féminin.
-58. Mets ce groupe nominal au féminin.
-59. Mets ce groupe nominal au féminin.
-60. Mets ce groupe nominal au féminin.
+
+### Niveau 2 (difficulty: 2) (20 items)
+
+1. Mets ce groupe nominal au masculin pluriel.
+2. Mets ce groupe nominal au masculin pluriel.
+3. Mets ce groupe nominal au masculin pluriel.
+4. Mets ce groupe nominal au masculin pluriel.
+5. Mets ce groupe nominal au masculin pluriel.
+6. Mets ce groupe nominal au masculin pluriel.
+7. Mets ce groupe nominal au féminin singulier.
+8. Mets ce groupe nominal au féminin singulier.
+9. Mets ce groupe nominal au féminin singulier.
+10. Mets ce groupe nominal au féminin singulier.
+11. Mets ce groupe nominal au féminin singulier.
+12. Mets ce groupe nominal au féminin singulier.
+13. Mets ce groupe nominal au féminin.
+14. Mets ce groupe nominal au féminin.
+15. Mets ce groupe nominal au féminin.
+16. Mets ce groupe nominal au féminin.
+17. Mets ce groupe nominal au féminin.
+18. Mets ce groupe nominal au féminin.
+19. Mets ce groupe nominal au féminin.
+20. Mets ce groupe nominal au féminin pluriel.
+
+### Niveau 3 (difficulty: 3) (20 items)
+
+1. Mets ce groupe nominal au pluriel.
+2. Mets ce groupe nominal au féminin pluriel.
+3. Mets ce groupe nominal au pluriel.
+4. Mets ce groupe nominal au pluriel.
+5. Mets ce groupe nominal au féminin pluriel.
+6. Mets ce groupe nominal au pluriel.
+7. Mets ce groupe nominal au pluriel.
+8. Mets ce groupe nominal au pluriel.
+9. Mets ce groupe nominal au féminin.
+10. Mets ce groupe nominal au féminin.
+11. Mets ce groupe nominal au féminin.
+12. Mets ce groupe nominal au féminin.
+13. Mets ce groupe nominal au féminin.
+14. Mets ce groupe nominal au féminin pluriel.
+15. Mets ce groupe nominal au masculin pluriel.
+16. Mets ce groupe nominal au pluriel.
+17. Mets ce groupe nominal au féminin.
+18. Mets ce groupe nominal au féminin.
+19. Mets ce groupe nominal au féminin.
+20. Mets ce groupe nominal au féminin.
 
 ## Orthographe — Accord dans le groupe nominal
 
@@ -5671,9 +6221,9 @@ _Domaine : Français · Exercice : `ortho-transformer-gn-pluriel` — Transforme
 
 _Domaine : Français · Exercice : `ortho-accorder-determinant-nom` — Accorder le déterminant avec le nom · **60 items au total**_
 
-**Total par niveau :** Niveau 1 (bank) = 60
+**Total par niveau :** Niveau 1 (difficulty: 1) = 20 · Niveau 2 (difficulty: 2) = 20 · Niveau 3 (difficulty: 3) = 20
 
-### Niveau 1 (bank) (60 items)
+### Niveau 1 (difficulty: 1) (20 items)
 
 1. Mets ce groupe nominal au pluriel.
 2. Mets ce groupe nominal au pluriel.
@@ -5695,46 +6245,52 @@ _Domaine : Français · Exercice : `ortho-accorder-determinant-nom` — Accorder
 18. Écris ce nom avec l'article défini qui convient.
 19. Écris ce nom avec l'article indéfini qui convient.
 20. Écris ce nom avec l'article indéfini qui convient.
-21. Mets ce groupe nominal au pluriel.
-22. Mets ce groupe nominal au pluriel.
-23. Mets ce groupe nominal au pluriel.
-24. Mets ce groupe nominal au pluriel.
-25. Mets ce groupe nominal au pluriel.
-26. Mets ce groupe nominal au pluriel.
-27. Mets ce groupe nominal au pluriel.
-28. Mets ce groupe nominal au pluriel.
-29. Mets ce groupe nominal au singulier.
-30. Mets ce groupe nominal au singulier.
-31. Mets ce groupe nominal au singulier.
-32. Mets ce groupe nominal au singulier.
-33. Mets ce groupe nominal au singulier.
-34. Mets ce groupe nominal au singulier.
-35. Écris ce nom avec l'article défini (attention à l'élision !).
-36. Écris ce nom avec l'article défini (attention à l'élision !).
-37. Écris ce nom avec l'article défini (attention à l'élision !).
-38. Écris ce nom avec le déterminant démonstratif qui convient. (Attention : « cet » devant voyelle !)
-39. Écris ce nom avec le déterminant démonstratif qui convient. (Attention : « cet » devant voyelle !)
-40. Écris ce nom avec le déterminant possessif « mon/ma ». (Attention : « mon » devant voyelle même au féminin !)
-41. Écris ce nom avec le déterminant partitif qui convient (du / de la / de l').
-42. Écris ce nom avec le déterminant partitif qui convient (du / de la / de l').
-43. Écris ce nom avec le déterminant partitif qui convient (du / de la / de l').
-44. Écris ce nom avec le déterminant partitif qui convient (du / de la / de l').
-45. Écris ce nom avec le déterminant partitif qui convient (du / de la / de l').
-46. Écris ce groupe nominal avec « tout » accordé correctement.
-47. Écris ce groupe nominal avec « tout » accordé correctement.
-48. Écris ce groupe nominal avec « tout » accordé correctement.
-49. Écris ce groupe nominal avec « tout » accordé correctement.
-50. Mets ce groupe nominal au pluriel.
-51. Mets ce groupe nominal au pluriel.
-52. Mets ce groupe nominal au singulier.
-53. Écris la forme contractée (de + le / de + les).
-54. Écris la forme contractée (à + le / à + les).
-55. Écris la forme contractée (à + le / à + les).
-56. Écris ce nom avec l'article défini (attention au h muet ou aspiré !).
-57. Écris ce nom avec l'article défini (attention au h muet ou aspiré !).
-58. Écris ce nom avec l'article défini (attention au h muet ou aspiré !).
-59. Écris ce nom avec l'article défini (attention au h muet ou aspiré !).
-60. Mets ce groupe nominal au pluriel.
+
+### Niveau 2 (difficulty: 2) (20 items)
+
+1. Mets ce groupe nominal au pluriel.
+2. Mets ce groupe nominal au pluriel.
+3. Mets ce groupe nominal au pluriel.
+4. Mets ce groupe nominal au pluriel.
+5. Mets ce groupe nominal au pluriel.
+6. Mets ce groupe nominal au pluriel.
+7. Mets ce groupe nominal au pluriel.
+8. Mets ce groupe nominal au pluriel.
+9. Mets ce groupe nominal au singulier.
+10. Mets ce groupe nominal au singulier.
+11. Mets ce groupe nominal au singulier.
+12. Mets ce groupe nominal au singulier.
+13. Mets ce groupe nominal au singulier.
+14. Mets ce groupe nominal au singulier.
+15. Écris ce nom avec l'article défini (attention à l'élision !).
+16. Écris ce nom avec l'article défini (attention à l'élision !).
+17. Écris ce nom avec l'article défini (attention à l'élision !).
+18. Écris ce nom avec le déterminant démonstratif qui convient. (Attention : « cet » devant voyelle !)
+19. Écris ce nom avec le déterminant démonstratif qui convient. (Attention : « cet » devant voyelle !)
+20. Écris ce nom avec le déterminant possessif « mon/ma ». (Attention : « mon » devant voyelle même au féminin !)
+
+### Niveau 3 (difficulty: 3) (20 items)
+
+1. Écris ce nom avec le déterminant partitif qui convient (du / de la / de l').
+2. Écris ce nom avec le déterminant partitif qui convient (du / de la / de l').
+3. Écris ce nom avec le déterminant partitif qui convient (du / de la / de l').
+4. Écris ce nom avec le déterminant partitif qui convient (du / de la / de l').
+5. Écris ce nom avec le déterminant partitif qui convient (du / de la / de l').
+6. Écris ce groupe nominal avec « tout » accordé correctement.
+7. Écris ce groupe nominal avec « tout » accordé correctement.
+8. Écris ce groupe nominal avec « tout » accordé correctement.
+9. Écris ce groupe nominal avec « tout » accordé correctement.
+10. Mets ce groupe nominal au pluriel.
+11. Mets ce groupe nominal au pluriel.
+12. Mets ce groupe nominal au singulier.
+13. Écris la forme contractée (de + le / de + les).
+14. Écris la forme contractée (à + le / à + les).
+15. Écris la forme contractée (à + le / à + les).
+16. Écris ce nom avec l'article défini (attention au h muet ou aspiré !).
+17. Écris ce nom avec l'article défini (attention au h muet ou aspiré !).
+18. Écris ce nom avec l'article défini (attention au h muet ou aspiré !).
+19. Écris ce nom avec l'article défini (attention au h muet ou aspiré !).
+20. Mets ce groupe nominal au pluriel.
 
 ## Orthographe — Modifier le temps et effectuer les accords nécessaires
 

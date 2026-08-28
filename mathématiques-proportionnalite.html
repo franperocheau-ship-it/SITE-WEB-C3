@@ -23,16 +23,343 @@
   <link rel="stylesheet" href="styles.css?v=12">
   <link rel="stylesheet" href="breadcrumb.css?v=1">
   <script src="js/breadcrumb.js?v=3"></script>
-  <script src="js/page-a-venir.js?v=1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/idle-logout.js"></script>
+  <script src="js/guided-access.js?v=1"></script>
+  <script src="data/index.js?v=10"></script>
+  <script src="js/skill-badges.js?v=1"></script>
   <style>
-    .page-wrap { background: var(--bg); min-height: calc(100vh - 88px); padding-bottom: 64px; }
-    .page-content { max-width: 1400px; margin: 0 auto; padding: 0 64px; }
-    @media (max-width: 1024px) { .page-content { padding: 0 40px; } .navbar__inner { padding: 0 40px; } }
-    @media (max-width: 768px) { .page-content { padding: 0 24px; } }
+    /* ── Page layout ────────────────────────────────────────── */
+    .page-wrap {
+      background: var(--bg);
+      min-height: calc(100vh - 88px);
+      padding-bottom: 64px;
+    }
+
+    .page-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 64px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 20px 0 0;
+      opacity: 0.75;
+      transition: opacity 180ms;
+    }
+    .back-link:hover { opacity: 1; }
+
+    /* ── Page header ────────────────────────────────────────── */
+    .page-header {
+      text-align: center;
+      padding: 28px 0 32px;
+    }
+
+    .page-header-icon {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .page-title {
+      font-weight: 900;
+      font-size: 32px;
+      color: var(--blue);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .page-title-rule {
+      width: 44px;
+      height: 3px;
+      background: var(--red);
+      border-radius: 2px;
+      margin: 0 auto 16px;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    /* ── Filter bar ─────────────────────────────────────────── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      flex: 1;
+      min-width: 220px;
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--muted);
+    }
+
+    .search-input {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 10px 16px 10px 42px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+
+    .search-input::placeholder { color: var(--muted); }
+
+    .search-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(16,43,106,0.08);
+    }
+
+    .level-filters {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .level-btn {
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: 9px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      color: var(--muted);
+      background: var(--card-bg);
+      cursor: pointer;
+      transition: border-color 200ms, color 200ms, background 200ms;
+    }
+
+    .level-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+    .level-btn.active[data-level="all"]  { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .level-btn.active[data-level="CM1"] { background: rgba(16,43,106,0.1); border-color: rgba(16,43,106,0.3); color: var(--blue); }
+    .level-btn.active[data-level="CM2"] { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .level-btn.active[data-level="6e"]  { background: var(--red);  border-color: var(--red);  color: #fff; }
+
+    /* ── Sections ───────────────────────────────────────────── */
+    .skill-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .skill-section {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: box-shadow 250ms ease;
+    }
+
+    .skill-section.section-hidden { display: none; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 24px;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1.5px solid var(--border);
+      transition: background 200ms;
+    }
+
+    .section-header:hover { background: rgba(16,43,106,0.025); }
+
+    .section-emoji { font-size: 20px; flex-shrink: 0; line-height: 1; }
+
+    .section-title {
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--blue);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      flex: 1;
+    }
+
+    .section-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(16,43,106,0.07);
+      color: var(--blue);
+      font-weight: 700;
+      font-size: 11px;
+      border-radius: 100px;
+      padding: 3px 12px;
+      flex-shrink: 0;
+      transition: background 200ms;
+    }
+
+    .section-toggle {
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      flex-shrink: 0;
+      transition: transform 280ms cubic-bezier(.4,0,.2,1), border-color 200ms;
+    }
+
+    .skill-section.is-collapsed .section-toggle { transform: rotate(-90deg); }
+
+    /* Collapsible body — grid-template-rows trick for smooth animation */
+    .section-body {
+      display: grid;
+      grid-template-rows: 1fr;
+      transition: grid-template-rows 300ms cubic-bezier(.4,0,.2,1);
+    }
+
+    .skill-section.is-collapsed .section-body { grid-template-rows: 0fr; }
+
+    .section-body-inner { overflow: hidden; }
+
+    .section-content { padding: 22px 24px; }
+
+    /* ── Sub-section label ──────────────────────────────────── */
+    .subsection { margin-bottom: 4px; }
+    .subsection:last-child { margin-bottom: 0; }
+
+    .subsection-label {
+      font-weight: 700;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      margin-top: 22px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .subsection:first-child .subsection-label { margin-top: 0; }
+
+    /* ── Skills grid ────────────────────────────────────────── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    /* ── Skill card ─────────────────────────────────────────── */
+    .skill-card {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms;
+    }
+
+    .skill-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(16,43,106,0.18);
+    }
+
+    .skill-card.card-hidden { display: none; }
+    .skill-card-locked { opacity: 0.45; cursor: not-allowed; }
+    .skill-card-locked:hover { transform: none; box-shadow: none; border-color: var(--border); }
+
+    .skill-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    /* ── Level badges ───────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .skill-title {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    /* ── Empty states ───────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 56px 24px;
+      color: var(--muted);
+      font-size: 15px;
+      display: none;
+    }
+
+    .empty-state.visible { display: block; }
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .page-content { padding: 0 40px; }
+      .navbar__inner { padding: 0 40px; }
+    }
+
+    @media (max-width: 768px) {
+      .page-content { padding: 0 24px; }
+
+      .skills-grid { grid-template-columns: repeat(2, 1fr); }
+
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .level-filters { justify-content: center; }
+
+      .section-title { font-size: 11px; }
+    }
+
+    @media (max-width: 480px) {
+      .skills-grid { grid-template-columns: 1fr; }
+
+      .level-filters { flex-wrap: wrap; justify-content: center; }
+    }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -82,12 +409,45 @@
 
       <script>Breadcrumb.render({ current: 'Proportionnalité' });</script>
 
-      <script>
-        PageAVenir.render({
-          titre: 'Proportionnalité',
-          icone: 'assets/proportionnalite.png',
-        });
-      </script>
+      <div class="page-header">
+        <div class="page-header-icon">
+          <img src="assets/proportionnalite.png" alt="Proportionnalité" />
+        </div>
+        <h1 class="page-title">PROPORTIONNALITÉ</h1>
+        <div class="page-title-rule"></div>
+        <p class="page-subtitle">Choisis une notion à travailler.</p>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 20 20" fill="none">
+            <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="2"/>
+            <line x1="12.5" y1="12.5" x2="17" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input
+            type="text"
+            class="search-input"
+            id="search-input"
+            placeholder="Rechercher une notion..."
+            autocomplete="off"
+            spellcheck="false"
+          >
+        </div>
+        <div class="level-filters">
+          <button class="level-btn active" data-level="all">Tous</button>
+          <button class="level-btn" data-level="CM1">CM1</button>
+          <button class="level-btn" data-level="CM2">CM2</button>
+          <button class="level-btn" data-level="6e">6e</button>
+        </div>
+      </div>
+
+      <!-- Skills container (rendered by JS) -->
+      <div class="skill-sections" id="skills-container"></div>
+
+      <div class="empty-state" id="empty-state">
+        Aucune notion ne correspond à ta recherche.
+      </div>
 
     </div>
   </div>
@@ -112,6 +472,210 @@
       &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
   </div>
 </footer>
+
+  <script>
+    /* ── Data ──────────────────────────────────────────────────────────────────
+       Comme sur les autres pages de catégorie (ex. mathématiques-probabilites) :
+       logique spiralaire du programme — une compétence introduite à un niveau
+       reste travaillée aux niveaux suivants. `entryLevel` est le niveau
+       d'entrée de la compétence ; les pastilles affichées sont la cascade de
+       ce niveau jusqu'à 6e (voir expandLevels ci-dessous, identique aux
+       autres pages). Sans rapport avec les ids internes CM1/CM2/6e ou
+       niveau1/niveau2/niveau3 du LevelSelect (data/proportionnalite.js), qui
+       restent une simple progression de difficulté à l'intérieur de chaque
+       compétence.
+
+       Compléter un tableau / Résoudre des problèmes d'échelles sont des
+       compétences 6e uniquement (entryLevel: "6e") : expandLevels("6e") ne
+       renvoie qu'une seule pastille rouge "6e", sans CM1/CM2 — exactement le
+       traitement de "probabilite-nombre" sur mathématiques-probabilites.html.
+    ────────────────────────────────────────────────────────────────────── */
+    const SECTIONS = [
+      {
+        id: "proportionnalite",
+        emoji: "⚖️",
+        title: "Proportionnalité",
+        subSections: [
+          {
+            label: null,
+            skills: [
+              { title: "Identifier une situation de proportionnalité",  slug: "identifier-situation-proportionnalite", entryLevel: "CM1" },
+              { title: "Résoudre un problème de proportionnalité",      slug: "resoudre-probleme-proportionnalite",     entryLevel: "CM1" },
+              { title: "Compléter un tableau de proportionnalité",      slug: "completer-tableau-proportionnalite",     entryLevel: "6e"  },
+              { title: "Résoudre des problèmes d'échelles",             slug: "resoudre-problemes-echelles",            entryLevel: "6e"  },
+            ]
+          }
+        ]
+      }
+    ];
+
+    /* ── Level inheritance: CM1→[CM1,CM2,6e]  CM2→[CM2,6e]  6e→[6e] ────────── */
+    function expandLevels(entryLevel) {
+      const order = ["CM1", "CM2", "6e"];
+      return order.slice(order.indexOf(entryLevel));
+    }
+
+    /* ── Badge rendering ────────────────────────────────────────────────── */
+    function renderBadges(levels) {
+      return levels.map(level => {
+        const cls = level === "CM1" ? "badge-cm1" : level === "CM2" ? "badge-cm2" : "badge-6e";
+        return `<span class="badge ${cls}">${level}</span>`;
+      }).join("");
+    }
+
+    /* Slugs qui ont une page d'exercice active */
+    const EXERCISE_SLUGS = new Set([
+      "identifier-situation-proportionnalite",
+      "resoudre-probleme-proportionnalite",
+      "completer-tableau-proportionnalite",
+      "resoudre-problemes-echelles"
+    ]);
+
+    /* ── Skill card rendering ──────────────────────────────────────────────── */
+    function renderSkillCard(skill, sectionId) {
+      const displayLevels = expandLevels(skill.entryLevel);
+      const inCatalog     = EXERCISE_SLUGS.has(skill.slug);
+      const isBlocked     = inCatalog && typeof lfmGuidedAccess !== 'undefined' && !lfmGuidedAccess.isAllowedSync(skill.slug);
+      const hasExercise   = inCatalog && !isBlocked;
+      const href          = hasExercise ? `exercise.html?slug=${skill.slug}` : "#";
+      const onclick       = hasExercise ? "" : `onclick="return false;"`;
+      const lockedClass   = isBlocked ? " skill-card-locked" : "";
+      return `
+        <a class="skill-card${lockedClass}"
+           href="${href}"
+           data-slug="${skill.slug}"
+           ${inCatalog ? `data-exercise-slug="${skill.slug}"` : ""}
+           data-levels="${displayLevels.join(",")}"
+           data-title="${skill.title.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}"
+           data-section="${sectionId}"
+           ${onclick}>
+          <div class="skill-badges">${renderBadges(displayLevels)}</div>
+          <div class="skill-title">${skill.title}${isBlocked ? ' 🔒' : ''}</div>
+        </a>
+      `;
+    }
+
+    /* ── Section rendering ─────────────────────────────────────────────────── */
+    function renderSection(section) {
+      const totalSkills = section.subSections.reduce((n, s) => n + s.skills.length, 0);
+      const label = `${totalSkills} notion${totalSkills > 1 ? "s" : ""}`;
+
+      const subSectionsHTML = section.subSections.map((sub, subIdx) => {
+        const skillsHTML = sub.skills.map(skill => renderSkillCard(skill, section.id)).join("");
+        const labelHTML  = sub.label ? `<div class="subsection-label">${sub.label}</div>` : "";
+        return `
+          <div class="subsection" data-subsection="${section.id}-${subIdx}">
+            ${labelHTML}
+            <div class="skills-grid">${skillsHTML}</div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="skill-section" data-section-id="${section.id}">
+          <div class="section-header" onclick="toggleSection('${section.id}')">
+            <span class="section-emoji">${section.emoji}</span>
+            <span class="section-title">${section.title}</span>
+            <span class="section-count" data-count-for="${section.id}">${label}</span>
+            <span class="section-toggle">▾</span>
+          </div>
+          <div class="section-body">
+            <div class="section-body-inner">
+              <div class="section-content">${subSectionsHTML}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ── Init ──────────────────────────────────────────────────────────────── */
+    async function init() {
+      if (typeof lfmGuidedAccess !== 'undefined') await lfmGuidedAccess.get();
+      document.getElementById("skills-container").innerHTML =
+        SECTIONS.map(renderSection).join("");
+      bindEvents();
+      if (typeof applySkillValidationBadges === 'function') applySkillValidationBadges();
+    }
+
+    /* ── Toggle section collapse ───────────────────────────────────────────── */
+    function toggleSection(sectionId) {
+      document.querySelector(`[data-section-id="${sectionId}"]`).classList.toggle("is-collapsed");
+    }
+
+    /* ── Filter state ──────────────────────────────────────────────────────── */
+    let activeLevel = "all";
+    let searchQuery  = "";
+
+    function normalize(str) {
+      return str.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    }
+
+    function applyFilters() {
+      const query    = normalize(searchQuery.trim());
+      let anyVisible = false;
+
+      SECTIONS.forEach(section => {
+        const sectionEl = document.querySelector(`[data-section-id="${section.id}"]`);
+        const cards     = sectionEl.querySelectorAll(".skill-card");
+        let sectionVisibleCount = 0;
+
+        cards.forEach(card => {
+          const matchesLevel  = activeLevel === "all" || card.dataset.levels.split(",").includes(activeLevel);
+          const matchesSearch = !query || card.dataset.title.includes(query);
+
+          if (matchesLevel && matchesSearch) {
+            card.classList.remove("card-hidden");
+            sectionVisibleCount++;
+            anyVisible = true;
+          } else {
+            card.classList.add("card-hidden");
+          }
+        });
+
+        /* Hide empty subsections */
+        sectionEl.querySelectorAll(".subsection").forEach(sub => {
+          const visibleInSub = sub.querySelectorAll(".skill-card:not(.card-hidden)").length;
+          sub.style.display  = visibleInSub === 0 ? "none" : "";
+        });
+
+        /* Update count badge */
+        const countEl  = sectionEl.querySelector(`[data-count-for="${section.id}"]`);
+        const total    = section.subSections.reduce((n, s) => n + s.skills.length, 0);
+        countEl.textContent = sectionVisibleCount === total
+          ? `${total} notion${total > 1 ? "s" : ""}`
+          : `${sectionVisibleCount} / ${total}`;
+
+        /* Show/hide section; auto-expand when searching */
+        if (sectionVisibleCount === 0) {
+          sectionEl.classList.add("section-hidden");
+        } else {
+          sectionEl.classList.remove("section-hidden");
+          if (query) sectionEl.classList.remove("is-collapsed");
+        }
+      });
+
+      document.getElementById("empty-state").classList.toggle("visible", !anyVisible);
+    }
+
+    /* ── Event binding ─────────────────────────────────────────────────────── */
+    function bindEvents() {
+      document.getElementById("search-input").addEventListener("input", e => {
+        searchQuery = e.target.value;
+        applyFilters();
+      });
+
+      document.querySelectorAll(".level-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".level-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          activeLevel = btn.dataset.level;
+          applyFilters();
+        });
+      });
+    }
+
+    init();
+  </script>
 
   <script src="js/menu.js"></script>
 <style>
