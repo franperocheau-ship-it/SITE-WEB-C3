@@ -25,7 +25,7 @@
   <script src="js/guided-access.js?v=1"></script>
   <script src="data/index.js?v=10"></script>
   <script src="js/exercise-catalog.js?v=6"></script>
-  <script src="js/teacher-analytics.js?v=9"></script>
+  <script src="js/teacher-analytics.js?v=10"></script>
   <script src="js/niveau-pastilles.js?v=2"></script>
   <script src="js/laurels.js?v=8"></script>
   <script src="js/jogging-data.js?v=1"></script>
@@ -39,7 +39,7 @@
   <script src="js/vocab-student-space.js?v=3"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=2">
   <script src="js/feature-flags.js?v=1"></script>
-  <script src="js/resultats-nav.js?v=3"></script>
+  <script src="js/resultats-nav.js?v=4"></script>
   <style>
     .dash-wrap {
       min-height: calc(100vh - 88px - 74px);
@@ -596,6 +596,30 @@
 
       </div><!-- /res-sub-questionnaires -->
 
+      <!-- ── Sous-section : Compréhension orale — même présentation (détail +
+           moyenne générale en tête) que Questionnaires de lecture ci-dessus.
+           La moyenne générale alimente aussi "Oral — Compréhension orale"
+           dans l'onglet Général, via le préfixe comprehension-orale-
+           enregistré dans STANDALONE_META (js/teacher-analytics.js). ── -->
+      <div id="res-sub-oral" style="display:none">
+
+        <div class="dash-section" id="section-oral" style="display:none">
+          <div class="dash-section-title">Ma compréhension orale</div>
+          <div class="dash-stats" id="co-dash-stats" style="margin-bottom:18px;">
+            <div class="dash-stat">
+              <div class="dash-stat-label">Moyenne générale</div>
+              <div class="dash-stat-value" id="co-stat-avg">—<span class="dash-stat-unit">%</span></div>
+            </div>
+            <div class="dash-stat">
+              <div class="dash-stat-label">Compréhensions orales passées</div>
+              <div class="dash-stat-value" id="co-stat-total">0</div>
+            </div>
+          </div>
+          <div id="co-dash-list"></div>
+        </div>
+
+      </div><!-- /res-sub-oral -->
+
       <!-- ── Sous-section : Corpus lexical — stats + carnet de mots
            personnel, voir js/vocab-student-space.js. ── -->
       <div id="res-sub-corpus" style="display:none">
@@ -838,6 +862,7 @@
           joggings:       { onClick: () => activateResultsSub('joggings') },
           dictees:        { onClick: () => activateResultsSub('dictees') },
           questionnaires: { onClick: () => activateResultsSub('questionnaires') },
+          oral:           { onClick: () => activateResultsSub('oral') },
           corpus:         { onClick: () => activateResultsSub('corpus') },
         }
       });
@@ -850,6 +875,7 @@
       document.getElementById('res-sub-joggings').style.display       = sub === 'joggings'       ? '' : 'none';
       document.getElementById('res-sub-dictees').style.display        = sub === 'dictees'        ? '' : 'none';
       document.getElementById('res-sub-questionnaires').style.display = sub === 'questionnaires' ? '' : 'none';
+      document.getElementById('res-sub-oral').style.display           = sub === 'oral'           ? '' : 'none';
       document.getElementById('res-sub-corpus').style.display         = sub === 'corpus'         ? '' : 'none';
 
       if (!_profile) return;
@@ -857,6 +883,7 @@
       if (sub === 'joggings')       JoggingStudentSpace.render(_profile.id);
       if (sub === 'dictees')        DicteesStudentSpace.render(_profile.id);
       if (sub === 'questionnaires') refreshQuestionnairesTab();
+      if (sub === 'oral')           refreshOralTab();
       if (sub === 'corpus')         VocabStudentSpace.renderSection(_profile.id);
     }
 
@@ -876,6 +903,7 @@
     document.getElementById('res-sub-joggings').style.display       = _currentResSub === 'joggings'       ? '' : 'none';
     document.getElementById('res-sub-dictees').style.display        = _currentResSub === 'dictees'        ? '' : 'none';
     document.getElementById('res-sub-questionnaires').style.display = _currentResSub === 'questionnaires' ? '' : 'none';
+    document.getElementById('res-sub-oral').style.display           = _currentResSub === 'oral'           ? '' : 'none';
     document.getElementById('res-sub-corpus').style.display         = _currentResSub === 'corpus'         ? '' : 'none';
     renderResultsNav();
 
@@ -1019,6 +1047,51 @@
 
       if (error) console.warn('[LFM] refreshQuestionnairesTab:', error.message);
       renderQuestionnairesSection(results || []);
+    }
+
+    /* ── Ma compréhension orale : même présentation (détail par
+       compréhension orale + moyenne générale) que Mes questionnaires de
+       lecture ci-dessus. Filtré sur le préfixe comprehension-orale- de
+       exercise_slug (voir soumettre_resultat_comprehension_orale dans la
+       migration 20260920100000_comprehensions_orales.sql). ── */
+    function renderOralSection(results) {
+      const section = document.getElementById('section-oral');
+      const coResults = results
+        .filter(r => typeof r.exercise_slug === 'string' && r.exercise_slug.startsWith('comprehension-orale-'))
+        .sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at));
+
+      if (coResults.length === 0) { section.style.display = 'none'; return; }
+      section.style.display = '';
+
+      const avg = Math.round(coResults.reduce((s, r) => s + parseFloat(r.pct), 0) / coResults.length);
+      document.getElementById('co-stat-avg').innerHTML = avg + '<span class="dash-stat-unit">%</span>';
+      document.getElementById('co-stat-total').textContent = coResults.length;
+
+      document.getElementById('co-dash-list').innerHTML = coResults.map(r => `
+        <div class="qz-hist-row">
+          <div>
+            <div class="qz-hist-title">${escHtml(r.exercise_title || 'Compréhension orale')}</div>
+            <div class="qz-hist-date">${new Date(r.completed_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</div>
+          </div>
+          <div class="qz-hist-score">${r.score} / ${r.total}<br><span style="font-size:12px;font-weight:600;color:var(--muted);">${Math.round(r.pct)} %</span></div>
+        </div>
+      `).join('');
+    }
+
+    /* ── Rechargement de l'onglet "Compréhension orale" — ne fetch que les
+       lignes utiles (préfixe comprehension-orale-), même filtre que côté
+       enseignant (js/comprehensions-orales-teacher.js). ── */
+    async function refreshOralTab() {
+      if (!_profile) return;
+
+      const { data: results, error } = await window.lfmDb
+        .from('exercise_results')
+        .select('*')
+        .like('exercise_slug', 'comprehension-orale-%')
+        .order('completed_at', { ascending: false });
+
+      if (error) console.warn('[LFM] refreshOralTab:', error.message);
+      renderOralSection(results || []);
     }
 
     /* ── Rendu du dashboard ────────────────────────────────────────────────── */

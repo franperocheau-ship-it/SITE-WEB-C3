@@ -10,14 +10,14 @@
   <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512x512.png?v=1">
   <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
   <link rel="manifest" href="site.webmanifest?v=1">
-  <title>Résultats des questionnaires de lecture — Espace enseignant — LFM</title>
+  <title>Résultats de compréhension orale — Espace enseignant — LFM</title>
   <link rel="stylesheet" href="styles.css?v=12">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=4"></script>
   <script src="js/teacher-analytics.js?v=10"></script>
-  <script src="js/questionnaires-teacher.js?v=5"></script>
+  <script src="js/comprehensions-orales-teacher.js?v=2"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=2">
   <script src="js/resultats-nav.js?v=4"></script>
   <style>
@@ -43,8 +43,8 @@
       font-family: inherit; font-size: 14px; color: var(--text); background: var(--card-bg); min-width: 220px;
     }
 
-    /* ── Vue à deux temps, même pattern que resultats-dictees-enseignant.html :
-       1) liste des questionnaires passés par la classe (moyenne + nb d'élèves),
+    /* ── Vue à deux temps, même pattern que resultats-questionnaires-enseignant.html :
+       1) liste des compréhensions orales passées par la classe (moyenne + nb d'élèves),
        2) au clic, détail par élève. ─────────────────────────────────────── */
     .qz-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
     .empty-inline { color: var(--muted); font-size: 13px; padding: 8px 0; }
@@ -75,8 +75,11 @@
       display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
       padding: 13px 18px; border: 1.5px solid var(--border); border-radius: 10px; margin-bottom: 9px;
       background: var(--card-bg);
+      text-decoration: none; cursor: pointer; transition: background 150ms, border-color 150ms;
     }
+    .qz-report-student-row:hover, .qz-report-student-row:focus-visible { background: rgba(16,43,106,0.05); border-color: var(--blue); outline: none; }
     .qz-report-student-name { font-weight: 700; font-size: 14.5px; color: var(--text); }
+    .qz-report-student-date { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
     .qz-report-score { font-size: 13.5px; font-weight: 700; color: var(--text); }
     .qz-report-pct { color: var(--blue); }
 
@@ -111,26 +114,17 @@
       <nav class="breadcrumb" aria-label="Fil d'Ariane">
         <a href="dashboard-enseignant.html">Espace enseignant</a>
         <span class="bc-sep">›</span>
-        <a href="questionnaires-enseignant.html">Questionnaires de lecture</a>
-        <span class="bc-sep">›</span>
-        <span class="bc-current">Résultats</span>
+        <span class="bc-current">Résultats de compréhension orale</span>
       </nav>
 
       <!-- Chargement des feature flags — ResultatsNav.render() (voir
            js/resultats-nav.js) lit LFM_FEATURES pour masquer la pastille
-           "Joggings d'écriture" tant que le module est désactivé. Sans ce
-           chargement, LFM_FEATURES est indéfini et ResultatsNav retombe sur
-           son repli permissif (pastille affichée à tort). -->
+           "Joggings d'écriture" tant que le module est désactivé. -->
       <script src="js/feature-flags.js?v=1"></script>
 
       <!-- Sous-navigation résultats -->
       <div id="resultats-nav-mount"></div>
       <script>
-        /* Reçu depuis la fiche élève (resultats-enseignant.html, view=eleve) :
-           student/sname/cname/clevel/cyear/class transmis pour rester scopé à
-           l'élève cliqué au lieu de retomber sur le panneau classe entière —
-           on les retransmet aux autres pastilles pour garder le filtre en
-           circulant entre les modules. */
         const _rnParams = new URLSearchParams(window.location.search);
         const _rnExtra = {};
         ['student', 'sname', 'cname', 'clevel', 'cyear', 'class'].forEach(k => {
@@ -139,7 +133,7 @@
         });
         const _rnQs = Object.keys(_rnExtra).length ? '?' + new URLSearchParams(_rnExtra).toString() : '';
         ResultatsNav.render(document.getElementById('resultats-nav-mount'), {
-          active: 'questionnaires',
+          active: 'oral',
           items: {
             general:        { href: 'resultats-enseignant.html' + (_rnExtra.student ? ('?view=eleve&' + new URLSearchParams(_rnExtra).toString()) : '') },
             joggings:       { href: 'resultats-joggings-enseignant.html' + _rnQs },
@@ -152,15 +146,15 @@
       </script>
 
       <div class="section-header">
-        <h1 class="section-title">Résultats des questionnaires de lecture</h1>
+        <h1 class="section-title">Résultats de compréhension orale</h1>
       </div>
 
       <div class="qz-filter-field" style="margin-bottom:20px;">
-        <label for="qz-class-select">Classe</label>
-        <select id="qz-class-select" class="qz-select"></select>
+        <label for="co-class-select">Classe</label>
+        <select id="co-class-select" class="qz-select"></select>
       </div>
 
-      <div id="qz-stats-body"><div class="qz-empty">Chargement…</div></div>
+      <div id="co-stats-body"><div class="qz-empty">Chargement…</div></div>
 
     </div>
   </div>
@@ -191,7 +185,7 @@
     let _teacherProfile = null;
     let _classes = [];
     let _currentClassId = null;
-    let _currentReport = null; // { perQuestionnaire: [{ id, titre, count, avgPct, students }] }
+    let _currentReport = null; // { perItem: [{ id, titre, count, avgPct, students }] }
     let _filterStudentId = null;
     let _filterStudentName = '';
 
@@ -200,24 +194,36 @@
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    /* ── Vue 1 : liste des questionnaires passés par la classe sélectionnée
-       (ordre repris de getMyQuestionnaires — plus récent en premier). ────── */
+    function fmtDate(iso) {
+      return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    /* Lien vers l'écran de synthèse en lecture seule (même écran que celui vu
+       par l'élève, voir js/comprehensions-orales-engine.js) — ?back= permet
+       au bouton "Retour" de cet écran de revenir exactement ici. */
+    function reviewHref(resultatId, studentName) {
+      const params = new URLSearchParams({ resultat: resultatId, sname: studentName || '', back: window.location.href });
+      return 'francais-oral.html?' + params.toString();
+    }
+
+    /* ── Vue 1 : liste des compréhensions orales passées par la classe
+       sélectionnée. ────────────────────────────────────────────────────── */
     function renderReportList() {
-      const body = document.getElementById('qz-stats-body');
-      if (!_currentReport || _currentReport.perQuestionnaire.length === 0) {
+      const body = document.getElementById('co-stats-body');
+      if (!_currentReport || _currentReport.perItem.length === 0) {
         body.innerHTML = '<div class="qz-empty">Aucun résultat pour l\'instant.</div>';
         return;
       }
-      body.innerHTML = _currentReport.perQuestionnaire.map((q, i) => `
-        <div class="qz-report-list-row" data-qz-idx="${i}" tabindex="0" role="button"
-             aria-label="Voir les résultats de ${escHtml(q.titre)}">
-          <div class="qz-report-list-title">${escHtml(q.titre)}</div>
-          <div class="qz-report-list-meta">${q.count} élève${q.count !== 1 ? 's' : ''} · ${q.avgPct !== null ? q.avgPct + ' %' : '—'} de moyenne</div>
+      body.innerHTML = _currentReport.perItem.map((item, i) => `
+        <div class="qz-report-list-row" data-co-idx="${i}" tabindex="0" role="button"
+             aria-label="Voir les résultats de ${escHtml(item.titre)}">
+          <div class="qz-report-list-title">${escHtml(item.titre)}</div>
+          <div class="qz-report-list-meta">${item.count} élève${item.count !== 1 ? 's' : ''} · ${item.avgPct !== null ? item.avgPct + ' %' : '—'} de moyenne</div>
           <div class="qz-report-chevron">›</div>
         </div>
       `).join('');
       document.querySelectorAll('.qz-report-list-row').forEach(row => {
-        const idx = parseInt(row.dataset.qzIdx, 10);
+        const idx = parseInt(row.dataset.coIdx, 10);
         row.addEventListener('click', () => renderReportDetail(idx));
         row.addEventListener('keydown', e => {
           if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); renderReportDetail(idx); }
@@ -225,66 +231,68 @@
       });
     }
 
-    /* ── Vue 2 : au clic sur un questionnaire, le score de chaque élève de
-       la classe qui l'a passé. ──────────────────────────────────────────── */
+    /* ── Vue 2 : au clic sur une compréhension orale, le score de chaque
+       élève de la classe qui l'a passée. ─────────────────────────────────── */
     function renderReportDetail(idx) {
-      const q = _currentReport.perQuestionnaire[idx];
-      if (!q) return;
-      const body = document.getElementById('qz-stats-body');
+      const item = _currentReport.perItem[idx];
+      if (!item) return;
+      const body = document.getElementById('co-stats-body');
 
-      const studentsHtml = [...q.students]
+      const studentsHtml = [...item.students]
         .sort((a, b) => a.student.display_name.localeCompare(b.student.display_name))
         .map(s => `
-          <div class="qz-report-student-row">
-            <div class="qz-report-student-name">${escHtml(s.student.display_name)}</div>
+          <a class="qz-report-student-row" href="${reviewHref(s.resultat_id, s.student.display_name)}">
+            <div>
+              <div class="qz-report-student-name">${escHtml(s.student.display_name)}</div>
+              <div class="qz-report-student-date">${fmtDate(s.completed_at)}</div>
+            </div>
             <div class="qz-report-score">${s.score} / ${s.total} <span class="qz-report-pct">${s.pct} %</span></div>
-          </div>`)
+          </a>`)
         .join('');
 
       body.innerHTML = `
-        <button type="button" class="qz-report-back-btn" id="qz-report-back-btn">← Retour aux questionnaires</button>
-        <div class="qz-report-detail-title">${escHtml(q.titre)}</div>
-        <div class="qz-report-detail-avg">${_filterStudentId ? 'Score' : 'Moyenne de la classe'} : ${q.avgPct !== null ? q.avgPct + ' %' : '—'}</div>
-        ${studentsHtml || '<div class="empty-inline">Aucun élève n\'a encore de résultat pour ce questionnaire.</div>'}
+        <button type="button" class="qz-report-back-btn" id="co-report-back-btn">← Retour aux compréhensions orales</button>
+        <div class="qz-report-detail-title">${escHtml(item.titre)}</div>
+        <div class="qz-report-detail-avg">${_filterStudentId ? 'Score' : 'Moyenne de la classe'} : ${item.avgPct !== null ? item.avgPct + ' %' : '—'}</div>
+        ${studentsHtml || '<div class="empty-inline">Aucun élève n\'a encore de résultat pour cette compréhension orale.</div>'}
       `;
-      document.getElementById('qz-report-back-btn').addEventListener('click', renderReportList);
+      document.getElementById('co-report-back-btn').addEventListener('click', renderReportList);
     }
 
-    /* ── Fiche élève : au lieu de filtrer la vue classe entière sur un seul
-       élève (ancien comportement, retour utilisateur : trop détourné, on
-       veut la fiche individuelle directement), transmis par ?student=/
-       ?sname= depuis la fiche élève d'un autre onglet du hub Résultats — une
-       ligne par questionnaire passé par cet élève, réutilise les données
-       déjà chargées pour toute la classe (aucune requête Supabase
-       supplémentaire). ──────────────────────────────────────────────────── */
+    /* ── Fiche élève : transmis par ?student=/?sname= depuis la fiche élève
+       d'un autre onglet du hub Résultats — une ligne par compréhension orale
+       passée par cet élève. ───────────────────────────────────────────────── */
     function renderStudentFiche() {
-      const body = document.getElementById('qz-stats-body');
+      const body = document.getElementById('co-stats-body');
       if (!_currentReport) return;
 
-      const rowsHtml = _currentReport.perQuestionnaire.map(q => {
-        const s = q.students.find(st => st.student.auth_user_id === _filterStudentId);
-        if (!s) return '';
-        return `
-          <div class="qz-report-student-row">
-            <div class="qz-report-student-name">${escHtml(q.titre)}</div>
-            <div class="qz-report-score">${s.score} / ${s.total} <span class="qz-report-pct">${s.pct} %</span></div>
-          </div>`;
-      }).join('');
+      const rowsHtml = _currentReport.perItem.flatMap(item =>
+        item.students
+          .filter(st => st.student.auth_user_id === _filterStudentId)
+          .map(s => `
+            <a class="qz-report-student-row" href="${reviewHref(s.resultat_id, _filterStudentName)}">
+              <div>
+                <div class="qz-report-student-name">${escHtml(item.titre)}</div>
+                <div class="qz-report-student-date">${fmtDate(s.completed_at)}</div>
+              </div>
+              <div class="qz-report-score">${s.score} / ${s.total} <span class="qz-report-pct">${s.pct} %</span></div>
+            </a>`)
+      ).join('');
 
       body.innerHTML = `
-        <a href="resultats-questionnaires-enseignant.html?class=${encodeURIComponent(_currentClassId || '')}" class="qz-report-back-btn" style="text-decoration:none">← Retour à la classe</a>
+        <a href="resultats-oral-enseignant.html?class=${encodeURIComponent(_currentClassId || '')}" class="qz-report-back-btn" style="text-decoration:none">← Retour à la classe</a>
         <div class="qz-report-detail-title">${escHtml(_filterStudentName || 'Élève')}</div>
-        ${rowsHtml || '<div class="empty-inline">Aucun résultat de questionnaire pour cet élève.</div>'}
+        ${rowsHtml || '<div class="empty-inline">Aucun résultat de compréhension orale pour cet élève.</div>'}
       `;
     }
 
     async function loadStats() {
       if (!_currentClassId) return;
-      document.getElementById('qz-stats-body').innerHTML = '<div class="qz-empty">Chargement…</div>';
+      document.getElementById('co-stats-body').innerHTML = '<div class="qz-empty">Chargement…</div>';
       try {
-        _currentReport = await lfmQuestionnairesTeacher.getClassQuestionnaireReport(_teacherProfile.id, _currentClassId);
+        _currentReport = await lfmComprehensionsOralesTeacher.getClassOralReport(_currentClassId);
       } catch (e) {
-        document.getElementById('qz-stats-body').innerHTML = `<div class="qz-empty">Erreur : ${escHtml(e.message)}</div>`;
+        document.getElementById('co-stats-body').innerHTML = `<div class="qz-empty">Erreur : ${escHtml(e.message)}</div>`;
         return;
       }
       if (_filterStudentId) {
@@ -299,17 +307,13 @@
       if (!_teacherProfile) return;
 
       _classes = await lfmTeacher.getClasses();
-      const classSel = document.getElementById('qz-class-select');
+      const classSel = document.getElementById('co-class-select');
       if (_classes.length === 0) {
-        document.getElementById('qz-stats-body').innerHTML = '<div class="qz-empty">Crée d\'abord une classe dans « Mes classes ».</div>';
+        document.getElementById('co-stats-body').innerHTML = '<div class="qz-empty">Crée d\'abord une classe dans « Mes classes ».</div>';
         return;
       }
       classSel.innerHTML = _classes.map(c => `<option value="${c.id}">${escHtml(c.name)} (${escHtml(c.level)})</option>`).join('');
 
-      /* ?class= transmis depuis un lien croisé ou depuis la fiche élève,
-         sinon première classe. ?student= (+ ?sname=) transmis depuis la
-         fiche élève ouvre directement sa fiche questionnaires (voir
-         renderStudentFiche). */
       const urlParams = new URLSearchParams(window.location.search);
       const classParam = urlParams.get('class');
       _currentClassId = (classParam && _classes.some(c => c.id === classParam))
@@ -319,9 +323,6 @@
 
       _filterStudentId = urlParams.get('student') || null;
       _filterStudentName = urlParams.get('sname') ? decodeURIComponent(urlParams.get('sname')) : '';
-      /* En fiche élève, le sélecteur de classe n'a pas de sens (un élève
-         appartient à une seule classe) — masqué au profit du bouton
-         "← Retour à la classe" dans renderStudentFiche(). */
       document.querySelector('.qz-filter-field').style.display = _filterStudentId ? 'none' : '';
 
       classSel.addEventListener('change', () => {

@@ -26,6 +26,7 @@ const ResultatsNav = (() => {
     { key: 'joggings',       icon: '✍️', label: "Joggings d'écriture" },
     { key: 'dictees',        icon: '✏️', label: 'Dictées préparées' },
     { key: 'questionnaires', icon: '📚', label: 'Questionnaires de lecture' },
+    { key: 'oral',           icon: '🎧', label: 'Compréhension orale' },
     { key: 'corpus',         icon: '🔤', label: 'Corpus lexical' },
   ];
 
@@ -46,8 +47,8 @@ const ResultatsNav = (() => {
   /**
    * @param {HTMLElement} mountEl  Point de montage — remplacé par la barre.
    * @param {object} config
-   * @param {'general'|'joggings'|'dictees'|'questionnaires'|'corpus'} config.active
-   * @param {object} config.items  { general: {href}|{onClick}, joggings: {...}, dictees: {...}, questionnaires: {...}, corpus: {...} }
+   * @param {'general'|'joggings'|'dictees'|'questionnaires'|'oral'|'corpus'} config.active
+   * @param {object} config.items  { general: {href}|{onClick}, joggings: {...}, dictees: {...}, questionnaires: {...}, oral: {...}, corpus: {...} }
    * @returns {HTMLElement} la barre insérée (à repasser à un futur appel de render()).
    */
   function render(mountEl, config = {}) {

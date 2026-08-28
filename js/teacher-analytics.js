@@ -95,6 +95,12 @@ const lfmAnalytics = (() => {
          enseignants. Pas de `levels` : aucune notion de niveau sur un
          questionnaire en Phase 1 (exclu des jauges CM1/CM2/6e, comme lex-*). */
       { prefix: 'questionnaire-lecture-', meta: { domaine: 'Français', competence: 'Lecture — Compréhension de lecture' } },
+      /* Même logique que questionnaire-lecture- ci-dessus, mais pour le
+         module Oral ('comprehension-orale-<id>', voir soumettre_resultat_
+         comprehension_orale dans la migration 20260920100000). Pas de
+         `levels` non plus : aucune notion de niveau sur une compréhension
+         orale. */
+      { prefix: 'comprehension-orale-', meta: { domaine: 'Français', competence: 'Oral — Compréhension orale' } },
       { prefix: 'lex-',   meta: { domaine: 'Français', competence: 'Vocabulaire' } },
     ],
   };

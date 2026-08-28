@@ -18,7 +18,7 @@
   <script src="js/auth.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/teacher.js?v=4"></script>
-  <script src="js/teacher-analytics.js?v=9"></script>
+  <script src="js/teacher-analytics.js?v=10"></script>
   <!-- Résolution dynamique du texte d'un item depuis EXERCISE_DATA (jamais
        stocké en dur) — réutilise extractLevelBuckets/describeQA du module
        aperçu admin, voir lfmAnalytics.resolveItemText(). Pas encore
@@ -35,10 +35,11 @@
   <script src="js/champ-lexical-teacher.js?v=4"></script>
   <script src="js/jogging-data.js?v=1"></script>
   <script src="js/jogging-teacher.js?v=1"></script>
+  <script src="js/comprehensions-orales-teacher.js?v=2"></script>
   <link rel="stylesheet" href="laurels.css?v=5">
   <script src="js/laurels.js?v=8"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=2">
-  <script src="js/resultats-nav.js?v=3"></script>
+  <script src="js/resultats-nav.js?v=4"></script>
   <style>
     /* ── Layout ──────────────────────────────────────────────────────────────── */
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
@@ -620,6 +621,11 @@
     .bdic-niveau-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .bdic-freqtext { font-size: 7.5pt; color: #5F6368; margin-top: 3px; }
 
+    /* 5ter-bis. Compréhension orale — même présentation compacte que les
+       questionnaires de lecture ci-dessus, mêmes classes de ligne (bqz-*)
+       réutilisées telles quelles (aucune différence visuelle à justifier). */
+    .bulletin-oral { margin-bottom: 18px; }
+
     /* 5quater. Corpus lexical — une ligne par champ, score total cumulé. */
     .bulletin-corpus { margin-bottom: 18px; }
     .bulletin-cl-row {
@@ -670,7 +676,7 @@
       body.printing-bulletin .student-header, body.printing-bulletin .stats-row-4,
       body.printing-bulletin #laurels-root, body.printing-bulletin #student-niveaux,
       body.printing-bulletin #student-consolider, body.printing-bulletin #student-reussies,
-      body.printing-bulletin #student-questionnaires,
+      body.printing-bulletin #student-questionnaires, body.printing-bulletin #student-oral,
       body.printing-bulletin .view-tabs, body.printing-bulletin #panel-student-general,
       body.printing-bulletin #panel-student-exercices-chutes,
       body.printing-bulletin .nav-footer,
@@ -777,6 +783,7 @@
               joggings: { href: 'resultats-joggings-enseignant.html' + qs },
               dictees:  { href: 'resultats-dictees-enseignant.html' + qs },
               questionnaires: { href: 'resultats-questionnaires-enseignant.html' + qs },
+              oral:     { href: 'resultats-oral-enseignant.html' + qs },
               corpus:   { href: 'resultats-corpus-enseignant.html' + qs },
             }
           });
@@ -926,6 +933,17 @@
               <div><span style="font-size:22px;font-weight:800;color:var(--blue)" id="student-qz-total">0</span> <span style="font-size:12px;color:var(--muted)">questionnaire(s) passé(s)</span></div>
             </div>
             <div id="student-qz-list"></div>
+          </div>
+
+          <!-- Ma compréhension orale — même présentation que Questionnaires
+               de lecture ci-dessus, voir computeOralSummary/renderStudentOral. -->
+          <div class="overview-card" id="student-oral" style="margin-bottom:20px;display:none">
+            <div class="overview-card-title">Compréhension orale</div>
+            <div style="display:flex;gap:24px;margin-bottom:14px;">
+              <div><span style="font-size:22px;font-weight:800;color:var(--blue)" id="student-co-avg">—</span> <span style="font-size:12px;color:var(--muted)">moyenne générale</span></div>
+              <div><span style="font-size:22px;font-weight:800;color:var(--blue)" id="student-co-total">0</span> <span style="font-size:12px;color:var(--muted)">compréhension(s) orale(s) passée(s)</span></div>
+            </div>
+            <div id="student-co-list"></div>
           </div>
         </div>
 
@@ -1866,7 +1884,7 @@
     _studentRows    = [];
     document.getElementById('student-rank-line').innerHTML = '';
     document.getElementById('print-student-btn').style.display = 'none';
-    ['student-consolider', 'student-reussies', 'student-niveaux', 'student-questionnaires'].forEach(id => {
+    ['student-consolider', 'student-reussies', 'student-niveaux', 'student-questionnaires', 'student-oral'].forEach(id => {
       document.getElementById(id).style.display = 'none';
     });
 
@@ -1890,6 +1908,7 @@
       renderReussiesList(profile.reussies);
       renderStudentNiveaux(profile);
       renderStudentQuestionnaires(rows);
+      await renderStudentOral(authUserId);
 
       document.getElementById('print-student-btn').style.display = '';
     } catch (e) {
@@ -1902,6 +1921,7 @@
      n'y correspondent à rien — on les fait pointer vers leur page dédiée. */
   function reviewHrefFor(exampleSlug) {
     if (exampleSlug.startsWith('questionnaire-lecture-')) return 'questionnaires-lecture.html';
+    if (exampleSlug.startsWith('comprehension-orale-')) return 'francais-oral.html';
     return `exercise.html?slug=${encodeURIComponent(exampleSlug)}`;
   }
 
@@ -2010,6 +2030,55 @@
         </div>
         <div class="qz-hist-score">${r.score} / ${r.total}<br><span style="font-size:12px;font-weight:600;color:var(--muted);">${Math.round(r.pct)} %</span></div>
       </div>
+    `).join('');
+  }
+
+  /* ── Ma compréhension orale — même présentation que Mes questionnaires de
+     lecture ci-dessus. Contrairement aux autres sections de cette page, la
+     source n'est pas _studentRows (exercise_results, dédoublonné par le
+     reste du site) mais resultats_comprehension_orale via
+     lfmComprehensionsOralesTeacher.getStudentOralAttempts() — chaque
+     tentative garde son propre id, nécessaire pour la consulter en lecture
+     seule (voir reviewHrefOral ci-dessous). Récupérée séparément (comme
+     getStudentDicteesForPrint/getStudentCorpusForPrint plus bas dans ce
+     fichier), réutilisée pour l'écran ET la synthèse PDF. ── */
+  function computeOralSummary(attempts) {
+    if (!attempts || attempts.length === 0) return null;
+    const avg = Math.round(attempts.reduce((s, r) => s + r.pct, 0) / attempts.length);
+    return { avg, count: attempts.length, list: attempts };
+  }
+
+  /* Lien vers l'écran de synthèse en lecture seule (même écran que celui vu
+     par l'élève, voir js/comprehensions-orales-engine.js). */
+  function reviewHrefOral(resultatId) {
+    const sname = _currentStudent?.display_name || document.getElementById('student-header-name').textContent || '';
+    const params = new URLSearchParams({ resultat: resultatId, sname, back: window.location.href });
+    return 'francais-oral.html?' + params.toString();
+  }
+
+  async function renderStudentOral(authUserId) {
+    const el = document.getElementById('student-oral');
+    let attempts;
+    try {
+      attempts = await lfmComprehensionsOralesTeacher.getStudentOralAttempts(authUserId);
+    } catch (e) {
+      console.warn('[LFM] renderStudentOral:', e.message);
+      el.style.display = 'none';
+      return;
+    }
+    const summary = computeOralSummary(attempts);
+    if (!summary) { el.style.display = 'none'; return; }
+    el.style.display = '';
+    document.getElementById('student-co-avg').textContent = summary.avg + ' %';
+    document.getElementById('student-co-total').textContent = summary.count;
+    document.getElementById('student-co-list').innerHTML = summary.list.map(r => `
+      <a class="qz-hist-row" href="${reviewHrefOral(r.id)}" style="text-decoration:none;color:inherit;">
+        <div>
+          <div class="qz-hist-title">${escHtml(r.titre_episode)}</div>
+          <div class="qz-hist-date">${new Date(r.date_passage).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</div>
+        </div>
+        <div class="qz-hist-score">${r.score} / ${r.total}<br><span style="font-size:12px;font-weight:600;color:var(--muted);">${r.pct} %</span></div>
+      </a>
     `).join('');
   }
 
@@ -2134,10 +2203,11 @@
     const classId    = new URLSearchParams(window.location.search).get('class');
     const authUserId = _currentStudent.auth_user_id;
     const joggingOn  = typeof LFM_FEATURES === 'undefined' || LFM_FEATURES.isEnabled('jogging');
-    const [dictees, corpusRows, joggingSummary] = await Promise.all([
+    const [dictees, corpusRows, joggingSummary, oralAttempts] = await Promise.all([
       getStudentDicteesForPrint(classId, authUserId),
       getStudentCorpusForPrint(_teacherProfile?.id, classId, authUserId),
-      joggingOn ? getStudentJoggingSummaryForPrint(authUserId) : Promise.resolve(null)
+      joggingOn ? getStudentJoggingSummaryForPrint(authUserId) : Promise.resolve(null),
+      lfmComprehensionsOralesTeacher.getStudentOralAttempts(authUserId)
     ]);
 
     const name  = document.getElementById('student-header-name').textContent;
@@ -2246,6 +2316,28 @@
         <div style="font-size:9.5pt;color:#888">Aucun résultat pour l'instant.</div>
       </div>`;
 
+    /* Compréhension orale — même donnée/logique que l'écran (voir
+       computeOralSummary). Section toujours affichée, avec un message dédié
+       si vide (comme les autres sections de la synthèse). */
+    const coSummary = computeOralSummary(oralAttempts);
+    const coHtml = coSummary ? `
+      <div class="bulletin-oral">
+        <div class="bulletin-jauges-title">Compréhension orale — moyenne ${coSummary.avg}% (${coSummary.count})</div>
+        ${coSummary.list.map(r => `
+          <div class="bulletin-qz-row">
+            <div>
+              <span class="bqz-title">${escHtml(r.titre_episode)}</span>
+              <span class="bqz-date"> — ${new Date(r.date_passage).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+            </div>
+            <div class="bqz-score">${r.score} / ${r.total} (${r.pct}%)</div>
+          </div>
+        `).join('')}
+      </div>` : `
+      <div class="bulletin-oral">
+        <div class="bulletin-jauges-title">Compréhension orale</div>
+        <div style="font-size:9.5pt;color:#888">Aucun résultat pour l'instant.</div>
+      </div>`;
+
     /* Corpus lexical — même donnée que resultats-corpus-enseignant.html
        (voir getStudentCorpusForPrint ci-dessus), une ligne par champ, score
        total cumulé sur les niveaux déjà entamés (pas de détail par niveau). */
@@ -2334,6 +2426,8 @@
       ${dicteesHtml}
 
       ${qzHtml}
+
+      ${coHtml}
 
       ${corpusHtml}
 

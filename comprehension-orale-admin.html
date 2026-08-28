@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/favicon/favicon.ico?v=1" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png?v=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png?v=1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/favicon-192x192.png?v=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512x512.png?v=1">
+  <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
+  <link rel="manifest" href="site.webmanifest?v=1">
+  <title>Compréhension orale — Espace administrateur — LFM</title>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="css/questionnaires.css?v=2">
+  <link rel="stylesheet" href="css/comprehension-orale.css?v=1">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/teacher-spellcheck.js?v=1"></script>
+  <script src="js/comprehensions-orales-admin.js?v=1"></script>
+  <style>
+    .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
+    .dash-content { max-width: 960px; margin: 0 auto; }
+
+    .breadcrumb {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 24px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
+    }
+    .breadcrumb a { color: var(--blue); text-decoration: none; font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .bc-sep { color: var(--border); user-select: none; }
+    .bc-current { font-weight: 600; color: var(--text); }
+
+    .section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+    .section-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <div class="dash-wrap">
+    <div class="dash-content">
+
+      <nav class="breadcrumb" aria-label="Fil d'Ariane">
+        <a href="dashboard-admin.html">Espace administrateur</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-current">Compréhension orale</span>
+      </nav>
+
+      <div class="section-header">
+        <h1 class="section-title">Compréhension orale</h1>
+        <button type="button" class="qz-btn qz-btn-primary" id="co-new-btn">+ Nouvelle compréhension orale</button>
+      </div>
+      <p style="color:var(--muted);font-size:13px;margin:-10px 0 20px;">
+        Chaque compréhension orale s'appuie sur un épisode du podcast « Les Odyssées » (France Inter). Une fois publiée,
+        elle est immédiatement accessible à tous les élèves depuis Français › Oral.
+      </p>
+
+      <!-- ── Formulaire de création/édition ── -->
+      <div id="co-form-card" class="qz-form-card" style="display:none">
+        <div class="qz-form-title" id="co-form-title">Nouvelle compréhension orale</div>
+
+        <label class="qz-form-label" for="co-form-titre">Titre de l'épisode</label>
+        <input type="text" id="co-form-titre" class="qz-form-input lfm-verifie" placeholder="Ex. Les Odyssées — Jeanne d'Arc, la fille du peuple (1/4)">
+
+        <label class="qz-form-label" for="co-form-episode-id">ID épisode France Inter</label>
+        <p class="qz-form-hint">Récupérable via le bouton « Partager » de l'épisode sur franceinter.fr — colle uniquement l'identifiant (UUID) ; si tu colles le code iframe complet par erreur, l'identifiant est extrait automatiquement.</p>
+        <input type="text" id="co-form-episode-id" class="qz-form-input" placeholder="Ex. c0c51454-5dcb-4c80-8e2b-366e7e66cfb3">
+        <div class="co-preview-wrap" id="co-preview-wrap" style="display:none">
+          <div class="co-preview-label">Aperçu du lecteur</div>
+          <div id="co-preview-mount"></div>
+        </div>
+
+        <label class="qz-form-label" for="co-form-description">Description (facultatif)</label>
+        <textarea id="co-form-description" class="qz-form-textarea lfm-verifie" rows="2" placeholder="Contexte de l'épisode pour les élèves"></textarea>
+
+        <label class="qz-form-label">Questions</label>
+        <p class="qz-form-hint">QCM : jusqu'à 4 réponses, avec une ou plusieurs bonnes réponses cochées. Réponse libre : l'élève saisit sa réponse, comparée à la liste des formulations acceptées.</p>
+        <div class="qz-questions-list" id="co-questions-list"></div>
+        <button type="button" class="qz-add-question-btn" id="co-add-question-btn">+ Ajouter une question</button>
+
+        <div class="qz-form-actions">
+          <button type="button" class="qz-btn qz-btn-primary" id="co-save-btn">Enregistrer</button>
+          <button type="button" class="qz-btn qz-btn-outline" id="co-cancel-btn">Annuler</button>
+        </div>
+      </div>
+
+      <!-- ── Liste des compréhensions orales ── -->
+      <div id="co-list"><div class="qz-empty">Chargement…</div></div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="js/menu.js"></script>
+  <script>
+    let _adminProfile = null;
+    let _items = [];
+    let _editingId = null;
+    // [{ typeQuestion: 'qcm'|'reponse_libre', enonce, explication,
+    //    propositions: [{ texte, est_correcte }],  // pertinent si typeQuestion === 'qcm'
+    //    reponsesLibres: ['texte', ...] }]          // pertinent si typeQuestion === 'reponse_libre'
+    let _formQuestions = [];
+
+    const STATUT_LABEL = { brouillon: 'Brouillon', publie: 'Publié' };
+
+    function escHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function emptyQuestion() {
+      return {
+        typeQuestion: 'qcm',
+        enonce: '', explication: '',
+        propositions: [{ texte: '', est_correcte: false }, { texte: '', est_correcte: false }],
+        reponsesLibres: ['']
+      };
+    }
+
+    /* Radio France attend l'UUID seul (ex. c0c51454-5dcb-4c80-8e2b-
+       366e7e66cfb3), pas le bloc <iframe> complet qu'un admin peut coller
+       par réflexe depuis le bouton « Partager » du site. Si le champ
+       contient un tag iframe (ou tout autre texte autour), on extrait l'UUID
+       par regex plutôt que de générer un lecteur cassé en silence. */
+    function extractEpisodeId(raw) {
+      const s = String(raw == null ? '' : raw).trim();
+      const match = s.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+      return match ? match[0] : s;
+    }
+
+    function iframeHtml(episodeId) {
+      return `<iframe src="https://embed.radiofrance.fr/franceinter/diffusion/${encodeURIComponent(extractEpisodeId(episodeId))}" width="100%" height="144" frameborder="0" allowfullscreen></iframe>`;
+    }
+
+    function updatePreview() {
+      const input = document.getElementById('co-form-episode-id');
+      const raw = input.value.trim();
+      const wrap = document.getElementById('co-preview-wrap');
+      if (!raw) { wrap.style.display = 'none'; return; }
+      const cleaned = extractEpisodeId(raw);
+      if (cleaned !== raw) input.value = cleaned; // nettoie automatiquement un tag iframe collé par erreur
+      document.getElementById('co-preview-mount').innerHTML = iframeHtml(cleaned);
+      wrap.style.display = '';
+    }
+
+    /* ── Éditeur de questions (même markup/CSS que questionnaires-enseignant.html) ── */
+    function renderQuestionsEditor() {
+      const list = document.getElementById('co-questions-list');
+      if (_formQuestions.length === 0) {
+        list.innerHTML = '<div class="qz-form-hint">Aucune question pour l\'instant.</div>';
+        return;
+      }
+      list.innerHTML = _formQuestions.map((q, qi) => `
+        <div class="qz-question-card" data-q="${qi}">
+          <div class="qz-question-card-head">
+            <span class="qz-question-num">Question ${qi + 1}</span>
+            <button type="button" class="qz-question-remove" data-remove-question="${qi}">Supprimer</button>
+          </div>
+          <label class="qz-form-label" style="margin-top:0;">Type de question</label>
+          <select class="qz-form-input qz-type-question" data-q-idx="${qi}" style="max-width:220px;">
+            <option value="qcm" ${q.typeQuestion === 'qcm' ? 'selected' : ''}>QCM</option>
+            <option value="reponse_libre" ${q.typeQuestion === 'reponse_libre' ? 'selected' : ''}>Réponse libre</option>
+          </select>
+          <textarea class="qz-form-textarea qz-enonce lfm-verifie" data-q-idx="${qi}" rows="2" placeholder="Énoncé de la question" style="margin-top:12px;">${escHtml(q.enonce)}</textarea>
+          ${q.typeQuestion === 'reponse_libre' ? `
+            <label class="qz-form-label" style="margin-top:12px;">Réponse(s) acceptée(s)</label>
+            <p class="qz-form-hint">Toutes les formulations listées sont acceptées (insensible à la casse, aux accents et aux espaces).</p>
+            <div class="qz-reponses-list">
+              ${q.reponsesLibres.map((texte, vi) => `
+                <div class="qz-reponse-row">
+                  <input type="text" class="qz-form-input qz-libre-variante lfm-verifie" data-q-idx="${qi}" data-r-idx="${vi}" value="${escHtml(texte)}" placeholder="Ex. narcisse pelletier">
+                  <button type="button" class="qz-reponse-remove" data-remove-variante-q="${qi}" data-remove-variante-r="${vi}" title="Supprimer cette variante">✕</button>
+                </div>
+              `).join('')}
+            </div>
+            <button type="button" class="qz-add-reponse-btn" data-add-variante="${qi}">+ Ajouter une variante</button>
+          ` : `
+            <div class="qz-reponses-list">
+              ${q.propositions.map((p, pi) => `
+                <div class="qz-reponse-row">
+                  <input type="checkbox" data-q-idx="${qi}" data-r-idx="${pi}" class="qz-correcte-check" ${p.est_correcte ? 'checked' : ''} title="Bonne réponse">
+                  <input type="text" class="qz-form-input qz-reponse-texte lfm-verifie" data-q-idx="${qi}" data-r-idx="${pi}" value="${escHtml(p.texte)}" placeholder="Réponse ${pi + 1}">
+                  <button type="button" class="qz-reponse-remove" data-remove-reponse-q="${qi}" data-remove-reponse-r="${pi}" title="Supprimer cette réponse">✕</button>
+                </div>
+              `).join('')}
+            </div>
+            ${q.propositions.length < 4 ? `<button type="button" class="qz-add-reponse-btn" data-add-reponse="${qi}">+ Ajouter une réponse</button>` : ''}
+          `}
+          <label class="qz-form-label" style="margin-top:12px;">Explication (facultatif, affichée à l'élève après correction)</label>
+          <textarea class="qz-form-textarea qz-explication lfm-verifie" data-q-idx="${qi}" rows="2" placeholder="Ex. Le podcast précise que...">${escHtml(q.explication)}</textarea>
+        </div>
+      `).join('');
+
+      list.querySelectorAll('.qz-type-question').forEach(el => el.addEventListener('change', e => {
+        _formQuestions[+e.target.dataset.qIdx].typeQuestion = e.target.value;
+        renderQuestionsEditor();
+      }));
+      list.querySelectorAll('.qz-enonce').forEach(el => el.addEventListener('input', e => {
+        _formQuestions[+e.target.dataset.qIdx].enonce = e.target.value;
+      }));
+      list.querySelectorAll('.qz-explication').forEach(el => el.addEventListener('input', e => {
+        _formQuestions[+e.target.dataset.qIdx].explication = e.target.value;
+      }));
+      list.querySelectorAll('.qz-reponse-texte').forEach(el => el.addEventListener('input', e => {
+        _formQuestions[+e.target.dataset.qIdx].propositions[+e.target.dataset.rIdx].texte = e.target.value;
+      }));
+      list.querySelectorAll('.qz-correcte-check').forEach(el => el.addEventListener('change', e => {
+        _formQuestions[+e.target.dataset.qIdx].propositions[+e.target.dataset.rIdx].est_correcte = e.target.checked;
+      }));
+      list.querySelectorAll('[data-remove-question]').forEach(btn => btn.addEventListener('click', () => {
+        _formQuestions.splice(+btn.dataset.removeQuestion, 1);
+        renderQuestionsEditor();
+      }));
+      list.querySelectorAll('[data-add-reponse]').forEach(btn => btn.addEventListener('click', () => {
+        _formQuestions[+btn.dataset.addReponse].propositions.push({ texte: '', est_correcte: false });
+        renderQuestionsEditor();
+      }));
+      list.querySelectorAll('[data-remove-reponse-q]').forEach(btn => btn.addEventListener('click', () => {
+        _formQuestions[+btn.dataset.removeReponseQ].propositions.splice(+btn.dataset.removeReponseR, 1);
+        renderQuestionsEditor();
+      }));
+      list.querySelectorAll('.qz-libre-variante').forEach(el => el.addEventListener('input', e => {
+        _formQuestions[+e.target.dataset.qIdx].reponsesLibres[+e.target.dataset.rIdx] = e.target.value;
+      }));
+      list.querySelectorAll('[data-add-variante]').forEach(btn => btn.addEventListener('click', () => {
+        _formQuestions[+btn.dataset.addVariante].reponsesLibres.push('');
+        renderQuestionsEditor();
+      }));
+      list.querySelectorAll('[data-remove-variante-q]').forEach(btn => btn.addEventListener('click', () => {
+        _formQuestions[+btn.dataset.removeVarianteQ].reponsesLibres.splice(+btn.dataset.removeVarianteR, 1);
+        renderQuestionsEditor();
+      }));
+    }
+
+    /* ── Formulaire ── */
+    function openForm(item, questions) {
+      _editingId = item ? item.id : null;
+      document.getElementById('co-form-title').textContent = item ? 'Modifier la compréhension orale' : 'Nouvelle compréhension orale';
+      document.getElementById('co-form-titre').value = item ? item.titre_episode : '';
+      document.getElementById('co-form-episode-id').value = item ? item.id_episode_france_inter : '';
+      document.getElementById('co-form-description').value = item ? (item.description || '') : '';
+      updatePreview();
+      _formQuestions = questions
+        ? questions.map(q => {
+            const typeQuestion = q.type_question || 'qcm';
+            return {
+              typeQuestion,
+              enonce: q.enonce, explication: q.explication || '',
+              propositions: typeQuestion === 'reponse_libre'
+                ? [{ texte: '', est_correcte: false }, { texte: '', est_correcte: false }]
+                : (q.propositions || []).map((texte, i) => ({ texte, est_correcte: (q.bonnes_reponses || []).includes(i) })),
+              reponsesLibres: typeQuestion === 'reponse_libre'
+                ? ((q.bonnes_reponses && q.bonnes_reponses.length) ? q.bonnes_reponses : [''])
+                : ['']
+            };
+          })
+        : Array.from({ length: 10 }, emptyQuestion);
+      renderQuestionsEditor();
+      document.getElementById('co-form-card').style.display = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeForm() {
+      document.getElementById('co-form-card').style.display = 'none';
+      _editingId = null;
+      _formQuestions = [];
+    }
+
+    function validateForm(titre, episodeId, questions) {
+      if (!titre) return "Le titre de l'épisode est obligatoire.";
+      if (!episodeId) return "L'ID épisode France Inter est obligatoire.";
+      if (questions.length === 0) return 'Ajoute au moins une question.';
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        if (!q.enonce.trim()) return `La question ${i + 1} n'a pas d'énoncé.`;
+        if (q.typeQuestion === 'reponse_libre') {
+          if (!q.reponsesLibres.some(r => r.trim())) return `La question ${i + 1} doit avoir au moins une réponse acceptée.`;
+        } else {
+          const propositions = q.propositions.filter(p => p.texte.trim());
+          if (propositions.length < 2) return `La question ${i + 1} doit avoir au moins 2 réponses.`;
+          if (!propositions.some(p => p.est_correcte)) return `La question ${i + 1} doit avoir au moins une bonne réponse cochée.`;
+        }
+      }
+      return null;
+    }
+
+    async function saveForm() {
+      const titre = document.getElementById('co-form-titre').value.trim();
+      const episodeId = extractEpisodeId(document.getElementById('co-form-episode-id').value);
+      const description = document.getElementById('co-form-description').value.trim();
+      const cleanedQuestions = _formQuestions.map(q => ({
+        typeQuestion: q.typeQuestion,
+        enonce: q.enonce, explication: q.explication,
+        propositions: q.propositions.filter(p => p.texte.trim()),
+        reponsesLibres: q.reponsesLibres.map(r => r.trim()).filter(Boolean)
+      }));
+
+      const err = validateForm(titre, episodeId, cleanedQuestions);
+      if (err) { alert(err); return; }
+
+      const saveBtn = document.getElementById('co-save-btn');
+      saveBtn.disabled = true;
+      try {
+        let itemId = _editingId;
+        if (_editingId) {
+          await lfmComprehensionsOralesAdmin.updateMeta(_editingId, titre, episodeId, description);
+        } else {
+          const created = await lfmComprehensionsOralesAdmin.create(_adminProfile.id, titre, episodeId, description);
+          itemId = created.id;
+        }
+        const questionsPayload = cleanedQuestions.map(q => q.typeQuestion === 'reponse_libre' ? {
+          typeQuestion: 'reponse_libre',
+          enonce: q.enonce,
+          explication: q.explication,
+          propositions: null,
+          bonnesReponses: q.reponsesLibres
+        } : {
+          typeQuestion: 'qcm',
+          enonce: q.enonce,
+          explication: q.explication,
+          propositions: q.propositions.map(p => p.texte.trim()),
+          bonnesReponses: q.propositions.reduce((acc, p, i) => { if (p.est_correcte) acc.push(i); return acc; }, [])
+        });
+        await lfmComprehensionsOralesAdmin.replaceQuestions(itemId, questionsPayload);
+        closeForm();
+        await loadItems();
+      } catch (e) {
+        alert('Erreur : ' + e.message);
+      } finally {
+        saveBtn.disabled = false;
+      }
+    }
+
+    /* ── Liste ── */
+    function renderList() {
+      const wrap = document.getElementById('co-list');
+      if (_items.length === 0) {
+        wrap.innerHTML = '<div class="qz-empty">Aucune compréhension orale créée pour l\'instant.</div>';
+        return;
+      }
+      wrap.innerHTML = _items.map(item => {
+        const toggleBtn = item.statut === 'publie'
+          ? `<button type="button" class="qz-btn qz-btn-outline qz-btn-sm" data-unpublish="${item.id}">Repasser en brouillon</button>`
+          : `<button type="button" class="qz-btn qz-btn-gold qz-btn-sm" data-publish="${item.id}">Publier</button>`;
+        return `
+        <div class="qz-teacher-card">
+          <div class="qz-teacher-card-top">
+            <div>
+              <div class="qz-teacher-card-title">${escHtml(item.titre_episode)}</div>
+              <span class="qz-statut-pill qz-statut-pill--${item.statut}">${STATUT_LABEL[item.statut]}</span>
+              ${item.description ? `<div class="qz-teacher-card-meta">${escHtml(item.description)}</div>` : ''}
+            </div>
+            <div class="qz-teacher-card-actions">
+              <button type="button" class="qz-btn qz-btn-outline qz-btn-sm" data-edit="${item.id}">Modifier</button>
+              ${toggleBtn}
+              <button type="button" class="qz-btn qz-btn-danger qz-btn-sm" data-delete="${item.id}">Supprimer</button>
+            </div>
+          </div>
+        </div>
+      `; }).join('');
+
+      wrap.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', async () => {
+        const { comprehensionOrale, questions } = await lfmComprehensionsOralesAdmin.getOne(btn.dataset.edit);
+        openForm(comprehensionOrale, questions);
+      }));
+      wrap.querySelectorAll('[data-publish]').forEach(btn => btn.addEventListener('click', async () => {
+        await lfmComprehensionsOralesAdmin.setStatut(btn.dataset.publish, 'publie');
+        await loadItems();
+      }));
+      wrap.querySelectorAll('[data-unpublish]').forEach(btn => btn.addEventListener('click', async () => {
+        await lfmComprehensionsOralesAdmin.setStatut(btn.dataset.unpublish, 'brouillon');
+        await loadItems();
+      }));
+      wrap.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', async () => {
+        if (!confirm('Supprimer définitivement cette compréhension orale ?')) return;
+        await lfmComprehensionsOralesAdmin.remove(btn.dataset.delete);
+        await loadItems();
+      }));
+    }
+
+    async function loadItems() {
+      document.getElementById('co-list').innerHTML = '<div class="qz-empty">Chargement…</div>';
+      _items = await lfmComprehensionsOralesAdmin.getAll();
+      renderList();
+    }
+
+    /* ── Init ── */
+    async function init() {
+      _adminProfile = await lfmAuth.requireRole('admin');
+      if (!_adminProfile) return;
+
+      document.getElementById('co-new-btn').addEventListener('click', () => openForm(null, null));
+      document.getElementById('co-add-question-btn').addEventListener('click', () => {
+        _formQuestions.push(emptyQuestion());
+        renderQuestionsEditor();
+      });
+      document.getElementById('co-form-episode-id').addEventListener('input', updatePreview);
+      document.getElementById('co-cancel-btn').addEventListener('click', closeForm);
+      document.getElementById('co-save-btn').addEventListener('click', saveForm);
+
+      loadItems();
+    }
+
+    init();
+  </script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/favicon/favicon.ico?v=1" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png?v=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png?v=1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/favicon-192x192.png?v=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512x512.png?v=1">
+  <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
+  <link rel="manifest" href="site.webmanifest?v=1">
+  <title>Compréhension orale — Français — Lycée Français de Madrid</title>
+  <link rel="stylesheet" href="styles.css?v=13">
+  <link rel="stylesheet" href="breadcrumb.css?v=1">
+  <link rel="stylesheet" href="css/questionnaires.css?v=2">
+  <link rel="stylesheet" href="css/comprehension-orale.css?v=1">
+  <script src="js/breadcrumb.js?v=3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/idle-logout.js"></script>
+  <script src="js/text-to-speech.js?v=2"></script>
+  <script src="js/teacher-analytics.js?v=10"></script>
+  <script src="js/comprehensions-orales-student.js?v=1"></script>
+  <!-- Consultation en lecture seule par un enseignant/admin (?resultat=<id>) —
+       voir js/comprehensions-orales-engine.js/startReview(). Sans effet pour
+       un élève, qui n'appelle jamais getResultatDetail(). -->
+  <script src="js/comprehensions-orales-teacher.js?v=2"></script>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <!-- MAIN -->
+  <div class="page-wrap">
+    <div class="page-content" style="max-width:760px;">
+
+      <script>Breadcrumb.render({ category: { href: "français.html", label: "Français" }, current: 'Compréhension orale' });</script>
+
+      <div class="page-header" style="padding:20px 0 24px;">
+        <div class="page-header-icon">
+          <img src="assets/comprehensionorale.png" alt="Compréhension orale" />
+        </div>
+        <h1 class="page-title" id="co-page-title" style="font-size:1.6rem;">Compréhension orale</h1>
+        <div class="page-title-rule"></div>
+        <p class="page-subtitle" id="co-page-subtitle">Écoute un épisode des Odyssées et teste ta compréhension.</p>
+      </div>
+
+      <!-- ── État : chargement ── -->
+      <div id="co-state-loading" style="text-align:center;padding:40px 0;color:var(--muted);">
+        Chargement…
+      </div>
+
+      <!-- ── État : bibliothèque ── -->
+      <div id="co-state-library" style="display:none">
+        <div class="co-bilan-line" id="co-bilan-line" style="display:none"></div>
+        <div class="qz-cards-grid" id="co-library-grid"></div>
+        <div class="qz-empty" id="co-library-empty" style="display:none">
+          Aucune compréhension orale disponible pour l'instant. Reviens bientôt !
+        </div>
+      </div>
+
+      <!-- ── État : question en cours ── -->
+      <div id="co-state-quiz" style="display:none">
+        <div class="co-player-wrap" id="co-player-wrap" style="display:none">
+          <div id="co-player-mount"></div>
+        </div>
+        <div class="qz-progress-msg" id="co-progress-msg"></div>
+        <div class="qz-question-block">
+          <div class="qz-question-enonce" id="co-question-enonce"></div>
+          <div class="qz-choices-list" id="co-choices-list"></div>
+          <div id="co-libre-wrap" style="display:none;max-width:420px;margin:0 auto;"></div>
+        </div>
+        <div class="qz-question-actions">
+          <button type="button" class="qz-btn qz-btn-primary" id="co-next-btn" disabled>Valider</button>
+        </div>
+      </div>
+
+      <!-- ── État : résultats ── -->
+      <div id="co-state-results" style="display:none;text-align:center;">
+        <div class="qz-score-circle" id="co-score-circle">
+          <span class="qz-score-pct" id="co-score-pct"></span>
+          <span class="qz-score-frac" id="co-score-frac"></span>
+        </div>
+        <div id="co-results-title" style="font-family:var(--font-display);font-weight:800;font-size:17px;color:var(--blue);"></div>
+        <div class="qz-review-list" id="co-review-list" style="text-align:left;"></div>
+        <div class="qz-actions">
+          <button type="button" class="qz-btn qz-btn-outline" id="co-back-btn">← Retour à la compréhension orale</button>
+        </div>
+      </div>
+
+      <!-- ── État : erreur ── -->
+      <div id="co-state-error" style="display:none;text-align:center;padding:40px 0;">
+        <p style="color:var(--muted);margin-bottom:14px;">Impossible de charger la compréhension orale.</p>
+        <a href="français.html" class="btn-secondary">← Retour au Français</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="js/menu.js"></script>
+  <script src="js/comprehensions-orales-engine.js?v=1"></script>
+<style>
+    /* ─── FOOTER PROFICIAMUS ─── */
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+</style>
+</body>
+</html>
