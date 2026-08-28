@@ -18,12 +18,13 @@ const lfmAuth = (() => {
   }
 
   /* Inscription — enseignants uniquement ──────────────────────────────────── */
-  async function signUp(email, password, displayName, role = 'enseignant') {
+  async function signUp(email, password, displayName, role = 'enseignant', emailRedirectTo) {
     const { data, error } = await db.auth.signUp({
       email,
       password,
       options: {
-        data: { display_name: displayName, role }
+        data: { display_name: displayName, role },
+        emailRedirectTo
       }
     });
     if (error) {
@@ -95,11 +96,10 @@ const lfmAuth = (() => {
       window.location.href = 'auth.html?role=' + expectedRole;
       return null;
     }
-    if (profile.status === 'pending') {
-      await signOut();
-      window.location.href = 'auth.html?role=' + expectedRole + '&status=pending';
-      return null;
-    }
+    /* status = 'pending' n'est plus attribué automatiquement (accès actif dès
+       confirmation d'e-mail — voir migration 20260919100000). 'rejected'
+       reste le seul moyen de bannir un compte (mise à jour SQL manuelle par
+       l'admin, l'UI de modération ayant été retirée). */
     if (profile.status === 'rejected') {
       await signOut();
       window.location.href = 'auth.html?role=' + expectedRole + '&status=rejected';
@@ -110,9 +110,9 @@ const lfmAuth = (() => {
 
   /* Variante de requireRole() pour une page utilisable par plusieurs rôles
      (ex. enseignant + admin) — même logique (session → profil → statut
-     pending/rejected → redirection), sauf que le test devient une
-     appartenance à la liste plutôt qu'une correspondance exacte. requireRole
-     reste inchangée pour ne rien risquer sur les pages qui l'utilisent déjà. */
+     rejected → redirection), sauf que le test devient une appartenance à
+     la liste plutôt qu'une correspondance exacte. requireRole reste
+     inchangée pour ne rien risquer sur les pages qui l'utilisent déjà. */
   async function requireAnyRole(roles) {
     const primaryRole = roles[0];
     const session = await getSession();
@@ -123,11 +123,6 @@ const lfmAuth = (() => {
     const profile = await getProfile();
     if (!profile || !roles.includes(profile.role)) {
       window.location.href = 'auth.html?role=' + primaryRole;
-      return null;
-    }
-    if (profile.status === 'pending') {
-      await signOut();
-      window.location.href = 'auth.html?role=' + primaryRole + '&status=pending';
       return null;
     }
     if (profile.status === 'rejected') {

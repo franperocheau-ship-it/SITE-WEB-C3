@@ -7,53 +7,21 @@ const lfmAdmin = (() => {
   const db = window.lfmDb;
 
   /* ── Stats globales ──────────────────────────────────────────────────────── */
+  /* Plus de compteur "pending" : les enseignants sont actifs dès l'inscription
+     (voir migration 20260919100000_teacher_signup_auto_active.sql). */
   async function getGlobalStats() {
-    const [teachersRes, pendingRes, classesRes, studentsRes, resultsRes] = await Promise.all([
+    const [teachersRes, classesRes, studentsRes, resultsRes] = await Promise.all([
       db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'enseignant').eq('status', 'active'),
-      db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'enseignant').eq('status', 'pending'),
       db.from('classes').select('id', { count: 'exact', head: true }),
       db.from('students').select('id', { count: 'exact', head: true }),
       db.from('exercise_results').select('id', { count: 'exact', head: true })
     ]);
     return {
       teachers: teachersRes.count  || 0,
-      pending:  pendingRes.count   || 0,
       classes:  classesRes.count   || 0,
       students: studentsRes.count  || 0,
       results:  resultsRes.count   || 0
     };
-  }
-
-  /* ── Demandes en attente ─────────────────────────────────────────────────── */
-  async function getPendingTeachers() {
-    const { data, error } = await db
-      .from('profiles')
-      .select('id, display_name, created_at')
-      .eq('role', 'enseignant')
-      .eq('status', 'pending')
-      .order('created_at');
-    if (error) throw error;
-    return data || [];
-  }
-
-  /* Valide le compte ET confirme l'e-mail côté Supabase Auth (sinon
-     signInWithPassword échoue avec "Email not confirmed" — voir
-     supabase/functions/approve-teacher/index.ts) */
-  async function approveTeacher(id) {
-    const { data, error } = await db.functions.invoke('approve-teacher', {
-      body: { teacher_id: id }
-    });
-    if (error) throw new Error(error.message || 'Erreur lors de la validation');
-    if (data && data.error) throw new Error(data.error);
-    return data;
-  }
-
-  async function rejectTeacher(id) {
-    const { error } = await db
-      .from('profiles')
-      .update({ status: 'rejected' })
-      .eq('id', id);
-    if (error) throw error;
   }
 
   /* ── Contenu en attente de validation (Champ lexical + Questionnaires) ──────
@@ -286,7 +254,6 @@ const lfmAdmin = (() => {
 
   return {
     getGlobalStats,
-    getPendingTeachers, approveTeacher, rejectTeacher,
     getPendingChamps, getPendingQuestionnaires, moderateChamp, moderateQuestionnaire,
     getPendingEvaluations, moderateEvaluation,
     getTeachers, getAllClasses, getClassesWithStats, exportAllStudents,

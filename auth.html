@@ -448,13 +448,8 @@
       el.style.display = 'block';
     }
 
-    /* Message de statut (pending / rejected) */
-    if (status === 'pending') {
-      showMsg(
-        'Votre demande de compte est en attente de validation par l\'administrateur. Vous recevrez accès dès qu\'elle sera approuvée.',
-        'success'
-      );
-    } else if (status === 'rejected') {
+    /* Message de statut (rejected — compte banni par un admin) */
+    if (status === 'rejected') {
       showMsg(
         'Votre demande d\'accès a été refusée. Contactez l\'administrateur pour plus d\'informations.',
         'error'
@@ -567,13 +562,7 @@
           setLoading(btn, false);
           return;
         }
-        /* Bloquer les enseignants en attente ou refusés */
-        if (profile.role === 'enseignant' && profile.status === 'pending') {
-          await lfmAuth.signOut();
-          showMsg('Votre compte est en attente de validation par l\'administrateur.', 'success');
-          setLoading(btn, false);
-          return;
-        }
+        /* Bloquer les enseignants dont le compte a été banni par un admin */
         if (profile.role === 'enseignant' && profile.status === 'rejected') {
           await lfmAuth.signOut();
           showMsg('Votre demande d\'accès a été refusée. Contactez l\'administrateur.', 'error');
@@ -699,14 +688,15 @@
 
       setLoading(btn, true);
       try {
-        const result = await lfmAuth.signUp(email, pwd, name, 'enseignant');
+        const redirectTo = 'https://proficiamus.eu/auth.html?role=enseignant';
+        const result = await lfmAuth.signUp(email, pwd, name, 'enseignant', redirectTo);
         /* Supabase renvoie identities=[] quand l'email existe déjà (sans confirmation) */
         if (result.user && result.user.identities && result.user.identities.length === 0) {
           showMsg('Cette adresse e-mail est déjà utilisée. Essayez de vous connecter.', 'error');
           return;
         }
         showMsg(
-          'Demande envoyée ! Votre compte est en attente de validation par l\'administrateur. Vous pourrez vous connecter dès qu\'il aura approuvé votre accès.',
+          'Compte créé ! Cliquez sur le lien de confirmation reçu par e-mail (vérifiez vos spams) pour activer votre accès.',
           'success'
         );
         document.getElementById('reg-form').reset();

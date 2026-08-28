@@ -457,17 +457,6 @@
         </div>
       </div>
 
-      <!-- Section : Demandes en attente -->
-      <div class="pending-card" id="pending-section" style="display:none">
-        <div class="pending-header">
-          <div class="pending-title">
-            🕐 Demandes en attente
-            <span class="pending-badge" id="pending-count">0</span>
-          </div>
-        </div>
-        <div id="pending-body"></div>
-      </div>
-
       <!-- Section : Contenu en attente de validation (Champ lexical + Questionnaires) -->
       <div class="pending-card" id="content-pending-section" style="display:none">
         <div class="pending-header">
@@ -744,7 +733,7 @@
     document.getElementById('dash-logout-btn').addEventListener('click', () => lfmAuth.signOut());
 
     /* ── Stats globales ──────────────────────────────────────────────────── */
-    let _stats = { teachers: 0, pending: 0, classes: 0, students: 0, results: 0 };
+    let _stats = { teachers: 0, classes: 0, students: 0, results: 0 };
     try {
       _stats = await lfmAdmin.getGlobalStats();
       document.getElementById('stat-teachers').textContent = _stats.teachers;
@@ -753,71 +742,6 @@
       document.getElementById('stat-results').textContent  = _stats.results;
     } catch (e) {
       console.warn('[LFM] stats :', e.message);
-    }
-
-    /* ── Demandes en attente ─────────────────────────────────────────────── */
-    let _pendingTeachers = [];
-    async function loadPending() {
-      try {
-        _pendingTeachers = await lfmAdmin.getPendingTeachers();
-        const section = document.getElementById('pending-section');
-        const body    = document.getElementById('pending-body');
-        const badge   = document.getElementById('pending-count');
-
-        if (_pendingTeachers.length === 0) {
-          section.style.display = 'none';
-          return;
-        }
-        section.style.display = 'block';
-        badge.textContent = _pendingTeachers.length;
-
-        body.innerHTML = _pendingTeachers.map(t => {
-          const date = new Date(t.created_at).toLocaleDateString('fr-FR',
-            { day: '2-digit', month: 'long', year: 'numeric' });
-          return `<div class="pending-row" id="pr-${t.id}">
-            <div>
-              <div class="pending-name">${escHtml(t.display_name)}</div>
-              <div class="pending-date">Demande reçue le ${date}</div>
-            </div>
-            <div class="pending-actions">
-              <button class="btn-approve" data-id="${t.id}" onclick="doApprove('${t.id}')">✓ Approuver</button>
-              <button class="btn-reject"  data-id="${t.id}" onclick="doReject('${t.id}')">✗ Refuser</button>
-            </div>
-          </div>`;
-        }).join('');
-      } catch (e) {
-        console.warn('[LFM] pending :', e.message);
-      }
-    }
-
-    window.doApprove = async function(id) {
-      const row = document.getElementById('pr-' + id);
-      row.querySelectorAll('button').forEach(b => b.disabled = true);
-      try {
-        await lfmAdmin.approveTeacher(id);
-        row.innerHTML = `<div style="padding:0;flex:1"><span style="color:#15803d;font-weight:600">✓ Compte approuvé</span></div>`;
-        setTimeout(() => { row.remove(); checkPendingSection(); }, 1800);
-        showToast('Enseignant approuvé');
-        document.getElementById('stat-teachers').textContent =
-          parseInt(document.getElementById('stat-teachers').textContent || 0) + 1;
-      } catch (e) { showToast('Erreur : ' + e.message, 'error'); }
-    };
-
-    window.doReject = async function(id) {
-      const row = document.getElementById('pr-' + id);
-      row.querySelectorAll('button').forEach(b => b.disabled = true);
-      try {
-        await lfmAdmin.rejectTeacher(id);
-        row.innerHTML = `<div style="padding:0;flex:1"><span style="color:var(--red);font-weight:600">✗ Demande refusée</span></div>`;
-        setTimeout(() => { row.remove(); checkPendingSection(); }, 1800);
-        showToast('Demande refusée');
-      } catch (e) { showToast('Erreur : ' + e.message, 'error'); }
-    };
-
-    function checkPendingSection() {
-      const remaining = document.getElementById('pending-body').querySelectorAll('.pending-row').length;
-      if (remaining === 0) document.getElementById('pending-section').style.display = 'none';
-      else document.getElementById('pending-count').textContent = remaining;
     }
 
     /* ── Contenu en attente de validation (Champ lexical + Questionnaires) ──
@@ -919,7 +843,6 @@
       }
     };
 
-    await loadPending();
     await loadPendingContent();
     await loadEvaluationsBadge();
 
@@ -1552,13 +1475,14 @@
            est commitée ou reversée séparément de ce commit de migration. */
         await Promise.all([
           'data/conjugaison.js?v=2',
-          'data/grammaire.js?v=9',
+          'data/grammaire.js?v=10',
           'data/orthographe.js?v=2',
           'data/lecture.js?v=2',
           'data/nombres-entiers.js?v=2',
           'data/fractions.js?v=2',
           'data/nombres-decimaux.js?v=2',
           'data/probabilites.js?v=2',
+          'data/proportionnalite.js?v=1',
           'data/vocabulaire.js?v=2'
         ].map(loadScript));
         const catalogMap = lfmAnalytics.buildCatalogMap();
