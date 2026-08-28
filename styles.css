@@ -1577,3 +1577,137 @@ body.home-page .cards-grid {
   0%, 100% { transform: scale(1); }
   50%      { transform: scale(1.08); }
 }
+
+/* ─── Fonctionnalité verrouillée (js/locked-feature.js) ─────────────────────
+   Carte hub/dashboard grisée avec badge "En construction" : le clic reste
+   actif et ouvre une modale demandant un mot de passe avant de poursuivre
+   vers la page cible. ─────────────────────────────────────────────────── */
+
+.hub-card--locked {
+  opacity: 0.55;
+  filter: grayscale(0.5);
+}
+.hub-card--locked:hover {
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.lf-badge-construction {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-brand-gold);
+  color: var(--color-brand-navy);
+  border-radius: 100px;
+  padding: 4px 10px;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(16,43,106,0.18);
+  pointer-events: none;
+}
+
+/* ── Modale mot de passe ─────────────────────────────────────────────────── */
+.lf-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,25,60,0.45);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 24px;
+}
+.lf-modal {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: 0 24px 64px rgba(16,43,106,0.22);
+  width: 100%;
+  max-width: 400px;
+  animation: lf-modal-in 180ms ease;
+}
+@keyframes lf-modal-in {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.lf-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 0;
+}
+.lf-modal-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--color-brand-navy);
+}
+.lf-modal-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--muted);
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: color 180ms, background 180ms;
+}
+.lf-modal-close:hover { color: var(--red); background: rgba(214,40,57,0.07); }
+.lf-modal-body { padding: 18px 24px 24px; display: flex; flex-direction: column; gap: 14px; }
+.lf-modal-text { font-size: 13.5px; color: var(--muted); line-height: 1.5; margin: 0; }
+.lf-modal-input {
+  padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border-color 180ms, box-shadow 180ms;
+  width: 100%;
+  box-sizing: border-box;
+}
+.lf-modal-input:focus {
+  border-color: var(--color-brand-navy);
+  box-shadow: 0 0 0 3px rgba(26,45,107,0.12);
+}
+.lf-modal-input.is-error {
+  border-color: var(--red);
+  animation: lf-shake 320ms ease;
+}
+@keyframes lf-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+.lf-modal-error {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--red);
+  margin: 0;
+}
+.lf-modal-footer { display: flex; gap: 10px; justify-content: flex-end; padding-top: 4px; }
+.lf-modal-btn {
+  padding: 10px 20px;
+  border-radius: 22px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  transition: background 180ms, border-color 180ms, color 180ms, transform 140ms;
+}
+.lf-modal-btn--primary { background: var(--color-brand-navy); color: #fff; }
+.lf-modal-btn--primary:hover { background: #0f1d45; }
+.lf-modal-btn--ghost { background: var(--card-bg); color: var(--muted); border: 1.5px solid var(--border); }
+.lf-modal-btn--ghost:hover { border-color: var(--red); color: var(--red); }

@@ -209,7 +209,7 @@
 
     .dash-card--soon {
       opacity: 0.55;
-      cursor: default;
+      cursor: pointer;
     }
 
     .dash-card-icon { width: 40px; height: 40px; }
@@ -402,7 +402,8 @@
              dédiée dans assets/logos panneau de controle/ pour cette carte
              — à remplacer par une icône du même style illustré (médaillon
              navy + liseré or) que les 8 autres dès qu'elle sera fournie. -->
-        <a href="evaluations-enseignant.html" class="dash-card dash-card--active">
+        <a href="evaluations-enseignant.html" class="dash-card dash-card--soon" data-locked="true">
+          <span class="lf-badge-construction">En construction</span>
           <div class="dash-card-icon">
             <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
               <circle cx="20" cy="20" r="19" fill="#102B6A" stroke="#F5A623" stroke-width="2"/>
@@ -439,14 +440,16 @@
           <div class="dash-card-action">Gérer →</div>
           <div class="dash-card-accent"></div>
         </a>
-        <a href="vocabulaire-corpus-enseignant.html" class="dash-card dash-card--active">
+        <a href="vocabulaire-corpus-enseignant.html" class="dash-card dash-card--soon" data-locked="true">
+          <span class="lf-badge-construction">En construction</span>
           <div class="dash-card-icon"><img src="assets/logos panneau de controle/corpus lexical.png" alt=""></div>
           <div class="dash-card-title">Corpus lexical</div>
           <div class="dash-card-desc">Jouer en équipe pour consolider et enrichir le vocabulaire</div>
           <div class="dash-card-action">Ouvrir →</div>
           <div class="dash-card-accent"></div>
         </a>
-        <a href="remediations-enseignant.html" class="dash-card dash-card--active">
+        <a href="remediations-enseignant.html" class="dash-card dash-card--soon" data-locked="true">
+          <span class="lf-badge-construction">En construction</span>
           <div class="dash-card-icon"><img src="assets/logos panneau de controle/Remédiations.png" alt=""></div>
           <div class="dash-card-title">Remédiations</div>
           <div class="dash-card-desc">Repérez les compétences en difficulté et les ressources pour y remédier.</div>
@@ -455,6 +458,7 @@
         </a>
       </div>
       <script src="js/feature-flags.js?v=1"></script><script>LFM_FEATURES.hideDisabled();</script>
+      <script src="js/locked-feature.js?v=1"></script><script>LockedFeature.init();</script>
 
       <!-- Pied de page -->
       <div class="dash-footer">
