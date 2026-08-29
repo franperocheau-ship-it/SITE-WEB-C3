@@ -44,24 +44,44 @@
     }
 
     .dic-teacher-card {
-      background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 14px;
-      padding: 16px 18px; margin-bottom: 12px;
+      background: #ffffff; border-radius: 12px; border-left: 4px solid #1DBFA0;
+      padding: 12px 14px; margin-bottom: 10px; box-shadow: 0 1px 2px #0000000d;
     }
-    .dic-teacher-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-    .dic-teacher-card-heading { display: flex; align-items: flex-start; gap: 10px; }
-    .dic-teacher-card-icon { font-size: 22px; line-height: 1.2; flex-shrink: 0; }
-    .dic-teacher-card-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 8px; }
-    .dic-teacher-card-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-    .dic-teacher-card-meta { font-size: 12px; color: var(--muted); }
-    .dic-teacher-card-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .dic-teacher-card--gold  { border-left-color: #F5A623; }
+    .dic-teacher-card--navy  { border-left-color: #1A2D6B; }
+    .dic-teacher-card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .dic-teacher-card-heading { display: flex; align-items: center; gap: 10px; }
+    .dic-teacher-card-num {
+      width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 500; font-size: 13px; background: rgba(29,191,160,0.10); color: #0E7A63;
+    }
+    .dic-teacher-card--gold .dic-teacher-card-num { background: rgba(245,166,35,0.10); color: #8A5A0F; }
+    .dic-teacher-card--navy .dic-teacher-card-num { background: rgba(26,45,107,0.10); color: #1A2D6B; }
+    .dic-teacher-card-title { font-weight: 500; font-size: 15px; color: var(--text); }
+    .dic-teacher-card-meta-pill {
+      display: inline-flex; margin-top: 4px; background: var(--bg); border-radius: 20px;
+      padding: 2px 8px; font-size: 12px; color: var(--muted);
+    }
+    .dic-teacher-card-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .dic-teacher-card-iconbtn {
+      width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid var(--border);
+      background: #ffffff; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 150ms;
+    }
+    .dic-teacher-card-iconbtn svg { width: 16px; height: 16px; }
+    .dic-teacher-card-iconbtn:hover { background: var(--bg); }
+    .dic-teacher-card-iconbtn--edit { color: var(--muted); }
+    .dic-teacher-card-iconbtn--delete { color: #B42318; }
 
     /* Carte de la dictée en cours d'édition dans le formulaire au-dessus —
        grisée + boutons désactivés pour ne pas laisser croire qu'elle reste
        cliquable normalement pendant qu'on la modifie (retour utilisateur :
        impression de "doublon" entre le formulaire et la liste). */
     .dic-teacher-card--editing { opacity: 0.55; }
-    .dic-teacher-card--editing .dic-btn { cursor: not-allowed; }
-    .dic-editing-badge { color: var(--blue); font-weight: 700; }
+    .dic-teacher-card--editing .dic-btn,
+    .dic-teacher-card--editing .dic-teacher-card-iconbtn { cursor: not-allowed; }
+    .dic-editing-badge { color: var(--blue); font-weight: 700; font-size: 12px; margin-top: 4px; display: inline-block; }
 
     .dic-btn {
       border: none; border-radius: 10px; padding: 9px 16px; font-family: inherit;
@@ -1086,28 +1106,40 @@
       }
     }
 
-    /* ── Liste ── */
+    /* ── Liste ──
+       Numérotation/couleur cycliques (position dans la liste, pas une
+       donnée stockée) : turquoise/or/navy, mêmes teintes de marque que le
+       catalogue élève (css/dictees.css). */
+    const ROW_COLOR_CYCLE = ['', 'dic-teacher-card--gold', 'dic-teacher-card--navy'];
+    const PENCIL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    const TRASH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>';
+
     function renderList() {
       const wrap = document.getElementById('dic-list');
       if (_dictees.length === 0) {
         wrap.innerHTML = '<div class="dic-empty">Aucune dictée préparée pour cette classe pour l\'instant.</div>';
         return;
       }
-      wrap.innerHTML = _dictees.map(d => {
+      wrap.innerHTML = _dictees.map((d, i) => {
         const isEditing = d.id === _editingId;
+        const colorClass = ROW_COLOR_CYCLE[i % 3];
+        const num = String(i + 1).padStart(2, '0');
         return `
-        <div class="dic-teacher-card${isEditing ? ' dic-teacher-card--editing' : ''}">
+        <div class="dic-teacher-card ${colorClass}${isEditing ? ' dic-teacher-card--editing' : ''}">
           <div class="dic-teacher-card-top">
             <div class="dic-teacher-card-heading">
-              <span class="dic-teacher-card-icon">${escHtml(d.emoji || '📖')}</span>
+              <span class="dic-teacher-card-num">${num}</span>
               <div>
                 <div class="dic-teacher-card-title">${escHtml(d.titre)}</div>
-                <div class="dic-teacher-card-meta">${d.mot_count} mot${d.mot_count !== 1 ? 's' : ''} difficile${d.mot_count !== 1 ? 's' : ''}${isEditing ? ' · <span class="dic-editing-badge">En cours d’édition</span>' : ''}</div>
+                <div>
+                  <span class="dic-teacher-card-meta-pill">${d.mot_count} mot${d.mot_count !== 1 ? 's' : ''} difficile${d.mot_count !== 1 ? 's' : ''}</span>
+                  ${isEditing ? ' <span class="dic-editing-badge">En cours d’édition</span>' : ''}
+                </div>
               </div>
             </div>
             <div class="dic-teacher-card-actions">
-              <button type="button" class="dic-btn dic-btn-outline dic-btn-sm" data-edit="${d.id}" ${isEditing ? 'disabled' : ''}>Modifier</button>
-              <button type="button" class="dic-btn dic-btn-danger dic-btn-sm" data-delete="${d.id}" ${isEditing ? 'disabled' : ''}>Supprimer</button>
+              <button type="button" class="dic-teacher-card-iconbtn dic-teacher-card-iconbtn--edit" data-edit="${d.id}" ${isEditing ? 'disabled' : ''} title="Modifier">${PENCIL_ICON}</button>
+              <button type="button" class="dic-teacher-card-iconbtn dic-teacher-card-iconbtn--delete" data-delete="${d.id}" ${isEditing ? 'disabled' : ''} title="Supprimer">${TRASH_ICON}</button>
             </div>
           </div>
         </div>

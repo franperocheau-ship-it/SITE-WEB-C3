@@ -27,18 +27,41 @@
   border-radius: 8px; padding: 6px 10px;
 }
 
-/* ─── Espace enseignant : liste des questionnaires ───────────────────── */
+/* ─── Espace enseignant : liste des questionnaires ─────────────────────
+   Même format de ligne que .dic-teacher-card (dictees-enseignant.html) :
+   fond blanc, liseré gauche coloré cyclique, badge numéro, pastille de
+   métadonnée, boutons d'action icône. */
 .qz-teacher-card {
-  background: var(--card-bg);
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
-  padding: 16px 18px;
-  margin-bottom: 12px;
+  background: #ffffff; border-radius: 12px; border-left: 4px solid #1DBFA0;
+  padding: 12px 14px; margin-bottom: 10px; box-shadow: 0 1px 2px #0000000d;
 }
-.qz-teacher-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.qz-teacher-card-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 6px; }
+.qz-teacher-card--gold { border-left-color: #F5A623; }
+.qz-teacher-card--navy { border-left-color: #1A2D6B; }
+.qz-teacher-card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.qz-teacher-card-heading { display: flex; align-items: center; gap: 10px; }
+.qz-teacher-card-num {
+  width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 500; font-size: 13px; background: rgba(29,191,160,0.10); color: #0E7A63;
+}
+.qz-teacher-card--gold .qz-teacher-card-num { background: rgba(245,166,35,0.10); color: #8A5A0F; }
+.qz-teacher-card--navy .qz-teacher-card-num { background: rgba(26,45,107,0.10); color: #1A2D6B; }
+.qz-teacher-card-title { font-weight: 500; font-size: 15px; color: var(--text); margin-bottom: 2px; }
+.qz-teacher-card-meta-pill {
+  display: inline-flex; margin-top: 4px; background: var(--bg); border-radius: 20px;
+  padding: 2px 8px; font-size: 12px; color: var(--muted);
+}
 .qz-teacher-card-meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
-.qz-teacher-card-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+.qz-teacher-card-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+.qz-teacher-card-iconbtn {
+  width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid var(--border);
+  background: #ffffff; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 150ms;
+}
+.qz-teacher-card-iconbtn svg { width: 16px; height: 16px; }
+.qz-teacher-card-iconbtn:hover { background: var(--bg); }
+.qz-teacher-card-iconbtn--edit { color: var(--muted); }
+.qz-teacher-card-iconbtn--delete { color: #B42318; }
 
 .qz-btn {
   border: none; border-radius: 10px; padding: 9px 16px; font-family: inherit;

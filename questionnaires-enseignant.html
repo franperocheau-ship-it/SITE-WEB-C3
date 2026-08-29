@@ -325,14 +325,21 @@
       `;
     }
 
-    /* ── Liste ── */
+    /* ── Liste ──
+       Numérotation/couleur cycliques (position dans la liste, pas une
+       donnée stockée) : turquoise/or/navy, même format de ligne que
+       .dic-teacher-card (dictees-enseignant.html). */
+    const ROW_COLOR_CYCLE = ['', 'qz-teacher-card--gold', 'qz-teacher-card--navy'];
+    const PENCIL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    const TRASH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>';
+
     function renderList() {
       const wrap = document.getElementById('qz-list');
       if (_questionnaires.length === 0) {
         wrap.innerHTML = '<div class="qz-empty">Aucun questionnaire créé pour l\'instant.</div>';
         return;
       }
-      wrap.innerHTML = _questionnaires.map(q => {
+      wrap.innerHTML = _questionnaires.map((q, i) => {
         // "Publier" ne pose jamais directement 'publie' — seul un admin le
         // peut (voir la file de modération). Repasser en brouillon reste
         // possible aussi bien depuis 'en_attente' que depuis 'publie'.
@@ -350,22 +357,27 @@
         const motifHtml = q.motif_refus
           ? `<div class="qz-motif-refus">Refusé par l'administrateur : ${escHtml(q.motif_refus)}</div>`
           : '';
+        const colorClass = ROW_COLOR_CYCLE[i % 3];
+        const num = String(i + 1).padStart(2, '0');
         return `
-        <div class="qz-teacher-card">
+        <div class="qz-teacher-card ${colorClass}">
           <div class="qz-teacher-card-top">
-            <div>
-              <div class="qz-teacher-card-title">${escHtml(q.titre_oeuvre)}</div>
-              ${q.auteur_oeuvre ? `<div class="qz-card-auteur">${escHtml(q.auteur_oeuvre)}</div>` : ''}
-              <span class="qz-statut-pill qz-statut-pill--${q.statut}">${STATUT_LABEL[q.statut]}</span>
-              ${visibilitePill}
-              <div class="qz-teacher-card-meta">${q.nb_questions} question${q.nb_questions !== 1 ? 's' : ''}</div>
-              ${motifHtml}
+            <div class="qz-teacher-card-heading">
+              <span class="qz-teacher-card-num">${num}</span>
+              <div>
+                <div class="qz-teacher-card-title">${escHtml(q.titre_oeuvre)}</div>
+                ${q.auteur_oeuvre ? `<div class="qz-card-auteur">${escHtml(q.auteur_oeuvre)}</div>` : ''}
+                <span class="qz-statut-pill qz-statut-pill--${q.statut}">${STATUT_LABEL[q.statut]}</span>
+                ${visibilitePill}
+                <div><span class="qz-teacher-card-meta-pill">${q.nb_questions} question${q.nb_questions !== 1 ? 's' : ''}</span></div>
+                ${motifHtml}
+              </div>
             </div>
             <div class="qz-teacher-card-actions">
-              <button type="button" class="qz-btn qz-btn-outline qz-btn-sm" data-edit="${q.id}">Modifier</button>
+              <button type="button" class="qz-teacher-card-iconbtn qz-teacher-card-iconbtn--edit" data-edit="${q.id}" title="Modifier">${PENCIL_ICON}</button>
               ${visibiliteBtn}
               ${toggleBtn}
-              <button type="button" class="qz-btn qz-btn-danger qz-btn-sm" data-delete="${q.id}">Supprimer</button>
+              <button type="button" class="qz-teacher-card-iconbtn qz-teacher-card-iconbtn--delete" data-delete="${q.id}" title="Supprimer">${TRASH_ICON}</button>
             </div>
           </div>
           ${renderResultsBlock(q.id)}

@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="styles.css?v=13">
   <link rel="stylesheet" href="breadcrumb.css?v=1">
   <link rel="stylesheet" href="css/questionnaires.css?v=2">
-  <link rel="stylesheet" href="css/comprehension-orale.css?v=1">
+  <link rel="stylesheet" href="css/comprehension-orale.css?v=9">
   <script src="js/breadcrumb.js?v=3"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
@@ -68,25 +68,27 @@
       <!-- ── État : bibliothèque ── -->
       <div id="co-state-library" style="display:none">
         <div class="co-bilan-line" id="co-bilan-line" style="display:none"></div>
-        <div class="qz-cards-grid" id="co-library-grid"></div>
+        <div class="co-episodes-grid" id="co-library-grid"></div>
         <div class="qz-empty" id="co-library-empty" style="display:none">
           Aucune compréhension orale disponible pour l'instant. Reviens bientôt !
         </div>
       </div>
 
-      <!-- ── État : question en cours ── -->
+      <!-- ── État : questions (les 10 affichées simultanément, sous le
+           lecteur, pour pouvoir les lire pendant l'écoute) — lecteur et
+           questions dans un même conteneur de largeur fixe (.co-quiz-wrap)
+           pour rester alignés, plutôt que centrés indépendamment l'un de
+           l'autre. ── -->
       <div id="co-state-quiz" style="display:none">
-        <div class="co-player-wrap" id="co-player-wrap" style="display:none">
-          <div id="co-player-mount"></div>
-        </div>
-        <div class="qz-progress-msg" id="co-progress-msg"></div>
-        <div class="qz-question-block">
-          <div class="qz-question-enonce" id="co-question-enonce"></div>
-          <div class="qz-choices-list" id="co-choices-list"></div>
-          <div id="co-libre-wrap" style="display:none;max-width:420px;margin:0 auto;"></div>
-        </div>
-        <div class="qz-question-actions">
-          <button type="button" class="qz-btn qz-btn-primary" id="co-next-btn" disabled>Valider</button>
+        <div class="co-quiz-wrap">
+          <div class="co-player-wrap" id="co-player-wrap" style="display:none">
+            <div id="co-player-mount"></div>
+          </div>
+          <div class="co-quiz-error" id="co-quiz-error" style="display:none"></div>
+          <div class="co-questions-list" id="co-questions-list"></div>
+          <div class="qz-question-actions">
+            <button type="button" class="qz-btn qz-btn-primary" id="co-next-btn">Valider mes réponses</button>
+          </div>
         </div>
       </div>
 
@@ -134,7 +136,7 @@
 </footer>
 
   <script src="js/menu.js"></script>
-  <script src="js/comprehensions-orales-engine.js?v=1"></script>
+  <script src="js/comprehensions-orales-engine.js?v=9"></script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */
     footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }

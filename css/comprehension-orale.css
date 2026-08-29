@@ -1,10 +1,15 @@
 /* ═══════════════════════════════════════════════════════════════════════
    css/comprehension-orale.css — Module Oral : Compréhension orale.
    Complète css/questionnaires.css (classes qz-* réutilisées telles quelles
-   pour le formulaire admin, la grille bibliothèque, le passage et l'écran
-   de résultats — voir comprehension-orale-admin.html / francais-oral.html)
-   avec les éléments propres à ce module : lecteur audio iframe (France
-   Inter), bannière d'entrée, ligne de bilan agrégé.
+   pour le formulaire admin, le passage et l'écran de résultats — voir
+   comprehension-orale-admin.html / francais-oral.html) avec les éléments
+   propres à ce module : lecteur audio iframe (France Inter), bannière
+   d'entrée, ligne de bilan agrégé, et la grille de cartes de la
+   bibliothèque élève (.co-episodes-grid / .co-tile, style aligné sur
+   .dic-card des Dictées préparées — remplace l'ancienne grille qz-cards-
+   grid/qz-card, jamais partagée avec questionnaires-lecture.html
+   contrairement au reste des classes qz-*, donc librement redessinée ici
+   sans risque de régression sur ce module).
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ─── Aperçu du lecteur dans le formulaire admin ─────────────────────── */
@@ -12,13 +17,118 @@
 .co-preview-label { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
 .co-preview-wrap iframe { border-radius: 10px; display: block; }
 
+/* ─── Réorganisation des questions (formulaire admin) — boutons ↑/↓ dans
+   .qz-question-card-head (css/questionnaires.css, partagée avec
+   questionnaires-enseignant.html — non modifiée, ces nouvelles classes sont
+   ajoutées ici plutôt que là-bas). Purement un réordonnancement du tableau
+   _formQuestions en mémoire : la persistance en base se fait au clic sur
+   "Enregistrer" comme pour le reste du formulaire (replaceQuestions
+   réécrit `ordre` d'après la position dans le tableau, voir
+   js/comprehensions-orales-admin.js). ── */
+.qz-question-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.qz-question-move {
+  background: rgba(26,45,107,0.06);
+  color: var(--blue);
+  border: 1.5px solid rgba(26,45,107,0.2);
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 150ms;
+}
+.qz-question-move:hover:not(:disabled) { background: rgba(26,45,107,0.12); }
+.qz-question-move:disabled { opacity: 0.35; cursor: default; }
+
+/* ─── Passage — lecteur + questions dans un même conteneur de largeur fixe,
+   pour rester alignés au lieu d'être centrés indépendamment l'un de
+   l'autre (chaque carte de question calculait auparavant sa propre largeur
+   via max-width + margin:auto sur .qz-question-block, ce qui produisait des
+   largeurs visuellement incohérentes selon le contenu). ── */
+.co-quiz-wrap {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
 /* ─── Lecteur audio pendant le passage ───────────────────────────────── */
 .co-player-wrap {
-  max-width: 560px; margin: 0 auto 20px;
+  width: 100%;
+  margin: 0 0 20px;
+  box-sizing: border-box;
   background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 16px;
   padding: 14px; box-shadow: var(--shadow-sm);
 }
 .co-player-wrap iframe { border-radius: 10px; display: block; }
+
+/* ─── Les 10 questions affichées simultanément sous le lecteur (au lieu
+   d'un flux une question à la fois, comme pour les questionnaires de
+   lecture) : l'élève peut les lire pendant qu'il écoute le podcast. Chaque
+   bloc réutilise .qz-question-block/.qz-choices-list/.qz-choice-btn
+   (css/questionnaires.css, purement visuelles, sans logique d'état liée au
+   flux "une question à la fois" — sûres à reprendre ici tel quel) dans une
+   simple pile verticale, avec un espacement constant (gap, pas des marges
+   individuelles qui s'accumulent différemment selon le contenu). ── */
+.co-questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 8px;
+}
+
+/* Override ciblé de .qz-question-block/.qz-question-enonce (css/
+   questionnaires.css, partagée avec questionnaires-lecture.html — jamais
+   modifiée directement, voir commentaire d'en-tête de ce fichier) :
+   uniquement dans ce conteneur précis, chaque carte occupe 100% de
+   .co-quiz-wrap plutôt qu'une largeur calculée sur son propre contenu, et
+   s'aligne à gauche (numéro + énoncé) plutôt que centrée. */
+.co-questions-list .qz-question-block {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  box-sizing: border-box;
+}
+.co-questions-list .qz-question-enonce {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.co-q-num {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+/* Question sans réponse au moment de la validation groupée (voir
+   validateAllAnswered() dans js/comprehensions-orales-engine.js) — liseré
+   rouge + halo léger, retiré dès que l'élève y répond. */
+.qz-question-block.co-q-block--missing {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(214,40,57,0.10);
+}
+
+.co-quiz-error {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 18px;
+  background: rgba(214,40,57,0.08);
+  border: 1.5px solid rgba(214,40,57,0.3);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--red);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: center;
+}
 
 /* ─── Bannière d'entrée (calquée sur .ql-entry-banner, français-lecture.html) ── */
 .co-entry-banner {
@@ -40,3 +150,131 @@
   padding: 12px 16px; margin-bottom: 20px;
 }
 .co-bilan-line strong { color: var(--blue); font-family: var(--font-display); }
+
+/* ─── Bibliothèque élève — grille de cartes ───────────────────────────────
+   Style aligné sur .dic-card (css/dictees.css, Dictées préparées) : fond
+   blanc, bordure fine + liseré coloré en haut (4px, rotation turquoise/or/
+   navy), plutôt que le fond plein coloré d'une première version — repris ici
+   sous des classes propres à ce module (pas un partage direct de
+   css/dictees.css, non chargé sur cette page) car le contenu diffère
+   (résumé en texte intégral, badge de score) et les dimensions ne sont pas
+   carrées ici. Carte réelle = <button> (accessible clavier nativement) ;
+   carte de complément (moins de 3 épisodes publiés) = <div>, même classe de
+   base .co-tile pour partager dimensions/padding/border-radius. ── */
+.co-episodes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+@media (max-width: 900px) { .co-episodes-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .co-episodes-grid { grid-template-columns: 1fr; } }
+
+.co-tile {
+  position: relative;
+  min-height: 200px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--border, #D7DEEA);
+  border-top: 4px solid #1A2D6B;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* espacement minimum garanti entre label/titre/résumé/bouton, même quand margin-top:auto (sur .co-tile-listen-btn) n'a plus d'espace libre à absorber */
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms;
+}
+.co-tile:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.co-tile:focus-visible { outline: 2px solid #1A2D6B; outline-offset: 2px; }
+
+.co-tile--turquoise { border-top-color: #1DBFA0; }
+.co-tile--or        { border-top-color: #F5A623; }
+.co-tile--navy      { border-top-color: #1A2D6B; }
+
+.co-tile-meta {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted, #5F6368);
+}
+
+.co-tile-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: #1A2D6B;
+  line-height: 1.3;
+}
+
+/* Résumé du podcast (comprehensions_orales.description) — toujours affiché
+   en entier, quand présent : pas de troncature (.co-tile n'a qu'un
+   min-height, pas une hauteur fixe, donc rien n'est jamais coupé — la carte
+   grandit avec le texte, et la grille aligne les cartes d'une même ligne
+   sur la plus haute via le stretch par défaut de CSS grid). */
+.co-tile-resume {
+  font-size: 12px;
+  line-height: 1.45;
+  color: #5F5E5A;
+}
+
+/* Badge "déjà passé" (meilleur score) — voir applyOralScoreBadges() dans
+   js/comprehensions-orales-engine.js. Pastille en haut à droite de la carte
+   (pas dans le flux, positionnée par rapport à .co-tile), teinte pâle
+   assortie à la couleur de la carte plutôt qu'un aplat — mêmes couples
+   fond-pâle/texte-foncé déjà utilisés ailleurs sur le site pour ce type de
+   pastille (qz-review-badge--ok, .bdic-pill--gram/--lex). Le mount point
+   existe toujours (vide si l'élève n'a jamais passé cet épisode, ou en
+   mode visiteur), donc aucun changement de mise en page au moment où le
+   badge apparaît. */
+.co-tile-score-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+.co-tile--turquoise .co-tile-score-badge { background: rgba(29,191,160,0.14); color: #0f7a67; }
+.co-tile--or        .co-tile-score-badge { background: rgba(245,166,35,0.18); color: #7A4D0A; }
+.co-tile--navy      .co-tile-score-badge { background: rgba(26,45,107,0.10); color: #1A2D6B; }
+
+/* Bouton pleine largeur — "Écouter" par défaut, repassé à "Réécouter" par
+   applyOralScoreBadges() pour un épisode déjà passé (même fonction que le
+   badge de score, un seul aller-retour en base). Fond assorti au liseré du
+   haut ; texte blanc, sauf sur or où le contraste est insuffisant (retenu
+   #412402, même logique que .dic-card--gold/--turquoise qui basculent déjà
+   en navy plutôt que blanc pour la même raison). */
+.co-tile-listen-btn {
+  display: block;
+  width: 100%;
+  margin-top: auto; /* ancre le bouton en bas de la carte (flex column), quelle que soit la longueur du titre/résumé au-dessus — même technique que .dic-card-btn-listen (css/dictees.css) */
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  box-sizing: border-box;
+}
+.co-tile--turquoise .co-tile-listen-btn { background: #1DBFA0; }
+.co-tile--or        .co-tile-listen-btn { background: #F5A623; color: #412402; }
+.co-tile--navy      .co-tile-listen-btn { background: #1A2D6B; }
+
+/* Carte de complément — moins de 3 épisodes publiés, pour ne jamais laisser
+   la grille avec un vide asymétrique. */
+.co-tile--placeholder {
+  background: #F5F6F8;
+  border: 1.5px dashed #C9CFDA;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  cursor: default;
+}
+.co-tile--placeholder:hover { transform: none; box-shadow: none; }
+.co-tile-placeholder-icon { font-size: 26px; line-height: 1; color: var(--muted, #9AA3B2); }
+.co-tile-placeholder-text { font-size: 12px; color: var(--muted, #5F6368); }

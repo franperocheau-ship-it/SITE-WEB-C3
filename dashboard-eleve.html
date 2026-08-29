@@ -1219,7 +1219,8 @@
       _profile = profile;
 
       maybeRenderGuidedCard();
-      if (typeof VocabStudentSpace !== 'undefined') VocabStudentSpace.renderReactivationBanner(profile.id);
+      // Bandeau de réactivation espacée (Champ lexical) désactivé : module pas encore en production.
+      // if (typeof VocabStudentSpace !== 'undefined') VocabStudentSpace.renderReactivationBanner(profile.id);
 
       /* Déconnexion */
       document.getElementById('dash-logout-btn').addEventListener('click', () => {
@@ -1244,7 +1245,8 @@
     window.addEventListener('pageshow', e => {
       if (e.persisted) {
         activateResultsSub(_currentResSub);
-        if (_profile && typeof VocabStudentSpace !== 'undefined') VocabStudentSpace.renderReactivationBanner(_profile.id);
+        // Bandeau de réactivation espacée (Champ lexical) désactivé : module pas encore en production.
+        // if (_profile && typeof VocabStudentSpace !== 'undefined') VocabStudentSpace.renderReactivationBanner(_profile.id);
       }
     });
   </script>

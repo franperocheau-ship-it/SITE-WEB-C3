@@ -107,21 +107,43 @@
       return div.innerHTML;
     }
 
-    /* Alternance visuelle navy/gold/turquoise du bouton "Commencer →" selon
-       la position de la carte (jamais une couleur stockée en base) — cf.
-       .dic-card-btn--gold/--turquoise dans css/dictees.css, scopées à cette
-       page pour ne pas affecter .dic-card-btn ailleurs (parcours d'exercice,
-       js/dictees-engine.js). Carte 1 = navy (classe par défaut, pas de
-       modificateur), carte 2 = gold, carte 3 = turquoise, carte 4 = navy... */
-    const CARD_BTN_CYCLE = ['', 'dic-card-btn--gold', 'dic-card-btn--turquoise'];
+    /* Alternance visuelle navy/gold/turquoise du liseré, de la bulle emoji et
+       du bouton "Écouter" selon la position de la carte (jamais une couleur
+       stockée en base) — cf. .dic-card--gold/--turquoise dans
+       css/dictees.css, scopées à cette page pour ne pas affecter .dic-card
+       ailleurs (dashboard-eleve.html). Carte 1 = navy (classe par défaut,
+       pas de modificateur), carte 2 = gold, carte 3 = turquoise, carte 4 =
+       navy... */
+    const CARD_COLOR_CYCLE = ['', 'dic-card--gold', 'dic-card--turquoise'];
 
-    function renderDicteeCard(dictee, i) {
-      const btnColorClass = CARD_BTN_CYCLE[i % 3];
+    /* Les titres en base sont souvent préfixés d'un numéro ("1. La rentrée
+       ...", cf. sortByTitleNumber dans js/utils.js) : affiché tel quel à
+       côté du label "Dictée N", ça ferait un numéro en double. On extrait ce
+       numéro pour le label et on l'ôte du titre affiché ; à défaut de
+       préfixe, on retombe sur la position dans la liste (i + 1). */
+    /* Badge "✓ Faite" : au moins un dictee_results pour cet élève et cette
+       dictée, tous exercices confondus (doneIds, cf. loadDictees) — jamais
+       de pourcentage, une dictée regroupant plusieurs exercices distincts
+       dont la moyenne n'aurait pas de sens ici, juste un indicateur de
+       passage. */
+    function renderDicteeCard(dictee, i, doneIds) {
+      const colorClass = CARD_COLOR_CYCLE[i % 3];
+      const titre = String(dictee.titre || '');
+      const m = titre.match(/^\s*(\d+)\s*\.\s*/);
+      const numero = m ? m[1] : i + 1;
+      const titreAffiche = m ? titre.slice(m[0].length) : titre;
+      const badge = doneIds.has(dictee.id) ? '<span class="dic-card-badge-done">✓ Faite</span>' : '';
       return `
-        <a class="dic-card" href="dictee.html?id=${dictee.id}">
-          <div class="dic-card-illustration">${escapeHtml(dictee.emoji || '📖')}</div>
-          <div class="dic-card-title">${escapeHtml(dictee.titre)}</div>
-          <span class="dic-card-btn ${btnColorClass}">Commencer →</span>
+        <a class="dic-card ${colorClass}" href="dictee.html?id=${dictee.id}">
+          ${badge}
+          <div class="dic-card-header">
+            <span class="dic-card-emoji-bubble">${escapeHtml(dictee.emoji || '📖')}</span>
+            <span class="dic-card-label">Dictée ${numero}</span>
+          </div>
+          <div class="dic-card-title-wrap">
+            <span class="dic-card-title">${escapeHtml(titreAffiche)}</span>
+          </div>
+          <span class="dic-card-btn-listen">Écouter</span>
         </a>
       `;
     }
@@ -143,7 +165,13 @@
           .order('created_at', { ascending: false });
         if (error || !dictees || dictees.length === 0) { empty.style.display = ''; return; }
 
-        grid.innerHTML = sortByTitleNumber(dictees).map(renderDicteeCard).join('');
+        /* dictee_results.student_id = auth.uid() directement (RLS : student_id
+           = auth.uid()), pas besoin de passer par students.id/profiles.id. */
+        const { data: results } = await window.lfmDb
+          .from('dictee_results').select('dictee_id').eq('student_id', session.user.id);
+        const doneIds = new Set((results || []).map(r => r.dictee_id));
+
+        grid.innerHTML = sortByTitleNumber(dictees).map((d, i) => renderDicteeCard(d, i, doneIds)).join('');
       } catch (e) {
         empty.style.display = '';
       }

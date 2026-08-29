@@ -13,7 +13,7 @@
   <title>Compréhension orale — Espace administrateur — LFM</title>
   <link rel="stylesheet" href="styles.css?v=12">
   <link rel="stylesheet" href="css/questionnaires.css?v=2">
-  <link rel="stylesheet" href="css/comprehension-orale.css?v=1">
+  <link rel="stylesheet" href="css/comprehension-orale.css?v=9">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
@@ -190,7 +190,11 @@
         <div class="qz-question-card" data-q="${qi}">
           <div class="qz-question-card-head">
             <span class="qz-question-num">Question ${qi + 1}</span>
-            <button type="button" class="qz-question-remove" data-remove-question="${qi}">Supprimer</button>
+            <div class="qz-question-card-actions">
+              <button type="button" class="qz-question-move" data-move-up="${qi}" ${qi === 0 ? 'disabled' : ''} title="Monter">↑</button>
+              <button type="button" class="qz-question-move" data-move-down="${qi}" ${qi === _formQuestions.length - 1 ? 'disabled' : ''} title="Descendre">↓</button>
+              <button type="button" class="qz-question-remove" data-remove-question="${qi}">Supprimer</button>
+            </div>
           </div>
           <label class="qz-form-label" style="margin-top:0;">Type de question</label>
           <select class="qz-form-input qz-type-question" data-q-idx="${qi}" style="max-width:220px;">
@@ -245,6 +249,18 @@
       }));
       list.querySelectorAll('[data-remove-question]').forEach(btn => btn.addEventListener('click', () => {
         _formQuestions.splice(+btn.dataset.removeQuestion, 1);
+        renderQuestionsEditor();
+      }));
+      list.querySelectorAll('[data-move-up]').forEach(btn => btn.addEventListener('click', () => {
+        const i = +btn.dataset.moveUp;
+        if (i <= 0) return;
+        [_formQuestions[i - 1], _formQuestions[i]] = [_formQuestions[i], _formQuestions[i - 1]];
+        renderQuestionsEditor();
+      }));
+      list.querySelectorAll('[data-move-down]').forEach(btn => btn.addEventListener('click', () => {
+        const i = +btn.dataset.moveDown;
+        if (i >= _formQuestions.length - 1) return;
+        [_formQuestions[i], _formQuestions[i + 1]] = [_formQuestions[i + 1], _formQuestions[i]];
         renderQuestionsEditor();
       }));
       list.querySelectorAll('[data-add-reponse]').forEach(btn => btn.addEventListener('click', () => {
