@@ -250,70 +250,62 @@ Object.assign(window.EXERCISE_DATA, {
     title: "Identifier la valeur d'un chiffre selon sa position",
     domaine:    "Mathématiques",
     competence: "Nombres entiers — Valeur positionnelle",
-    type:  "valeur-position",
-    levels: ["CM1", "CM2", "6e"],
-    paliers: 1, /* nombre réel de paliers du moteur */
-    questionsPerSession: 13,
+    type:       "identifier-valeur-position-niveaux",
+    levels:     ["CM1", "CM2", "6e"],
+    paliers:    3, /* nombre réel de paliers du moteur */
+    levelDescs: {
+      "CM1": "Nombres entiers jusqu'à 6 chiffres — chiffre des…",
+      "CM2": "Nombres entiers jusqu'à 9 chiffres — chiffre des… et nombre de…",
+      "6e":  "Nombres décimaux — chiffre des… et nombre de…"
+    },
     backLink: { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
-    /* Étape 1 — "Le chiffre allumé" : { n, pos } — pos = rang depuis la droite (0=unités) */
-    step1Pool: [
-      { n: 4582,   pos: 2 },   /* 5 → 500                                               */
-      { n: 7346,   pos: 3 },   /* 7 → 7 000                                             */
-      { n: 93508,  pos: 2 },   /* 5 → 500   (zéro adjacent)                             */
-      { n: 4484,   pos: 2 },   /* 4 → 400   (piège : chiffre 4 répété trois fois)       */
-      { n: 71204,  pos: 1 },   /* 0 → 0     (piège : le chiffre allumé est un zéro)     */
-      { n: 358209, pos: 5 },   /* 3 → 300 000                                           */
-      { n: 62850,  pos: 4 },   /* 6 → 60 000                                            */
-      { n: 834567, pos: 3 },   /* 4 → 4 000                                             */
-      { n: 209300, pos: 4 },   /* 0 → 0     (piège : zéro à position haute)             */
-      { n: 540821, pos: 5 },   /* 5 → 500 000                                           */
+    /* ── Niveau 1 — QCM : « chiffre des… » (nombres ≤ 6 chiffres) ──
+       distracteurs = chiffre pris à d'autres positions du même nombre */
+    lvl1: [
+      { n: 452786, rang: "unités",              reponse: 6, distracteurs: [8, 7, 2] },
+      { n: 613940, rang: "dizaines",             reponse: 4, distracteurs: [0, 9, 3] },
+      { n: 875231, rang: "centaines",            reponse: 2, distracteurs: [3, 1, 5] },
+      { n: 349617, rang: "milliers",             reponse: 9, distracteurs: [4, 3, 6] },
+      { n: 726458, rang: "dizaines de mille",    reponse: 2, distracteurs: [7, 6, 4] },
+      { n: 158964, rang: "centaines de mille",   reponse: 1, distracteurs: [5, 8, 9] },
+      { n: 937042, rang: "unités",               reponse: 2, distracteurs: [4, 0, 7] },
+      { n: 264719, rang: "dizaines",             reponse: 1, distracteurs: [9, 7, 4] },
+      { n: 583176, rang: "centaines",            reponse: 1, distracteurs: [7, 6, 3] },
+      { n: 461823, rang: "milliers",             reponse: 1, distracteurs: [8, 2, 6] }
     ],
 
-    /* Étape 2 — Tableau de numération : { n, fr } — fr = texte lu à voix haute */
-    step2Pool: [
-      { n: 6254,   fr: "six mille deux cent cinquante-quatre" },
-      { n: 30508,  fr: "trente mille cinq cent huit" },           /* zéro intercalé */
-      { n: 72061,  fr: "soixante-douze mille soixante et un" },
-      { n: 103475, fr: "cent trois mille quatre cent soixante-quinze" },
-      { n: 4009,   fr: "quatre mille neuf" },                     /* deux zéros     */
-      { n: 81300,  fr: "quatre-vingt-un mille trois cents" },
+    /* ── Niveau 2 — nombres ≤ 9 chiffres ──
+       mode "chiffre" : clic sur le chiffre isolé demandé
+       mode "groupe"  : clic sur le groupe de chiffres contigus (depuis la
+                        gauche) représentant le nombre d'unités de ce rang */
+    lvl2: [
+      { mode: "chiffre", n: 345678912, rang: "centaines de mille" },
+      { mode: "chiffre", n: 128934567, rang: "dizaines de millions" },
+      { mode: "chiffre", n: 906452178, rang: "unités de mille" },
+      { mode: "chiffre", n: 573891246, rang: "centaines de millions" },
+      { mode: "chiffre", n: 214967038, rang: "dizaines de mille" },
+      { mode: "groupe",  n: 45678,  rang: "centaines" },
+      { mode: "groupe",  n: 128934, rang: "dizaines de mille" },
+      { mode: "groupe",  n: 906452, rang: "milliers" },
+      { mode: "groupe",  n: 573891, rang: "centaines" },
+      { mode: "groupe",  n: 214967, rang: "dizaines" }
     ],
 
-    /* Étape 3 — "Clique sur le chiffre des…" : { n, posName, pos } */
-    step3Pool: [
-      { n: 23508,   posName: "milliers",              pos: 3 },  /* 3 (zéro adjacent)        */
-      { n: 4484,    posName: "centaines",              pos: 2 },  /* 4 (piège : trois fois 4) */
-      { n: 53042800, posName: "dizaines de millions",  pos: 7 },  /* 5 (8 chiffres)           */
-      { n: 69482,   posName: "dizaines",               pos: 1 },  /* 8                        */
-      { n: 105070,  posName: "centaines de milliers",  pos: 5 },  /* 1                        */
-      { n: 833912,  posName: "dizaines de milliers",   pos: 4 },  /* 3 (piège : deux fois 3)  */
-      { n: 40300,   posName: "centaines",              pos: 2 },  /* 3                        */
-      { n: 2050900, posName: "millions",               pos: 6 },  /* 2                        */
-    ],
-
-    /* Étape 4 — "Nombre de…" : { n, posName, placeValue }
-       Réponse = Math.floor(n / placeValue)
-       Piège classique : élève répond chiffre=7 au lieu de nombre=457 */
-    step4Pool: [
-      { n: 45782,   posName: "centaines",             placeValue: 100    },  /* 457 (chiffre=7) */
-      { n: 30508,   posName: "milliers",              placeValue: 1000   },  /* 30  (zéro)      */
-      { n: 2345678, posName: "dizaines de milliers",  placeValue: 10000  },  /* 234             */
-      { n: 96300,   posName: "centaines",             placeValue: 100    },  /* 963             */
-      { n: 1050000, posName: "dizaines de milliers",  placeValue: 10000  },  /* 105             */
-      { n: 74839,   posName: "milliers",              placeValue: 1000   },  /* 74              */
-      { n: 830247,  posName: "centaines de milliers", placeValue: 100000 },  /* 8               */
-      { n: 5070,    posName: "milliers",              placeValue: 1000   },  /* 5               */
-    ],
-
-    /* Étape 5 — Décomposition : nombres dont zéros intercalés en piège final */
-    step5Pool: [
-      4582,    /* 4×1 000 + 5×100 + 8×10 + 2                                   */
-      30508,   /* 3×10 000 + 0×1 000 + 5×100 + 0×10 + 8  (piège requis)       */
-      716043,  /* 6 chiffres avec zéro                                          */
-      8200,    /* 4 chiffres, zéros finaux                                       */
-      90305,   /* 5 chiffres, deux zéros                                        */
-      403026,  /* 6 chiffres, deux zéros                                        */
+    /* ── Niveau 3 — nombres décimaux ──
+       mode "chiffre" : clic sur le chiffre isolé au rang décimal demandé
+       mode "nombre"  : saisie du nombre total d'unités du rang demandé */
+    lvl3: [
+      { mode: "chiffre", nombre: "47,308",  rang: "dixièmes" },
+      { mode: "chiffre", nombre: "152,904", rang: "centièmes" },
+      { mode: "chiffre", nombre: "8,675",   rang: "millièmes" },
+      { mode: "chiffre", nombre: "93,014",  rang: "dixièmes" },
+      { mode: "chiffre", nombre: "6,247",   rang: "centièmes" },
+      { mode: "nombre",  nombre: "47,308",  rang: "dixièmes" },
+      { mode: "nombre",  nombre: "152,904", rang: "centièmes" },
+      { mode: "nombre",  nombre: "93,014",  rang: "dixièmes" },
+      { mode: "nombre",  nombre: "8,675",   rang: "centièmes" },
+      { mode: "nombre",  nombre: "6,247",   rang: "dixièmes" }
     ]
   },
 
@@ -325,52 +317,51 @@ Object.assign(window.EXERCISE_DATA, {
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
     levelDescs: {
-      "CM1": "4 champs numériques : milliers, centaines, dizaines, unités",
-      "CM2": "Étiquettes positionnelles à placer",
-      "6e":  "Écriture additive, en produits et en lettres"
+      "CM1": "Nombres à 3-4 chiffres, sans zéro",
+      "CM2": "Nombres à 4-5 chiffres, avec un zéro intercalé",
+      "6e":  "Nombres à 5-6 chiffres + question piège sur les positions"
     },
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
-    /* ── Niveau 1 — 4 champs numériques (milliers / centaines / dizaines / unités) ── */
+    /* ── Génération procédurale ────────────────────────────────────────
+       À chaque tentative, dniBuildItem() (exercise.html) tire un nombre
+       aléatoire selon ces règles puis un format (additif / multiplicatif).
+       Aucune banque fixe : itemsPerLevel questions fraîches par session. */
+    genRules: {
+      1: { digitsMin: 3, digitsMax: 4, noZero: true },
+      2: { digitsMin: 4, digitsMax: 5, requireInteriorZero: true },
+      3: { digitsMin: 5, digitsMax: 6, trap: true }
+    },
+    itemsPerLevel: 8,
+
+    /* ── Exemples statiques (nouveau format) — utilisés uniquement par
+       l'aperçu enseignant (js/competence-preview.js) ; le moteur d'exercice
+       ignore ces tableaux et génère toujours à la volée. ── */
     lvl1: [
-      { display: "4 537", mil: 4, cen: 5, diz: 3, uni: 7 },
-      { display: "2 080", mil: 2, cen: 0, diz: 8, uni: 0 },
-      { display: "7 001", mil: 7, cen: 0, diz: 0, uni: 1 },
-      { display: "3 456", mil: 3, cen: 4, diz: 5, uni: 6 },
-      { display: "9 090", mil: 9, cen: 0, diz: 9, uni: 0 }
+      { display: "3 456", value: 3456, format: "multiplicative",
+        digits: [3, 4, 5, 6],
+        positions: [
+          { name: "Milliers",  mult: 1000 }, { name: "Centaines", mult: 100 },
+          { name: "Dizaines",  mult: 10 },   { name: "Unités",    mult: 1 }
+        ] }
     ],
-
-    /* ── Niveau 2 — étiquettes positionnelles à placer dans les slots ── */
     lvl2: [
-      { display: "27 046",  parts: [20000, 7000, 40, 6] },
-      { display: "150 302", parts: [100000, 50000, 300, 2] },
-      { display: "83 500",  parts: [80000, 3000, 500] },
-      { display: "400 070", parts: [400000, 70] },
-      { display: "609 403", parts: [600000, 9000, 400, 3] }
+      { display: "4 059", value: 4059, format: "additive",
+        digits: [4, 0, 5, 9],
+        positions: [
+          { name: "Milliers",  mult: 1000 }, { name: "Centaines", mult: 100 },
+          { name: "Dizaines",  mult: 10 },   { name: "Unités",    mult: 1 }
+        ] }
     ],
-
-    /* ── Niveau 3 — 3 champs texte : additive / somme de produits / lettres ── */
     lvl3: [
-      { display: "306 050",
-        add: "300000+6000+50",
-        vp: ["3×100000","6×1000","5×10"],
-        lettres: "trois",  chiffre: "3" },
-      { display: "2 040 107",
-        add: "2000000+40000+100+7",
-        vp: ["2×1000000","4×10000","1×100","7×1"],
-        lettres: "vingt",  chiffre: "20" },
-      { display: "750 030",
-        add: "700000+50000+30",
-        vp: ["7×100000","5×10000","3×10"],
-        lettres: "sept",   chiffre: "7" },
-      { display: "1 800 605",
-        add: "1000000+800000+600+5",
-        vp: ["1×1000000","8×100000","6×100","5×1"],
-        lettres: "huit",   chiffre: "8" },
-      { display: "450 002",
-        add: "400000+50000+2",
-        vp: ["4×100000","5×10000","2×1"],
-        lettres: "quatre", chiffre: "4" }
+      { display: "306 050", value: 306050, format: "additive",
+        digits: [3, 0, 6, 0, 5, 0],
+        positions: [
+          { name: "Centaines de mille", mult: 100000 }, { name: "Dizaines de mille", mult: 10000 },
+          { name: "Milliers",           mult: 1000 },   { name: "Centaines",         mult: 100 },
+          { name: "Dizaines",           mult: 10 },     { name: "Unités",            mult: 1 }
+        ],
+        trap: { name: "Unités de million", mult: 1000000 } }
     ]
   },
 
