@@ -10,7 +10,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512x512.png?v=1">
   <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
   <link rel="manifest" href="site.webmanifest?v=1">
-  <title>Résultats — Espace enseignant — LFM</title>
+  <title>Résultats — Espace enseignant</title>
   <link rel="stylesheet" href="styles.css?v=11">
   <link rel="stylesheet" href="css/niveau-pastilles.css?v=1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -850,7 +850,7 @@
         <div id="panel-bilan" style="display:none">
           <!-- En-tête impression uniquement -->
           <div class="print-header" id="print-header">
-            <div style="font-weight:800;font-size:20px;color:var(--blue)" id="print-title">Résultats — LFM</div>
+            <div style="font-weight:800;font-size:20px;color:var(--blue)" id="print-title">Résultats</div>
             <div style="font-size:13px;color:var(--muted);margin-top:4px" id="print-date"></div>
             <hr style="margin:16px 0;border:none;border-top:2px solid var(--border)">
           </div>
@@ -1097,7 +1097,7 @@
     const profile = await lfmAuth.requireRole('enseignant');
     if (!profile) return;
     _teacherProfile = profile;
-    document.title = 'Résultats — ' + profile.display_name + ' — LFM';
+    document.title = 'Résultats — ' + profile.display_name;
 
     try {
       _classes = await lfmTeacher.getClasses();
@@ -1479,7 +1479,7 @@
     const p     = new URLSearchParams(window.location.search);
     const cname = decodeURIComponent(p.get('cname') || (_currentClass?.name || 'Classe'));
     document.getElementById('print-title').textContent =
-      `Résultats — ${cname} — LFM`;
+      `Résultats — ${cname}`;
     document.getElementById('print-date').textContent =
       `Imprimé le ${new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}`;
     window.print();
@@ -1540,7 +1540,7 @@
     w.document.write(`<!DOCTYPE html>
 <html lang="fr"><head>
   <meta charset="UTF-8">
-  <title>${competence} — ${cname} — LFM</title>
+  <title>${competence} — ${cname}</title>
   <style>
     body  { font-family: system-ui, sans-serif; margin: 28px; color: #000; font-size: 11pt; }
     h1    { font-size: 15pt; color: #102B6A; margin: 0 0 2px; }

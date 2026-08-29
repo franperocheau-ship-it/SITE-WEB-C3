@@ -10,7 +10,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512x512.png?v=1">
   <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
   <link rel="manifest" href="site.webmanifest?v=1">
-  <title>Exercice — Français — Lycée Français de Madrid</title>
+  <title>Exercice — Français</title>
   <link rel="stylesheet" href="styles.css?v=13">
   <link rel="stylesheet" href="level-select.css?v=1">
   <link rel="stylesheet" href="breadcrumb.css?v=1">
@@ -20,6 +20,7 @@
   <script src="js/auth.js"></script>
   <script src="js/idle-logout.js"></script>
   <script src="js/text-to-speech.js?v=2"></script>
+  <script src="js/dictees-speech.js?v=6"></script>
   <script src="js/results.js"></script>
   <script src="js/guided-access.js?v=1"></script>
   <script src="js/niveau-mode.js?v=1"></script>
@@ -11097,21 +11098,16 @@
        Le nombre écrit est masqué : l'élève doit l'entendre pour raisonner.
        ════════════════════════════════════════════════════════════════════════ */
 
-    /* ── Lecture vocale via Web Speech API ────────────────────────────────── */
+    /* ── Lecture vocale via DicteesSpeech (js/dictees-speech.js) : même voix
+       et même contournement anti-troncature Chrome que les dictées préparées. */
     function vpSpeak(text, btnId) {
-      if (!window.speechSynthesis) return;
+      if (typeof DicteesSpeech === 'undefined') return;
       const btn = btnId ? document.getElementById(btnId) : null;
       if (btn) { btn.disabled = true; btn.classList.add('is-playing'); btn.textContent = '🔊 …'; }
-      speechSynthesis.cancel();
-      const utter  = new SpeechSynthesisUtterance(text);
-      utter.lang   = 'fr-FR';
-      utter.rate   = 0.82;
-      utter.pitch  = 1;
-      utter.onend  = () => {
+      DicteesSpeech.speak(text, () => {
         const b = btnId ? document.getElementById(btnId) : null;
         if (b) { b.textContent = '🔊 Ré-écouter'; b.disabled = false; b.classList.remove('is-playing'); }
-      };
-      speechSynthesis.speak(utter);
+      });
     }
 
     function vpStep2(card, item) {
