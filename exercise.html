@@ -1934,7 +1934,26 @@
       border-color: #15803d;
       cursor: default;
     }
-    .rfrac-part:disabled { cursor: default; }
+    .rfrac-part:disabled,
+    .rfrac-part.rfrac-part--disabled { cursor: default; }
+    .rfrac-circle-wrap { display: flex; justify-content: center; }
+    .rfrac-circle { max-width: 100%; height: auto; }
+    path.rfrac-part {
+      fill: #eff6ff;
+      stroke: #fff;
+      stroke-width: 2;
+      cursor: pointer;
+      transition: fill 140ms;
+    }
+    path.rfrac-part:hover:not(.rfrac-part--disabled) {
+      fill: #bfdbfe;
+    }
+    path.rfrac-part.is-colored {
+      fill: #3b82f6;
+    }
+    path.rfrac-part.is-ok {
+      fill: #16a34a;
+    }
     .rfrac-counter {
       text-align: center;
       font-size: 13px;
@@ -1971,6 +1990,55 @@
       color: var(--blue);
       min-height: 20px;
       margin-bottom: 16px;
+    }
+
+    /* ── Type : placer-fraction-droite-niveaux ───────────────────────────── */
+    .pfd-scroll-wrap {
+      overflow-x: auto;
+      padding: 8px 4px 12px;
+      margin-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .pfd-mn-row {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin: 20px 0 8px;
+    }
+    .pfd-mn-block { text-align: center; }
+    .pfd-mn-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--blue);
+      margin-bottom: 8px;
+    }
+    /* N'affiche jamais qu'une seule cible de placement à la fois — voir
+       pfdRenderMixed / updateProgress(). */
+    .pfd-placer-progress {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--blue);
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      margin: 18px auto 4px;
+      max-width: 360px;
+    }
+    /* Rappelle, dans la couleur de chaque point déjà posé, la fraction
+       correspondante — voir pfdRenderMixed / updateRecap(). */
+    .pfd-placed-recap {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px 16px;
+      margin: 14px 0 0;
+    }
+    .pfd-recap-item {
+      font-size: 14px;
+      font-weight: 800;
     }
 
     /* ── Type : comparer-fractions ───────────────────────────────────────── */
@@ -2035,13 +2103,6 @@
       letter-spacing: 0.08em;
       text-align: center;
       opacity: 0.7;
-    }
-    .cmp-counter {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
-      text-align: center;
-      min-height: 14px;
     }
     .cmp-side-feedback {
       font-size: 12px;
@@ -3040,10 +3101,15 @@
       line-height: 1;
     }
 
-    /* Champs numériques — communs aux 3 niveaux (format additif ou multiplicatif) */
+    /* Cases de décomposition — communes aux 3 niveaux. Les deux formats
+       (additif et multiplicatif) se présentent désormais comme une seule
+       ligne d'équation continue, terminée par "= {nombre cible}" : le
+       format additif n'affiche que des cases nues séparées par "+", le
+       multiplicatif enveloppe chaque case dans "( ? × N )" sur la même
+       ligne. Plus de label de position ni de sous-texte "× N" séparé. */
     .dni-fields-row {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       gap: 6px;
       flex-wrap: wrap;
       justify-content: center;
@@ -3054,13 +3120,6 @@
       flex-direction: column;
       align-items: center;
       gap: 5px;
-    }
-    .dni-field-label {
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
     }
     .dni-field-input {
       width: 68px;
@@ -3091,38 +3150,56 @@
       color: var(--red);
     }
     .dni-field-input:disabled { cursor: default; }
-    .dni-field-unit {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--muted);
-      white-space: nowrap;
-    }
     .dni-field-op {
       font-size: 22px;
       font-weight: 700;
       color: var(--muted);
-      padding-bottom: 20px;
       flex-shrink: 0;
     }
-    .dni-preview {
-      text-align: center;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--blue);
-      background: rgba(16,43,106,0.04);
-      border: 1.5px solid rgba(16,43,106,0.12);
-      border-radius: 10px;
-      padding: 11px 14px;
-      margin-bottom: 16px;
-      min-height: 42px;
-      display: flex;
+    .dni-eq-target {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+    /* Format multiplicatif : terme "( ? × N )" — case + puissance de 10
+       dans la même parenthèse, sur la ligne d'équation. */
+    .dni-mult-term {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      font-style: italic;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .dni-mult-paren {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .dni-mult-op {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .dni-mult-pow {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .dni-field-input--inline {
+      width: 56px;
+      height: 48px;
+      font-size: 22px;
     }
     @media (max-width: 600px) {
-      .dni-field-input { width: 52px; height: 52px; font-size: 22px; }
-      .dni-field-op    { font-size: 17px; padding-bottom: 16px; }
+      .dni-field-input   { width: 52px; height: 52px; font-size: 22px; }
+      .dni-field-op      { font-size: 17px; }
+      .dni-eq-target     { font-size: 22px; }
+      .dni-mult-term     { gap: 2px; }
+      .dni-mult-paren    { font-size: 20px; }
+      .dni-mult-op       { font-size: 15px; }
+      .dni-mult-pow      { font-size: 16px; }
+      .dni-field-input--inline { width: 44px; height: 40px; font-size: 18px; }
     }
 
     /* Niveau 3 — question piège Oui/Non */
@@ -3336,6 +3413,21 @@
       padding: 9px 14px;
       margin: 0 0 18px;
     }
+    .consigne-croissant,
+    .consigne-decroissant {
+      display: inline-block;
+      font-weight: 800;
+      padding: 1px 8px;
+      border-radius: 4px;
+    }
+    .consigne-croissant {
+      background: #DCEEFF;
+      color: #1A5FB4;
+    }
+    .consigne-decroissant {
+      background: #FFF3C4;
+      color: #8A6D00;
+    }
     .rni-bank {
       display: flex;
       flex-wrap: wrap;
@@ -3412,6 +3504,19 @@
       flex-shrink: 0;
       align-self: flex-end;
     }
+    .rni-arrow.consigne-croissant,
+    .rni-arrow.consigne-decroissant {
+      border-radius: 4px;
+      padding: 1px 6px 10px;
+    }
+    .rni-arrow.consigne-croissant {
+      background: #DCEEFF;
+      color: #1A5FB4;
+    }
+    .rni-arrow.consigne-decroissant {
+      background: #FFF3C4;
+      color: #8A6D00;
+    }
     .rni-score-row {
       font-size: 13px;
       font-weight: 600;
@@ -3456,6 +3561,41 @@
       border: 1.5px solid var(--border);
       margin-bottom: 20px;
       flex-wrap: wrap;
+    }
+    .eni-rang-dizaine,
+    .eni-rang-centaine,
+    .eni-rang-millier,
+    .eni-rang-dizaine-milliers,
+    .eni-rang-centaine-milliers,
+    .eni-rang-million {
+      display: inline-block;
+      font-weight: 800;
+      padding: 1px 8px;
+      border-radius: 4px;
+    }
+    .eni-rang-dizaine {
+      background: #DCEEFF;
+      color: #1A5FB4;
+    }
+    .eni-rang-centaine {
+      background: #EDE3FB;
+      color: #6B3FA0;
+    }
+    .eni-rang-millier {
+      background: #FFE9D6;
+      color: #B85C00;
+    }
+    .eni-rang-dizaine-milliers {
+      background: #FBE3EE;
+      color: #A03A6B;
+    }
+    .eni-rang-centaine-milliers {
+      background: #D9F7F1;
+      color: #0E7C6B;
+    }
+    .eni-rang-million {
+      background: #DCF5E3;
+      color: #1E7B3D;
     }
     .eni-bound-input {
       width: 140px;
@@ -5189,12 +5329,13 @@
       document.getElementById("exercise-screen").classList.add("ex-hidden");
       document.getElementById("results-screen").classList.add("ex-hidden");
 
-      const levels  = sessionData.levels || ["CM1", "CM2"];
+      const levels  = sessionData.levels || ["CM1", "CM2", "6e"];
       const descs   = {
         "CM1": "Fractions simples avec petits nombres",
-        "CM2": "Fractions variées, y compris supérieures à 1"
+        "CM2": "Fractions variées, y compris supérieures à 1",
+        "6e": "Dénominateurs moins courants, fractions supérieures à 1 avec plusieurs entiers"
       };
-      const diffMap = { "CM1": 1, "CM2": 2 };
+      const diffMap = { "CM1": 1, "CM2": 2, "6e": 3 };
 
       const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
       fracLevelSelect = LevelSelect.create({
@@ -5239,12 +5380,13 @@
       document.getElementById("exercise-screen").classList.add("ex-hidden");
       document.getElementById("results-screen").classList.add("ex-hidden");
 
-      const levels  = sessionData.levels || ["CM1", "CM2"];
+      const levels  = sessionData.levels || ["CM1", "CM2", "6e"];
       const descs   = {
         "CM1": "Fraction simple — la bande est partagée selon le dénominateur",
-        "CM2": "Partage différent — introduction aux fractions équivalentes"
+        "CM2": "Partage différent — introduction aux fractions équivalentes",
+        "6e": "Fractions supérieures à 1 avec un partage différent du dénominateur"
       };
-      const diffMap = { "CM1": 1, "CM2": 2 };
+      const diffMap = { "CM1": 1, "CM2": 2, "6e": 3 };
 
       const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
       rfLevelSelect = LevelSelect.create({
@@ -5354,7 +5496,7 @@
         threshold: 0.8,
         onSelectLevel: (l) => {
           cmpLevel = diffMap[l];
-          const filtered = sessionData.bank.filter(it => it.level === cmpLevel);
+          const filtered = sessionData.bank.filter(it => it.level === cmpLevel && !_cmpIsIdentical(it));
           questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
           currentIndex = 0;
           score        = 0;
@@ -5363,7 +5505,7 @@
           sessionLevelIdx    = levels.indexOf(l);
           sessionLevelLoader = (lv) => {
             cmpLevel = diffMap[lv];
-            const fq = sessionData.bank.filter(it => it.level === cmpLevel);
+            const fq = sessionData.bank.filter(it => it.level === cmpLevel && !_cmpIsIdentical(it));
             questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
             document.getElementById('q-total').textContent = questions.length;
             document.getElementById('ex-bar-fill').style.width = '0%';
@@ -6030,6 +6172,9 @@
       } else if (currentType === "droite-graduee-nombres-entiers-niveaux") {
         dgnInitSession();
         return;
+      } else if (currentType === "placer-fraction-droite-niveaux") {
+        pfdInitSession();
+        return;
       } else if (currentType === "arrondir-nombre-entier-niveaux") {
         aniInitSession();
         return;
@@ -6369,6 +6514,8 @@
         /* session managed by rniInitSession — no-op here */
       } else if (currentType === "droite-graduee-nombres-entiers-niveaux") {
         /* session managed by dgnInitSession — no-op here */
+      } else if (currentType === "placer-fraction-droite-niveaux") {
+        /* session managed by pfdInitSession — no-op here */
       } else if (currentType === "arrondir-nombre-entier-niveaux") {
         /* session managed by aniInitSession — no-op here */
       } else if (currentType === "arrondi-adapte-niveaux") {
@@ -8689,39 +8836,75 @@
       </span>`;
     }
 
+    /* Secteurs cliquables d'un disque (1 unité) — même logique d'angle
+       (2π/parts) et d'arc SVG que _fracCircle (lire-fraction, ci-dessus),
+       mais chaque secteur est un <path class="rfrac-part"> non pré-colorié :
+       coloriage/état gérés par les mêmes classes CSS que les bandes. */
+    function _rfracCircleUnit(partsPerStrip, stripIdx) {
+      const cx = 60, cy = 60, r = 54, W = 120, H = 120;
+      const step = (2 * Math.PI) / partsPerStrip;
+      let paths = '';
+      for (let p = 0; p < partsPerStrip; p++) {
+        const a1 = -Math.PI / 2 + step * p, a2 = a1 + step;
+        const x1 = (cx + r * Math.cos(a1)).toFixed(2), y1 = (cy + r * Math.sin(a1)).toFixed(2);
+        const x2 = (cx + r * Math.cos(a2)).toFixed(2), y2 = (cy + r * Math.sin(a2)).toFixed(2);
+        const lg = step > Math.PI ? 1 : 0;
+        paths += `<path class="rfrac-part" data-strip="${stripIdx}" data-part="${p}"
+                   d="M${cx},${cy} L${x1},${y1} A${r},${r},0,${lg},1,${x2},${y2} Z"></path>`;
+      }
+      paths += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1e40af" stroke-width="2"/>`;
+      return `<svg class="rfrac-circle" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${paths}</svg>`;
+    }
+
+    /* Une "unité" (= 1 entier) : bande de boutons en ligne, ou disque à
+       secteurs — même structure de retour (une chaîne HTML), consommée à
+       l'identique par le rendu principal ci-dessous. */
+    function _rfracUnitHtml(shape, partsPerStrip, stripIdx) {
+      if (shape === 'circle') {
+        return `<div class="rfrac-circle-wrap">${_rfracCircleUnit(partsPerStrip, stripIdx)}</div>`;
+      }
+      let partsHtml = '';
+      for (let p = 0; p < partsPerStrip; p++) {
+        partsHtml += `<button class="rfrac-part" data-strip="${stripIdx}" data-part="${p}"></button>`;
+      }
+      return `<div class="rfrac-strip">${partsHtml}</div>`;
+    }
+
     function renderRepresenterFraction(card, q) {
       const { numerator, denominator } = q;
-      const isLevel2      = q.level === 2;
-      const partsPerStrip = isLevel2 ? q.partitions : denominator;
-      const stripsCount   = isLevel2 ? 1 : Math.ceil(numerator / denominator);
-      const correctTotal  = isLevel2 ? (numerator * q.partitions / denominator) : numerator;
+      const partsPerStrip = q.level >= 2 ? q.partitions : denominator;
+      const stripsCount   = q.level === 2 ? 1 : Math.ceil(numerator / denominator);
+      const correctTotal  = q.partitions != null ? (numerator * q.partitions / denominator) : numerator;
 
       let colored = 0;
       let scored  = false;
 
-      /* Texte d'aide contextuel */
+      /* Texte d'aide contextuel — combine les deux messages quand les deux
+         conditions s'appliquent (Niveau 3 : partage différent ET plusieurs
+         unités). Vocabulaire (bande/disque) accordé à q.shape. */
+      const shapeWord    = q.shape === 'circle' ? 'disque' : 'bande';
+      const shapeArticle = q.shape === 'circle' ? 'Le' : 'La';
+      const shapePartage = q.shape === 'circle' ? 'partagé' : 'partagée';
       let hintHtml = '';
-      if (isLevel2) {
-        hintHtml = `<p class="rfrac-hint">La bande est partagée en <strong>${q.partitions} parts</strong> égales.</p>`;
-      } else if (stripsCount > 1) {
-        hintHtml = `<p class="rfrac-hint">Chaque bande représente 1 entier.</p>`;
+      if (q.partitions != null) {
+        hintHtml += `<p class="rfrac-hint">${shapeArticle} ${shapeWord} est ${shapePartage} en <strong>${q.partitions} parts</strong> égales.</p>`;
+      }
+      if (stripsCount > 1) {
+        hintHtml += `<p class="rfrac-hint">Chaque ${shapeWord} représente 1 entier.</p>`;
       }
 
-      /* Construction des bandes */
+      /* Construction des unités (bandes ou disques) */
       let stripsHtml = '';
       for (let s = 0; s < stripsCount; s++) {
-        let partsHtml = '';
-        for (let p = 0; p < partsPerStrip; p++) {
-          partsHtml += `<button class="rfrac-part" data-strip="${s}" data-part="${p}"></button>`;
-        }
+        const unitHtml = _rfracUnitHtml(q.shape, partsPerStrip, s);
         if (stripsCount > 1) {
           stripsHtml += `
             <div class="rfrac-unit">
-              <div class="rfrac-strip">${partsHtml}</div>
+              ${unitHtml}
               <div class="rfrac-unit-label">entier ${s + 1}</div>
             </div>`;
         } else {
-          stripsHtml += `<div class="rfrac-strip">${partsHtml}</div>`;
+          stripsHtml += unitHtml;
         }
       }
 
@@ -8746,6 +8929,13 @@
       const counterEl   = card.querySelector('#rfrac-counter');
       const validateBtn = card.querySelector('#rfrac-validate');
 
+      function setPartsDisabled(disabled) {
+        card.querySelectorAll('.rfrac-part').forEach(b => {
+          b.disabled = disabled;
+          b.classList.toggle('rfrac-part--disabled', disabled);
+        });
+      }
+
       card.querySelectorAll('.rfrac-part').forEach(btn => {
         btn.addEventListener('click', () => {
           if (btn.disabled) return;
@@ -8761,14 +8951,14 @@
       });
 
       function enableRetry() {
-        card.querySelectorAll('.rfrac-part').forEach(b => { b.disabled = false; });
+        setPartsDisabled(false);
         validateBtn.disabled = false;
         document.getElementById('feedback1').innerHTML = '';
       }
 
       validateBtn.addEventListener('click', () => {
         const isRight = colored === correctTotal;
-        card.querySelectorAll('.rfrac-part').forEach(b => { b.disabled = true; });
+        setPartsDisabled(true);
         validateBtn.disabled = true;
 
         if (isRight) {
@@ -8978,6 +9168,14 @@
       return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="max-width:100%;display:block">${s}</svg>`;
     }
 
+    /* Exclut les items où les deux fractions comparées sont une seule et
+       même écriture (même numérateur ET même dénominateur) : le cas
+       d'égalité doit toujours reposer sur des fractions équivalentes mais
+       écrites différemment (ex. 1/2 = 2/4), jamais sur une répétition. */
+    function _cmpIsIdentical(it) {
+      return it.left.num === it.right.num && it.left.den === it.right.den;
+    }
+
     function _cmpExplanation(left, right, answer) {
       const lh = _rfracHtml(left.num, left.den);
       const rh = _rfracHtml(right.num, right.den);
@@ -9009,7 +9207,6 @@
           <div class="cmp-side" id="cmp-left">
             <div style="margin-bottom:2px">${_rfracHtml(left.num, left.den)}</div>
             <div id="cmp-left-svg"></div>
-            <div class="cmp-counter" id="cmp-left-counter">0 / ${left.num} parts coloriées</div>
             <div class="cmp-side-feedback" id="cmp-left-fb"></div>
             <button class="ex-validate-btn" id="cmp-left-btn"
                     style="padding:10px 18px;font-size:13px;margin-top:2px">Valider</button>
@@ -9026,7 +9223,6 @@
           <div class="cmp-side cmp-side-locked" id="cmp-right">
             <div style="margin-bottom:2px">${_rfracHtml(right.num, right.den)}</div>
             <div id="cmp-right-svg"></div>
-            <div class="cmp-counter" id="cmp-right-counter">0 / ${right.num} parts coloriées</div>
             <div class="cmp-side-feedback" id="cmp-right-fb"></div>
             <button class="ex-validate-btn" id="cmp-right-btn"
                     style="padding:10px 18px;font-size:13px;margin-top:2px" disabled>Valider</button>
@@ -9048,8 +9244,6 @@
           wrap.querySelectorAll('[data-idx]').forEach(el =>
             el.addEventListener('click', () => {
               leftStates[parseInt(el.getAttribute('data-idx'), 10)] ^= true;
-              card.querySelector('#cmp-left-counter').textContent =
-                `${leftCount()} / ${left.num} parts coloriées`;
               card.querySelector('#cmp-left-fb').textContent = '';
               renderLeftSvg();
             })
@@ -9064,8 +9258,6 @@
           wrap.querySelectorAll('[data-idx]').forEach(el =>
             el.addEventListener('click', () => {
               rightStates[parseInt(el.getAttribute('data-idx'), 10)] ^= true;
-              card.querySelector('#cmp-right-counter').textContent =
-                `${rightCount()} / ${right.num} parts coloriées`;
               card.querySelector('#cmp-right-fb').textContent = '';
               renderRightSvg();
             })
@@ -9088,7 +9280,6 @@
         card.querySelector('#cmp-left-fb').textContent = '';
         card.querySelector('#cmp-left-btn').disabled = true;
         card.querySelector('#cmp-left-svg').innerHTML = _cmpPieSvgOk(left.den, left.num);
-        card.querySelector('#cmp-left-counter').textContent = `✓ ${left.num} / ${left.num}`;
         card.querySelector('#cmp-step-badge').textContent = 'Étape 2 / 3 — Colorie la fraction de droite';
         card.querySelector('#cmp-right').classList.remove('cmp-side-locked');
         card.querySelector('#cmp-right-btn').disabled = false;
@@ -9107,7 +9298,6 @@
         card.querySelector('#cmp-right-fb').textContent = '';
         card.querySelector('#cmp-right-btn').disabled = true;
         card.querySelector('#cmp-right-svg').innerHTML = _cmpPieSvgOk(right.den, right.num);
-        card.querySelector('#cmp-right-counter').textContent = `✓ ${right.num} / ${right.num}`;
         card.querySelector('#cmp-step-badge').textContent = 'Étape 3 / 3 — Quel est le bon signe ?';
         const signInp = card.querySelector('#cmp-sign');
         const signBtn = card.querySelector('#cmp-sign-btn');
@@ -21499,7 +21689,7 @@
     }
 
     function dniStartLevel(lv) {
-      const total = sessionData.itemsPerLevel || 8;
+      const total = sessionData.itemsPerLevel || 10;
       const qs = [];
       for (let i = 0; i < total; i++) qs.push(dniBuildItem(lv));
       dniState = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
@@ -21521,62 +21711,54 @@
     }
 
     /* ══════════════════════════════════════════════════════════════════
-       Cases de décomposition — communes aux 3 niveaux
-       Format additif       : chaque case attend la valeur totale du chiffre
-                               à sa position (ex. 3 000 pour les milliers).
-       Format multiplicatif : chaque case attend le chiffre brut, le
-                               multiplicateur de la position étant déjà donné.
+       Cases de décomposition — communes aux 3 niveaux. Les deux formats
+       rendent une équation à une seule ligne, terminée par "= {nombre
+       cible}" :
+       Format additif       : cases nues séparées par "+" — chaque case
+                               attend la valeur totale du chiffre à sa
+                               position (ex. 3 000 pour les milliers).
+       Format multiplicatif : chaque case est enveloppée dans "( ? × N )"
+                               sur la ligne — elle attend le chiffre brut,
+                               le multiplicateur de la position étant déjà
+                               indiqué dans la parenthèse.
     ══════════════════════════════════════════════════════════════════ */
 
     function dniRenderFields(card, q) {
-      const instruction = q.format === 'additive'
+      const isAdd = q.format === 'additive';
+      const instruction = isAdd
         ? 'Décompose ce nombre : trouve la valeur de chaque chiffre à sa position.'
         : 'Décompose ce nombre : trouve le chiffre de chaque position (le multiplicateur est déjà indiqué).';
       const boxesHtml = q.digits.map((d, i) => {
         const pos = q.positions[i];
         const op = i > 0 ? '<span class="dni-field-op">+</span>' : '';
-        const maxAttr = q.format === 'additive' ? 9 * pos.mult : 9;
-        return `${op}<div class="dni-field-wrap">
-          <span class="dni-field-label">${pos.name}</span>
-          <input type="number" class="dni-field-input" id="dni-box-${i}" min="0" max="${maxAttr}" placeholder="?" autocomplete="off">
-          <span class="dni-field-unit">× ${dniFmtVal(pos.mult)}</span>
-        </div>`;
+        if (isAdd) {
+          const maxAttr = 9 * pos.mult;
+          return `${op}<div class="dni-field-wrap"><input type="number" class="dni-field-input" id="dni-box-${i}" min="0" max="${maxAttr}" placeholder="?" autocomplete="off"></div>`;
+        }
+        return `${op}<span class="dni-mult-term">
+          <span class="dni-mult-paren">(</span>
+          <input type="number" class="dni-field-input dni-field-input--inline" id="dni-box-${i}" min="0" max="9" placeholder="?" autocomplete="off">
+          <span class="dni-mult-op">×</span>
+          <span class="dni-mult-pow">${dniFmtVal(pos.mult)}</span>
+          <span class="dni-mult-paren">)</span>
+        </span>`;
       }).join('');
+      const eqTail = `<span class="dni-field-op">=</span><span class="dni-eq-target">${q.display}</span>`;
 
       card.innerHTML = `
         <p class="ex-question-label">${instruction}</p>
         <div class="vp-number-display">${q.display}</div>
-        <div class="dni-fields-row">${boxesHtml}</div>
-        <div class="dni-preview" id="dni-preview">Remplis les cases pour voir l'équation</div>
+        <div class="dni-fields-row">${boxesHtml}${eqTail}</div>
         <div class="ex-feedback-area" id="dni-feedback"></div>
         <button class="ex-validate-btn" id="dni-validate-btn" style="width:100%;margin-top:16px">Vérifier</button>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
       `;
       q.digits.forEach((_, i) => {
         const el = document.getElementById('dni-box-' + i);
-        el.addEventListener('input', () => dniUpdatePreview(q));
         el.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('dni-validate-btn').click(); });
       });
       setTimeout(() => document.getElementById('dni-box-0')?.focus(), 50);
       document.getElementById('dni-validate-btn').addEventListener('click', () => dniOnValidate(q));
-      dniUpdatePreview(q);
-    }
-
-    function dniUpdatePreview(q) {
-      const preview = document.getElementById('dni-preview');
-      if (!preview) return;
-      const parts = q.digits.map((_, i) => {
-        const el = document.getElementById('dni-box-' + i);
-        const v = el ? el.value : '';
-        if (v === '') return null;
-        const n = parseInt(v, 10);
-        if (isNaN(n)) return null;
-        if (q.format === 'additive') {
-          return n !== 0 ? dniFmtVal(n) : null;
-        }
-        return `(${n} × ${dniFmtVal(q.positions[i].mult)})`;
-      }).filter(Boolean);
-      preview.textContent = parts.length ? parts.join(' + ') : 'Remplis les cases pour voir l\'équation';
     }
 
     function dniBuildEquation(q) {
@@ -21774,10 +21956,17 @@
 
     /* ══════════════════════════════════════════════════════════════════════
        TYPE : composer-nombre-entier-niveaux
-       Mathématiques — Composer un nombre à partir de sa décomposition, 3 niveaux
-       Niveau 1 (CM1) : décomposition canonique → 1 champ numérique
-       Niveau 2 (CM2) : somme de parties non canoniques → 1 champ numérique
-       Niveau 3 (6e)  : somme de produits avec grandes puissances → 1 champ numérique
+       Mathématiques — Composer un nombre à partir de sa décomposition, 3
+       niveaux. Sens inverse de decomposer-nombre-entier-niveaux, et
+       réutilise directement son moteur de génération procédurale
+       (dniGenerateDigits / DNI_POSITIONS / dniFmtVal, définis plus haut
+       dans ce même script) : mêmes règles de génération par niveau
+       (sessionData.genRules), même alternance additif/multiplicatif —
+       seule la présentation change, ici la décomposition est DONNÉE et
+       l'élève saisit le nombre qu'elle représente dans un champ unique.
+       Niveau 1 (CM1) : 3-4 chiffres, sans zéro
+       Niveau 2 (CM2) : 4-5 chiffres, avec un zéro non terminal obligatoire
+       Niveau 3 (6e)  : 5-6 chiffres
     ══════════════════════════════════════════════════════════════════════ */
 
     let cniState = null;
@@ -21785,10 +21974,27 @@
 
     const CNI_SEUIL = 0.80;
     const CNI_LV_DEFS = [
-      { lv: 1, desc: 'Décomposition canonique → 1 champ numérique' },
-      { lv: 2, desc: 'Somme de parties non canoniques → 1 champ numérique' },
-      { lv: 3, desc: 'Somme de produits avec grandes puissances → 1 champ numérique' }
+      { lv: 1, desc: 'Nombres à 3 ou 4 chiffres, sans zéro' },
+      { lv: 2, desc: 'Nombres à 4 ou 5 chiffres, avec un zéro intercalé' },
+      { lv: 3, desc: 'Nombres à 5 ou 6 chiffres' }
     ];
+
+    /* Décomposition additive : les termes à 0 sont omis (convention déjà
+       utilisée par decomposer-nombre-entier — ajouter 0 ne change rien à
+       la somme). Décomposition multiplicative : tous les termes sont
+       affichés, y compris "(0 × 100)", pour que l'élève rencontre bien la
+       position à zéro (obligatoire au niveau 2). */
+    function cniBuildItem(level) {
+      const digits = dniGenerateDigits(level);
+      const n = digits.length;
+      const value = digits.reduce((acc, d) => acc * 10 + d, 0);
+      const positions = digits.map((_, i) => DNI_POSITIONS[n - 1 - i]);
+      const format = Math.random() < 0.5 ? 'additive' : 'multiplicative';
+      const display = format === 'additive'
+        ? digits.map((d, i) => d !== 0 ? dniFmtVal(d * positions[i].mult) : null).filter(Boolean).join(' + ')
+        : digits.map((d, i) => `(${d} × ${dniFmtVal(positions[i].mult)})`).join(' + ');
+      return { display, value, format };
+    }
 
     function cniBackToSelectScreen() {
       cniState = null;
@@ -21821,10 +22027,9 @@
     }
 
     function cniStartLevel(lv) {
-      const pool = lv === 1 ? [...sessionData.lvl1]
-                 : lv === 2 ? [...sessionData.lvl2]
-                 : [...sessionData.lvl3];
-      const qs = shuffle(pool);
+      const total = sessionData.itemsPerLevel || 10;
+      const qs = [];
+      for (let i = 0; i < total; i++) qs.push(cniBuildItem(lv));
       cniState = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
@@ -21834,28 +22039,18 @@
     }
 
     function cniRenderQuestion() {
-      const { level, questions, idx, total } = cniState;
+      const { questions, idx, total } = cniState;
       const q = questions[idx];
       document.getElementById('q-num').textContent = idx + 1;
       document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
       const card = document.getElementById('ex-card');
-      if (level === 1)      cniRenderLvl1(card, q);
-      else if (level === 2) cniRenderLvl2(card, q);
-      else                  cniRenderLvl3(card, q);
+      cniRenderFields(card, q);
     }
 
-    /* ── Formatage nombre français (espace tous les 3 chiffres) ─────── */
-
-    function cniFmt(n) { return n.toLocaleString('fr-FR'); }
-
-    /* ══════════════════════════════════════════════════════════════════
-       NIVEAU 1 — décomposition canonique → trouver le nombre entier
-    ══════════════════════════════════════════════════════════════════ */
-
-    function cniRenderLvl1(card, q) {
+    function cniRenderFields(card, q) {
       card.innerHTML = `
         <p class="ex-question-label">Quel est le nombre entier correspondant à cette décomposition ?</p>
-        <div class="cni-decomp-display">${q.display}</div>
+        <div class="cni-decomp-display">${q.display} = ?</div>
         <div class="cni-input-wrap">
           <input type="number" class="cni-number-input" id="cni-answer"
                  placeholder="?" autocomplete="off" min="0">
@@ -21867,116 +22062,26 @@
       const inp = document.getElementById('cni-answer');
       inp.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('cni-validate-btn').click(); });
       setTimeout(() => inp.focus(), 50);
-      document.getElementById('cni-validate-btn').addEventListener('click', () => cniValidateLvl1(q));
+      document.getElementById('cni-validate-btn').addEventListener('click', () => cniValidateAnswer(q));
     }
 
-    function cniValidateLvl1(q) {
+    function cniValidateAnswer(q) {
       const inp = document.getElementById('cni-answer');
       if (inp.value === '') return;
       inp.disabled = true;
       document.getElementById('cni-validate-btn').disabled = true;
       const val     = parseInt(inp.value, 10);
-      const isRight = val === q.answer;
+      const isRight = val === q.value;
       inp.classList.add(isRight ? 'is-correct' : 'is-wrong');
+      const feedback = document.getElementById('cni-feedback');
       if (isRight) {
         cniState.score++;
-        const displayParen = q.display.split(' + ').map(t => `(${t})`).join(' + ');
-        document.getElementById('cni-feedback').innerHTML =
-          `<div class="ex-feedback-correct">✅ Bravo ! ${displayParen} = ${cniFmt(q.answer)}</div>`;
+        feedback.innerHTML = `<div class="ex-feedback-correct">✅ Bravo ! ${q.display} = ${dniFmtVal(q.value)}</div>`;
       } else {
-        const hint = [
-          q.mil ? `${q.mil} millier${q.mil > 1 ? 's' : ''} = ${cniFmt(q.mil * 1000)}` : null,
-          q.cen ? `${q.cen} centaine${q.cen > 1 ? 's' : ''} = ${cniFmt(q.cen * 100)}` : null,
-          q.diz ? `${q.diz} dizaine${q.diz > 1 ? 's' : ''} = ${cniFmt(q.diz * 10)}` : null,
-          q.uni ? `${q.uni} unité${q.uni > 1 ? 's' : ''} = ${q.uni}` : null
-        ].filter(Boolean).join(', ');
-        document.getElementById('cni-feedback').innerHTML =
-          `<div class="ex-feedback-wrong">❌ Recompte : ${hint}. Additionne !</div>`;
-      }
-      cniAdvance();
-    }
-
-    /* ══════════════════════════════════════════════════════════════════
-       NIVEAU 2 — somme de parties non canoniques → trouver le nombre entier
-    ══════════════════════════════════════════════════════════════════ */
-
-    function cniRenderLvl2(card, q) {
-      card.innerHTML = `
-        <p class="ex-question-label">Calcule le nombre entier correspondant à cette somme.</p>
-        <div class="cni-decomp-display">${q.display}</div>
-        <div class="cni-input-wrap">
-          <input type="number" class="cni-number-input" id="cni-answer"
-                 placeholder="?" autocomplete="off" min="0">
-        </div>
-        <div class="ex-feedback-area" id="cni-feedback"></div>
-        <button class="ex-validate-btn" id="cni-validate-btn" style="width:100%;margin-top:16px">Vérifier</button>
-        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
-      `;
-      const inp = document.getElementById('cni-answer');
-      inp.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('cni-validate-btn').click(); });
-      setTimeout(() => inp.focus(), 50);
-      document.getElementById('cni-validate-btn').addEventListener('click', () => cniValidateLvl2(q));
-    }
-
-    function cniValidateLvl2(q) {
-      const inp = document.getElementById('cni-answer');
-      if (inp.value === '') return;
-      inp.disabled = true;
-      document.getElementById('cni-validate-btn').disabled = true;
-      const val     = parseInt(inp.value, 10);
-      const isRight = val === q.answer;
-      inp.classList.add(isRight ? 'is-correct' : 'is-wrong');
-      if (isRight) {
-        cniState.score++;
-        const sorted = [...q.parts].sort((a, b) => b - a);
-        document.getElementById('cni-feedback').innerHTML =
-          `<div class="ex-feedback-correct">✅ Bravo ! ${sorted.map(cniFmt).join(' + ')} = ${cniFmt(q.answer)}</div>`;
-      } else {
-        document.getElementById('cni-feedback').innerHTML =
-          `<div class="ex-feedback-wrong">❌ La bonne réponse est <strong>${cniFmt(q.answer)}</strong>.<br>
-           Vérifie chaque terme : ${q.parts.map(cniFmt).join(' + ')} = ${cniFmt(q.answer)}</div>`;
-      }
-      cniAdvance();
-    }
-
-    /* ══════════════════════════════════════════════════════════════════
-       NIVEAU 3 — somme de produits avec grandes puissances → trouver le nombre entier
-    ══════════════════════════════════════════════════════════════════ */
-
-    function cniRenderLvl3(card, q) {
-      card.innerHTML = `
-        <p class="ex-question-label">Compose le nombre entier à partir de cette expression.</p>
-        <div class="cni-decomp-display">${q.display}</div>
-        <div class="cni-input-wrap">
-          <input type="number" class="cni-number-input" id="cni-answer"
-                 placeholder="?" autocomplete="off" min="0">
-        </div>
-        <div class="ex-feedback-area" id="cni-feedback"></div>
-        <button class="ex-validate-btn" id="cni-validate-btn" style="width:100%;margin-top:16px">Vérifier</button>
-        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
-      `;
-      const inp = document.getElementById('cni-answer');
-      inp.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('cni-validate-btn').click(); });
-      setTimeout(() => inp.focus(), 50);
-      document.getElementById('cni-validate-btn').addEventListener('click', () => cniValidateLvl3(q));
-    }
-
-    function cniValidateLvl3(q) {
-      const inp = document.getElementById('cni-answer');
-      if (inp.value === '') return;
-      inp.disabled = true;
-      document.getElementById('cni-validate-btn').disabled = true;
-      const val     = parseInt(inp.value, 10);
-      const isRight = val === q.answer;
-      inp.classList.add(isRight ? 'is-correct' : 'is-wrong');
-      if (isRight) {
-        cniState.score++;
-        document.getElementById('cni-feedback').innerHTML =
-          `<div class="ex-feedback-correct">✅ Bravo ! Le résultat est <strong>${cniFmt(q.answer)}</strong></div>`;
-      } else {
-        const nbChiffres = String(q.answer).length;
-        document.getElementById('cni-feedback').innerHTML =
-          `<div class="ex-feedback-wrong">❌ Pas tout à fait. Le résultat est un nombre à <strong>${nbChiffres} chiffre${nbChiffres > 1 ? 's' : ''}</strong>. Calcule chaque produit, puis additionne.</div>`;
+        feedback.innerHTML = `
+          <div class="ex-feedback-wrong">❌ Vérifie ton calcul.<br>
+            <strong>${q.display} = ${dniFmtVal(q.value)}</strong>
+          </div>`;
       }
       cniAdvance();
     }
@@ -22408,12 +22513,19 @@
       rniRenderCard(document.getElementById('ex-card'), q, level);
     }
 
+    function rniOrderWord(order) {
+      const cls = order === 'croissant' ? 'consigne-croissant' : 'consigne-decroissant';
+      return `<span class="${cls}">${order}</span>`;
+    }
+
     function rniRenderCard(card, q, lv) {
       const { score, idx } = rniState;
       const arrow = q.order === 'croissant' ? '&lt;' : '&gt;';
+      const arrowCls = q.order === 'croissant' ? 'consigne-croissant' : 'consigne-decroissant';
+      const orderWord = rniOrderWord(q.order);
       const orderLabel = q.order === 'croissant'
-        ? '⬆ Ordre croissant — du plus petit au plus grand'
-        : '⬇ Ordre décroissant — du plus grand au plus petit';
+        ? `⬆ Ordre ${orderWord} — du plus petit au plus grand`
+        : `⬇ Ordre ${orderWord} — du plus grand au plus petit`;
       const attemptsLabel = idx === 0
         ? 'Aucun essai pour l\'instant'
         : `${score} bonne${score !== 1 ? 's' : ''} sur ${idx} essai${idx !== 1 ? 's' : ''}`;
@@ -22425,7 +22537,7 @@
       ).join('');
 
       const slotsHtml = q.answer.map((_, i) =>
-        (i > 0 ? `<span class="rni-arrow">${arrow}</span>` : '') +
+        (i > 0 ? `<span class="rni-arrow ${arrowCls}">${arrow}</span>` : '') +
         `<div class="rni-slot-wrap">
           <div class="rni-slot-label">${rniOrdinal(i)}</div>
           <div class="rni-slot" data-idx="${i}" data-val="">&nbsp;</div>
@@ -22433,7 +22545,7 @@
       ).join('');
 
       card.innerHTML = `
-        <p class="ex-question-label">Range ces nombres dans l'ordre ${q.order}.</p>
+        <p class="ex-question-label">Range ces nombres dans l'ordre ${orderWord}.</p>
         <div class="rni-order-badge">${orderLabel}</div>
         <div class="ex-bank-label">Nombres à placer :</div>
         <div class="rni-bank" id="rni-bank">${bankHtml}</div>
@@ -22685,6 +22797,22 @@
       'million':              'au million près',
     };
 
+    const ENI_RANG_CLASS = {
+      'dizaine':              'eni-rang-dizaine',
+      'centaine':             'eni-rang-centaine',
+      'millier':              'eni-rang-millier',
+      'dizaine de milliers':  'eni-rang-dizaine-milliers',
+      'centaine de milliers': 'eni-rang-centaine-milliers',
+      'million':              'eni-rang-million',
+    };
+
+    function eniRangHighlight(rang) {
+      const article = ENI_RANG_ARTICLE[rang] || rang;
+      const cls = ENI_RANG_CLASS[rang];
+      if (!cls) return article;
+      return article.replace(/^(.*) près$/, (m, phrase) => `<span class="${cls}">${phrase}</span> près`);
+    }
+
     const ENI_RANG_TIP = {
       'dizaine':              'Pour encadrer à la dizaine près, on cherche la dizaine juste en dessous et la dizaine juste au-dessus.',
       'centaine':             'Pour encadrer à la centaine près, on cherche la centaine juste en dessous et la centaine juste au-dessus.',
@@ -22787,7 +22915,7 @@
       const attemptsLabel = idx === 0
         ? 'Aucun essai pour l\'instant'
         : `${score} bonne${score !== 1 ? 's' : ''} sur ${idx} essai${idx !== 1 ? 's' : ''}`;
-      const article = ENI_RANG_ARTICLE[q.rang] || q.rang;
+      const article = eniRangHighlight(q.rang);
       card.innerHTML = `
         <p class="ex-question-label">Encadre ${q.display} ${article}</p>
         <div class="eni-bracket-row">
@@ -23334,6 +23462,580 @@
         exerciseSlug: slug, subject, category,
         exerciseType: 'droite-graduee-nombres-entiers-niveaux',
         level:        'Niveau ' + level,
+        score:        s20,
+        total:        20,
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       TYPE : placer-fraction-droite-niveaux
+       Mathématiques — Placer une fraction sur une droite graduée, 3 niveaux
+       Génération procédurale (sessionData.genRules) : aucune banque fixe,
+       chaque tentative tire de nouveaux items — même logique que
+       decomposer-nombre-entier-niveaux / composer-nombre-entier-niveaux.
+       Chaque item est un exercice complet à plusieurs sous-réponses (pas une
+       fraction isolée) ; le score de niveau agrège les sous-réponses de
+       tous les items, pas un tout-ou-rien par item.
+       Les 3 niveaux réutilisent le même mécanisme à deux volets (jamais de
+       glisser-déposer entre étiquettes : chaque fraction exige une vraie
+       lecture individuelle de la droite, sans comparaison relative possible) :
+         - repérer : une graduation est déjà marquée → l'élève saisit
+           numérateur/dénominateur dans deux champs.
+         - placer  : une fraction est donnée → clic séquentiel sur la
+           droite pour poser le point (une seule cible affichée à la fois).
+       Niveau 1 : 1 dénominateur, 1 placer seul (pas de repérer), droite
+                  fixe de 0 à 3 (l'élève doit comparer sa fraction à 1,
+                  pas déduire la réponse de la longueur de la droite).
+       Niveau 2 : dénominateurs mixtes, 1 repérer + 1 placer.
+       Niveau 3 : uniquement du placement (pas de repérer), 4 points A-D à
+                  couleurs distinctes aléatoires ; droite à un seul pas fixe
+                  (gridDenom) mais une partie des fractions à placer ont un
+                  dénominateur différent — toujours diviseur de gridDenom,
+                  donc exact sur cette graduation (ex. 2/3 sur une droite en
+                  sixièmes → 4/6) : force le raisonnement en fractions
+                  équivalentes plutôt qu'un comptage de graduations.
+    ══════════════════════════════════════════════════════════════════════ */
+
+    let pfdState = null;
+    let pfdLevelSelect = null;
+
+    const PFD_SEUIL = 0.80;
+    const PFD_LV_DEFS = [
+      { lv: 1, desc: 'Un dénominateur — placer une fraction sur la droite' },
+      { lv: 2, desc: 'Dénominateurs mixtes — repérer une graduation, placer une fraction' },
+      { lv: 3, desc: 'Placer 4 fractions, dont certaines en dénominateur équivalent' }
+    ];
+
+    function pfdRandInt(min, max) {
+      return min + Math.floor(Math.random() * (max - min + 1));
+    }
+
+    function pfdGcd(a, b) { return b === 0 ? a : pfdGcd(b, a % b); }
+    function pfdLcm(a, b) { return (a * b) / pfdGcd(a, b); }
+    function pfdLcmAll(arr) { return arr.reduce((acc, v) => pfdLcm(acc, v), 1); }
+
+    /* Tire `count` fractions distinctes (par position sur la grille au pas
+       1/gridDenom) parmi les dénominateurs de denomSet, en imposant un
+       écart minimal `minGap` (en ticks) entre deux positions pour éviter
+       que deux points se chevauchent visuellement. `maxWhole` borne le
+       numérateur tiré à den*maxWhole-1, donc la valeur de la fraction
+       reste strictement inférieure à maxWhole unités. */
+    function pfdBuildDenomFractions(denomSet, count, minGap, maxWhole = 4) {
+      const gridDenom = pfdLcmAll(denomSet);
+      const accepted  = [];
+      let guard = 0;
+      while (accepted.length < count && guard < 500) {
+        guard++;
+        const den     = rand(denomSet);
+        const num     = pfdRandInt(1, den * maxWhole - 1);
+        const tickIdx = num * (gridDenom / den);
+        if (accepted.some(a => Math.abs(a.tickIdx - tickIdx) < minGap)) continue;
+        accepted.push({ num, den, tickIdx });
+      }
+      while (accepted.length < count) {
+        const den     = rand(denomSet);
+        const num     = pfdRandInt(1, den * maxWhole - 1);
+        const tickIdx = num * (gridDenom / den);
+        if (accepted.some(a => a.tickIdx === tickIdx)) continue;
+        accepted.push({ num, den, tickIdx });
+      }
+      return { gridDenom, fractions: accepted };
+    }
+
+    const PFD_REPER_LETTERS  = ['M', 'N'];
+    const PFD_PLACER_LETTERS = ['A', 'B', 'C', 'D'];
+    /* Couleurs distinctes assignées aléatoirement aux points « placer »
+       quand il y en a plusieurs dans le même item (niveau 3) — servent
+       uniquement à distinguer les points entre eux, jamais à indiquer leur
+       position/valeur correcte (même piège que l'ancien glisser-déposer
+       niveau 1/2, déjà corrigé). Avec un seul point (niveau 1/2), on garde
+       la couleur turquoise historique. */
+    const PFD_PLACER_COLORS   = ['#F5A623', '#7C3AED', '#2563EB', '#DB2777', '#0E9488', '#C2410C'];
+    const PFD_PLACER_SINGLE_COLOR = '#1DBFA0';
+
+    function pfdProperDivisors(n) {
+      const divs = [];
+      for (let d = 2; d < n; d++) if (n % d === 0) divs.push(d);
+      return divs;
+    }
+
+    /* Item générique à deux volets : numReperer fractions déjà marquées à
+       lire, numPlacer fractions à placer par clic. Utilisé par les 3
+       niveaux (0+1 pour niveau 1, 1+1 pour niveau 2, 0+4 pour niveau 3).
+       `fixedMaxUnits`, quand fourni, impose la longueur de la droite au
+       lieu de la calculer depuis la valeur max générée (niveau 1 : droite
+       toujours affichée de 0 à 3, pour que l'élève doive comparer sa
+       fraction à 1 plutôt que de lire la réponse dans la longueur de la
+       droite). */
+    function pfdBuildMixedItem(denomSet, numReperer, numPlacer, { maxWhole = 4, fixedMaxUnits = null } = {}) {
+      const { gridDenom, fractions } = pfdBuildDenomFractions(denomSet, numReperer + numPlacer, 2, maxWhole);
+      const maxUnits = fixedMaxUnits != null
+        ? fixedMaxUnits
+        : Math.max(1, Math.ceil(Math.max(...fractions.map(f => f.num / f.den))));
+      const reperer = fractions.slice(0, numReperer).map((f, i) => ({ ...f, letter: PFD_REPER_LETTERS[i] }));
+      const placerColors = numPlacer > 1 ? shuffle(PFD_PLACER_COLORS).slice(0, numPlacer) : [PFD_PLACER_SINGLE_COLOR];
+      const placer = fractions.slice(numReperer).map((f, i) => ({ ...f, letter: PFD_PLACER_LETTERS[i], color: placerColors[i] }));
+      return { kind: 'mixed', gridDenom, maxUnits, reperer, placer };
+    }
+
+    /* Droite fixe de 0 à 3 (pédagogie : l'élève doit se demander si sa
+       fraction est < ou > 1 sur une droite plus longue que nécessaire,
+       plutôt que la longueur de la droite ne trahisse la réponse). */
+    function pfdBuildLevel1Item(rules) {
+      return pfdBuildMixedItem([rand(rules.denominators)], 0, 1, { maxWhole: 3, fixedMaxUnits: 3 });
+    }
+
+    function pfdBuildLevel2Item(rules) {
+      return pfdBuildMixedItem(rand(rules.denominatorSets), 1, 1);
+    }
+
+    /* Niveau 3 — uniquement du placement (pas de repérer), 4 points A-D.
+       Difficulté : la droite est graduée à un seul pas fixe (gridDenom,
+       ex. sixièmes), et une partie des fractions à placer ont un
+       dénominateur différent — mais toujours diviseur de gridDenom, donc
+       toujours représentable exactement sur cette graduation (ex. 2/3 sur
+       une droite en sixièmes → 4/6). Force un raisonnement en fractions
+       équivalentes plutôt qu'un simple comptage de graduations. */
+    function pfdBuildLevel3Item(rules) {
+      const gridDenom = rand(rules.gridDenoms);
+      const divisors  = pfdProperDivisors(gridDenom);
+      const extra     = shuffle(divisors).slice(0, Math.min(2, divisors.length));
+      const denomSet  = [gridDenom, ...extra];
+      /* maxWhole:3 borne totalIntervals = maxUnits*gridDenom (≤ 3*12 = 36
+         avec le pool actuel) pour que le tracé reste lisible une fois
+         réduit à la largeur de la carte par max-width:100% — un gridDenom
+         élevé (ex. 24) combiné à maxUnits=4 produisait un mur de traits
+         collés (mesuré ~8px d'écart à l'écran, illisible). */
+      return pfdBuildMixedItem(denomSet, 0, 4, { maxWhole: 3 });
+    }
+
+    function pfdBuildItems(level) {
+      const rules = sessionData.genRules[level];
+      const total = sessionData.itemsPerLevel || 10;
+      const builder = level === 1 ? pfdBuildLevel1Item : level === 2 ? pfdBuildLevel2Item : pfdBuildLevel3Item;
+      return Array.from({ length: total }, () => builder(rules));
+    }
+
+    /* ── SVG des niveaux 1-3 — droite + points repérer fixes (optionnel) +
+       points placer (couleurs distinctes) ──────────────────────────────── */
+    /* Retourne { svg, padL, tickSpacing, totalIntervals, W } — la géométrie
+       est réutilisée par pfdRenderMixed pour convertir une position pointeur
+       en index de graduation (pas de zones de clic étroites par graduation :
+       toute la largeur de la droite capture le geste et snap sur la
+       graduation la plus proche, cf. pfdRenderMixed). */
+    function pfdBuildMixedSvg(q, placedIdx, results) {
+      const { gridDenom, maxUnits, reperer, placer } = q;
+      const totalIntervals = maxUnits * gridDenom;
+      const totalTicks     = totalIntervals + 1;
+      const tickSpacing    = Math.max(20, Math.min(44, Math.floor(560 / totalIntervals)));
+      const padL = 30, padR = 50;
+      const lineWidth = totalIntervals * tickSpacing;
+      const W = lineWidth + padL + padR;
+      const H = 130;
+      const lineY = 60;
+
+      let s = '';
+      s += `<line x1="${padL}" y1="${lineY}" x2="${padL + lineWidth + 8}" y2="${lineY}"
+             stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>`;
+      s += `<polygon points="${padL + lineWidth + 16},${lineY} ${padL + lineWidth + 6},${lineY - 5} ${padL + lineWidth + 6},${lineY + 5}" fill="#94a3b8"/>`;
+
+      for (let i = 0; i < totalTicks; i++) {
+        const x       = padL + i * tickSpacing;
+        const isMajor = i % gridDenom === 0;
+        const tH      = isMajor ? 16 : 9;
+        s += `<line x1="${x}" y1="${lineY - tH / 2}" x2="${x}" y2="${lineY + tH / 2}"
+               stroke="${isMajor ? '#102b6a' : '#94a3b8'}" stroke-width="${isMajor ? 2 : 1.2}"/>`;
+        if (isMajor) {
+          s += `<text x="${x}" y="${lineY + 13 + 14}" text-anchor="middle" font-family="sans-serif"
+                 font-size="13" font-weight="700" fill="#102b6a">${i / gridDenom}</text>`;
+        }
+      }
+
+      /* Zone de capture unique sur toute la largeur/hauteur du SVG — pas de
+         zone étroite par graduation. */
+      if (!results) {
+        s += `<rect class="pfd-mixed-capture" x="0" y="0" width="${W}" height="${H}" fill="transparent" style="cursor:pointer"/>`;
+      }
+
+      function drawPoint(x, letter, color) {
+        s += `<circle cx="${x}" cy="${lineY}" r="7" fill="${color}" stroke="white" stroke-width="2"/>`;
+        s += `<text x="${x}" y="${lineY - 14}" text-anchor="middle" font-family="Fredoka,sans-serif"
+               font-size="14" font-weight="800" fill="${color}">${letter}</text>`;
+      }
+
+      reperer.forEach(r => drawPoint(padL + r.tickIdx * tickSpacing, r.letter, '#F5A623'));
+      placer.forEach((p, i) => {
+        if (placedIdx[i] == null) return;
+        const x      = padL + placedIdx[i] * tickSpacing;
+        const isDone = results ? results[i] : null;
+        const color  = isDone === true ? '#16a34a' : isDone === false ? '#dc2626' : p.color;
+        drawPoint(x, p.letter, color);
+        if (isDone === false) {
+          const cx = padL + p.tickIdx * tickSpacing;
+          s += `<circle cx="${cx}" cy="${lineY}" r="5" fill="none" stroke="#16a34a" stroke-width="2" stroke-dasharray="2,2"/>`;
+        }
+        /* Zone de préhension large (bien plus que le point visible) pour
+           reprendre et déplacer un point déjà posé, tant que non validé. */
+        if (!results) {
+          s += `<circle class="pfd-point-hit" data-letter-idx="${i}" cx="${x}" cy="${lineY}"
+                 r="18" fill="transparent" style="cursor:grab"/>`;
+        }
+      });
+
+      const svg = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"
+               style="display:block;max-width:100%;overflow:visible;touch-action:pan-x">${s}</svg>`;
+      return { svg, padL, tickSpacing, totalIntervals, W };
+    }
+
+    function pfdJoinLetters(letters) {
+      if (letters.length <= 1) return letters.join('');
+      return letters.slice(0, -1).join(', ') + ' et ' + letters[letters.length - 1];
+    }
+
+    function pfdRenderMixed(card, q) {
+      const { reperer, placer } = q;
+      const n = reperer.length + placer.length;
+      const placedIdx = Array(placer.length).fill(null);
+      let answered = false;
+      let geo = null;          /* dernière géométrie SVG renvoyée par pfdBuildMixedSvg */
+      let dragLetterIdx = null; /* index (dans placer[]) en cours de glisser, ou null */
+
+      const reperLetters  = reperer.map(r => r.letter);
+      const placerLetters = placer.map(p => p.letter);
+      const placerClause  = `${placer.length > 1 ? 'Place les points' : 'Place le point'} ${pfdJoinLetters(placerLetters)}.`;
+      const instruction = reperer.length > 0
+        ? `Lis l'abscisse ${reperer.length > 1 ? 'des points' : 'du point'} ${pfdJoinLetters(reperLetters)}, puis ${placerClause.charAt(0).toLowerCase()}${placerClause.slice(1)}`
+        : placerClause;
+
+      card.innerHTML = `
+        <p class="ex-question-label">${instruction}</p>
+        <div class="pfd-scroll-wrap" id="pfd-svg-wrap"></div>
+
+        ${reperer.length > 0 ? `
+        <div class="pfd-mn-row">
+          ${reperer.map(r => `
+            <div class="pfd-mn-block">
+              <div class="pfd-mn-label">Abscisse de ${r.letter}</div>
+              <div class="frac-input-area">
+                <input type="text" inputmode="numeric" class="frac-field" id="pfd-mn-num-${r.letter}"
+                       maxlength="3" placeholder="?" autocomplete="off" autocorrect="off" spellcheck="false">
+                <div class="frac-divider"></div>
+                <input type="text" inputmode="numeric" class="frac-field" id="pfd-mn-den-${r.letter}"
+                       maxlength="3" placeholder="?" autocomplete="off" autocorrect="off" spellcheck="false">
+              </div>
+            </div>
+          `).join('')}
+        </div>` : ''}
+
+        <div class="pfd-placed-recap" id="pfd-placed-recap"></div>
+        <p class="pfd-placer-progress" id="pfd-placer-progress"></p>
+
+        <div class="rfrac-validate-row">
+          <button class="ex-validate-btn" id="pfd-validate" disabled>Valider</button>
+        </div>
+        <div class="ex-feedback-area" id="pfd-feedback"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      /* svgWrap est un conteneur stable : seul son innerHTML est remplacé à
+         chaque tracé (draw()), jamais le noeud lui-même — les écouteurs
+         posés une seule fois ci-dessous sur svgWrap survivent donc à tous
+         les redessins, y compris pendant un glisser en cours (cf. le
+         mécanisme équivalent de placer-decimaux-droite-niveaux, qui pose
+         ses écouteurs sur le wrapper #pd-numlineOuter et non sur le <svg>
+         recréé à chaque rendu). */
+      const svgWrap    = card.querySelector('#pfd-svg-wrap');
+      const vBtn       = card.querySelector('#pfd-validate');
+      const progressEl = card.querySelector('#pfd-placer-progress');
+      const recapEl    = card.querySelector('#pfd-placed-recap');
+      const inputs     = reperer.map(r => [
+        card.querySelector(`#pfd-mn-num-${r.letter}`),
+        card.querySelector(`#pfd-mn-den-${r.letter}`)
+      ]);
+
+      function nextPendingIdx() { return placedIdx.findIndex(v => v == null); }
+
+      /* Cible d'un clic/tap sur une zone vide de la droite : la prochaine
+         lettre non placée, ou — une fois tout placé — la dernière lettre
+         touchée, pour qu'un simple nouveau clic n'importe où continue de
+         corriger un point sans avoir à viser précisément son petit rond
+         (le grab direct sur .pfd-point-hit reste possible pour ajuster une
+         lettre plus ancienne que la dernière). */
+      function activeIdx() {
+        const pending = nextPendingIdx();
+        return pending !== -1 ? pending : placer.length - 1;
+      }
+
+      /* N'affiche jamais la liste complète des cibles à placer — seule la
+         cible en cours est visible, pour forcer une lecture graduation par
+         graduation plutôt qu'un repérage de l'ordre gauche-droite. */
+      function updateProgress() {
+        const pending = nextPendingIdx();
+        if (pending !== -1) {
+          const p = placer[pending];
+          progressEl.innerHTML = `Point à placer : <strong>${p.letter}</strong> d'abscisse ${p.num}/${p.den}`;
+        } else {
+          progressEl.textContent = '✓ Tous les points sont placés — tu peux encore les ajuster avant de valider.';
+        }
+      }
+
+      /* Sous la droite, rappelle en couleur la fraction de chaque point déjà
+         posé (couleur = celle du point) — pas les cibles pas encore
+         placées. */
+      function updateRecap() {
+        const items = placer
+          .map((p, i) => (placedIdx[i] != null
+            ? `<span class="pfd-recap-item" style="color:${p.color}">${p.letter} : ${p.num}/${p.den}</span>`
+            : null))
+          .filter(Boolean);
+        recapEl.innerHTML = items.join('');
+        recapEl.style.display = items.length ? '' : 'none';
+      }
+
+      function checkFilled() {
+        const mnFilled   = inputs.every(([nI, dI]) => nI.value.trim() && dI.value.trim());
+        const allPlaced  = placedIdx.every(v => v != null);
+        vBtn.disabled = !(mnFilled && allPlaced);
+      }
+
+      function draw(resultMap) {
+        const built = pfdBuildMixedSvg(q, placedIdx, resultMap || null);
+        geo = built;
+        svgWrap.innerHTML = built.svg;
+      }
+
+      /* Convertit une position pointeur (client) en index de graduation —
+         snap systématique au plus proche : toute la largeur du SVG capture
+         le geste, pas de zone étroite par graduation. */
+      function tickIdxFromClientX(clientX) {
+        const svgEl = svgWrap.querySelector('svg');
+        const rect  = svgEl.getBoundingClientRect();
+        const scale = geo.W / rect.width;
+        const x     = (clientX - rect.left) * scale;
+        const raw   = Math.round((x - geo.padL) / geo.tickSpacing);
+        return Math.max(0, Math.min(geo.totalIntervals, raw));
+      }
+
+      svgWrap.addEventListener('pointerdown', evt => {
+        if (answered) return;
+        const hit = evt.target.closest('.pfd-point-hit');
+        if (hit) {
+          dragLetterIdx = parseInt(hit.dataset.letterIdx, 10);
+        } else if (evt.target.closest('.pfd-mixed-capture')) {
+          dragLetterIdx = activeIdx();
+        } else {
+          return;
+        }
+        evt.preventDefault();
+        svgWrap.setPointerCapture(evt.pointerId);
+        placedIdx[dragLetterIdx] = tickIdxFromClientX(evt.clientX);
+        draw();
+        updateProgress();
+        updateRecap();
+        checkFilled();
+      });
+
+      svgWrap.addEventListener('pointermove', evt => {
+        if (dragLetterIdx == null || answered) return;
+        evt.preventDefault();
+        placedIdx[dragLetterIdx] = tickIdxFromClientX(evt.clientX);
+        draw();
+        updateProgress();
+        updateRecap();
+        checkFilled();
+      });
+
+      const endDrag = () => { dragLetterIdx = null; };
+      svgWrap.addEventListener('pointerup', endDrag);
+      svgWrap.addEventListener('pointercancel', endDrag);
+
+      draw();
+      updateProgress();
+      updateRecap();
+
+      inputs.forEach(([nI, dI]) => { nI.addEventListener('input', checkFilled); dI.addEventListener('input', checkFilled); });
+
+      vBtn.addEventListener('click', () => {
+        if (answered || vBtn.disabled) return;
+        answered = true;
+        inputs.forEach(([nI, dI]) => { nI.disabled = true; dI.disabled = true; });
+        vBtn.disabled = true;
+
+        let correct = 0;
+        reperer.forEach((r, i) => {
+          const [nInp, dInp] = inputs[i];
+          const numVal = parseInt(nInp.value.trim(), 10);
+          const denVal = parseInt(dInp.value.trim(), 10);
+          const ok = Number.isInteger(numVal) && Number.isInteger(denVal) && numVal > 0 && denVal > 0 && numVal * r.den === denVal * r.num;
+          nInp.classList.add(ok ? 'is-correct' : 'is-wrong');
+          dInp.classList.add(ok ? 'is-correct' : 'is-wrong');
+          if (ok) correct++;
+        });
+        const placerResults = placer.map((p, i) => placedIdx[i] === p.tickIdx);
+        correct += placerResults.filter(Boolean).length;
+
+        draw(placerResults);
+
+        pfdState.subCorrect += correct;
+        pfdState.subTotal   += n;
+
+        if (correct === n) {
+          setFeedback('pfd-feedback', `<div class="ex-feedback-correct">✅ Bravo ! Tout est correct.</div>`);
+        } else {
+          const wrongPlacer = placer.filter((p, i) => !placerResults[i]);
+          const hint = wrongPlacer.length
+            ? ` Point(s) mal placé(s) : ${wrongPlacer.map(p => `${p.letter} (${p.num}/${p.den})`).join(', ')}.`
+            : '';
+          setFeedback('pfd-feedback', `<div class="ex-feedback-wrong">${correct} / ${n} bonnes réponses.${hint}</div>`);
+        }
+        pfdAdvance();
+      });
+    }
+
+    function pfdAdvance() {
+      const { idx, total } = pfdState;
+      const isLast  = idx === total - 1;
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.textContent = isLast ? 'Voir mes résultats' : 'Exercice suivant →';
+      nextBtn.classList.remove('ex-hidden');
+      nextBtn.onclick = () => {
+        pfdState.idx++;
+        if (pfdState.idx >= total) {
+          pfdShowLevelResults();
+        } else {
+          pfdRenderQuestion();
+          document.getElementById('ex-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      };
+    }
+
+    function pfdRenderQuestion() {
+      const { questions, idx, total } = pfdState;
+      const q = questions[idx];
+      document.getElementById('q-num').textContent       = idx + 1;
+      document.getElementById('ex-bar-fill').style.width = (idx / total * 100) + '%';
+      const card = document.getElementById('ex-card');
+      pfdRenderMixed(card, q);
+    }
+
+    function pfdStartLevel(lv) {
+      const qs = pfdBuildItems(lv);
+      pfdState = { level: lv, questions: qs, idx: 0, total: qs.length, subCorrect: 0, subTotal: 0 };
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.remove('ex-hidden');
+      document.getElementById('q-total').textContent = qs.length;
+      if (pfdLevelSelect) pfdLevelSelect.renderBadges(lv);
+      pfdRenderQuestion();
+    }
+
+    function pfdBackToSelectScreen() {
+      pfdState = null;
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+    }
+
+    function pfdInitSession() {
+      pfdState = null;
+      sessionStartTime = Date.now();
+      document.getElementById('results-screen').classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-type-back-btn').classList.add('ex-hidden');
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
+      pfdLevelSelect = LevelSelect.create({
+        exerciseKey: slug,
+        levels: PFD_LV_DEFS.map(d => ({ id: d.lv, label: 'Niveau ' + d.lv, description: d.desc })),
+        threshold: PFD_SEUIL,
+        onSelectLevel: (lv) => pfdStartLevel(parseInt(lv, 10)),
+        selectContainer: document.getElementById('ex-card'),
+        badgesContainer: document.getElementById('ex-badges'),
+        onBackToSelect: pfdBackToSelectScreen
+      });
+      pfdLevelSelect.renderSelectScreen();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function pfdShowLevelResults() {
+      const { level, subCorrect, subTotal } = pfdState;
+      const s20   = subTotal > 0 ? Math.round(subCorrect / subTotal * 20) : 0;
+      const stars = s20 >= 16 ? ' 🌟🌟🌟' : s20 >= 10 ? ' ⭐⭐' : ' ⭐';
+
+      const { passed, isLast } = pfdLevelSelect.completeLevel(level, subCorrect, subTotal);
+
+      const prog = document.querySelector('#exercise-screen .ex-progress');
+      if (prog) prog.classList.add('ex-hidden');
+      document.getElementById('exercise-screen').classList.add('ex-hidden');
+      document.getElementById('results-screen').classList.remove('ex-hidden');
+      document.getElementById('ex-bar-fill').style.width = '100%';
+
+      document.getElementById('score-value').textContent = subCorrect + ' / ' + subTotal;
+      document.getElementById('score-pct').textContent   = Math.round(subCorrect / subTotal * 100) + ' %';
+
+      const backHref = sessionData.backLink?.href || 'mathématiques-fractions.html';
+      const backToSelectBtn = pfdLevelSelect.backToSelectButtonHTML();
+      let msg, btnsHTML;
+
+      if (passed && isLast) {
+        msg = `🎊 Bravo ! Tu maîtrises le placement de fractions sur une droite graduée aux 3 niveaux !${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="pfd-restart-btn">Recommencer</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      } else if (passed) {
+        msg = `Niveau ${level} validé !${stars} 🏆 Le Niveau ${level + 1} est débloqué !`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="pfd-next-btn">Niveau ${level + 1} →</button>
+            <button class="ex-btn-secondary" id="pfd-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+          </div>
+          <a href="${backHref}" class="ex-results-back-link">← Retour aux notions</a>`;
+      } else {
+        const needed = Math.ceil(subTotal * PFD_SEUIL);
+        msg = `Pas encore… il faut ${needed} / ${subTotal} bonnes réponses pour valider ce niveau. On réessaie ?${stars}`;
+        btnsHTML = `
+          <div class="ex-results-btns">
+            <button class="ex-btn-primary" id="pfd-retry-btn">Recommencer ce niveau</button>
+            ${backToSelectBtn}
+            <a href="${backHref}" class="ex-btn-secondary">← Retour aux notions</a>
+          </div>`;
+      }
+
+      document.getElementById('score-msg').textContent          = msg;
+      document.getElementById('ex-results-btns-wrap').innerHTML = btnsHTML;
+
+      document.getElementById('pfd-retry-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        pfdStartLevel(level);
+      });
+      document.getElementById('pfd-next-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        pfdStartLevel(level + 1);
+      });
+      document.getElementById('pfd-restart-btn')?.addEventListener('click', () => {
+        document.getElementById('results-screen').classList.add('ex-hidden');
+        document.getElementById('exercise-screen').classList.remove('ex-hidden');
+        pfdLevelSelect.reset();
+        pfdInitSession();
+      });
+      pfdLevelSelect.wireBackToSelectButton(document.getElementById('ex-results-btns-wrap'));
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const slug = new URLSearchParams(window.location.search).get('slug');
+      const { subject, category } = deriveSubjectCategory(sessionData?.backLink?.href);
+      saveExerciseResult({
+        exerciseSlug: slug, subject, category,
+        exerciseType: 'placer-fraction-droite-niveaux',
+        level,
         score:        s20,
         total:        20,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null

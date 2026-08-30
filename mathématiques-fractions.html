@@ -501,7 +501,7 @@
             skills: [
               { title: "Lire une fraction",                                                slug: "lire-fraction",                         levels: ["CM1"] },
               { title: "Représenter une fraction",                                         slug: "representer-fraction",                  levels: ["CM1"] },
-              { title: "Placer une fraction sur une droite graduée",                       slug: "placer-fraction-droite-graduee",        levels: ["CM1","CM2"] },
+              { title: "Placer une fraction sur une droite graduée",                       slug: "placer-fraction-droite-graduee",        levels: ["CM1","CM2","6e"] },
               { title: "Comparer deux fractions",                                          slug: "comparer-fractions",                    levels: ["CM1"] },
               { title: "Encadrer une fraction",                                             slug: "encadrer-fraction",                     levels: ["CM1","CM2"] },
               { title: "Décomposer une fraction (partie entière + fraction)",              slug: "decomposer-fraction-partie-entiere",    levels: ["CM1"] },
@@ -545,7 +545,7 @@
     const CUSTOM_PAGES = new Map([
       ["lire-fraction",                        "exercise.html?slug=lire-fraction"],
       ["representer-fraction",                 "exercise.html?slug=representer-fraction"],
-      ["placer-fraction-droite-graduee",       "maths-fractions-droite.html"],
+      ["placer-fraction-droite-graduee",       "exercise.html?slug=placer-fraction-droite-graduee"],
       ["comparer-fractions",                   "exercise.html?slug=comparer-fractions"],
       ["encadrer-fraction",                    "exercise.html?slug=encadrer-fraction"],
       ["decomposer-fraction-partie-entiere",   "exercise.html?slug=decomposer-fraction-partie-entiere"],
@@ -554,9 +554,8 @@
       ["fraction-decimale-tableau-numeration", "exercise.html?slug=fraction-decimale-tableau-numeration"],
     ]);
 
-    /* Un CUSTOM_PAGES peut pointer vers une page hors moteur (ex. la droite
-       graduée, qui a sa propre page dédiée) — dans ce cas il n'y a pas de
-       slug exercise.html à résoudre pour le mode guidé. */
+    /* Un CUSTOM_PAGES peut pointer vers une page hors moteur — dans ce cas
+       il n'y a pas de slug exercise.html à résoudre pour le mode guidé. */
     function guidedExerciseId(skill) {
       const custom = CUSTOM_PAGES.get(skill.slug);
       if (!custom) return skill.slug;

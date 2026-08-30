@@ -333,6 +333,16 @@ const CompetencePreview = (() => {
       return null;
     },
 
+    "placer-fraction-droite-niveaux": (item) => {
+      if (item.kind !== "mixed") return null;
+      const rep = (item.reperer || []).map((r) => `${r.letter}=${r.num}/${r.den}`).join(", ");
+      const pl  = (item.placer  || []).map((p) => `${p.letter}=${p.num}/${p.den}`).join(", ");
+      const q = rep
+        ? `Lire l'abscisse de ${rep} puis placer ${pl} (exemple ; item tiré aléatoirement à l'exécution)`
+        : `Placer ${pl} (exemple ; item tiré aléatoirement à l'exécution)`;
+      return { q, a: rep ? `${rep}, ${pl}` : pl };
+    },
+
     "lire-fraction": (item) => {
       if (item.parts == null || item.colored == null) return null;
       const shapeLabel = item.shape === "circle" ? "disque" : item.shape === "rect" ? "grille" : "bande";
@@ -587,6 +597,11 @@ const CompetencePreview = (() => {
       }
       const fmtLabel = isAdd ? "écriture additive" : "écriture en produits";
       return { q: `Décomposer ${item.display} (${fmtLabel} — exemple ; format tiré aléatoirement à l'exécution)`, a };
+    },
+
+    "composer-nombre-entier-niveaux": (item) => {
+      if (!item.display || typeof item.value !== "number") return null;
+      return { q: `${item.display} = ? (exemple ; format tiré aléatoirement à l'exécution)`, a: String(item.value) };
     },
 
     "encadrer-nombre-entier-niveaux": (item) => {

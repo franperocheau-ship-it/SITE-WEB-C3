@@ -13,48 +13,66 @@ Object.assign(window.EXERCISE_DATA, {
     domaine:    "Mathématiques",
     competence: "Fractions — Représenter",
     type: "representer-fraction",
-    levels: ["CM1", "CM2"],
-    paliers: 2, /* nombre réel de paliers du moteur */
+    levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     levelDescs: {
       "CM1": "Fraction simple — la bande est partagée selon le dénominateur",
-      "CM2": "Partage différent — introduction aux fractions équivalentes"
+      "CM2": "Partage différent — introduction aux fractions équivalentes",
+      "6e": "Fractions supérieures à 1 avec un partage différent du dénominateur"
     },
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
     /* ── Banque de questions ─────────────────────────────────────────────
-       level 1 : fraction simple — la bande est partagée en `denominator`
-                 parts. Fractions ≤ 1 ET > 1 (plusieurs bandes).
-       level 2 : partage différent — la bande est partagée en `partitions`
-                 parts (multiple de `denominator`). Introduction fractions éq.
+       level 1 : fraction simple — la bande/le disque est partagé en
+                 `denominator` parts. Fractions ≤ 1 ET > 1 (plusieurs unités).
+       level 2 : partage différent — la bande/le disque est partagé en
+                 `partitions` parts (multiple de `denominator`). Introduction
+                 fractions équivalentes.
+       level 3 : combine les deux logiques — fractions > 1 ET partage
+                 différent (`partitions`) en même temps.
+       shape   : "strip" | "circle" — forme de l'unité, explicite sur
+                 chaque item (pas de valeur implicite).
     ────────────────────────────────────────────────────────────────────── */
     bank: [
 
       /* Niveau 1 — fractions ≤ 1 */
-      { level: 1, numerator: 1, denominator: 2 },
-      { level: 1, numerator: 3, denominator: 4 },
-      { level: 1, numerator: 2, denominator: 5 },
-      { level: 1, numerator: 5, denominator: 6 },
-      { level: 1, numerator: 7, denominator: 8 },
+      { level: 1, numerator: 1, denominator: 2, shape: "circle" },
+      { level: 1, numerator: 3, denominator: 4, shape: "strip"  },
+      { level: 1, numerator: 2, denominator: 5, shape: "circle" },
+      { level: 1, numerator: 5, denominator: 6, shape: "strip"  },
+      { level: 1, numerator: 7, denominator: 8, shape: "circle" },
 
-      /* Niveau 1 — fractions > 1 (plusieurs bandes automatiques) */
-      { level: 1, numerator: 5,  denominator: 4 },
-      { level: 1, numerator: 7,  denominator: 5 },
-      { level: 1, numerator: 3,  denominator: 2 },
-      { level: 1, numerator: 11, denominator: 6 },
-      { level: 1, numerator: 9,  denominator: 4 },
+      /* Niveau 1 — fractions > 1 (plusieurs bandes/disques automatiques) */
+      { level: 1, numerator: 5,  denominator: 4, shape: "strip"  },
+      { level: 1, numerator: 7,  denominator: 5, shape: "circle" },
+      { level: 1, numerator: 3,  denominator: 2, shape: "strip"  },
+      { level: 1, numerator: 11, denominator: 6, shape: "circle" },
+      { level: 1, numerator: 9,  denominator: 4, shape: "strip"  },
 
       /* Niveau 2 — partage différent du dénominateur */
-      { level: 2, numerator: 1, denominator: 2, partitions: 4  },
-      { level: 2, numerator: 1, denominator: 2, partitions: 6  },
-      { level: 2, numerator: 1, denominator: 3, partitions: 6  },
-      { level: 2, numerator: 2, denominator: 3, partitions: 6  },
-      { level: 2, numerator: 1, denominator: 4, partitions: 8  },
-      { level: 2, numerator: 3, denominator: 4, partitions: 8  },
-      { level: 2, numerator: 2, denominator: 5, partitions: 10 },
-      { level: 2, numerator: 4, denominator: 5, partitions: 10 },
-      { level: 2, numerator: 3, denominator: 6, partitions: 12 },
-      { level: 2, numerator: 5, denominator: 6, partitions: 12 },
+      { level: 2, numerator: 1, denominator: 2, partitions: 4,  shape: "circle" },
+      { level: 2, numerator: 1, denominator: 2, partitions: 6,  shape: "strip"  },
+      { level: 2, numerator: 1, denominator: 3, partitions: 6,  shape: "circle" },
+      { level: 2, numerator: 2, denominator: 3, partitions: 6,  shape: "strip"  },
+      { level: 2, numerator: 1, denominator: 4, partitions: 8,  shape: "circle" },
+      { level: 2, numerator: 3, denominator: 4, partitions: 8,  shape: "strip"  },
+      { level: 2, numerator: 2, denominator: 5, partitions: 10, shape: "circle" },
+      { level: 2, numerator: 4, denominator: 5, partitions: 10, shape: "strip"  },
+      { level: 2, numerator: 3, denominator: 6, partitions: 12, shape: "circle" },
+      { level: 2, numerator: 5, denominator: 6, partitions: 12, shape: "strip"  },
+
+      /* Niveau 3 — fractions > 1 ET partage différent (équivalence) combinés */
+      { level: 3, numerator: 3,  denominator: 2, partitions: 6,  shape: "circle" },
+      { level: 3, numerator: 5,  denominator: 3, partitions: 6,  shape: "strip"  },
+      { level: 3, numerator: 5,  denominator: 4, partitions: 8,  shape: "circle" },
+      { level: 3, numerator: 7,  denominator: 4, partitions: 8,  shape: "strip"  },
+      { level: 3, numerator: 7,  denominator: 5, partitions: 10, shape: "circle" },
+      { level: 3, numerator: 9,  denominator: 5, partitions: 10, shape: "strip"  },
+      { level: 3, numerator: 7,  denominator: 6, partitions: 12, shape: "circle" },
+      { level: 3, numerator: 4,  denominator: 3, partitions: 9,  shape: "strip"  },
+      { level: 3, numerator: 11, denominator: 6, partitions: 12, shape: "circle" },
+      { level: 3, numerator: 9,  denominator: 4, partitions: 8,  shape: "strip"  }
 
     ]
   },
@@ -64,11 +82,12 @@ Object.assign(window.EXERCISE_DATA, {
     domaine:    "Mathématiques",
     competence: "Fractions — Lire et écrire",
     type: "lire-fraction",
-    levels: ["CM1", "CM2"],
-    paliers: 2, /* nombre réel de paliers du moteur */
+    levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     levelDescs: {
       "CM1": "Fractions simples avec petits nombres",
-      "CM2": "Fractions variées, y compris supérieures à 1"
+      "CM2": "Fractions variées, y compris supérieures à 1",
+      "6e": "Dénominateurs moins courants, fractions supérieures à 1 avec plusieurs entiers"
     },
     questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
@@ -95,16 +114,28 @@ Object.assign(window.EXERCISE_DATA, {
       { parts: 6, colored: 4, shape: "rect",  cols: 3,     difficulty: 1 },
 
       /* Niveau 2 — figures variées, dont fractions > 1 */
-      { parts: 4, colored: 5, shape: "strip",              difficulty: 2 },
+      { parts: 4, colored: 5, shape: "circle",             difficulty: 2 },
       { parts: 4, colored: 7, shape: "strip",              difficulty: 2 },
       { parts: 3, colored: 4, shape: "circle",             difficulty: 2 },
-      { parts: 5, colored: 6, shape: "strip",              difficulty: 2 },
+      { parts: 5, colored: 6, shape: "circle",             difficulty: 2 },
       { parts: 3, colored: 5, shape: "circle",             difficulty: 2 },
       { parts: 4, colored: 9, shape: "strip",              difficulty: 2 },
       { parts: 8, colored: 5, shape: "rect",  cols: 4,     difficulty: 2 },
       { parts: 10, colored: 7, shape: "rect", cols: 5,     difficulty: 2 },
       { parts: 6, colored: 4, shape: "circle",             difficulty: 2 },
-      { parts: 9, colored: 6, shape: "rect",  cols: 3,     difficulty: 2 }
+      { parts: 9, colored: 6, shape: "rect",  cols: 3,     difficulty: 2 },
+
+      /* Niveau 3 — dénominateurs moins immédiats, fractions > 1 avec plusieurs entiers */
+      { parts: 7, colored: 3, shape: "strip",              difficulty: 3 },
+      { parts: 9, colored: 4, shape: "rect",  cols: 3,     difficulty: 3 },
+      { parts: 11, colored: 6, shape: "circle",            difficulty: 3 },
+      { parts: 12, colored: 5, shape: "rect", cols: 4,     difficulty: 3 },
+      { parts: 7, colored: 9, shape: "strip",              difficulty: 3 },
+      { parts: 9, colored: 13, shape: "rect", cols: 3,     difficulty: 3 },
+      { parts: 5, colored: 12, shape: "circle",            difficulty: 3 },
+      { parts: 8, colored: 19, shape: "rect", cols: 4,     difficulty: 3 },
+      { parts: 11, colored: 4, shape: "strip",             difficulty: 3 },
+      { parts: 9, colored: 7, shape: "circle",             difficulty: 3 }
     ]
   },
 
@@ -393,48 +424,90 @@ Object.assign(window.EXERCISE_DATA, {
     title: "Placer une fraction sur une droite graduée",
     domaine:    "Mathématiques",
     competence: "Fractions — Droite graduée",
-    type: "placer-fraction-droite",
-    levels: ["CM1", "CM2"],
-    paliers: 2, /* nombre réel de paliers du moteur */
+    type: "placer-fraction-droite-niveaux",
+    levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     levelDescs: {
-      "CM1": "Fractions inférieures à 1",
-      "CM2": "Fractions supérieures à 1"
+      "CM1": "Un dénominateur — placer une fraction sur la droite",
+      "CM2": "Dénominateurs mixtes — repérer une graduation, placer une fraction",
+      "6e":  "Placer 4 fractions, dont certaines en dénominateur équivalent"
     },
-    questionsPerSession: 10,
+    itemsPerLevel: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
-    /* ── Banque de questions ─────────────────────────────────────────────
-       level 1 : fraction < 1 — droite de 0 à 1, partagée en denominator parts
-       level 2 : fraction > 1 — droite de 0 à ceil(num/denom), même découpage
-       Tick i représente la valeur i/denominator.
-       La bonne réponse est toujours le tick d'index numerator.
+    /* ── Génération procédurale ────────────────────────────────────────────
+       Aucune banque fixe : pfdBuildItems() (exercise.html) tire les items
+       selon ces règles à chaque tentative (même logique que
+       decomposer-nombre-entier-niveaux / composer-nombre-entier-niveaux
+       dans data/nombres-entiers.js). Chaque item est un exercice complet à
+       plusieurs sous-réponses, pas une fraction isolée. Les 3 niveaux
+       réutilisent le même mécanisme à deux volets (jamais de glisser-
+       déposer entre étiquettes, qui permettrait de résoudre par simple
+       comparaison des numérateurs sans lire la droite) :
+         - repérer : une graduation est déjà marquée → saisie numérateur/
+           dénominateur dans deux champs.
+         - placer  : une fraction est donnée → clic séquentiel sur la
+           droite (une seule cible affichée à la fois, jamais la liste
+           complète à l'avance).
+       Niveau 1 : 1 dénominateur, 1 placer par item (pas de repérer), droite
+                  toujours affichée de 0 à 3 (fixedMaxUnits) quelle que soit
+                  la fraction générée — l'élève doit se demander si sa
+                  fraction est < ou > 1 plutôt que lire la réponse dans la
+                  longueur de la droite ; les fractions sont bornées en
+                  génération (maxWhole:3) pour rester placables sur [0,3].
+       Niveau 2 : dénominateurs mixtes (`denominatorSets`), 1 repérer + 1
+                  placer par item (graduations au pas fin = PPCM du groupe),
+                  longueur de droite adaptative (inchangée).
+       Niveau 3 : uniquement du placement (pas de repérer), 4 points (A-D) à
+                  couleurs distinctes tirées aléatoirement à chaque item
+                  (jamais dans un ordre prévisible — sert seulement à
+                  distinguer les points, jamais à indiquer leur position).
+                  Droite à un seul pas fixe (`gridDenoms`), mais une partie
+                  des fractions à placer ont un dénominateur différent —
+                  toujours diviseur du pas affiché, donc exact sur cette
+                  graduation (ex. 2/3 sur une droite en sixièmes → 4/6) :
+                  force le raisonnement en fractions équivalentes plutôt
+                  qu'un simple comptage de graduations. `gridDenoms` plafonné
+                  à 12 (pas à 24) et fractions bornées sous 3 unités
+                  (maxWhole:3 dans pfdBuildLevel3Item) pour que la droite
+                  reste lisible une fois réduite à la largeur de la carte —
+                  un pas élevé (ex. 24) sur une droite jusqu'à 4 produisait
+                  un mur de graduations collées, illisible.
     ────────────────────────────────────────────────────────────────────── */
-    bank: [
+    genRules: {
+      1: { denominators: [2, 3, 4, 5, 6, 8, 10] },
+      2: { denominatorSets: [[2, 4], [2, 6], [3, 6], [2, 3, 6], [4, 8], [2, 4, 8]] },
+      3: { gridDenoms: [6, 8, 10, 12] }
+    },
 
-      /* Niveau 1 — fractions inférieures à 1 */
-      { level: 1, numerator: 1, denominator: 2 },
-      { level: 1, numerator: 1, denominator: 3 },
-      { level: 1, numerator: 2, denominator: 3 },
-      { level: 1, numerator: 1, denominator: 4 },
-      { level: 1, numerator: 3, denominator: 4 },
-      { level: 1, numerator: 1, denominator: 5 },
-      { level: 1, numerator: 2, denominator: 5 },
-      { level: 1, numerator: 3, denominator: 5 },
-      { level: 1, numerator: 4, denominator: 5 },
-      { level: 1, numerator: 5, denominator: 6 },
-
-      /* Niveau 2 — fractions supérieures à 1 */
-      { level: 2, numerator: 5,  denominator: 4 },
-      { level: 2, numerator: 3,  denominator: 2 },
-      { level: 2, numerator: 7,  denominator: 4 },
-      { level: 2, numerator: 7,  denominator: 5 },
-      { level: 2, numerator: 9,  denominator: 4 },
-      { level: 2, numerator: 11, denominator: 6 },
-      { level: 2, numerator: 8,  denominator: 3 },
-      { level: 2, numerator: 10, denominator: 4 },
-      { level: 2, numerator: 13, denominator: 8 },
-      { level: 2, numerator: 15, denominator: 6 }
-
+    /* ── Exemples statiques — utilisés uniquement par l'aperçu enseignant
+       (js/competence-preview.js) ; le moteur d'exercice ignore ces
+       tableaux et génère toujours à la volée. ── */
+    lvl1: [
+      {
+        kind: "mixed", gridDenom: 6, maxUnits: 3,
+        reperer: [],
+        placer:  [ { num: 8, den: 6, tickIdx: 8, letter: "A" } ]
+      }
+    ],
+    lvl2: [
+      {
+        kind: "mixed", gridDenom: 6, maxUnits: 2,
+        reperer: [ { num: 1, den: 2, tickIdx: 3, letter: "M" } ],
+        placer:  [ { num: 11, den: 6, tickIdx: 11, letter: "A" } ]
+      }
+    ],
+    lvl3: [
+      {
+        kind: "mixed", gridDenom: 6, maxUnits: 3,
+        reperer: [],
+        placer: [
+          { num: 5, den: 6, tickIdx: 5,  letter: "A", color: "#F5A623" },
+          { num: 9, den: 6, tickIdx: 9,  letter: "B", color: "#2563EB" },
+          { num: 4, den: 3, tickIdx: 8,  letter: "C", color: "#DB2777" },
+          { num: 5, den: 2, tickIdx: 15, letter: "D", color: "#0E9488" }
+        ]
+      }
     ]
   },
 
@@ -497,27 +570,38 @@ Object.assign(window.EXERCISE_DATA, {
       "6e":  "Fractions < 1 et > 1 — place-les sur une droite graduée"
     },
     type: "comparer-fractions",
-    questionsPerSession: 6,
+    questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
     /* ── Banque de questions ──────────────────────────────────────────────
        level 1 — même dénominateur (Niveau 1)
          → comparer revient à comparer les numérateurs
-         → inclut au moins un cas d'égalité
+         → aucun cas d'égalité : à dénominateur commun, deux fractions
+           égales seraient forcément deux écritures strictement identiques
+           (même numérateur ET même dénominateur), ce qui est exclu — voir
+           niveau 2 pour les cas d'égalité (fractions équivalentes écrites
+           différemment, ex. 1/2 = 2/4)
        level 2 — dénominateurs différents (Niveau 2 / Niveau 3)
          → approche visuelle : même taille de disque, partages différents
-         → inclut : fractions équivalentes, pièges (1/2 > 1/3),
-                    cas où grand dénominateur ≠ grande fraction
+         → inclut : fractions équivalentes non identiques (ex. 1/2 = 2/4),
+                    pièges (1/2 > 1/3), cas où grand dénominateur ≠ grande
+                    fraction
+       Aucun item ne doit comparer une fraction à elle-même (même
+       numérateur ET même dénominateur des deux côtés).
     ────────────────────────────────────────────────────────────────────── */
     bank: [
 
       /* Niveau 1 — même dénominateur */
       { level: 1, left: { num: 3, den: 4 }, right: { num: 1, den: 4 }, answer: ">" },
       { level: 1, left: { num: 2, den: 5 }, right: { num: 4, den: 5 }, answer: "<" },
-      { level: 1, left: { num: 3, den: 6 }, right: { num: 3, den: 6 }, answer: "=" },
+      { level: 1, left: { num: 5, den: 6 }, right: { num: 2, den: 6 }, answer: ">" },
       { level: 1, left: { num: 5, den: 8 }, right: { num: 3, den: 8 }, answer: ">" },
       { level: 1, left: { num: 1, den: 3 }, right: { num: 2, den: 3 }, answer: "<" },
       { level: 1, left: { num: 4, den: 7 }, right: { num: 6, den: 7 }, answer: "<" },
+      { level: 1, left: { num: 1, den: 5 }, right: { num: 3, den: 5 }, answer: "<" },
+      { level: 1, left: { num: 4, den: 6 }, right: { num: 1, den: 6 }, answer: ">" },
+      { level: 1, left: { num: 2, den: 8 }, right: { num: 6, den: 8 }, answer: "<" },
+      { level: 1, left: { num: 2, den: 4 }, right: { num: 3, den: 4 }, answer: "<" },
 
       /* Niveau 3 — droite graduée partagée, fractions < 1 et > 1, dénominateurs différents */
       { level: 3, left: { num: 1, den: 2 }, right: { num: 2, den: 3 }, answer: "<" },   // LCM=6
@@ -528,6 +612,8 @@ Object.assign(window.EXERCISE_DATA, {
       { level: 3, left: { num: 4, den: 3 }, right: { num: 3, den: 2 }, answer: "<" },   // LCM=6, >1
       { level: 3, left: { num: 5, den: 4 }, right: { num: 3, den: 2 }, answer: "<" },   // LCM=4, >1
       { level: 3, left: { num: 3, den: 2 }, right: { num: 4, den: 3 }, answer: ">" },   // LCM=6, >1
+      { level: 3, left: { num: 7, den: 4 }, right: { num: 5, den: 3 }, answer: ">" },   // LCM=12, >1
+      { level: 3, left: { num: 5, den: 6 }, right: { num: 3, den: 4 }, answer: ">" },   // LCM=12
 
       /* Niveau 2 — dénominateurs différents */
       { level: 2, left: { num: 1, den: 2 }, right: { num: 2, den: 4 }, answer: "=" },
@@ -535,7 +621,11 @@ Object.assign(window.EXERCISE_DATA, {
       { level: 2, left: { num: 3, den: 4 }, right: { num: 2, den: 3 }, answer: ">" },
       { level: 2, left: { num: 1, den: 3 }, right: { num: 2, den: 5 }, answer: "<" },
       { level: 2, left: { num: 2, den: 3 }, right: { num: 3, den: 4 }, answer: "<" },
-      { level: 2, left: { num: 1, den: 4 }, right: { num: 2, den: 3 }, answer: "<" }
+      { level: 2, left: { num: 1, den: 4 }, right: { num: 2, den: 3 }, answer: "<" },
+      { level: 2, left: { num: 2, den: 3 }, right: { num: 4, den: 6 }, answer: "=" },
+      { level: 2, left: { num: 3, den: 5 }, right: { num: 1, den: 2 }, answer: ">" },
+      { level: 2, left: { num: 1, den: 6 }, right: { num: 1, den: 4 }, answer: "<" },
+      { level: 2, left: { num: 3, den: 8 }, right: { num: 1, den: 2 }, answer: "<" }
 
     ]
   },
