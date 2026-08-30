@@ -227,6 +227,30 @@
     showState('library');
   }
 
+  /* ── Piège "un niveau de retour" pour le bouton retour du navigateur ────
+     Même pattern que js/dictees-engine.js/trapBackToNiveauChoice : sans
+     ceci, un appui sur retour depuis le passage ou l'écran de résultats
+     quittait carrément francais-oral.html (vers français.html, la page
+     d'où l'élève venait) au lieu de revenir à la bibliothèque des épisodes
+     — bibliothèque et passage partagent la même URL (aucun ?id= poussé au
+     clic sur un épisode), donc sans entrée d'historique dédiée, le
+     navigateur n'a qu'UNE seule page à "dépiler". On pousse une entrée
+     d'historique en entrant dans le passage (startQuiz) ; le popstate
+     déclenché par le bouton retour consomme cette entrée sans changer
+     d'URL et ramène à la bibliothèque plutôt que de quitter la page — que
+     l'élève soit encore en train de répondre ou déjà sur l'écran de
+     résultats. Jamais posé en mode consultation (startReview), qui gère
+     déjà son propre retour via _reviewBackUrl. */
+  function trapBackToLibrary() {
+    history.pushState({ coQuiz: true }, '', location.href);
+  }
+
+  window.addEventListener('popstate', () => {
+    if (_reviewMode || !content) return;
+    content = null;
+    loadLibrary();
+  });
+
   /* ── Passage ── */
   async function startQuiz(id) {
     showState('loading');
@@ -235,6 +259,7 @@
     } catch (e) {
       return showError();
     }
+    trapBackToLibrary();
     selectedByQuestion = new Map();
     document.getElementById('co-page-title').textContent = preventWidow(content.comprehension_orale.titre_episode);
     document.getElementById('co-page-subtitle').textContent = content.comprehension_orale.description || '';
