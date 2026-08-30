@@ -332,7 +332,7 @@ Object.assign(window.EXERCISE_DATA, {
       2: { digitsMin: 4, digitsMax: 5, requireInteriorZero: true },
       3: { digitsMin: 5, digitsMax: 6, trap: true }
     },
-    itemsPerLevel: 8,
+    itemsPerLevel: 10,
 
     /* ── Exemples statiques (nouveau format) — utilisés uniquement par
        l'aperçu enseignant (js/competence-preview.js) ; le moteur d'exercice
@@ -430,37 +430,37 @@ Object.assign(window.EXERCISE_DATA, {
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
     levelDescs: {
-      "CM1": "Décomposition canonique → 1 champ numérique",
-      "CM2": "Somme de parties non canoniques → 1 champ numérique",
-      "6e":  "Somme de produits avec grandes puissances → 1 champ numérique"
+      "CM1": "Nombres à 3-4 chiffres, sans zéro",
+      "CM2": "Nombres à 4-5 chiffres, avec un zéro intercalé",
+      "6e":  "Nombres à 5-6 chiffres"
     },
     backLink:   { href: "mathématiques-nombres-entiers.html", label: "Nombres entiers" },
 
-    /* ── Niveau 1 — décomposition canonique → trouver le nombre ── */
+    /* ── Génération procédurale — moteur partagé avec decomposer-nombre-
+       entier (sens inverse : ici la décomposition est donnée, l'élève
+       recompose le nombre). dniGenerateDigits()/DNI_POSITIONS/dniFmtVal()
+       (exercise.html) sont réutilisées telles quelles ; cniBuildItem() ne
+       fait qu'assembler l'affichage et la réponse à partir des mêmes
+       chiffres générés. Aucune banque fixe : itemsPerLevel questions
+       fraîches par session. */
+    genRules: {
+      1: { digitsMin: 3, digitsMax: 4, noZero: true },
+      2: { digitsMin: 4, digitsMax: 5, requireInteriorZero: true },
+      3: { digitsMin: 5, digitsMax: 6 }
+    },
+    itemsPerLevel: 10,
+
+    /* ── Exemples statiques (nouveau format) — utilisés uniquement par
+       l'aperçu enseignant (js/competence-preview.js) ; le moteur d'exercice
+       ignore ces tableaux et génère toujours à la volée. ── */
     lvl1: [
-      { display: "3 × 1 000 + 2 × 100 + 4 × 10 + 5 × 1", answer: 3245,  mil: 3, cen: 2, diz: 4, uni: 5 },
-      { display: "6 × 1 000 + 0 × 100 + 7 × 10 + 0 × 1", answer: 6070,  mil: 6, cen: 0, diz: 7, uni: 0 },
-      { display: "5 × 1 000 + 5 × 100 + 0 × 10 + 1 × 1", answer: 5501,  mil: 5, cen: 5, diz: 0, uni: 1 },
-      { display: "9 × 1 000 + 0 × 100 + 0 × 10 + 8 × 1", answer: 9008,  mil: 9, cen: 0, diz: 0, uni: 8 },
-      { display: "1 × 1 000 + 3 × 100 + 3 × 10 + 3 × 1", answer: 1333,  mil: 1, cen: 3, diz: 3, uni: 3 }
+      { display: "(3 × 100) + (4 × 10) + (5 × 1)", value: 345, format: "multiplicative" }
     ],
-
-    /* ── Niveau 2 — parties non canoniques, ordre mélangé → trouver le nombre ── */
     lvl2: [
-      { display: "40 000 + 3 000 + 200 + 8",        answer: 43208,   parts: [40000, 3000, 200, 8] },
-      { display: "500 000 + 60 + 7 000",             answer: 507060,  parts: [500000, 60, 7000] },
-      { display: "200 000 + 90 000 + 400 + 5",       answer: 290405,  parts: [200000, 90000, 400, 5] },
-      { display: "30 + 800 000 + 4 000",             answer: 804030,  parts: [30, 800000, 4000] },
-      { display: "6 000 000 + 50 000 + 3",           answer: 6050003, parts: [6000000, 50000, 3] }
+      { display: "4 000 + 50 + 9", value: 4059, format: "additive" }
     ],
-
-    /* ── Niveau 3 — somme de produits avec grandes puissances → trouver le nombre ── */
     lvl3: [
-      { display: "4 × 100 000 + 2 × 10 000 + 0 × 1 000 + 7 × 100 + 3 × 10 + 9 × 1", answer: 420739,  factors: [[4,100000],[2,10000],[0,1000],[7,100],[3,10],[9,1]] },
-      { display: "3 × 1 000 000 + 5 × 10 000 + 8 × 1",                                answer: 3050008, factors: [[3,1000000],[5,10000],[8,1]] },
-      { display: "7 × 100 000 + 7 × 1 000 + 7 × 10",                                  answer: 707070,  factors: [[7,100000],[7,1000],[7,10]] },
-      { display: "2 × 1 000 000 + 4 × 100 000 + 0 × 10 000 + 6 × 100 + 1 × 1",       answer: 2400601, factors: [[2,1000000],[4,100000],[0,10000],[6,100],[1,1]] },
-      { display: "9 × 100 000 + 9 × 100 + 9 × 1",                                     answer: 900909,  factors: [[9,100000],[9,100],[9,1]] }
+      { display: "(3 × 100 000) + (0 × 10 000) + (6 × 1 000) + (0 × 100) + (5 × 10) + (0 × 1)", value: 306050, format: "multiplicative" }
     ]
   },
 
@@ -487,7 +487,9 @@ Object.assign(window.EXERCISE_DATA, {
       { order: "croissant",   numbers: [1010, 1100, 1001, 1110], answer: [1001, 1010, 1100, 1110] },
       { order: "décroissant", numbers: [7070, 7700, 7007, 7770], answer: [7770, 7700, 7070, 7007] },
       { order: "croissant",   numbers: [2400, 2040, 2004, 2440], answer: [2004, 2040, 2400, 2440] },
-      { order: "décroissant", numbers: [9010, 9100, 9001, 9110], answer: [9110, 9100, 9010, 9001] }
+      { order: "décroissant", numbers: [9010, 9100, 9001, 9110], answer: [9110, 9100, 9010, 9001] },
+      { order: "croissant",   numbers: [6350, 6035, 6503, 6305], answer: [6035, 6305, 6350, 6503] },
+      { order: "décroissant", numbers: [4820, 4082, 4802, 4280], answer: [4820, 4802, 4280, 4082] }
     ],
 
     /* ── Niveau 2 — 4 nombres à 5–6 chiffres ──────────────────────────────── */
@@ -499,7 +501,9 @@ Object.assign(window.EXERCISE_DATA, {
       { order: "croissant",   numbers: [500050, 505000, 550000, 500500], answer: [500050, 500500, 505000, 550000] },
       { order: "décroissant", numbers: [408000, 480000, 400800, 408800], answer: [480000, 408800, 408000, 400800] },
       { order: "croissant",   numbers: [999001, 990001, 999100, 909001], answer: [909001, 990001, 999001, 999100] },
-      { order: "décroissant", numbers: [100001, 10001, 100010, 1001],    answer: [100010, 100001, 10001, 1001] }
+      { order: "décroissant", numbers: [100001, 10001, 100010, 1001],    answer: [100010, 100001, 10001, 1001] },
+      { order: "croissant",   numbers: [670300, 67300, 607300, 673000],  answer: [67300, 607300, 670300, 673000] },
+      { order: "décroissant", numbers: [305600, 350600, 300560, 305060], answer: [350600, 305600, 305060, 300560] }
     ],
 
     /* ── Niveau 3 — 5 nombres jusqu'au million et au-delà ─────────────────── */
@@ -511,7 +515,9 @@ Object.assign(window.EXERCISE_DATA, {
       { order: "croissant",   numbers: [7070070, 707007, 7007700, 770700, 7700007],  answer: [707007, 770700, 7007700, 7070070, 7700007] },
       { order: "décroissant", numbers: [1000001, 999999, 1001000, 1000100, 100001],  answer: [1001000, 1000100, 1000001, 999999, 100001] },
       { order: "croissant",   numbers: [5050500, 5500050, 5005050, 505050, 5500500], answer: [505050, 5005050, 5050500, 5500050, 5500500] },
-      { order: "décroissant", numbers: [8008080, 8080800, 800808, 8800008, 8000880], answer: [8800008, 8080800, 8008080, 8000880, 800808] }
+      { order: "décroissant", numbers: [8008080, 8080800, 800808, 8800008, 8000880], answer: [8800008, 8080800, 8008080, 8000880, 800808] },
+      { order: "croissant",   numbers: [6030600, 603060, 6300600, 630060, 6003060],  answer: [603060, 630060, 6003060, 6030600, 6300600] },
+      { order: "décroissant", numbers: [7070700, 7700070, 7007700, 7770000, 7000770], answer: [7770000, 7700070, 7070700, 7007700, 7000770] }
     ]
   },
 
@@ -721,10 +727,10 @@ Object.assign(window.EXERCISE_DATA, {
         explication: "On arrondit par excès pour ne pas tomber en panne d'essence. Sous-estimer la distance serait dangereux. À la dizaine près, 473 → 480."
       },
       {
-        enonce: "Une école commande des stylos pour 124 élèves. Elle en a commandé 126. La secrétaire note approximativement…",
-        choices: ["100 stylos", "130 stylos"],
-        answer:  "130 stylos",
-        explication: "On arrondit par excès pour ne pas manquer de stylos. À la dizaine près, 126 → 130. Choisir 100 laisserait 26 élèves sans stylo."
+        enonce: "Une bibliothécaire a reçu 126 nouveaux livres ce mois-ci. Pour l'affichage à l'entrée, elle arrondit ce nombre à la dizaine : elle annonce environ…",
+        choices: ["120 livres", "130 livres"],
+        answer:  "130 livres",
+        explication: "Bravo ! Le chiffre des unités de 126 est 6, donc on arrondit à la dizaine supérieure : 126 → 130."
       },
       {
         enonce: "Un agriculteur récolte 1 847 kg de pommes. Pour son compte-rendu annuel, il note environ…",
@@ -763,74 +769,74 @@ Object.assign(window.EXERCISE_DATA, {
         explication: "On arrondit par excès pour vérifier si l'objectif est atteignable. 674 → 700 montre qu'on est très proche. Arrondir à 600 € sous-estimerait la cagnotte."
       },
       {
-        enonce: "Un bus peut transporter 48 passagers. Il y a 45 élèves à transporter. On arrondit le nombre d'élèves à…",
-        choices: ["40 élèves", "50 élèves"],
-        answer:  "50 élèves",
-        explication: "On arrondit par excès pour s'assurer qu'un seul bus suffit. 45 → 50 confirme qu'un bus de 48 places est suffisant pour tout le monde."
+        enonce: "Un fleuriste a vendu 45 bouquets aujourd'hui. Pour son compte-rendu du soir, il arrondit ce nombre à la dizaine : il note environ…",
+        choices: ["40 bouquets", "50 bouquets"],
+        answer:  "50 bouquets",
+        explication: "Bravo ! Quand le chiffre des unités est 5 ou plus, on arrondit à la dizaine supérieure : 45 → 50."
       }
     ],
 
-    /* ── Niveau 2 — 3 choix, choisir le rang d'arrondi adapté au contexte ── */
+    /* ── Niveau 2 — 3 choix, choisir le rang d'arrondi imposé par un indice concret ── */
     lvl2: [
       {
-        enonce: "La population d'une ville est de 34 672 habitants. Le maire donne une estimation dans son discours. Quel arrondi est le plus adapté ?",
-        choices: ["34 670", "34 700", "35 000"],
-        answer:  "35 000",
-        explication: "Dans un discours public, on parle de grandes tendances : l'arrondi au millier (35 000) est le plus adapté. 34 670 est trop précis pour un discours ; 34 700 l'est encore trop."
+        enonce: "Léna retire de l'argent à un distributeur qui ne donne que des billets de 10 €. Elle veut environ 236 €. Elle demande un retrait de…",
+        choices: ["236 €", "240 €", "200 €"],
+        answer:  "240 €",
+        explication: "Le distributeur ne donne que des billets de 10 €, donc on arrondit à la dizaine : 236 € devient 240 €."
       },
       {
-        enonce: "Un stade contient 48 315 places. Le speaker annonce l'affluence du match. Il dit environ…",
-        choices: ["48 300", "48 000", "50 000"],
-        answer:  "48 000",
-        explication: "Pour l'affluence d'un match, l'arrondi au millier (48 000) est adapté : ni trop précis ni trop vague. 48 300 serait trop détaillé ; 50 000 exagèrerait de près de 1 700 personnes."
+        enonce: "Une balance de cuisine n'affiche que des multiples de 10 g. Une recette nécessite 764 g de farine. La balance affichera environ…",
+        choices: ["764 g", "760 g", "800 g"],
+        answer:  "760 g",
+        explication: "La balance n'affiche que des multiples de 10 g, donc on arrondit à la dizaine : 764 g devient 760 g."
       },
       {
-        enonce: "Un magasin a réalisé un chiffre d'affaires de 127 483 €. Le comptable arrondit pour une estimation rapide…",
-        choices: ["127 500 €", "127 000 €", "130 000 €"],
-        answer:  "127 000 €",
-        explication: "En comptabilité, l'arrondi au millier le plus proche (127 000 €) est adéquat. 127 500 € est trop précis ; 130 000 € introduit une erreur de plus de 2 500 €."
+        enonce: "Un producteur vend ses pommes par caisses de 10 fruits. Il a récolté 368 pommes. Le nombre de caisses pleines correspond à environ…",
+        choices: ["368 pommes", "370 pommes", "400 pommes"],
+        answer:  "370 pommes",
+        explication: "Les caisses contiennent 10 fruits chacune, donc on arrondit à la dizaine : 368 pommes correspond à environ 370 pommes."
       },
       {
-        enonce: "La distance Paris–Madrid est de 1 272 km. Sur un panneau indicateur, on afficherait environ…",
-        choices: ["1 270 km", "1 300 km", "1 000 km"],
-        answer:  "1 300 km",
-        explication: "Sur un panneau routier, on indique à la centaine près (1 300 km). 1 270 km serait trop précis pour un panneau ; 1 000 km serait beaucoup trop approximatif."
+        enonce: "Un bureau de poste vend les timbres uniquement par carnets de 100. Une entreprise veut 1 247 timbres. Elle doit en commander environ…",
+        choices: ["1 250 timbres", "1 200 timbres", "1 000 timbres"],
+        answer:  "1 200 timbres",
+        explication: "Les timbres se vendent par carnets de 100, donc on arrondit à la centaine : 1 247 timbres devient environ 1 200 timbres."
       },
       {
-        enonce: "Un collège compte 763 élèves. Le principal répond à une journaliste. Il dit environ…",
-        choices: ["760 élèves", "800 élèves", "700 élèves"],
-        answer:  "800 élèves",
-        explication: "Pour une estimation orale, la centaine est plus naturelle. 763 → 800 est l'arrondi le plus proche. 760 paraît trop précis ; 700 s'éloigne trop de la réalité."
+        enonce: "Une bibliothèque range ses livres sur des étagères de 100 livres chacune. Il y a 3 482 livres à ranger. Le nombre d'étagères nécessaires est d'environ…",
+        choices: ["3 480 livres", "3 500 livres", "3 000 livres"],
+        answer:  "3 500 livres",
+        explication: "Chaque étagère contient 100 livres, donc on arrondit à la centaine : 3 482 livres devient environ 3 500 livres."
       },
       {
-        enonce: "Un pays a une superficie de 504 782 km². Dans un manuel scolaire, on indique environ…",
-        choices: ["504 800 km²", "505 000 km²", "500 000 km²"],
-        answer:  "500 000 km²",
-        explication: "Dans un manuel, on donne un ordre de grandeur : à la centaine de milliers (500 000 km²). 504 800 et 505 000 sont trop précis pour une notion générale de géographie."
+        enonce: "Une kermesse vend ses bonbons par sachets de 100. Il reste 2 763 bonbons. Le nombre de sachets restants est d'environ…",
+        choices: ["2 760 bonbons", "2 800 bonbons", "3 000 bonbons"],
+        answer:  "2 800 bonbons",
+        explication: "Les bonbons se vendent par sachets de 100, donc on arrondit à la centaine : 2 763 bonbons devient environ 2 800 bonbons."
       },
       {
-        enonce: "Un artisan a besoin d'environ 1 847 vis et veut commander avec une marge de sécurité. Il vaut mieux en commander…",
-        choices: ["1 800 vis", "1 850 vis", "2 000 vis"],
-        answer:  "2 000 vis",
-        explication: "On arrondit par excès au millier pour avoir une marge confortable. 2 000 vis assure qu'il n'en manquera pas. 1 800 et 1 850 seraient trop proches du besoin réel."
+        enonce: "Une carte de randonnée place une borne tous les 1 000 mètres. Un randonneur a parcouru 47 328 m. Il se trouve environ à la borne…",
+        choices: ["47 330 m", "47 300 m", "47 000 m"],
+        answer:  "47 000 m",
+        explication: "Les bornes sont placées tous les 1 000 mètres, donc on arrondit au millier : 47 328 m devient environ 47 000 m."
       },
       {
-        enonce: "Un événement a attiré 23 418 visiteurs. Le journal titre « Environ … visiteurs ».",
-        choices: ["23 400 visiteurs", "23 000 visiteurs", "20 000 visiteurs"],
-        answer:  "23 000 visiteurs",
-        explication: "Dans un article de presse, l'arrondi au millier (23 000) offre un bon équilibre entre précision et lisibilité. 23 400 semble trop précis ; 20 000 est trop vague."
+        enonce: "Un stade est divisé en tribunes de 1 000 places chacune. Il y a 82 643 spectateurs. Le nombre de tribunes occupées est d'environ…",
+        choices: ["82 640 spectateurs", "82 600 spectateurs", "83 000 spectateurs"],
+        answer:  "83 000 spectateurs",
+        explication: "Chaque tribune contient 1 000 places, donc on arrondit au millier : 82 643 spectateurs devient environ 83 000 spectateurs."
       },
       {
-        enonce: "Une famille a roulé 1 253 km pendant les vacances. Pour le carnet de bord, elle note environ…",
-        choices: ["1 250 km", "1 300 km", "1 000 km"],
-        answer:  "1 300 km",
-        explication: "Pour un carnet de bord, la centaine (1 300 km) est suffisamment précise. 1 250 km paraît trop détaillé ; 1 000 km serait bien trop imprécis."
+        enonce: "Une association envoie des vêtements collectés par cartons de 1 000 pièces. Elle a reçu 6 480 vêtements. Le nombre de cartons nécessaires est d'environ…",
+        choices: ["6 480 vêtements", "6 500 vêtements", "6 000 vêtements"],
+        answer:  "6 000 vêtements",
+        explication: "Les cartons contiennent 1 000 pièces chacun, donc on arrondit au millier : 6 480 vêtements devient environ 6 000 vêtements."
       },
       {
-        enonce: "Un pays a une dette de 2 847 632 €. Le ministre l'arrondit dans son allocution…",
-        choices: ["2 847 600 €", "2 848 000 €", "2 800 000 €"],
-        answer:  "2 800 000 €",
-        explication: "À l'oral, énoncer « 2 847 632 € » est impossible. L'arrondi à la centaine de milliers (2 800 000 €) est le seul lisible et compréhensible en discours public."
+        enonce: "Une classe de 529 élèves (plusieurs écoles réunies) se répartit par groupes de 10 pour une photo. Le nombre de groupes complets est d'environ…",
+        choices: ["529 élèves", "530 élèves", "500 élèves"],
+        answer:  "530 élèves",
+        explication: "La photo se fait par groupes de 10, donc on arrondit à la dizaine : 529 élèves devient environ 530 élèves."
       }
     ],
 
@@ -843,10 +849,10 @@ Object.assign(window.EXERCISE_DATA, {
         explication: "En matière de sécurité, on arrondit toujours par excès au rang le plus fort. 5 000 couvre tous les spectateurs avec marge. Commander pour 4 800 laisserait 30 personnes sans couverture."
       },
       {
-        enonce: "Une pharmacie a 1 247 comprimés en stock. Un médecin demande s'il y en a assez pour 1 300 patients. La pharmacienne estime…",
-        choices: ["Oui, j'en ai environ 1 300", "Non, j'en ai environ 1 200"],
-        answer:  "Non, j'en ai environ 1 200",
-        explication: "1 247 arrondi à la centaine par défaut donne 1 200. Le stock est insuffisant pour 1 300 patients. Dire « environ 1 300 » serait inexact et risquerait de laisser des patients sans traitement."
+        enonce: "Un club de sport a 1 247 casques de protection en stock pour ses adhérents. Pour ne jamais promettre plus de casques qu'il n'en a réellement, l'entraîneur annonce en disposer d'environ…",
+        choices: ["1 300 casques", "1 200 casques"],
+        answer:  "1 200 casques",
+        explication: "Arrondi par défaut : en matière de sécurité et de matériel, on annonce toujours moins que ce qu'on a réellement, jamais plus. 1 247 casques → environ 1 200."
       },
       {
         enonce: "Un entrepreneur doit couvrir 873 m² avec des dalles vendues par lot de 100 m². Il commande…",
@@ -855,10 +861,10 @@ Object.assign(window.EXERCISE_DATA, {
         explication: "On ne peut pas laisser de sol non couvert : l'arrondi par excès est obligatoire. 873 → 900 m², soit 9 lots. 8 lots ne couvrirait que 800 m², laissant 73 m² de sol nu."
       },
       {
-        enonce: "Un organisateur a un budget de 9 730 € pour décorer une salle. Le décorateur lui demande s'il peut dépenser 10 000 €. L'organisateur répond…",
-        choices: ["Oui, j'ai environ 10 000 €", "Non, j'ai environ 9 000 €"],
-        answer:  "Non, j'ai environ 9 000 €",
-        explication: "Le budget réel est 9 730 €. Dire qu'on a 10 000 € ferait dépasser le budget. L'arrondi par défaut (9 000 €) est prudent et honnête — il protège contre un dépassement."
+        enonce: "Un organisateur dispose d'un budget de 9 730 € pour un évènement. Pour ne jamais risquer de dépasser son budget réel en négociant avec les fournisseurs, il annonce disposer d'environ…",
+        choices: ["9 800 €", "9 700 €"],
+        answer:  "9 700 €",
+        explication: "Arrondi par défaut : on annonce toujours moins que ce qu'on a réellement pour ne pas se retrouver à découvert. 9 730 € → environ 9 700 €."
       },
       {
         enonce: "Un camion peut transporter 3 000 kg. Un livreur charge 2 847 kg de marchandises. Son collègue lui demande quelle est la charge. Il répond qu'il transporte environ…",
@@ -867,10 +873,10 @@ Object.assign(window.EXERCISE_DATA, {
         explication: "Pour la sécurité, on arrondit la charge par défaut : déclarer 3 000 kg pour 2 847 kg porterait la charge déclarée au maximum autorisé, ce qui est inexact et risqué."
       },
       {
-        enonce: "Une ville doit évacuer 38 412 habitants en urgence. Des cars de 50 personnes sont commandés. Le préfet commande…",
-        choices: ["760 cars — 38 000 ÷ 50", "770 cars — 38 500 ÷ 50", "800 cars — 40 000 ÷ 50"],
-        answer:  "800 cars — 40 000 ÷ 50",
-        explication: "En urgence, on ne peut pas laisser quelqu'un sans moyen d'évacuation. On arrondit par excès à 40 000 ÷ 50 = 800 cars. 760 cars laisserait 412 personnes sans transport."
+        enonce: "Un refuge d'urgence doit distribuer une couverture à chacun des 38 412 réfugiés accueillis. Pour être certain de ne manquer à personne, le responsable en commande environ…",
+        choices: ["38 400 couvertures", "38 000 couvertures", "39 000 couvertures"],
+        answer:  "39 000 couvertures",
+        explication: "Arrondi par excès au millier : en situation d'urgence, on prévoit toujours plus, jamais moins. 38 412 → environ 39 000 couvertures."
       },
       {
         enonce: "Un projecteur éclaire une scène de 247 m². Le technicien commande des ampoules pour couvrir environ…",
@@ -879,10 +885,10 @@ Object.assign(window.EXERCISE_DATA, {
         explication: "Pour l'éclairage, mieux vaut prévoir plus que moins. L'arrondi par excès à la centaine (300 m²) garantit une scène bien éclairée. 200 m² serait insuffisant ; 250 m² légèrement court."
       },
       {
-        enonce: "Une école prévoit une sortie pour 312 élèves. Les bus ont 50 places. Le directeur commande…",
-        choices: ["6 bus — 300 places", "7 bus — 350 places"],
-        answer:  "7 bus — 350 places",
-        explication: "312 élèves ne rentrent pas dans 6 bus (300 places seulement, il manquerait 12 places). Un 7e bus est indispensable : on arrondit toujours le nombre de bus par excès."
+        enonce: "Un aéroport prépare des cartes d'embarquement pour un vol de 312 passagers. Pour ne jamais tomber à court, le personnel en imprime environ…",
+        choices: ["310 cartes", "300 cartes", "320 cartes"],
+        answer:  "320 cartes",
+        explication: "Arrondi par excès à la dizaine : mieux vaut en avoir trop que pas assez. 312 → environ 320 cartes."
       },
       {
         enonce: "Un producteur récolte 4 173 kg de tomates. Il les vend en caisses complètes de 500 kg. Combien de caisses complètes peut-il remplir ?",
