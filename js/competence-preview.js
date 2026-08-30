@@ -575,16 +575,18 @@ const CompetencePreview = (() => {
     },
 
     "decomposer-nombre-entier-niveaux": (item) => {
-      if (item.mil !== undefined && item.cen !== undefined) {
-        return { q: `Décomposer ${item.display} (milliers/centaines/dizaines/unités)`, a: `${item.mil} milliers + ${item.cen} centaines + ${item.diz} dizaines + ${item.uni} unités` };
+      if (!Array.isArray(item.digits) || !Array.isArray(item.positions)) return null;
+      const isAdd = item.format === "additive";
+      const parts = item.digits.map((d, i) => {
+        const pos = item.positions[i];
+        return isAdd ? `${d * pos.mult} (${pos.name.toLowerCase()})` : `${d} × ${pos.mult} (${pos.name.toLowerCase()})`;
+      });
+      let a = parts.join(" + ");
+      if (item.trap) {
+        a += ` — piège : « a-t-il un chiffre des ${item.trap.name.toLowerCase()} ? » → Non`;
       }
-      if (Array.isArray(item.parts)) {
-        return { q: `Décomposer ${item.display} en unités de numération`, a: item.parts.join(" + ") };
-      }
-      if (item.add !== undefined) {
-        return { q: `Décomposer ${item.display} (écriture additive / somme de produits / lettres)`, a: `${item.add}  |  ${(item.vp || []).join(" + ")}  |  ${item.lettres} (${item.chiffre})` };
-      }
-      return null;
+      const fmtLabel = isAdd ? "écriture additive" : "écriture en produits";
+      return { q: `Décomposer ${item.display} (${fmtLabel} — exemple ; format tiré aléatoirement à l'exécution)`, a };
     },
 
     "encadrer-nombre-entier-niveaux": (item) => {
