@@ -397,6 +397,10 @@
             <strong>Supabase</strong> (Supabase Inc.), un service d'infrastructure de base de données
             PostgreSQL hébergé en Europe.
           </p>
+          <p>
+            L'envoi de l'email de confirmation d'inscription des comptes enseignants s'appuie sur
+            <strong>Resend</strong> (Resend Inc.), un service d'envoi d'emails transactionnels.
+          </p>
         </section>
 
         <!-- 3. Objet du site -->
@@ -502,9 +506,29 @@
             <li>les résultats aux exercices et l'historique de progression.</li>
           </ul>
           <p>
+            Les résultats et l'historique de progression des élèves sont conservés pour la durée
+            de l'année scolaire en cours, puis supprimés à son terme.
+          </p>
+          <p>
+            Le compte enseignant est associé à une adresse email, utilisée uniquement pour la
+            connexion au service et, le cas échéant, pour le contacter en lien avec son compte.
+          </p>
+          <p>
             Ces données ne sont jamais cédées à des tiers, ne sont pas utilisées à des fins
             publicitaires, et restent sous le contrôle de l'enseignant responsable de la classe.
           </p>
+          <p>
+            L'enseignant est responsable des données qu'il saisit pour sa classe (création des
+            comptes élèves, choix des pseudos, gestion des accès). L'éditeur du site intervient
+            en tant que sous-traitant technique, assurant l'hébergement et le fonctionnement du
+            service, sans accès aux données à d'autres fins que la maintenance.
+          </p>
+          <p>
+            Pour toute question relative aux données personnelles ou pour exercer vos droits
+            (accès, rectification, suppression), vous pouvez contacter l'éditeur du site via
+            l'adresse affichée ci-dessous.
+          </p>
+          <p><span id="rgpd-contact-email"></span></p>
         </section>
 
         <!-- 7. Sécurité et accès -->
@@ -585,7 +609,7 @@
           <p>
             <strong>Conception, développement et contenus :</strong> François Pérocheau<br>
             <strong>Établissement de rattachement :</strong> Lycée Français de Madrid (LFM)<br>
-            <strong>Technologies utilisées :</strong> HTML, CSS, JavaScript, GitHub Pages, Supabase<br>
+            <strong>Technologies utilisées :</strong> HTML, CSS, JavaScript, GitHub Pages, Supabase, Resend<br>
             <strong>Diffusion :</strong> sous licence Creative Commons BY-NC-ND 4.0
           </p>
           <div class="cc-badge-wrap">
@@ -637,6 +661,19 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/menu.js"></script>
+  <script>
+  (function () {
+    var codes = [102, 114, 97, 110, 112, 101, 114, 111, 99, 104, 101, 97, 117, 64, 103, 109, 97, 105, 108, 46, 99, 111, 109];
+    var address = String.fromCharCode.apply(null, codes);
+    var host = document.getElementById('rgpd-contact-email');
+    if (host) {
+      var link = document.createElement('a');
+      link.href = 'mailto:' + address;
+      link.textContent = address;
+      host.appendChild(link);
+    }
+  })();
+  </script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */
     footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
