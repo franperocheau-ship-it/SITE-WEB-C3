@@ -343,6 +343,23 @@ const CompetencePreview = (() => {
       return { q, a: rep ? `${rep}, ${pl}` : pl };
     },
 
+    "fraction-decimale-grille-droite-niveaux": (item) => {
+      if (item.num == null || item.den == null) return null;
+      if (item.level === 1) {
+        return { q: `Colorier la grille (bande de 10) et placer ${item.num}/${item.den} sur la droite 0→1 (exemple ; item tiré aléatoirement à l'exécution)`, a: `${item.num}/${item.den}` };
+      }
+      if (item.level === 2) {
+        const d = Math.floor(item.num / 10), c = item.num % 10;
+        return { q: `Colorier la grille 10×10, placer ${item.num}/${item.den} sur la droite, puis décomposer (exemple ; item tiré aléatoirement à l'exécution)`, a: `${item.num}/${item.den} = ${d} dixième(s) + ${c} centième(s)` };
+      }
+      const unit = Math.floor(item.num / item.den);
+      const rem  = item.num % item.den;
+      const d = item.den === 10 ? rem : Math.floor(rem / 10);
+      const c = item.den === 10 ? 0   : rem % 10;
+      const trapNote = item.hasTrap ? " + piège vrai/faux sur une écriture équivalente" : "";
+      return { q: `Colorier plusieurs grilles, placer ${item.num}/${item.den} au-delà de 1, puis décomposer${trapNote} (exemple ; item tiré aléatoirement à l'exécution)`, a: `${item.num}/${item.den} = ${unit} unité(s) + ${d} dixième(s) + ${c} centième(s)` };
+    },
+
     "lire-fraction": (item) => {
       if (item.parts == null || item.colored == null) return null;
       const shapeLabel = item.shape === "circle" ? "disque" : item.shape === "rect" ? "grille" : "bande";

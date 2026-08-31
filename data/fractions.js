@@ -515,23 +515,25 @@ Object.assign(window.EXERCISE_DATA, {
     title: "Encadrer une fraction entre deux entiers consécutifs",
     domaine:    "Mathématiques",
     competence: "Fractions — Encadrer",
-    levels: ["CM1", "CM2"],
-    paliers: 2, /* nombre réel de paliers du moteur */
+    levels: ["CM1", "CM2", "6e"],
+    paliers: 3, /* nombre réel de paliers du moteur */
     levelDescs: {
       "CM1": "Avec droite graduée pour t'aider",
-      "CM2": "Par le calcul, sans droite graduée"
+      "CM2": "Par le calcul, sans droite graduée",
+      "6e":  "Dénominateurs plus grands, sans droite graduée"
     },
     type: "encadrer-fraction",
-    questionsPerSession: 6,
+    questionsPerSession: 10,
     backLink: { href: "mathématiques-fractions.html", label: "Fractions" },
 
     /* ── Banque de questions ──────────────────────────────────────────────
-       difficulty 1 — avec droite graduée (Niveau 1 / Niveau 2)
-         Fractions > 1, petits dénominateurs. Un cas entier : 8/4 = 2 (signe ≤).
-       difficulty 2 — sans droite graduée, par le calcul (Niveau 2 / Niveau 3)
-         Fractions plus grandes ou en dixièmes. Un cas entier : 30/6 = 5.
-       Champs : numerator, denominator, lo (entier inf.), hi (entier sup.),
-                isInteger (true quand la fraction vaut exactement un entier)
+       difficulty 1 — avec droite graduée (Niveau 1)
+         Fractions > 1, petits dénominateurs.
+       difficulty 2 — sans droite graduée, par le calcul (Niveau 2)
+         Fractions plus grandes ou en dixièmes.
+       difficulty 3 — sans droite graduée, par le calcul (Niveau 3)
+         Dénominateurs plus grands (8 à 15), numérateurs à 2-3 chiffres.
+       Champs : numerator, denominator, lo (entier inf.), hi (entier sup.)
     ────────────────────────────────────────────────────────────────────── */
     bank: [
 
@@ -544,6 +546,13 @@ Object.assign(window.EXERCISE_DATA, {
       { numerator:  7, denominator: 2, lo: 3, hi: 4, difficulty: 1 },
       { numerator: 13, denominator: 5, lo: 2, hi: 3, difficulty: 1 },
       { numerator:  9, denominator: 2, lo: 4, hi: 5, difficulty: 1 },
+      { numerator: 11, denominator: 4, lo: 2, hi: 3, difficulty: 1 },
+      { numerator: 13, denominator: 3, lo: 4, hi: 5, difficulty: 1 },
+      { numerator:  9, denominator: 5, lo: 1, hi: 2, difficulty: 1 },
+      { numerator: 17, denominator: 5, lo: 3, hi: 4, difficulty: 1 },
+      { numerator: 15, denominator: 4, lo: 3, hi: 4, difficulty: 1 },
+      { numerator:  8, denominator: 3, lo: 2, hi: 3, difficulty: 1 },
+      { numerator: 19, denominator: 5, lo: 3, hi: 4, difficulty: 1 },
 
       /* Niveau 2 — sans droite graduée */
       { numerator: 47, denominator: 10, lo: 4, hi: 5, difficulty: 2 },
@@ -553,7 +562,31 @@ Object.assign(window.EXERCISE_DATA, {
       { numerator: 53, denominator:  8, lo: 6, hi: 7, difficulty: 2 },
       { numerator: 29, denominator:  6, lo: 4, hi: 5, difficulty: 2 },
       { numerator: 41, denominator:  9, lo: 4, hi: 5, difficulty: 2 },
-      { numerator: 43, denominator:  6, lo: 7, hi: 8, difficulty: 2 }
+      { numerator: 43, denominator:  6, lo: 7, hi: 8, difficulty: 2 },
+      { numerator: 27, denominator:  4, lo: 6, hi: 7, difficulty: 2 },
+      { numerator: 33, denominator:  8, lo: 4, hi: 5, difficulty: 2 },
+      { numerator: 61, denominator: 10, lo: 6, hi: 7, difficulty: 2 },
+      { numerator: 77, denominator: 10, lo: 7, hi: 8, difficulty: 2 },
+      { numerator: 44, denominator:  7, lo: 6, hi: 7, difficulty: 2 },
+      { numerator: 39, denominator:  5, lo: 7, hi: 8, difficulty: 2 },
+      { numerator: 19, denominator:  3, lo: 6, hi: 7, difficulty: 2 },
+
+      /* Niveau 3 — sans droite graduée, dénominateurs 8-15 */
+      { numerator:  67, denominator:  9, lo:  7, hi:  8, difficulty: 3 },
+      { numerator: 134, denominator: 11, lo: 12, hi: 13, difficulty: 3 },
+      { numerator:  89, denominator: 13, lo:  6, hi:  7, difficulty: 3 },
+      { numerator:  97, denominator:  8, lo: 12, hi: 13, difficulty: 3 },
+      { numerator: 103, denominator: 12, lo:  8, hi:  9, difficulty: 3 },
+      { numerator: 151, denominator: 14, lo: 10, hi: 11, difficulty: 3 },
+      { numerator: 178, denominator: 15, lo: 11, hi: 12, difficulty: 3 },
+      { numerator: 122, denominator:  9, lo: 13, hi: 14, difficulty: 3 },
+      { numerator: 145, denominator: 13, lo: 11, hi: 12, difficulty: 3 },
+      { numerator:  94, denominator: 11, lo:  8, hi:  9, difficulty: 3 },
+      { numerator: 167, denominator: 12, lo: 13, hi: 14, difficulty: 3 },
+      { numerator:  76, denominator:  8, lo:  9, hi: 10, difficulty: 3 },
+      { numerator: 199, denominator: 14, lo: 14, hi: 15, difficulty: 3 },
+      { numerator:  88, denominator:  9, lo:  9, hi: 10, difficulty: 3 },
+      { numerator: 129, denominator: 13, lo:  9, hi: 10, difficulty: 3 }
 
     ]
   },
@@ -631,55 +664,73 @@ Object.assign(window.EXERCISE_DATA, {
   },
 
   /* NB : classé ici (Fractions) par backLink car proposé sur la page Fractions,
-     bien que competence relève des Nombres décimaux (lien fraction décimale ↔ décimal). */
+     bien que competence relève des Nombres décimaux (lien fraction décimale ↔
+     numération en parts de dix/cent). L'écriture décimale à virgule (0,3 ;
+     1,25...) n'est JAMAIS affichée ni manipulée ici — elle est travaillée
+     séparément dans le domaine Nombres décimaux (decomposer-decimaux-niveaux
+     etc.) ; cette compétence reste en fractions et en décompositions
+     dixièmes/centièmes/unités. */
   "fraction-decimale-grille-droite": {
-    title:      "Fraction décimale — Grille, droite et écriture décimale",
+    title:      "Fraction décimale — Grille et droite graduée",
     domaine:    "Mathématiques",
-    competence: "Nombres décimaux — Associer une fraction décimale à un nombre décimal",
+    competence: "Nombres décimaux — Représenter une fraction décimale (grille, droite, décomposition)",
     type:       "fraction-decimale-grille-droite-niveaux",
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
     levelDescs: {
-      "CM1": "Dixièmes (/10) — grille 10 cases + droite graduée + saisie",
-      "CM2": "Centièmes (/100) — grille 10×10 + droite graduée + saisie",
-      "6e":  "Millièmes (/1000) — droite graduée + saisie"
+      "CM1": "Dixièmes (≤ 1) — grille et droite graduée, coloriage au clic",
+      "CM2": "Centièmes (≤ 1) — grille 10×10, droite fine, décomposition dixièmes + centièmes",
+      "6e":  "Fractions > 1 — plusieurs grilles, droite au-delà de 1, décomposition complète"
     },
+    itemsPerLevel: 10,
     backLink:   { href: "mathématiques-fractions.html", label: "Fractions" },
 
-    /* ── Niveau 1 — /10 ── */
+    /* ── Génération procédurale ────────────────────────────────────────────
+       Aucune banque fixe : fdgdBuildItems() (exercise.html) tire les items
+       selon ces règles à chaque tentative (même logique que
+       placer-fraction-droite-niveaux / decomposer-nombre-entier-niveaux).
+       Chaque item est un exercice complet à plusieurs sous-réponses ; le
+       score de niveau agrège les sous-réponses de tous les items
+       (subCorrect/subTotal), pas un tout-ou-rien par item.
+       Coloriage de grille par clic direct sur chaque case (toggle) — jamais
+       de saisie numérique du nombre de cases.
+       Niveau 1 : fraction x/10 (x de 1 à 10) — grille = 1 bande de 10 cases,
+                  droite 0→1 graduée en dixièmes. 2 sous-réponses (grille +
+                  droite), pas de décomposition.
+       Niveau 2 : fraction x/100 (x de 1 à 100) — grille 10×10 (chaque ligne
+                  de 10 cases = un dixième, bordure marquée entre les
+                  lignes), droite 0→1 graduée finement en centièmes (mêmes
+                  ticks visibles que placer-decimaux-droite-niveaux niveau 1,
+                  seuls les repères d'unité sont étiquetés). Décomposition à
+                  saisir : ? dixième(s) + ? centième(s). 3 sous-réponses.
+       Niveau 3 : fraction x/10 ou x/100 avec x strictement supérieur au
+                  dénominateur (valeur entre 1 et 3 unités) — plusieurs
+                  grilles complètes (1 grille = 1 unité) + le reste, droite
+                  au-delà de 1. Décomposition à saisir : ? unité(s) +
+                  ? dixième(s) + ? centième(s). Un item sur deux ajoute un
+                  piège vrai/faux sur deux écritures fractionnaires
+                  équivalentes (ex. 12/10 et 120/100), jamais en écriture à
+                  virgule ; quand aucune équivalence exacte /10 ↔ /100
+                  n'existe pour l'item tiré, le piège est toujours "faux".
+                  3 sous-réponses, 4 si le piège vrai/faux est présent.
+    ────────────────────────────────────────────────────────────────────── */
+    genRules: {
+      1: { den: 10,  numMin: 1,   numMax: 10  },
+      2: { den: 100, numMin: 1,   numMax: 100 },
+      3: { dens: [10, 100] }
+    },
+
+    /* ── Exemples statiques — utilisés uniquement par l'aperçu enseignant
+       (js/competence-preview.js) ; le moteur d'exercice ignore ces
+       tableaux et génère toujours à la volée. ── */
     lvl1: [
-      { num: 3, den: 10, decimal: 0.3,  decimalStr: "0,3",  droiteTicks: 10, majorStep: 10, tickIdx: 3  },
-      { num: 7, den: 10, decimal: 0.7,  decimalStr: "0,7",  droiteTicks: 10, majorStep: 10, tickIdx: 7  },
-      { num: 1, den: 10, decimal: 0.1,  decimalStr: "0,1",  droiteTicks: 10, majorStep: 10, tickIdx: 1  },
-      { num: 9, den: 10, decimal: 0.9,  decimalStr: "0,9",  droiteTicks: 10, majorStep: 10, tickIdx: 9  },
-      { num: 5, den: 10, decimal: 0.5,  decimalStr: "0,5",  droiteTicks: 10, majorStep: 10, tickIdx: 5  },
-      { num: 4, den: 10, decimal: 0.4,  decimalStr: "0,4",  droiteTicks: 10, majorStep: 10, tickIdx: 4  },
-      { num: 6, den: 10, decimal: 0.6,  decimalStr: "0,6",  droiteTicks: 10, majorStep: 10, tickIdx: 6  },
-      { num: 2, den: 10, decimal: 0.2,  decimalStr: "0,2",  droiteTicks: 10, majorStep: 10, tickIdx: 2  }
+      { level: 1, num: 7, den: 10 }
     ],
-
-    /* ── Niveau 2 — /100 ── */
     lvl2: [
-      { num: 23, den: 100, decimal: 0.23, decimalStr: "0,23", droiteTicks: 100, majorStep: 10, tickIdx: 23 },
-      { num: 75, den: 100, decimal: 0.75, decimalStr: "0,75", droiteTicks: 100, majorStep: 10, tickIdx: 75 },
-      { num: 40, den: 100, decimal: 0.4,  decimalStr: "0,40", droiteTicks: 100, majorStep: 10, tickIdx: 40 },
-      { num: 8,  den: 100, decimal: 0.08, decimalStr: "0,08", droiteTicks: 100, majorStep: 10, tickIdx: 8  },
-      { num: 60, den: 100, decimal: 0.6,  decimalStr: "0,60", droiteTicks: 100, majorStep: 10, tickIdx: 60 },
-      { num: 17, den: 100, decimal: 0.17, decimalStr: "0,17", droiteTicks: 100, majorStep: 10, tickIdx: 17 },
-      { num: 50, den: 100, decimal: 0.5,  decimalStr: "0,50", droiteTicks: 100, majorStep: 10, tickIdx: 50 },
-      { num: 91, den: 100, decimal: 0.91, decimalStr: "0,91", droiteTicks: 100, majorStep: 10, tickIdx: 91 }
+      { level: 2, num: 34, den: 100 }
     ],
-
-    /* ── Niveau 3 — /1000 (pas droite = 50/1000, 20 graduations) ── */
     lvl3: [
-      { num:  50, den: 1000, decimal: 0.05,  decimalStr: "0,050", droiteTicks: 20, majorStep: 5, tickIdx:  1 },
-      { num: 150, den: 1000, decimal: 0.15,  decimalStr: "0,150", droiteTicks: 20, majorStep: 5, tickIdx:  3 },
-      { num: 250, den: 1000, decimal: 0.25,  decimalStr: "0,250", droiteTicks: 20, majorStep: 5, tickIdx:  5 },
-      { num: 350, den: 1000, decimal: 0.35,  decimalStr: "0,350", droiteTicks: 20, majorStep: 5, tickIdx:  7 },
-      { num: 450, den: 1000, decimal: 0.45,  decimalStr: "0,450", droiteTicks: 20, majorStep: 5, tickIdx:  9 },
-      { num: 650, den: 1000, decimal: 0.65,  decimalStr: "0,650", droiteTicks: 20, majorStep: 5, tickIdx: 13 },
-      { num: 750, den: 1000, decimal: 0.75,  decimalStr: "0,750", droiteTicks: 20, majorStep: 5, tickIdx: 15 },
-      { num: 900, den: 1000, decimal: 0.9,   decimalStr: "0,900", droiteTicks: 20, majorStep: 5, tickIdx: 18 }
+      { level: 3, num: 23, den: 10, hasTrap: true }
     ]
   },
 
