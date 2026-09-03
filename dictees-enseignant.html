@@ -19,7 +19,8 @@
   <script src="js/utils.js"></script>
   <script src="js/teacher.js?v=4"></script>
   <script src="js/teacher-spellcheck.js?v=1"></script>
-  <script src="js/dictees-teacher.js?v=14"></script>
+  <script src="js/dictees-colors.js?v=2"></script>
+  <script src="js/dictees-teacher.js?v=15"></script>
   <style>
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
     .dash-content { max-width: 960px; margin: 0 auto; }
@@ -322,6 +323,10 @@
         <label class="dic-form-label" for="dic-form-titre">Titre</label>
         <input type="text" id="dic-form-titre" class="dic-form-input lfm-verifie" placeholder="Ex. La rentrée des classes">
 
+        <label class="dic-form-label">Classes destinataires</label>
+        <p class="dic-form-hint" style="margin-top:0;">La dictée n'est visible que par les élèves des classes cochées.</p>
+        <div class="dic-volets-row" id="dic-form-classes"></div>
+
         <label class="dic-form-label">Émoticon d'illustration</label>
         <p class="dic-form-hint" style="margin-top:0;">Affiché sur la carte de la dictée, à la place de 📖 par défaut.</p>
         <div class="dic-emoji-picker" id="dic-emoji-picker"></div>
@@ -435,6 +440,7 @@
     let _currentClassId = null;
     let _dictees = [];
     let _editingId = null;
+    let _formClassIds = []; // classes cochées dans le formulaire (dictee_classes)
     let _formEmoji = '📖'; // émoticon d'illustration de la carte, défaut identique à la colonne dictees.emoji
     let _formMots = []; // [{ contenu, niveau }] — état du formulaire en cours
     let _formTrous = []; // [{ phrase, niveau, tags: [{ position, mot_attendu }] }]
@@ -506,6 +512,22 @@
 
     function parseList(raw) {
       return (raw || '').split(';').map(s => s.trim()).filter(Boolean);
+    }
+
+    /* ── Classes destinataires (dictee_classes) ── */
+    function renderClassCheckboxes() {
+      const wrap = document.getElementById('dic-form-classes');
+      wrap.innerHTML = _classes.map(c => `
+        <label class="dic-volet-checkbox">
+          <input type="checkbox" class="dic-form-class-checkbox" value="${c.id}" ${_formClassIds.includes(c.id) ? 'checked' : ''}>
+          ${escHtml(c.name)} (${escHtml(c.level)})
+        </label>
+      `).join('');
+      wrap.querySelectorAll('.dic-form-class-checkbox').forEach(cb => {
+        cb.addEventListener('change', () => {
+          _formClassIds = [...wrap.querySelectorAll('.dic-form-class-checkbox:checked')].map(el => el.value);
+        });
+      });
     }
 
     /* ── Émoticon d'illustration ── */
@@ -976,6 +998,11 @@
       _editingId = dictee ? dictee.id : null;
       document.getElementById('dic-form-title').textContent = dictee ? 'Modifier la dictée' : 'Nouvelle dictée';
       document.getElementById('dic-form-titre').value = dictee ? dictee.titre : '';
+      // Nouvelle dictée : pré-coche la classe actuellement filtrée (retour au
+      // comportement précédent, où la dictée était créée pour cette classe) ;
+      // édition : les classes déjà assignées (dictee.class_ids, cf. getDictee).
+      _formClassIds = dictee ? (dictee.class_ids || []) : (_currentClassId ? [_currentClassId] : []);
+      renderClassCheckboxes();
       _formEmoji = dictee && dictee.emoji ? dictee.emoji : '📖';
       document.getElementById('dic-form-inclut-lexicale').checked = dictee ? dictee.inclut_lexicale !== false : true;
       document.getElementById('dic-form-inclut-grammaticale').checked = dictee ? dictee.inclut_grammaticale !== false : true;
@@ -1026,6 +1053,7 @@
     function closeForm() {
       document.getElementById('dic-form-card').style.display = 'none';
       _editingId = null;
+      _formClassIds = [];
       _formEmoji = '📖';
       _formMots = [];
       _formTrous = [];
@@ -1038,6 +1066,7 @@
     async function saveForm() {
       const titre = document.getElementById('dic-form-titre').value.trim();
       if (!titre) { alert('Le titre est obligatoire.'); return; }
+      if (_formClassIds.length === 0) { alert('Sélectionne au moins une classe.'); return; }
       if (_formMots.length === 0) { alert('Ajoute au moins un mot difficile.'); return; }
 
       const inclutLexicale = document.getElementById('dic-form-inclut-lexicale').checked;
@@ -1093,9 +1122,9 @@
       saveBtn.disabled = true;
       try {
         if (_editingId) {
-          await lfmDicteesTeacher.updateDictee(_editingId, titre, _formEmoji, mots, trous, trousConj, transformations, extraMots, inclutLexicale, inclutGrammaticale);
+          await lfmDicteesTeacher.updateDictee(_editingId, _formClassIds, titre, _formEmoji, mots, trous, trousConj, transformations, extraMots, inclutLexicale, inclutGrammaticale);
         } else {
-          await lfmDicteesTeacher.createDictee(_currentClassId, _teacherProfile.id, titre, _formEmoji, mots, trous, trousConj, transformations, extraMots, inclutLexicale, inclutGrammaticale);
+          await lfmDicteesTeacher.createDictee(_formClassIds, _teacherProfile.id, titre, _formEmoji, mots, trous, trousConj, transformations, extraMots, inclutLexicale, inclutGrammaticale);
         }
         closeForm();
         await loadDictees();
@@ -1124,6 +1153,11 @@
         const isEditing = d.id === _editingId;
         const colorClass = ROW_COLOR_CYCLE[i % 3];
         const num = String(i + 1).padStart(2, '0');
+        const classPills = (d.class_ids || [])
+          .map(cid => _classes.find(c => c.id === cid))
+          .filter(Boolean)
+          .map(c => `<span class="dic-point-pastille" style="--dic-color:${DicteesColors.colorFor(c.name)}">${escHtml(c.name)}</span>`)
+          .join(' ');
         return `
         <div class="dic-teacher-card ${colorClass}${isEditing ? ' dic-teacher-card--editing' : ''}">
           <div class="dic-teacher-card-top">
@@ -1135,6 +1169,7 @@
                   <span class="dic-teacher-card-meta-pill">${d.mot_count} mot${d.mot_count !== 1 ? 's' : ''} difficile${d.mot_count !== 1 ? 's' : ''}</span>
                   ${isEditing ? ' <span class="dic-editing-badge">En cours d’édition</span>' : ''}
                 </div>
+                <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">${classPills}</div>
               </div>
             </div>
             <div class="dic-teacher-card-actions">

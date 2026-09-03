@@ -11,25 +11,45 @@
 const lfmDicteesTeacher = (() => {
   const db = window.lfmDb;
 
-  /* Liste des dictées d'une classe, avec le nombre de mots (pour l'affichage
-     de la carte enseignant) — pas les mots eux-mêmes, chargés à la demande
-     à l'ouverture du formulaire d'édition. */
+  /* Liste des dictées assignées à une classe (via dictee_classes, cf.
+     migration 20260924100000 — une dictée peut désormais être distribuée à
+     plusieurs classes), avec le nombre de mots (pour l'affichage de la carte
+     enseignant) — pas les mots eux-mêmes, chargés à la demande à l'ouverture
+     du formulaire d'édition — et `class_ids` : TOUTES les classes assignées
+     à chaque dictée (pas seulement `classId`), pour les pastilles de la
+     liste enseignante. */
   async function getClassDictees(classId) {
+    const { data: links, error: linkErr } = await db.from('dictee_classes')
+      .select('dictee_id').eq('class_id', classId);
+    if (linkErr) throw linkErr;
+    const ids = [...new Set((links || []).map(l => l.dictee_id))];
+    if (ids.length === 0) return [];
+
     const { data: dictees, error } = await db.from('dictees').select('*')
-      .eq('class_id', classId)
+      .in('id', ids)
       .order('created_at', { ascending: false });
     if (error) throw error;
 
-    const ids = (dictees || []).map(d => d.id);
-    const countMap = {};
-    if (ids.length > 0) {
-      const { data: mots, error: motsErr } = await db.from('dictee_mots')
-        .select('dictee_id').in('dictee_id', ids);
-      if (motsErr) throw motsErr;
-      (mots || []).forEach(m => { countMap[m.dictee_id] = (countMap[m.dictee_id] || 0) + 1; });
-    }
+    const [motsRes, allLinksRes] = await Promise.all([
+      db.from('dictee_mots').select('dictee_id').in('dictee_id', ids),
+      db.from('dictee_classes').select('dictee_id, class_id').in('dictee_id', ids)
+    ]);
+    if (motsRes.error) throw motsRes.error;
+    if (allLinksRes.error) throw allLinksRes.error;
 
-    const withCounts = (dictees || []).map(d => ({ ...d, mot_count: countMap[d.id] || 0 }));
+    const countMap = {};
+    (motsRes.data || []).forEach(m => { countMap[m.dictee_id] = (countMap[m.dictee_id] || 0) + 1; });
+
+    const classIdsByDictee = {};
+    (allLinksRes.data || []).forEach(l => {
+      (classIdsByDictee[l.dictee_id] = classIdsByDictee[l.dictee_id] || []).push(l.class_id);
+    });
+
+    const withCounts = (dictees || []).map(d => ({
+      ...d,
+      mot_count: countMap[d.id] || 0,
+      class_ids: classIdsByDictee[d.id] || []
+    }));
     return sortByTitleNumber(withCounts);
   }
 
@@ -45,6 +65,11 @@ const lfmDicteesTeacher = (() => {
     const { data: dictee, error } = await db.from('dictees').select('*')
       .eq('id', dicteeId).single();
     if (error) throw error;
+
+    const { data: classLinks, error: classErr } = await db.from('dictee_classes')
+      .select('class_id').eq('dictee_id', dicteeId);
+    if (classErr) throw classErr;
+    dictee.class_ids = (classLinks || []).map(l => l.class_id);
 
     const { data: mots, error: motsErr } = await db.from('dictee_mots').select('*')
       .eq('dictee_id', dicteeId).order('ordre', { ascending: true });
@@ -62,11 +87,14 @@ const lfmDicteesTeacher = (() => {
 
   /**
    * Crée une dictée et ses mots/exercices grammaticaux en une opération.
-   * `mots` : [{ contenu, niveau, nature_grammaticale }] — l'ordre est déduit
-   * de la position dans le tableau (correspond à l'ordre de saisie dans la
-   * zone de texte). `trous`/`transformations`/`extraMots` : voir §2/§1 des
-   * fonctions replaceX ci-dessous. `inclutLexicale`/`inclutGrammaticale` :
-   * volets proposés à l'élève pour cette dictée (colonnes `dictees.inclut_lexicale`/
+   * `classIds` : classes destinataires (dictee_classes, cf. migration
+   * 20260924100000 — une dictée peut être distribuée à plusieurs classes ;
+   * non vide, validé côté formulaire). `mots` : [{ contenu, niveau,
+   * nature_grammaticale }] — l'ordre est déduit de la position dans le
+   * tableau (correspond à l'ordre de saisie dans la zone de texte).
+   * `trous`/`transformations`/`extraMots` : voir §2/§1 des fonctions
+   * replaceX ci-dessous. `inclutLexicale`/`inclutGrammaticale` : volets
+   * proposés à l'élève pour cette dictée (colonnes `dictees.inclut_lexicale`/
    * `inclut_grammaticale`, défaut true en base — validé côté formulaire
    * pour qu'au moins l'un des deux reste actif). `emoji` : illustration de
    * la carte (dictees-catalogue.html/dictees-enseignant.html), choisie dans
@@ -78,10 +106,14 @@ const lfmDicteesTeacher = (() => {
    * la colonne existe toujours en base et d'éventuelles valeurs antérieures
    * sont conservées telles quelles, mais plus jamais lues/écrites/affichées
    * par le client (voir aussi dictees-catalogue.html, épuré de même).
+   *
+   * `dictees.class_id` (mono-classe, hérité du modèle précédent) n'est plus
+   * écrit ici : reste NULL pour toute dictée créée depuis cette migration,
+   * dictee_classes étant désormais la seule source de vérité pour la
+   * visibilité élève (voir aussi getOrphanDictees/reassignDictee plus bas).
    */
-  async function createDictee(classId, teacherId, titre, emoji, mots, trous, trousConjugaison, transformations, extraMots, inclutLexicale, inclutGrammaticale) {
+  async function createDictee(classIds, teacherId, titre, emoji, mots, trous, trousConjugaison, transformations, extraMots, inclutLexicale, inclutGrammaticale) {
     const { data: dictee, error } = await db.from('dictees').insert({
-      class_id: classId,
       teacher_id: teacherId,
       titre: titre.trim(),
       emoji: emoji || '📖',
@@ -91,6 +123,7 @@ const lfmDicteesTeacher = (() => {
     if (error) throw error;
 
     await Promise.all([
+      replaceDicteeClasses(dictee.id, classIds),
       replaceMots(dictee.id, mots),
       replaceTrous(dictee.id, trous),
       replaceTrousConjugaison(dictee.id, trousConjugaison),
@@ -100,7 +133,7 @@ const lfmDicteesTeacher = (() => {
     return dictee;
   }
 
-  async function updateDictee(dicteeId, titre, emoji, mots, trous, trousConjugaison, transformations, extraMots, inclutLexicale, inclutGrammaticale) {
+  async function updateDictee(dicteeId, classIds, titre, emoji, mots, trous, trousConjugaison, transformations, extraMots, inclutLexicale, inclutGrammaticale) {
     const { error } = await db.from('dictees').update({
       titre: titre.trim(),
       emoji: emoji || '📖',
@@ -111,12 +144,26 @@ const lfmDicteesTeacher = (() => {
     if (error) throw error;
 
     await Promise.all([
+      replaceDicteeClasses(dicteeId, classIds),
       replaceMots(dicteeId, mots),
       replaceTrous(dicteeId, trous),
       replaceTrousConjugaison(dicteeId, trousConjugaison),
       replaceTransformations(dicteeId, transformations),
       replaceGramExtraMots(dicteeId, extraMots)
     ]);
+  }
+
+  /* Remplace intégralement les classes destinataires d'une dictée (même
+     patron delete-then-reinsert que replaceMots) — le formulaire enseignant
+     ressaisit l'ensemble des cases cochées à chaque enregistrement. */
+  async function replaceDicteeClasses(dicteeId, classIds) {
+    const { error: delErr } = await db.from('dictee_classes').delete().eq('dictee_id', dicteeId);
+    if (delErr) throw delErr;
+
+    if (!classIds || classIds.length === 0) return;
+    const rows = classIds.map(classId => ({ dictee_id: dicteeId, class_id: classId }));
+    const { error: insErr } = await db.from('dictee_classes').insert(rows);
+    if (insErr) throw insErr;
   }
 
   /* Remplace intégralement la liste des mots d'une dictée (le formulaire
@@ -296,23 +343,35 @@ const lfmDicteesTeacher = (() => {
     if (error) throw error;
   }
 
-  /* Dictées orphelines de classe (class_id NULL) — survivent à une
+  /* Dictées orphelines (aucune ligne dans dictee_classes) — survivent à une
      suppression de fin d'année (voir 20260902100000_fin_annee_suppression.sql)
-     tant que la classe qui les portait a été supprimée. RLS scope déjà sur
+     quand la (ou les) classe(s) qui les portaient ont été supprimées
+     (dictee_classes.class_id en ON DELETE CASCADE). Depuis la migration
+     20260924100000 (distribution multi-classes), ce n'est plus
+     `dictees.class_id IS NULL` qui définit une orpheline — cette colonne
+     n'est plus jamais écrite — mais l'absence de toute ligne dans
+     dictee_classes ; une dictée qui perd une classe parmi plusieurs reste
+     visible via les autres, sans passer par ce flux. RLS scope déjà sur
      teacher_id = auth.uid(), inutile de le repasser en paramètre. */
   async function getOrphanDictees() {
-    const { data, error } = await db.from('dictees')
+    const { data: dictees, error } = await db.from('dictees')
       .select('id, titre, created_at')
-      .is('class_id', null)
       .order('created_at', { ascending: false });
     if (error) throw error;
-    return sortByTitleNumber(data || []);
+    if (!dictees || dictees.length === 0) return [];
+
+    const ids = dictees.map(d => d.id);
+    const { data: links, error: linkErr } = await db.from('dictee_classes')
+      .select('dictee_id').in('dictee_id', ids);
+    if (linkErr) throw linkErr;
+    const assigned = new Set((links || []).map(l => l.dictee_id));
+
+    return sortByTitleNumber(dictees.filter(d => !assigned.has(d.id)));
   }
 
   async function reassignDictee(dicteeId, classId) {
-    const { error } = await db.from('dictees')
-      .update({ class_id: classId })
-      .eq('id', dicteeId);
+    const { error } = await db.from('dictee_classes')
+      .insert({ dictee_id: dicteeId, class_id: classId });
     if (error) throw error;
   }
 

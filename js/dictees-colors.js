@@ -8,8 +8,10 @@
    libellé garde toujours la même couleur d'une dictée à l'autre, sans
    mapping manuel à entretenir.
 
-   Utilisé par dictees-enseignant.html (aperçu) et français-orthographe.html
-   (cartes de la section « Dictées préparées »).
+   Repris par dictees-enseignant.html pour les pastilles de classes
+   destinataires d'une dictée (dictee_classes, cf. migration 20260924100000)
+   — même logique de couleur déterministe, appliquée au nom de la classe
+   plutôt qu'à un point grammatical.
    ───────────────────────────────────────────────────────────────────────────── */
 
 const DicteesColors = (() => {

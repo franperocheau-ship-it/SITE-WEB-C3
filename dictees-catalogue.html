@@ -160,8 +160,19 @@
           .from('students').select('class_id').eq('auth_user_id', session.user.id).single();
         if (!student || !student.class_id) { empty.style.display = ''; return; }
 
+        /* Une dictée n'est visible que si elle est distribuée à la classe de
+           l'élève (dictee_classes, cf. migration 20260924100000 — une même
+           dictée peut désormais être assignée à plusieurs classes ; RLS sur
+           `dictees` fait déjà respecter cette règle côté serveur, ce filtre
+           client évite juste un aller-retour inutile). */
+        const { data: links, error: linkErr } = await window.lfmDb
+          .from('dictee_classes').select('dictee_id').eq('class_id', student.class_id);
+        if (linkErr) { empty.style.display = ''; return; }
+        const dicteeIds = (links || []).map(l => l.dictee_id);
+        if (dicteeIds.length === 0) { empty.style.display = ''; return; }
+
         const { data: dictees, error } = await window.lfmDb
-          .from('dictees').select('*').eq('class_id', student.class_id)
+          .from('dictees').select('*').in('id', dicteeIds)
           .order('created_at', { ascending: false });
         if (error || !dictees || dictees.length === 0) { empty.style.display = ''; return; }
 
