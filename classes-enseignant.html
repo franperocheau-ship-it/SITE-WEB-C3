@@ -114,6 +114,8 @@
     .btn-ghost:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
     .btn-danger { background: rgba(214,40,57,0.07); color: var(--red); border: 1.5px solid rgba(214,40,57,0.2); }
     .btn-danger:hover:not(:disabled) { background: rgba(214,40,57,0.14); }
+    .btn-gold { background: var(--color-brand-gold, #F5A623); color: var(--blue); font-family: var(--font-display, 'Fredoka', sans-serif); font-weight: 700; box-shadow: 0 2px 8px rgba(245,166,35,0.35); }
+    .btn-gold:hover:not(:disabled) { background: #e8971a; }
     .btn-sm { padding: 7px 14px; font-size: 12px; }
     .btn-icon { padding: 7px 10px; border-radius: 8px; }
 
@@ -1711,11 +1713,16 @@
     renderDetailStudents();
 
     let html = '';
-    ok.forEach(r => {
-      html += `<div style="color:#15803d">✓ <strong>${esc(r.student.display_name)}</strong> — <code>${esc(r.student.username)}</code> / <code>${esc(r.student.password)}</code></div>`;
-    });
+    if (ok.length > 0) {
+      html += `
+        <div style="color:var(--text);line-height:1.6">
+          Vos comptes ont été créés. Téléchargez les étiquettes à découper pour les distribuer aux élèves.
+        </div>
+        <button type="button" class="btn btn-gold" style="margin-top:10px" onclick="downloadPDF()">📄 Télécharger étiquettes identifiants</button>
+      `;
+    }
     failed.forEach(r => {
-      html += `<div style="color:var(--red)">✗ ${esc(r.name)} — ${esc(r.error)}</div>`;
+      html += `<div style="color:var(--red);margin-top:${ok.length > 0 ? '14px' : '0'}">✗ ${esc(r.name)} — ${esc(r.error)}</div>`;
     });
     resultsEl.innerHTML  = html;
     resultsEl.style.display = 'block';
