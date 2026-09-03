@@ -1,6 +1,11 @@
 // Edge Function : delete-class
-// Supprime une ou plusieurs classes avec leurs élèves et résultats.
-// NE touche PAS aux comptes enseignants.
+// Supprime une ou plusieurs classes avec leurs élèves, leurs comptes
+// auth.users (via l'API admin) et leurs résultats. NE touche PAS aux comptes
+// enseignants.
+//
+// Appelable par un admin (n'importe quelle classe) ou par un enseignant
+// (uniquement ses propres classes — l'appartenance est vérifiée via le
+// client RLS de l'appelant, cf. policy classes_all_own_teacher).
 //
 // Corps attendu : { class_ids: string[] }
 // Variable d'environnement requise : SUPABASE_SERVICE_ROLE_KEY
@@ -29,7 +34,7 @@ Deno.serve(async (req) => {
     const anonKey    = Deno.env.get('SUPABASE_ANON_KEY')!;
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-    // Vérifier que l'appelant est bien un admin connecté
+    // Vérifier que l'appelant est bien un admin ou un enseignant connecté
     const callerClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } }
     });
@@ -42,7 +47,7 @@ Deno.serve(async (req) => {
 
     const { data: profile } = await callerClient
       .from('profiles').select('role').eq('id', user.id).single();
-    if (!profile || profile.role !== 'admin') {
+    if (!profile || (profile.role !== 'admin' && profile.role !== 'enseignant')) {
       return new Response(JSON.stringify({ error: 'Accès refusé' }), {
         status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -64,8 +69,11 @@ Deno.serve(async (req) => {
 
     for (const classId of class_ids) {
       try {
-        // 1. Récupérer les infos de la classe
-        const { data: classData, error: classErr } = await adminClient
+        // 1. Récupérer les infos de la classe — via callerClient (RLS) pour que
+        //    l'appartenance soit vérifiée automatiquement : un enseignant ne
+        //    voit ainsi que ses propres classes (policy classes_all_own_teacher),
+        //    un admin les voit toutes (policy classes_all_admin).
+        const { data: classData, error: classErr } = await callerClient
           .from('classes').select('id, name').eq('id', classId).single();
         if (classErr || !classData) {
           errors.push({ class_id: classId, error: 'Classe introuvable' });

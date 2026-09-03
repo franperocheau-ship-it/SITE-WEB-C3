@@ -342,22 +342,6 @@
     .dys-badge.is-active:hover { background: #17a58a; }
     .dys-badge:disabled { opacity: 0.6; cursor: default; }
 
-    /* ── Lien vers le pilotage des exercices (déménagé, Lot C) ──────────────── */
-    .pilotage-link-card {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-      background: var(--card-bg);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-sm);
-      padding: 18px 26px;
-      margin-bottom: 20px;
-    }
-    .pilotage-link-text { font-size: 13.5px; color: var(--muted); }
-    .pilotage-link-text strong { color: var(--color-brand-navy); }
-
     /* ── Students table ──────────────────────────────────────────────────────── */
     .table-wrap {
       background: var(--card-bg);
@@ -699,20 +683,13 @@
           </div>
         </div>
 
-        <!-- Lien vers le pilotage des exercices (déménagé dans pilotage-enseignant.html, Lot C) -->
-        <div class="pilotage-link-card">
-          <span class="pilotage-link-text">
-            🎯 Mode d'accès, exercices débloqués et progression par niveaux se règlent désormais dans <strong>Pilotage des compétences</strong>.
-          </span>
-          <a class="btn btn-outline btn-sm" id="pilotage-link" href="pilotage-enseignant.html">Piloter les exercices de cette classe →</a>
-        </div>
-
         <!-- En-tête élèves -->
         <div class="section-header">
           <span class="section-title">Élèves</span>
           <div class="section-actions">
+            <button class="btn btn-danger btn-sm" id="btn-repair-auth" onclick="repairMissingAuth()" style="display:none">🔧 Créer les comptes manquants</button>
             <button class="btn btn-outline btn-sm" onclick="openModalGroups()">👥 Gérer les groupes</button>
-            <button class="btn btn-ghost btn-sm" id="btn-pdf"   onclick="downloadPDF()">📄 Télécharger étiquettes identifiants</button>
+            <button class="btn btn-outline btn-sm" id="btn-pdf"   onclick="downloadPDF()">📄 Télécharger étiquettes identifiants</button>
             <button class="btn btn-outline btn-sm" onclick="openModalBulk()">+ Ajout en masse</button>
             <button class="btn btn-primary btn-sm" onclick="openModalAddStudent()">+ Ajouter un élève</button>
           </div>
@@ -1171,7 +1148,6 @@
     document.getElementById('detail-badge').innerHTML     = `<span class="badge badge-${badgeClass(c.level)}">${esc(c.level)}</span>`;
     document.getElementById('detail-class-name').textContent = c.name;
     document.getElementById('detail-year').textContent    = c.school_year;
-    document.getElementById('pilotage-link').href = `pilotage-enseignant.html?class=${encodeURIComponent(c.id)}`;
     renderDetailStudents();
   }
 
@@ -1194,6 +1170,15 @@
 
     const hasStudents = _students.length > 0;
     document.getElementById('btn-pdf').disabled   = !hasStudents;
+
+    const missingCount = _students.filter(s => !s.auth_user_id).length;
+    const repairBtn = document.getElementById('btn-repair-auth');
+    if (missingCount > 0) {
+      repairBtn.style.display = '';
+      repairBtn.textContent = `🔧 Créer les comptes manquants (${missingCount})`;
+    } else {
+      repairBtn.style.display = 'none';
+    }
 
     if (!hasStudents) {
       wrap.style.display  = 'none';
@@ -1321,6 +1306,38 @@
     } catch (err) {
       showToast('Erreur : ' + err.message, 'error');
       btn.disabled = false;
+    }
+  }
+
+  /* Rattrapage groupé : recrée en une fois le compte auth.users de tous les
+     élèves de la classe encore sans auth_user_id (ex. après le bug du rate
+     limit e-mail sur signUp — voir retryStudentAuth ci-dessus). */
+  async function repairMissingAuth() {
+    const btn = document.getElementById('btn-repair-auth');
+    const missing = _students.filter(s => !s.auth_user_id);
+    if (missing.length === 0) return;
+
+    btn.disabled = true;
+
+    const results = await lfmTeacher.retryMissingAuthForClass(_currentClass.id, (done, total) => {
+      btn.textContent = `Création en cours… ${done}/${total}`;
+    });
+
+    results.forEach(r => {
+      const s = _students.find(s => s.id === r.id);
+      if (s && r.ok) s.auth_user_id = r.authUserId;
+    });
+
+    const ok     = results.filter(r => r.ok);
+    const failed = results.filter(r => !r.ok);
+
+    renderDetailStudents();
+    btn.disabled = false;
+
+    if (failed.length === 0) {
+      showToast(`${ok.length} compte${ok.length !== 1 ? 's' : ''} de connexion créé${ok.length !== 1 ? 's' : ''}`);
+    } else {
+      showToast(`${ok.length} compte${ok.length !== 1 ? 's' : ''} créé${ok.length !== 1 ? 's' : ''}, ${failed.length} échec${failed.length !== 1 ? 's' : ''} — réessaie via le 🔧 sur chaque ligne concernée`, 'error');
     }
   }
 

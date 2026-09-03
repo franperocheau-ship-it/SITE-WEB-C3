@@ -44,21 +44,27 @@ const lfmTeacher = (() => {
     return candidate;
   }
 
-  /* ── Création du compte auth.users pour un élève (Option A) ──────────────── */
+  /* ── Création du compte auth.users pour un élève ──────────────────────────
+     Passe par l'Edge Function create-student-account (clé service_role) plutôt
+     que par auth.signUp() : les identifiants élève sont générés (pas de vraie
+     adresse e-mail personnelle), donc pas besoin d'e-mail de confirmation —
+     et ça évite le rate limit d'envoi d'e-mails de Supabase Auth. ────────── */
   async function _createStudentAuth(username, password, displayName) {
-    // Client isolé sans persistance : ne touche pas à la session enseignant
-    const tmp = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+    const { data: { session } } = await db.auth.getSession();
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/create-student-account`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.access_token
+      },
+      body: JSON.stringify({ username, password, display_name: displayName })
     });
-    const { data, error } = await tmp.auth.signUp({
-      email: username + '@eleves.lfmadrid.org',
-      password,
-      options: { data: { display_name: displayName, role: 'eleve' } }
-    });
-    if (error) throw error;
-    // Petite pause pour que le trigger crée le profil
-    await new Promise(r => setTimeout(r, 600));
-    return data.user?.id || null;
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(txt || 'Erreur lors de la création du compte élève');
+    }
+    const data = await res.json();
+    return data.user_id || null;
   }
 
   /* ── Classes ─────────────────────────────────────────────────────────────── */
@@ -361,21 +367,21 @@ const lfmTeacher = (() => {
     }
   }
 
+  /* Passe par l'Edge Function delete-class (clé service_role) plutôt que par
+     des delete() directs sur students/classes : elle supprime aussi le compte
+     auth.users de chaque élève. Sans ça, les comptes Auth restent orphelins
+     et bloquent la recréation d'une classe avec les mêmes identifiants
+     (username déjà pris côté auth.users). */
   async function deleteClass(id) {
-    // Récupérer les IDs des élèves avant la suppression
-    const { data: students, error: fetchErr } = await db
-      .from('students').select('id').eq('class_id', id);
-    if (fetchErr) throw fetchErr;
-
-    // Supprimer les élèves par leur propre ID (contourne les éventuels problèmes RLS/FK)
-    if (students && students.length > 0) {
-      const ids = students.map(s => s.id);
-      const { error: studErr } = await db.from('students').delete().in('id', ids);
-      if (studErr) throw studErr;
+    const { data, error } = await db.functions.invoke('delete-class', {
+      body: { class_ids: [id] }
+    });
+    if (error) throw new Error(error.message || 'Erreur lors de la suppression de la classe');
+    if (data && data.error) throw new Error(data.error);
+    if (data && Array.isArray(data.errors) && data.errors.length > 0) {
+      throw new Error(data.errors[0].error);
     }
-
-    const { error } = await db.from('classes').delete().eq('id', id);
-    if (error) throw error;
+    return data;
   }
 
   /* ── Élèves ──────────────────────────────────────────────────────────────── */
@@ -409,8 +415,10 @@ const lfmTeacher = (() => {
         results.push({ ok: false, name, error: err.message });
       }
       if (onProgress) onProgress(i + 1, names.length);
-      // Pause entre chaque signUp pour rester sous le rate limit Supabase (auth IP)
-      if (i < names.length - 1) await new Promise(r => setTimeout(r, 450));
+      // Léger espacement entre les appels à l'Edge Function (robustesse sur
+      // les gros lots, ex. création d'une classe entière) — create-student-account
+      // n'envoie plus d'e-mail, mais on reste prudent sur les appels en rafale.
+      if (i < names.length - 1) await new Promise(r => setTimeout(r, 250));
     }
     return results;
   }
@@ -503,6 +511,34 @@ const lfmTeacher = (() => {
     if (updErr) throw updErr;
 
     return authUserId;
+  }
+
+  /* ── Rattrapage groupé : (re)crée le compte auth.users de tous les élèves
+     d'une classe encore sans auth_user_id (ex. après le bug du rate limit
+     e-mail sur signUp) ──────────────────────────────────────────────────── */
+  async function retryMissingAuthForClass(classId, onProgress) {
+    const { data: missing, error } = await db
+      .from('students')
+      .select('id, display_name')
+      .eq('class_id', classId)
+      .is('auth_user_id', null);
+    if (error) throw error;
+
+    const results = [];
+    for (let i = 0; i < missing.length; i++) {
+      const s = missing[i];
+      try {
+        const authUserId = await retryStudentAuth(s.id);
+        results.push({ ok: true, id: s.id, name: s.display_name, authUserId });
+      } catch (err) {
+        results.push({ ok: false, id: s.id, name: s.display_name, error: err.message });
+      }
+      if (onProgress) onProgress(i + 1, missing.length);
+      // Léger espacement entre les appels à l'Edge Function, mêmes raisons
+      // que createStudentsBulk.
+      if (i < missing.length - 1) await new Promise(r => setTimeout(r, 250));
+    }
+    return results;
   }
 
   async function updateStudent(id, updates) {
@@ -762,7 +798,7 @@ const lfmTeacher = (() => {
   return {
     getClasses, createClass, updateClass, updateClassAccessMode, deleteClass,
     getStudents, getAllStudents, createStudent, createStudentsBulk, updateStudent,
-    deleteStudent, moveStudent, resetStudentPassword, retryStudentAuth,
+    deleteStudent, moveStudent, resetStudentPassword, retryStudentAuth, retryMissingAuthForClass,
     getClassResults, getClassResultsRaw, getStudentResults, getStudentResultsRaw, getStudentItemResultsRaw, getStudentStats,
     getActiveExercises, addActiveExercise, removeActiveExercise,
     addActiveExercisesBulk, removeActiveExercisesBulk,
