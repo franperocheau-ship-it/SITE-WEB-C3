@@ -483,14 +483,6 @@
             <div class="dash-card-accent"></div>
           </a>
 
-          <a href="vocabulaire-corpus.html" class="dash-card dash-card--active">
-            <div class="dash-card-icon"><img src="assets/logos panneau de controle/corpus lexical.png" alt=""></div>
-            <div class="dash-card-title">Corpus lexical</div>
-            <div class="dash-card-desc">Enrichis ton vocabulaire et engrange des points !</div>
-            <div class="dash-card-action">Découvrir →</div>
-            <div class="dash-card-accent"></div>
-          </a>
-
         </div>
         <script>LFM_FEATURES.hideDisabled();</script>
       </div>
@@ -619,28 +611,6 @@
         </div>
 
       </div><!-- /res-sub-oral -->
-
-      <!-- ── Sous-section : Corpus lexical — stats + carnet de mots
-           personnel, voir js/vocab-student-space.js. ── -->
-      <div id="res-sub-corpus" style="display:none">
-
-        <div class="dash-section" id="section-vocabulaire" style="display:none">
-          <div class="dash-section-title">Corpus lexical</div>
-          <div class="dash-stats" style="margin-bottom:18px;">
-            <div class="dash-stat">
-              <div class="dash-stat-label">Niveaux terminés</div>
-              <div class="dash-stat-value" id="vocab-stat-champs">0</div>
-            </div>
-            <div class="dash-stat">
-              <div class="dash-stat-label">Points cumulés</div>
-              <div class="dash-stat-value" id="vocab-stat-points">0</div>
-            </div>
-          </div>
-          <div class="dash-section-title" style="font-size:14px;">Mon carnet de mots</div>
-          <div id="vocab-carnet-list"></div>
-        </div>
-
-      </div><!-- /res-sub-corpus -->
 
       <!-- ── Sous-section : Joggings d'écriture ── -->
       <div id="res-sub-joggings" style="display:none">
@@ -847,23 +817,25 @@
     }
 
     /* ── Hub "Mes résultats" (Général / Joggings / Dictées / Questionnaires
-       de lecture / Corpus lexical) ────────────────────────────────────────
-       Sous-navigation partagée (resultats-nav) qui bascule entre 5 sections
+       de lecture / Compréhension orale) ────────────────────────────────────
+       Sous-navigation partagée (resultats-nav) qui bascule entre ces sections
        internes, sans rechargement de page — mêmes IDs qu'avant la fusion des
        anciens onglets "Mes joggings d'écriture" / "Mes dictées préparées",
        donc JoggingStudentSpace.render()/DicteesStudentSpace.render() n'ont
-       pas besoin d'être adaptés. */
+       pas besoin d'être adaptés. Pastille "Corpus lexical" volontairement
+       exclue côté élève (voir exclude: ['corpus'] plus bas) — le module
+       reste accessible via son propre onglet enseignant. */
     function renderResultsNav() {
       const mount = _resNavBar || document.getElementById('resultats-nav-mount');
       _resNavBar = ResultatsNav.render(mount, {
         active: _currentResSub,
+        exclude: ['corpus'],
         items: {
           general:        { onClick: () => activateResultsSub('general') },
           joggings:       { onClick: () => activateResultsSub('joggings') },
           dictees:        { onClick: () => activateResultsSub('dictees') },
           questionnaires: { onClick: () => activateResultsSub('questionnaires') },
           oral:           { onClick: () => activateResultsSub('oral') },
-          corpus:         { onClick: () => activateResultsSub('corpus') },
         }
       });
     }
@@ -876,7 +848,6 @@
       document.getElementById('res-sub-dictees').style.display        = sub === 'dictees'        ? '' : 'none';
       document.getElementById('res-sub-questionnaires').style.display = sub === 'questionnaires' ? '' : 'none';
       document.getElementById('res-sub-oral').style.display           = sub === 'oral'           ? '' : 'none';
-      document.getElementById('res-sub-corpus').style.display         = sub === 'corpus'         ? '' : 'none';
 
       if (!_profile) return;
       if (sub === 'general')        refreshResultsTab();
@@ -884,7 +855,6 @@
       if (sub === 'dictees')        DicteesStudentSpace.render(_profile.id);
       if (sub === 'questionnaires') refreshQuestionnairesTab();
       if (sub === 'oral')           refreshOralTab();
-      if (sub === 'corpus')         VocabStudentSpace.renderSection(_profile.id);
     }
 
     /* Le paramètre ?tab= (utilisé par le fil d'Ariane, "🏠 Mon espace")
@@ -904,7 +874,6 @@
     document.getElementById('res-sub-dictees').style.display        = _currentResSub === 'dictees'        ? '' : 'none';
     document.getElementById('res-sub-questionnaires').style.display = _currentResSub === 'questionnaires' ? '' : 'none';
     document.getElementById('res-sub-oral').style.display           = _currentResSub === 'oral'           ? '' : 'none';
-    document.getElementById('res-sub-corpus').style.display         = _currentResSub === 'corpus'         ? '' : 'none';
     renderResultsNav();
 
     /* ── Table de correspondance slug → compétence/domaine/titre ─────────────

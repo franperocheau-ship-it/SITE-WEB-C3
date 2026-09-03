@@ -206,28 +206,6 @@
       line-height: 1.45;
     }
 
-    /* ── Bannière Corpus lexical (module dédié, hors du moteur exercise.html
-       — voir data/vocabulaire.js et le commentaire en tête de fichier).
-       Bloc frère de la grille de cartes .skill-card, jamais intégré à
-       SECTIONS/renderSkillCard (câblés pour exercise.html?slug=). ──────── */
-    .cl-entry-banner {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      background: linear-gradient(135deg, rgba(29,191,160,0.10), rgba(245,166,35,0.08));
-      border: 1.5px solid rgba(29,191,160,0.30);
-      border-radius: var(--radius-card);
-      padding: 20px 24px;
-      margin-bottom: 28px;
-      text-decoration: none;
-      transition: transform 200ms ease, box-shadow 200ms ease;
-    }
-    .cl-entry-banner:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-    .cl-entry-banner-icon { font-size: 38px; flex-shrink: 0; }
-    .cl-entry-banner-title { font-family: var(--font-display); font-weight: 800; font-size: 16px; color: var(--text); }
-    .cl-entry-banner-desc { font-size: 13px; color: var(--muted); margin-top: 3px; }
-    .cl-entry-banner-cta { margin-left: auto; font-weight: 700; font-size: 13px; color: var(--blue); white-space: nowrap; }
-
     /* ── Empty state ──────────────────────────────────────────────────────── */
     .empty-state {
       text-align: center;
@@ -307,17 +285,6 @@
           <button class="level-btn" data-level="6e">6e</button>
         </div>
       </div>
-
-      <!-- Corpus lexical / Champ lexical — module dédié, hors moteur
-           exercise.html (voir css/champ-lexical.css et vocabulaire-corpus.html) -->
-      <a href="vocabulaire-corpus.html" class="cl-entry-banner">
-        <div class="cl-entry-banner-icon">📖</div>
-        <div>
-          <div class="cl-entry-banner-title">Corpus lexical</div>
-          <div class="cl-entry-banner-desc">Trouve le plus de mots possible autour d'un thème : synonymes, antonymes, expressions...</div>
-        </div>
-        <div class="cl-entry-banner-cta">Découvrir →</div>
-      </a>
 
       <!-- Skills container (rendered by JS) -->
       <div class="skill-sections" id="skills-container"></div>

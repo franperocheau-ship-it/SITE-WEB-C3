@@ -32,10 +32,14 @@ const ResultatsNav = (() => {
 
   /* Pastille "Joggings d'écriture" masquée quand le module est désactivé
      (voir js/feature-flags.js — JOGGING_ENABLED). Repli permissif si le
-     flag n'est pas chargé sur la page (pastille affichée). */
-  function visibleTabs() {
+     flag n'est pas chargé sur la page (pastille affichée).
+     `exclude` retire en plus des clés données par l'appelant (ex: pastille
+     "Corpus lexical" masquée côté élève, voir dashboard-eleve.html). */
+  function visibleTabs(exclude = []) {
     const joggingOn = typeof LFM_FEATURES === 'undefined' || LFM_FEATURES.isEnabled('jogging');
-    return joggingOn ? ALL_TABS : ALL_TABS.filter(t => t.key !== 'joggings');
+    return ALL_TABS
+      .filter(t => joggingOn || t.key !== 'joggings')
+      .filter(t => !exclude.includes(t.key));
   }
 
   function escapeHTML(str) {
@@ -49,16 +53,17 @@ const ResultatsNav = (() => {
    * @param {object} config
    * @param {'general'|'joggings'|'dictees'|'questionnaires'|'oral'|'corpus'} config.active
    * @param {object} config.items  { general: {href}|{onClick}, joggings: {...}, dictees: {...}, questionnaires: {...}, oral: {...}, corpus: {...} }
+   * @param {string[]} [config.exclude]  Clés de pastilles à ne pas afficher.
    * @returns {HTMLElement} la barre insérée (à repasser à un futur appel de render()).
    */
   function render(mountEl, config = {}) {
-    const { active = 'general', items = {} } = config;
+    const { active = 'general', items = {}, exclude = [] } = config;
 
     const bar = document.createElement('nav');
     bar.className = 'rn-bar';
     bar.setAttribute('aria-label', 'Navigation résultats');
 
-    visibleTabs().forEach(tab => {
+    visibleTabs(exclude).forEach(tab => {
       const isActive = tab.key === active;
       const item = items[tab.key] || {};
       const el = document.createElement(item.href ? 'a' : 'button');
