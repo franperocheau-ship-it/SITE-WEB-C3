@@ -15,15 +15,13 @@
           c'est le site qui tranche juste/faux, jamais l'élève. Les mots
           ratés reviennent plus tard dans le tirage, jamais juste après.
      0.5. Effacement progressif — le mot est affiché à trous (lettres tirées
-          au hasard à chaque passage, jamais les mêmes positions) : passage 1
-          ≈25 % de lettres masquées, passage 2 ≈60 %. Pas d'audio dans ce
-          palier (retiré pour ne pas faire doublon avec le palier 1, qui est
-          déjà une dictée audio). Correction automatique comme au palier 0.
-          Par mot : une réussite fait progresser d'un passage (jusqu'à
-          maîtrisé au passage 2), un échec fait redescendre d'un passage
-          (jamais retiré, jamais retenté au même passage juste après : mot
-          raté exclu du prochain tirage seulement, jamais retenté
-          immédiatement).
+          au hasard à chaque tirage, jamais les mêmes positions, ≈25 %
+          masquées). Pas d'audio dans ce palier (retiré pour ne pas faire
+          doublon avec le palier 1, qui est déjà une dictée audio).
+          Correction automatique comme au palier 0. Un seul passage par mot :
+          maîtrisé dès la réussite (un échec ne le retire jamais, mais il
+          n'est jamais retenté au tirage suivant immédiat — exclu du prochain
+          tirage seulement).
      1.   Dictée audio — consigne simple ("Écoute le mot puis écris-le."),
           pas d'écran de lancement : le premier mot est dicté (TTS) dès
           l'arrivée sur l'écran (contrairement au palier 0, rien ne disparaît
@@ -121,18 +119,16 @@
    auth.js (lfmAuth), dictees-speech.js (DicteesSpeech), breadcrumb.js.
 
    SCHEMA_VERSION : la forme/les règles de `state` ont changé plusieurs fois
-   (dernier changement : ajout de state.sectionResume — { lexical, gram },
-   mémorise le dernier step actif de chaque section pour que le switcher
-   lexical/grammatical reprenne le bon exercice au lieu de changer les
-   onglets sans resynchroniser le contenu affiché, voir renderStepBanner).
-   Toute session sessionStorage sauvegardée sous un schéma différent est
+   (dernier changement : palier 0.5 passé de 2 passages à 1 seul — le mot est
+   maîtrisé dès la réussite au tirage unique ≈25 % masqué, state.ex05.levels
+   supprimé). Toute session sessionStorage sauvegardée sous un schéma différent est
    ignorée au chargement (redémarrage propre sur l'écran de choix du niveau)
    plutôt que de risquer un état incohérent — à bumper à chaque futur
    changement de forme/règles de state.
    ───────────────────────────────────────────────────────────────────────────── */
 
 const DicteesEngine = (() => {
-  const SCHEMA_VERSION = 17;  // voir note ci-dessus
+  const SCHEMA_VERSION = 18;  // voir note ci-dessus
 
   /* Liste fixe des natures grammaticales (dupliquée depuis
      dictees-enseignant.html — pas de fichier utilitaire commun sur ce
@@ -1093,21 +1089,20 @@ const DicteesEngine = (() => {
   }
 
   /* ── Palier 0.5 : effacement progressif ──────────────────────────────── */
-  /* Fraction de lettres masquées par passage (1 → 2, maîtrisé après le 2).
-     Seules les lettres comptent (espaces, apostrophes, traits d'union
-     toujours visibles) : sur un groupe comme "les enfants jouaient", le
-     découpage en mots reste un repère constant, seule l'orthographe des
-     lettres est à retrouver. */
-  function maskFraction(passage) {
-    return passage === 1 ? 0.25 : 0.6;
-  }
+  /* Fraction de lettres masquées, un seul tirage par mot (jusqu'en 2026-09,
+     2 passages successifs 25 %/60 % — le second jugé trop difficile pour
+     être exploitable, retour utilisateur). Seules les lettres comptent
+     (espaces, apostrophes, traits d'union toujours visibles) : sur un groupe
+     comme "les enfants jouaient", le découpage en mots reste un repère
+     constant, seule l'orthographe des lettres est à retrouver. */
+  const MASK_FRACTION = 0.25;
 
-  function computeMaskIndices(word, passage) {
+  function computeMaskIndices(word) {
     const letterPositions = [];
     for (let i = 0; i < word.length; i++) {
       if (/\p{L}/u.test(word[i])) letterPositions.push(i);
     }
-    const count = Math.round(maskFraction(passage) * letterPositions.length);
+    const count = Math.round(MASK_FRACTION * letterPositions.length);
     return shuffle(letterPositions).slice(0, count);
   }
 
@@ -1124,7 +1119,6 @@ const DicteesEngine = (() => {
         unmastered: ids,
         deck: shuffle(ids),
         current: null,
-        levels: Object.fromEntries(ids.map(id => [id, 1])),  // passage courant (1-3) par mot
         maskIndices: [],
         correct: 0,           // mots maîtrisés cumulés (toujours égal à total en fin d'exercice — retries illimités)
         correctFirstTry: 0,   // score réellement soumis : mots réussis dès leur toute première tentative
@@ -1142,13 +1136,13 @@ const DicteesEngine = (() => {
   function drawNextPalier05() {
     if (state.ex05.deck.length === 0) state.ex05.deck = shuffle(state.ex05.unmastered);
     state.ex05.current = state.ex05.deck.shift();
-    state.ex05.maskIndices = computeMaskIndices(motById(state.ex05.current).contenu, state.ex05.levels[state.ex05.current]);
+    state.ex05.maskIndices = computeMaskIndices(motById(state.ex05.current).contenu);
   }
 
   function renderPalier05() {
     document.getElementById('dic-state-results').style.display = 'none';
     document.getElementById('dic-state-exercise').style.display = '';
-    setConsigne("Complète le mot à trous. Il y aura de moins en moins d'indices à chaque passage.");
+    setConsigne("Complète le mot à trous grâce aux lettres visibles.");
 
     if (state.ex05.unmastered.length === 0) {
       showPalier05Results();
@@ -1167,13 +1161,11 @@ const DicteesEngine = (() => {
     if (state.ex05.current == null) { drawNextPalier05(); saveState(); }
 
     const mot = motById(state.ex05.current);
-    const passage = state.ex05.levels[mot.id];
     const remaining = state.ex05.unmastered.length;
     const total = mots.length;
     const counterHTML = `
       <div class="dic-counters">
         ${progressBarHTML(total - remaining, total, 'Mots maîtrisés')}
-        <div class="dic-passage-badge">Passage ${passage} / 2</div>
       </div>`;
 
     const hintHTML = `<div class="dic-flash-wrap"><div class="dic-flash-word dic-mask-word">${escapeHtml(renderMaskedWord(mot.contenu, state.ex05.maskIndices))}</div></div>`;
@@ -1191,8 +1183,8 @@ const DicteesEngine = (() => {
     `;
     const input = document.getElementById('dic-input');
     /* Correction automatique (DicteesSpeech.normalize, comme au palier 0) :
-       le site tranche et fait progresser/reculer le mot entre les 2 passages
-       — maîtrisé (retiré du tirage) dès la réussite au passage 2. */
+       le site tranche — mot maîtrisé (retiré du tirage) dès la réussite au
+       tirage unique. */
     const onValidate = () => {
       if (!input || !input.value.trim() || input.disabled) return;
       const typed = input.value;
@@ -1202,32 +1194,27 @@ const DicteesEngine = (() => {
       input.classList.add(isRight ? 'is-correct' : 'is-wrong');
       state.ex05.attempts++;
 
-      /* Un même mot peut être retenté plusieurs fois (recul d'un passage sur
-         échec) avant d'être maîtrisé — contrairement au palier 0, une
-         réussite ne suffit donc pas à garantir qu'il s'agit de la 1ère
-         tentative. `attemptedIds` isole ce moment une seule fois par mot,
-         pour ne compter dans correctFirstTry que les mots réussis dès leur
-         tout premier essai (jamais après un recul), sans quoi le score
-         soumis vaudrait toujours 100 % par construction (l'exercice ne finit
-         qu'une fois tous les mots maîtrisés — même bug que celui déjà corrigé
-         sur la classification, voir validateClassification). */
+      /* Un même mot peut être retenté plusieurs fois (mot raté remis en jeu
+         au prochain tirage) avant d'être maîtrisé — une réussite ne suffit
+         donc pas à garantir qu'il s'agit de la 1ère tentative. `attemptedIds`
+         isole ce moment une seule fois par mot, pour ne compter dans
+         correctFirstTry que les mots réussis dès leur tout premier essai,
+         sans quoi le score soumis vaudrait toujours 100 % par construction
+         (l'exercice ne finit qu'une fois tous les mots maîtrisés — même bug
+         que celui déjà corrigé sur la classification, voir
+         validateClassification). */
       const firstAttempt = !state.ex05.attemptedIds.includes(mot.id);
       if (firstAttempt) state.ex05.attemptedIds.push(mot.id);
 
       if (isRight) {
         state.ex05.correct++;
         if (firstAttempt) state.ex05.correctFirstTry++;
-        if (passage >= 2) {
-          state.ex05.unmastered = state.ex05.unmastered.filter(id => id !== mot.id);
-          state.ex05.deck = state.ex05.deck.filter(id => id !== mot.id);
-        } else {
-          state.ex05.levels[mot.id] = passage + 1;
-        }
+        state.ex05.unmastered = state.ex05.unmastered.filter(id => id !== mot.id);
+        state.ex05.deck = state.ex05.deck.filter(id => id !== mot.id);
       } else {
         // Une entrée par échec réel (pas de garde de dédoublonnage) — même
         // correction que le palier 0 ci-dessus, voir son commentaire.
         state.ex05.wrongIds.push(mot.id);
-        state.ex05.levels[mot.id] = Math.max(1, passage - 1);
       }
 
       /* Écran de correction : uniquement le verdict automatique, la saisie de
