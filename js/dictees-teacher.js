@@ -402,18 +402,18 @@ const lfmDicteesTeacher = (() => {
    * type classification/trous/trous_conjugaison/transformation (null si
    * jamais tenté) — la page n'affiche une pastille que pour les
    * paliers/types réellement tentés ; `niveau` = niveau AFFICHÉ (1/2/3, null
-   * si aucune session complète) de cet élève sur cette dictée — la ligne la
-   * plus récente (dictee_results OU dictee_gram_results confondues) marquée
-   * `session_complete = true` (posé côté client par js/dictees-engine.js/
-   * isFullSessionComplete quand TOUS les exercices actifs de la dictée à ce
-   * niveau sont terminés, cf. migration 20260914110000) — écrase une session
-   * complète antérieure à un autre niveau, jamais cumulé ; une dictée
-   * commencée mais pas terminée ne compte pour aucun niveau. Remplace
-   * l'ancien calcul "dernière tentative GRAMMATICALE, tous types confondus"
-   * (gramLatestByStudentDictee), qui ne marchait pas pour une dictée
-   * purement lexicale et ne reflétait pas vraiment une session complète —
-   * même correction que dashboard-eleve.html/DicteesStudentSpace
-   * (completeSessionLatest là-bas). `freqLine` = retour "erreurs les
+   * si aucun niveau complet) de cet élève sur cette dictée — recalculé à
+   * partir de TOUT l'historique dictee_results/dictee_gram_results (cf.
+   * computeNiveauAffiche plus bas), PAS du flag `session_complete` posé côté
+   * client (js/dictees-engine.js/isFullSessionComplete) : ce flag ne
+   * regarde que le sessionStorage de l'onglet en cours et reste quasi
+   * toujours à `false` en usage réel, une classe travaillant en général le
+   * lexical et le grammatical sur des créneaux séparés (bug constaté en
+   * classe CM2H le 2026-09-04 — correctif purement côté lecture, aucune
+   * migration nécessaire). Le niveau retenu est celui devenu complet le
+   * plus récemment ; jamais un mélange entre deux niveaux différents (élève
+   * ayant changé de niveau en cours de route) ; une dictée commencée mais
+   * pas terminée ne compte pour aucun niveau. `freqLine` = retour "erreurs les
    * plus fréquentes" (js/dictees-word-stats.js) sur les tentatives
    * lexicales de CET élève pour CETTE dictée, fusionné aux wrong_items de
    * l'exercice "Texte à trous" (seul exercice grammatical à avoir un suivi
@@ -432,7 +432,7 @@ const lfmDicteesTeacher = (() => {
     const dicteeIds = dictees.map(d => d.id);
     const studentById = new Map(students.map(s => [s.auth_user_id, s]));
 
-    let lexResults = [], gramResults = [], mots = [];
+    let lexResults = [], gramResults = [], mots = [], trousMeta = [];
     if (dicteeIds.length > 0 && authIds.length > 0) {
       const [lexRes, gramRes] = await Promise.all([
         db.from('dictee_results').select('*')
@@ -446,12 +446,28 @@ const lfmDicteesTeacher = (() => {
       gramResults = gramRes.data || [];
     }
     if (dicteeIds.length > 0) {
-      const { data: motsData, error: motsErr } = await db.from('dictee_mots')
-        .select('id, contenu').in('dictee_id', dicteeIds);
-      if (motsErr) throw motsErr;
-      mots = motsData || [];
+      const [motsRes, trousRes] = await Promise.all([
+        db.from('dictee_mots').select('id, contenu').in('dictee_id', dicteeIds),
+        db.from('dictee_trous').select('dictee_id, niveau').in('dictee_id', dicteeIds)
+      ]);
+      if (motsRes.error) throw motsRes.error;
+      if (trousRes.error) throw trousRes.error;
+      mots = motsRes.data || [];
+      trousMeta = trousRes.data || [];
     }
     const motById = new Map(mots.map(m => [m.id, m.contenu]));
+
+    /* Niveau minimum auquel "Texte à trous" grammatical apparaît pour une
+       dictée donnée (filtrage cumulatif niveau <= N, identique à
+       js/dictees-engine.js/filterByChosenNiveau) — sert à savoir si ce
+       palier fait partie des paliers requis pour qu'une session compte comme
+       complète à tel niveau (cf. computeNiveauAffiche ci-dessous). Absent de
+       la Map si la dictée n'a aucune phrase à trous (jamais requis alors). */
+    const minTrousNiveauByDictee = new Map();
+    trousMeta.forEach(t => {
+      const prev = minTrousNiveauByDictee.get(t.dictee_id);
+      if (prev == null || t.niveau < prev) minTrousNiveauByDictee.set(t.dictee_id, t.niveau);
+    });
 
     const TYPES = ['classification', 'trous', 'trous_conjugaison', 'transformation'];
 
@@ -470,17 +486,69 @@ const lfmDicteesTeacher = (() => {
       if (!prev || new Date(r.completed_at) > new Date(prev.completed_at)) gramLatest.set(k, r);
     });
 
-    /* Session complète la plus récente par élève|dictée (lexical ET
-       grammatical confondus) — source du niveau AFFICHÉ (une seule pastille
-       par carte, cf. JSDoc ci-dessus), même logique que dashboard-eleve.html/
-       DicteesStudentSpace (completeSessionLatest). */
-    const completeSessionLatestByStudentDictee = new Map();
-    [...lexResults, ...gramResults].forEach(r => {
-      if (!r.session_complete || r.niveau == null) return;
-      const k = `${r.student_id}|${r.dictee_id}`;
-      const prev = completeSessionLatestByStudentDictee.get(k);
-      if (!prev || new Date(r.completed_at) > new Date(prev.completed_at)) completeSessionLatestByStudentDictee.set(k, r);
-    });
+    /* Niveau AFFICHÉ par élève|dictée — recalculé à partir de TOUT
+       l'historique de résultats en base plutôt que du seul flag
+       `session_complete` (posé côté client par js/dictees-engine.js/
+       isFullSessionComplete, qui ne regarde que le sessionStorage de l'onglet
+       en cours). Ce flag reste quasi toujours à `false` en usage réel : une
+       classe travaille en général le volet lexical et le volet grammatical
+       dans des créneaux séparés (tablette fermée/rouverte entre les deux),
+       ce qui vide le sessionStorage avant que TOUS les paliers requis
+       n'aient pu être vus dans une même session ininterrompue — constaté en
+       classe CM2H le 2026-09-04 : élève ayant réellement terminé lexical +
+       "Texte à trous" au même niveau dans la journée, mais aucune ligne
+       `session_complete = true` en base. Voir requiredKeysForNiveau/
+       computeNiveauAffiche plus bas — même principe que dashboard-eleve.html/
+       DicteesStudentSpace (completeSessionLatest), gardé dupliqué (pas de
+       fichier utilitaire commun sur ce module, cf. NIVEAU_COLOR ailleurs). */
+    const rowsByStudentDictee = new Map();
+    function pushRow(studentId, dicteeId, niveau, completedAt, key) {
+      if (niveau == null) return;
+      const k = `${studentId}|${dicteeId}`;
+      if (!rowsByStudentDictee.has(k)) rowsByStudentDictee.set(k, []);
+      rowsByStudentDictee.get(k).push({ niveau, completed_at: completedAt, key });
+    }
+    lexResults.forEach(r => pushRow(r.student_id, r.dictee_id, r.niveau, r.completed_at, `lex:${r.exercice}`));
+    gramResults.forEach(r => pushRow(r.student_id, r.dictee_id, r.niveau, r.completed_at, `gram:${r.type}`));
+
+    /* Paliers requis pour qu'une session compte comme complète à un niveau
+       donné : le trio lexical (0/3/1, cf. LEX_EXERCICES) si le volet lexical
+       est actif pour cette dictée, + "Texte à trous" grammatical
+       UNIQUEMENT s'il existe au moins une phrase à ce niveau ou en dessous
+       (dictee_trous.niveau <= niveau, cf. minTrousNiveauByDictee) — même
+       sous-ensemble que js/dictees-engine.js/isFullSessionComplete
+       (Classification/Trous-conjugaison/Transformation ne comptent jamais). */
+    function requiredKeysForNiveau(dictee, minTrousNiveau, niveau) {
+      const keys = [];
+      if (dictee.inclut_lexicale !== false) LEX_EXERCICES.forEach(ex => keys.push(`lex:${ex}`));
+      if (dictee.inclut_grammaticale !== false && minTrousNiveau != null && minTrousNiveau <= niveau) keys.push('gram:trous');
+      return keys;
+    }
+
+    /* Parmi les niveaux utilisés au moins une fois par l'élève sur cette
+       dictée, celui dont TOUTES les clés requises ont une ligne — en
+       retenant le niveau devenu complet le plus récemment (l'instant où la
+       DERNIÈRE clé requise manquante à CE niveau a fini par apparaître),
+       jamais un mélange incohérent entre deux niveaux différents (un élève
+       qui change de niveau en cours de route via "Changer de niveau" a des
+       lignes à plusieurs niveaux ; seul celui réellement complet compte). */
+    function computeNiveauAffiche(rows, dictee, minTrousNiveau) {
+      const byNiveau = new Map();
+      rows.forEach(r => {
+        if (!byNiveau.has(r.niveau)) byNiveau.set(r.niveau, new Map());
+        const firstByKey = byNiveau.get(r.niveau);
+        const prevTs = firstByKey.get(r.key);
+        if (!prevTs || new Date(r.completed_at) < new Date(prevTs)) firstByKey.set(r.key, r.completed_at);
+      });
+      let best = null;
+      byNiveau.forEach((firstByKey, niveau) => {
+        const required = requiredKeysForNiveau(dictee, minTrousNiveau, niveau);
+        if (required.length === 0 || !required.every(k => firstByKey.has(k))) return;
+        const completionTs = Math.max(...required.map(k => new Date(firstByKey.get(k)).getTime()));
+        if (!best || completionTs > best.ts) best = { niveau, ts: completionTs };
+      });
+      return best ? best.niveau : null;
+    }
 
     const perDictee = dictees
       .map(d => {
@@ -511,8 +579,8 @@ const lfmDicteesTeacher = (() => {
             DicteesWordStats.tally(studentLexResults, motById),
             DicteesWordStats.tallyText(studentTrousResults, 'wrong_items')
           ));
-          const completeRow = completeSessionLatestByStudentDictee.get(`${studentId}|${d.id}`);
-          const niveau = completeRow ? completeRow.niveau : null;
+          const studentDicteeRows = rowsByStudentDictee.get(`${studentId}|${d.id}`) || [];
+          const niveau = computeNiveauAffiche(studentDicteeRows, d, minTrousNiveauByDictee.get(d.id));
           return {
             student: studentById.get(studentId) || { display_name: 'Élève inconnu' },
             lexByExercice,

@@ -95,9 +95,28 @@ const DicteesStudentSpace = (() => {
     if (dicteeIds.length === 0) { section.style.display = 'none'; return { 1: 0, 2: 0, 3: 0 }; }
 
     let titresById = new Map();
+    let dicteeMetaById = new Map();
     if (window.lfmDb) {
-      const { data, error } = await window.lfmDb.from('dictees').select('id,titre').in('id', dicteeIds);
-      if (!error) titresById = new Map((data || []).map(d => [d.id, d.titre]));
+      const { data, error } = await window.lfmDb.from('dictees')
+        .select('id,titre,inclut_lexicale,inclut_grammaticale').in('id', dicteeIds);
+      if (!error) {
+        titresById = new Map((data || []).map(d => [d.id, d.titre]));
+        dicteeMetaById = new Map((data || []).map(d => [d.id, d]));
+      }
+    }
+
+    /* Niveau minimum auquel "Texte à trous" grammatical apparaît pour une
+       dictée (filtrage cumulatif niveau <= N, identique à
+       js/dictees-engine.js/filterByChosenNiveau) — sert à computeNiveauAffiche
+       ci-dessous pour savoir si ce palier fait partie des paliers requis à
+       tel niveau. */
+    const minTrousNiveauByDictee = new Map();
+    if (window.lfmDb) {
+      const { data, error } = await window.lfmDb.from('dictee_trous').select('dictee_id,niveau').in('dictee_id', dicteeIds);
+      if (!error) (data || []).forEach(t => {
+        const prev = minTrousNiveauByDictee.get(t.dictee_id);
+        if (prev == null || t.niveau < prev) minTrousNiveauByDictee.set(t.dictee_id, t.niveau);
+      });
     }
 
     /* Contenu des mots ratés (dictee_mots.contenu), pour le retour "erreurs
@@ -113,20 +132,61 @@ const DicteesStudentSpace = (() => {
 
     const lexLatest = latestByKey(lexicalResults, r => r.dictee_id + '|' + r.exercice);
     const gramLatest = latestByKey(gramResults, r => r.dictee_id + '|' + r.type);
-    /* Niveau AFFICHÉ pour la dictée (remplace l'ancien calcul "dernière
-       tentative grammaticale, tous types confondus" — ne marchait pas du
-       tout pour une dictée purement lexicale, cf. migration 20260914110000) :
-       parmi TOUTES les lignes (lexicales dictee_results ET grammaticales
-       dictee_gram_results) marquées session_complete = true — posé côté
-       client par js/dictees-engine.js/isFullSessionComplete quand TOUS les
-       exercices actifs de la dictée à ce niveau sont terminés — la plus
-       récente (completed_at). Écrase une session complète antérieure à un
-       autre niveau (pas de cumul) ; reste absent tant qu'aucune session n'a
-       jamais été menée à son terme sur cette dictée. */
-    const completeSessionLatest = latestByKey(
-      [...lexicalResults, ...gramResults].filter(r => r.session_complete && r.niveau != null),
-      r => r.dictee_id
-    );
+
+    /* Niveau AFFICHÉ pour la dictée — recalculé à partir de TOUT
+       l'historique de résultats plutôt que du flag `session_complete` posé
+       côté client (js/dictees-engine.js/isFullSessionComplete), qui ne
+       regarde que le sessionStorage de l'onglet en cours et reste quasi
+       toujours à `false` en usage réel dès que le lexical et le grammatical
+       sont travaillés sur des créneaux séparés (tablette fermée/rouverte
+       entre les deux — bug constaté en classe CM2H le 2026-09-04, même
+       correctif que js/dictees-teacher.js/getClassDicteeReport, dupliqué ici
+       faute de fichier utilitaire commun sur ce module). */
+    const rowsByDictee = new Map();
+    function pushRow(dicteeId, niveau, completedAt, key) {
+      if (niveau == null) return;
+      if (!rowsByDictee.has(dicteeId)) rowsByDictee.set(dicteeId, []);
+      rowsByDictee.get(dicteeId).push({ niveau, completed_at: completedAt, key });
+    }
+    lexicalResults.forEach(r => pushRow(r.dictee_id, r.niveau, r.completed_at, `lex:${r.exercice}`));
+    gramResults.forEach(r => pushRow(r.dictee_id, r.niveau, r.completed_at, `gram:${r.type}`));
+
+    /* Paliers requis pour qu'une session compte comme complète à un niveau
+       donné — même sous-ensemble que js/dictees-engine.js/
+       isFullSessionComplete (Classification/Trous-conjugaison/
+       Transformation ne comptent jamais). */
+    function requiredKeysForNiveau(dictee, minTrousNiveau, niveau) {
+      const keys = [];
+      if (!dictee || dictee.inclut_lexicale !== false) LEX_EXERCICES.forEach(ex => keys.push(`lex:${ex}`));
+      if ((!dictee || dictee.inclut_grammaticale !== false) && minTrousNiveau != null && minTrousNiveau <= niveau) keys.push('gram:trous');
+      return keys;
+    }
+
+    /* Parmi les niveaux utilisés au moins une fois sur cette dictée, celui
+       dont TOUTES les clés requises ont une ligne, en retenant celui devenu
+       complet le plus récemment — jamais un mélange entre deux niveaux
+       différents (élève ayant changé de niveau en cours de route via
+       "Changer de niveau"). */
+    function computeNiveauAffiche(dicteeId) {
+      const rows = rowsByDictee.get(dicteeId) || [];
+      const dictee = dicteeMetaById.get(dicteeId);
+      const minTrousNiveau = minTrousNiveauByDictee.get(dicteeId);
+      const byNiveau = new Map();
+      rows.forEach(r => {
+        if (!byNiveau.has(r.niveau)) byNiveau.set(r.niveau, new Map());
+        const firstByKey = byNiveau.get(r.niveau);
+        const prevTs = firstByKey.get(r.key);
+        if (!prevTs || new Date(r.completed_at) < new Date(prevTs)) firstByKey.set(r.key, r.completed_at);
+      });
+      let best = null;
+      byNiveau.forEach((firstByKey, niveau) => {
+        const required = requiredKeysForNiveau(dictee, minTrousNiveau, niveau);
+        if (required.length === 0 || !required.every(k => firstByKey.has(k))) return;
+        const completionTs = Math.max(...required.map(k => new Date(firstByKey.get(k)).getTime()));
+        if (!best || completionTs > best.ts) best = { niveau, ts: completionTs };
+      });
+      return best ? best.niveau : null;
+    }
 
     const rows = dicteeIds.map(id => {
       const lexResults = LEX_EXERCICES
@@ -142,8 +202,7 @@ const DicteesStudentSpace = (() => {
          mêmes tentatives grammaticales que gramTypes ci-dessus, non filtrées
          à la dernière (même logique que allLexResults). */
       const allTrousResults = gramResults.filter(r => r.dictee_id === id && r.type === 'trous');
-      const completeRow = completeSessionLatest.get(id);
-      const niveau = completeRow ? completeRow.niveau : null;
+      const niveau = computeNiveauAffiche(id);
       return { id, titre: titresById.get(id) || '—', lexResults, gramTypes, lastActivity, allLexResults, allTrousResults, niveau };
     }).sort((a, b) => b.lastActivity - a.lastActivity);
 
