@@ -1556,6 +1556,15 @@ body.home-page .cards-grid {
   transition: background 150ms, border-color 150ms, color 150ms, transform 150ms;
 }
 .lfm-speech-btn:hover { border-color: var(--blue); background: rgba(16,43,106,0.06); transform: translateY(-1px); }
+.lfm-speech-btn--unavailable,
+.lfm-speech-btn--unavailable:hover {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: var(--card-bg);
+  border-color: var(--border);
+  color: var(--muted);
+  transform: none;
+}
 .lfm-speech-btn.is-playing {
   border-color: var(--color-niveau-cm1);
   color: #0f7a67;

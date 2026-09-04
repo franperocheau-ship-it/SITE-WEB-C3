@@ -36954,6 +36954,7 @@
         </div>
       `;
 
+      if (typeof DicteesSpeech !== 'undefined') DicteesSpeech.watchButtonAvailability(document.getElementById("mi-listen-btn"));
       document.getElementById("mi-listen-btn").addEventListener("click", () => miSpeakCurrent());
       document.getElementById("mi-stop-btn").addEventListener("click", miShowResults);
 

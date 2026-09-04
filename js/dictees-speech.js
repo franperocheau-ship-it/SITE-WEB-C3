@@ -107,6 +107,48 @@ const DicteesSpeech = (() => {
     if (window.speechSynthesis) window.speechSynthesis.cancel();
   }
 
+  const SPEECH_UNAVAILABLE_TITLE = 'Lecture audio indisponible sur cet appareil';
+  const SPEECH_UNAVAILABLE_TIMEOUT_MS = 2500;
+
+  /* Réutilisée par tous les boutons "🔊 Réécouter" natifs (dic-listen-btn,
+     dic-trou-speak-btn, mi-listen-btn dans exercise.html) — même logique que
+     watchVoiceAvailability de js/text-to-speech.js (voir ce fichier pour le
+     détail du raisonnement Chromebook), reprise ici plutôt qu'importée car
+     certaines pages (dictee.html) chargent dictees-speech.js sans charger
+     text-to-speech.js. N'agit que sur de vrais <button> : ces boutons
+     utilisent déjà nativement `disabled` (bascule pendant la lecture), donc
+     aucun conflit — un bouton nativement disabled ne déclenche pas de clic,
+     ce qui empêche aussi la bascule temporaire de s'exécuter tant qu'on
+     considère la lecture audio indisponible. */
+  function watchButtonAvailability(btn) {
+    if (!btn || !('speechSynthesis' in window)) return;
+    const synth = window.speechSynthesis;
+    const defaultTitle = btn.title;
+    const defaultLabel = btn.getAttribute('aria-label') || defaultTitle;
+
+    function hasVoices() { return (synth.getVoices() || []).length > 0; }
+
+    function markUnavailable() {
+      btn.classList.add('speech-btn-unavailable');
+      btn.disabled = true;
+      btn.title = SPEECH_UNAVAILABLE_TITLE;
+      btn.setAttribute('aria-label', SPEECH_UNAVAILABLE_TITLE);
+    }
+
+    function markAvailable() {
+      if (!btn.classList.contains('speech-btn-unavailable')) return;
+      btn.classList.remove('speech-btn-unavailable');
+      btn.disabled = false;
+      btn.title = defaultTitle;
+      btn.setAttribute('aria-label', defaultLabel);
+    }
+
+    if (hasVoices()) return;
+
+    synth.addEventListener('voiceschanged', () => { if (hasVoices()) markAvailable(); });
+    setTimeout(() => { if (!hasVoices()) markUnavailable(); }, SPEECH_UNAVAILABLE_TIMEOUT_MS);
+  }
+
   /* Tolérance : espaces multiples réduits + insensible à la casse, apostrophe
      ramenée à une forme canonique (') quelle que soit celle tapée par
      l'élève (' ’ ʼ `) ou stockée en base pour ce mot — un clavier standard
@@ -176,5 +218,5 @@ const DicteesSpeech = (() => {
       c.slice(midEnd);
   }
 
-  return { speak, cancel, normalize, normalizeSentence, normalizeTrouAnswer, diffHighlight };
+  return { speak, cancel, normalize, normalizeSentence, normalizeTrouAnswer, diffHighlight, watchButtonAvailability };
 })();

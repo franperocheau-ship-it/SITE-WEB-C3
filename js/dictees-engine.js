@@ -883,6 +883,7 @@ const DicteesEngine = (() => {
   }
 
   function wireItem(mot, onValidate) {
+    DicteesSpeech.watchButtonAvailability(document.getElementById('dic-listen-btn'));
     document.getElementById('dic-listen-btn').addEventListener('click', () => speakCurrent(mot.contenu));
     document.getElementById('dic-val-btn').addEventListener('click', onValidate);
     document.getElementById('dic-input').addEventListener('keydown', e => { if (e.key === 'Enter') onValidate(); });
@@ -1785,6 +1786,7 @@ const DicteesEngine = (() => {
       });
     });
     document.querySelectorAll('.dic-trou-speak-btn').forEach(btn => {
+      DicteesSpeech.watchButtonAvailability(btn);
       btn.addEventListener('click', () => {
         const tag = tags.find(g => g.id === btn.dataset.blankId);
         if (!tag) return;

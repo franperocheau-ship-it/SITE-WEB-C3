@@ -30,6 +30,51 @@ const attachSpeechButton = (() => {
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
   }
 
+  const SPEECH_UNAVAILABLE_TITLE = 'Lecture audio indisponible sur cet appareil';
+  const SPEECH_UNAVAILABLE_TIMEOUT_MS = 2500;
+
+  /* Sur certains appareils (Chromebooks notamment), la liste des voix se
+     charge de façon asynchrone côté navigateur et peut mettre plusieurs
+     secondes à être prête au premier chargement de la page — parfois elle
+     ne l'est jamais (TTS bloqué par une politique de l'appareil/réseau). On
+     ne grise donc jamais le bouton sur la seule base de l'état des voix au
+     moment de sa création : on réévalue à chaque 'voiceschanged' (déclenché
+     indéfiniment, pas seulement avant le délai ci-dessous, au cas où les
+     voix mettraient encore plus longtemps à arriver), et seulement si
+     aucune voix n'est toujours disponible après un délai raisonnable, on
+     grise le bouton avec une info-bulle explicite plutôt que de le laisser
+     silencieusement inopérant. */
+  function watchVoiceAvailability(btn, inline) {
+    if (!('speechSynthesis' in window)) return;
+    const synth = window.speechSynthesis;
+    const defaultTitle = btn.title;
+    const defaultLabel = btn.getAttribute('aria-label');
+
+    function hasVoices() { return (synth.getVoices() || []).length > 0; }
+
+    function markUnavailable() {
+      btn.classList.add('lfm-speech-btn--unavailable');
+      if (inline) btn.setAttribute('aria-disabled', 'true');
+      else btn.disabled = true;
+      btn.title = SPEECH_UNAVAILABLE_TITLE;
+      btn.setAttribute('aria-label', SPEECH_UNAVAILABLE_TITLE);
+    }
+
+    function markAvailable() {
+      if (!btn.classList.contains('lfm-speech-btn--unavailable')) return;
+      btn.classList.remove('lfm-speech-btn--unavailable');
+      if (inline) btn.removeAttribute('aria-disabled');
+      else btn.disabled = false;
+      btn.title = defaultTitle;
+      btn.setAttribute('aria-label', defaultLabel);
+    }
+
+    if (hasVoices()) return;
+
+    synth.addEventListener('voiceschanged', () => { if (hasVoices()) markAvailable(); });
+    setTimeout(() => { if (!hasVoices()) markUnavailable(); }, SPEECH_UNAVAILABLE_TIMEOUT_MS);
+  }
+
   function voiceScore(v) {
     if (v.name === 'Google français') return 1000;
     let score = 0;
@@ -113,6 +158,7 @@ const attachSpeechButton = (() => {
 
     function activate(e) {
       if (inline) { e.stopPropagation(); e.preventDefault(); }
+      if (btn.classList.contains('lfm-speech-btn--unavailable')) return;
       if (btn.classList.contains('is-playing')) {
         window.speechSynthesis.cancel();
         setIdle();
@@ -129,6 +175,8 @@ const attachSpeechButton = (() => {
         if (e.key === 'Enter' || e.key === ' ') activate(e);
       });
     }
+
+    watchVoiceAvailability(btn, inline);
 
     element.appendChild(btn);
     return btn;
