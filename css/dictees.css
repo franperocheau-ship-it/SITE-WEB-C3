@@ -291,6 +291,25 @@
 }
 .dic-niveau-indicator:empty { display: none; }
 
+/* Bouton "Changer de niveau", accolé au rappel de niveau ci-dessus (voir
+   renderStepBanner/changeNiveau, js/dictees-engine.js) — style discret
+   (soulignement seul, pas de fond) pour rester secondaire par rapport aux
+   onglets d'exercice, tout en étant repérable comme cliquable malgré le
+   texte non-cliquable environnant. */
+.dic-change-niveau-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--blue);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.dic-change-niveau-btn:hover { color: #0d2255; }
+
 /* ─── Écran de dictée (dictee.html) — bandeau d'étape et consigne ──────── */
 /* Fond légèrement teinté + icône (::before) + texte plus grand/gras/foncé —
    remplace l'ancien style gris clair 15px trop peu contrasté (retour

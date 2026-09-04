@@ -159,13 +159,6 @@ const DicteesEngine = (() => {
   let classificationPool = [];    // gramExtraMots seuls (jamais les mots de dictee_mots, cf. §2 en tête de fichier)
   let studentId = null;
   let state = null;
-  /* Exercices déjà réalisés par l'élève AVANT cette session, sur cette
-     dictée — un booléen par palier scoré (0/0.5 n'ont aucun résultat
-     persisté, jamais concernés). Chargé une fois dans init() ; sert
-     uniquement à proposer refaire/passer (voir withRedoOrSkipCheck) —
-     jamais mis à jour en cours de session pour ne pas se re-déclencher sur
-     ce que l'élève vient tout juste de terminer ici. */
-  let alreadyDone = { 1: false, 2: false, 3: false, 4: false, 5: false };  // clé = même `step` numérique que currentSequence()
 
   /* Note historique : une variable previewSection permettait de "prévisualiser"
      l'autre section sans lancer d'exercice, mais ça désynchronisait le
@@ -253,7 +246,6 @@ const DicteesEngine = (() => {
       trous: null,
       trousConj: null,
       transfo: null,
-      redoChoiceResolved: {},  // { [step]: true } une fois le choix refaire/passer tranché pour ce step
       sectionResume: { lexical: null, gram: null },  // dernier step actif par section, voir renderStepBanner
       schemaVersion: SCHEMA_VERSION
     };
@@ -328,31 +320,6 @@ const DicteesEngine = (() => {
       allGramTrous = []; allGramTrousConj = []; gramTransformations = []; gramExtraMots = [];
     }
 
-    /* Historique des résultats déjà soumis par cet élève sur CETTE dictée
-       (toutes tentatives passées, tous niveaux confondus — cette vérification
-       d'existence ignore volontairement dictee_gram_results.niveau) : sert
-       uniquement à proposer refaire/passer avant de relancer un exercice
-       déjà fait (voir withRedoOrSkipCheck). Échec isolé sans conséquence :
-       repli sur "rien de fait" plutôt que de bloquer le chargement. */
-    try {
-      const [lexRes, gramRes] = await Promise.all([
-        window.lfmDb.from('dictee_results').select('id').eq('student_id', studentId).eq('dictee_id', dicteeId).eq('exercice', 1).limit(1),
-        window.lfmDb.from('dictee_gram_results').select('type').eq('student_id', studentId).eq('dictee_id', dicteeId).limit(50)
-      ]);
-      if (lexRes.error) throw lexRes.error;
-      if (gramRes.error) throw gramRes.error;
-      const gramTypes = new Set((gramRes.data || []).map(r => r.type));
-      alreadyDone = {
-        1: (lexRes.data || []).length > 0,
-        2: gramTypes.has('classification'),
-        3: gramTypes.has('trous'),
-        4: gramTypes.has('transformation'),
-        5: gramTypes.has('trous_conjugaison')
-      };
-    } catch (e) {
-      console.warn('[LFM] DicteesEngine: historique des résultats indisponible (refaire/passer désactivé):', e.message);
-    }
-
     /* Uniquement les mots saisis manuellement pour cet exercice — jamais les
        mots de la dictée de mots (allMots), même tagués d'une nature
        grammaticale : ce couplage automatique a été retiré (retour
@@ -415,6 +382,14 @@ const DicteesEngine = (() => {
     document.getElementById('dic-state-exercise').style.display = 'none';
     document.getElementById('dic-state-results').style.display = 'none';
     document.getElementById('dic-state-niveau-choice').style.display = '';
+    /* Vide aussi le bandeau d'étape et l'indicateur de niveau (bouton
+       "Changer de niveau" compris) : appelée depuis changeNiveau() en plein
+       milieu d'une dictée, avec `state` déjà remis à null — des onglets
+       laissés à l'écran resteraient cliquables et planteraient sur ce state
+       nul. :empty (css/dictees.css) masque #dic-niveau-indicator une fois
+       vidé, comme au tout premier chargement de la page. */
+    document.getElementById('dic-step-banner').innerHTML = '';
+    document.getElementById('dic-niveau-indicator').innerHTML = '';
     document.getElementById('dic-niveau-choice-grid').innerHTML = [1, 2, 3].map(n => `
       <button type="button" class="dic-niveau-choice-btn" data-niveau="${n}">
         <span class="dic-niveau-badge" style="--ls-color:var(--ls-color-${n})">Niveau de difficulté n°${n}</span>
@@ -422,13 +397,13 @@ const DicteesEngine = (() => {
     `).join('');
     /* Sélecteur scopé à #dic-niveau-choice-grid, PAS un querySelectorAll
        global sur .dic-niveau-choice-btn : cette classe est réutilisée pour
-       le style (pas la sélection) par les boutons ordre-choice et
-       refaire/passer, déjà présents dans le DOM à ce moment — un sélecteur
-       global les aurait aussi appariés et leur aurait posé un faux listener
-       chooseNiveau(NaN) (data-niveau absent sur ces boutons-là), écrasant
-       ensuite leur vrai onclick au clic (bug trouvé en testant redo/skip :
-       le niveau filtré retombait silencieusement sur NaN → repli sur "tous
-       les mots" dès que l'écran ordre-choice avait été affiché une fois). */
+       le style (pas la sélection) par les boutons ordre-choice, déjà
+       présents dans le DOM à ce moment — un sélecteur global les aurait
+       aussi appariés et leur aurait posé un faux listener chooseNiveau(NaN)
+       (data-niveau absent sur ces boutons-là), écrasant ensuite leur vrai
+       onclick au clic (bug trouvé en testant redo/skip : le niveau filtré
+       retombait silencieusement sur NaN → repli sur "tous les mots" dès que
+       l'écran ordre-choice avait été affiché une fois). */
     document.querySelectorAll('#dic-niveau-choice-grid .dic-niveau-choice-btn').forEach(btn =>
       btn.addEventListener('click', () => chooseNiveau(parseInt(btn.dataset.niveau, 10)))
     );
@@ -490,70 +465,6 @@ const DicteesEngine = (() => {
     if (msg) document.querySelector('#dic-state-error p').textContent = msg;
   }
 
-  /* ── Refaire pour s'entraîner / passer au suivant ────────────────────────
-     Un palier scoré (1/2/3/4) dont l'élève a déjà une tentative en base
-     (alreadyDone, chargé dans init()) ne se relance plus automatiquement :
-     on lui propose d'abord de le refaire (entraînement, nouvelle tentative
-     normale — submitResult/submitGramResult insèrent toujours une nouvelle
-     ligne, jamais un écrasement, cf. "Mes dictées" qui affiche déjà la plus
-     récente) ou de passer directement à la suite. `state.redoChoiceResolved`
-     retient le choix pour ne pas re-proposer deux fois le même palier dans
-     une même session déjà en cours (ex. retour arrière puis re-avance). */
-  function withRedoOrSkipCheck(key, realStart) {
-    return () => {
-      const resolved = state.redoChoiceResolved && state.redoChoiceResolved[key];
-      if (alreadyDone[key] && !resolved) {
-        renderRedoOrSkipChoice(key, realStart);
-      } else {
-        realStart();
-      }
-    };
-  }
-
-  function renderRedoOrSkipChoice(key, realStart) {
-    document.getElementById('dic-state-results').style.display = 'none';
-    document.getElementById('dic-state-exercise').style.display = '';
-    setConsigne('');
-
-    /* state.step positionné dès cet écran (avant même que realStart() ne le
-       fasse) uniquement pour que renderStepBanner — normalement appelé par
-       render(), qu'on court-circuite ici — reflète déjà le palier concerné
-       plutôt que le précédent. markSectionResume() mémorise ce step comme
-       dernier actif de sa section, pour que le switcher (voir
-       renderStepBanner) sache y revenir. */
-    state.step = key;
-    markSectionResume();
-    renderStepBanner();
-
-    const seq = currentSequence();
-    const idx = seq.findIndex(s => s.step === key);
-    const current = idx >= 0 ? seq[idx] : null;
-    const next = idx >= 0 ? seq[idx + 1] : undefined;
-
-    const resolve = fn => {
-      state.redoChoiceResolved = state.redoChoiceResolved || {};
-      state.redoChoiceResolved[key] = true;
-      saveState();
-      fn();
-    };
-
-    document.getElementById('dic-item').innerHTML = `
-      <p class="dic-niveau-choice-intro">Tu as déjà fait « ${escapeHtml(current ? current.label : 'cet exercice')} » sur cette dictée.</p>
-      <div class="dic-niveau-choice-grid">
-        <button type="button" class="dic-niveau-choice-btn" id="dic-redo-btn">🔁 Refaire pour t'entraîner</button>
-        <button type="button" class="dic-niveau-choice-btn" id="dic-skip-btn">${next ? '⏭️ Passer à ' + escapeHtml(next.label) : '⏭️ Passer à la suite'}</button>
-      </div>
-    `;
-    document.getElementById('dic-redo-btn').addEventListener('click', () => resolve(() => {
-      resetStepState(key);
-      realStart();
-    }));
-    document.getElementById('dic-skip-btn').addEventListener('click', () => resolve(() => {
-      if (next) next.start();
-      else advanceAfter(key, 'Dictée terminée !', 'Tu as déjà fait tous les exercices disponibles pour cette dictée.');
-    }));
-  }
-
   /* ── Rendu général ───────────────────────────────────────────────────── */
   /* Étapes du volet grammatical, calculées à partir des données réellement
      chargées : une dictée n'a pas forcément les 3 exercices renseignés, dans
@@ -562,10 +473,10 @@ const DicteesEngine = (() => {
   function gramSteps() {
     if (dictee.inclut_grammaticale === false) return [];
     const steps = [];
-    if (classificationPool.length > 0) steps.push({ step: 2, label: 'Classification', icon: '🏷️', start: withRedoOrSkipCheck(2, startClassification) });
-    if (gramTrous.length > 0) steps.push({ step: 3, label: 'Texte à trous', icon: '🧩', start: withRedoOrSkipCheck(3, startTrous) });
-    if (gramTrousConj.length > 0) steps.push({ step: 5, label: 'Trous — conjugaison', icon: '🔤', start: withRedoOrSkipCheck(5, startTrousConjugaison) });
-    if (gramTransformations.length > 0) steps.push({ step: 4, label: 'Transformation', icon: '🔄', start: withRedoOrSkipCheck(4, startTransformation) });
+    if (classificationPool.length > 0) steps.push({ step: 2, label: 'Classification', icon: '🏷️', start: startClassification });
+    if (gramTrous.length > 0) steps.push({ step: 3, label: 'Texte à trous', icon: '🧩', start: startTrous });
+    if (gramTrousConj.length > 0) steps.push({ step: 5, label: 'Trous — conjugaison', icon: '🔤', start: startTrousConjugaison });
+    if (gramTransformations.length > 0) steps.push({ step: 4, label: 'Transformation', icon: '🔄', start: startTransformation });
     return steps;
   }
 
@@ -579,7 +490,7 @@ const DicteesEngine = (() => {
     return [
       { step: 0, label: 'Photographie le mot', icon: '📸', color: 'var(--color-niveau-cm1)', start: startExercice0 },
       { step: 0.5, label: 'Effacement progressif', icon: '🧽', color: 'var(--color-niveau-cm2)', start: startPalier05 },
-      { step: 1, label: 'Dictée audio', icon: '🎧', color: 'var(--color-niveau-6e)', start: withRedoOrSkipCheck(1, startExercice1) }
+      { step: 1, label: 'Dictée audio', icon: '🎧', color: 'var(--color-niveau-6e)', start: startExercice1 }
     ];
   }
 
@@ -695,11 +606,9 @@ const DicteesEngine = (() => {
      vraie navigation, voir plus bas.
 
      Chaque tuile d'exercice est un vrai <button> qui appelle s.start
-     directement : s.start est déjà le bon point d'entrée
-     (withRedoOrSkipCheck pour les paliers scorés 1/2/3/4, start direct pour
-     0/0.5) — cliquer sur l'onglet courant relance simplement le même palier
-     (startXXX est idempotente, voir plus bas : elle reprend l'état en cours
-     au lieu de le réinitialiser). */
+     directement — cliquer sur l'onglet courant relance simplement le même
+     palier (startXXX est idempotente, voir plus bas : elle reprend l'état en
+     cours au lieu de le réinitialiser). */
   function renderStepBanner() {
     const banner = document.getElementById('dic-step-banner');
     const lex = lexicalSteps();
@@ -743,10 +652,30 @@ const DicteesEngine = (() => {
        affiché juste au-dessus) — retour utilisateur : partager le même
        conteneur flex que les onglets, avec un style de pastille identique,
        laissait croire à une 4e option cliquable alors que c'est une simple
-       info d'état sur la session en cours (jamais modifiable ici, voir
-       showNiveauChoice pour le seul écran où le niveau est un vrai choix). */
-    document.getElementById('dic-niveau-indicator').innerHTML =
-      `<span class="dic-niveau-dot" style="--ls-color:var(--ls-color-${state.niveauChoisi})"></span>Niveau de difficulté n°${state.niveauChoisi}`;
+       info d'état sur la session en cours. Le bouton "Changer de niveau" y
+       est accolé (retour utilisateur : il était jusqu'ici impossible de
+       changer de niveau sans terminer la dictée en cours ou vider le cache —
+       voir changeNiveau) : seul point de la session où le niveau redevient
+       un vrai choix, comme sur showNiveauChoice. */
+    document.getElementById('dic-niveau-indicator').innerHTML = `
+      <span class="dic-niveau-dot" style="--ls-color:var(--ls-color-${state.niveauChoisi})"></span>Niveau de difficulté n°${state.niveauChoisi}
+      <button type="button" id="dic-change-niveau-btn" class="dic-change-niveau-btn">Changer de niveau</button>
+    `;
+    document.getElementById('dic-change-niveau-btn').addEventListener('click', changeNiveau);
+  }
+
+  /* Réinitialise complètement la progression sessionStorage de cette dictée
+     pour cet élève et relance l'écran de choix du niveau — accessible à tout
+     moment pendant une dictée (bouton posé dans #dic-niveau-indicator, voir
+     renderStepBanner), y compris en plein milieu d'un palier non terminé :
+     aucun résultat déjà soumis (dictee_results/dictee_gram_results) n'est
+     touché, seule la progression locale en cours l'est, donc rien ne bloque
+     ni ne fausse la reprise sur un autre niveau ensuite. */
+  function changeNiveau() {
+    DicteesSpeech.cancel();
+    sessionStorage.removeItem(storageKey(dictee.id));
+    state = null;
+    showNiveauChoice();
   }
 
   function render() {
@@ -789,8 +718,7 @@ const DicteesEngine = (() => {
      chacun des 4 autres écrans dédiés pour 0/0.5/2/3 — ces derniers ne
      passent pas par advanceAfter, cf. en-tête des paliers correspondants).
      `restart` est appelé APRÈS le reset : passer directement la fonction
-     start du palier (jamais besoin de repasser par withRedoOrSkipCheck ici,
-     l'élève vient déjà de voir/choisir de refaire sur cet écran). */
+     start du palier. */
   function redoButtonHTML() {
     return `<button type="button" class="dic-card-btn" id="dic-redo-again-btn" style="width:auto;padding:12px 28px;background:#fff;color:var(--blue);border:2px solid var(--blue);">🔁 Refaire pour t'entraîner</button>`;
   }
@@ -799,8 +727,6 @@ const DicteesEngine = (() => {
     if (!btn) return;
     btn.addEventListener('click', () => {
       resetStepState(step);
-      state.redoChoiceResolved = state.redoChoiceResolved || {};
-      state.redoChoiceResolved[step] = true;
       saveState();
       restart();
     });
@@ -812,9 +738,7 @@ const DicteesEngine = (() => {
      sinon affiche l'écran de fin du module entier. Remplace l'ancien
      finishGramStep (qui ne connaissait que l'ordre lexical→grammatical figé,
      incompatible avec le choix d'ordre). Propose aussi de refaire ce même
-     palier (retour utilisateur) : jusqu'ici, ce choix n'était offert qu'en
-     rentrant à nouveau sur l'onglet du palier (withRedoOrSkipCheck), jamais
-     directement sur cet écran de fin. */
+     palier (retour utilisateur) directement sur cet écran de fin. */
   function advanceAfter(step, title, detail) {
     const seq = currentSequence();
     const idx = seq.findIndex(s => s.step === step);
