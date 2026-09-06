@@ -725,6 +725,14 @@
       padding: 0 2px;
       user-select: none;
     }
+    /* Séparateur de classe (espace de groupement par tranches de 3 :
+       unités simples / milliers / millions) — renforcé par rapport à la
+       virgule décimale pour marquer clairement les classes du nombre. */
+    .ivp-sep-group {
+      padding: 0 12px;
+      margin: 0 2px;
+      border-left: 2px solid rgba(30, 37, 50, 0.16);
+    }
 
     .ivp-number-input {
       display: block;
@@ -750,6 +758,7 @@
       .ivp-number-plain        { font-size: 30px; padding: 16px 10px; }
       .ivp-number-clickable    { padding: 16px 10px; }
       .ivp-digit-btn, .ivp-sep { font-size: 28px; }
+      .ivp-sep-group           { padding: 0 7px; }
     }
 
     /* ── Type : encadrer-fraction ────────────────────────────────────────── */
@@ -1289,6 +1298,16 @@
       margin-bottom: 22px;
       color: var(--blue);
     }
+    /* probabilite-issues niveau 3 : le champ "word" y sert de vraie
+       question (pas un mot court) — cf. wordCls dans renderChoixEtiquette.
+       Repasse à une taille de lecture normale, alignée sur .ex-question-
+       label ci-dessus (16px) plutôt que sur le kicker 28px d'origine. */
+    .ex-label-word.ex-label-word-consigne {
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
 
     /* ── Type : glisser-deposer ──────────────────────────────────────────── */
     .ex-fill-sentence {
@@ -1350,6 +1369,203 @@
       letter-spacing: 0.07em;
       color: var(--blue);
       margin-bottom: 10px;
+    }
+
+    /* Casse normale + taille de lecture — probabilite-issues uniquement (cf.
+       isProbaIssues dans renderClassificationEtapes/renderChoixEtiquette/
+       renderMotsCliquables). Sélecteur composé (deux classes) pour gagner
+       en spécificité sur .ex-question-label/.ex-classify-step-title
+       ci-dessus (12-13px, pensés pour un court kicker en majuscules) sans
+       toucher aux autres exercices qui réutilisent ces mêmes classes de
+       base (grammaire, homophones, proportionnalite, probabilite-chances).
+       16px aligné sur .aa-enonce/.ecn-prompt (17px) et .pp-enonce-question
+       (15px) — mêmes précédents du site pour un énoncé à lire en entier,
+       plutôt qu'une étiquette courte. Letter-spacing réduit en conséquence
+       (0.1em/0.07em convenait à une petite majuscule, pas à une vraie
+       phrase à cette taille). */
+    .ex-question-label.ex-label-sentencecase,
+    .ex-classify-step-title.ex-label-sentencecase {
+      text-transform: none;
+      font-size: 16px;
+      line-height: 1.5;
+      letter-spacing: 0.01em;
+    }
+
+    /* Surlignage des mots-clés de consigne — probabilite-issues uniquement,
+       posé par highlightConsigne(text, terms) (cf. exercise.html, appelée
+       sur q.instruction/step1Instruction/step2Instruction/word). Fond doré
+       clair (teinte de la charte #F5A623) + texte navy en gras : contraste
+       élevé (~7:1, texte foncé sur fond clair), lisible même en gras à 16px.
+       <mark> n'ajoute aucun texte ni attribut caché : attachSpeechButton lit
+       el.textContent, qui traverse les <mark> normalement — aucune
+       interférence avec la lecture audio dys. */
+    .ex-consigne-highlight {
+      background: rgba(245, 166, 35, 0.32);
+      color: var(--color-brand-navy, #1A2D6B);
+      font-weight: 800;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+
+    /* Empêche une notation courte (ex. "(1-_-_)", "1-1-2") de casser au
+       milieu quand la ligne manque de place : le navigateur renvoie le
+       bloc entier à la ligne suivante plutôt que de couper sur un tiret,
+       comme le ferait un tiret normal. Utilitaire générique — à poser sur
+       tout jeton de ce type dans une consigne, pas propre à un item. */
+    .ex-nowrap { white-space: nowrap; }
+
+    /* Ronds colorés pour les billes/jetons de probabilite-issues (remplace
+       le bouton-texte "Rouge"/"Bleue" par un vrai repère visuel + le nom en
+       petit dessous, gardé pour la lecture audio dys via .ex-word-btn déjà
+       ciblé par attachSpeechButton). N'apparaît que si le mot est reconnu
+       comme couleur ET isProbaIssues (cf. probaBilleColor) : aucun effet
+       sur les autres classification-etapes. */
+    .ex-word-btn.ex-word-btn--bille {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 14px;
+    }
+    .ex-bille-dot {
+      display: inline-block; /* sinon un <span> reste "inline" et ignore
+        width/height hors d'un conteneur flex (ex. dans un <th>, cf.
+        grille-double-entree en-têtes) */
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid rgba(20,20,20,0.25);
+      box-shadow: inset 0 -3px 5px rgba(0,0,0,0.15), inset 0 2px 4px rgba(255,255,255,0.4);
+    }
+    .ex-bille-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: none;
+    }
+
+    /* ── Type : grille-double-entree — probabilite-issues niveau 3 ────────── */
+    .pigde-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 4px 0 18px;
+    }
+    .pigde-table { border-collapse: collapse; margin: 0 auto; }
+    .pigde-corner, .pigde-header {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      padding: 8px;
+      text-align: center;
+    }
+    .pigde-corner {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .pigde-header { min-width: 64px; }
+    .pigde-table td { padding: 0; border: 1.5px solid var(--border); }
+    .pigde-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      width: 100%;
+      min-width: 72px;
+      min-height: 72px;
+      padding: 8px 6px;
+      background: var(--card-bg);
+      border: none;
+      font-family: inherit;
+      cursor: pointer;
+      transition: border-color 160ms, background 160ms;
+    }
+    .pigde-cell:hover:not(:disabled) { background: rgba(16,43,106,0.05); }
+    .pigde-cell:disabled { cursor: default; }
+    .pigde-cell.is-selected { background: rgba(16,43,106,0.12); box-shadow: inset 0 0 0 2px var(--blue); }
+    .pigde-cell.is-correct  { background: rgba(22,163,74,0.09); box-shadow: inset 0 0 0 2px #16a34a; }
+    .pigde-cell.is-missed   { background: rgba(22,163,74,0.06); outline: 2px dashed #16a34a; outline-offset: -2px; }
+    /* Case acquise (repère) — affichée normalement, PAS grisée/estompée :
+       ce n'est pas "quelque chose à faire" mais un couple déjà correct,
+       laissé visible pour comprendre la logique du tableau. Seules les
+       cases <input> (.pigde-input plus bas) portent l'indication visuelle
+       "à compléter". */
+    .pigde-cell.is-given {
+      background: var(--card-bg);
+      cursor: default;
+    }
+    .pigde-pair-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .pigde-plus { font-size: 11px; font-weight: 700; color: var(--muted); }
+    .pigde-text { font-size: 14px; font-weight: 700; color: var(--text); }
+
+    /* Case à compléter (tableau incomplet, cf. fillMode dans
+       renderGrilleDoubleEntree) — <input> vide, même gabarit que
+       .pigde-cell pour rester alignée dans la grille. Contour pointillé
+       doré + fond teinté dès le chargement : affordance "à remplir"
+       visible immédiatement, à l'opposé des cases acquises (.pigde-cell.
+       is-given, plain/normales) — cf. correctif "distinguer visuellement
+       les cases à compléter des cases en lecture seule". */
+    .pigde-input {
+      display: block;
+      width: 100%;
+      min-width: 72px;
+      min-height: 72px;
+      padding: 8px 6px;
+      border: none;
+      background: rgba(245,166,35,0.08);
+      outline: 2px dashed rgba(245,166,35,0.65);
+      outline-offset: -2px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      text-align: center;
+    }
+    .pigde-input::placeholder { color: #b8790f; opacity: 0.75; font-weight: 700; }
+    .pigde-input:focus { outline: 2px solid var(--blue); outline-offset: -2px; background: rgba(16,43,106,0.05); }
+    .pigde-input.is-correct { background: rgba(22,163,74,0.09); outline: none; box-shadow: inset 0 0 0 2px #16a34a; color: #15803d; }
+    .pigde-input.is-wrong   { background: rgba(214,40,57,0.07); outline: none; box-shadow: inset 0 0 0 2px var(--red); color: var(--red); }
+    .pigde-input.is-empty-missed { background: rgba(22,163,74,0.06); outline: 2px dashed #16a34a; outline-offset: -2px; color: #16a34a; }
+    .pigde-input:disabled {
+      cursor: default;
+      opacity: 1; /* neutralise l'estompage par défaut du navigateur sur un
+        input désactivé — sinon .is-correct/.is-wrong deviennent illisibles */
+      -webkit-text-fill-color: currentColor;
+    }
+
+    /* ── Type : arbre-probabilites — probabilite-issues niveau 2 ────────────
+       Structure réelle : racine → nœuds 1er choix → feuilles 2e choix,
+       reliés par de vraies lignes SVG (pas de simple empilement par
+       bordure colorée). .arbre-svg-scroll gère le débordement horizontal
+       (mobile/tablette) sans tasser l'arbre — cf. .pigde-wrap, même
+       stratégie déjà utilisée pour le tableau à double entrée. */
+    .arbre-svg-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 8px 0 4px;
+    }
+    .arbre-svg-wrap { position: relative; }
+    .arbre-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      overflow: visible;
+      pointer-events: none; /* les lignes/nœuds sont décoratifs, jamais cliqués */
+    }
+    .arbre-branch-line { stroke: var(--color-brand-turquoise, #1DBFA0); stroke-width: 2; }
+    .arbre-node-dot { fill: var(--color-brand-navy, #1A2D6B); }
+    .arbre-root-label, .arbre-node-label {
+      position: absolute;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--color-brand-navy, #1A2D6B);
+      white-space: nowrap;
+    }
+    .arbre-leaf {
+      position: absolute;
+      transform: translateY(-50%); /* top = centre vertical de la feuille, pas son bord */
     }
 
     /* ── Type : click-sort / match / col-sort / dict-mcq ──────────────────
@@ -4442,6 +4658,12 @@
       margin-bottom: 14px;
       min-height: 20px;
     }
+    .fdgd-unit-hint {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
     @media (max-width: 480px) {
       .fdgd-cell-10  { width: 30px; height: 30px; }
       .fdgd-cell-100 { width: 20px; height: 20px; }
@@ -4455,11 +4677,41 @@
       margin-bottom: 8px;
     }
     .fdgd-grid-block { text-align: center; }
-    .fdgd-grid-label {
+    /* Bouton "Unité N" : clic pour colorier/décolorier la grille entière
+       d'un coup (fraction > 1, ex. 22/10 = 2 unités pleines + 2 cases),
+       même logique que .fdgd-row-toggle pour une ligne. Look de "chip"
+       (fond teinté, bordure, forme arrondie) + icône ■/□ pour que
+       l'affordance de clic soit visible sans avoir à la découvrir par
+       hasard — simple texte au-dessus d'une grille ne se lisait pas comme
+       interactif. */
+    .fdgd-grid-label-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
       font-size: 12px;
       font-weight: 700;
-      color: var(--muted);
-      margin-bottom: 6px;
+      color: #0d9488;
+      margin-bottom: 8px;
+      background: rgba(29,191,160,0.12);
+      border: 1px solid rgba(29,191,160,0.4);
+      border-radius: 999px;
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: background 120ms, box-shadow 120ms, border-color 120ms, transform 80ms;
+    }
+    .fdgd-grid-label-btn:hover {
+      background: rgba(29,191,160,0.22);
+      border-color: #0d9488;
+      box-shadow: 0 2px 6px rgba(13,148,136,0.28);
+    }
+    .fdgd-grid-label-btn:active { transform: scale(0.96); }
+    .fdgd-grid-label-icon { font-size: 12px; line-height: 1; }
+    /* Aperçu au survol (souris) : surligne toutes les cases de l'unité
+       visée par le bouton, avant même le clic — sans effet sur tactile
+       (:hover ne s'y déclenche pas), où l'icône + le style bouton suffisent. */
+    .fdgd-grid-label-btn:hover ~ .fdgd-grid-10 .fdgd-cell,
+    .fdgd-grid-label-btn:hover ~ .fdgd-grid-100 .fdgd-cell {
+      box-shadow: 0 0 0 2px rgba(13,148,136,0.5) inset;
     }
     /* Décomposition en dixièmes/centièmes/unités (niveau 2/3) */
     .fdgd-decomp-label {
@@ -4468,12 +4720,6 @@
       color: var(--muted);
       margin-top: 4px;
       text-align: center;
-    }
-    /* Piège vrai/faux (niveau 3) */
-    .fdgd-trap-statement {
-      text-align: center;
-      font-size: 17px;
-      margin-bottom: 18px;
     }
     /* Droite graduée responsive */
     .fdgd-droite-container {
@@ -4500,6 +4746,11 @@
       margin-bottom: 4px;
     }
     .zline-sub-svg { width: 100%; overflow: visible; }
+    /* Cascade à 3 niveaux (niveau 3, den=100) : la 2e étape de zoom (dixième
+       → centième) est une instance ZoomLine normale montée à l'intérieur,
+       donc son propre .zline-main-wrap/.zline-sub-wrap ; juste une légère
+       séparation visuelle avec l'étape du dessus (unité → dixième). */
+    .zline-unit-wrap { margin-top: 6px; }
 
     /* ── Type : fraction-decimale-tableau-niveaux ───────────────────────── */
     .fdtn-table-wrap {
@@ -4574,6 +4825,84 @@
       .fdtn-input  { width: 42px; height: 42px; font-size: 20px; }
       .fdtn-th     { min-width: 52px; font-size: 10px; }
       .fdtn-td     { padding: 8px 4px; }
+    }
+
+    /* ── Tableau de numération complet (fraction-decimale-tableau-niveaux) —
+       6 colonnes toujours affichées et éditables (jamais grisées : l'élève
+       doit repérer lui-même la bonne position), sur le modèle des tableaux
+       de numération imprimables : 2 bandeaux de section + sous-en-têtes.
+       Classes dédiées fdtn2-* pour ne pas toucher .fdtn-* (réutilisée par
+       associer-decimal-fraction-niveaux, cf. plus haut, qui grise
+       volontairement les colonnes non concernées). ── */
+    .fdtn2-table-wrap {
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 8px;
+    }
+    .fdtn2-table { border-collapse: collapse; margin: 0 auto; }
+    .fdtn2-section-th {
+      font-family: var(--font-display, 'Fredoka', sans-serif);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #fff;
+      text-align: center;
+      padding: 8px 6px;
+    }
+    .fdtn2-section-left  { background: var(--color-brand-navy, #1A2D6B); border-top-left-radius: 10px; }
+    .fdtn2-section-right { background: var(--color-brand-gold, #F5A623); border-top-right-radius: 10px; }
+    .fdtn2-th {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: center;
+      padding: 8px 6px 6px;
+      background: var(--card-bg);
+      border-bottom: 2px solid var(--border);
+      min-width: 60px;
+    }
+    .fdtn2-th-value {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+    .fdtn2-td {
+      text-align: center;
+      padding: 10px 6px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+    }
+    .fdtn2-col-sep { border-right: 3px solid var(--color-brand-navy, #1A2D6B); }
+    .fdtn2-input {
+      width: 52px;
+      height: 52px;
+      border: 2px solid var(--blue);
+      border-radius: 10px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      background: var(--card-bg);
+      outline: none;
+      font-family: inherit;
+      transition: border-color 150ms, box-shadow 150ms;
+    }
+    .fdtn2-input:focus { box-shadow: 0 0 0 3px rgba(16,43,106,0.12); }
+    .fdtn2-input.is-correct { border-color: #16a34a; background: rgba(22,163,74,0.07); color: #15803d; }
+    .fdtn2-input.is-wrong   { border-color: var(--red); background: rgba(214,40,57,0.06); color: var(--red); }
+    .fdtn2-input:disabled   { cursor: default; }
+    @media (max-width: 480px) {
+      .fdtn2-input      { width: 40px; height: 44px; font-size: 20px; }
+      .fdtn2-th         { min-width: 46px; font-size: 9px; padding: 6px 3px 5px; }
+      .fdtn2-th-value   { font-size: 9px; }
+      .fdtn2-td         { padding: 6px 3px; }
+      .fdtn2-section-th { font-size: 10px; padding: 6px 3px; }
     }
 
     /* ══════════════════════════════════════════════════════════════
@@ -4901,8 +5230,6 @@
     let nbEntierLevelSelect = null; /* nombre-entier : instance LevelSelect */
     let probaChancesLevel       = null; /* probabilite-chances : niveau sélectionné (id "niveauN") */
     let probaChancesLevelSelect = null; /* probabilite-chances : instance LevelSelect */
-    let probaIssuesLevel        = null; /* probabilite-issues  : niveau sélectionné (id "niveauN") */
-    let probaIssuesLevelSelect  = null; /* probabilite-issues  : instance LevelSelect */
     let probaNombreLevel        = null; /* probabilite-nombre  : niveau sélectionné (id "niveauN") */
     let probaNombreLevelSelect  = null; /* probabilite-nombre  : instance LevelSelect */
     let propSituationLevel       = null; /* identifier-situation-proportionnalite : niveau sélectionné */
@@ -4982,7 +5309,7 @@
     const SPEECH_TARGET_SELECTOR = [
       '.ex-question-label', '.cd-q-prompt', '.aa-enonce', '.pl-prompt',
       '.ct-instruction', '.ecn-prompt', '.rd-followup-prompt', '.ex-classify-step-title',
-      '.pp-enonce-contexte', '.pp-enonce-question'
+      '.pp-enonce-contexte', '.pp-enonce-question', '.pigde-header', '.pigde-corner'
     ].join(', ');
 
     const ITEM_TARGET_SELECTOR = [
@@ -4997,7 +5324,7 @@
     ].join(', ');
 
     const CHOICE_TARGET_SELECTOR = [
-      '.ex-choice', '.match-chip', '.ex-word-btn', '.cs-chip', '.col-sort-btn'
+      '.ex-choice', '.match-chip', '.ex-word-btn', '.cs-chip', '.col-sort-btn', '.pigde-cell'
     ].join(', ');
 
     function injectSpeechButtons(root) {
@@ -5114,7 +5441,6 @@
       decompLevel      = null;
       fpLevel           = null;
       probaChancesLevel = null;
-      probaIssuesLevel  = null;
       probaNombreLevel  = null;
       propSituationLevel = null;
       propProblemeLevel  = null;
@@ -5816,56 +6142,6 @@
       probaChancesLevelSelect.renderSelectScreen();
     }
 
-    function showProbaIssuesLevelSelect() {
-      document.getElementById("level-select-screen").classList.remove("ex-hidden");
-      document.getElementById("exercise-screen").classList.add("ex-hidden");
-      document.getElementById("results-screen").classList.add("ex-hidden");
-
-      const levels = sessionData.levels || ["niveau1", "niveau2", "niveau3"];
-      const descs  = {
-        "niveau1": "Lister les issues possibles",
-        "niveau2": "Dénombrer les issues favorables",
-        "niveau3": "Situations combinées"
-      };
-
-      const slug = new URLSearchParams(window.location.search).get('slug') || 'unknown';
-      probaIssuesLevelSelect = LevelSelect.create({
-        exerciseKey: slug,
-        levels: levels.map(l => ({ id: l, description: descs[l] || '' })),
-        threshold: 0.8,
-        onSelectLevel: (l) => {
-          probaIssuesLevel = l;
-          const filtered = sessionData.bank.filter(it => it.level === probaIssuesLevel);
-          questions = shuffle(filtered).slice(0, sessionData.questionsPerSession);
-          currentIndex = 0;
-          score        = 0;
-          sessionLevelList   = [...levels];
-          sessionLevelLabels = levels.map(lv => LEVEL_LABELS[lv] ?? lv);
-          sessionLevelIdx    = levels.indexOf(l);
-          sessionLevelLoader = (lv) => {
-            probaIssuesLevel = lv;
-            const fq = sessionData.bank.filter(it => it.level === probaIssuesLevel);
-            questions = shuffle(fq).slice(0, sessionData.questionsPerSession);
-            document.getElementById('q-total').textContent = questions.length;
-            document.getElementById('ex-bar-fill').style.width = '0%';
-            currentIndex = 0;
-            score        = 0;
-            showQuestion(0);
-            probaIssuesLevelSelect.renderBadges(lv);
-          };
-          document.getElementById('q-total').textContent = questions.length;
-          document.getElementById("level-select-screen").classList.add("ex-hidden");
-          document.getElementById("exercise-screen").classList.remove("ex-hidden");
-          showQuestion(0);
-          probaIssuesLevelSelect.renderBadges(l);
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        },
-        selectContainer: document.getElementById("level-select-screen"),
-        badgesContainer: document.getElementById("ex-badges")
-      });
-      probaIssuesLevelSelect.renderSelectScreen();
-    }
-
     function showProbaNombreLevelSelect() {
       document.getElementById("level-select-screen").classList.remove("ex-hidden");
       document.getElementById("exercise-screen").classList.add("ex-hidden");
@@ -6356,11 +6632,6 @@
         return;
       }
 
-      if (currentType === "probabilite-issues" && probaIssuesLevel === null) {
-        showProbaIssuesLevelSelect();
-        return;
-      }
-
       if (currentType === "probabilite-nombre" && probaNombreLevel === null) {
         showProbaNombreLevelSelect();
         return;
@@ -6442,13 +6713,13 @@
           "texte-a-trous":        renderTexteATrous,
           "production-libre":     renderProductionLibre,
           "double-blanc":         renderDoubleBlanc,
-          "gap-saisie":           renderGapSaisie
+          "gap-saisie":           renderGapSaisie,
+          "grille-double-entree": renderGrilleDoubleEntree,
+          "arbre-probabilites":   renderArbreProbabilites
         };
         HOMO_RENDERERS[q.type](card, q);
       } else if (currentType === "probabilite-chances") {
         renderChoixEtiquette(card, q);
-      } else if (currentType === "probabilite-issues") {
-        renderClassificationEtapes(card, q);
       } else if (currentType === "probabilite-nombre") {
         renderMotsCliquables(card, q);
       } else if (currentType === "identifier-situation-proportionnalite") {
@@ -6995,7 +7266,6 @@
           else if (currentType === 'decomposer-fraction') showDecomposerFractionLevelSelect();
           else if (currentType === 'fractions-problemes') showFractionsProblemesLevelSelect();
           else if (currentType === 'probabilite-chances') showProbaChancesLevelSelect();
-          else if (currentType === 'probabilite-issues') showProbaIssuesLevelSelect();
           else if (currentType === 'probabilite-nombre') showProbaNombreLevelSelect();
           else if (currentType === 'identifier-situation-proportionnalite') showPropSituationLevelSelect();
           else if (currentType === 'proportionnalite-probleme-libre') showPropProblemeLevelSelect();
@@ -7099,9 +7369,6 @@
       if (currentType === 'probabilite-chances' && probaChancesLevel && probaChancesLevelSelect) {
         probaChancesLevelSelect.completeLevel(probaChancesLevel, score, total);
       }
-      if (currentType === 'probabilite-issues' && probaIssuesLevel && probaIssuesLevelSelect) {
-        probaIssuesLevelSelect.completeLevel(probaIssuesLevel, score, total);
-      }
       if (currentType === 'probabilite-nombre' && probaNombreLevel && probaNombreLevelSelect) {
         probaNombreLevelSelect.completeLevel(probaNombreLevel, score, total);
       }
@@ -7130,7 +7397,7 @@
       const activeLevel = pfiSelectedLevel || accordLevel || homoLevel
         || (sessionLevelIdTypes.includes(currentType) ? sessionLevelList[sessionLevelIdx] : null)
         || nbEntierLevel || encadrLevel || decompLevel || fpLevel
-        || probaChancesLevel || probaIssuesLevel || probaNombreLevel
+        || probaChancesLevel || probaNombreLevel
         || propSituationLevel || propProblemeLevel || propTableauLevel || null;
       saveExerciseResult({
         exerciseSlug: slug,
@@ -7487,8 +7754,19 @@
 
     function renderMotsCliquables(card, q) {
       if (q.steps) { renderMotsCliquablesEtapes(card, q); return; }
+      /* isProbaIssues : ronds colorés (billes/secteurs de roue), réservé à
+         probabilite-issues seul — pas demandé pour probabilite-nombre, qui
+         utilise aussi ce renderer (mots comme "impossible"/"peu-probable"
+         ou des écritures "3/10", pas des couleurs). isProbaCompetence() ci-
+         dessous couvre en plus casse normale + taille de consigne pour les
+         3 compétences Probabilités (issues/chances/nombre) — aucun effet
+         sur les ~70 autres compétences qui utilisent mots-cliquables
+         (dictées, etc.). */
+      const isProbaIssues = (sessionData === EXERCISE_DATA["probabilite-issues"]);
+      const labelCls = isProbaCompetence() ? " ex-label-sentencecase" : "";
+
       card.innerHTML = `
-        <p class="ex-question-label">${q.instruction}</p>
+        <p class="ex-question-label${labelCls}">${highlightConsigne(q.instruction, q.highlightTerms)}</p>
         <div class="ex-sentence-words" id="mc-words"></div>
         <div class="ex-feedback-area" id="mc-piege" style="min-height:24px"></div>
         <button class="ex-choice" id="mc-validate" style="margin-top:10px;width:100%">Valider ma sélection</button>
@@ -7504,8 +7782,15 @@
         if (!clean) return;
         const btn = document.createElement("button");
         btn.className    = "ex-word-btn";
-        btn.textContent  = token;
         btn.dataset.clean = clean;
+
+        const billeColor = isProbaIssues ? probaBilleColor(clean) : null;
+        if (billeColor) {
+          btn.classList.add("ex-word-btn--bille");
+          btn.innerHTML = `<span class="ex-bille-dot" style="background:${billeColor}"></span><span class="ex-bille-label">${token}</span>`;
+        } else {
+          btn.textContent = token;
+        }
 
         btn.addEventListener("click", () => {
           if (answered) return;
@@ -7660,10 +7945,23 @@
     /* ── Type : choix-etiquette ──────────────────────────────────────────── */
 
     function renderChoixEtiquette(card, q) {
+      /* isProbaCompetence() : casse normale + taille augmentée pour les 3
+         compétences Probabilités uniquement, sans toucher aux ~60 autres
+         compétences en choix-etiquette (conjugaison, etc.). */
+      const labelCls = isProbaCompetence() ? " ex-label-sentencecase" : "";
+      /* wordCls : probabilite-issues seul. .ex-label-word est pensé pour un
+         MOT court (28px, ex. "Pile", "Bille rouge" chez probabilite-
+         chances) ; probabilite-issues niveau 3 y met une VRAIE question
+         ("Combien de ces codes commencent par un 1 (1-_-_) ?", parfois
+         70+ caractères) — à 28px ça déborde du conteneur (cf. bug
+         rapporté : "(1-_-_)" coupé au milieu). Ramené à la taille de la
+         consigne au lieu d'inventer une 3e taille. */
+      const wordCls = (sessionData === EXERCISE_DATA["probabilite-issues"]) ? " ex-label-word-consigne" : "";
+
       card.innerHTML = `
-        <p class="ex-question-label">${q.instruction || 'Quel déterminant va avec ce nom ?'}</p>
+        <p class="ex-question-label${labelCls}">${highlightConsigne(q.instruction || 'Quel déterminant va avec ce nom ?', q.highlightTerms)}</p>
         <div class="ex-label-display">${q.emoji || ''}</div>
-        <div class="ex-label-word">${q.word}</div>
+        <div class="ex-label-word${wordCls}">${highlightConsigne(q.word, q.highlightTerms)}</div>
         <div class="ex-choices-grid" id="ex-choices-grid"></div>
         <div class="ex-feedback-area" id="feedback1"></div>
         <button class="ex-next-btn ex-hidden" id="next-btn"></button>
@@ -7711,20 +8009,104 @@
 
     /* ── Type : classification-etapes ───────────────────────────────────── */
 
+    /* Palette bille/jeton/secteur de roue — probabilite-issues uniquement
+       (cf. isProbaIssues dans renderClassificationEtapes et
+       renderGrilleDoubleEntree). Mots-clés couleur normalisés (sans accent,
+       minuscule) → couleur CSS, pour dessiner de vrais ronds au lieu de
+       boutons-texte "Rouge"/"Bleue" — sert aussi bien à représenter une
+       bille qu'un secteur coloré de roue (même abstraction visuelle : un
+       disque de couleur). Complète au besoin si de nouvelles couleurs
+       apparaissent dans la banque data/probabilites.js. */
+    const PROBA_BILLE_COLORS = {
+      noir: "#2b2b2b", noire: "#2b2b2b",
+      blanc: "#f4f4f4", blanche: "#f4f4f4",
+      rouge: "#e5383b",
+      vert: "#2f9e44", verte: "#2f9e44",
+      bleu: "#1d6fd8", bleue: "#1d6fd8",
+      jaune: "#f5c518",
+      violet: "#8e44ad", violette: "#8e44ad",
+      orange: "#f5811f"
+    };
+    function probaBilleColor(clean) {
+      const key = clean.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+      return PROBA_BILLE_COLORS[key] || null;
+    }
+
+    /* Surlignage des mots-clés d'une consigne — reçoit le texte tel quel et
+       la liste des termes à mettre en évidence (q.highlightTerms), pensé
+       pour probabilite-issues mais générique : sans terms, retourne le
+       texte inchangé, donc appelable sans risque sur n'importe quel item
+       de n'importe quelle compétence (les ~250 autres n'ont pas ce champ).
+       Simple recherche littérale (les termes sont écrits pour correspondre
+       exactement à la sous-chaîne présente dans le texte de la banque) —
+       PAS de regex spéciale à gérer côté auteur de contenu, juste recopier
+       le morceau de phrase à surligner. Piège à éviter côté données : ne
+       jamais lister à la fois un terme et un terme plus court qui lui est
+       inclus (ex. "dé" et "dé à six faces") — le second remplacement
+       romprait le <mark> déjà posé par le premier. */
+    function highlightConsigne(text, terms) {
+      if (!text || !terms || !terms.length) return text;
+      let result = text;
+      terms.forEach(term => {
+        if (!term) return;
+        const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        result = result.replace(new RegExp(escaped, "g"), `<mark class="ex-consigne-highlight">${term}</mark>`);
+      });
+      return result;
+    }
+
+    /* Vrai pour les 3 compétences Mathématiques > Probabilités
+       (probabilite-issues, probabilite-chances, probabilite-nombre) —
+       active la casse normale + la taille de consigne augmentée
+       (.ex-label-sentencecase) sur les 3, cohérence visuelle au sein d'une
+       même sous-matière. Facteur commun pour éviter de dupliquer l'OR sur
+       3 renderers partagés (renderChoixEtiquette, renderMotsCliquables,
+       renderClassificationEtapes). Le rendu "ronds de billes colorés"
+       (probaBilleColor) reste réservé à probabilite-issues seul (cf.
+       isProbaIssues dans chaque renderer) : pas demandé pour chances/
+       nombre, resterait un changement visuel distinct de celui-ci. */
+    function isProbaCompetence() {
+      return sessionData === EXERCISE_DATA["probabilite-issues"]
+        || sessionData === EXERCISE_DATA["probabilite-chances"]
+        || sessionData === EXERCISE_DATA["probabilite-nombre"];
+    }
+
     function renderClassificationEtapes(card, q) {
+      /* isProbaIssues : borne toutes les adaptations probabilite-issues
+         (casse normale, ronds de billes, étape 2 cliquable cf. q.step2Mode
+         plus bas) à ce seul exercice — ce renderer est partagé par
+         grammaire.js, orthographe-homophones.js et identifier-situation-
+         proportionnalite (cf. commentaire plus bas) via le même type
+         "homophones-niveaux", qui ne doivent pas être affectés. L'objectif
+         de chaque étape ("pour compter les issues possibles/favorables")
+         est écrit explicitement dans step1Instruction/step2Instruction côté
+         data/probabilites.js — pas de suffixe auto-déduit ici, pour éviter
+         tout risque de doublon avec le texte déjà rédigé.
+         sessionData reste le même objet pour toute la session (assigné une
+         fois dans init()) : comparaison par référence, pas besoin d'un
+         nouveau global rien que pour porter le slug jusqu'ici. */
+      const isProbaIssues = (sessionData === EXERCISE_DATA["probabilite-issues"]);
+      const labelCls = isProbaIssues ? " ex-label-sentencecase" : "";
+
       card.innerHTML = `
-        <p class="ex-question-label">${q.instruction || 'Identifie, puis classe.'}</p>
+        <p class="ex-question-label${labelCls}">${highlightConsigne(q.instruction || 'Identifie, puis classe.', q.highlightTerms)}</p>
 
         <div id="ce-step1" class="ex-classify-step">
-          <div class="ex-classify-step-title">Étape 1 — ${q.step1Instruction}</div>
+          <div class="ex-classify-step-title${labelCls}">Étape 1 — ${highlightConsigne(q.step1Instruction, q.highlightTerms)}</div>
           <div class="ex-sentence-words" id="ce-words"></div>
           <div class="ex-feedback-area" id="ce-fb1"></div>
           <button class="ex-choice" id="ce-val1" style="margin-top:10px;width:100%">Valider l'étape 1</button>
         </div>
 
         <div id="ce-step2" class="ex-classify-step ex-hidden">
-          <div class="ex-classify-step-title">Étape 2 — ${q.step2Instruction}</div>
+          <div class="ex-classify-step-title${labelCls}">Étape 2 — ${highlightConsigne(q.step2Instruction, q.highlightTerms)}</div>
+          ${q.step2Mode === "click" ? `
+          <div class="ex-sentence-words" id="ce-words2"></div>
+          <div class="ex-feedback-area" id="ce-fb2"></div>
+          <button class="ex-choice" id="ce-val2" style="margin-top:10px;width:100%">Valider l'étape 2</button>
+          ` : `
           <div class="ex-choices-grid" id="ce-choices2"></div>
+          `}
           <div class="ex-feedback-area" id="feedback1"></div>
         </div>
 
@@ -7740,8 +8122,15 @@
         if (!clean) return;
         const btn = document.createElement("button");
         btn.className    = "ex-word-btn";
-        btn.textContent  = token;
         btn.dataset.clean = clean;
+
+        const billeColor = isProbaIssues ? probaBilleColor(clean) : null;
+        if (billeColor) {
+          btn.classList.add("ex-word-btn--bille");
+          btn.innerHTML = `<span class="ex-bille-dot" style="background:${billeColor}"></span><span class="ex-bille-label">${token}</span>`;
+        } else {
+          btn.textContent = token;
+        }
 
         btn.addEventListener("click", () => {
           if (btn.disabled) return;
@@ -7786,45 +8175,507 @@
         }, 500);
       });
 
-      const choices2El = document.getElementById("ce-choices2");
-      /* q.fixedChoiceOrder : même mécanisme que renderChoixEtiquette
-         (exercise.html) — conserve l'ordre déclaré de q.classifyChoices au
-         lieu du mélange par défaut, pour les compétences où la position des
-         boutons doit rester stable d'un item à l'autre. Sans ce champ,
-         comportement inchangé pour tous les classification-etapes existants. */
-      const orderedChoices2 = q.fixedChoiceOrder ? q.classifyChoices : shuffle(q.classifyChoices);
-      orderedChoices2.forEach(c => {
-        const btn = document.createElement("button");
-        btn.className   = "ex-choice";
-        btn.textContent = c;
-        btn.addEventListener("click", () => {
-          choices2El.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
-          const isRight = c === q.step2Answer;
-          choices2El.querySelectorAll(".ex-choice").forEach(b => {
-            if (b.textContent === q.step2Answer) b.classList.add("is-correct");
-          });
-          if (!isRight) btn.classList.add("is-wrong");
+      if (q.step2Mode === "click") {
+        /* Étape 2 cliquable — probabilite-issues niveau 2 uniquement (cf.
+           isProbaIssues) : au lieu d'un QCM numérique, l'élève reclique sur
+           le même contenant pour ne garder que les éléments correspondant à
+           l'événement cible énoncé dans step2Instruction (q.step2Targets).
+           Le récap "X sur Y" est calculé ici (nombre de mots dans la phrase
+           = issues possibles, nombre de cibles = issues favorables) plutôt
+           que déclaré dans les données, pour rester toujours exact même si
+           la banque évolue. */
+        const words2El  = document.getElementById("ce-words2");
+        const selected2 = new Set();
 
-          const rewriteHtml = q.rewriteSentence ? `<div class="ex-note">📝 « ${q.rewriteSentence} »</div>` : "";
+        q.sentence.split(/\s+/).forEach(token => {
+          const clean = token.replace(/[.,!?;:«»"""'']/g, "");
+          if (!clean) return;
+          const btn = document.createElement("button");
+          btn.className     = "ex-word-btn";
+          btn.dataset.clean = clean;
 
-          recordItemResult(q, isRight && step1Correct, homoLevelNum);
-          if (isRight && step1Correct) {
-            score++;
-            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}${rewriteHtml}</div>`);
-          } else if (isRight) {
-            setFeedback("feedback1",
-              `<div class="ex-feedback-correct" style="opacity:0.8">
-                ✓ Bonne réponse à l'étape 2 (mais l'étape 1 était incomplète).${rewriteHtml}
-              </div>`);
+          const billeColor = isProbaIssues ? probaBilleColor(clean) : null;
+          if (billeColor) {
+            btn.classList.add("ex-word-btn--bille");
+            btn.innerHTML = `<span class="ex-bille-dot" style="background:${billeColor}"></span><span class="ex-bille-label">${token}</span>`;
           } else {
-            setFeedback("feedback1", `
-              <div class="ex-feedback-wrong">
-                ❌ La bonne réponse est : <strong>${q.step2Answer}</strong>.${rewriteHtml}
-              </div>`);
+            btn.textContent = token;
+          }
+
+          btn.addEventListener("click", () => {
+            if (btn.disabled) return;
+            if (selected2.has(btn)) {
+              selected2.delete(btn);
+              btn.classList.remove("is-selected");
+            } else {
+              selected2.add(btn);
+              btn.classList.add("is-selected");
+            }
+          });
+          words2El.appendChild(btn);
+        });
+
+        document.getElementById("ce-val2").addEventListener("click", () => {
+          const targets2 = new Set(q.step2Targets.map(t => t.replace(/[.,!?;:]/g, "")));
+          let correct2      = true;
+          let totalCount    = 0;
+          let favorableCount = 0;
+
+          words2El.querySelectorAll(".ex-word-btn").forEach(btn => {
+            totalCount++;
+            const clean       = btn.dataset.clean;
+            const isTarget    = targets2.has(clean);
+            const wasSelected = selected2.has(btn);
+            if (isTarget) favorableCount++;
+            btn.disabled = true;
+            btn.classList.remove("is-selected");
+
+            if      (isTarget && wasSelected)  { btn.classList.add("is-correct"); }
+            else if (isTarget && !wasSelected) { btn.classList.add("is-missed"); correct2 = false; }
+            else if (!isTarget && wasSelected) { btn.classList.add("is-wrong"); btn.classList.add("shake"); correct2 = false; }
+          });
+
+          document.getElementById("ce-val2").disabled = true;
+
+          document.getElementById("ce-fb2").innerHTML = correct2
+            ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+            : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Les bonnes réponses sont en vert.</div>`;
+
+          const recapHtml = `<div class="ex-note">📊 <strong>${favorableCount} issue${favorableCount === 1 ? '' : 's'} favorable${favorableCount === 1 ? '' : 's'}</strong> sur <strong>${totalCount} issues possibles</strong>.</div>`;
+          const overallCorrect = step1Correct && correct2;
+
+          recordItemResult(q, overallCorrect, homoLevelNum);
+          if (overallCorrect) {
+            score++;
+            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>${recapHtml}`);
+          } else {
+            setFeedback("feedback1", `<div class="ex-feedback-wrong">❌ Relis bien l'étape qui a posé problème.</div>${recapHtml}`);
           }
           showNextBtn();
         });
-        choices2El.appendChild(btn);
+      } else {
+        const choices2El = document.getElementById("ce-choices2");
+        /* q.fixedChoiceOrder : même mécanisme que renderChoixEtiquette
+           (exercise.html) — conserve l'ordre déclaré de q.classifyChoices au
+           lieu du mélange par défaut, pour les compétences où la position des
+           boutons doit rester stable d'un item à l'autre. Sans ce champ,
+           comportement inchangé pour tous les classification-etapes existants. */
+        const orderedChoices2 = q.fixedChoiceOrder ? q.classifyChoices : shuffle(q.classifyChoices);
+        orderedChoices2.forEach(c => {
+          const btn = document.createElement("button");
+          btn.className   = "ex-choice";
+          btn.textContent = c;
+          btn.addEventListener("click", () => {
+            choices2El.querySelectorAll(".ex-choice").forEach(b => b.disabled = true);
+            const isRight = c === q.step2Answer;
+            choices2El.querySelectorAll(".ex-choice").forEach(b => {
+              if (b.textContent === q.step2Answer) b.classList.add("is-correct");
+            });
+            if (!isRight) btn.classList.add("is-wrong");
+
+            const rewriteHtml = q.rewriteSentence ? `<div class="ex-note">📝 « ${q.rewriteSentence} »</div>` : "";
+
+            recordItemResult(q, isRight && step1Correct, homoLevelNum);
+            if (isRight && step1Correct) {
+              score++;
+              setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}${rewriteHtml}</div>`);
+            } else if (isRight) {
+              setFeedback("feedback1",
+                `<div class="ex-feedback-correct" style="opacity:0.8">
+                  ✓ Bonne réponse à l'étape 2 (mais l'étape 1 était incomplète).${rewriteHtml}
+                </div>`);
+            } else {
+              setFeedback("feedback1", `
+                <div class="ex-feedback-wrong">
+                  ❌ La bonne réponse est : <strong>${q.step2Answer}</strong>.${rewriteHtml}
+                </div>`);
+            }
+            showNextBtn();
+          });
+          choices2El.appendChild(btn);
+        });
+      }
+    }
+
+    /* ── Type : grille-double-entree ──────────────────────────────────────
+       probabilite-issues niveau 3 uniquement — aucun renderer de tableau à
+       double entrée cliquable n'existait déjà sur le site (renderMatch est
+       un appariement 1:1 à 2 colonnes plates, pas une matrice ligne×colonne ;
+       les autres "tableaux" du site sont des tableaux à saisie texte, pas à
+       clic). Nouveau renderer minimal, sur le modèle clic/valide/état des
+       autres types classification (is-selected/is-correct/is-missed).
+       Expérience répétée deux fois (pièce, roue, dé restreint...) : chaque
+       cellule (valeur ligne, valeur colonne) est un couple réellement
+       possible (tirages indépendants, avec remise) — il n'y a donc pas de
+       piège "case invalide à ne pas cocher" ici, l'exercice consiste à
+       cocher l'intégralité de la grille pour recenser tous les couples,
+       ce qui force à traiter (a;b) et (b;a) comme deux cases distinctes
+       (objectif pédagogique explicite : ne pas fusionner les couples
+       symétriques). q.rowValues/q.colValues : mêmes mots-clés couleur que
+       probaBilleColor pour un rendu en ronds colorés quand pertinent. */
+    function renderGrilleDoubleEntree(card, q) {
+      const rows = q.rowValues;
+      const cols = q.colValues;
+      /* q.prefilledKeys ("i-j") : tableau "déjà partiellement rempli" —
+         probabilite-issues niveau 2 (deux dés 6×6). Détermine le MODE de
+         l'exercice, pas seulement le style visuel des cases listées :
+         - fillMode (prefilledKeys non vide) : "tableau incomplet à
+           compléter" — les cases listées affichent leur couple en lecture
+           seule (acquis) ; TOUTES les autres cases démarrent VIDES, comme
+           <input> à remplir (l'élève tape le couple, ex. "3+5"). Avant ce
+           correctif, cellHtml() affichait le couple dans CHAQUE case y
+           compris les cases à compléter : il n'y avait donc rien à
+           deviner/écrire, l'exercice n'avait aucun intérêt (bug rapporté).
+         - sans prefilledKeys (cf. niveau 3, 10 items) : grille entièrement
+           vide au départ, on clique CHAQUE case pour la cocher comme issue
+           possible (recensement exhaustif) — comportement inchangé, ce
+           n'est pas le même exercice ni le même bug : ici le couple
+           affiché sur le bouton cliqué n'est jamais "la réponse à deviner",
+           juste l'étiquette de la case qu'on vient de cocher. */
+      const prefilled = new Set(q.prefilledKeys || []);
+      const fillMode  = prefilled.size > 0;
+
+      /* Header / case acquise : un seul rond/texte, ou le couple complet.
+         Toujours du texte en plus du rond couleur (accessibilité :
+         attachSpeechButton lit btn.dataset.clean, pas le HTML du rond). */
+      const swatchHtml = (val, size) => {
+        const color = probaBilleColor(val);
+        return color
+          ? `<span class="ex-bille-dot" style="width:${size}px;height:${size}px;background:${color}"></span><span class="ex-bille-label">${val}</span>`
+          : `<span class="pigde-text">${val}</span>`;
+      };
+      const headerHtml = (val) => swatchHtml(val, 26);
+      const cellHtml    = (r, c) => `
+        <span class="pigde-pair-item">${swatchHtml(r, 20)}</span>
+        <span class="pigde-plus">+</span>
+        <span class="pigde-pair-item">${swatchHtml(c, 20)}</span>`;
+
+      const bodyCellHtml = (r, c, i, j) => {
+        const key = i + "-" + j;
+        if (prefilled.has(key)) {
+          return `<button class="pigde-cell is-given" disabled>${cellHtml(r, c)}</button>`;
+        }
+        if (fillMode) {
+          /* Réponse attendue = "R+C" sans espace (même convention que le
+             couple affiché dans les cases acquises) ; l'entrée de l'élève
+             est débarrassée de ses espaces avant comparaison (cf. validate),
+             donc "3 + 5" est accepté au même titre que "3+5". */
+          return `<input type="text" inputmode="text" autocomplete="off" class="pigde-input" placeholder="X+Y" data-row="${i}" data-col="${j}" data-answer="${attrEsc(r + '+' + c)}">`;
+        }
+        return `<button class="pigde-cell" data-row="${i}" data-col="${j}" data-clean="${attrEsc(r + ', ' + c)}">${cellHtml(r, c)}</button>`;
+      };
+
+      card.innerHTML = `
+        <p class="ex-question-label ex-label-sentencecase">${highlightConsigne(q.instruction, q.highlightTerms)}</p>
+        <div class="pigde-wrap">
+          <table class="pigde-table">
+            <thead>
+              <tr>
+                <th class="pigde-corner">${q.rowLabel || ''} \\ ${q.colLabel || ''}</th>
+                ${cols.map(c => `<th class="pigde-header">${headerHtml(c)}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map((r, i) => `
+                <tr>
+                  <th class="pigde-header">${headerHtml(r)}</th>
+                  ${cols.map((c, j) => `<td>${bodyCellHtml(r, c, i, j)}</td>`).join('')}
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+        <button class="ex-choice" id="pigde-validate" style="margin-top:10px;width:100%">Valider ma grille</button>
+        <div class="ex-feedback-area" id="feedback1"></div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      if (!fillMode) {
+        /* Mode clic (niveau 3, grille vide) — inchangé. */
+        const selected = new Set(); // Set de "i-j"
+        card.querySelectorAll(".pigde-cell:not(.is-given)").forEach(btn => {
+          btn.addEventListener("click", () => {
+            if (btn.disabled) return;
+            const key = btn.dataset.row + "-" + btn.dataset.col;
+            if (selected.has(key)) {
+              selected.delete(key);
+              btn.classList.remove("is-selected");
+            } else {
+              selected.add(key);
+              btn.classList.add("is-selected");
+            }
+          });
+        });
+
+        document.getElementById("pigde-validate").addEventListener("click", () => {
+          const total = rows.length * cols.length;
+          let missed = 0;
+
+          card.querySelectorAll(".pigde-cell").forEach(btn => {
+            const key = btn.dataset.row + "-" + btn.dataset.col;
+            if (prefilled.has(key)) return;
+            btn.disabled = true;
+            btn.classList.remove("is-selected");
+            if (selected.has(key)) {
+              btn.classList.add("is-correct");
+            } else {
+              btn.classList.add("is-missed");
+              missed++;
+            }
+          });
+
+          document.getElementById("pigde-validate").disabled = true;
+          const correct = (missed === 0);
+          const recapHtml = `<div class="ex-note">📊 <strong>${total} issues possibles</strong> au total (${rows.length} × ${cols.length}).</div>`;
+
+          recordItemResult(q, correct, homoLevelNum);
+          if (correct) {
+            score++;
+            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>${recapHtml}`);
+          } else {
+            setFeedback("feedback1", `
+              <div class="ex-feedback-wrong">
+                ❌ Il manque ${missed} case${missed > 1 ? 's' : ''} (en pointillés) : chaque case du tableau est un couple différent, même quand les deux valeurs sont juste inversées.
+              </div>${recapHtml}`);
+          }
+          showNextBtn();
+        });
+      } else {
+        /* Mode saisie (tableau incomplet) — cases listées dans
+           prefilledKeys déjà acquises ; toutes les autres sont des <input>
+           vides que l'élève complète, comparées à data-answer ("R+C") une
+           fois les espaces retirés de sa saisie. */
+        document.getElementById("pigde-validate").addEventListener("click", () => {
+          const total = rows.length * cols.length;
+          let wrongCount = 0;
+          let emptyCount = 0;
+
+          card.querySelectorAll(".pigde-input").forEach(input => {
+            const given = input.dataset.answer;
+            const typed = input.value.replace(/\s+/g, "");
+            input.disabled = true;
+            if (!typed) {
+              input.classList.add("is-empty-missed");
+              emptyCount++;
+            } else if (typed === given) {
+              input.classList.add("is-correct");
+            } else {
+              input.classList.add("is-wrong");
+              wrongCount++;
+            }
+          });
+
+          document.getElementById("pigde-validate").disabled = true;
+          const correct = (wrongCount === 0 && emptyCount === 0);
+          const recapHtml = `<div class="ex-note">📊 <strong>${total} issues possibles</strong> au total (${rows.length} × ${cols.length}).</div>`;
+
+          recordItemResult(q, correct, homoLevelNum);
+          if (correct) {
+            score++;
+            setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>${recapHtml}`);
+          } else {
+            const parts = [];
+            if (wrongCount) parts.push(`${wrongCount} case${wrongCount > 1 ? 's' : ''} incorrecte${wrongCount > 1 ? 's' : ''} (en rouge)`);
+            if (emptyCount) parts.push(`${emptyCount} case${emptyCount > 1 ? 's' : ''} oubliée${emptyCount > 1 ? 's' : ''} (en pointillés)`);
+            setFeedback("feedback1", `
+              <div class="ex-feedback-wrong">
+                ❌ ${parts.join(' et ')}. La bonne réponse est indiquée dans chaque case corrigée.
+              </div>${recapHtml}`);
+            /* Révèle la bonne réponse dans les cases en erreur/oubliées,
+               une fois la tentative terminée (pas de retry, cf. convention
+               "no retry" du site pour ce type d'exercice à correction
+               immédiate). */
+            card.querySelectorAll(".pigde-input.is-wrong, .pigde-input.is-empty-missed").forEach(input => {
+              input.value = input.dataset.answer;
+            });
+          }
+          showNextBtn();
+        });
+      }
+    }
+
+    /* ── Type : arbre-probabilites ─────────────────────────────────────────
+       probabilite-issues niveau 2 uniquement — arbre à 2 niveaux de
+       branches (cf. exploration : rien d'existant pour un arbre, ni pour un
+       vrai glisser-déposer libre adapté à ce besoin). Vraie structure
+       arborescente en SVG (lignes + nœuds) superposée à des boutons HTML
+       positionnés en absolu aux mêmes coordonnées calculées (racine → 1er
+       choix → 2e choix, de gauche à droite) — corrige une 1re version qui
+       n'affichait que des blocs empilés sans ligne de branche (cf. capture
+       rapportée). Coordonnées dérivées uniquement du nombre de branches et
+       de feuilles (jamais mesurées dans le DOM), donc toujours alignées.
+       .arbre-svg-scroll fait défiler horizontalement au-delà de la largeur
+       de l'écran (mobile/tablette) plutôt que de tasser l'arbre.
+       Même mécanique en 2 étapes que renderClassificationEtapes en mode
+       step2Mode:"click" (étape 1 : clique toutes les feuilles = total ;
+       étape 2 : un événement cité, ne recliquer que les feuilles qui le
+       réalisent = favorables) — les feuilles réutilisent directement les
+       classes .ex-word-btn / .ex-word-btn--bille pour hériter des styles
+       is-selected/is-correct/is-missed/is-wrong déjà éprouvés, et de la
+       lecture audio dys (attachSpeechButton cible déjà .ex-word-btn).
+       q.step2Targets : tableau de paires [valeur1erTirage, valeur2eTirage]
+       réalisant l'événement. ────────────────────────────────────────── */
+    function renderArbreProbabilites(card, q) {
+      const l1 = q.level1Values;
+      const l2 = q.level2Values;
+
+      const leafInner = (val) => {
+        const color = probaBilleColor(val);
+        return color
+          ? `<span class="ex-bille-dot" style="background:${color}"></span><span class="ex-bille-label">${val}</span>`
+          : val;
+      };
+      const leafClass = (val) => "ex-word-btn arbre-leaf" + (probaBilleColor(val) ? " ex-word-btn--bille" : "");
+
+      /* Géométrie de l'arbre calculée à partir du nombre de branches
+         (l1.length) et de feuilles par branche (l2.length) — jamais
+         mesurée dans le DOM : les lignes SVG et les boutons HTML utilisent
+         exactement les mêmes coordonnées, donc toujours alignés quel que
+         soit le contenu (nombres, couleurs...). Disposition racine → 1er
+         choix → 2e choix de gauche à droite. Largeur/hauteur fixes en px
+         (pas de %) : au-delà de la largeur de l'écran, .arbre-svg-scroll
+         prend le relais en scroll horizontal plutôt que de tasser l'arbre
+         (mobile/tablette, cf. correctif). */
+      const LEAF_H     = 50;
+      const BAND_GAP   = 28;
+      const ROOT_X     = 14;
+      const L1_X       = 130;
+      const L2_X       = 250;
+      const LEAF_LEFT  = L2_X + 18;
+      const bandHeight  = l2.length * LEAF_H;
+      const totalHeight = l1.length * bandHeight + (l1.length - 1) * BAND_GAP;
+      const totalWidth  = LEAF_LEFT + 160;
+      const l1Y   = (i) => i * (bandHeight + BAND_GAP) + bandHeight / 2;
+      const leafY = (i, j) => i * (bandHeight + BAND_GAP) + j * LEAF_H + LEAF_H / 2;
+      const rootY = totalHeight / 2;
+
+      const buildTree = (idx) => {
+        const lines = [];
+        const dots = [`<circle class="arbre-node-dot" cx="${ROOT_X}" cy="${rootY}" r="5"></circle>`];
+        l1.forEach((v1, i) => {
+          lines.push(`<line class="arbre-branch-line" x1="${ROOT_X}" y1="${rootY}" x2="${L1_X}" y2="${l1Y(i)}"></line>`);
+          dots.push(`<circle class="arbre-node-dot" cx="${L1_X}" cy="${l1Y(i)}" r="5"></circle>`);
+          l2.forEach((v2, j) => {
+            lines.push(`<line class="arbre-branch-line" x1="${L1_X}" y1="${l1Y(i)}" x2="${L2_X}" y2="${leafY(i, j)}"></line>`);
+          });
+        });
+
+        const l1LabelsHtml = l1.map((v1, i) => `
+          <div class="arbre-node-label" style="left:${L1_X}px;top:${l1Y(i) - 30}px">${leafInner(v1)}</div>`).join('');
+
+        const leafButtonsHtml = [];
+        l1.forEach((v1, i) => {
+          l2.forEach((v2, j) => {
+            leafButtonsHtml.push(`<button class="${leafClass(v2)}" style="left:${LEAF_LEFT}px;top:${leafY(i, j)}px" data-l1="${i}" data-l2="${j}" data-clean="${attrEsc(v1 + ', ' + v2)}">${leafInner(v2)}</button>`);
+          });
+        });
+
+        return `
+          <div class="arbre-svg-scroll">
+            <div class="arbre-svg-wrap" data-tree="${idx}" style="width:${totalWidth}px;height:${totalHeight}px">
+              <svg class="arbre-svg" width="${totalWidth}" height="${totalHeight}" viewBox="0 0 ${totalWidth} ${totalHeight}">
+                ${lines.join('')}
+                ${dots.join('')}
+              </svg>
+              <div class="arbre-root-label" style="left:${ROOT_X - 6}px;top:${rootY - 30}px">Départ</div>
+              ${l1LabelsHtml}
+              ${leafButtonsHtml.join('')}
+            </div>
+          </div>`;
+      };
+
+      card.innerHTML = `
+        <p class="ex-question-label ex-label-sentencecase">${highlightConsigne(q.instruction, q.highlightTerms)}</p>
+        <div id="arbre-step1" class="ex-classify-step">
+          <div class="ex-classify-step-title ex-label-sentencecase">Étape 1 — Clique sur toutes les feuilles de l'arbre (pour établir le total).</div>
+          ${buildTree(1)}
+          <div class="ex-feedback-area" id="arbre-fb1"></div>
+          <button class="ex-choice" id="arbre-val1" style="margin-top:10px;width:100%">Valider l'étape 1</button>
+        </div>
+        <div id="arbre-step2" class="ex-classify-step ex-hidden">
+          <div class="ex-classify-step-title ex-label-sentencecase">Étape 2 — ${highlightConsigne(q.step2Instruction, q.highlightTerms)}</div>
+          ${buildTree(2)}
+          <button class="ex-choice" id="arbre-val2" style="margin-top:10px;width:100%">Valider l'étape 2</button>
+          <div class="ex-feedback-area" id="feedback1"></div>
+        </div>
+        <button class="ex-next-btn ex-hidden" id="next-btn"></button>
+      `;
+
+      const tree1 = card.querySelector('[data-tree="1"]');
+      const tree2 = card.querySelector('[data-tree="2"]');
+      const selected1 = new Set();
+      let step1Correct = false;
+
+      tree1.querySelectorAll(".arbre-leaf").forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (btn.disabled) return;
+          const key = btn.dataset.l1 + "-" + btn.dataset.l2;
+          if (selected1.has(key)) { selected1.delete(key); btn.classList.remove("is-selected"); }
+          else { selected1.add(key); btn.classList.add("is-selected"); }
+        });
+      });
+
+      document.getElementById("arbre-val1").addEventListener("click", () => {
+        let missed = 0;
+        tree1.querySelectorAll(".arbre-leaf").forEach(btn => {
+          const key = btn.dataset.l1 + "-" + btn.dataset.l2;
+          btn.disabled = true;
+          btn.classList.remove("is-selected");
+          if (selected1.has(key)) { btn.classList.add("is-correct"); }
+          else { btn.classList.add("is-missed"); missed++; }
+        });
+        document.getElementById("arbre-val1").disabled = true;
+        step1Correct = (missed === 0);
+        document.getElementById("arbre-fb1").innerHTML = step1Correct
+          ? `<div class="ex-feedback-correct" style="font-size:13px">${rand(SUCCESS)}</div>`
+          : `<div class="ex-feedback-wrong" style="font-size:13px">❌ Il manque ${missed} feuille${missed > 1 ? 's' : ''} (en pointillés).</div>`;
+
+        setTimeout(() => {
+          const step2 = document.getElementById("arbre-step2");
+          step2.classList.remove("ex-hidden");
+          step2.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }, 500);
+      });
+
+      const targets2 = new Set((q.step2Targets || []).map(([a, b]) => l1.indexOf(a) + "-" + l2.indexOf(b)));
+      const selected2 = new Set();
+      tree2.querySelectorAll(".arbre-leaf").forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (btn.disabled) return;
+          const key = btn.dataset.l1 + "-" + btn.dataset.l2;
+          if (selected2.has(key)) { selected2.delete(key); btn.classList.remove("is-selected"); }
+          else { selected2.add(key); btn.classList.add("is-selected"); }
+        });
+      });
+
+      document.getElementById("arbre-val2").addEventListener("click", () => {
+        let correct2 = true;
+        let favorableCount = 0;
+        const totalCount = l1.length * l2.length;
+
+        tree2.querySelectorAll(".arbre-leaf").forEach(btn => {
+          const key = btn.dataset.l1 + "-" + btn.dataset.l2;
+          const isTarget    = targets2.has(key);
+          const wasSelected = selected2.has(key);
+          if (isTarget) favorableCount++;
+          btn.disabled = true;
+          btn.classList.remove("is-selected");
+          if      (isTarget && wasSelected)  { btn.classList.add("is-correct"); }
+          else if (isTarget && !wasSelected) { btn.classList.add("is-missed"); correct2 = false; }
+          else if (!isTarget && wasSelected) { btn.classList.add("is-wrong"); btn.classList.add("shake"); correct2 = false; }
+        });
+
+        document.getElementById("arbre-val2").disabled = true;
+        const recapHtml = `<div class="ex-note">📊 <strong>${favorableCount} issue${favorableCount === 1 ? '' : 's'} favorable${favorableCount === 1 ? '' : 's'}</strong> sur <strong>${totalCount} issues possibles</strong>.</div>`;
+        const overallCorrect = step1Correct && correct2;
+
+        recordItemResult(q, overallCorrect, homoLevelNum);
+        if (overallCorrect) {
+          score++;
+          setFeedback("feedback1", `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>${recapHtml}`);
+        } else {
+          setFeedback("feedback1", `<div class="ex-feedback-wrong">❌ Relis bien l'étape qui a posé problème.</div>${recapHtml}`);
+        }
+        showNextBtn();
       });
     }
 
@@ -10782,11 +11633,19 @@
     /* Rend une chaîne d'affichage (entier formaté "345 678 912" ou décimal
        "47,308") en boutons cliquables un par chiffre ; espaces et virgule
        deviennent des séparateurs statiques non cliquables. data-idx indexe
-       les chiffres de gauche à droite, virgule/espaces exclus. */
+       les chiffres de gauche à droite, virgule/espaces exclus.
+       L'espace de groupement par tranches de 3 (classes unités/milliers/
+       millions) reçoit en plus la classe ivp-sep-group pour un renforcement
+       visuel — la virgule décimale, elle, garde le style ivp-sep neutre car
+       les rangs après la virgule (dixièmes/centièmes/millièmes) ne se
+       regroupent pas par 3 de la même façon. */
     function ivpDigitsHtml(displayStr) {
       let idx = 0;
       return displayStr.split('').map(ch => {
-        if (ch < '0' || ch > '9') return `<span class="ivp-sep">${ch}</span>`;
+        if (ch < '0' || ch > '9') {
+          const sepClass = ch === ' ' ? 'ivp-sep ivp-sep-group' : 'ivp-sep';
+          return `<span class="${sepClass}">${ch}</span>`;
+        }
         const html = `<button type="button" class="ivp-digit-btn" data-idx="${idx}">${ch}</button>`;
         idx++;
         return html;
@@ -35619,10 +36478,8 @@
        Niveau 3        : fraction x/10 ou x/100 avec x > dénominateur —
                          plusieurs grilles complètes (1 grille = 1 unité) +
                          le reste, droite au-delà de 1. Décomposition à 3
-                         champs (unités + dixièmes + centièmes). Un item sur
-                         deux ajoute un piège vrai/faux sur deux écritures
-                         fractionnaires équivalentes (jamais à virgule).
-                         3 sous-réponses, 4 si le piège est présent.
+                         champs (unités + dixièmes + centièmes).
+                         3 sous-réponses.
     ══════════════════════════════════════════════════════════════════════ */
 
     const FDGD_SEUIL = 0.80;
@@ -35636,15 +36493,43 @@
       return min + Math.floor(Math.random() * (max - min + 1));
     }
 
+    function fdgdShuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    /* Tirage sans répétition immédiate : concatène des permutations mélangées
+       de `pool` jusqu'à atteindre `total`, en évitant qu'une permutation
+       commence par la valeur qui terminait la précédente. Avec pool.length
+       === total (niveau 1 : 10 dixièmes pour 10 items), garantit que chaque
+       valeur du pool apparaît exactement une fois par tentative, dans un
+       ordre différent à chaque fois — plutôt qu'un tirage indépendant qui,
+       avec un petit pool, répète souvent les mêmes valeurs dans la même
+       tentative (constaté sur le niveau 1 : les dixièmes revenaient trop). */
+    function fdgdBalancedDraw(pool, total) {
+      let result = [];
+      while (result.length < total) {
+        const batch = fdgdShuffle(pool);
+        if (result.length && batch.length > 1 && batch[0] === result[result.length - 1]) {
+          [batch[0], batch[1]] = [batch[1], batch[0]];
+        }
+        result = result.concat(batch);
+      }
+      return result.slice(0, total);
+    }
+
     /* ── Génération procédurale des items ────────────────────────────────── */
-    function fdgdBuildLevel1Item() {
+    function fdgdBuildLevel1Item(num) {
       const rules = sessionData.genRules[1];
-      const num = fdgdRandInt(rules.numMin, rules.numMax);
       return {
         level: 1, num, den: rules.den,
         grids: [{ den: rules.den, target: num }],
         maxUnits: 1, ticksPerUnit: rules.den, targetTick: num,
-        decomp: null, trap: null
+        decomp: null
       };
     }
 
@@ -35659,35 +36544,11 @@
         decomp: { fields: [
           { key: 'd', label: 'dixième(s)',  expected: d },
           { key: 'c', label: 'centième(s)', expected: c }
-        ] },
-        trap: null
+        ] }
       };
     }
 
-    /* Piège vrai/faux (niveau 3) : deux écritures fractionnaires
-       équivalentes, jamais à virgule. Quand aucune équivalence exacte
-       /10 ↔ /100 n'existe pour la fraction tirée (den=100, num non multiple
-       de 10), le piège est toujours "faux" — pas d'équivalent propre à
-       proposer comme vrai sans introduire un autre dénominateur. */
-    function fdgdBuildTrap(num, den) {
-      const partnerDen = den === 10 ? 100 : 10;
-      const equalPartner = den === 10 ? num * 10 : (num % 10 === 0 ? num / 10 : null);
-      const canBeTrue = equalPartner != null;
-      const isTrue = canBeTrue && Math.random() < 0.5;
-
-      let partnerNum;
-      if (isTrue) {
-        partnerNum = equalPartner;
-      } else if (canBeTrue) {
-        const delta = fdgdRandInt(1, 3) * (Math.random() < 0.5 ? 1 : -1);
-        partnerNum = Math.max(1, equalPartner + delta);
-      } else {
-        partnerNum = Math.max(1, Math.round(num / 10));
-      }
-      return { num, den, num2: partnerNum, den2: partnerDen, isTrue: !!isTrue };
-    }
-
-    function fdgdBuildLevel3Item(hasTrap) {
+    function fdgdBuildLevel3Item() {
       const rules = sessionData.genRules[3];
       const den = rand(rules.dens);
       const num = fdgdRandInt(den + 1, den * 3 - 1);
@@ -35713,16 +36574,20 @@
           { key: 'u', label: 'unité(s)',    expected: unit },
           { key: 'd', label: 'dixième(s)',  expected: d },
           { key: 'c', label: 'centième(s)', expected: c }
-        ] },
-        trap: hasTrap ? fdgdBuildTrap(num, den) : null
+        ] }
       };
     }
 
     function fdgdBuildItems(level) {
       const total = sessionData.itemsPerLevel || 10;
-      if (level === 1) return Array.from({ length: total }, () => fdgdBuildLevel1Item());
+      if (level === 1) {
+        const rules = sessionData.genRules[1];
+        const pool = [];
+        for (let n = rules.numMin; n <= rules.numMax; n++) pool.push(n);
+        return fdgdBalancedDraw(pool, total).map(fdgdBuildLevel1Item);
+      }
       if (level === 2) return Array.from({ length: total }, () => fdgdBuildLevel2Item());
-      return Array.from({ length: total }, (_, i) => fdgdBuildLevel3Item(i % 2 === 1));
+      return Array.from({ length: total }, () => fdgdBuildLevel3Item());
     }
 
     /* ── Grille(s) de coloriage — coloriage/décoloriage au clic direct ──── */
@@ -35731,7 +36596,13 @@
       const blocks = item.grids.map((g, gi) => {
         const cellClass = g.den === 10 ? 'fdgd-cell-10' : 'fdgd-cell-100';
         const gridClass = g.den === 10 ? 'fdgd-grid-10'  : 'fdgd-grid-100';
-        const label = multi ? `<div class="fdgd-grid-label">Grille ${gi + 1}</div>` : '';
+        const isFull = coloredSets[gi].size === g.den;
+        const label = multi
+          ? `<button type="button" class="fdgd-grid-label-btn" data-grid="${gi}" title="Colorier ou décolorier toute l'unité" aria-label="Colorier ou décolorier toute l'unité ${gi + 1}">
+              <span class="fdgd-grid-label-icon" data-grid-icon="${gi}" aria-hidden="true">${isFull ? '■' : '□'}</span>
+              <span class="fdgd-grid-label-text">Unité ${gi + 1}</span>
+            </button>`
+          : '';
         let inner;
         if (g.den === 10) {
           const cells = Array.from({ length: 10 }, (_, i) => {
@@ -35771,6 +36642,16 @@
        le navigateur route tous les pointermove suivants vers la cible du
        pointerdown, jamais de pointerover natif sur les cases survolées. */
     function fdgdAttachGridEvents(wrap, coloredSets, onChange) {
+      /* Icône ■/□ du bouton "Unité N" : reflète l'état réel de la grille
+         (pleine ou non) après chaque modification, quelle que soit sa
+         source (case, ligne, ou le bouton lui-même). */
+      function refreshGridIcon(gi) {
+        const icon = wrap.querySelector(`.fdgd-grid-label-icon[data-grid-icon="${gi}"]`);
+        if (!icon) return;
+        const total = wrap.querySelectorAll(`.fdgd-cell[data-grid="${gi}"]`).length;
+        icon.textContent = coloredSets[gi].size === total ? '■' : '□';
+      }
+
       function setCell(btn, on) {
         const gi  = parseInt(btn.dataset.grid, 10);
         const ci  = parseInt(btn.dataset.cell, 10);
@@ -35778,6 +36659,8 @@
         const has = set.has(ci);
         if (on && !has)       { set.add(ci);    btn.classList.add('is-colored'); }
         else if (!on && has)  { set.delete(ci); btn.classList.remove('is-colored'); }
+        else return;
+        refreshGridIcon(gi);
       }
 
       let painting = false;
@@ -35792,6 +36675,17 @@
           const ci = parseInt(cellBtn.dataset.cell, 10);
           paintOn  = !coloredSets[gi].has(ci);
           setCell(cellBtn, paintOn);
+          onChange();
+          return;
+        }
+        const gridBtn = evt.target.closest('.fdgd-grid-label-btn');
+        if (gridBtn) {
+          evt.preventDefault();
+          const gi    = parseInt(gridBtn.dataset.grid, 10);
+          const cells = wrap.querySelectorAll(`.fdgd-cell[data-grid="${gi}"]`);
+          const set   = coloredSets[gi];
+          const allOn = set.size === cells.length;
+          cells.forEach(btn => setCell(btn, !allOn));
           onChange();
           return;
         }
@@ -35917,7 +36811,8 @@
        (ex. placer une valeur au centième). Afficher toutes les graduations
        fines sur une seule ligne (100 ticks pour des centièmes) la rend à la
        fois illisible et impossible à cliquer avec précision — constaté sur
-       fraction-decimale-grille-droite niveau 2 après test réel. Ici la
+       fraction-decimale-grille-droite niveau 2 après test réel, puis niveau
+       3 (plusieurs unités avec centièmes, encore plus dense). Ici la
        droite principale n'affiche que les grandes bandes (labellisées,
        cliquables) ; cliquer une bande l'agrandit en une sous-droite montrant
        ses sous-graduations fines, où le placement se fait au clic/glisser
@@ -35926,7 +36821,15 @@
        tant que rien n'est verrouillé (showResult()). Pas de banque de cas
        spéciaux : majorCount/minorPerMajor/majorLabel sont fournis par
        l'appelant, donc réutilisable pour d'autres compétences (ex. milliers
-       dans un millier, ou toute droite à deux granularités).
+       dans un millier, ou toute droite à deux granularités) — niveau 2
+       (majorCount=10 dixièmes, minorPerMajor=10 centièmes) et niveau 3 sans
+       centièmes (majorCount=maxUnits, minorPerMajor=10) en sont deux
+       instances. Jamais plus de 10 graduations fines par zoom : au niveau 3
+       avec centièmes (den=100), un troisième niveau s'ajoute en cascade
+       (ZoomLine.createCascade / buildStaticCascadeHTML, plus bas) — unité →
+       dixième → centième, chaque étape ne montrant jamais plus de 10
+       graduations, plutôt qu'un unique zoom sur 100 centièmes à la fois
+       (illisible même en élargissant/faisant défiler la ligne).
        Valeur = index absolu 0..majorCount*minorPerMajor (ex. 0..100 pour un
        zoom dixièmes → centièmes avec majorCount=10, minorPerMajor=10).
        API :
@@ -36114,7 +37017,95 @@
         `;
       }
 
-      return { create, buildStaticHTML };
+      /* ── Cascade à 3 niveaux (unité → dixième → centième) ──────────────────
+         Utilisée quand minorPerMajor dépasserait 10 (niveau 3, den=100) :
+         plutôt qu'un seul zoom sur 100 centièmes d'un coup, on ouvre d'abord
+         les 10 dixièmes de l'unité choisie (réutilise mainSvg), puis, en
+         cliquant un dixième, on monte une instance normale de `create()`
+         (dixième → centième, 10 puis 10) à l'intérieur — donc jamais plus de
+         10 graduations visibles à la fois, à chaque étape. */
+      function createCascade({ container, maxUnits, initialValue = null, onChange }) {
+        const CHILD = 100; /* 10 dixièmes × 10 centièmes par unité */
+        let value = initialValue;
+        let openUnit = value != null ? Math.min(maxUnits - 1, Math.floor(value / CHILD)) : null;
+
+        container.innerHTML = `
+          <div class="zline-main-wrap"></div>
+          <div class="zline-sub-wrap ex-hidden"></div>
+        `;
+        const mainWrap = container.querySelector('.zline-main-wrap');
+        const subWrap  = container.querySelector('.zline-sub-wrap');
+
+        function renderMain() {
+          const built = mainSvg({ majorCount: maxUnits, minorPerMajor: CHILD, majorLabel: fdgdUniteLabel, value, openMajor: openUnit, locked: false });
+          mainWrap.innerHTML = built.svg;
+          mainWrap.querySelectorAll('.zline-major-hit').forEach(rect => {
+            rect.addEventListener('click', () => {
+              openUnit = parseInt(rect.dataset.major, 10);
+              renderMain();
+              renderChild();
+            });
+          });
+        }
+
+        function renderChild() {
+          if (openUnit == null) {
+            subWrap.classList.add('ex-hidden');
+            subWrap.innerHTML = '';
+            return;
+          }
+          subWrap.classList.remove('ex-hidden');
+          const u = openUnit;
+          subWrap.innerHTML = `<div class="zline-sub-label">Zoom : ${fdgdUniteLabel(u)} → ${fdgdUniteLabel(u + 1)}</div><div class="zline-unit-wrap"></div>`;
+          const inBand      = value != null && Math.floor(value / CHILD) === u;
+          const localValue  = inBand ? value - u * CHILD : null;
+          create({
+            container: subWrap.querySelector('.zline-unit-wrap'),
+            majorCount: 10,
+            minorPerMajor: 10,
+            majorLabel: i => `${u * 10 + i}/10`,
+            initialValue: localValue,
+            onChange: (lv) => {
+              value = u * CHILD + lv;
+              renderMain();
+              if (onChange) onChange(value);
+            }
+          });
+        }
+
+        renderMain();
+        renderChild();
+
+        return { getValue: () => value };
+      }
+
+      function buildStaticCascadeHTML({ maxUnits, value, correct, correctValue }) {
+        const CHILD = 100;
+        const openUnit = value != null
+          ? Math.min(maxUnits - 1, Math.floor(value / CHILD))
+          : (correctValue != null ? Math.min(maxUnits - 1, Math.floor(correctValue / CHILD)) : 0);
+        const u = openUnit;
+        const main = mainSvg({ majorCount: maxUnits, minorPerMajor: CHILD, majorLabel: fdgdUniteLabel, value, openMajor: openUnit, locked: true, correct, correctValue });
+        const localValue        = value != null ? value - u * CHILD : null;
+        const localCorrectValue = correctValue != null ? correctValue - u * CHILD : null;
+        const inner = buildStaticHTML({
+          majorCount: 10,
+          minorPerMajor: 10,
+          majorLabel: i => `${u * 10 + i}/10`,
+          value: localValue,
+          correct,
+          correctValue: localCorrectValue
+        });
+        return `
+          <div class="zline-main-wrap">${main.svg}</div>
+          <div class="zline-sub-wrap">
+            <div class="zline-sub-label">Zoom : ${fdgdUniteLabel(u)} → ${fdgdUniteLabel(u + 1)}</div>
+            <div class="zline-unit-wrap">${inner}</div>
+          </div>
+        `;
+      }
+
+      return { create, buildStaticHTML, createCascade, buildStaticCascadeHTML };
     })();
 
     /* Repère de bande pour le zoom dixièmes → centièmes (niveau 2) : jamais
@@ -36123,26 +37114,46 @@
       return i === 0 ? '0' : i === 10 ? '1' : `${i}/10`;
     }
 
+    /* Repère d'unité entière pour le zoom du niveau 3 (au-delà de 1) : les
+       bandes du niveau principal sont de simples unités 0, 1, 2… */
+    function fdgdUniteLabel(i) {
+      return String(i);
+    }
+
     /* ── Orchestration d'un item (plusieurs étapes séquentielles) ────────── */
     function fdgdRenderItem(card, item) {
       const ctx = {
         item,
         coloredSets: item.grids.map(() => new Set()),
         droiteTick: null,
-        decompVals: {},
-        trapChoice: null
+        decompVals: {}
       };
       fdgdStepGrille(card, ctx);
     }
 
+    /* Astuce affichée une seule fois (localStorage), la première fois que
+       l'élève rencontre une grille multiple (niveau 3), pour signaler le
+       bouton "Unité N" sans alourdir l'interface une fois l'astuce connue. */
+    const FDGD_UNIT_HINT_KEY = 'fdgd_unit_hint_seen';
+
     function fdgdStepGrille(card, ctx) {
       const { item, coloredSets } = ctx;
       const multi = item.grids.length > 1;
+      let showHint = false;
+      if (multi) {
+        try {
+          if (!localStorage.getItem(FDGD_UNIT_HINT_KEY)) {
+            showHint = true;
+            localStorage.setItem(FDGD_UNIT_HINT_KEY, '1');
+          }
+        } catch {}
+      }
       card.innerHTML = `
         <div class="fdgd-step-tag">Étape 1 — Coloriage</div>
         <p class="ex-question-label">Colorie ${multi ? 'les cases pour représenter' : 'le nombre de cases correspondant à'} cette fraction.</p>
         <div class="nline-question-area" style="margin-bottom:12px">${_rfracHtml(item.num, item.den)}</div>
         <div id="fdgd-grids-wrap">${fdgdRenderGridsHTML(item, coloredSets)}</div>
+        ${showHint ? `<p class="fdgd-unit-hint">💡 Astuce : clique sur « Unité 1 », « Unité 2 »… pour colorier toute une unité d'un coup.</p>` : ''}
         <div class="fdgd-counter" id="fdgd-counter"></div>
         <button class="ex-validate-btn" id="fdgd-next-step-btn" style="width:100%;margin-top:4px">Étape suivante →</button>
       `;
@@ -36162,7 +37173,7 @@
     function fdgdStepDroite(card, ctx) {
       const { item } = ctx;
       const isLastStep = !item.decomp;
-      const isZoomed   = item.level === 2; /* centièmes ≤ 1 : droite à plat illisible/imprécise, cf. ZoomLine */
+      const isZoomed   = item.level === 2 || item.level === 3; /* droite à plat illisible/imprécise dès que les graduations sont fines (centièmes) ou nombreuses (plusieurs unités), cf. ZoomLine */
       card.innerHTML = `
         <div class="fdgd-step-tag">Étape 2 — Droite graduée</div>
         <p class="ex-question-label">Place cette fraction sur la droite graduée.</p>
@@ -36180,12 +37191,22 @@
         nextBtn.disabled = false;
       };
 
-      if (isZoomed) {
+      if (item.level === 3 && item.den === 100) {
+        /* Centièmes sur plusieurs unités : cascade à 3 niveaux (unité →
+           dixième → centième) plutôt qu'un zoom unique sur 100 graduations. */
+        ZoomLine.createCascade({
+          container: wrap,
+          maxUnits: item.maxUnits,
+          initialValue: ctx.droiteTick,
+          onChange: (value) => { ctx.droiteTick = value; onPlaced(); }
+        });
+      } else if (isZoomed) {
+        const zoomCfg = item.level === 2
+          ? { majorCount: 10, minorPerMajor: 10, majorLabel: fdgdDixiemeLabel }
+          : { majorCount: item.maxUnits, minorPerMajor: item.den, majorLabel: fdgdUniteLabel };
         ZoomLine.create({
           container: wrap,
-          majorCount: 10,
-          minorPerMajor: 10,
-          majorLabel: fdgdDixiemeLabel,
+          ...zoomCfg,
           initialValue: ctx.droiteTick,
           onChange: (value) => { ctx.droiteTick = value; onPlaced(); }
         });
@@ -36201,7 +37222,6 @@
 
     function fdgdStepDecomp(card, ctx) {
       const { item } = ctx;
-      const isLastStep = !item.trap;
       const fieldsHtml = item.decomp.fields.map((f, i) => {
         const op = i > 0 ? '<span class="dni-field-op">+</span>' : '';
         return `${op}<div class="dni-field-wrap">
@@ -36214,7 +37234,7 @@
         <p class="ex-question-label">Décompose cette fraction.</p>
         <div class="nline-question-area" style="margin-bottom:16px">${_rfracHtml(item.num, item.den)}</div>
         <div class="dni-fields-row" style="margin-bottom:8px">${fieldsHtml}<span class="dni-field-op">=</span><span class="dni-eq-target">${item.num}/${item.den}</span></div>
-        <button class="ex-validate-btn" id="fdgd-decomp-next-btn" disabled style="width:100%;margin-top:12px">${isLastStep ? 'Valider' : 'Étape suivante →'}</button>
+        <button class="ex-validate-btn" id="fdgd-decomp-next-btn" disabled style="width:100%;margin-top:12px">Valider</button>
       `;
       const inputs = item.decomp.fields.map(f => card.querySelector(`#fdgd-decomp-${f.key}`));
       const btn    = card.querySelector('#fdgd-decomp-next-btn');
@@ -36226,55 +37246,35 @@
       setTimeout(() => inputs[0]?.focus(), 50);
       btn.addEventListener('click', () => {
         item.decomp.fields.forEach((f, i) => { ctx.decompVals[f.key] = parseInt(inputs[i].value, 10); });
-        if (item.trap) fdgdStepTrap(card, ctx);
-        else fdgdFinishItem(card, ctx);
+        fdgdFinishItem(card, ctx);
       });
     }
 
-    function fdgdStepTrap(card, ctx) {
-      const { item } = ctx;
-      const t = item.trap;
-      card.innerHTML = `
-        <div class="fdgd-step-tag">Étape 4 — Vrai ou faux</div>
-        <p class="ex-question-label">Vrai ou faux ?</p>
-        <p class="fdgd-trap-statement"><strong>${t.num}/${t.den}</strong> et <strong>${t.num2}/${t.den2}</strong> représentent-elles le même nombre ?</p>
-        <div class="cd-vf-row">
-          <button type="button" class="cd-vf-btn" id="fdgd-vf-true">✓ Vrai</button>
-          <button type="button" class="cd-vf-btn" id="fdgd-vf-false">✗ Faux</button>
-        </div>
-      `;
-      card.querySelector('#fdgd-vf-true').addEventListener('click', () => { ctx.trapChoice = true; fdgdFinishItem(card, ctx); });
-      card.querySelector('#fdgd-vf-false').addEventListener('click', () => { ctx.trapChoice = false; fdgdFinishItem(card, ctx); });
-    }
-
     function fdgdFinishItem(card, ctx) {
-      const { item, coloredSets, droiteTick, decompVals, trapChoice } = ctx;
+      const { item, coloredSets, droiteTick, decompVals } = ctx;
 
       const grilleColored = coloredSets.reduce((a, s) => a + s.size, 0);
       const grilleOk = grilleColored === item.num;
       const droiteOk = droiteTick === item.targetTick;
       const decompOk = item.decomp ? item.decomp.fields.every(f => decompVals[f.key] === f.expected) : null;
-      const trapOk   = item.trap   ? (trapChoice === item.trap.isTrue) : null;
 
-      const subs    = [grilleOk, droiteOk, decompOk, trapOk].filter(v => v !== null);
+      const subs    = [grilleOk, droiteOk, decompOk].filter(v => v !== null);
       const correct = subs.filter(Boolean).length;
       fdgdState.subCorrect += correct;
       fdgdState.subTotal   += subs.length;
 
       const notes = [];
-      notes.push(grilleOk
-        ? '✅ Grille : correct !'
-        : `💡 Grille : il fallait colorier ${item.num} case${item.num > 1 ? 's' : ''} (tu en as colorié ${grilleColored}).`);
-      notes.push(droiteOk ? '✅ Droite : bonne graduation !' : `💡 Droite : ce n'était pas la bonne graduation.`);
-      if (item.decomp) {
-        notes.push(decompOk
-          ? '✅ Décomposition : correct !'
-          : `💡 Décomposition : ${item.decomp.fields.map(f => `${f.expected} ${f.label}`).join(' + ')}.`);
+      /* Feedback détaillé par sous-partie affiché seulement en cas d'erreur
+         sur cette sous-partie, pour aider l'élève à localiser sa faute. Si
+         tout est correct, seul le message global "Bravo" est utile. */
+      if (!grilleOk || !droiteOk) {
+        notes.push(grilleOk
+          ? '✅ Unité : correct !'
+          : `💡 Unité : il fallait colorier ${item.num} case${item.num > 1 ? 's' : ''} (tu en as colorié ${grilleColored}).`);
+        notes.push(droiteOk ? '✅ Droite : bonne graduation !' : `💡 Droite : ce n'était pas la bonne graduation.`);
       }
-      if (item.trap) {
-        notes.push(trapOk
-          ? '✅ Vrai/Faux : correct !'
-          : `💡 Vrai/Faux : ${item.trap.num}/${item.trap.den} et ${item.trap.num2}/${item.trap.den2} ${item.trap.isTrue ? 'représentent bien le même nombre' : 'ne représentent pas le même nombre'}.`);
+      if (item.decomp && !decompOk) {
+        notes.push(`💡 Décomposition : ${item.decomp.fields.map(f => `${f.expected} ${f.label}`).join(' + ')}.`);
       }
       const noteHtml = notes.map(n => `<div class="ex-note" style="margin-top:6px">${n}</div>`).join('');
 
@@ -36286,6 +37286,10 @@
 
       const droiteRecap = item.level === 2
         ? ZoomLine.buildStaticHTML({ majorCount: 10, minorPerMajor: 10, majorLabel: fdgdDixiemeLabel, value: droiteTick, correct: droiteOk, correctValue: item.targetTick })
+        : item.level === 3 && item.den === 100
+        ? ZoomLine.buildStaticCascadeHTML({ maxUnits: item.maxUnits, value: droiteTick, correct: droiteOk, correctValue: item.targetTick })
+        : item.level === 3
+        ? ZoomLine.buildStaticHTML({ majorCount: item.maxUnits, minorPerMajor: item.den, majorLabel: fdgdUniteLabel, value: droiteTick, correct: droiteOk, correctValue: item.targetTick })
         : fdgdBuildDroiteSvg(item, droiteTick, droiteOk).svg;
 
       card.innerHTML = `
@@ -36460,9 +37464,9 @@
 
     const FDTN_SEUIL = 0.80;
     const FDTN_LV_DEFS = [
-      { lv: 1, desc: 'Colonnes Unités + Dixièmes (/10)' },
-      { lv: 2, desc: 'Colonnes Unités + Dixièmes + Centièmes (/100)' },
-      { lv: 3, desc: 'Colonnes Unités + Dixièmes + Centièmes + Millièmes (/1000)' }
+      { lv: 1, desc: 'Fractions en dixièmes (/10)' },
+      { lv: 2, desc: 'Fractions en dixièmes et centièmes (/100)' },
+      { lv: 3, desc: 'Fractions en dixièmes, centièmes et millièmes (/1000)' }
     ];
 
     function fdtnBackToSelectScreen() {
@@ -36515,47 +37519,45 @@
       fdtnRenderTableau(card, q);
     }
 
-    /* ── Colonnes actives selon le niveau ──────────────────────────────── */
+    /* ── Colonnes du tableau de numération — toujours les 6, jamais grisées :
+       l'élève doit lui-même repérer la bonne position (aucun indice visuel
+       sur les colonnes concernées, sinon l'exercice se résout sans
+       réflexion). Centaine/Dizaine ne sont jamais utilisées par cette
+       compétence (absentes de q.tab) mais restent affichées et éditables ;
+       leur saisie est simplement ignorée à la validation. ── */
     const FDTN_COL_DEFS = [
-      { id: 'u',  label: 'Unités',    isComma: false },
-      { id: '_',  label: ',',         isComma: true  },
-      { id: 'di', label: 'Dixièmes',  isComma: false },
-      { id: 'ce', label: 'Centièmes', isComma: false },
-      { id: 'mi', label: 'Millièmes', isComma: false }
+      { id: 'cH', label: 'Centaine', value: '100',    section: 'left'  },
+      { id: 'dH', label: 'Dizaine',  value: '10',     section: 'left'  },
+      { id: 'u',  label: 'Unité',    value: '1',      section: 'left', sep: true },
+      { id: 'di', label: 'Dixième',  value: '1/10',   section: 'right' },
+      { id: 'ce', label: 'Centième', value: '1/100',  section: 'right' },
+      { id: 'mi', label: 'Millième', value: '1/1000', section: 'right' }
     ];
-
-    function fdtnActiveCols(level) {
-      if (level === 1) return ['u', 'di'];
-      if (level === 2) return ['u', 'di', 'ce'];
-      return ['u', 'di', 'ce', 'mi'];
-    }
 
     /* ── Rendu du tableau + saisie décimale ────────────────────────────── */
     function fdtnRenderTableau(card, q) {
-      const { num, den, decimal, decimalStr, tab } = q;
-      const activeCols = fdtnActiveCols(fdtnState.level);
+      const { num, den, decimal, decimalStr } = q;
 
-      const visibleDefs = FDTN_COL_DEFS.filter(col => {
-        if (col.isComma) return true;
-        return activeCols.includes(col.id);
-      });
+      const headerCells = FDTN_COL_DEFS.map(col =>
+        `<th class="fdtn2-th${col.sep ? ' fdtn2-col-sep' : ''}">${col.label}<span class="fdtn2-th-value">${col.value}</span></th>`
+      ).join('');
 
-      const headerCells = visibleDefs.map(col => {
-        if (col.isComma) return `<th class="fdtn-comma-th">,</th>`;
-        return `<th class="fdtn-th">${col.label}</th>`;
-      }).join('');
-
-      const inputCells = visibleDefs.map(col => {
-        if (col.isComma) return `<td class="fdtn-comma-td"><span class="fdtn-comma-sym">,</span></td>`;
-        return `<td class="fdtn-td"><input type="tel" maxlength="1" class="fdtn-input" data-col="${col.id}" autocomplete="off" pattern="[0-9]" inputmode="numeric"></td>`;
-      }).join('');
+      const inputCells = FDTN_COL_DEFS.map(col =>
+        `<td class="fdtn2-td${col.sep ? ' fdtn2-col-sep' : ''}"><input type="tel" maxlength="1" class="fdtn2-input" data-col="${col.id}" autocomplete="off" pattern="[0-9]" inputmode="numeric" aria-label="${col.label}"></td>`
+      ).join('');
 
       card.innerHTML = `
         <p class="ex-question-label">Place les chiffres de cette fraction dans le tableau de numération.</p>
         <div class="nline-question-area" style="margin-bottom:16px">${_rfracHtml(num, den)}</div>
-        <div class="fdtn-table-wrap">
-          <table class="fdtn-table">
-            <thead><tr>${headerCells}</tr></thead>
+        <div class="fdtn2-table-wrap">
+          <table class="fdtn2-table">
+            <thead>
+              <tr>
+                <th colspan="3" class="fdtn2-section-th fdtn2-section-left">Unités simples</th>
+                <th colspan="3" class="fdtn2-section-th fdtn2-section-right">Partie décimale</th>
+              </tr>
+              <tr>${headerCells}</tr>
+            </thead>
             <tbody><tr>${inputCells}</tr></tbody>
           </table>
         </div>
@@ -36573,7 +37575,7 @@
         </div>
       `;
 
-      const inputs = [...card.querySelectorAll('.fdtn-input')];
+      const inputs = [...card.querySelectorAll('.fdtn2-input')];
 
       /* Navigation automatique entre cases */
       inputs.forEach((inp, i) => {
@@ -36588,25 +37590,38 @@
       if (inputs.length > 0) setTimeout(() => inputs[0].focus(), 50);
 
       document.getElementById('fdtn-check-btn').addEventListener('click', () => {
-        fdtnCheckTableau(q, activeCols, inputs);
+        fdtnCheckTableau(q, inputs);
       });
     }
 
     /* ── Validation du tableau ─────────────────────────────────────────── */
-    function fdtnCheckTableau(q, activeCols, inputs) {
+    function fdtnCheckTableau(q, inputs) {
       let allCorrect = true;
       inputs.forEach(inp => {
         const col      = inp.dataset.col;
-        const expected = String(q.tab[col]);
-        const isRight  = inp.value === expected;
+        const expected = q.tab[col];
         inp.disabled   = true;
+        /* Colonne non concernée par cette fraction (Centaine/Dizaine, ou
+           Centièmes/Millièmes aux niveaux qui n'en comportent pas) : la
+           saisie est ignorée sans être marquée juste/fausse, pour ne pas
+           révéler par la couleur quelles colonnes comptent. */
+        if (expected === undefined || expected === null) return;
+        /* Une case laissée vide vaut 0 implicitement (ex. Unités d'un
+           nombre < 1) : on l'accepte comme correcte et on affiche le 0
+           attendu au moment de la correction plutôt que de la laisser
+           vide, pour que le corrigé affiché reste cohérent. */
+        if (expected === 0 && inp.value === '') inp.value = '0';
+        const isRight = inp.value === String(expected);
         inp.classList.add(isRight ? 'is-correct' : 'is-wrong');
         if (!isRight) allCorrect = false;
       });
       document.getElementById('fdtn-check-btn').disabled = true;
 
       const labelMap = { u: 'Unités', di: 'Dixièmes', ce: 'Centièmes', mi: 'Millièmes' };
-      const corrigé  = activeCols.map(id => `${labelMap[id]} : <strong>${q.tab[id]}</strong>`).join(' &nbsp;|&nbsp; ');
+      const concernedCols = FDTN_COL_DEFS
+        .map(col => col.id)
+        .filter(id => q.tab[id] !== undefined && q.tab[id] !== null);
+      const corrigé = concernedCols.map(id => `${labelMap[id]} : <strong>${q.tab[id]}</strong>`).join(' &nbsp;|&nbsp; ');
 
       document.getElementById('fdtn-tab-feedback').innerHTML = allCorrect
         ? `<div class="ex-feedback-correct" style="margin-bottom:0">✅ Tableau correct !</div>`
