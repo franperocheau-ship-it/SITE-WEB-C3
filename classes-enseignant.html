@@ -17,6 +17,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=4"></script>
+  <script src="js/class-links-teacher.js?v=1"></script>
   <style>
     /* ── Layout ──────────────────────────────────────────────────────────────── */
     .dash-wrap {
@@ -292,6 +293,24 @@
       line-height: 1.5;
       color: var(--text);
     }
+
+    /* ── Modal : liste des liens de la classe ─────────────────────────────────── */
+    .link-list { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; margin-bottom: 16px; }
+    .link-list-empty { font-size: 13px; color: var(--muted); padding: 8px 0; }
+    .link-list-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .link-list-body { flex: 1; min-width: 0; }
+    .link-list-title { font-weight: 700; font-size: 14px; color: var(--text); }
+    .link-list-url { font-size: 12px; color: var(--color-brand-blue); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .link-list-desc { font-size: 12px; color: var(--muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .link-list-actions { display: flex; gap: 4px; flex-shrink: 0; }
+    .link-form-hint { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
     .perso-badge {
       display: inline-flex; align-items: center; gap: 3px;
       background: rgba(245,166,35,0.14);
@@ -965,6 +984,36 @@
       </div>
     </div>
 
+    <!-- ── Liens de la classe ──────────────────────────────────────────────── -->
+    <div class="modal" id="modal-links" style="display:none">
+      <div class="modal-header">
+        <h2 class="modal-title">Liens de la classe</h2>
+        <button class="modal-close" onclick="closeModal()" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="link-list" id="link-list"></div>
+        <form id="form-link" onsubmit="submitLink(event)" novalidate>
+          <div class="form-field">
+            <label class="form-label" for="fl-title">Titre</label>
+            <input class="form-input" id="fl-title" type="text" placeholder="Ex. Pronote" required maxlength="80">
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="fl-url">URL</label>
+            <input class="form-input" id="fl-url" type="text" placeholder="pronote.mon-etablissement.fr" required>
+            <div class="link-form-hint">« https:// » sera ajouté automatiquement si tu ne le précises pas.</div>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="fl-desc">Description (optionnelle)</label>
+            <input class="form-input" id="fl-desc" type="text" placeholder="Ex. Cahier de textes et absences" maxlength="200">
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-ghost" type="button" onclick="closeModal()">Fermer</button>
+            <button class="btn btn-primary" type="submit" id="fl-submit">+ Ajouter le lien</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
   </div>
 
   <!-- Zone d'impression (visible uniquement @media print) -->
@@ -990,6 +1039,10 @@
      v9) : prime silencieusement sur l'affectation de groupe — voir badge et
      avertissement dans renderDetailStudents(). */
   let _studentsWithPersonalList = new Set();
+
+  /* ── Liens de la classe ──────────────────────────────────────────────────── */
+  let _links         = [];
+  let _editingLinkId = null;
 
   function normalize(str) {
     return str.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, '-');
@@ -1027,6 +1080,17 @@
 
     if (classId) {
       await showDetail(classId);
+      /* Point d'entrée unique depuis la carte "Liens de la classe"
+         (dashboard-enseignant.html) : ouvre directement le modal plutôt que
+         de passer par un bouton dans cette page. `modal` est retiré de l'URL
+         (replaceState, sans repasser par navigate()/applyView()) pour ne pas
+         rouvrir le modal à chaque navigation ultérieure vers cette classe. */
+      if (p.get('modal') === 'links') {
+        openModalLinks();
+        const url = new URL(window.location.href);
+        url.searchParams.delete('modal');
+        history.replaceState(null, '', url);
+      }
     } else {
       setTab('classes');
       updateBreadcrumb('classes');
@@ -1122,12 +1186,14 @@
       if (!_classes.length) _classes = await lfmTeacher.getClasses();
       _currentClass = _classes.find(c => c.id === classId);
       if (!_currentClass) { navigate({}); return; }
-      const [students, groups] = await Promise.all([
+      const [students, groups, links] = await Promise.all([
         lfmTeacher.getStudents(classId),
-        lfmTeacher.getGroups(classId)
+        lfmTeacher.getGroups(classId),
+        lfmClassLinksTeacher.getClassLinks(classId)
       ]);
       _students = students;
       _groups   = groups;
+      _links    = links;
       _studentsWithPersonalList = new Set(
         await lfmTeacher.getStudentIdsWithActiveExercises(students.map(s => s.id))
       );
@@ -1372,6 +1438,7 @@
     _editingClassId   = null;
     _editingStudentId = null;
     _movingStudentId  = null;
+    _editingLinkId    = null;
   }
 
   document.getElementById('modal-overlay').addEventListener('click', e => {
@@ -1577,6 +1644,11 @@
         renderDetailStudents();
         showToast('Groupe supprimé');
         openModalGroups();
+      } else if (type === 'link') {
+        await lfmClassLinksTeacher.deleteLink(id);
+        _links = _links.filter(l => l.id !== id);
+        showToast('Lien supprimé');
+        openModalLinks();
       } else {
         await lfmTeacher.deleteStudent(id);
         _students = _students.filter(s => s.id !== id);
@@ -1682,6 +1754,118 @@
       ? `Voulez-vous vraiment supprimer le groupe <strong>${esc(g.name)}</strong> ?<br>
          <span class="confirm-warning">${count} élève${count !== 1 ? 's' : ''} repassera${count !== 1 ? 'nt' : ''} sur la liste de la classe.</span>`
       : `Voulez-vous vraiment supprimer le groupe <strong>${esc(g.name)}</strong> ?`;
+    openModal('confirm');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     MODAL : LIENS DE LA CLASSE
+  ═══════════════════════════════════════════════════════════════════════════ */
+  function openModalLinks() {
+    _editingLinkId = null;
+    document.getElementById('form-link').reset();
+    document.getElementById('fl-submit').textContent = '+ Ajouter le lien';
+    renderLinkList();
+    openModal('links');
+    setTimeout(() => document.getElementById('fl-title').focus(), 80);
+  }
+
+  function renderLinkList() {
+    const wrap = document.getElementById('link-list');
+    if (!_links.length) {
+      wrap.innerHTML = '<div class="link-list-empty">Aucun lien pour cette classe.</div>';
+      return;
+    }
+    wrap.innerHTML = _links.map((l, i) => `
+      <div class="link-list-item">
+        <div class="link-list-body">
+          <div class="link-list-title">${esc(l.title)}</div>
+          <div class="link-list-url">${esc(l.url)}</div>
+          ${l.description ? `<div class="link-list-desc">${esc(l.description)}</div>` : ''}
+        </div>
+        <div class="link-list-actions">
+          <button type="button" class="btn btn-ghost btn-sm btn-icon" title="Monter" ${i === 0 ? 'disabled' : ''} onclick="moveLink('${l.id}', -1)">▲</button>
+          <button type="button" class="btn btn-ghost btn-sm btn-icon" title="Descendre" ${i === _links.length - 1 ? 'disabled' : ''} onclick="moveLink('${l.id}', 1)">▼</button>
+          <button type="button" class="btn btn-ghost btn-sm btn-icon" title="Modifier" onclick="startEditLink('${l.id}')">✏️</button>
+          <button type="button" class="btn btn-danger btn-sm btn-icon" title="Supprimer" onclick="confirmDeleteLink('${l.id}')">🗑</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function startEditLink(id) {
+    const l = _links.find(l => l.id === id);
+    if (!l) return;
+    _editingLinkId = id;
+    document.getElementById('fl-title').value = l.title;
+    document.getElementById('fl-url').value   = l.url;
+    document.getElementById('fl-desc').value  = l.description || '';
+    document.getElementById('fl-submit').textContent = 'Enregistrer';
+    document.getElementById('fl-title').focus();
+  }
+
+  /* Complète automatiquement le protocole plutôt que de bloquer la
+     soumission (retour utilisateur du plan : "pas de blocage"). */
+  function normalizeUrl(raw) {
+    const trimmed = raw.trim();
+    return /^https?:\/\//i.test(trimmed) ? trimmed : 'https://' + trimmed;
+  }
+
+  async function submitLink(e) {
+    e.preventDefault();
+    const btn   = document.getElementById('fl-submit');
+    const title = document.getElementById('fl-title').value.trim();
+    const url   = normalizeUrl(document.getElementById('fl-url').value);
+    const desc  = document.getElementById('fl-desc').value.trim();
+    if (!title || !url) return;
+
+    btn.disabled = true;
+    try {
+      if (_editingLinkId) {
+        const updated = await lfmClassLinksTeacher.updateLink(_editingLinkId, { title, url, description: desc || null });
+        const idx = _links.findIndex(l => l.id === _editingLinkId);
+        if (idx !== -1) _links[idx] = updated;
+        showToast('Lien modifié');
+      } else {
+        const created = await lfmClassLinksTeacher.createLink(_currentClass.id, { title, url, description: desc });
+        _links.push(created);
+        showToast('Lien ajouté');
+      }
+      _editingLinkId = null;
+      document.getElementById('form-link').reset();
+      document.getElementById('fl-submit').textContent = '+ Ajouter le lien';
+      renderLinkList();
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  async function moveLink(id, direction) {
+    const idx = _links.findIndex(l => l.id === id);
+    const swapIdx = idx + direction;
+    if (idx === -1 || swapIdx < 0 || swapIdx >= _links.length) return;
+    const a = _links[idx];
+    const b = _links[swapIdx];
+    try {
+      await lfmClassLinksTeacher.swapPositions(a, b);
+      const posA = a.position, posB = b.position;
+      a.position = posB;
+      b.position = posA;
+      [_links[idx], _links[swapIdx]] = [_links[swapIdx], _links[idx]];
+      renderLinkList();
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    }
+  }
+
+  function confirmDeleteLink(id) {
+    const l = _links.find(l => l.id === id);
+    if (!l) return;
+    _pendingDelete = { type: 'link', id };
+    document.getElementById('conf-title').textContent = 'Supprimer le lien';
+    document.getElementById('conf-text').innerHTML =
+      `Voulez-vous vraiment supprimer le lien <strong>${esc(l.title)}</strong> ?`;
     openModal('confirm');
   }
 

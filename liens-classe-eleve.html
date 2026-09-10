@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/favicon/favicon.ico?v=1" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png?v=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png?v=1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/favicon-192x192.png?v=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512x512.png?v=1">
+  <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
+  <link rel="manifest" href="site.webmanifest?v=1">
+  <title>Liens de la classe — Espace élève</title>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <style>
+    .lc-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 40px 24px 64px; }
+    .lc-content { max-width: 1000px; margin: 0 auto; }
+    .lc-back-link { display: inline-block; margin-bottom: 20px; font-size: 13px; font-weight: 700; color: var(--blue); text-decoration: none; }
+    .lc-back-link:hover { text-decoration: underline; }
+    .lc-header { text-align: center; margin-bottom: 32px; }
+    .lc-header-icon { font-size: 48px; line-height: 1; margin-bottom: 8px; }
+    .lc-title { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: var(--blue); letter-spacing: 0.02em; }
+    .lc-subtitle { font-size: 14px; color: var(--muted); margin-top: 6px; }
+
+    .lc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+
+    .link-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-decoration: none;
+      border: 2px solid transparent;
+      border-top: 4px solid var(--blue);
+      transition: border-color 200ms, box-shadow 200ms, transform 140ms;
+    }
+    .link-card:hover { border-color: rgba(16,43,106,0.2); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .link-card--gold      { border-top-color: var(--color-brand-gold); }
+    .link-card--turquoise { border-top-color: var(--color-niveau-cm1); }
+
+    .link-card-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; overflow: hidden; background: var(--bg); }
+    .link-card-icon img { width: 24px; height: 24px; object-fit: contain; }
+    .link-card-icon-fallback {
+      width: 40px; height: 40px; border-radius: 10px; display: none;
+      align-items: center; justify-content: center;
+      background: rgba(245,166,35,0.14);
+    }
+
+    .link-card-title { font-weight: 700; font-size: 15px; color: var(--blue); }
+    .link-card-desc  { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .link-card-action { font-size: 12px; font-weight: 700; color: var(--blue); letter-spacing: 0.03em; margin-top: auto; }
+
+    .lc-empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
+
+    @media (max-width: 600px) { .lc-wrap { padding: 24px 16px 48px; } }
+  </style>
+  <!-- NAVBAR-PROFICIAMUS-CSS -->
+  <style>
+  body{padding-top:50px;}
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:#fff;border-bottom:1px solid #e8e8e8;height:auto;padding:4px 0;display:flex;align-items:center;}
+  .navbar__inner{max-width:1100px;margin:0 auto;padding:0 20px;width:100%;display:flex;align-items:center;justify-content:space-between;}
+  .navbar__brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+  .navbar__brand img{height:34px;width:auto;}
+  .navbar__nav{display:flex;align-items:center;gap:24px;}
+  .navbar__nav a{text-decoration:none;color:#1a1a1a;font-size:14px;font-weight:700;transition:color .2s;}
+  .navbar__nav a:hover{color:#1B4EBF;}
+  .nav-lang{font-size:14px;font-weight:700;cursor:pointer;color:#1a1a1a;}
+  .navbar__nav .btn-login{color:#fff!important;}
+  .btn-login{background:#102B6A;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;transition:background .2s;}
+  .btn-login:hover{background:#0b1e4d;}
+  @media(max-width:768px){.navbar__brand img{height:28px;}.navbar__nav{gap:12px;}.navbar__nav a:not(.btn-login){display:none;}.nav-lang{display:none;}.btn-login{padding:7px 13px;font-size:13px;}}
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+  </nav>
+
+  <!-- CONTENU -->
+  <div class="lc-wrap">
+    <div class="lc-content">
+      <a href="dashboard-eleve.html" class="lc-back-link">← Retour à mon espace</a>
+
+      <div class="lc-header">
+        <div class="lc-header-icon">🔗</div>
+        <div class="lc-title">Liens de la classe</div>
+        <div class="lc-subtitle">Les sites choisis par ton enseignant, en un clic.</div>
+      </div>
+
+      <div class="lc-grid" id="lc-grid"></div>
+      <div class="lc-empty" id="lc-empty" style="display:none">Ta classe n'a pas encore de lien enregistré.</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+  </footer>
+  <style>
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/idle-logout.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/class-links-student.js?v=1"></script>
+
+  <script>
+    const CARD_COLOR_CYCLE = ['', 'link-card--gold', 'link-card--turquoise'];
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    /* Favicon récupéré côté client via Google s2/favicons, sans rien à
+       uploader côté enseignant. Fallback (onerror) : icône générique
+       "lien" en navy/gold, jamais d'emoji (retour explicite du plan). */
+    function faviconUrlFor(url) {
+      try {
+        const hostname = new URL(url).hostname;
+        return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=64`;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    const FALLBACK_ICON_SVG = `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 15L15 9" stroke="#1A2D6B" stroke-width="2" stroke-linecap="round"/>
+        <path d="M11 7L12.5 5.5C14 4 16.5 4 18 5.5V5.5C19.5 7 19.5 9.5 18 11L16.5 12.5" stroke="#1A2D6B" stroke-width="2" stroke-linecap="round"/>
+        <path d="M13 17L11.5 18.5C10 20 7.5 20 6 18.5V18.5C4.5 17 4.5 14.5 6 13L7.5 11.5" stroke="#1A2D6B" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    `;
+
+    function renderLinkCard(link, i) {
+      const colorClass = CARD_COLOR_CYCLE[i % 3];
+      const faviconUrl = faviconUrlFor(link.url);
+      const iconHtml = faviconUrl
+        ? `<img src="${escapeHtml(faviconUrl)}" alt="" onerror="this.closest('.link-card-icon').style.display='none'; this.closest('.link-card-icon').nextElementSibling.style.display='flex';">`
+        : '';
+      return `
+        <a class="link-card ${colorClass}" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">
+          <div class="link-card-icon" style="${faviconUrl ? '' : 'display:none'}">${iconHtml}</div>
+          <div class="link-card-icon-fallback" style="${faviconUrl ? '' : 'display:flex'}">${FALLBACK_ICON_SVG}</div>
+          <div class="link-card-title">${escapeHtml(link.title)}</div>
+          ${link.description ? `<div class="link-card-desc">${escapeHtml(link.description)}</div>` : ''}
+          <div class="link-card-action">Ouvrir →</div>
+        </a>
+      `;
+    }
+
+    async function loadLinks() {
+      const grid  = document.getElementById('lc-grid');
+      const empty = document.getElementById('lc-empty');
+      const links = await lfmClassLinksStudent.getMyClassLinks();
+      if (!links.length) { empty.style.display = 'block'; return; }
+      grid.innerHTML = links.map((l, i) => renderLinkCard(l, i)).join('');
+    }
+
+    (async () => {
+      const profile = await lfmAuth.requireRole('eleve');
+      if (!profile) return;
+      loadLinks();
+    })();
+  </script>
+</body>
+</html>

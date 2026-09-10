@@ -37,6 +37,7 @@
   <script src="js/dictees-word-stats.js?v=2"></script>
   <script src="js/dictees-student-space.js?v=10"></script>
   <script src="js/vocab-student-space.js?v=3"></script>
+  <script src="js/class-links-student.js?v=1"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=2">
   <script src="js/feature-flags.js?v=1"></script>
   <script src="js/resultats-nav.js?v=4"></script>
@@ -1181,6 +1182,38 @@
       grid.appendChild(card);
     }
 
+    /* ── Carte "Liens de la classe" ────────────────────────────────────────────
+       N'apparaît que si l'enseignant a enregistré au moins un lien pour la
+       classe (jamais de carte vide) — voir js/class-links-student.js. Icône
+       en SVG inline (pas d'emoji, cohérent avec la contrainte "pas
+       d'emoticon" des cartes-liens de la page liens-classe-eleve.html). */
+    async function maybeRenderClassLinksCard() {
+      if (typeof lfmClassLinksStudent === 'undefined') return;
+      const links = await lfmClassLinksStudent.getMyClassLinks();
+      if (!links.length) return;
+
+      const grid = document.getElementById('student-dash-grid');
+      if (!grid) return;
+
+      const card = document.createElement('a');
+      card.href = 'liens-classe-eleve.html';
+      card.className = 'dash-card dash-card--active';
+      card.innerHTML = `
+        <div class="dash-card-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 15L15 9" stroke="#102B6A" stroke-width="2" stroke-linecap="round"/>
+            <path d="M11 7L12.5 5.5C14 4 16.5 4 18 5.5V5.5C19.5 7 19.5 9.5 18 11L16.5 12.5" stroke="#102B6A" stroke-width="2" stroke-linecap="round"/>
+            <path d="M13 17L11.5 18.5C10 20 7.5 20 6 18.5V18.5C4.5 17 4.5 14.5 6 13L7.5 11.5" stroke="#102B6A" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="dash-card-title">Liens de la classe</div>
+        <div class="dash-card-desc">Retrouve les sites choisis par ton professeur (Pronote, Padlets...).</div>
+        <div class="dash-card-action">Voir les liens →</div>
+        <div class="dash-card-accent"></div>
+      `;
+      grid.appendChild(card);
+    }
+
     /* ── Initialisation ────────────────────────────────────────────────────── */
     (async () => {
       const profile = await lfmAuth.requireRole('eleve');
@@ -1188,6 +1221,7 @@
       _profile = profile;
 
       maybeRenderGuidedCard();
+      maybeRenderClassLinksCard();
       // Bandeau de réactivation espacée (Champ lexical) désactivé : module pas encore en production.
       // if (typeof VocabStudentSpace !== 'undefined') VocabStudentSpace.renderReactivationBanner(profile.id);
 

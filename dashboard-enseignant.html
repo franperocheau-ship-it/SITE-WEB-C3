@@ -384,6 +384,23 @@
           <div class="dash-card-action">Gérer →</div>
           <div class="dash-card-accent"></div>
         </a>
+        <!-- Pas d'icône dédiée dans assets/logos panneau de controle/ pour
+             cette carte : médaillon SVG inline (même style que la carte
+             "Évaluations" ci-dessous), chaîne de lien blanche sur fond navy. -->
+        <a href="#" class="dash-card dash-card--active" id="card-class-links">
+          <div class="dash-card-icon">
+            <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+              <circle cx="20" cy="20" r="19" fill="#102B6A" stroke="#F5A623" stroke-width="2"/>
+              <path d="M17 23L23 17" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+              <path d="M19 15L20.5 13.5C22 12 24.5 12 26 13.5V13.5C27.5 15 27.5 17.5 26 19L24.5 20.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+              <path d="M21 25L19.5 26.5C18 28 15.5 28 14 26.5V26.5C12.5 25 12.5 22.5 14 21L15.5 19.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="dash-card-title">Liens de la classe</div>
+          <div class="dash-card-desc">Partagez des liens utiles (Pronote, Padlets, sites pédagogiques...) avec vos classes.</div>
+          <div class="dash-card-action">Gérer →</div>
+          <div class="dash-card-accent"></div>
+        </a>
         <a href="pilotage-enseignant.html" class="dash-card dash-card--active">
           <div class="dash-card-icon"><img src="assets/logos panneau de controle/pilotage des competences.png" alt=""></div>
           <div class="dash-card-title">Pilotage des compétences</div>
@@ -471,6 +488,22 @@
     </div>
   </div>
 
+  <!-- Choix de classe (carte "Liens de la classe", enseignants à plusieurs classes) -->
+  <div class="modal-overlay" id="cl-picker-overlay" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Choisir une classe</h2>
+        <button class="modal-close" onclick="closeClassPicker()" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="cl-picker-list" id="cl-picker-list"></div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" type="button" onclick="closeClassPicker()">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- FOOTER -->
   <footer>
   <div class="footer__inner">
@@ -504,6 +537,28 @@
       document.title = 'Espace enseignant — ' + profile.display_name + ' — LFM';
 
       document.getElementById('dash-logout-btn').addEventListener('click', () => lfmAuth.signOut());
+
+      /* Carte "Liens de la classe" : une seule classe → gestion des liens
+         directement ; plusieurs classes → choix préalable (modal) avant
+         d'ouvrir classes-enseignant.html?class=<id>&modal=links, qui rouvre
+         le modal-links déjà implémenté là-bas (voir applyView()). */
+      document.getElementById('card-class-links').addEventListener('click', async e => {
+        e.preventDefault();
+        try {
+          const classes = await lfmTeacher.getClasses();
+          if (!classes.length) {
+            showToast('Créez d\'abord une classe pour pouvoir y ajouter des liens.', 'error');
+            return;
+          }
+          if (classes.length === 1) {
+            window.location.href = `classes-enseignant.html?class=${classes[0].id}&modal=links`;
+            return;
+          }
+          openClassPicker(classes);
+        } catch (err) {
+          showToast('Erreur : ' + err.message, 'error');
+        }
+      });
 
       /* Affichage du bandeau fin d'année, piloté depuis l'espace admin */
       lfmEoyBanner.getBandeauState()
@@ -549,8 +604,79 @@
         document.getElementById('stat-eleves').textContent  = '—';
       }
     })();
+
+    function openClassPicker(classes) {
+      document.getElementById('cl-picker-list').innerHTML = classes.map(c => `
+        <button type="button" class="cl-picker-item" onclick="window.location.href='classes-enseignant.html?class=${c.id}&modal=links'">
+          <span class="cl-picker-item-name">${esc(c.name)}</span>
+          <span class="cl-picker-item-arrow">→</span>
+        </button>
+      `).join('');
+      document.getElementById('cl-picker-overlay').style.display = 'flex';
+    }
+
+    function closeClassPicker() {
+      document.getElementById('cl-picker-overlay').style.display = 'none';
+    }
+
+    function esc(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    let _toastTimer;
+    function showToast(msg, type) {
+      clearTimeout(_toastTimer);
+      document.querySelector('.toast')?.remove();
+      const t       = document.createElement('div');
+      t.className   = 'toast' + (type === 'error' ? ' is-error' : '');
+      t.textContent = msg;
+      document.body.appendChild(t);
+      _toastTimer = setTimeout(() => t.remove(), 3000);
+    }
   </script>
 <style>
+    /* ─── Modal choix de classe (carte "Liens de la classe") ─────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(10,25,60,0.45);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; padding: 24px;
+    }
+    .modal {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: 0 24px 64px rgba(16,43,106,0.22);
+      width: 100%; max-width: 420px;
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 0; }
+    .modal-title { font-weight: 800; font-size: 17px; color: var(--blue); }
+    .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--muted); line-height: 1; padding: 2px 6px; border-radius: 6px; }
+    .modal-close:hover { color: var(--red); background: rgba(214,40,57,0.07); }
+    .modal-body { padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 16px; }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; }
+    .cl-picker-list { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; }
+    .cl-picker-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+      background: none; cursor: pointer; font-family: inherit; text-align: left; width: 100%;
+      transition: border-color 180ms, background 180ms;
+    }
+    .cl-picker-item:hover { border-color: var(--blue); background: rgba(16,43,106,0.04); }
+    .cl-picker-item-name { font-weight: 700; font-size: 14px; color: var(--text); }
+    .cl-picker-item-arrow { color: var(--blue); font-weight: 700; }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--blue); color: #fff; padding: 12px 22px; border-radius: 100px;
+      font-size: 14px; font-weight: 600; box-shadow: var(--shadow-md); z-index: 2000;
+    }
+    .toast.is-error { background: var(--red); }
+
     /* ─── FOOTER PROFICIAMUS ─── */
     footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
     .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
