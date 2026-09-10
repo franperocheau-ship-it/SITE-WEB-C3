@@ -16,6 +16,7 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=4"></script>
+  <script src="js/competence-order.js?v=1"></script>
   <style>
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
     .dash-content { max-width: 960px; margin: 0 auto; }
@@ -98,61 +99,6 @@
     .empty-icon { font-size: 40px; margin-bottom: 12px; }
     .empty-text { font-size: 15px; margin-bottom: 20px; }
 
-    /* ── Mode d'accès (libre / guidé) — déménagé depuis classes-enseignant.html ── */
-    .access-card {
-      background: var(--card-bg);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-sm);
-      padding: 22px 26px;
-      margin-bottom: 20px;
-    }
-    .access-card-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .access-card-title {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 16px;
-      color: var(--color-brand-navy);
-    }
-    .access-card-sub {
-      font-size: 12.5px;
-      color: var(--muted);
-      margin-top: 3px;
-    }
-    .access-toggle {
-      display: flex;
-      gap: 4px;
-      background: var(--bg);
-      border-radius: 100px;
-      padding: 4px;
-      flex-shrink: 0;
-    }
-    .access-toggle-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 16px;
-      border: none;
-      border-radius: 100px;
-      background: none;
-      font-family: var(--font-display);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-      transition: background 180ms, color 180ms;
-      white-space: nowrap;
-    }
-    .access-toggle-btn:disabled { opacity: 0.6; cursor: default; }
-    .access-toggle-btn[data-mode="libre"].is-active { background: var(--color-brand-navy); color: #fff; }
-    .access-toggle-btn[data-mode="guide"].is-active { background: var(--color-niveau-cm1); color: #fff; }
-
-    .access-panel { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 18px; }
     .access-panel-head {
       display: flex;
       align-items: center;
@@ -174,49 +120,70 @@
     }
     .access-tree { display: flex; flex-direction: column; gap: 8px; }
 
-    /* ── Cible du parcours guidé (classe / groupe / élève) ───────────────────── */
-    .access-target-row {
+    /* ── Onglets Navigation libre / Parcours guidé ───────────────────────────── */
+    .pilot-tabs {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-    }
-    .access-target-row .form-label { margin: 0; white-space: nowrap; }
-    .access-target-select { max-width: 300px; width: auto; flex-shrink: 1; }
-    .access-target-hint {
-      font-size: 12.5px;
-      color: var(--muted);
-      line-height: 1.5;
-      margin: -6px 0 14px;
-    }
-    .access-dot-legend { display: inline-block; margin-top: 2px; }
-
-    .access-inherit-banner {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      background: rgba(29,191,160,0.10);
-      border: 1px solid rgba(29,191,160,0.30);
-      border-radius: 10px;
-      padding: 10px 14px;
-      margin-bottom: 14px;
-      font-size: 13px;
-      color: var(--color-brand-navy);
-    }
-    .access-inherit-banner strong { font-weight: 700; }
-    .perso-badge-inline {
-      display: inline-flex; align-items: center; gap: 4px;
-      background: rgba(245,166,35,0.18);
-      border: 1px solid rgba(245,166,35,0.4);
-      color: var(--color-brand-navy);
+      gap: 4px;
+      background: var(--card-bg);
       border-radius: 100px;
-      padding: 3px 11px;
-      font-size: 12px;
-      font-weight: 700;
+      box-shadow: var(--shadow-sm);
+      padding: 4px;
+      margin-bottom: 20px;
+      width: fit-content;
     }
+    .pilot-tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 100px;
+      background: none;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 180ms, color 180ms;
+      white-space: nowrap;
+    }
+    .pilot-tab:disabled { opacity: 0.6; cursor: default; }
+    .pilot-tab[data-mode="libre"].is-active { background: var(--color-brand-navy); color: #fff; }
+    .pilot-tab[data-mode="guide"].is-active { background: var(--color-niveau-cm1); color: #fff; }
+
+    .pilot-panel {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 24px 26px;
+      margin-bottom: 20px;
+    }
+    .pilot-explain { font-size: 15px; color: var(--text); line-height: 1.6; margin: 0; }
+    #panel-guide .pilot-explain { margin-bottom: 18px; }
+
+    /* ── Interrupteur oui/non par compétence (style iOS) ─────────────────────── */
+    .ax-switch { position: relative; width: 44px; height: 26px; flex-shrink: 0; }
+    .ax-switch input {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      margin: 0; opacity: 0; cursor: pointer; z-index: 2;
+    }
+    .ax-switch-track {
+      position: absolute; inset: 0;
+      background: var(--border);
+      border-radius: 100px;
+      transition: background 180ms;
+    }
+    .ax-switch-thumb {
+      position: absolute; top: 3px; left: 3px;
+      width: 20px; height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+      transition: transform 180ms;
+    }
+    .ax-switch input:checked ~ .ax-switch-track { background: var(--color-niveau-cm1); }
+    .ax-switch input:checked ~ .ax-switch-thumb { transform: translateX(18px); }
+    .ax-switch input:disabled ~ .ax-switch-track { opacity: 0.5; }
 
     .ax-domaine { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
     .ax-domaine-summary {
@@ -257,35 +224,20 @@
     }
     .ax-notion-summary:hover { background: var(--bg); }
     .ax-notion.is-open > .ax-notion-summary .ax-caret { transform: rotate(90deg); }
-    .ax-notion-count { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--muted); }
     .ax-exercises { padding: 2px 0 6px 24px; display: none; flex-direction: column; gap: 2px; }
     .ax-notion.is-open > .ax-exercises { display: flex; }
-
-    .ax-group-label {
-      font-family: var(--font-display);
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 10px 10px 2px;
-    }
-    .ax-group-label:first-child { padding-top: 4px; }
 
     .ax-row {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 7px 10px;
+      padding: 8px 10px;
       border-radius: 8px;
       font-size: 13.5px;
       color: var(--text);
     }
     .ax-row:hover { background: var(--bg); }
-    .ax-row label { flex: 1; cursor: pointer; }
-    .ax-check { width: 17px; height: 17px; accent-color: var(--color-niveau-cm1); cursor: pointer; flex-shrink: 0; }
-    .ax-notion-summary .ax-check,
-    .ax-domaine-summary .ax-check { accent-color: var(--color-brand-navy); }
+    .ax-row label.ax-comp-label { flex: 1; cursor: pointer; }
 
     .ax-status { width: 16px; height: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .ax-spinner {
@@ -310,81 +262,6 @@
       font-size: 13.5px;
     }
     .ax-loading .ax-spinner { width: 15px; height: 15px; border-width: 2.5px; }
-
-    /* ── Progression dans les niveaux (Lot C, competence_settings) ──────────── */
-    .comp-card {
-      background: var(--card-bg);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-sm);
-      padding: 22px 26px;
-      margin-bottom: 20px;
-    }
-    .comp-card-title {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 16px;
-      color: var(--color-brand-navy);
-      margin-bottom: 3px;
-    }
-    .comp-card-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 16px; }
-
-    .comp-domaine { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 10px; }
-    .comp-domaine:last-child { margin-bottom: 0; }
-    .comp-domaine-summary {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      background: rgba(26,45,107,0.05);
-      cursor: pointer;
-      font-family: var(--font-display);
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--color-brand-navy);
-      flex-wrap: wrap;
-    }
-    .comp-domaine.is-open > .comp-domaine-summary .ax-caret { transform: rotate(90deg); }
-    .comp-domaine-actions { display: flex; gap: 6px; margin-left: auto; }
-    .comp-rows { padding: 6px 10px 10px; display: none; flex-direction: column; gap: 2px; }
-    .comp-domaine.is-open > .comp-rows { display: flex; }
-
-    .comp-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 10px;
-      border-radius: 8px;
-      flex-wrap: wrap;
-    }
-    .comp-row:hover { background: var(--bg); }
-    .comp-name { flex: 1; min-width: 180px; font-size: 13.5px; color: var(--text); }
-    .comp-row--mixed { background: rgba(245,166,35,0.06); }
-    .comp-mixed-tag {
-      font-size: 11px; font-weight: 700; color: #B8791A;
-      background: rgba(245,166,35,0.16); border-radius: 100px; padding: 2px 9px;
-      cursor: help; white-space: nowrap;
-    }
-    .comp-toggle {
-      display: flex; gap: 4px;
-      background: var(--bg);
-      border-radius: 100px;
-      padding: 3px;
-      flex-shrink: 0;
-    }
-    .comp-toggle-btn {
-      padding: 7px 14px;
-      border: none;
-      border-radius: 100px;
-      background: none;
-      font-family: inherit;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      cursor: pointer;
-      transition: background 180ms, color 180ms;
-      white-space: nowrap;
-    }
-    .comp-toggle-btn.is-active { background: var(--color-brand-navy); color: #fff; }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -456,44 +333,25 @@
           <span class="class-picker-meta" id="class-picker-meta"></span>
         </div>
 
-        <!-- Section 1 : Exercices visibles (mode d'accès, déménagé depuis Mes classes) -->
-        <div class="access-card">
-          <div class="access-card-head">
-            <div>
-              <div class="access-card-title">Exercices visibles</div>
-              <div class="access-card-sub" id="access-sub">Navigation libre : les élèves voient tout le catalogue.</div>
-            </div>
-            <div class="access-toggle" id="access-toggle">
-              <button type="button" class="access-toggle-btn" data-mode="libre">🔓 Navigation libre</button>
-              <button type="button" class="access-toggle-btn" data-mode="guide">🎯 Parcours guidé</button>
-            </div>
-          </div>
-          <div class="access-panel" id="access-panel" style="display:none">
-            <div class="access-target-row">
-              <label class="form-label" for="ax-target-select">Configurer les exercices pour :</label>
-              <select class="form-select access-target-select" id="ax-target-select"></select>
-            </div>
-            <p class="access-target-hint">
-              🎯 Ici, vous choisissez quels exercices sont débloqués (pour la classe, un groupe ou un élève).
-              L'appartenance des élèves aux groupes se règle dans le tableau Élèves de Mes classes.
-              <span class="access-dot-legend">« ● » devant un nom = des exercices sont déjà configurés pour cette cible — pour un élève, cette liste personnelle prime toujours sur son groupe.</span>
-            </p>
-            <div class="access-inherit-banner" id="access-inherit-banner" style="display:none"></div>
-            <div class="access-panel-head">
-              <input class="form-input access-search" id="ax-search" type="text" placeholder="🔍 Rechercher un exercice…">
-              <span class="access-counter" id="ax-counter">0 exercices actifs sur 0</span>
-            </div>
-            <div class="access-tree" id="ax-tree"></div>
-          </div>
+        <!-- Onglets Navigation libre / Parcours guidé -->
+        <div class="pilot-tabs" id="pilot-tabs">
+          <button type="button" class="pilot-tab" data-mode="libre">🔓 Navigation libre</button>
+          <button type="button" class="pilot-tab" data-mode="guide">🎯 Parcours guidé</button>
         </div>
 
-        <!-- Section 2 : Progression dans les niveaux (Lot C, nouveau) -->
-        <div class="comp-card">
-          <div class="comp-card-title">Progression dans les niveaux</div>
-          <div class="comp-card-sub">
-            Par défaut, les niveaux se débloquent un par un (80 % de réussite requis). « Niveaux ouverts » rend tous les niveaux d'une compétence accessibles d'emblée.
+        <!-- Onglet : Navigation libre -->
+        <div class="pilot-panel" id="panel-libre" style="display:none">
+          <p class="pilot-explain">Tous les exercices du site sont accessibles librement à tous les élèves de votre classe.</p>
+        </div>
+
+        <!-- Onglet : Parcours guidé -->
+        <div class="pilot-panel" id="panel-guide" style="display:none">
+          <p class="pilot-explain">Vous choisissez les compétences accessibles à vos élèves. Seules les compétences activées ci-dessous leur seront visibles.</p>
+          <div class="access-panel-head">
+            <input class="form-input access-search" id="ax-search" type="text" placeholder="🔍 Rechercher une compétence…">
+            <span class="access-counter" id="ax-counter">0 compétences activées sur 0</span>
           </div>
-          <div id="comp-tree"><div class="ax-loading"><span class="ax-spinner"></span> Chargement…</div></div>
+          <div class="access-tree" id="ax-tree"></div>
         </div>
 
       </div>
@@ -529,23 +387,14 @@
   ═══════════════════════════════════════════════════════════════════════════ */
   let _classes      = [];
   let _currentClass = null;
-  let _students     = [];
-  let _groups       = [];
 
-  /* ── Section 1 : mode d'accès aux exercices (libre / guidé, v7/v9) ──────────── */
-  let _activeExerciseIds   = new Set();
-  let _openGroups          = new Set();
-  let _exerciseTreeCache   = null;
-  let _currentTarget       = { type: 'class', id: null };
-  let _configuredGroupIds  = new Set();
-  let _configuredStudentIds = new Set();
-  let _studentInherit      = null; // { source: 'group'|'class', list: string[], groupName?: string } | null
-  let _studentPersonalized = false;
-
-  /* ── Section 2 : progression dans les niveaux (competence_settings, Lot C) ──── */
-  let _competenceSettings    = new Map(); // exercise_id -> 'ouvert' (absent = progressif)
-  let _competenceTreeCache   = null;
-  let _openCompetenceGroups  = new Set();
+  /* ── Parcours guidé (mode_acces, v7) — un seul toggle par compétence, à
+     l'échelle de la classe entière (plus de ciblage groupe/élève ni de
+     réglage "progression dans les niveaux" séparé sur cet écran, refonte
+     2026-09 : voir class_active_exercises, table inchangée). ── */
+  let _activeExerciseIds       = new Set();
+  let _openGroups              = new Set();
+  let _competenceAccessTreeCache = null;
 
   function esc(str) {
     return String(str ?? '')
@@ -619,28 +468,11 @@
       `${_currentClass.student_count} élève${_currentClass.student_count !== 1 ? 's' : ''}`;
 
     /* Repart toujours de zéro à chaque changement de classe — pas de
-       mémorisation de la dernière cible/recherche/accordéon entre classes. */
-    _currentTarget        = { type: 'class', id: classId };
-    _studentInherit       = null;
-    _studentPersonalized  = false;
-    _openGroups           = new Set();
-    _openCompetenceGroups = new Set();
+       mémorisation de la dernière recherche/accordéon entre classes. */
+    _openGroups = new Set();
     document.getElementById('ax-search').value = '';
 
-    try {
-      const [students, groups] = await Promise.all([
-        lfmTeacher.getStudents(classId),
-        lfmTeacher.getGroups(classId)
-      ]);
-      _students = students;
-      _groups   = groups;
-    } catch (e) {
-      showToast('Erreur lors du chargement de la classe', 'error');
-      return;
-    }
-
-    renderAccessCard();
-    loadCompetenceSection();
+    renderPilotTabs();
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
@@ -679,9 +511,43 @@
     return _exerciseAssetsPromise;
   }
 
+  /* ═══════════════════════════════════════════════════════════════════════════
+     ONGLETS Navigation libre / Parcours guidé (mode_acces de la classe)
+  ═══════════════════════════════════════════════════════════════════════════ */
+
+  function renderPilotTabs() {
+    const mode = _currentClass.mode_acces || 'libre';
+    document.querySelectorAll('.pilot-tab').forEach(btn => {
+      btn.classList.toggle('is-active', btn.dataset.mode === mode);
+    });
+    document.getElementById('panel-libre').style.display = mode === 'libre' ? 'block' : 'none';
+    document.getElementById('panel-guide').style.display = mode === 'guide' ? 'block' : 'none';
+    if (mode === 'guide') ensureExerciseDataLoaded();
+  }
+
+  document.getElementById('pilot-tabs').addEventListener('click', async e => {
+    const btn = e.target.closest('.pilot-tab');
+    if (!btn || btn.classList.contains('is-active')) return;
+    const newMode = btn.dataset.mode;
+
+    document.querySelectorAll('.pilot-tab').forEach(b => b.disabled = true);
+    try {
+      await lfmTeacher.updateClassAccessMode(_currentClass.id, newMode);
+      _currentClass.mode_acces = newMode;
+      const idx = _classes.findIndex(c => c.id === _currentClass.id);
+      if (idx !== -1) _classes[idx].mode_acces = newMode;
+      renderPilotTabs();
+      showToast(newMode === 'guide' ? 'Parcours guidé activé' : 'Navigation libre activée');
+    } catch (err) {
+      showToast('Erreur : ' + err.message, 'error');
+    } finally {
+      document.querySelectorAll('.pilot-tab').forEach(b => b.disabled = false);
+    }
+  });
+
   async function ensureExerciseDataLoaded() {
     if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined') {
-      await onGuidedPanelReady();
+      await loadActiveExercisesAndRender();
       return;
     }
     document.getElementById('ax-tree').innerHTML = '<div class="ax-loading"><span class="ax-spinner"></span> Chargement du catalogue des exercices…</div>';
@@ -689,225 +555,71 @@
     try {
       await loadExerciseAssets();
       document.getElementById('ax-search').disabled = false;
-      await onGuidedPanelReady();
+      await loadActiveExercisesAndRender();
     } catch (err) {
       document.getElementById('ax-tree').innerHTML = `<div class="ax-empty">${esc(err.message)}</div>`;
     }
   }
 
+  async function loadActiveExercisesAndRender() {
+    _activeExerciseIds = new Set(await lfmTeacher.getActiveExercises(_currentClass.id));
+    renderAccessTree();
+  }
+
   /* ═══════════════════════════════════════════════════════════════════════════
-     SECTION 1 — EXERCICES VISIBLES (mode d'accès, déménagé depuis
-     classes-enseignant.html — comportement identique, tables v7/v9 inchangées)
+     PARCOURS GUIDÉ — un toggle par compétence (fusion des anciennes sections
+     "Exercices visibles" et "Progression dans les niveaux" : la progression
+     par paliers reste toujours 'progressif', competence_settings n'est plus
+     alimentée depuis cet écran)
   ═══════════════════════════════════════════════════════════════════════════ */
 
   function axNormalize(str) {
     return String(str ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   }
 
-  async function onGuidedPanelReady() {
-    await refreshConfiguredIndicators();
-    populateTargetSelector();
-    await loadActiveSetForTarget();
-    renderAccessTree();
-  }
+  /* Rattachement d'AFFICHAGE uniquement pour cette arborescence de pilotage —
+     n'affecte ni exercise-data.js/data/*.js, ni les pages domaine élève. Ces
+     2 exercices ont une `competence` réelle "Nombres décimaux — ..." mais
+     l'enseignant les retrouve plus naturellement sous "Fractions" ici.
+     Décision utilisateur du 2026-09-10. */
+  const PILOTAGE_NOTION_OVERRIDE = {
+    'fraction-decimale-grille-droite':      'Fractions',
+    'fraction-decimale-tableau-numeration': 'Fractions'
+  };
 
-  async function refreshConfiguredIndicators() {
-    const groupIds   = _groups.map(g => g.id);
-    const studentIds = _students.map(s => s.id);
-    const [configuredGroups, configuredStudents] = await Promise.all([
-      lfmTeacher.getGroupIdsWithActiveExercises(groupIds),
-      lfmTeacher.getStudentIdsWithActiveExercises(studentIds)
-    ]);
-    _configuredGroupIds   = new Set(configuredGroups);
-    _configuredStudentIds = new Set(configuredStudents);
-  }
+  /* matière (ex.domaine / category) → domaine (préfixe de ex.competence, ou
+     subCategory pour les exercices autonomes) → compétence (libellé complet,
+     ou title pour les autonomes) → tous les exercise_id qu'elle recouvre. Un
+     seul toggle par compétence pilote l'ensemble de ces exercise_id à la fois. */
+  function buildCompetenceAccessTree() {
+    if (_competenceAccessTreeCache) return _competenceAccessTreeCache;
+    const byDomaine = {};
 
-  function populateTargetSelector() {
-    const sel = document.getElementById('ax-target-select');
-    const prevValue = _currentTarget.type === 'class' ? 'class' : `${_currentTarget.type}:${_currentTarget.id}`;
-
-    let html = `<option value="class">Toute la classe</option>`;
-
-    if (_groups.length) {
-      html += `<optgroup label="Groupes">` + _groups.map(g => {
-        const dot = _configuredGroupIds.has(g.id) ? '● ' : '';
-        return `<option value="group:${g.id}">${dot}${esc(g.name)}</option>`;
-      }).join('') + `</optgroup>`;
-    }
-
-    if (_students.length) {
-      html += `<optgroup label="Élèves">` + _students.map(s => {
-        const dot = _configuredStudentIds.has(s.id) ? '● ' : '';
-        return `<option value="student:${s.id}">${dot}${esc(s.display_name)}</option>`;
-      }).join('') + `</optgroup>`;
-    }
-
-    sel.innerHTML = html;
-    sel.value = prevValue;
-    if (sel.value !== prevValue) {
-      _currentTarget = { type: 'class', id: _currentClass.id };
-      sel.value = 'class';
-    }
-  }
-
-  document.getElementById('ax-target-select').addEventListener('change', async e => {
-    const val = e.target.value;
-    if (val === 'class') {
-      _currentTarget = { type: 'class', id: _currentClass.id };
-    } else {
-      const [type, id] = val.split(':');
-      _currentTarget = { type, id };
-    }
-    await loadActiveSetForTarget();
-    renderAccessTree();
-  });
-
-  async function loadActiveSetForTarget() {
-    _studentInherit       = null;
-    _studentPersonalized  = false;
-
-    if (_currentTarget.type === 'class') {
-      _activeExerciseIds = new Set(await lfmTeacher.getActiveExercises(_currentClass.id));
-    } else if (_currentTarget.type === 'group') {
-      _activeExerciseIds = new Set(await lfmTeacher.getActiveExercisesForGroup(_currentTarget.id));
-    } else {
-      const student = _students.find(s => s.id === _currentTarget.id);
-      const personal = await lfmTeacher.getActiveExercisesForStudent(_currentTarget.id);
-
-      let source = 'class', groupName = null, inheritedList = null;
-      if (student && student.group_id) {
-        const groupList = await lfmTeacher.getActiveExercisesForGroup(student.group_id);
-        if (groupList.length > 0) {
-          source = 'group';
-          groupName = _groups.find(g => g.id === student.group_id)?.name || null;
-          inheritedList = groupList;
-        }
-      }
-      if (inheritedList === null) inheritedList = await lfmTeacher.getActiveExercises(_currentClass.id);
-      _studentInherit = { source, groupName, list: inheritedList };
-
-      if (personal.length > 0) {
-        _activeExerciseIds      = new Set(personal);
-        _studentPersonalized    = true;
-      } else {
-        _activeExerciseIds      = new Set(inheritedList);
-        _studentPersonalized    = false;
-      }
-    }
-    renderInheritBanner();
-  }
-
-  /* Correctif UX (bug groupe vs liste perso) : badge plus visible ("🔒 Liste
-     personnelle active") qu'un simple texte, et bouton de réinitialisation
-     toujours à portée — la même action que "↺" dans le tableau Élèves de
-     Mes classes. */
-  function renderInheritBanner() {
-    const banner = document.getElementById('access-inherit-banner');
-    if (_currentTarget.type !== 'student') { banner.style.display = 'none'; return; }
-
-    if (_studentPersonalized) {
-      banner.innerHTML = `
-        <span class="perso-badge-inline">🔒 Liste personnelle active — prime sur le groupe</span>
-        <button type="button" class="btn btn-outline btn-sm" onclick="revertCurrentStudent()">↺ Réinitialiser (revenir à la liste héritée)</button>
-      `;
-    } else {
-      const label = _studentInherit.source === 'group'
-        ? `la liste du groupe <strong>${esc(_studentInherit.groupName || '?')}</strong>`
-        : `la liste de la classe`;
-      const canPersonalize = _studentInherit.list.length > 0;
-      banner.innerHTML = `
-        <span>Cet élève suit actuellement ${label} (pas de liste personnelle).</span>
-        ${canPersonalize ? `<button type="button" class="btn btn-primary btn-sm" onclick="personalizeCurrentStudent()">Personnaliser</button>` : ''}
-      `;
-    }
-    banner.style.display = 'flex';
-  }
-
-  async function personalizeCurrentStudent() {
-    if (_currentTarget.type !== 'student' || !_studentInherit || !_studentInherit.list.length) return;
-    const studentId = _currentTarget.id;
-    try {
-      await lfmTeacher.addActiveExercisesBulkToStudent(studentId, _studentInherit.list);
-      _configuredStudentIds.add(studentId);
-      showToast('Liste personnalisée à partir de la liste héritée');
-      await loadActiveSetForTarget();
-      populateTargetSelector();
-      renderAccessTree();
-    } catch (err) {
-      showToast('Erreur : ' + err.message, 'error');
-    }
-  }
-
-  async function revertCurrentStudent() {
-    if (_currentTarget.type !== 'student') return;
-    const studentId = _currentTarget.id;
-    try {
-      await lfmTeacher.clearActiveExercisesForStudent(studentId);
-      _configuredStudentIds.delete(studentId);
-      showToast('Retour à la liste héritée');
-      await loadActiveSetForTarget();
-      populateTargetSelector();
-      renderAccessTree();
-    } catch (err) {
-      showToast('Erreur : ' + err.message, 'error');
-    }
-  }
-
-  function axApi() {
-    if (_currentTarget.type === 'group') {
-      return {
-        add: lfmTeacher.addActiveExerciseToGroup,
-        remove: lfmTeacher.removeActiveExerciseFromGroup,
-        addBulk: lfmTeacher.addActiveExercisesBulkToGroup,
-        removeBulk: lfmTeacher.removeActiveExercisesBulkFromGroup,
-        targetId: _currentTarget.id
-      };
-    }
-    if (_currentTarget.type === 'student') {
-      return {
-        add: lfmTeacher.addActiveExerciseToStudent,
-        remove: lfmTeacher.removeActiveExerciseFromStudent,
-        addBulk: lfmTeacher.addActiveExercisesBulkToStudent,
-        removeBulk: lfmTeacher.removeActiveExercisesBulkFromStudent,
-        targetId: _currentTarget.id
-      };
-    }
-    return {
-      add: lfmTeacher.addActiveExercise,
-      remove: lfmTeacher.removeActiveExercise,
-      addBulk: lfmTeacher.addActiveExercisesBulk,
-      removeBulk: lfmTeacher.removeActiveExercisesBulk,
-      targetId: _currentClass.id
-    };
-  }
-
-  function buildExerciseTree() {
-    if (_exerciseTreeCache) return _exerciseTreeCache;
-    const byCategory = {};
-
-    function addItem(category, subCategory, slug, title) {
-      if (!category || !subCategory) {
+    function addToTree(domaine, notion, competenceKey, competenceLabel, slug) {
+      if (!domaine || !notion) {
         console.warn('[Parcours guidé] Exercice sans catégorie reconnue, exclu du panneau :', slug);
         return;
       }
-      if (!byCategory[category]) byCategory[category] = {};
-      if (!byCategory[category][subCategory]) byCategory[category][subCategory] = [];
-      byCategory[category][subCategory].push({ slug, title });
+      if (!byDomaine[domaine]) byDomaine[domaine] = {};
+      if (!byDomaine[domaine][notion]) byDomaine[domaine][notion] = {};
+      if (!byDomaine[domaine][notion][competenceKey]) byDomaine[domaine][notion][competenceKey] = { label: competenceLabel, exerciseIds: [] };
+      byDomaine[domaine][notion][competenceKey].exerciseIds.push(slug);
     }
 
     Object.keys(EXERCISE_DATA).forEach(slug => {
       const ex     = EXERCISE_DATA[slug];
       const sepIdx = ex.competence.indexOf(' — ');
-      const subCategory = sepIdx !== -1 ? ex.competence.slice(0, sepIdx) : ex.competence;
-      addItem(ex.domaine, subCategory, slug, ex.title);
+      const notion = PILOTAGE_NOTION_OVERRIDE[slug] || (sepIdx !== -1 ? ex.competence.slice(0, sepIdx) : ex.competence);
+      const label  = sepIdx !== -1 ? ex.competence.slice(sepIdx + 3) : ex.competence;
+      addToTree(ex.domaine, notion, ex.competence, label, slug);
     });
 
     EXERCISE_CATALOG_AUTONOMOUS.forEach(({ slug, title, category, subCategory }) => {
-      addItem(category, subCategory, slug, title);
+      addToTree(category, subCategory, `${category}::${subCategory}::${title}`, title, slug);
     });
 
     const DOMAINE_ORDER = ['Français', 'Mathématiques'];
-    const domaines = Object.keys(byCategory).sort((a, b) => {
+    const domaines = Object.keys(byDomaine).sort((a, b) => {
       const ia = DOMAINE_ORDER.indexOf(a), ib = DOMAINE_ORDER.indexOf(b);
       if (ia === -1 && ib === -1) return a.localeCompare(b, 'fr');
       if (ia === -1) return 1;
@@ -915,101 +627,60 @@
       return ia - ib;
     });
 
-    _exerciseTreeCache = domaines.map(domaine => ({
+    _competenceAccessTreeCache = domaines.map(domaine => ({
       domaine,
-      notions: Object.keys(byCategory[domaine]).sort((a, b) => a.localeCompare(b, 'fr')).map(notion => ({
+      notions: Object.keys(byDomaine[domaine]).sort((a, b) => a.localeCompare(b, 'fr')).map(notion => ({
         notion,
-        items: applyGroupOrder(domaine, notion, byCategory[domaine][notion])
+        competences: sortCompetencesForNotion(domaine, notion, Object.values(byDomaine[domaine][notion]))
       }))
     }));
-    return _exerciseTreeCache;
+    return _competenceAccessTreeCache;
   }
 
-  function applyGroupOrder(domaine, notion, rawItems) {
-    const groupDefs = EXERCISE_CATALOG_GROUPS[domaine] && EXERCISE_CATALOG_GROUPS[domaine][notion];
-    if (!groupDefs) return rawItems.slice().sort((a, b) => a.title.localeCompare(b.title, 'fr'));
+  /* Ordre pédagogique (js/competence-order.js) = ordre déjà affiché sur la
+     page d'exercices élève/enseignant du domaine (ex. français-conjugaison.html),
+     PAS un ordre alphabétique. Une compétence absente de la liste (nouvel
+     exercice non encore référencé dans competence-order.js) retombe en fin de
+     groupe par ordre alphabétique, avec un avertissement console. */
+  function sortCompetencesForNotion(domaine, notion, competences) {
+    const orderList = (window.COMPETENCE_ORDER && window.COMPETENCE_ORDER[`${domaine}::${notion}`]) || null;
 
-    const bySlug = new Map(rawItems.map(it => [it.slug, it]));
-    const used   = new Set();
-    const items  = [];
+    const sorted = competences.slice().sort((a, b) => {
+      const ia = orderList ? orderList.indexOf(a.exerciseIds[0]) : -1;
+      const ib = orderList ? orderList.indexOf(b.exerciseIds[0]) : -1;
+      if (ia === -1 && ib === -1) return a.label.localeCompare(b.label, 'fr');
+      if (ia === -1) return 1;
+      if (ib === -1) return -1;
+      return ia - ib;
+    });
 
-    groupDefs.forEach(({ groupe, slugs }) => {
-      slugs.forEach(slug => {
-        const it = bySlug.get(slug);
-        if (!it) return;
-        used.add(slug);
-        items.push({ ...it, groupe });
+    if (orderList) {
+      sorted.forEach(c => {
+        if (!orderList.includes(c.exerciseIds[0])) {
+          console.warn('[Parcours guidé] Compétence sans ordre défini dans competence-order.js pour', domaine, '/', notion, '— repli alphabétique :', c.label, c.exerciseIds[0]);
+        }
       });
-    });
-
-    const rest = rawItems
-      .filter(it => !used.has(it.slug))
-      .sort((a, b) => a.title.localeCompare(b.title, 'fr'));
-
-    return items.concat(rest);
-  }
-
-  function exerciseTotalCount() {
-    return Object.keys(EXERCISE_DATA).length + EXERCISE_CATALOG_AUTONOMOUS.length;
-  }
-
-  function renderAccessCard() {
-    const mode = _currentClass.mode_acces || 'libre';
-    document.querySelectorAll('#access-toggle .access-toggle-btn').forEach(btn => {
-      btn.classList.toggle('is-active', btn.dataset.mode === mode);
-    });
-    document.getElementById('access-sub').textContent = mode === 'guide'
-      ? 'Parcours guidé : les élèves ne voient que les exercices activés ci-dessous.'
-      : 'Navigation libre : les élèves voient tout le catalogue.';
-    document.getElementById('access-panel').style.display = mode === 'guide' ? 'block' : 'none';
-    if (mode === 'guide') {
-      document.getElementById('ax-search').value = '';
-      ensureExerciseDataLoaded();
-    } else {
-      document.getElementById('access-inherit-banner').style.display = 'none';
     }
+    return sorted;
   }
 
-  document.getElementById('access-toggle').addEventListener('click', async e => {
-    const btn = e.target.closest('.access-toggle-btn');
-    if (!btn || btn.classList.contains('is-active')) return;
-    const newMode = btn.dataset.mode;
-
-    document.querySelectorAll('#access-toggle .access-toggle-btn').forEach(b => b.disabled = true);
-    try {
-      await lfmTeacher.updateClassAccessMode(_currentClass.id, newMode);
-      _currentClass.mode_acces = newMode;
-      const idx = _classes.findIndex(c => c.id === _currentClass.id);
-      if (idx !== -1) _classes[idx].mode_acces = newMode;
-      renderAccessCard();
-
-      if (newMode === 'guide') {
-        const groupIds   = _groups.map(g => g.id);
-        const studentIds = _students.map(s => s.id);
-        const [cg, cs] = await Promise.all([
-          lfmTeacher.getGroupIdsWithActiveExercises(groupIds),
-          lfmTeacher.getStudentIdsWithActiveExercises(studentIds)
-        ]);
-        showToast(cg.length || cs.length
-          ? 'Parcours guidé activé — des listes de groupe/élève existantes sont réactivées'
-          : 'Parcours guidé activé');
-      } else {
-        showToast('Navigation libre activée');
-      }
-    } catch (err) {
-      showToast('Erreur : ' + err.message, 'error');
-    } finally {
-      document.querySelectorAll('#access-toggle .access-toggle-btn').forEach(b => b.disabled = false);
-    }
-  });
+  function countCompetences() {
+    let total = 0, active = 0;
+    buildCompetenceAccessTree().forEach(({ notions }) => notions.forEach(({ competences }) => competences.forEach(c => {
+      total++;
+      if (c.exerciseIds.every(id => _activeExerciseIds.has(id))) active++;
+    })));
+    return { total, active };
+  }
 
   function updateAxCounter() {
+    const { total, active } = countCompetences();
     document.getElementById('ax-counter').textContent =
-      `${_activeExerciseIds.size} exercice${_activeExerciseIds.size !== 1 ? 's' : ''} actif${_activeExerciseIds.size !== 1 ? 's' : ''} sur ${exerciseTotalCount()}`;
+      `${active} compétence${active !== 1 ? 's' : ''} activée${active !== 1 ? 's' : ''} sur ${total}`;
   }
 
   function renderAccessTree() {
-    const tree  = buildExerciseTree();
+    const tree  = buildCompetenceAccessTree();
     const query = axNormalize(document.getElementById('ax-search').value.trim());
     let html = '';
 
@@ -1017,28 +688,27 @@
       let notionsHtml = '';
       let domaineActive = 0, domaineTotal = 0;
 
-      notions.forEach(({ notion, items }) => {
-        const filtered = query ? items.filter(it => axNormalize(it.title).includes(query)) : items;
+      notions.forEach(({ notion, competences }) => {
+        const filtered = query ? competences.filter(c => axNormalize(c.label).includes(query)) : competences;
         if (filtered.length === 0) return;
 
-        const activeInNotion = filtered.filter(it => _activeExerciseIds.has(it.slug)).length;
-        domaineActive += activeInNotion;
-        domaineTotal  += filtered.length;
+        domaineTotal += filtered.length;
         const notionKey = domaine + '::' + notion;
         const isOpen = _openGroups.has(notionKey) || !!query;
 
-        let lastGroupe = null;
-        const rows = filtered.map(it => {
-          const groupLabel = (it.groupe && it.groupe !== lastGroupe)
-            ? `<div class="ax-group-label">${esc(it.groupe)}</div>`
-            : '';
-          lastGroupe = it.groupe || null;
+        const rows = filtered.map(c => {
+          const isOn = c.exerciseIds.every(id => _activeExerciseIds.has(id));
+          if (isOn) domaineActive++;
+          const inputId = 'ax-comp-' + esc(c.exerciseIds[0]);
           return `
-            ${groupLabel}
-            <div class="ax-row">
-              <input type="checkbox" class="ax-check" id="ax-ex-${esc(it.slug)}" data-slug="${esc(it.slug)}" ${_activeExerciseIds.has(it.slug) ? 'checked' : ''}>
-              <label for="ax-ex-${esc(it.slug)}">${esc(it.title)}</label>
-              <span class="ax-status" data-status-for="${esc(it.slug)}"></span>
+            <div class="ax-row" data-exercise-ids="${esc(c.exerciseIds.join(','))}">
+              <label class="ax-comp-label" for="${inputId}">${esc(c.label)}</label>
+              <span class="ax-status" data-status-for="${esc(c.exerciseIds[0])}"></span>
+              <label class="ax-switch">
+                <input type="checkbox" id="${inputId}" ${isOn ? 'checked' : ''}>
+                <span class="ax-switch-track"></span>
+                <span class="ax-switch-thumb"></span>
+              </label>
             </div>
           `;
         }).join('');
@@ -1047,9 +717,7 @@
           <div class="ax-notion${isOpen ? ' is-open' : ''}" data-notion-key="${esc(notionKey)}">
             <div class="ax-notion-summary" data-toggle="notion">
               <span class="ax-caret">▸</span>
-              <input type="checkbox" class="ax-check" data-notion-all="${esc(notionKey)}">
               <span>${esc(notion)}</span>
-              <span class="ax-notion-count">${activeInNotion}/${filtered.length}</span>
             </div>
             <div class="ax-exercises">${rows}</div>
           </div>
@@ -1063,7 +731,6 @@
         <div class="ax-domaine${isDomaineOpen ? ' is-open' : ''}" data-domaine-key="${esc(domaine)}">
           <div class="ax-domaine-summary" data-toggle="domaine">
             <span class="ax-caret">▸</span>
-            <input type="checkbox" class="ax-check" data-domaine-all="${esc(domaine)}">
             <span>${esc(domaine)}</span>
             <span class="ax-domaine-count">${domaineActive}/${domaineTotal}</span>
           </div>
@@ -1073,34 +740,24 @@
     });
 
     const treeEl = document.getElementById('ax-tree');
-    treeEl.innerHTML = html || '<div class="ax-empty">Aucun exercice ne correspond à la recherche.</div>';
-    updateGroupCheckStates(treeEl);
+    treeEl.innerHTML = html || '<div class="ax-empty">Aucune compétence ne correspond à la recherche.</div>';
     updateAxCounter();
   }
 
-  function updateGroupCheckStates(scope) {
-    scope.querySelectorAll('.ax-notion').forEach(notionEl => {
-      const boxes  = notionEl.querySelectorAll('.ax-exercises input[data-slug]');
-      const all    = boxes.length;
-      const active = Array.from(boxes).filter(b => b.checked).length;
-      const cb     = notionEl.querySelector('[data-notion-all]');
-      cb.checked       = all > 0 && active === all;
-      cb.indeterminate = active > 0 && active < all;
-    });
+  function updateDomaineCounts(scope) {
     scope.querySelectorAll('.ax-domaine').forEach(domaineEl => {
-      const boxes  = domaineEl.querySelectorAll('.ax-exercises input[data-slug]');
-      const all    = boxes.length;
+      const boxes  = domaineEl.querySelectorAll('.ax-row input[type=checkbox]');
+      const total  = boxes.length;
       const active = Array.from(boxes).filter(b => b.checked).length;
-      const cb     = domaineEl.querySelector('[data-domaine-all]');
-      cb.checked       = all > 0 && active === all;
-      cb.indeterminate = active > 0 && active < all;
+      const countEl = domaineEl.querySelector('.ax-domaine-count');
+      if (countEl) countEl.textContent = `${active}/${total}`;
     });
   }
 
   const axTreeEl = document.getElementById('ax-tree');
 
   axTreeEl.addEventListener('click', e => {
-    if (e.target.matches('input[type=checkbox]') || e.target.closest('label')) return;
+    if (e.target.matches('input[type=checkbox]') || e.target.closest('.ax-switch')) return;
     const summary = e.target.closest('[data-toggle]');
     if (!summary) return;
     if (summary.dataset.toggle === 'domaine') {
@@ -1119,14 +776,9 @@
   axTreeEl.addEventListener('change', async e => {
     const cb = e.target;
     if (!cb.matches('input[type=checkbox]')) return;
-
-    if (cb.dataset.slug) {
-      await axToggleExercise(cb.dataset.slug, cb.checked, cb);
-    } else if (cb.dataset.notionAll) {
-      await axToggleGroup(cb, cb.closest('.ax-notion').querySelectorAll('.ax-exercises input[data-slug]'));
-    } else if (cb.dataset.domaineAll) {
-      await axToggleGroup(cb, cb.closest('.ax-domaine').querySelectorAll('.ax-exercises input[data-slug]'));
-    }
+    const row = cb.closest('.ax-row');
+    if (!row) return;
+    await axToggleCompetence(row.dataset.exerciseIds.split(','), cb.checked, cb);
   });
 
   function axShowStatus(slug, state) {
@@ -1142,71 +794,21 @@
     }
   }
 
-  async function axToggleExercise(slug, isActive, checkboxEl) {
-    axShowStatus(slug, 'saving');
-    const api = axApi();
+  async function axToggleCompetence(exerciseIds, isActive, checkboxEl) {
+    const statusKey = exerciseIds[0];
+    axShowStatus(statusKey, 'saving');
     try {
-      if (_currentTarget.type === 'student' && !_studentPersonalized && _studentInherit.list.length) {
-        await lfmTeacher.addActiveExercisesBulkToStudent(_currentTarget.id, _studentInherit.list);
-      }
+      if (isActive) await lfmTeacher.addActiveExercisesBulk(_currentClass.id, exerciseIds);
+      else          await lfmTeacher.removeActiveExercisesBulk(_currentClass.id, exerciseIds);
 
-      if (isActive) await api.add(api.targetId, slug);
-      else          await api.remove(api.targetId, slug);
-
-      if (_currentTarget.type === 'student') {
-        await loadActiveSetForTarget();
-      } else {
-        if (isActive) _activeExerciseIds.add(slug);
-        else          _activeExerciseIds.delete(slug);
-        if (_currentTarget.type === 'group') {
-          if (_activeExerciseIds.size > 0) _configuredGroupIds.add(_currentTarget.id);
-          else _configuredGroupIds.delete(_currentTarget.id);
-        }
-      }
-      axShowStatus(slug, 'saved');
-      updateGroupCheckStates(axTreeEl);
+      exerciseIds.forEach(id => { isActive ? _activeExerciseIds.add(id) : _activeExerciseIds.delete(id); });
+      axShowStatus(statusKey, 'saved');
+      updateDomaineCounts(axTreeEl);
       updateAxCounter();
     } catch (err) {
       checkboxEl.checked = !isActive;
-      axShowStatus(slug, 'idle');
+      axShowStatus(statusKey, 'idle');
       showToast('Erreur : ' + err.message, 'error');
-    }
-  }
-
-  async function axToggleGroup(groupCb, exerciseBoxes) {
-    const turnOn = groupCb.checked;
-    const slugs  = Array.from(exerciseBoxes).map(b => b.dataset.slug);
-    const toChange = slugs.filter(slug => _activeExerciseIds.has(slug) !== turnOn);
-    if (toChange.length === 0) return;
-
-    const api = axApi();
-    toChange.forEach(slug => axShowStatus(slug, 'saving'));
-    try {
-      if (_currentTarget.type === 'student' && !_studentPersonalized && _studentInherit.list.length) {
-        await lfmTeacher.addActiveExercisesBulkToStudent(_currentTarget.id, _studentInherit.list);
-      }
-
-      if (turnOn) await api.addBulk(api.targetId, toChange);
-      else        await api.removeBulk(api.targetId, toChange);
-
-      if (_currentTarget.type === 'student') {
-        await loadActiveSetForTarget();
-      } else {
-        if (turnOn) toChange.forEach(slug => _activeExerciseIds.add(slug));
-        else        toChange.forEach(slug => _activeExerciseIds.delete(slug));
-        if (_currentTarget.type === 'group') {
-          if (_activeExerciseIds.size > 0) _configuredGroupIds.add(_currentTarget.id);
-          else _configuredGroupIds.delete(_currentTarget.id);
-        }
-      }
-      exerciseBoxes.forEach(b => { b.checked = _activeExerciseIds.has(b.dataset.slug); });
-      toChange.forEach(slug => axShowStatus(slug, 'saved'));
-      updateGroupCheckStates(axTreeEl);
-      updateAxCounter();
-    } catch (err) {
-      toChange.forEach(slug => axShowStatus(slug, 'idle'));
-      showToast('Erreur : ' + err.message, 'error');
-      renderAccessTree();
     }
   }
 
@@ -1215,161 +817,6 @@
     clearTimeout(_axSearchTimer);
     _axSearchTimer = setTimeout(renderAccessTree, 120);
   });
-
-  /* ═══════════════════════════════════════════════════════════════════════════
-     SECTION 2 — PROGRESSION DANS LES NIVEAUX (Lot C, competence_settings)
-  ═══════════════════════════════════════════════════════════════════════════ */
-
-  /* Une compétence = un ou plusieurs exercice_id d'EXERCISE_DATA partageant le
-     même libellé `competence`, et ayant plus d'un palier de difficulté réel
-     (rien à faire progresser sinon — le toggle progressif/ouvert agit sur la
-     progression LevelSelect du moteur, pas sur la pertinence pédagogique par
-     niveau scolaire). `paliers` (nombre réel de paliers du moteur) est
-     distinct de `levels` (niveaux scolaires pédagogiques, utilisé par le
-     bulletin/les badges/le catalogue) — voir exercise-data.js. Les exercices
-     "autonomes" (EXERCISE_CATALOG_AUTONOMOUS) n'ont pas de champ `paliers`
-     accessible ici : ils ne sont pas listés dans cette section (limite
-     connue, sans impact — leur niveau_mode reste 'progressif' par défaut,
-     comportement actuel inchangé). */
-  function buildCompetenceTree() {
-    if (_competenceTreeCache) return _competenceTreeCache;
-    const byDomaine = {};
-
-    Object.keys(EXERCISE_DATA).forEach(slug => {
-      const ex = EXERCISE_DATA[slug];
-      if (!ex.paliers || ex.paliers < 2) return;
-      if (!byDomaine[ex.domaine]) byDomaine[ex.domaine] = {};
-      if (!byDomaine[ex.domaine][ex.competence]) byDomaine[ex.domaine][ex.competence] = [];
-      byDomaine[ex.domaine][ex.competence].push(slug);
-    });
-
-    const DOMAINE_ORDER = ['Français', 'Mathématiques'];
-    const domaines = Object.keys(byDomaine).sort((a, b) => {
-      const ia = DOMAINE_ORDER.indexOf(a), ib = DOMAINE_ORDER.indexOf(b);
-      if (ia === -1 && ib === -1) return a.localeCompare(b, 'fr');
-      if (ia === -1) return 1;
-      if (ib === -1) return -1;
-      return ia - ib;
-    });
-
-    _competenceTreeCache = domaines.map(domaine => ({
-      domaine,
-      competences: Object.keys(byDomaine[domaine]).sort((a, b) => a.localeCompare(b, 'fr')).map(competence => ({
-        competence,
-        exerciseIds: byDomaine[domaine][competence]
-      }))
-    }));
-    return _competenceTreeCache;
-  }
-
-  async function loadCompetenceSection() {
-    document.getElementById('comp-tree').innerHTML = '<div class="ax-loading"><span class="ax-spinner"></span> Chargement…</div>';
-    try {
-      await loadExerciseAssets();
-      const rows = await lfmTeacher.getCompetenceSettings(_currentClass.id);
-      _competenceSettings = new Map(rows.map(r => [r.exercise_id, r.niveau_mode]));
-      renderCompetenceSection();
-    } catch (err) {
-      document.getElementById('comp-tree').innerHTML = `<div class="ax-empty">${esc(err.message)}</div>`;
-    }
-  }
-
-  /* Cohérence des compétences couvrant plusieurs exercice_id (rares, ~2 sur
-     78) : si les réglages divergent en base (état hérité), affichage "Mixte"
-     — cliquer un mode force TOUS les exercice_id de cette compétence à ce
-     même mode (résout la divergence immédiatement, pas de résolution
-     silencieuse à la lecture). */
-  function renderCompetenceSection() {
-    const tree = buildCompetenceTree();
-    let html = '';
-
-    tree.forEach(({ domaine, competences }) => {
-      const rows = competences.map(({ competence, exerciseIds }) => {
-        const modes         = exerciseIds.map(id => _competenceSettings.get(id) || 'progressif');
-        const allOuvert      = modes.every(m => m === 'ouvert');
-        const allProgressif  = modes.every(m => m === 'progressif');
-        const mixed          = !allOuvert && !allProgressif;
-        return `
-          <div class="comp-row${mixed ? ' comp-row--mixed' : ''}" data-competence="${esc(competence)}" data-exercise-ids="${esc(exerciseIds.join(','))}">
-            <span class="comp-name">${esc(competence)}</span>
-            ${mixed ? `<span class="comp-mixed-tag" title="Cette compétence couvre plusieurs exercices dont les réglages divergent. Cliquez un mode pour les harmoniser.">⚠ Mixte</span>` : ''}
-            <div class="comp-toggle">
-              <button type="button" class="comp-toggle-btn${!mixed && allProgressif ? ' is-active' : ''}" data-mode="progressif">Niveaux progressifs</button>
-              <button type="button" class="comp-toggle-btn${allOuvert ? ' is-active' : ''}" data-mode="ouvert">Niveaux ouverts</button>
-            </div>
-          </div>`;
-      }).join('');
-
-      const isOpen = _openCompetenceGroups.has(domaine);
-      html += `
-        <div class="comp-domaine${isOpen ? ' is-open' : ''}" data-domaine-key="${esc(domaine)}">
-          <div class="comp-domaine-summary" data-comp-domaine-toggle>
-            <span class="ax-caret">▸</span>
-            <span>${esc(domaine)}</span>
-            <div class="comp-domaine-actions">
-              <button type="button" class="btn btn-ghost btn-sm" data-bulk="progressif" data-domaine="${esc(domaine)}">Tout progressif</button>
-              <button type="button" class="btn btn-ghost btn-sm" data-bulk="ouvert" data-domaine="${esc(domaine)}">Tout ouvert</button>
-            </div>
-          </div>
-          <div class="comp-rows">${rows}</div>
-        </div>`;
-    });
-
-    document.getElementById('comp-tree').innerHTML = html || '<div class="ax-empty">Aucune compétence à plusieurs niveaux dans le catalogue.</div>';
-  }
-
-  document.getElementById('comp-tree').addEventListener('click', async e => {
-    const bulkBtn = e.target.closest('[data-bulk]');
-    if (bulkBtn) {
-      await handleCompetenceBulkDomaine(bulkBtn.dataset.domaine, bulkBtn.dataset.bulk);
-      return;
-    }
-    const toggleBtn = e.target.closest('.comp-toggle-btn');
-    if (toggleBtn) {
-      const row = toggleBtn.closest('.comp-row');
-      await handleCompetenceToggle(row.dataset.exerciseIds.split(','), toggleBtn.dataset.mode);
-      return;
-    }
-    const summary = e.target.closest('[data-comp-domaine-toggle]');
-    if (summary) {
-      const el  = summary.closest('.comp-domaine');
-      const key = el.dataset.domaineKey;
-      el.classList.toggle('is-open');
-      el.classList.contains('is-open') ? _openCompetenceGroups.add(key) : _openCompetenceGroups.delete(key);
-    }
-  });
-
-  async function handleCompetenceToggle(exerciseIds, mode) {
-    try {
-      await lfmTeacher.setNiveauModeBulk(_currentClass.id, exerciseIds, mode);
-      exerciseIds.forEach(id => {
-        if (mode === 'ouvert') _competenceSettings.set(id, 'ouvert');
-        else _competenceSettings.delete(id);
-      });
-      renderCompetenceSection();
-      showToast(mode === 'ouvert' ? 'Niveaux ouverts pour cette compétence' : 'Niveaux progressifs pour cette compétence');
-    } catch (err) {
-      showToast('Erreur : ' + err.message, 'error');
-    }
-  }
-
-  async function handleCompetenceBulkDomaine(domaine, mode) {
-    const tree   = buildCompetenceTree();
-    const entry  = tree.find(d => d.domaine === domaine);
-    if (!entry) return;
-    const allIds = entry.competences.flatMap(c => c.exerciseIds);
-    try {
-      await lfmTeacher.setNiveauModeBulk(_currentClass.id, allIds, mode);
-      allIds.forEach(id => {
-        if (mode === 'ouvert') _competenceSettings.set(id, 'ouvert');
-        else _competenceSettings.delete(id);
-      });
-      renderCompetenceSection();
-      showToast(mode === 'ouvert' ? `Domaine « ${domaine} » : tous les niveaux ouverts` : `Domaine « ${domaine} » : tous les niveaux progressifs`);
-    } catch (err) {
-      showToast('Erreur : ' + err.message, 'error');
-    }
-  }
   </script>
 <style>
     /* ─── FOOTER PROFICIAMUS ─── */
