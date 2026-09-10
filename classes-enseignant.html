@@ -232,13 +232,6 @@
       flex-shrink: 0;
     }
 
-    /* ── Colonne "Groupe" dans le tableau élèves ──────────────────────────────── */
-    .group-select { min-width: 140px; padding: 7px 10px; font-size: 13px; }
-    .group-cell { display: flex; align-items: center; gap: 8px; }
-    .group-dot {
-      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
-      box-sizing: border-box;
-    }
     /* Tooltip CSS maison plutôt que l'attribut title natif : ce dernier s'est
        révélé peu fiable ici (délai/désactivation dépendants de l'OS et du
        navigateur, invisible sur certaines configs) — voir diagnostic dans la
@@ -311,18 +304,6 @@
     .link-list-desc { font-size: 12px; color: var(--muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .link-list-actions { display: flex; gap: 4px; flex-shrink: 0; }
     .link-form-hint { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
-    .perso-badge {
-      display: inline-flex; align-items: center; gap: 3px;
-      background: rgba(245,166,35,0.14);
-      border: 1px solid rgba(245,166,35,0.35);
-      color: var(--color-brand-navy);
-      border-radius: 100px;
-      padding: 2px 9px;
-      font-size: 10.5px;
-      font-weight: 700;
-      white-space: nowrap;
-      cursor: help;
-    }
     .no-auth-badge {
       display: inline-flex; align-items: center; gap: 3px;
       background: rgba(220,38,38,0.10);
@@ -707,7 +688,6 @@
           <span class="section-title">Élèves</span>
           <div class="section-actions">
             <button class="btn btn-danger btn-sm" id="btn-repair-auth" onclick="repairMissingAuth()" style="display:none">🔧 Créer les comptes manquants</button>
-            <button class="btn btn-outline btn-sm" onclick="openModalGroups()">👥 Gérer les groupes</button>
             <button class="btn btn-outline btn-sm" id="btn-pdf"   onclick="downloadPDF()">📄 Télécharger étiquettes identifiants</button>
             <button class="btn btn-outline btn-sm" onclick="openModalBulk()">+ Ajout en masse</button>
             <button class="btn btn-primary btn-sm" onclick="openModalAddStudent()">+ Ajouter un élève</button>
@@ -722,9 +702,6 @@
                 <th>Nom</th>
                 <th>Identifiant</th>
                 <th>Mot de passe</th>
-                <th>Groupe
-                  <span class="th-info" tabindex="0" data-tooltip="Ce groupe détermine aussi les exercices proposés en parcours guidé." aria-label="Ce groupe détermine aussi les exercices proposés en parcours guidé.">ⓘ</span>
-                </th>
                 <th>DYS
                   <span class="th-info" tabindex="0" data-tooltip="Active la lecture audio des consignes" aria-label="Active la lecture audio des consignes">ⓘ</span>
                 </th>
@@ -1035,10 +1012,6 @@
   /* ── Groupes de besoin (v9) ──────────────────────────────────────────────────── */
   let _groups          = [];
   let _editingGroupId  = null;
-  /* Élèves ayant une liste d'exercices personnalisée (student_active_exercises,
-     v9) : prime silencieusement sur l'affectation de groupe — voir badge et
-     avertissement dans renderDetailStudents(). */
-  let _studentsWithPersonalList = new Set();
 
   /* ── Liens de la classe ──────────────────────────────────────────────────── */
   let _links         = [];
@@ -1194,9 +1167,6 @@
       _students = students;
       _groups   = groups;
       _links    = links;
-      _studentsWithPersonalList = new Set(
-        await lfmTeacher.getStudentIdsWithActiveExercises(students.map(s => s.id))
-      );
     } catch (e) {
       showToast('Erreur lors du chargement', 'error');
       navigate({});
@@ -1215,15 +1185,6 @@
     document.getElementById('detail-class-name').textContent = c.name;
     document.getElementById('detail-year').textContent    = c.school_year;
     renderDetailStudents();
-  }
-
-  /* Pastille de couleur du groupe : neutre (anneau gris) si l'élève n'a pas
-     de groupe — jamais la couleur par défaut du formulaire de création. */
-  function groupDotStyle(groupId) {
-    if (!groupId) return 'background:transparent;border:2px solid var(--border)';
-    const g = _groups.find(g => g.id === groupId);
-    const color = g && /^#[0-9A-Fa-f]{6}$/.test(g.color || '') ? g.color : '#94A3B8';
-    return `background:${color};border:none`;
   }
 
   function renderDetailStudents() {
@@ -1266,19 +1227,6 @@
         <td><span class="td-cred">${esc(s.username)}</span></td>
         <td><span class="td-cred" id="pwd-${s.id}">${esc(s.password)}</span></td>
         <td>
-          <div class="group-cell">
-            <span class="group-dot" id="group-dot-${s.id}" style="${groupDotStyle(s.group_id)}"></span>
-            <select class="form-select group-select" data-sid="${s.id}">
-              <option value="">— Aucun groupe —</option>
-              ${_groups.map(g => `<option value="${g.id}" ${s.group_id === g.id ? 'selected' : ''}>${esc(g.name)}</option>`).join('')}
-            </select>
-            ${_studentsWithPersonalList.has(s.id) ? `
-              <span class="perso-badge" id="perso-badge-${s.id}" title="Cet élève a une liste d'exercices personnalisée (parcours guidé) : elle prime sur son groupe, tant qu'elle n'est pas réinitialisée.">🔒 Liste perso</span>
-              <button type="button" class="btn btn-ghost btn-sm btn-icon" data-action="reset-perso" data-sid="${s.id}" title="Réinitialiser la liste personnalisée — l'élève suivra à nouveau son groupe">↺</button>
-            ` : ''}
-          </div>
-        </td>
-        <td>
           <button type="button" class="dys-badge ${s.est_dyslexique ? 'is-active' : ''}" id="dys-badge-${s.id}"
             data-action="toggle-dys" data-sid="${s.id}"
             title="${s.est_dyslexique ? 'Dyslexie activée — cliquer pour désactiver' : 'Dyslexie désactivée — cliquer pour activer'}">DYS</button>
@@ -1295,31 +1243,6 @@
     `).join('');
   }
 
-  document.getElementById('detail-tbody').addEventListener('change', async e => {
-    const sel = e.target.closest('.group-select');
-    if (!sel) return;
-    const studentId = sel.dataset.sid;
-    const groupId   = sel.value || null;
-    sel.disabled = true;
-    try {
-      await lfmTeacher.assignStudentToGroup(studentId, groupId);
-      const s = _students.find(s => s.id === studentId);
-      if (s) s.group_id = groupId;
-      const dot = document.getElementById(`group-dot-${studentId}`);
-      if (dot) dot.setAttribute('style', groupDotStyle(groupId));
-      if (_studentsWithPersonalList.has(studentId)) {
-        showToast('⚠️ Cet élève a une liste personnalisée : elle reste prioritaire sur ce nouveau groupe', 'error');
-      } else {
-        showToast('Groupe mis à jour');
-      }
-    } catch (err) {
-      sel.value = _students.find(s => s.id === studentId)?.group_id || '';
-      showToast('Erreur : ' + err.message, 'error');
-    } finally {
-      sel.disabled = false;
-    }
-  });
-
   document.getElementById('detail-tbody').addEventListener('click', async e => {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
@@ -1331,7 +1254,6 @@
     if (action === 'reset')       confirmResetPassword(student);
     if (action === 'move')        openModalMove(student);
     if (action === 'delete')      confirmDeleteById('student', id, student.display_name);
-    if (action === 'reset-perso') await resetPersoList(student, btn);
     if (action === 'retry-auth')  await retryStudentAuth(student, btn);
     if (action === 'toggle-dys')  await toggleDysStatus(student, btn);
   });
@@ -1404,23 +1326,6 @@
       showToast(`${ok.length} compte${ok.length !== 1 ? 's' : ''} de connexion créé${ok.length !== 1 ? 's' : ''}`);
     } else {
       showToast(`${ok.length} compte${ok.length !== 1 ? 's' : ''} créé${ok.length !== 1 ? 's' : ''}, ${failed.length} échec${failed.length !== 1 ? 's' : ''} — réessaie via le 🔧 sur chaque ligne concernée`, 'error');
-    }
-  }
-
-  /* Correctif UX (bug groupe vs liste perso) : réinitialisation directe de la
-     liste personnalisée d'un élève depuis le tableau, sans passer par
-     pilotage-enseignant.html. */
-  async function resetPersoList(student, btn) {
-    if (!confirm(`Réinitialiser la liste d'exercices personnalisée de ${student.display_name} ?\nL'élève suivra à nouveau son groupe (ou la classe s'il n'en a pas).`)) return;
-    btn.disabled = true;
-    try {
-      await lfmTeacher.clearActiveExercisesForStudent(student.id);
-      _studentsWithPersonalList.delete(student.id);
-      renderDetailStudents();
-      showToast('Liste personnalisée réinitialisée');
-    } catch (err) {
-      showToast('Erreur : ' + err.message, 'error');
-      btn.disabled = false;
     }
   }
 
