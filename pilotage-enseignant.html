@@ -17,6 +17,7 @@
   <script src="js/auth.js"></script>
   <script src="js/teacher.js?v=4"></script>
   <script src="js/competence-order.js?v=1"></script>
+  <script src="js/competence-display-titles.js?v=1"></script>
   <style>
     .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
     .dash-content { max-width: 960px; margin: 0 auto; }
@@ -608,6 +609,22 @@
     EXERCISE_CATALOG_AUTONOMOUS.forEach(({ slug, title, category, subCategory }) => {
       addToTree(category, subCategory, `${category}::${subCategory}::${title}`, title, slug);
     });
+
+    /* Pour une compétence à exercice UNIQUE, le titre affiché sur la vraie page
+       d'exercice élève/enseignant (js/competence-display-titles.js) remplace
+       ex.competence tronqué. Volontairement inchangé pour les compétences qui
+       regroupent plusieurs exercices sous un seul toggle (ex. "La phrase
+       complexe", "Homophones grammaticaux") : un seul texte ne peut pas
+       représenter fidèlement plusieurs exercices — décision de libellé à
+       prendre au cas par cas, voir competence-display-titles.js. */
+    const displayTitles = window.COMPETENCE_DISPLAY_TITLES || {};
+    Object.values(byDomaine).forEach(notions => Object.values(notions).forEach(competences => {
+      Object.values(competences).forEach(entry => {
+        if (entry.exerciseIds.length === 1 && displayTitles[entry.exerciseIds[0]]) {
+          entry.label = displayTitles[entry.exerciseIds[0]];
+        }
+      });
+    }));
 
     const DOMAINE_ORDER = ['Français', 'Mathématiques'];
     const domaines = Object.keys(byDomaine).sort((a, b) => {
