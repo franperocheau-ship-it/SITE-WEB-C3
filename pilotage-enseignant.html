@@ -489,25 +489,16 @@
   }
 
   let _exerciseAssetsPromise = null;
-  function loadExerciseAssets() {
+  async function loadExerciseAssets() {
     if (typeof EXERCISE_DATA !== 'undefined' && typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined') return Promise.resolve();
     if (_exerciseAssetsPromise) return _exerciseAssetsPromise;
-    const DOMAIN_DATA_FILES = [
-      'data/conjugaison.js?v=2',
-      'data/grammaire.js?v=10',
-      'data/orthographe.js?v=2',
-      'data/lecture.js?v=2',
-      'data/nombres-entiers.js?v=2',
-      'data/fractions.js?v=3',
-      'data/nombres-decimaux.js?v=2',
-      'data/probabilites.js?v=8',
-      'data/proportionnalite.js?v=1',
-      'data/vocabulaire.js?v=2'
-    ];
-    _exerciseAssetsPromise = Promise.all([
-      typeof EXERCISE_DATA               !== 'undefined' ? null : Promise.all(DOMAIN_DATA_FILES.map(loadScript)),
-      typeof EXERCISE_CATALOG_AUTONOMOUS !== 'undefined' ? null : loadScript('js/exercise-catalog.js?v=6')
-    ]).catch(err => { _exerciseAssetsPromise = null; throw err; });
+    _exerciseAssetsPromise = (async () => {
+      if (typeof EXERCISE_DATA === 'undefined') {
+        if (typeof window.EXERCISE_DOMAIN_FILE_URLS === 'undefined') await loadScript('data/domain-files.js?v=1');
+        await Promise.all(window.EXERCISE_DOMAIN_FILE_URLS.map(loadScript));
+      }
+      if (typeof EXERCISE_CATALOG_AUTONOMOUS === 'undefined') await loadScript('js/exercise-catalog.js?v=6');
+    })().catch(err => { _exerciseAssetsPromise = null; throw err; });
     return _exerciseAssetsPromise;
   }
 

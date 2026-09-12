@@ -291,26 +291,17 @@
   }
 
   let _assetsPromise = null;
-  function loadRemediationAssets() {
+  async function loadRemediationAssets() {
     if (typeof EXERCISE_DATA !== 'undefined' && typeof REMEDIATION_DATA !== 'undefined') {
       checkRemediationDataOrphans();
       return Promise.resolve();
     }
     if (_assetsPromise) return _assetsPromise;
-    const DOMAIN_DATA_FILES = [
-      'data/conjugaison.js?v=2',
-      'data/grammaire.js?v=10',
-      'data/orthographe.js?v=2',
-      'data/lecture.js?v=2',
-      'data/nombres-entiers.js?v=2',
-      'data/fractions.js?v=3',
-      'data/nombres-decimaux.js?v=2',
-      'data/probabilites.js?v=8',
-      'data/proportionnalite.js?v=1',
-      'data/vocabulaire.js?v=2'
-    ];
+    if (typeof EXERCISE_DATA === 'undefined' && typeof window.EXERCISE_DOMAIN_FILE_URLS === 'undefined') {
+      await loadScript('data/domain-files.js?v=1');
+    }
     _assetsPromise = Promise.all([
-      typeof EXERCISE_DATA      !== 'undefined' ? null : Promise.all(DOMAIN_DATA_FILES.map(loadScript)),
+      typeof EXERCISE_DATA      !== 'undefined' ? null : Promise.all(window.EXERCISE_DOMAIN_FILE_URLS.map(loadScript)),
       typeof REMEDIATION_DATA   !== 'undefined' ? null : loadScript('js/remediation-data.js?v=1')
     ]).then(() => checkRemediationDataOrphans())
       .catch(err => { _assetsPromise = null; throw err; });

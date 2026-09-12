@@ -1490,18 +1490,8 @@
         /* Requis par la migration data/*.js (commit 2b83da7) : remplace l'ancien
            loadScript('exercise-data.js?v=21'). À conserver si loadCompetenceStats
            est commitée ou reversée séparément de ce commit de migration. */
-        await Promise.all([
-          'data/conjugaison.js?v=2',
-          'data/grammaire.js?v=10',
-          'data/orthographe.js?v=2',
-          'data/lecture.js?v=2',
-          'data/nombres-entiers.js?v=2',
-          'data/fractions.js?v=3',
-          'data/nombres-decimaux.js?v=2',
-          'data/probabilites.js?v=8',
-          'data/proportionnalite.js?v=1',
-          'data/vocabulaire.js?v=2'
-        ].map(loadScript));
+        if (typeof window.EXERCISE_DOMAIN_FILE_URLS === 'undefined') await loadScript('data/domain-files.js?v=1');
+        await Promise.all(window.EXERCISE_DOMAIN_FILE_URLS.map(loadScript));
         const catalogMap = lfmAnalytics.buildCatalogMap();
         const results     = await lfmAdmin.getAllResultsRaw();
 
