@@ -3759,6 +3759,7 @@ Object.assign(window.EXERCISE_DATA, {
     lvl1Bank: [
       /* 1 — phrase-ancre : seul pronom = sujet */
       {
+        id:       "distinguer-pronom-sujet-complement-n1-01",
         words:    ["Ils", "jouent", "dans", "la", "cour", "."],
         wordTypes:["subject", null, null, null, null, null],
         testQ:    "Qui est-ce qui joue ?",
@@ -3768,6 +3769,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 2 — phrase-ancre : seul pronom = sujet */
       {
+        id:       "distinguer-pronom-sujet-complement-n1-02",
         words:    ["Elle", "adore", "le", "chocolat", "."],
         wordTypes:["subject", null, null, null, null],
         testQ:    "Qui est-ce qui adore ?",
@@ -3777,6 +3779,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 3 — piège : pronom complément avant le verbe */
       {
+        id:       "distinguer-pronom-sujet-complement-n1-03",
         words:    ["Il", "me", "regarde", "."],
         wordTypes:["subject", "complement", null, null],
         testQ:    "Qui est-ce qui regarde ?",
@@ -3787,6 +3790,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 4 — piège central : même forme nous / vous */
       {
+        id:       "distinguer-pronom-sujet-complement-n1-04",
         words:    ["Nous", "vous", "attendons", "."],
         wordTypes:["subject", "complement", null, null],
         testQ:    "Qui est-ce qui attend ?",
@@ -3797,6 +3801,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 5 — piège : « les » pronom vs article */
       {
+        id:       "distinguer-pronom-sujet-complement-n1-05",
         words:    ["Je", "les", "vois", "."],
         wordTypes:["subject", "complement", null, null],
         testQ:    "Qui est-ce qui voit ?",
@@ -3807,6 +3812,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 6 — pronom complément indirect (lui) */
       {
+        id:       "distinguer-pronom-sujet-complement-n1-06",
         words:    ["Tu", "lui", "parles", "gentiment", "."],
         wordTypes:["subject", "complement", null, null, null],
         testQ:    "Qui est-ce qui parle ?",
@@ -3817,6 +3823,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 7 — piège : « leur » pronom vs déterminant possessif */
       {
+        id:       "distinguer-pronom-sujet-complement-n1-07",
         words:    ["On", "leur", "raconte", "une", "histoire", "."],
         wordTypes:["subject", "complement", null, null, null, null],
         testQ:    "Qui est-ce qui raconte ?",
@@ -3827,6 +3834,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 8 — piège : « vous » sujet, mais aussi possible complément */
       {
+        id:       "distinguer-pronom-sujet-complement-n1-08",
         words:    ["Vous", "m'", "écoutez", "attentivement", "."],
         wordTypes:["subject", "complement", null, null, null],
         testQ:    "Qui est-ce qui écoute ?",
@@ -3844,6 +3852,7 @@ Object.assign(window.EXERCISE_DATA, {
     lvl2Bank: [
       /* 1 — piège position : pronom complément avant le verbe */
       {
+        id: "distinguer-pronom-sujet-complement-n2-01",
         words: ["Je", "le", "vois", "chaque", "jour", "."],
         highlightIdx: 1, fn: "complement", verb: "vois",
         testQ: "Qui est-ce qui voit ?", testA: "Je",
@@ -3853,6 +3862,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 2 — piège nous / vous — côté sujet */
       {
+        id: "distinguer-pronom-sujet-complement-n2-02",
         words: ["Nous", "vous", "attendons", "."],
         highlightIdx: 0, fn: "subject", verb: "attendons",
         testQ: "Qui est-ce qui attend ?", testA: "Nous",
@@ -3862,6 +3872,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 3 — piège nous / vous — côté complément */
       {
+        id: "distinguer-pronom-sujet-complement-n2-03",
         words: ["Nous", "vous", "attendons", "."],
         highlightIdx: 1, fn: "complement", verb: "attendons",
         testQ: "Qui est-ce qui attend ?", testA: "Nous",
@@ -3871,6 +3882,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 4 — complément indirect (te) */
       {
+        id: "distinguer-pronom-sujet-complement-n2-04",
         words: ["Il", "te", "téléphone", "souvent", "."],
         highlightIdx: 1, fn: "complement", verb: "téléphone",
         testQ: "Qui est-ce qui téléphone ?", testA: "Il",
@@ -3880,6 +3892,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 5 — sujet simple */
       {
+        id: "distinguer-pronom-sujet-complement-n2-05",
         words: ["Elle", "leur", "explique", "la", "leçon", "."],
         highlightIdx: 0, fn: "subject", verb: "explique",
         testQ: "Qui est-ce qui explique ?", testA: "Elle",
@@ -3889,6 +3902,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 6 — piège : « les » article vs pronom complément */
       {
+        id: "distinguer-pronom-sujet-complement-n2-06",
         words: ["Tu", "les", "emmènes", "au", "cinéma", "."],
         highlightIdx: 1, fn: "complement", verb: "emmènes",
         testQ: "Qui est-ce qui emmène ?", testA: "Tu",
@@ -3898,6 +3912,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 7 — vous sujet (avec les complément) */
       {
+        id: "distinguer-pronom-sujet-complement-n2-07",
         words: ["Vous", "les", "comprenez", "très", "bien", "."],
         highlightIdx: 0, fn: "subject", verb: "comprenez",
         testQ: "Qui est-ce qui comprend ?", testA: "Vous",
@@ -3907,6 +3922,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 8 — piège : « leur » pronom vs déterminant possessif */
       {
+        id: "distinguer-pronom-sujet-complement-n2-08",
         words: ["Il", "leur", "écrit", "une", "lettre", "."],
         highlightIdx: 1, fn: "complement", verb: "écrit",
         testQ: "Qui est-ce qui écrit ?", testA: "Il",
@@ -3916,6 +3932,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 9 — piège : « le » article vs pronom (sujet = GN, pas pronom) */
       {
+        id: "distinguer-pronom-sujet-complement-n2-09",
         words: ["Le", "chat", "le", "regarde", "depuis", "la", "fenêtre", "."],
         highlightIdx: 2, fn: "complement", verb: "regarde",
         testQ: "Qui est-ce qui regarde ?", testA: "Le chat",
@@ -3925,6 +3942,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 10 — vous complément (sujet = ils), piège nous/vous */
       {
+        id: "distinguer-pronom-sujet-complement-n2-10",
         words: ["Ils", "vous", "ont", "vus", "hier", "."],
         highlightIdx: 1, fn: "complement", verb: "ont vus",
         testQ: "Qui est-ce qui a vu ?", testA: "Ils",
@@ -3940,6 +3958,7 @@ Object.assign(window.EXERCISE_DATA, {
     lvl3Bank: [
       /* 1 — remplacer le SUJET */
       {
+        id:          "distinguer-pronom-sujet-complement-n3-01",
         sentence:    "Marie regarde le film .",
         displayHtml: "<strong class='psc-replace-hl'>Marie</strong> regarde le film .",
         instruction: "Remplace le groupe en gras par le bon pronom <strong>sujet</strong> et réécris la phrase complète.",
@@ -3952,6 +3971,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 2 — remplacer le COMPLÉMENT */
       {
+        id:          "distinguer-pronom-sujet-complement-n3-02",
         sentence:    "Marie regarde le film .",
         displayHtml: "Marie regarde <strong class='psc-replace-hl'>le film</strong> .",
         instruction: "Remplace le groupe en gras par le bon pronom <strong>complément</strong> et réécris la phrase complète.",
@@ -3964,6 +3984,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 3 — remplacer le SUJET (pluriel) */
       {
+        id:          "distinguer-pronom-sujet-complement-n3-03",
         sentence:    "Les enfants jouent dans la cour .",
         displayHtml: "<strong class='psc-replace-hl'>Les enfants</strong> jouent dans la cour .",
         instruction: "Remplace le groupe en gras par le bon pronom <strong>sujet</strong> et réécris la phrase complète.",
@@ -3976,6 +3997,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 4 — remplacer le COMPLÉMENT indirect (lui) */
       {
+        id:          "distinguer-pronom-sujet-complement-n3-04",
         sentence:    "Paul téléphone à sa mère .",
         displayHtml: "Paul téléphone <strong class='psc-replace-hl'>à sa mère</strong> .",
         instruction: "Remplace le groupe en gras par le bon pronom <strong>complément</strong> et réécris la phrase complète.",
@@ -3988,6 +4010,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 5 — remplacer le SUJET (féminin) */
       {
+        id:          "distinguer-pronom-sujet-complement-n3-05",
         sentence:    "La maîtresse aide les élèves .",
         displayHtml: "<strong class='psc-replace-hl'>La maîtresse</strong> aide les élèves .",
         instruction: "Remplace le groupe en gras par le bon pronom <strong>sujet</strong> et réécris la phrase complète.",
@@ -4000,6 +4023,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 6 — remplacer le COMPLÉMENT direct (les) */
       {
+        id:          "distinguer-pronom-sujet-complement-n3-06",
         sentence:    "Les enfants adorent les bonbons .",
         displayHtml: "Les enfants adorent <strong class='psc-replace-hl'>les bonbons</strong> .",
         instruction: "Remplace le groupe en gras par le bon pronom <strong>complément</strong> et réécris la phrase complète.",
@@ -4012,6 +4036,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 7 — remplacer le COMPLÉMENT indirect (lui, féminin) */
       {
+        id:          "distinguer-pronom-sujet-complement-n3-07",
         sentence:    "Zoé envoie une lettre à son amie .",
         displayHtml: "Zoé envoie une lettre <strong class='psc-replace-hl'>à son amie</strong> .",
         instruction: "Remplace le groupe en gras par le bon pronom <strong>complément</strong> et réécris la phrase complète.",
@@ -4024,6 +4049,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 8 — remplacer le SUJET (nous) */
       {
+        id:          "distinguer-pronom-sujet-complement-n3-08",
         sentence:    "Mon frère et moi regardons la télévision .",
         displayHtml: "<strong class='psc-replace-hl'>Mon frère et moi</strong> regardons la télévision .",
         instruction: "Remplace le groupe en gras par le bon pronom <strong>sujet</strong> et réécris la phrase complète.",
@@ -4036,6 +4062,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 9 — remplacer le COMPLÉMENT direct (les, pluriel) */
       {
+        id:          "distinguer-pronom-sujet-complement-n3-09",
         sentence:    "La directrice félicite les élèves .",
         displayHtml: "La directrice félicite <strong class='psc-replace-hl'>les élèves</strong> .",
         instruction: "Remplace le groupe en gras par le bon pronom <strong>complément</strong> et réécris la phrase complète.",
@@ -4048,6 +4075,7 @@ Object.assign(window.EXERCISE_DATA, {
       },
       /* 10 — remplacer le SUJET (ils, pluriel masculin) */
       {
+        id:          "distinguer-pronom-sujet-complement-n3-10",
         sentence:    "Les oiseaux chantent dans le jardin .",
         displayHtml: "<strong class='psc-replace-hl'>Les oiseaux</strong> chantent dans le jardin .",
         instruction: "Remplace le groupe en gras par le bon pronom <strong>sujet</strong> et réécris la phrase complète.",

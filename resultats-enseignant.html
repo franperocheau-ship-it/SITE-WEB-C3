@@ -1441,7 +1441,19 @@
      d'Ariane (étape 4 déjà sélectionnée). */
   function renderBilanEleveLeafHtml(itemRows) {
     const worst = lfmAnalytics.computeWorstItems(itemRows);
-    if (worst.length === 0) return '<div class="empty-inline">Aucune erreur enregistrée sur ce niveau.</div>';
+    if (worst.length === 0) {
+      /* itemRows vide alors que ce palier a forcément été tenté (sinon pas de
+         feuille à afficher, voir niveauRates) : aucune ligne exercise_item_results
+         n'existe pour cette tentative — pas la même chose que "0 erreur avec détail
+         disponible" (itemRows non vide, tous corrects). Cas réel : compétences
+         migrées depuis un ancien moteur sans suivi par item (ex. identifier-verbe-
+         conjugue, commit c61a6af) tant que personne n'a retenté depuis, ou moteur
+         dont le suivi par item n'a jamais été câblé (ex. psc-niveaux). */
+      if (itemRows.length === 0) {
+        return '<div class="empty-inline">Détail non disponible pour les tentatives enregistrées avant la mise à jour de cet exercice.</div>';
+      }
+      return '<div class="empty-inline">Aucune erreur enregistrée sur ce niveau.</div>';
+    }
     return worst.map(it => {
       const qa = lfmAnalytics.resolveItemText(it.exercise_slug, it.level, it.item_id);
       const questionText = qa && qa.q ? qa.q : '(question retirée du catalogue depuis)';
