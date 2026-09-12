@@ -14681,6 +14681,9 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
 
+      itemResults = [];
+      attemptId   = crypto.randomUUID();
+
       if (lv === 1) {
         const qs = pscShuffle([...sessionData.lvl1Bank]);
         pscState = { level: 1, questions: qs, idx: 0, score: 0, total: qs.length };
@@ -14729,7 +14732,8 @@
         <div class="ex-feedback-area" id="psc-fb"></div>
         <button class="ex-next-btn ex-hidden" id="next-btn">${idx + 1 < total ? 'Phrase suivante →' : 'Voir les résultats →'}</button>`;
 
-      let answered = false;
+      let answered  = false;
+      let firstTry   = true;
 
       card.querySelectorAll('.ex-word-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -14741,18 +14745,21 @@
             answered = true;
             card.querySelectorAll('.ex-word-btn').forEach(b => b.disabled = true);
             btn.classList.add('is-correct');
-            pscState.score++;
+            if (firstTry) pscState.score++;
+            recordItemResult(q, firstTry, pscState.level);
             document.getElementById('psc-fb').innerHTML =
               `<div class="ex-feedback-correct">${pscPos()} ${q.feedbackCorrect}<div class="ex-note">${q.note}</div></div>`;
             document.getElementById('next-btn').classList.remove('ex-hidden');
 
           } else if (wt === 'complement') {
+            firstTry = false;
             btn.classList.add('is-wrong');
             document.getElementById('psc-fb').innerHTML =
               `<div class="ex-feedback-wrong">❌ ${q.feedbackComplement || '« ' + q.words[i] + ' » est un pronom complément, pas le sujet.'}<br><small>📌 Test : <em>${q.testQ}</em> → <strong>${q.testA}</strong></small></div>`;
             setTimeout(() => { btn.classList.remove('is-wrong'); document.getElementById('psc-fb').innerHTML = ''; }, 2800);
 
           } else {
+            firstTry = false;
             btn.classList.add('is-wrong');
             setTimeout(() => btn.classList.remove('is-wrong'), 500);
             document.getElementById('psc-fb').innerHTML =
@@ -14806,6 +14813,7 @@
           const chosen  = btn.dataset.fn;
           const correct = chosen === q.fn;
 
+          recordItemResult(q, correct, pscState.level);
           if (correct) { btn.classList.add('is-correct'); pscState.score++; }
           else {
             btn.classList.add('is-wrong');
@@ -14888,6 +14896,7 @@
         const pronounOnly  = pscNorm(q.targetPronoun) === norm;
         const correct      = pronounOnly || q.answers.some(a => pscNorm(a) === norm);
 
+        recordItemResult(q, correct, pscState.level);
         if (correct) {
           input.classList.add('is-correct');
           pscState.score++;
@@ -14993,7 +15002,9 @@
         exerciseType: currentType,
         level:        'Niveau ' + level,
         score:        lvScore, total,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
       });
     }
 
