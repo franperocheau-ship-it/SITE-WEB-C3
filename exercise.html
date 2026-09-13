@@ -15080,6 +15080,9 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
 
+      itemResults = [];
+      attemptId   = crypto.randomUUID();
+
       if (lv === 1) {
         const qs = gnspShuffle([...sessionData.lvl1Bank]);
         gnspState = { level: 1, questions: qs, idx: 0, score: 0, total: qs.length };
@@ -15142,6 +15145,7 @@
           else if (selected.has(i)) b.classList.add('is-wrong');
         });
 
+        recordItemResult(q, isCorrect, gnspState.level);
         if (isCorrect) {
           gnspState.score++;
           document.getElementById('gnsp-fb').innerHTML =
@@ -15234,6 +15238,7 @@
           const chosen  = btn.dataset.pn;
           const correct = chosen === q.pronoun;
 
+          recordItemResult(q, correct, gnspState.level);
           if (correct) {
             btn.classList.add('is-correct');
             gnspState.score++;
@@ -15287,6 +15292,7 @@
         const norm    = gnspNorm(raw);
         const correct = q.answers.some(a => gnspNorm(a) === norm);
 
+        recordItemResult(q, correct, gnspState.level);
         if (correct) {
           input.classList.add('is-correct');
           gnspState.score++;
@@ -15391,7 +15397,9 @@
         exerciseType: currentType,
         level:        'Niveau ' + level,
         score:        lvScore, total,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
       });
     }
 

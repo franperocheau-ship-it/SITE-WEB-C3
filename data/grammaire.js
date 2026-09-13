@@ -4109,6 +4109,7 @@ Object.assign(window.EXERCISE_DATA, {
        ════════════════════════════════════════════════════════════════════ */
     lvl1Bank: [
       {
+        id:         "remplacer-gn-sujet-pronom-n1-01",
         words:      ["Le", "chat", "dort", "sur", "le", "canapé", "."],
         gnsIndices: [0, 1],
         verb:       "dort",
@@ -4117,6 +4118,7 @@ Object.assign(window.EXERCISE_DATA, {
         note:       "Le GNS est « Le chat » : déterminant + nom-noyau."
       },
       {
+        id:         "remplacer-gn-sujet-pronom-n1-02",
         words:      ["La", "petite", "fille", "mange", "une", "pomme", "."],
         gnsIndices: [0, 1, 2],
         verb:       "mange",
@@ -4125,6 +4127,7 @@ Object.assign(window.EXERCISE_DATA, {
         note:       "Le GNS est « La petite fille » : il inclut l'adjectif « petite »."
       },
       {
+        id:         "remplacer-gn-sujet-pronom-n1-03",
         words:      ["Le", "grand", "chien", "de", "mon", "voisin", "aboie", "."],
         gnsIndices: [0, 1, 2, 3, 4, 5],
         verb:       "aboie",
@@ -4133,6 +4136,7 @@ Object.assign(window.EXERCISE_DATA, {
         note:       "Attention : le GNS entier est « Le grand chien de mon voisin ». Il faut prendre tout le groupe, y compris le complément du nom « de mon voisin », pas seulement le nom-noyau « chien »."
       },
       {
+        id:         "remplacer-gn-sujet-pronom-n1-04",
         words:      ["Les", "élèves", "de", "la", "classe", "écoutent", "la", "maîtresse", "."],
         gnsIndices: [0, 1, 2, 3, 4],
         verb:       "écoutent",
@@ -4141,6 +4145,7 @@ Object.assign(window.EXERCISE_DATA, {
         note:       "Le GNS « Les élèves de la classe » inclut le complément du nom « de la classe »."
       },
       {
+        id:         "remplacer-gn-sujet-pronom-n1-05",
         words:      ["Mon", "petit", "frère", "joue", "dans", "le", "jardin", "."],
         gnsIndices: [0, 1, 2],
         verb:       "joue",
@@ -4149,6 +4154,7 @@ Object.assign(window.EXERCISE_DATA, {
         note:       "Le GNS est « Mon petit frère »."
       },
       {
+        id:         "remplacer-gn-sujet-pronom-n1-06",
         words:      ["La", "vieille", "maison", "de", "mes", "grands-parents", "est", "magnifique", "."],
         gnsIndices: [0, 1, 2, 3, 4, 5],
         verb:       "est",
@@ -4157,6 +4163,7 @@ Object.assign(window.EXERCISE_DATA, {
         note:       "Le GNS complet « La vieille maison de mes grands-parents » comprend le déterminant, l'adjectif, le nom-noyau « maison » et son complément du nom « de mes grands-parents »."
       },
       {
+        id:         "remplacer-gn-sujet-pronom-n1-07",
         words:      ["Les", "oiseaux", "chantent", "dans", "les", "arbres", "."],
         gnsIndices: [0, 1],
         verb:       "chantent",
@@ -4165,6 +4172,7 @@ Object.assign(window.EXERCISE_DATA, {
         note:       "Le GNS est « Les oiseaux »."
       },
       {
+        id:         "remplacer-gn-sujet-pronom-n1-08",
         words:      ["Le", "livre", "de", "mathématiques", "est", "sur", "la", "table", "."],
         gnsIndices: [0, 1, 2, 3],
         verb:       "est",
@@ -4179,6 +4187,7 @@ Object.assign(window.EXERCISE_DATA, {
        ════════════════════════════════════════════════════════════════════ */
     lvl2Bank: [
       {
+        id: "remplacer-gn-sujet-pronom-n2-01",
         displayHtml: "<span class='psc-pronoun-hl'>La fillette</span> court dans la cour.",
         gnsText: "La fillette", noyau: "fillette",
         gender: "féminin", number: "singulier", pronoun: "elle",
@@ -4186,6 +4195,7 @@ Object.assign(window.EXERCISE_DATA, {
         trap: false
       },
       {
+        id: "remplacer-gn-sujet-pronom-n2-02",
         displayHtml: "<span class='psc-pronoun-hl'>Le grand chien de mon voisin</span> aboie toute la nuit.",
         gnsText: "Le grand chien de mon voisin", noyau: "chien",
         gender: "masculin", number: "singulier", pronoun: "il",
@@ -4193,6 +4203,7 @@ Object.assign(window.EXERCISE_DATA, {
         trap: true
       },
       {
+        id: "remplacer-gn-sujet-pronom-n2-03",
         displayHtml: "<span class='psc-pronoun-hl'>Les danseuses</span> montent sur scène.",
         gnsText: "Les danseuses", noyau: "danseuses",
         gender: "féminin", number: "pluriel", pronoun: "elles",
@@ -4200,6 +4211,7 @@ Object.assign(window.EXERCISE_DATA, {
         trap: false
       },
       {
+        id: "remplacer-gn-sujet-pronom-n2-04",
         displayHtml: "<span class='psc-pronoun-hl'>Paul et Marie</span> arrivent en retard.",
         gnsText: "Paul et Marie", noyau: "Paul et Marie",
         gender: "masculin", number: "pluriel", pronoun: "ils",
@@ -4207,6 +4219,7 @@ Object.assign(window.EXERCISE_DATA, {
         trap: true
       },
       {
+        id: "remplacer-gn-sujet-pronom-n2-05",
         displayHtml: "<span class='psc-pronoun-hl'>Marie</span> chante très bien.",
         gnsText: "Marie", noyau: "Marie",
         gender: "féminin", number: "singulier", pronoun: "elle",
@@ -4214,6 +4227,7 @@ Object.assign(window.EXERCISE_DATA, {
         trap: false
       },
       {
+        id: "remplacer-gn-sujet-pronom-n2-06",
         displayHtml: "<span class='psc-pronoun-hl'>Les enfants de la classe</span> jouent en récréation.",
         gnsText: "Les enfants de la classe", noyau: "enfants",
         gender: "masculin", number: "pluriel", pronoun: "ils",
@@ -4221,6 +4235,7 @@ Object.assign(window.EXERCISE_DATA, {
         trap: true
       },
       {
+        id: "remplacer-gn-sujet-pronom-n2-07",
         displayHtml: "<span class='psc-pronoun-hl'>La belle robe de ma mère</span> est accrochée dans l'armoire.",
         gnsText: "La belle robe de ma mère", noyau: "robe",
         gender: "féminin", number: "singulier", pronoun: "elle",
@@ -4228,6 +4243,7 @@ Object.assign(window.EXERCISE_DATA, {
         trap: true
       },
       {
+        id: "remplacer-gn-sujet-pronom-n2-08",
         displayHtml: "<span class='psc-pronoun-hl'>Les Dupont</span> partent en vacances demain.",
         gnsText: "Les Dupont", noyau: "Dupont",
         gender: "masculin", number: "pluriel", pronoun: "ils",
@@ -4235,6 +4251,7 @@ Object.assign(window.EXERCISE_DATA, {
         trap: true
       },
       {
+        id: "remplacer-gn-sujet-pronom-n2-09",
         displayHtml: "<span class='psc-pronoun-hl'>Les roses du jardin</span> embaument toute la pièce.",
         gnsText: "Les roses du jardin", noyau: "roses",
         gender: "féminin", number: "pluriel", pronoun: "elles",
@@ -4242,6 +4259,7 @@ Object.assign(window.EXERCISE_DATA, {
         trap: true
       },
       {
+        id: "remplacer-gn-sujet-pronom-n2-10",
         displayHtml: "<span class='psc-pronoun-hl'>Mon grand frère et sa meilleure amie</span> rentrent de l'école.",
         gnsText: "Mon grand frère et sa meilleure amie", noyau: "frère et amie",
         gender: "masculin", number: "pluriel", pronoun: "ils",
@@ -4256,6 +4274,7 @@ Object.assign(window.EXERCISE_DATA, {
        ════════════════════════════════════════════════════════════════════ */
     lvl3Bank: [
       {
+        id:          "remplacer-gn-sujet-pronom-n3-01",
         sentence:    "Les enfants jouent dans le jardin .",
         displayHtml: "<span class='psc-pronoun-hl'>Les enfants</span> jouent dans le jardin .",
         gns: "Les enfants", pronoun: "Ils", verb: "jouent",
@@ -4264,6 +4283,7 @@ Object.assign(window.EXERCISE_DATA, {
         noteOk:   "« Les enfants » est masculin pluriel → « Ils »."
       },
       {
+        id:          "remplacer-gn-sujet-pronom-n3-02",
         sentence:    "La directrice de l'école parle aux parents .",
         displayHtml: "<span class='psc-pronoun-hl'>La directrice de l'école</span> parle aux parents .",
         gns: "La directrice de l'école", pronoun: "Elle", verb: "parle",
@@ -4272,6 +4292,7 @@ Object.assign(window.EXERCISE_DATA, {
         noteOk:   "Le nom-noyau du GNS long est « directrice » (féminin singulier) → « Elle »."
       },
       {
+        id:          "remplacer-gn-sujet-pronom-n3-03",
         sentence:    "Paul et Marie chantent ensemble .",
         displayHtml: "<span class='psc-pronoun-hl'>Paul et Marie</span> chantent ensemble .",
         gns: "Paul et Marie", pronoun: "Ils", verb: "chantent",
@@ -4280,6 +4301,7 @@ Object.assign(window.EXERCISE_DATA, {
         noteOk:   "Genres mélangés (Paul masculin, Marie féminin) → « Ils »."
       },
       {
+        id:          "remplacer-gn-sujet-pronom-n3-04",
         sentence:    "Les danseuses montent sur scène .",
         displayHtml: "<span class='psc-pronoun-hl'>Les danseuses</span> montent sur scène .",
         gns: "Les danseuses", pronoun: "Elles", verb: "montent",
@@ -4287,6 +4309,7 @@ Object.assign(window.EXERCISE_DATA, {
         answers:  ["elles montent sur scene", "elles montent sur scène", "elles montent sur scène .", "elles"]
       },
       {
+        id:          "remplacer-gn-sujet-pronom-n3-05",
         sentence:    "Mon petit frère regarde un film .",
         displayHtml: "<span class='psc-pronoun-hl'>Mon petit frère</span> regarde un film .",
         gns: "Mon petit frère", pronoun: "Il", verb: "regarde",
@@ -4294,6 +4317,7 @@ Object.assign(window.EXERCISE_DATA, {
         answers:  ["il regarde un film", "il regarde un film .", "il"]
       },
       {
+        id:          "remplacer-gn-sujet-pronom-n3-06",
         sentence:    "Les grands arbres du parc donnent de l'ombre .",
         displayHtml: "<span class='psc-pronoun-hl'>Les grands arbres du parc</span> donnent de l'ombre .",
         gns: "Les grands arbres du parc", pronoun: "Ils", verb: "donnent",
@@ -4302,6 +4326,7 @@ Object.assign(window.EXERCISE_DATA, {
         noteOk:   "Le nom-noyau du GNS long est « arbres » (masculin pluriel) → « Ils »."
       },
       {
+        id:          "remplacer-gn-sujet-pronom-n3-07",
         sentence:    "Le facteur du quartier distribue le courrier .",
         displayHtml: "<span class='psc-pronoun-hl'>Le facteur du quartier</span> distribue le courrier .",
         gns: "Le facteur du quartier", pronoun: "Il", verb: "distribue",
@@ -4310,6 +4335,7 @@ Object.assign(window.EXERCISE_DATA, {
         noteOk:   "Le nom-noyau du GNS long est « facteur » (masculin singulier) → « Il »."
       },
       {
+        id:          "remplacer-gn-sujet-pronom-n3-08",
         sentence:    "Ma cousine et son frère habitent à Paris .",
         displayHtml: "<span class='psc-pronoun-hl'>Ma cousine et son frère</span> habitent à Paris .",
         gns: "Ma cousine et son frère", pronoun: "Ils", verb: "habitent",
@@ -4318,6 +4344,7 @@ Object.assign(window.EXERCISE_DATA, {
         noteOk:   "Genres mélangés (cousine féminin, frère masculin) → « Ils »."
       },
       {
+        id:          "remplacer-gn-sujet-pronom-n3-09",
         sentence:    "Les fleurs du jardin embaument la maison .",
         displayHtml: "<span class='psc-pronoun-hl'>Les fleurs du jardin</span> embaument la maison .",
         gns: "Les fleurs du jardin", pronoun: "Elles", verb: "embaument",
@@ -4326,6 +4353,7 @@ Object.assign(window.EXERCISE_DATA, {
         noteOk:   "Le nom-noyau est « fleurs » (féminin pluriel) ; « du jardin » est complément du nom."
       },
       {
+        id:          "remplacer-gn-sujet-pronom-n3-10",
         sentence:    "Le vieux chat du voisin dort toute la journée .",
         displayHtml: "<span class='psc-pronoun-hl'>Le vieux chat du voisin</span> dort toute la journée .",
         gns: "Le vieux chat du voisin", pronoun: "Il", verb: "dort",
