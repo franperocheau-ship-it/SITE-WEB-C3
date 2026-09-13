@@ -21946,6 +21946,9 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
 
+      itemResults = [];
+      attemptId   = crypto.randomUUID();
+
       const pool = shuffle((sessionData.bank || []).filter(item => item.level === lv));
       const qs   = pool.slice(0, sessionData.questionsPerSession || 10);
       cigState   = { level: lv, questions: qs, idx: 0, score: 0, total: qs.length };
@@ -22034,6 +22037,7 @@
         document.getElementById('cig-fb1').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
         setTimeout(() => cigRenderStep2(card, q), 700);
       } else {
+        recordItemResult(q, false, cigState.level);
         document.getElementById('cig-fb1').innerHTML = `
           <div class="ex-feedback-wrong">
             ❌ Ce n'est pas la bonne réponse.<br>
@@ -22072,6 +22076,7 @@
       });
       if (!isRight) btn.classList.add('is-wrong');
 
+      recordItemResult(q, isRight, cigState.level);
       if (isRight) {
         cigState.score++;
         document.getElementById('cig-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
@@ -22163,7 +22168,9 @@
         level:        'Niveau ' + level,
         score:        lvScore,
         total,
-        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null
+        durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
+        attemptId,
+        itemResults
       });
     }
 
