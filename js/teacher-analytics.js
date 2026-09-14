@@ -169,12 +169,25 @@ const lfmAnalytics = (() => {
     return UNKNOWN_META;
   }
 
-  /* ── Dédoublonnage : meilleur pct par (élève × exercice) ─────────────────────
+  /* ── Ordre de récence entre deux lignes exercise_results ─────────────────
+     Utilisé par tous les dédoublonnages ci-dessous depuis le changement
+     "dernière tentative" plutôt que "meilleur score" (audit 2026-09-13 :
+     un élève avec une bonne tentative ancienne puis une mauvaise récente
+     voyait encore le bon score partout — jauges, bilan enseignant, PDF).
+     completed_at manquant traité comme "le plus ancien possible" plutôt que
+     de planter — défensif, ne devrait pas arriver (colonne NOT NULL). */
+  function isMoreRecent(a, b) {
+    const ta = a.completed_at ? new Date(a.completed_at).getTime() : 0;
+    const tb = b.completed_at ? new Date(b.completed_at).getTime() : 0;
+    return ta > tb;
+  }
+
+  /* ── Dédoublonnage : ligne la plus récente par (élève × exercice) ────────────
      exercise_slug résolu via canonicalSlug() avant de servir de clé — un
      ancien slug fusionné (Lot 6, ex. identifier-phrase-declarative) et son
      exercice cible (identifier-type-phrase) comptent donc comme UN seul
-     exercice, avec le meilleur score toutes tentatives confondues (ancien
-     ET nouveau slug). exercise_slug est aussi réécrit dans la ligne
+     exercice, avec la tentative la plus récente retenue (ancien ET nouveau
+     slug confondus). exercise_slug est aussi réécrit dans la ligne
      conservée, pour que tout le code en aval (aggregateByCompetence,
      computeClassLeafStudents…) qui lit r.exercise_slug voie déjà la forme
      canonique sans avoir à refaire la résolution lui-même. */
@@ -183,33 +196,35 @@ const lfmAnalytics = (() => {
     rows.forEach(r => {
       const slug = canonicalSlug(r.exercise_slug);
       const key  = r.student_id + '|' + slug;
-      const pct  = parseFloat(r.pct);
       const prev = map.get(key);
-      if (!prev || pct > prev.pct) map.set(key, { ...r, exercise_slug: slug, pct });
+      if (!prev || isMoreRecent(r, prev)) map.set(key, { ...r, exercise_slug: slug, pct: parseFloat(r.pct) });
     });
     return Array.from(map.values());
   }
 
-  /* ── Dédoublonnage : meilleur pct par (élève × exercice), TOUS PALIERS
-     REQUIS, réservé au numérateur de computeNiveauJauge. Une compétence ne
-     compte comme "acquise" que si CHAQUE palier déclaré (meta.paliers,
-     nombre réel de paliers du moteur — repli sur meta.levels.length si non
-     déclaré, même convention que levelDescFor) atteint individuellement
-     SUCCESS_THRESHOLD ; un seul palier sous le seuil, ou jamais tenté,
-     empêche la compétence entière d'être comptée (bug constaté : "Encadrer
-     une fraction..." validée à tort avec Niveau 1 à 100% alors que Niveau 2
-     n'était qu'à 67% — l'ancienne version ne gardait que le meilleur score
-     TOUS paliers confondus). Le pct renvoyé par compétence est donc le
-     MINIMUM des meilleurs scores par palier (palier jamais tenté = 0), pas
-     le meilleur score global — pour que la comparaison `pct >= SUCCESS_THRESHOLD`
-     déjà faite en aval par computeNiveauJauge reste inchangée.
+  /* ── Dédoublonnage : ligne la plus récente par (élève × exercice), TOUS
+     PALIERS REQUIS, réservé au numérateur de computeNiveauJauge. Une
+     compétence ne compte comme "acquise" que si CHAQUE palier déclaré
+     (meta.paliers, nombre réel de paliers du moteur — repli sur
+     meta.levels.length si non déclaré, même convention que levelDescFor)
+     atteint individuellement SUCCESS_THRESHOLD ; un seul palier sous le
+     seuil, ou jamais tenté, empêche la compétence entière d'être comptée
+     (bug constaté : "Encadrer une fraction..." validée à tort avec Niveau 1
+     à 100% alors que Niveau 2 n'était qu'à 67% — l'ancienne version ne
+     gardait que le meilleur score TOUS paliers confondus ; ce constat sur
+     le mélange des paliers reste valable indépendamment du choix
+     meilleur/dernier ci-dessous). Le pct renvoyé par compétence est donc le
+     MINIMUM des pct de la tentative la plus récente de chaque palier
+     (palier jamais tenté = 0), jamais un score global unique — pour que la
+     comparaison `pct >= SUCCESS_THRESHOLD` déjà faite en aval par
+     computeNiveauJauge reste inchangée.
      Même garde que précédemment : exclut, via metaFor(), toute ligne dont
      l'exercise_slug brut n'a pas de `levels` fiables — notamment les anciens
      slugs LEGACY_SLUG_ALIASES (metaFor leur renvoie `levels: []`, leur
      numérotation de palier, flat/mono-niveau, étant incompatible avec celle
      du nouvel exercice fusionné). */
   function dedupeBestBySlugForJauge(rows, catalogMap) {
-    const bestByPalier      = new Map(); // 'student|slug' -> Map(palier -> meilleur pct)
+    const latestByPalier    = new Map(); // 'student|slug' -> Map(palier -> ligne la plus récente)
     const totalPaliersBySlug = new Map(); // slug -> nombre de paliers requis
 
     rows.forEach(r => {
@@ -220,22 +235,22 @@ const lfmAnalytics = (() => {
       totalPaliersBySlug.set(slug, totalPaliers);
       const palier = levelToPalierKey(r.level);
       const key    = r.student_id + '|' + slug;
-      const pct    = parseFloat(r.pct);
-      if (!bestByPalier.has(key)) bestByPalier.set(key, new Map());
-      const paliersMap = bestByPalier.get(key);
-      const prevPct = paliersMap.get(palier);
-      if (prevPct === undefined || pct > prevPct) paliersMap.set(palier, pct);
+      if (!latestByPalier.has(key)) latestByPalier.set(key, new Map());
+      const paliersMap = latestByPalier.get(key);
+      const prevRow = paliersMap.get(palier);
+      if (!prevRow || isMoreRecent(r, prevRow)) paliersMap.set(palier, r);
     });
 
     const out = [];
-    bestByPalier.forEach((paliersMap, key) => {
+    latestByPalier.forEach((paliersMap, key) => {
       const sep = key.indexOf('|');
       const studentId = key.slice(0, sep);
       const slug = key.slice(sep + 1);
       const totalPaliers = totalPaliersBySlug.get(slug) || 1;
       let effectivePct = 100;
       for (let p = 1; p <= totalPaliers; p++) {
-        const pct = paliersMap.get(String(p));
+        const row = paliersMap.get(String(p));
+        const pct = row ? parseFloat(row.pct) : undefined;
         effectivePct = Math.min(effectivePct, pct !== undefined ? pct : 0);
       }
       out.push({ student_id: studentId, exercise_slug: slug, pct: effectivePct });
@@ -290,19 +305,19 @@ const lfmAnalytics = (() => {
     return niveauForPalier(safeIdx, paliers, meta.levels);
   }
 
-  /* ── Dédoublonnage : meilleur pct par (élève × exercice × niveau scolaire résolu) ──
-     Nécessaire pour les jauges — un même exercice progressif peut être tenté
-     à plusieurs paliers, on ne veut retenir que le meilleur score obtenu au
-     niveau scolaire résolu, pas le meilleur toutes tentatives confondues. */
+  /* ── Dédoublonnage : ligne la plus récente par (élève × exercice × niveau
+     scolaire résolu) ── Nécessaire pour les jauges — un même exercice
+     progressif peut être tenté à plusieurs paliers, on ne veut retenir que
+     la tentative la plus récente au niveau scolaire résolu, pas le
+     meilleur score toutes tentatives confondues. */
   function dedupeBestByNiveau(rows, catalogMap) {
     const map = new Map();
     rows.forEach(r => {
       const niveau = resolveNiveau(catalogMap, r);
       if (!niveau) return;
       const key  = r.student_id + '|' + r.exercise_slug + '|' + niveau;
-      const pct  = parseFloat(r.pct);
       const prev = map.get(key);
-      if (!prev || pct > prev.pct) map.set(key, { ...r, pct, niveau });
+      if (!prev || isMoreRecent(r, prev)) map.set(key, { ...r, pct: parseFloat(r.pct), niveau });
     });
     return Array.from(map.values());
   }
@@ -461,12 +476,12 @@ const lfmAnalytics = (() => {
       .sort((a, b) => a.avgPct - b.avgPct);
   }
 
-  /* ── Dédoublonnage : meilleur pct par (élève × exercice × palier interne 1/2/3) ──
-     Distinct de dedupeBestByNiveau (qui résout le niveau SCOLAIRE CM1/CM2/6e
-     via meta.levels/paliers — approximatif, pensé pour les jauges de
-     progression). Ici on veut le palier interne (1/2/3) tel quel, via
-     levelToPalierKey directement sur la valeur brute stockée — donc
-     disponible pour tout exercice, y compris les types standalone sans
+  /* ── Dédoublonnage : ligne la plus récente par (élève × exercice × palier
+     interne 1/2/3) ── Distinct de dedupeBestByNiveau (qui résout le niveau
+     SCOLAIRE CM1/CM2/6e via meta.levels/paliers — approximatif, pensé pour
+     les jauges de progression). Ici on veut le palier interne (1/2/3) tel
+     quel, via levelToPalierKey directement sur la valeur brute stockée —
+     donc disponible pour tout exercice, y compris les types standalone sans
      `levels` déclarés dans le catalogue (contrairement à resolveNiveau).
      exercise_slug résolu via canonicalSlug() avant de servir de clé, même
      principe que dedupeBestBySlug — un ancien exercice mono-niveau fusionné
@@ -479,9 +494,8 @@ const lfmAnalytics = (() => {
       const slug   = canonicalSlug(r.exercise_slug);
       const palier = levelToPalierKey(r.level);
       const key    = r.student_id + '|' + slug + '|' + palier;
-      const pct    = parseFloat(r.pct);
       const prev   = map.get(key);
-      if (!prev || pct > prev.pct) map.set(key, { ...r, exercise_slug: slug, pct, palier });
+      if (!prev || isMoreRecent(r, prev)) map.set(key, { ...r, exercise_slug: slug, pct: parseFloat(r.pct), palier });
     });
     return Array.from(map.values());
   }
@@ -756,14 +770,22 @@ const lfmAnalytics = (() => {
     Object.values(sousDomaineJauges).forEach(list => list.sort((a, b) => a.sousDomaine.localeCompare(b.sousDomaine, 'fr')));
 
     /* ── Compétences à consolider / réussies ──────────────────────────────
-       Consolider : moyenne ≤60% OU échec répété (≥2 tentatives sur un même
-       exercice sans jamais atteindre 80%). Réussies : moyenne ≥80%.
+       Consolider : dernière tentative ≤60% OU échec répété (≥2 tentatives
+       sur un même exercice sans jamais atteindre 80%, sur l'historique
+       complet — indépendant du choix dernier/meilleur ci-dessus). Réussies :
+       dernière tentative ≥80%.
        Clé par exercise_slug (même principe que niveauAggByComp ci-dessus,
        et même clé exacte) — pas par compLabel : une compétence du catalogue
        peut regrouper plusieurs exercices, chacun listé séparément avec son
        propre titre (exerciseTitleFor) plutôt que fusionnés sous le libellé
        générique de la compétence. La clé doit correspondre exactement à
-       celle de niveauAggByComp pour que `levels` ci-dessous ne soit pas vide. */
+       celle de niveauAggByComp pour que `levels` ci-dessous ne soit pas vide.
+       Champ `pct` (pas `avgPct`) : `best` ne contient déjà qu'une ligne par
+       (élève × exercice) — ce n'est jamais la moyenne de plusieurs
+       tentatives, seulement le pct de la tentative retenue (la plus
+       récente) ; agg.sum/agg.count ci-dessous vaut donc toujours agg.sum
+       lui-même (count === 1), gardé sous cette forme uniquement pour
+       partager la même structure que les autres agrégats de ce fichier. */
     const attemptsBySlug = new Map();
     rows.forEach(r => {
       if (!attemptsBySlug.has(r.exercise_slug)) attemptsBySlug.set(r.exercise_slug, []);
@@ -782,26 +804,27 @@ const lfmAnalytics = (() => {
     const consolider = [];
     const reussies    = [];
     compAgg.forEach((agg, key) => {
-      const avgPct = agg.sum / agg.count;
+      const pct = agg.sum / agg.count;
       const attempts = attemptsBySlug.get(agg.slug) || [];
       const hasRepeatedFailure = attempts.length >= 2 && Math.max(...attempts) < SUCCESS_THRESHOLD;
       const entry = {
         domaine: agg.meta.domaine,
         competence: agg.title,
-        avgPct: Math.round(avgPct),
+        pct: Math.round(pct),
         hasRepeatedFailure,
         exampleSlug: agg.slug,
         levels: levelsPctFor(key)
       };
-      if (avgPct <= 60 || hasRepeatedFailure) consolider.push(entry);
-      else if (avgPct >= SUCCESS_THRESHOLD) reussies.push(entry);
+      if (pct <= 60 || hasRepeatedFailure) consolider.push(entry);
+      else if (pct >= SUCCESS_THRESHOLD) reussies.push(entry);
     });
-    consolider.sort((a, b) => (b.hasRepeatedFailure - a.hasRepeatedFailure) || (a.avgPct - b.avgPct));
-    reussies.sort((a, b) => b.avgPct - a.avgPct);
+    consolider.sort((a, b) => (b.hasRepeatedFailure - a.hasRepeatedFailure) || (a.pct - b.pct));
+    reussies.sort((a, b) => b.pct - a.pct);
 
     /* ── Taux de réussite général / par matière ───────────────────────────
-       Moyenne simple des meilleurs scores (un seul élève : pas de biais
-       "élève très actif" à corriger, contrairement à la classe). */
+       Moyenne simple des pct de la dernière tentative de chaque exercice
+       (un par exercice, via `best`) — un seul élève : pas de biais "élève
+       très actif" à corriger, contrairement à la classe. */
     const generalAvg  = best.length ? Math.round(best.reduce((s, r) => s + r.pct, 0) / best.length) : null;
     const francaisBest = best.filter(r => metaFor(catalogMap, r.exercise_slug).domaine === 'Français');
     const mathsBest     = best.filter(r => metaFor(catalogMap, r.exercise_slug).domaine === 'Mathématiques');

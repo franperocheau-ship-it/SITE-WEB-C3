@@ -14615,6 +14615,13 @@
        ══════════════════════════════════════════════════════════════════════ */
 
     const PSC_SEUIL    = 0.8;
+    /* Coupe l'écriture exercise_item_results (audit 2026-09-13) : le détail
+       par question n'est plus exposé dans l'interface, pas de raison de
+       payer le coût d'écriture Supabase tant que ça reste vrai. Code de
+       suivi (recordItemResult() + attemptId/itemResults) laissé en place
+       ci-dessous, juste neutralisé par ce flag — repasser à true pour
+       réactiver. */
+    const PSC_ITEM_TRACKING_ENABLED = false;
     const PSC_POSITIFS = ["Très bien !", "Parfait !", "Excellent !", "C'est juste !", "Bravo !"];
     let pscState = null;
     let pscLevelSelect = null;
@@ -14681,8 +14688,10 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
 
-      itemResults = [];
-      attemptId   = crypto.randomUUID();
+      if (PSC_ITEM_TRACKING_ENABLED) {
+        itemResults = [];
+        attemptId   = crypto.randomUUID();
+      }
 
       if (lv === 1) {
         const qs = pscShuffle([...sessionData.lvl1Bank]);
@@ -14746,7 +14755,7 @@
             card.querySelectorAll('.ex-word-btn').forEach(b => b.disabled = true);
             btn.classList.add('is-correct');
             if (firstTry) pscState.score++;
-            recordItemResult(q, firstTry, pscState.level);
+            if (PSC_ITEM_TRACKING_ENABLED) recordItemResult(q, firstTry, pscState.level);
             document.getElementById('psc-fb').innerHTML =
               `<div class="ex-feedback-correct">${pscPos()} ${q.feedbackCorrect}<div class="ex-note">${q.note}</div></div>`;
             document.getElementById('next-btn').classList.remove('ex-hidden');
@@ -14813,7 +14822,7 @@
           const chosen  = btn.dataset.fn;
           const correct = chosen === q.fn;
 
-          recordItemResult(q, correct, pscState.level);
+          if (PSC_ITEM_TRACKING_ENABLED) recordItemResult(q, correct, pscState.level);
           if (correct) { btn.classList.add('is-correct'); pscState.score++; }
           else {
             btn.classList.add('is-wrong');
@@ -14896,7 +14905,7 @@
         const pronounOnly  = pscNorm(q.targetPronoun) === norm;
         const correct      = pronounOnly || q.answers.some(a => pscNorm(a) === norm);
 
-        recordItemResult(q, correct, pscState.level);
+        if (PSC_ITEM_TRACKING_ENABLED) recordItemResult(q, correct, pscState.level);
         if (correct) {
           input.classList.add('is-correct');
           pscState.score++;
@@ -15003,8 +15012,7 @@
         level:        'Niveau ' + level,
         score:        lvScore, total,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
-        attemptId,
-        itemResults
+        ...(PSC_ITEM_TRACKING_ENABLED ? { attemptId, itemResults } : {})
       });
     }
 
@@ -15017,6 +15025,13 @@
        ══════════════════════════════════════════════════════════════════════════ */
 
     const GNSP_SEUIL    = 0.8;
+    /* Coupe l'écriture exercise_item_results (audit 2026-09-13) : le détail
+       par question n'est plus exposé dans l'interface, pas de raison de
+       payer le coût d'écriture Supabase tant que ça reste vrai. Code de
+       suivi (recordItemResult() + attemptId/itemResults) laissé en place
+       ci-dessous, juste neutralisé par ce flag — repasser à true pour
+       réactiver. */
+    const GNSP_ITEM_TRACKING_ENABLED = false;
     const GNSP_POSITIFS = ["Très bien !", "Parfait !", "Excellent !", "C'est juste !", "Bravo !"];
     const GNSP_LEVEL_DEFS = [
       { lv: 1, desc: 'Clique sur tous les mots qui composent le GNS' },
@@ -15080,8 +15095,10 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
 
-      itemResults = [];
-      attemptId   = crypto.randomUUID();
+      if (GNSP_ITEM_TRACKING_ENABLED) {
+        itemResults = [];
+        attemptId   = crypto.randomUUID();
+      }
 
       if (lv === 1) {
         const qs = gnspShuffle([...sessionData.lvl1Bank]);
@@ -15145,7 +15162,7 @@
           else if (selected.has(i)) b.classList.add('is-wrong');
         });
 
-        recordItemResult(q, isCorrect, gnspState.level);
+        if (GNSP_ITEM_TRACKING_ENABLED) recordItemResult(q, isCorrect, gnspState.level);
         if (isCorrect) {
           gnspState.score++;
           document.getElementById('gnsp-fb').innerHTML =
@@ -15238,7 +15255,7 @@
           const chosen  = btn.dataset.pn;
           const correct = chosen === q.pronoun;
 
-          recordItemResult(q, correct, gnspState.level);
+          if (GNSP_ITEM_TRACKING_ENABLED) recordItemResult(q, correct, gnspState.level);
           if (correct) {
             btn.classList.add('is-correct');
             gnspState.score++;
@@ -15292,7 +15309,7 @@
         const norm    = gnspNorm(raw);
         const correct = q.answers.some(a => gnspNorm(a) === norm);
 
-        recordItemResult(q, correct, gnspState.level);
+        if (GNSP_ITEM_TRACKING_ENABLED) recordItemResult(q, correct, gnspState.level);
         if (correct) {
           input.classList.add('is-correct');
           gnspState.score++;
@@ -15398,8 +15415,7 @@
         level:        'Niveau ' + level,
         score:        lvScore, total,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
-        attemptId,
-        itemResults
+        ...(GNSP_ITEM_TRACKING_ENABLED ? { attemptId, itemResults } : {})
       });
     }
 
@@ -21900,6 +21916,13 @@
        ════════════════════════════════════════════════════════════════════════ */
 
     const CIG_SEUIL = 0.8;
+    /* Coupe l'écriture exercise_item_results (audit 2026-09-13) : le détail
+       par question n'est plus exposé dans l'interface, pas de raison de
+       payer le coût d'écriture Supabase tant que ça reste vrai. Code de
+       suivi (recordItemResult() + attemptId/itemResults) laissé en place
+       ci-dessous, juste neutralisé par ce flag — repasser à true pour
+       réactiver. */
+    const CIG_ITEM_TRACKING_ENABLED = false;
 
     const CIG_LV_DEFS = [
       { lv: 1, desc: 'QCM : trouve l\'infinitif et le groupe' },
@@ -21946,8 +21969,10 @@
       const prog = document.querySelector('#exercise-screen .ex-progress');
       if (prog) prog.classList.remove('ex-hidden');
 
-      itemResults = [];
-      attemptId   = crypto.randomUUID();
+      if (CIG_ITEM_TRACKING_ENABLED) {
+        itemResults = [];
+        attemptId   = crypto.randomUUID();
+      }
 
       const pool = shuffle((sessionData.bank || []).filter(item => item.level === lv));
       const qs   = pool.slice(0, sessionData.questionsPerSession || 10);
@@ -22037,7 +22062,7 @@
         document.getElementById('cig-fb1').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
         setTimeout(() => cigRenderStep2(card, q), 700);
       } else {
-        recordItemResult(q, false, cigState.level);
+        if (CIG_ITEM_TRACKING_ENABLED) recordItemResult(q, false, cigState.level);
         document.getElementById('cig-fb1').innerHTML = `
           <div class="ex-feedback-wrong">
             ❌ Ce n'est pas la bonne réponse.<br>
@@ -22076,7 +22101,7 @@
       });
       if (!isRight) btn.classList.add('is-wrong');
 
-      recordItemResult(q, isRight, cigState.level);
+      if (CIG_ITEM_TRACKING_ENABLED) recordItemResult(q, isRight, cigState.level);
       if (isRight) {
         cigState.score++;
         document.getElementById('cig-fb2').innerHTML = `<div class="ex-feedback-correct">${rand(SUCCESS)}</div>`;
@@ -22169,8 +22194,7 @@
         score:        lvScore,
         total,
         durationSecs: sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : null,
-        attemptId,
-        itemResults
+        ...(CIG_ITEM_TRACKING_ENABLED ? { attemptId, itemResults } : {})
       });
     }
 

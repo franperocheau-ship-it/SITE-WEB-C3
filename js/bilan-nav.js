@@ -2,8 +2,12 @@
    bilan-nav.js — Navigation progressive à 5 étapes pour l'onglet "Détail par
    compétence" (classe ET fiche élève) : matière → sous-domaine → compétence
    (un exercice, triée du moins réussi au mieux réussi) → niveau (palier
-   interne 1/2/3, avec %) → feuille (élèves pour la classe, détail par
-   question pour l'élève — voir resultats-enseignant.html).
+   interne 1/2/3, avec %) → feuille (élèves et leur score pour la classe —
+   voir resultats-enseignant.html). Mode élève : l'étape 4 (niveau) est le
+   terminus — le pourcentage y est affiché mais la ligne n'est plus cliquable
+   (audit 2026-09-13, retrait du détail par question/erreur de l'interface) ;
+   getLeafItems/renderEleveLeaf restent acceptés par mount() pour ne pas
+   casser un appelant existant, simplement jamais atteints en mode élève.
 
    Ne fait aucun appel réseau. Ne construit aucune structure imbriquée lui-
    même : la structure de l'arbre (quels domaines/sous-domaines/compétences/
@@ -187,6 +191,12 @@ const lfmBilanNav = (() => {
         const desc  = config.getLevelDesc ? config.getLevelDesc(slug, palier) : null;
         const label = desc ? `Niveau ${escHtml(palier)} — ${escHtml(desc)}` : `Niveau ${escHtml(palier)}`;
         if (!rate) return disabledRow(label, 'pas encore travaillé');
+        /* Mode élève : pas de feuille (étape 5) — le détail par question/
+           erreur n'est plus exposé dans l'interface (audit 2026-09-13).
+           Le pourcentage reste affiché, juste non cliquable. Mode classe
+           inchangé : sa feuille liste les élèves et leur score, jamais le
+           détail des erreurs, donc hors de ce retrait. */
+        if (mode === 'eleve') return disabledRow(label, pctMeta(rate.avgPct, rate.metaText));
         return navRow(palier, label, pctMeta(rate.avgPct, rate.metaText));
       });
       body = renderRowList(rows);
