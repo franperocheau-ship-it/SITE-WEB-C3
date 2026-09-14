@@ -739,48 +739,56 @@ Object.assign(window.EXERCISE_DATA, {
     levels:     ["CM1", "CM2", "6e"],
     paliers:    3, /* nombre réel de paliers du moteur */
     levelDescs: {
-      "CM1": "Colonnes Unités + Dixièmes (/10)",
-      "CM2": "Colonnes Unités + Dixièmes + Centièmes (/100)",
-      "6e":  "Colonnes Unités + Dixièmes + Centièmes + Millièmes (/1000)"
+      "CM1": "Fractions en dixièmes (/10)",
+      "CM2": "Fractions en dixièmes et centièmes (/100)",
+      "6e":  "Fractions en dixièmes, centièmes et millièmes (/1000)"
     },
     backLink:   { href: "mathématiques-fractions.html", label: "Fractions" },
 
     /* tab : { u, di, ce, mi } — null = colonne non active */
 
-    /* ── Niveau 1 — /10 ── */
+    /* ── Niveau 1 — /10 ── 10 items, dont 4 fractions > 1 (num > den) qui
+       remplissent aussi la colonne Unité, pour que la Dizaine/Centaine
+       restent des colonnes "à ignorer" quel que soit le niveau. ── */
     lvl1: [
-      { num: 7, den: 10, decimal: 0.7, decimalStr: "0,7", tab: { u: 0, di: 7, ce: null, mi: null } },
       { num: 3, den: 10, decimal: 0.3, decimalStr: "0,3", tab: { u: 0, di: 3, ce: null, mi: null } },
+      { num: 7, den: 10, decimal: 0.7, decimalStr: "0,7", tab: { u: 0, di: 7, ce: null, mi: null } },
       { num: 9, den: 10, decimal: 0.9, decimalStr: "0,9", tab: { u: 0, di: 9, ce: null, mi: null } },
-      { num: 1, den: 10, decimal: 0.1, decimalStr: "0,1", tab: { u: 0, di: 1, ce: null, mi: null } },
-      { num: 5, den: 10, decimal: 0.5, decimalStr: "0,5", tab: { u: 0, di: 5, ce: null, mi: null } },
       { num: 4, den: 10, decimal: 0.4, decimalStr: "0,4", tab: { u: 0, di: 4, ce: null, mi: null } },
       { num: 6, den: 10, decimal: 0.6, decimalStr: "0,6", tab: { u: 0, di: 6, ce: null, mi: null } },
-      { num: 2, den: 10, decimal: 0.2, decimalStr: "0,2", tab: { u: 0, di: 2, ce: null, mi: null } }
+      { num: 8, den: 10, decimal: 0.8, decimalStr: "0,8", tab: { u: 0, di: 8, ce: null, mi: null } },
+      { num: 12, den: 10, decimal: 1.2, decimalStr: "1,2", tab: { u: 1, di: 2, ce: null, mi: null } },
+      { num: 15, den: 10, decimal: 1.5, decimalStr: "1,5", tab: { u: 1, di: 5, ce: null, mi: null } },
+      { num: 18, den: 10, decimal: 1.8, decimalStr: "1,8", tab: { u: 1, di: 8, ce: null, mi: null } },
+      { num: 23, den: 10, decimal: 2.3, decimalStr: "2,3", tab: { u: 2, di: 3, ce: null, mi: null } }
     ],
 
-    /* ── Niveau 2 — /100 ── */
+    /* ── Niveau 2 — /100 ── 10 items, dont 4 fractions > 1 ── */
     lvl2: [
       { num: 37, den: 100, decimal: 0.37, decimalStr: "0,37", tab: { u: 0, di: 3, ce: 7, mi: null } },
       { num: 75, den: 100, decimal: 0.75, decimalStr: "0,75", tab: { u: 0, di: 7, ce: 5, mi: null } },
-      { num: 40, den: 100, decimal: 0.4,  decimalStr: "0,40", tab: { u: 0, di: 4, ce: 0, mi: null } },
       { num:  8, den: 100, decimal: 0.08, decimalStr: "0,08", tab: { u: 0, di: 0, ce: 8, mi: null } },
       { num: 60, den: 100, decimal: 0.6,  decimalStr: "0,60", tab: { u: 0, di: 6, ce: 0, mi: null } },
       { num: 17, den: 100, decimal: 0.17, decimalStr: "0,17", tab: { u: 0, di: 1, ce: 7, mi: null } },
-      { num: 50, den: 100, decimal: 0.5,  decimalStr: "0,50", tab: { u: 0, di: 5, ce: 0, mi: null } },
-      { num: 91, den: 100, decimal: 0.91, decimalStr: "0,91", tab: { u: 0, di: 9, ce: 1, mi: null } }
+      { num: 91, den: 100, decimal: 0.91, decimalStr: "0,91", tab: { u: 0, di: 9, ce: 1, mi: null } },
+      { num: 105, den: 100, decimal: 1.05, decimalStr: "1,05", tab: { u: 1, di: 0, ce: 5, mi: null } },
+      { num: 148, den: 100, decimal: 1.48, decimalStr: "1,48", tab: { u: 1, di: 4, ce: 8, mi: null } },
+      { num: 230, den: 100, decimal: 2.3,  decimalStr: "2,30", tab: { u: 2, di: 3, ce: 0, mi: null } },
+      { num: 372, den: 100, decimal: 3.72, decimalStr: "3,72", tab: { u: 3, di: 7, ce: 2, mi: null } }
     ],
 
-    /* ── Niveau 3 — /1000 ── */
+    /* ── Niveau 3 — /1000 ── 10 items, dont 4 fractions > 1 ── */
     lvl3: [
       { num:  125, den: 1000, decimal: 0.125, decimalStr: "0,125", tab: { u: 0, di: 1, ce: 2, mi: 5 } },
       { num:  450, den: 1000, decimal: 0.45,  decimalStr: "0,450", tab: { u: 0, di: 4, ce: 5, mi: 0 } },
       { num:  875, den: 1000, decimal: 0.875, decimalStr: "0,875", tab: { u: 0, di: 8, ce: 7, mi: 5 } },
-      { num: 1234, den: 1000, decimal: 1.234, decimalStr: "1,234", tab: { u: 1, di: 2, ce: 3, mi: 4 } },
       { num:  500, den: 1000, decimal: 0.5,   decimalStr: "0,500", tab: { u: 0, di: 5, ce: 0, mi: 0 } },
       { num:  750, den: 1000, decimal: 0.75,  decimalStr: "0,750", tab: { u: 0, di: 7, ce: 5, mi: 0 } },
+      { num:   30, den: 1000, decimal: 0.03,  decimalStr: "0,030", tab: { u: 0, di: 0, ce: 3, mi: 0 } },
+      { num: 1234, den: 1000, decimal: 1.234, decimalStr: "1,234", tab: { u: 1, di: 2, ce: 3, mi: 4 } },
+      { num: 1500, den: 1000, decimal: 1.5,   decimalStr: "1,500", tab: { u: 1, di: 5, ce: 0, mi: 0 } },
       { num: 2345, den: 1000, decimal: 2.345, decimalStr: "2,345", tab: { u: 2, di: 3, ce: 4, mi: 5 } },
-      { num:   30, den: 1000, decimal: 0.03,  decimalStr: "0,030", tab: { u: 0, di: 0, ce: 3, mi: 0 } }
+      { num: 3125, den: 1000, decimal: 3.125, decimalStr: "3,125", tab: { u: 3, di: 1, ce: 2, mi: 5 } }
     ]
   }
 
