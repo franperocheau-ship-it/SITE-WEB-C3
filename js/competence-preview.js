@@ -356,8 +356,7 @@ const CompetencePreview = (() => {
       const rem  = item.num % item.den;
       const d = item.den === 10 ? rem : Math.floor(rem / 10);
       const c = item.den === 10 ? 0   : rem % 10;
-      const trapNote = item.hasTrap ? " + piège vrai/faux sur une écriture équivalente" : "";
-      return { q: `Colorier plusieurs grilles, placer ${item.num}/${item.den} au-delà de 1, puis décomposer${trapNote} (exemple ; item tiré aléatoirement à l'exécution)`, a: `${item.num}/${item.den} = ${unit} unité(s) + ${d} dixième(s) + ${c} centième(s)` };
+      return { q: `Colorier plusieurs grilles, placer ${item.num}/${item.den} au-delà de 1, puis décomposer (exemple ; item tiré aléatoirement à l'exécution)`, a: `${item.num}/${item.den} = ${unit} unité(s) + ${d} dixième(s) + ${c} centième(s)` };
     },
 
     "lire-fraction": (item) => {

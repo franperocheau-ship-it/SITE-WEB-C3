@@ -707,12 +707,7 @@ Object.assign(window.EXERCISE_DATA, {
                   dénominateur (valeur entre 1 et 3 unités) — plusieurs
                   grilles complètes (1 grille = 1 unité) + le reste, droite
                   au-delà de 1. Décomposition à saisir : ? unité(s) +
-                  ? dixième(s) + ? centième(s). Un item sur deux ajoute un
-                  piège vrai/faux sur deux écritures fractionnaires
-                  équivalentes (ex. 12/10 et 120/100), jamais en écriture à
-                  virgule ; quand aucune équivalence exacte /10 ↔ /100
-                  n'existe pour l'item tiré, le piège est toujours "faux".
-                  3 sous-réponses, 4 si le piège vrai/faux est présent.
+                  ? dixième(s) + ? centième(s). 3 sous-réponses.
     ────────────────────────────────────────────────────────────────────── */
     genRules: {
       1: { den: 10,  numMin: 1,   numMax: 10  },
@@ -730,7 +725,7 @@ Object.assign(window.EXERCISE_DATA, {
       { level: 2, num: 34, den: 100 }
     ],
     lvl3: [
-      { level: 3, num: 23, den: 10, hasTrap: true }
+      { level: 3, num: 23, den: 10 }
     ]
   },
 
