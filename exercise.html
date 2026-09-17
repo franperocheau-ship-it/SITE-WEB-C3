@@ -7299,6 +7299,24 @@
         .replace(/[''`´‘’]/g, '');
     }
 
+    /* Compare la saisie de l'élève à la réponse attendue pour les exercices
+       « texte à trous » (q.sentence contient un blanc "____", q.answer est
+       le mot/la forme attendue). Accepte :
+         1. la réponse seule (comportement historique) ;
+         2. la phrase entière reconstituée, blanc remplacé par la réponse
+            (certains élèves recopient toute la phrase).
+       Insensible à la casse, aux espaces multiples et à la ponctuation finale. */
+    function isBlankAnswerCorrect(userValue, q) {
+      const stripEndPunct = s => s.replace(/[\s.!?;:,]+$/, '');
+      const userNorm      = stripEndPunct(normalize(userValue));
+      if (userNorm === stripEndPunct(normalize(q.answer))) return true;
+      if (q.sentence && /_{3,}/.test(q.sentence)) {
+        const fullSentence = q.sentence.replace(/_{3,}/, q.answer);
+        if (userNorm === stripEndPunct(normalize(fullSentence))) return true;
+      }
+      return false;
+    }
+
     /* ── Type: accord-ecrit ──────────────────────────────────────────────────
        Student reads an instruction, sees a GN to transform, and types the
        correct form. Supports q.answer (string) or q.answers (array).
@@ -17912,7 +17930,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -18182,7 +18200,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -18446,7 +18464,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -18713,7 +18731,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -18980,7 +18998,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -19247,7 +19265,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -19549,7 +19567,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -19595,7 +19613,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -19897,7 +19915,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -19943,7 +19961,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -20245,7 +20263,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -20291,7 +20309,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -20595,7 +20613,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -20641,7 +20659,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -20928,7 +20946,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -20973,7 +20991,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -21277,7 +21295,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
@@ -21323,7 +21341,7 @@
         input.disabled  = true;
         valBtn.disabled = true;
 
-        const isRight = normalize(input.value) === normalize(q.answer);
+        const isRight = isBlankAnswerCorrect(input.value, q);
         input.classList.add(isRight ? 'is-correct' : 'is-wrong');
 
         if (isRight) {
