@@ -1339,11 +1339,21 @@
   }
 
   function closeModal() {
+    /* Le modal "Liens de la classe" n'a qu'un point d'entrée : la carte du
+       dashboard enseignant (voir applyView(), ?modal=links). Le fermer doit
+       donc ramener vers ce dashboard plutôt que de dévoiler la fiche classe
+       chargée en arrière-plan. */
+    const closingLinksModal = document.getElementById('modal-links').style.display !== 'none';
+
     document.getElementById('modal-overlay').style.display = 'none';
     _editingClassId   = null;
     _editingStudentId = null;
     _movingStudentId  = null;
     _editingLinkId    = null;
+
+    if (closingLinksModal) {
+      window.location.href = 'dashboard-enseignant.html';
+    }
   }
 
   document.getElementById('modal-overlay').addEventListener('click', e => {
