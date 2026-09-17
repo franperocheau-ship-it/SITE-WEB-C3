@@ -1101,19 +1101,35 @@
         el.innerHTML = subjAvg + '<span class="dash-stat-unit">%</span>';
       });
 
-      /* ── Points forts / à consolider (top 5 et bottom 5 compétences) ── */
+      /* ── Points forts (≥ seuil) / à consolider (< seuil) — partition
+         stricte par seuil, PAS de top N / bottom N : une compétence n'est
+         jamais évaluée par son rang mais uniquement par son score comparé à
+         CONSOLIDATION_THRESHOLD, donc chaque compétence tombe dans une seule
+         des deux listes (jamais aucune, jamais les deux). Le slice(0, 5) ne
+         fait que plafonner l'affichage, il ne participe pas au classement. ── */
+      const CONSOLIDATION_THRESHOLD = 80;
       const competenceStats = computeCompetenceStats(results);
-      const strengths  = [...competenceStats].sort((a, b) => b.avg - a.avg).slice(0, 5);
-      const weaknesses = [...competenceStats].sort((a, b) => a.avg - b.avg).slice(0, 5);
+      const strengths = competenceStats
+        .filter(e => e.avg >= CONSOLIDATION_THRESHOLD)
+        .sort((a, b) => b.avg - a.avg)
+        .slice(0, 5);
+      const weaknesses = competenceStats
+        .filter(e => e.avg < CONSOLIDATION_THRESHOLD)
+        .sort((a, b) => a.avg - b.avg)
+        .slice(0, 5);
 
       document.getElementById('strengths-content').innerHTML = strengths.length
         ? strengths.map(renderCompetenceRow).join('')
-        : '<div class="dash-empty" style="padding:8px 0;">Pas encore de résultat.</div>';
+        : competenceStats.length
+          ? '<div class="dash-empty" style="padding:8px 0;">Pas encore de compétence au-dessus du seuil, continue tes exercices !</div>'
+          : '<div class="dash-empty" style="padding:8px 0;">Pas encore de résultat.</div>';
       document.getElementById('section-strengths').style.display = '';
 
       document.getElementById('weaknesses-content').innerHTML = weaknesses.length
         ? weaknesses.map(renderCompetenceRow).join('')
-        : '<div class="dash-empty" style="padding:8px 0;">Pas encore de résultat.</div>';
+        : competenceStats.length
+          ? '<div class="dash-empty" style="padding:8px 0;">Rien à consolider pour l’instant, continue comme ça !</div>'
+          : '<div class="dash-empty" style="padding:8px 0;">Pas encore de résultat.</div>';
       document.getElementById('section-weaknesses').style.display = '';
 
       /* ── Bilan par compétences (pastilles) ── même composant que la fiche
