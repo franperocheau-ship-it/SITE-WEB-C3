@@ -38,6 +38,7 @@
   <script src="js/dictees-student-space.js?v=10"></script>
   <script src="js/vocab-student-space.js?v=3"></script>
   <script src="js/class-links-student.js?v=1"></script>
+  <script src="js/chorale-student.js?v=1"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=2">
   <script src="js/feature-flags.js?v=1"></script>
   <script src="js/resultats-nav.js?v=4"></script>
@@ -1214,6 +1215,31 @@
       grid.appendChild(card);
     }
 
+    /* ── Carte "Chorale" ────────────────────────────────────────────────────
+       N'apparaît que si l'enseignant a enregistré au moins un lien pour la
+       classe (jamais de carte vide) — voir js/chorale-student.js. Module
+       indépendant de "Liens de la classe" ci-dessus (chorale_links). */
+    async function maybeRenderChoraleCard() {
+      if (typeof lfmChoraleStudent === 'undefined') return;
+      const links = await lfmChoraleStudent.getMyChoraleLinks();
+      if (!links.length) return;
+
+      const grid = document.getElementById('student-dash-grid');
+      if (!grid) return;
+
+      const card = document.createElement('a');
+      card.href = 'chorale-eleve.html';
+      card.className = 'dash-card dash-card--active';
+      card.innerHTML = `
+        <div class="dash-card-icon dash-card-icon--placeholder">🎵</div>
+        <div class="dash-card-title">Chorale</div>
+        <div class="dash-card-desc">Retrouve les vidéos et liens choisis par ton professeur.</div>
+        <div class="dash-card-action">Voir →</div>
+        <div class="dash-card-accent"></div>
+      `;
+      grid.appendChild(card);
+    }
+
     /* ── Initialisation ────────────────────────────────────────────────────── */
     (async () => {
       const profile = await lfmAuth.requireRole('eleve');
@@ -1222,6 +1248,7 @@
 
       maybeRenderGuidedCard();
       maybeRenderClassLinksCard();
+      maybeRenderChoraleCard();
       // Bandeau de réactivation espacée (Champ lexical) désactivé : module pas encore en production.
       // if (typeof VocabStudentSpace !== 'undefined') VocabStudentSpace.renderReactivationBanner(profile.id);
 

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/favicon/favicon.ico?v=1" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png?v=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png?v=1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/favicon-192x192.png?v=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512x512.png?v=1">
+  <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
+  <link rel="manifest" href="site.webmanifest?v=1">
+  <title>Chorale — Espace élève</title>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <style>
+    .ch-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 40px 24px 64px; }
+    .ch-content { max-width: 1000px; margin: 0 auto; }
+    .ch-back-link { display: inline-block; margin-bottom: 20px; font-size: 13px; font-weight: 700; color: var(--blue); text-decoration: none; }
+    .ch-back-link:hover { text-decoration: underline; }
+    .ch-header { text-align: center; margin-bottom: 32px; }
+    .ch-header-icon { font-size: 48px; line-height: 1; margin-bottom: 8px; }
+    .ch-title { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: var(--blue); letter-spacing: 0.02em; }
+    .ch-subtitle { font-size: 14px; color: var(--muted); margin-top: 6px; }
+
+    .ch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+
+    .ch-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-sm);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-decoration: none;
+      border: 2px solid transparent;
+      border-top: 4px solid var(--blue);
+      transition: border-color 200ms, box-shadow 200ms, transform 140ms;
+    }
+    .ch-card:hover { border-color: rgba(16,43,106,0.2); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .ch-card--gold      { border-top-color: var(--color-brand-gold); }
+    .ch-card--turquoise { border-top-color: var(--color-niveau-cm1); }
+
+    .ch-card-thumb-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: var(--bg); }
+    .ch-card-thumb { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    .ch-card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .ch-card-thumb--favicon img { width: 32px; height: 32px; object-fit: contain; }
+    .ch-card-thumb-fallback {
+      position: absolute; inset: 0; display: none;
+      align-items: center; justify-content: center; font-size: 32px; background: var(--bg);
+    }
+
+    .ch-card-title { font-weight: 700; font-size: 15px; color: var(--blue); }
+    .ch-card-desc  { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .ch-card-action { font-size: 12px; font-weight: 700; color: var(--blue); letter-spacing: 0.03em; margin-top: auto; }
+
+    .ch-empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
+
+    button.ch-card { font: inherit; text-align: left; width: 100%; cursor: pointer; }
+
+    /* ── Modale de lecture vidéo (réutilise .lf-modal-* de styles.css,
+       élargie et sans marge autour du lecteur) ── */
+    .ch-video-modal { max-width: 720px; width: 92vw; }
+    .ch-video-body { padding: 14px 0 0 !important; gap: 0 !important; }
+    .ch-video-frame-wrap {
+      position: relative; width: 100%; aspect-ratio: 16 / 9;
+      background: #000; overflow: hidden;
+      border-radius: 0 0 var(--radius-card) var(--radius-card);
+    }
+    .ch-video-frame-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    @media (max-width: 600px) { .ch-wrap { padding: 24px 16px 48px; } }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+  </nav>
+
+  <!-- CONTENU -->
+  <div class="ch-wrap">
+    <div class="ch-content">
+      <a href="dashboard-eleve.html" class="ch-back-link">← Retour à mon espace</a>
+
+      <div class="ch-header">
+        <div class="ch-header-icon">🎵</div>
+        <div class="ch-title">Chorale</div>
+        <div class="ch-subtitle">Les vidéos et liens choisis par ton enseignant, en un clic.</div>
+      </div>
+
+      <div class="ch-grid" id="ch-grid"></div>
+      <div class="ch-empty" id="ch-empty" style="display:none">Ta classe n'a pas encore de lien enregistré.</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+  </footer>
+  <style>
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/idle-logout.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/chorale-student.js?v=1"></script>
+
+  <script>
+    const CARD_COLOR_CYCLE = ['', 'ch-card--gold', 'ch-card--turquoise'];
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    /* Miniature YouTube en priorité (extraction de l'ID depuis toutes les
+       formes d'URL courantes), sinon favicon du domaine (Google
+       s2/favicons, même précédent que "Liens de la classe" — voir
+       liens-classe-eleve.html), sinon icône générique 🔗. */
+    function youtubeIdFor(url) {
+      try {
+        const u = new URL(url);
+        const host = u.hostname.replace(/^www\./, '');
+        if (host === 'youtu.be') return u.pathname.slice(1) || null;
+        if (host === 'youtube.com' || host === 'm.youtube.com') {
+          if (u.pathname === '/watch') return u.searchParams.get('v');
+          if (u.pathname.startsWith('/embed/')) return u.pathname.split('/')[2] || null;
+          if (u.pathname.startsWith('/shorts/')) return u.pathname.split('/')[2] || null;
+        }
+      } catch (e) { /* URL invalide : pas de miniature */ }
+      return null;
+    }
+
+    function faviconUrlFor(url) {
+      try {
+        const hostname = new URL(url).hostname;
+        return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=64`;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function thumbHtmlFor(url) {
+      const ytId = youtubeIdFor(url);
+      const imgSrc = ytId ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` : faviconUrlFor(url);
+      const isFavicon = !ytId && !!imgSrc;
+      return `
+        <div class="ch-card-thumb-wrap">
+          <div class="ch-card-thumb${isFavicon ? ' ch-card-thumb--favicon' : ''}" style="${imgSrc ? '' : 'display:none'}">
+            ${imgSrc ? `<img src="${escapeHtml(imgSrc)}" alt="" onerror="this.closest('.ch-card-thumb').style.display='none'; this.closest('.ch-card-thumb-wrap').querySelector('.ch-card-thumb-fallback').style.display='flex';">` : ''}
+          </div>
+          <div class="ch-card-thumb-fallback" style="${imgSrc ? '' : 'display:flex'}">🔗</div>
+        </div>
+      `;
+    }
+
+    /* Vidéos YouTube : lues dans une modale (embed youtube-nocookie) plutôt
+       que d'ouvrir un nouvel onglet, pour rester sur le site. Les autres
+       liens gardent le comportement précédent (nouvel onglet). Le titre est
+       passé via _links + data-video-idx (jamais interpolé dans un attribut
+       HTML) pour éviter tout souci d'échappement sur un titre à guillemets. */
+    function renderLinkCard(link, i) {
+      const colorClass = CARD_COLOR_CYCLE[i % 3];
+      const ytId  = youtubeIdFor(link.url);
+      const thumb = thumbHtmlFor(link.url);
+      const desc  = link.description ? `<div class="ch-card-desc">${escapeHtml(link.description)}</div>` : '';
+
+      if (ytId) {
+        return `
+          <button type="button" class="ch-card ${colorClass}" data-video-idx="${i}">
+            ${thumb}
+            <div class="ch-card-title">${escapeHtml(link.title)}</div>
+            ${desc}
+            <div class="ch-card-action">Regarder ▶</div>
+          </button>
+        `;
+      }
+      return `
+        <a class="ch-card ${colorClass}" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">
+          ${thumb}
+          <div class="ch-card-title">${escapeHtml(link.title)}</div>
+          ${desc}
+          <div class="ch-card-action">Ouvrir →</div>
+        </a>
+      `;
+    }
+
+    /* ── Modale de lecture vidéo ── */
+    let _videoModalEl = null;
+
+    function injectVideoModal() {
+      if (_videoModalEl) return;
+      const wrap = document.createElement('div');
+      wrap.innerHTML = `
+        <div class="lf-modal-overlay" id="ch-video-overlay">
+          <div class="lf-modal ch-video-modal" role="dialog" aria-modal="true" aria-labelledby="ch-video-title">
+            <div class="lf-modal-header">
+              <h2 class="lf-modal-title" id="ch-video-title"></h2>
+              <button type="button" class="lf-modal-close" id="ch-video-close" aria-label="Fermer">×</button>
+            </div>
+            <div class="lf-modal-body ch-video-body">
+              <div class="ch-video-frame-wrap" id="ch-video-frame-wrap"></div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(wrap.firstElementChild);
+      _videoModalEl = document.getElementById('ch-video-overlay');
+
+      function close() {
+        _videoModalEl.style.display = 'none';
+        /* Retire l'iframe du DOM (et non un simple display:none) : c'est ce
+           qui coupe réellement la lecture, pas juste l'affichage. */
+        document.getElementById('ch-video-frame-wrap').innerHTML = '';
+      }
+
+      document.getElementById('ch-video-close').addEventListener('click', close);
+      _videoModalEl.addEventListener('click', (e) => { if (e.target === _videoModalEl) close(); });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && _videoModalEl.style.display === 'flex') close();
+      });
+
+      _videoModalEl.__close = close;
+    }
+
+    function openVideoModal(ytId, title) {
+      injectVideoModal();
+      document.getElementById('ch-video-title').textContent = title;
+
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(ytId)}?autoplay=1`;
+      iframe.title = title;
+      iframe.setAttribute('allow', 'autoplay; encrypted-media');
+      iframe.setAttribute('allowfullscreen', '');
+      iframe.setAttribute('frameborder', '0');
+
+      const frameWrap = document.getElementById('ch-video-frame-wrap');
+      frameWrap.innerHTML = '';
+      frameWrap.appendChild(iframe);
+
+      _videoModalEl.style.display = 'flex';
+    }
+
+    let _links = [];
+
+    async function loadLinks() {
+      const grid  = document.getElementById('ch-grid');
+      const empty = document.getElementById('ch-empty');
+      _links = await lfmChoraleStudent.getMyChoraleLinks();
+      if (!_links.length) { empty.style.display = 'block'; return; }
+      grid.innerHTML = _links.map((l, i) => renderLinkCard(l, i)).join('');
+
+      grid.querySelectorAll('[data-video-idx]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const link = _links[parseInt(btn.dataset.videoIdx, 10)];
+          const ytId = youtubeIdFor(link.url);
+          if (ytId) openVideoModal(ytId, link.title);
+        });
+      });
+    }
+
+    (async () => {
+      const profile = await lfmAuth.requireRole('eleve');
+      if (!profile) return;
+      loadLinks();
+    })();
+  </script>
+</body>
+</html>

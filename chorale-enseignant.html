@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/favicon/favicon.ico?v=1" sizes="any">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png?v=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png?v=1">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon/favicon-192x192.png?v=1">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon/favicon-512x512.png?v=1">
+  <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png?v=1">
+  <link rel="manifest" href="site.webmanifest?v=1">
+  <title>Chorale — Espace enseignant</title>
+  <link rel="stylesheet" href="styles.css?v=12">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/teacher.js?v=4"></script>
+  <script src="js/chorale-teacher.js?v=1"></script>
+  <style>
+    .dash-wrap { min-height: calc(100vh - 88px - 74px); background: var(--bg); padding: 32px 24px 64px; }
+    .dash-content { max-width: 900px; margin: 0 auto; }
+
+    .breadcrumb {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 24px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
+    }
+    .breadcrumb a { color: var(--blue); text-decoration: none; font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .bc-sep { color: var(--border); user-select: none; }
+    .bc-current { font-weight: 600; color: var(--text); }
+
+    .section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+    .section-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text); }
+
+    .ch-filter-field { margin-bottom: 20px; }
+    .ch-filter-field label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+    select.ch-select {
+      border: 1.5px solid var(--border); border-radius: 10px; padding: 9px 12px;
+      font-family: inherit; font-size: 14px; color: var(--text); background: var(--card-bg); min-width: 220px;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 20px; border-radius: 100px; font-family: inherit;
+      font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+      transition: background 180ms, transform 120ms, opacity 180ms; text-decoration: none;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.45; cursor: default; transform: none !important; }
+    .btn-primary { background: var(--blue); color: #fff; box-shadow: 0 2px 8px rgba(16,43,106,0.2); }
+    .btn-primary:hover:not(:disabled) { background: #0d2255; }
+    .btn-ghost { background: var(--card-bg); color: var(--muted); border: 1.5px solid var(--border); }
+    .btn-ghost:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
+    .btn-danger { background: rgba(214,40,57,0.07); color: var(--red); border: 1.5px solid rgba(214,40,57,0.2); }
+    .btn-danger:hover:not(:disabled) { background: rgba(214,40,57,0.14); }
+    .btn-sm { padding: 7px 14px; font-size: 12px; }
+    .btn-icon { padding: 7px 10px; border-radius: 8px; }
+
+    /* ── Formulaire d'ajout/édition ── */
+    .ch-form-card { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 14px; padding: 22px 24px; margin-bottom: 20px; }
+    .ch-form-title { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--blue); margin-bottom: 16px; }
+    .form-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .form-label { font-size: 11px; font-weight: 700; color: var(--blue); letter-spacing: 0.05em; text-transform: uppercase; }
+    .form-input {
+      padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: inherit; font-size: 14px; color: var(--text); background: var(--bg);
+      outline: none; transition: border-color 180ms; width: 100%; box-sizing: border-box;
+    }
+    .form-input:focus { border-color: var(--blue); }
+    .ch-form-hint { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+    .ch-form-actions { display: flex; gap: 10px; margin-top: 6px; }
+
+    .ch-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
+
+    /* ── Liste des liens ── */
+    .ch-list { display: flex; flex-direction: column; gap: 10px; }
+    .ch-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px;
+      background: var(--card-bg);
+    }
+    .ch-item--editing { opacity: 0.55; }
+
+    .ch-thumb-wrap { position: relative; width: 64px; height: 48px; flex-shrink: 0; }
+    .ch-thumb {
+      width: 64px; height: 48px; border-radius: 8px; overflow: hidden;
+      background: var(--bg); display: flex; align-items: center; justify-content: center;
+    }
+    .ch-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .ch-thumb--favicon img { width: 24px; height: 24px; object-fit: contain; }
+    .ch-thumb-fallback {
+      position: absolute; inset: 0; border-radius: 8px; background: var(--bg);
+      display: none; align-items: center; justify-content: center; font-size: 20px;
+    }
+
+    .ch-item-body { flex: 1; min-width: 0; }
+    .ch-item-title { font-weight: 700; font-size: 14px; color: var(--text); }
+    .ch-item-url { font-size: 12px; color: var(--blue); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ch-item-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .ch-item-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--blue); color: #fff; padding: 12px 22px; border-radius: 100px;
+      font-size: 14px; font-weight: 600; box-shadow: var(--shadow-md); z-index: 2000;
+    }
+    .toast.is-error { background: var(--red); }
+
+    footer { background: #102B6A !important; color: #fff !important; padding: 10px 20px !important; }
+    .footer__inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .footer__text { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffffbb; line-height: 1.4; padding-bottom: 2px; }
+    .footer__text .rouge { color: #F5A623; font-weight: 700; }
+    .footer__credit { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: #ffffff66; }
+    .footer__credit a { color: #ffffff99; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+  <div class="navbar__inner">
+    <a href="index.html" class="navbar__brand">
+      <img src="assets/proficiamuspetit.png?v=9" alt="Logo Proficiamus" />
+    </a>
+    <div class="navbar__nav">
+      <a href="index.html">Accueil</a>
+      <a href="apropos.html">À propos</a>
+      <span class="nav-lang">🌐 FR ∨</span>
+      <button class="btn-login menu-btn" aria-label="Ouvrir le menu">👤 Connexion</button>
+    </div>
+  </div>
+</nav>
+
+  <div class="dash-wrap">
+    <div class="dash-content">
+
+      <nav class="breadcrumb" aria-label="Fil d'Ariane">
+        <a href="dashboard-enseignant.html">Espace enseignant</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-current">Chorale</span>
+      </nav>
+
+      <div class="section-header">
+        <h1 class="section-title">🎵 Chorale</h1>
+      </div>
+
+      <div class="ch-filter-field">
+        <label for="ch-class-select">Classe</label>
+        <select id="ch-class-select" class="ch-select"></select>
+      </div>
+
+      <div class="section-header">
+        <div></div>
+        <button type="button" class="btn btn-primary" id="ch-new-btn">+ Nouveau lien</button>
+      </div>
+
+      <!-- ── Formulaire de création/édition ── -->
+      <div id="ch-form-card" class="ch-form-card" style="display:none">
+        <div class="ch-form-title" id="ch-form-title">Nouveau lien</div>
+
+        <div class="form-field">
+          <label class="form-label" for="ch-title">Titre</label>
+          <input class="form-input" id="ch-title" type="text" placeholder="Ex. Chant de Noël — répétition" maxlength="80">
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="ch-url">URL</label>
+          <input class="form-input" id="ch-url" type="text" placeholder="https://www.youtube.com/watch?v=...">
+          <div class="ch-form-hint">« https:// » sera ajouté automatiquement si tu ne le précises pas.</div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="ch-desc">Description (optionnelle)</label>
+          <input class="form-input" id="ch-desc" type="text" placeholder="Ex. Couplets 1 et 2" maxlength="200">
+        </div>
+
+        <div class="ch-form-actions">
+          <button type="button" class="btn btn-primary" id="ch-save-btn">+ Ajouter le lien</button>
+          <button type="button" class="btn btn-ghost" id="ch-cancel-btn">Annuler</button>
+        </div>
+      </div>
+
+      <!-- ── Liste des liens de la classe ── -->
+      <div id="ch-list"><div class="ch-empty">Chargement…</div></div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer__inner">
+    <p class="footer__text">
+      Cet espace est conçu comme un support ponctuel d'entraînement et de consolidation des apprentissages,
+      dans le respect d'un <span class="rouge">usage mesuré</span> des écrans.
+    </p>
+    <p class="footer__credit">© 2026 François Pérocheau &nbsp;•&nbsp;
+      <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.fr"
+         target="_blank" rel="license noopener noreferrer">
+        <span class="cc-badge" style="display:inline-flex; align-items:center; gap:4px; vertical-align:middle;">
+            <img src="assets/icons/cc/cc.svg" alt="Creative Commons" width="14" height="14">
+            <img src="assets/icons/cc/by.svg" alt="Attribution" width="14" height="14">
+            <img src="assets/icons/cc/nc.svg" alt="Pas d'utilisation commerciale" width="14" height="14">
+            <img src="assets/icons/cc/nd.svg" alt="Pas de modification" width="14" height="14">
+          </span>
+      </a>
+      &nbsp;•&nbsp; <a href="/mentions-legales.html">Mentions légales</a></p>
+  </div>
+</footer>
+
+  <script src="js/menu.js"></script>
+  <script>
+    let _classes        = [];
+    let _currentClassId = null;
+    let _links          = [];
+    let _editingLinkId  = null;
+
+    /* ── Miniatures : vidéo YouTube en priorité (extraction de l'ID depuis
+       toutes les formes d'URL courantes), sinon favicon du domaine (Google
+       s2/favicons, même précédent que "Liens de la classe" côté élève —
+       voir liens-classe-eleve.html), sinon icône générique 🔗. Le repli en
+       cas d'échec de chargement de l'image (domaine sans favicon, ID
+       YouTube invalide...) bascule sur cette même icône générique. */
+    function youtubeIdFor(url) {
+      try {
+        const u = new URL(url);
+        const host = u.hostname.replace(/^www\./, '');
+        if (host === 'youtu.be') return u.pathname.slice(1) || null;
+        if (host === 'youtube.com' || host === 'm.youtube.com') {
+          if (u.pathname === '/watch') return u.searchParams.get('v');
+          if (u.pathname.startsWith('/embed/')) return u.pathname.split('/')[2] || null;
+          if (u.pathname.startsWith('/shorts/')) return u.pathname.split('/')[2] || null;
+        }
+      } catch (e) { /* URL invalide : pas de miniature */ }
+      return null;
+    }
+
+    function faviconUrlFor(url) {
+      try {
+        const hostname = new URL(url).hostname;
+        return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=64`;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function thumbHtmlFor(url) {
+      const ytId = youtubeIdFor(url);
+      const imgSrc  = ytId ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` : faviconUrlFor(url);
+      const isFavicon = !ytId && !!imgSrc;
+      return `
+        <div class="ch-thumb-wrap">
+          <div class="ch-thumb${isFavicon ? ' ch-thumb--favicon' : ''}" style="${imgSrc ? '' : 'display:none'}">
+            ${imgSrc ? `<img src="${escHtml(imgSrc)}" alt="" onerror="this.closest('.ch-thumb').style.display='none'; this.closest('.ch-thumb-wrap').querySelector('.ch-thumb-fallback').style.display='flex';">` : ''}
+          </div>
+          <div class="ch-thumb-fallback" style="${imgSrc ? '' : 'display:flex'}">🔗</div>
+        </div>
+      `;
+    }
+
+    /* Complète automatiquement le protocole plutôt que de bloquer la
+       soumission (même pattern que "Liens de la classe"). */
+    function normalizeUrl(raw) {
+      const trimmed = raw.trim();
+      return /^https?:\/\//i.test(trimmed) ? trimmed : 'https://' + trimmed;
+    }
+
+    let _toastTimer;
+    function showToast(msg, type) {
+      clearTimeout(_toastTimer);
+      document.querySelector('.toast')?.remove();
+      const t       = document.createElement('div');
+      t.className   = 'toast' + (type === 'error' ? ' is-error' : '');
+      t.textContent = msg;
+      document.body.appendChild(t);
+      _toastTimer = setTimeout(() => t.remove(), 3000);
+    }
+
+    function renderList() {
+      const wrap = document.getElementById('ch-list');
+      if (!_links.length) {
+        wrap.innerHTML = '<div class="ch-empty">Aucun lien pour cette classe.</div>';
+        return;
+      }
+      wrap.innerHTML = `<div class="ch-list">${_links.map((l, i) => `
+        <div class="ch-item${l.id === _editingLinkId ? ' ch-item--editing' : ''}">
+          ${thumbHtmlFor(l.url)}
+          <div class="ch-item-body">
+            <div class="ch-item-title">${escHtml(l.title)}</div>
+            <div class="ch-item-url">${escHtml(l.url)}</div>
+            ${l.description ? `<div class="ch-item-desc">${escHtml(l.description)}</div>` : ''}
+          </div>
+          <div class="ch-item-actions">
+            <button type="button" class="btn btn-ghost btn-sm btn-icon" title="Monter" ${i === 0 ? 'disabled' : ''} data-move="-1" data-id="${l.id}">▲</button>
+            <button type="button" class="btn btn-ghost btn-sm btn-icon" title="Descendre" ${i === _links.length - 1 ? 'disabled' : ''} data-move="1" data-id="${l.id}">▼</button>
+            <button type="button" class="btn btn-ghost btn-sm btn-icon" title="Modifier" data-edit="${l.id}">✏️</button>
+            <button type="button" class="btn btn-danger btn-sm btn-icon" title="Supprimer" data-delete="${l.id}">🗑</button>
+          </div>
+        </div>
+      `).join('')}</div>`;
+
+      wrap.querySelectorAll('[data-move]').forEach(btn => {
+        btn.addEventListener('click', () => moveLink(btn.dataset.id, parseInt(btn.dataset.move, 10)));
+      });
+      wrap.querySelectorAll('[data-edit]').forEach(btn => {
+        btn.addEventListener('click', () => startEditLink(btn.dataset.edit));
+      });
+      wrap.querySelectorAll('[data-delete]').forEach(btn => {
+        btn.addEventListener('click', () => deleteLink(btn.dataset.delete));
+      });
+    }
+
+    async function loadLinks() {
+      document.getElementById('ch-list').innerHTML = '<div class="ch-empty">Chargement…</div>';
+      try {
+        _links = await lfmChoraleTeacher.getChoraleLinks(_currentClassId);
+        renderList();
+      } catch (err) {
+        document.getElementById('ch-list').innerHTML = `<div class="ch-empty">Erreur : ${escHtml(err.message)}</div>`;
+      }
+    }
+
+    function openForm() {
+      document.getElementById('ch-form-card').style.display = '';
+      document.getElementById('ch-title').focus();
+    }
+
+    function closeForm() {
+      _editingLinkId = null;
+      document.getElementById('ch-form-card').style.display = 'none';
+      document.getElementById('ch-form-title').textContent = 'Nouveau lien';
+      document.getElementById('ch-save-btn').textContent = '+ Ajouter le lien';
+      document.getElementById('ch-title').value = '';
+      document.getElementById('ch-url').value   = '';
+      document.getElementById('ch-desc').value  = '';
+      renderList();
+    }
+
+    function startEditLink(id) {
+      const l = _links.find(l => l.id === id);
+      if (!l) return;
+      _editingLinkId = id;
+      document.getElementById('ch-form-title').textContent = 'Modifier le lien';
+      document.getElementById('ch-title').value = l.title;
+      document.getElementById('ch-url').value   = l.url;
+      document.getElementById('ch-desc').value  = l.description || '';
+      document.getElementById('ch-save-btn').textContent = 'Enregistrer';
+      openForm();
+      renderList();
+    }
+
+    async function saveLink() {
+      const btn   = document.getElementById('ch-save-btn');
+      const title = document.getElementById('ch-title').value.trim();
+      const url   = document.getElementById('ch-url').value.trim();
+      const desc  = document.getElementById('ch-desc').value.trim();
+      if (!title || !url) {
+        showToast('Titre et URL sont obligatoires.', 'error');
+        return;
+      }
+      const normUrl = normalizeUrl(url);
+
+      btn.disabled = true;
+      try {
+        if (_editingLinkId) {
+          const updated = await lfmChoraleTeacher.updateLink(_editingLinkId, { title, url: normUrl, description: desc || null });
+          const idx = _links.findIndex(l => l.id === _editingLinkId);
+          if (idx !== -1) _links[idx] = updated;
+          showToast('Lien modifié');
+        } else {
+          const created = await lfmChoraleTeacher.createLink(_currentClassId, { title, url: normUrl, description: desc });
+          _links.push(created);
+          showToast('Lien ajouté');
+        }
+        closeForm();
+      } catch (err) {
+        showToast('Erreur : ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function moveLink(id, direction) {
+      const idx = _links.findIndex(l => l.id === id);
+      const swapIdx = idx + direction;
+      if (idx === -1 || swapIdx < 0 || swapIdx >= _links.length) return;
+      const a = _links[idx];
+      const b = _links[swapIdx];
+      try {
+        await lfmChoraleTeacher.swapPositions(a, b);
+        const posA = a.position, posB = b.position;
+        a.position = posB;
+        b.position = posA;
+        [_links[idx], _links[swapIdx]] = [_links[swapIdx], _links[idx]];
+        renderList();
+      } catch (err) {
+        showToast('Erreur : ' + err.message, 'error');
+      }
+    }
+
+    async function deleteLink(id) {
+      const l = _links.find(l => l.id === id);
+      if (!l) return;
+      if (!confirm(`Supprimer le lien « ${l.title} » ?`)) return;
+      try {
+        await lfmChoraleTeacher.deleteLink(id);
+        _links = _links.filter(l => l.id !== id);
+        if (_editingLinkId === id) closeForm();
+        renderList();
+        showToast('Lien supprimé');
+      } catch (err) {
+        showToast('Erreur : ' + err.message, 'error');
+      }
+    }
+
+    async function init() {
+      const profile = await lfmAuth.requireRole('enseignant');
+      if (!profile) return;
+
+      _classes = await lfmTeacher.getClasses();
+      const classSel = document.getElementById('ch-class-select');
+      if (_classes.length === 0) {
+        document.getElementById('ch-list').innerHTML = '<div class="ch-empty">Crée d\'abord une classe dans « Mes classes ».</div>';
+        return;
+      }
+      classSel.innerHTML = _classes.map(c => `<option value="${c.id}">${escHtml(c.name)} (${escHtml(c.level)})</option>`).join('');
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const classParam = urlParams.get('class');
+      _currentClassId = (classParam && _classes.some(c => c.id === classParam))
+        ? classParam
+        : _classes[0].id;
+      classSel.value = _currentClassId;
+
+      classSel.addEventListener('change', () => {
+        _currentClassId = classSel.value;
+        closeForm();
+        loadLinks();
+      });
+
+      document.getElementById('ch-new-btn').addEventListener('click', () => {
+        _editingLinkId = null;
+        document.getElementById('ch-form-title').textContent = 'Nouveau lien';
+        document.getElementById('ch-save-btn').textContent = '+ Ajouter le lien';
+        openForm();
+      });
+      document.getElementById('ch-cancel-btn').addEventListener('click', closeForm);
+      document.getElementById('ch-save-btn').addEventListener('click', saveLink);
+
+      loadLinks();
+    }
+
+    init();
+  </script>
+</body>
+</html>

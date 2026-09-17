@@ -212,9 +212,10 @@
       cursor: pointer;
     }
 
-    .dash-card-icon { width: 40px; height: 40px; }
+    .dash-card-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
     .dash-card-icon img { width: 100%; height: 100%; object-fit: contain; }
     .dash-card-icon svg { width: 100%; height: 100%; }
+    .dash-card-icon--placeholder { font-size: 26px; }
 
     .dash-card-title {
       font-weight: 700;
@@ -426,6 +427,17 @@
           </div>
           <div class="dash-card-title">Liens de la classe</div>
           <div class="dash-card-desc">Partagez des liens utiles (Pronote, Padlets, sites pédagogiques...) avec vos classes.</div>
+          <div class="dash-card-action">Gérer →</div>
+          <div class="dash-card-accent"></div>
+        </a>
+        <!-- Icône temporaire (emoji 🎵) : pas d'icône dédiée dans
+             assets/logos panneau de controle/ pour cette carte — à
+             remplacer par un logo du même style illustré (médaillon navy +
+             liseré or) que les autres dès qu'il sera fourni. -->
+        <a href="chorale-enseignant.html" class="dash-card dash-card--active">
+          <div class="dash-card-icon dash-card-icon--placeholder">🎵</div>
+          <div class="dash-card-title">Chorale</div>
+          <div class="dash-card-desc">Partagez des vidéos et liens utiles pour les répétitions de chorale.</div>
           <div class="dash-card-action">Gérer →</div>
           <div class="dash-card-accent"></div>
         </a>
