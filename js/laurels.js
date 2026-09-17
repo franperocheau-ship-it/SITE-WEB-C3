@@ -615,11 +615,20 @@ async function initLaurels(studentId) {
     .filter(e => e.state !== null)
     .sort((a, b) => a.firstMasteredAt - b.firstMasteredAt);
 
-  const notionMap = buildLaurelNotionMap();
-  const gradedNotions = buildLaurelGradedNotions();
   const totalLeaves = earnedList.length;
   const { current, next } = computeLaurelRank(totalLeaves);
   const isGolden = current.name === 'Laureatus';
+
+  /* Fiche élève enseignant (resultats-enseignant.html) : couronne + rang
+     seulement, pas de grille de badges de sous-domaine (jugée redondante
+     avec le bilan par compétences déjà présent sur cette page) — ni
+     calculée ni injectée dans le DOM pour ce contexte, voir
+     .laurel-context-teacher dans laurels.css. Le rendu par défaut côté
+     élève ("Mes résultats", dashboard-eleve.html) n'est pas concerné. */
+  const isTeacherContext = root.classList.contains('laurel-context-teacher');
+  const badgesHtml = isTeacherContext ? '' : renderLaurelBadges(
+    bySlug, buildLaurelNotionMap(), buildLaurelGradedNotions(), studentLevel, validatedNiveauBySlug
+  );
 
   root.innerHTML = `
     <div class="laurel-section">
@@ -627,7 +636,7 @@ async function initLaurels(studentId) {
       <div class="laurel-rank-block">
         ${renderLaurelRank(totalLeaves)}
       </div>
-      ${renderLaurelBadges(bySlug, notionMap, gradedNotions, studentLevel, validatedNiveauBySlug)}
+      ${badgesHtml}
     </div>`;
 
   requestAnimationFrame(() => {

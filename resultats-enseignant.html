@@ -36,8 +36,8 @@
   <script src="js/jogging-data.js?v=1"></script>
   <script src="js/jogging-teacher.js?v=1"></script>
   <script src="js/comprehensions-orales-teacher.js?v=2"></script>
-  <link rel="stylesheet" href="laurels.css?v=5">
-  <script src="js/laurels.js?v=8"></script>
+  <link rel="stylesheet" href="laurels.css?v=11">
+  <script src="js/laurels.js?v=9"></script>
   <link rel="stylesheet" href="resultats-nav.css?v=2">
   <script src="js/resultats-nav.js?v=4"></script>
   <style>
@@ -1675,7 +1675,26 @@
       console.warn('[LFM] getStudentStats :', e.message);
     }
 
-    initLaurels(s.auth_user_id).catch(e => console.warn('[LFM] initLaurels:', e.message));
+    /* Reformule "X feuilles · dont Y dorées" (texte par défaut de
+       js/laurels.js, partagé avec dashboard-eleve.html) en "X feuilles sur
+       20, dont Y dorées" pour la barre couronne/rang compacte de cette
+       page — même regex que le bloc équivalent de printStudentBilan(),
+       appliquée ici au DOM live plutôt qu'à un clone (voir ce fichier plus
+       bas). Aucun changement dans js/laurels.js : dashboard-eleve.html
+       garde le texte d'origine. */
+    initLaurels(s.auth_user_id).then(() => {
+      const breakdownEl = document.querySelector('#laurels-root .laurel-crown-wrap .laurel-leaf-breakdown');
+      if (breakdownEl) {
+        const totalMatch = breakdownEl.textContent.match(/(\d+)\s*feuille/);
+        const goldMatch  = breakdownEl.textContent.match(/dont\s*(\d+)\s*dorée/);
+        if (totalMatch) {
+          const total = totalMatch[1];
+          const goldTxt = goldMatch ? `, dont ${goldMatch[1]} dorée${goldMatch[1] > 1 ? 's' : ''}` : '';
+          breakdownEl.textContent = `${total} feuille${total > 1 ? 's' : ''} sur ${LAUREL_LEAVES_PER_CROWN}${goldTxt}`;
+        }
+      }
+      document.querySelector('#laurels-root .laurel-crown-svg text.laurel-crown-count')?.remove();
+    }).catch(e => console.warn('[LFM] initLaurels:', e.message));
     await renderStudentProfile(s.auth_user_id);
     renderStudentStats(stats, _studentProfile);
 
